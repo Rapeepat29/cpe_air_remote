@@ -4,6 +4,7 @@ import {
   decideAutoOff,
 } from '../utils/auto-off.js';
 import { evaluateClassSchedule } from '../utils/class-schedule.js';
+import { readActiveTermGate } from './academic-terms.js';
 import { ALERT_KINDS, raiseAlert, resolveOpenAlerts } from './alerts.js';
 import { onAirStatus, onOccupancyStatus, publishAirCommand } from './mqtt.js';
 import { isAutoOffEnabled } from './system-settings.js';
@@ -316,7 +317,9 @@ async function applyNotificationRules({ row, occupancy, schedule }) {
       roomNumber: row.room_number,
       deviceId: row.device_id,
       deviceName: row.name,
-      detail: schedule.configured ? 'noClassNow' : 'noScheduleAtAll',
+      detail: schedule.termStatus === 'before' || schedule.termStatus === 'after'
+        ? 'outsideTerm'
+        : schedule.configured ? 'noClassNow' : 'noScheduleAtAll',
     });
     return;
   }
@@ -335,7 +338,9 @@ async function readSchedule(roomNumber, now) {
       WHERE room_number = ?`,
     [roomNumber],
   );
-  return evaluateClassSchedule(rows, now);
+  // นอกวันเปิด-ปิดภาคเรียน ทุกห้องถือว่าอยู่นอกคาบ (ดู services/academic-terms.js)
+  const term = await readActiveTermGate();
+  return evaluateClassSchedule(rows, now, { term });
 }
 
 function parseState(value) {

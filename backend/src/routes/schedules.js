@@ -20,6 +20,12 @@ import {
   readTimetableInfo,
   recordTimetableImport,
 } from '../services/system-settings.js';
+import {
+  clearTermCache,
+  deleteTerm,
+  readCalendar,
+  upsertTerm,
+} from '../services/academic-terms.js';
 
 export const schedulesRouter = express.Router();
 
@@ -61,6 +67,34 @@ schedulesRouter.post(
         newRoomCount: newRooms.length,
       },
     });
+  }),
+);
+
+// ---------------------------------------------------------------- ปฏิทินภาคเรียน
+// ต้องประกาศก่อน /:id ไม่งั้น PUT /terms จะถูกจับเป็นแก้คาบเรียน id = "terms"
+
+schedulesRouter.get(
+  '/terms',
+  asyncHandler(async (request, response) => {
+    response.json(await readCalendar());
+  }),
+);
+
+schedulesRouter.put(
+  '/terms',
+  requireAdmin,
+  asyncHandler(async (request, response) => {
+    const term = await upsertTerm(request.body, request.authUser.username);
+    response.json({ term });
+  }),
+);
+
+schedulesRouter.delete(
+  '/terms',
+  requireAdmin,
+  asyncHandler(async (request, response) => {
+    await deleteTerm(request.query.semester);
+    response.status(204).end();
   }),
 );
 
@@ -127,6 +161,8 @@ schedulesRouter.post(
         connection,
       );
     });
+    // ภาคเรียนของตารางอาจเปลี่ยน วันเปิด-ปิดที่ใช้ตัดสินต้องอ่านใหม่
+    clearTermCache();
 
     response.status(201).json({
       result: {
@@ -227,6 +263,7 @@ schedulesRouter.delete(
       deletedCount = await deleteAllSchedules(connection);
       await clearTimetableInfo(connection);
     });
+    clearTermCache();
     response.json({
       result: {
         deletedCount,

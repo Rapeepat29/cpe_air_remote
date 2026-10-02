@@ -35,7 +35,11 @@ export function parseSchemaTables(sql) {
 
 export function parseColumns(body) {
   const columns = [];
-  for (const part of splitTopLevel(body)) {
+  // ตัดคอมเมนต์ "-- ..." ออกก่อน ไม่งั้นคอมเมนต์ที่อยู่เหนือคอลัมน์ใน schema.sql
+  // (เช่นใน air_conditioners) จะถูกอ่านเป็นคอลัมน์ชื่อ "--" แล้ว --fix สั่ง
+  // ALTER TABLE ที่ผิดไวยากรณ์ ทำให้ doctor ล้มทุกครั้งที่ deploy
+  const source = String(body ?? '').replace(/--[^\n]*/g, '');
+  for (const part of splitTopLevel(source)) {
     const definition = part.trim().replace(/\s+/g, ' ');
     if (!definition) continue;
 

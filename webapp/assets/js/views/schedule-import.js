@@ -25,7 +25,7 @@
 
 import { api } from '../api.js';
 import { el, replace, svg } from '../dom.js';
-import { DAY_NAMES, floorLabel } from '../format.js';
+import { DAY_NAMES, floorLabel, thaiShortDate } from '../format.js';
 import { uiIcons } from '../icons-ui.js';
 
 /** ตรงกับ express.raw({ limit: '8mb' }) ใน backend/src/routes/schedules.js */
@@ -67,6 +67,28 @@ export function openScheduleImport({ onImported = null, current = null } = {}) {
 
   const currentSchedules = current?.schedules ?? [];
   const currentSemester = current?.semester ?? '';
+  const terms = current?.terms ?? [];
+  const termOf = (semester) => terms.find((term) => term.semester === semester) ?? null;
+
+  /**
+   * เตือนเมื่อนำเข้าเทอมหน้าทั้งที่เทอมปัจจุบันยังเรียนอยู่
+   * ตารางมีได้ชุดเดียว ถ้านำเข้าตอนนี้ คาบของเทอมปัจจุบันจะหายไปก่อนปิดภาค
+   */
+  function termWarning(preview) {
+    const next = termOf(preview.semester);
+    const now = termOf(currentSemester);
+    if (!next || !now || next.semester === now.semester) return null;
+    if (next.status !== 'before' || now.status !== 'active') return null;
+    return el('div', { class: 'import-note warn' }, [
+      el('div', { class: 'note-title', text: `ภาคเรียน ${now.semester} ยังเปิดเรียนอยู่` }),
+      el('div', {
+        text:
+          `ไฟล์นี้เป็นภาคเรียน ${next.semester} ซึ่งเปิด ${thaiShortDate(next.startDate)} ` +
+          `ถ้านำเข้าตอนนี้ ตารางของ ${now.semester} (ถึง ${thaiShortDate(now.endDate)}) จะถูกแทนที่ ` +
+          'และทุกห้องจะถือว่าว่างจนถึงวันเปิดภาคใหม่ แนะนำให้นำเข้าหลังปิดภาค',
+      }),
+    ]);
+  }
 
   /** ห้องที่ตอนนี้มีตารางอยู่ แต่ไม่มีในไฟล์ที่กำลังนำเข้า พร้อมจำนวนคาบ */
   function roomsOutsideFile(preview) {
@@ -417,6 +439,7 @@ export function openScheduleImport({ onImported = null, current = null } = {}) {
         stat(warnings.length, 'ข้อสังเกต', warnings.length > 0 ? 'warn' : ''),
       ]),
       warnings.length > 0 ? warningNote(warnings) : null,
+      termWarning(preview),
       newRooms.length > 0
         ? el('div', { class: 'import-note info' }, [
             el('div', { class: 'note-title', text: `จะสร้างห้องใหม่ ${newRooms.length} ห้อง` }),
@@ -656,6 +679,14 @@ export function openScheduleImport({ onImported = null, current = null } = {}) {
           class: 'dim small-note',
           text: 'ระบบปิดแอร์อัตโนมัติใช้ตารางใหม่นี้ตัดสินว่า "ในคาบ" หรือ "นอกคาบ" ทันที',
         }),
+        result.semester && current?.terms && !termOf(result.semester)
+          ? el('p', {
+              class: 'small-note warn',
+              text:
+                `ภาคเรียน ${result.semester} ยังไม่ได้ตั้งวันเปิด–ปิด ระบบจะใช้ตารางนี้ทุกวัน ` +
+                'ตั้งได้ที่ "ปฏิทินภาคเรียน" ในหน้าตารางเรียน',
+            })
+          : null,
       ]),
     ]);
     replace(actions, [

@@ -267,6 +267,26 @@ CREATE TABLE IF NOT EXISTS system_settings (
     ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ปฏิทินภาคเรียน: วันเปิด-ปิดของแต่ละเทอม เช่น 1/2569
+--
+-- ตารางเรียนที่ใช้อยู่จะมีผลเฉพาะระหว่างวันเปิด-ปิดของภาคเรียนของมัน
+-- (ภาคเรียนดูจาก system_settings.timetable_semester) นอกช่วงนั้นระบบถือว่า
+-- ทุกห้องอยู่นอกคาบ ห้องว่างช่วงปิดภาคจึงถูกปิดแอร์เร็ว (5 นาที) และมีแจ้งเตือน
+-- โดยไม่ต้องลบตารางทิ้ง ภาคเรียนที่ไม่ได้ตั้งวันไว้ ใช้ตารางได้ทุกวันเหมือนเดิม
+CREATE TABLE IF NOT EXISTS academic_terms (
+  semester VARCHAR(30) NOT NULL,
+  start_date DATE NOT NULL,
+  end_date DATE NOT NULL,
+  updated_by VARCHAR(100) NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (semester),
+  KEY idx_academic_terms_dates (start_date, end_date)
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci;
+
 INSERT IGNORE INTO system_settings (setting_key, setting_value)
 VALUES ('auto_off_enabled', 'true');
 

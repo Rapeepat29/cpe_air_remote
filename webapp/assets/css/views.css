@@ -2041,3 +2041,98 @@ table.data td.wrap {
   line-height: 1.55;
   overflow-wrap: anywhere;
 }
+
+/* ================= ปฏิทินภาคเรียน ================= */
+.term-line {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  margin-top: 6px;
+  font-size: var(--fs-xs);
+  color: var(--text-mid);
+}
+
+.term-calendar {
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-md);
+  background: var(--panel);
+  box-shadow: var(--shadow-card);
+  margin-bottom: 16px;
+}
+
+.term-calendar > summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 11px 16px;
+  cursor: pointer;
+  list-style: none;
+  border-radius: var(--radius-md);
+}
+
+.term-calendar > summary::-webkit-details-marker {
+  display: none;
+}
+
+.term-calendar > summary::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid var(--text-mid);
+  border-bottom: 2px solid var(--text-mid);
+  transform: rotate(-45deg);
+  transition: transform 0.15s;
+  flex: none;
+}
+
+.term-calendar[open] > summary::before {
+  transform: rotate(45deg);
+}
+
+.term-calendar > summary:hover {
+  background: var(--panel-raised);
+}
+
+.term-summary-title {
+  font-weight: 700;
+  font-size: var(--fs-sm);
+}
+
+.term-body {
+  padding: 4px 16px 16px;
+}
+
+.term-body > p {
+  margin-bottom: 12px;
+  line-height: 1.65;
+}
+
+.term-table td {
+  vertical-align: middle;
+}
+
+.term-table td b {
+  margin-right: 8px;
+}
+
+.term-table tr.current-term td {
+  background-image: linear-gradient(var(--accent-soft), var(--accent-soft));
+}
+
+.term-actions {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.term-add {
+  margin-top: 12px;
+}
+
+@media (max-width: 620px) {
+  .term-summary-hint {
+    display: none;
+  }
+}

@@ -272,6 +272,11 @@ export const api = {
    * Backend รุ่นก่อนไม่มีช่อง timetable หน้าเว็บใช้ข้อนี้รู้ว่าทำ "เปลี่ยนภาคเรียน" ได้ไหม
    */
   schedulesWithInfo: (query) => get('/schedules', query),
+  /** ปฏิทินภาคเรียน { today, terms: [{ semester, startDate, endDate, status }] } */
+  academicTerms: () => get('/schedules/terms'),
+  saveAcademicTerm: (input) => put('/schedules/terms', input).then((r) => r.term),
+  deleteAcademicTerm: (semester) =>
+    request('DELETE', '/schedules/terms', { query: { semester } }),
   createSchedule: (input) => post('/schedules', input).then((r) => r.schedule),
   updateSchedule: (id, input) =>
     put(`/schedules/${encodeURIComponent(id)}`, input).then((r) => r.schedule),

@@ -10,6 +10,7 @@ import {
   retainedTopics,
 } from '../utils/mqtt-topics.js';
 import { evaluateClassSchedule } from '../utils/class-schedule.js';
+import { readActiveTermGate } from './academic-terms.js';
 import { normalizeOccupancyStatus } from '../utils/occupancy-sensor.js';
 import { hashSecret, safeHashEquals } from '../utils/security.js';
 import {
@@ -630,7 +631,9 @@ async function publishScheduleEvaluation(deviceId) {
       ORDER BY day_of_week, start_time`,
     [deviceRows[0].room_number],
   );
-  const evaluation = evaluateClassSchedule(schedules, new Date());
+  const evaluation = evaluateClassSchedule(schedules, new Date(), {
+    term: await readActiveTermGate(),
+  });
   await publish(
     `${config.mqtt.topicPrefix}/${deviceId}/schedule-status`,
     JSON.stringify({

@@ -14,6 +14,7 @@ import { uiIcons } from '../icons-ui.js';
 import { loaders, roomsByFloor, state } from '../store.js';
 import { confirmAction, openForm, toastError, toastOk } from '../ui.js';
 import { openScheduleImport, schedulesToCsv, downloadText } from './schedule-import.js';
+import { createTermCalendar, termStatusLine } from './term-calendar.js';
 
 let selectedDay = new Date().getDay();
 
@@ -36,10 +37,13 @@ export default {
     const note = el('div', { class: 'hidden-note' });
     const grid = el('div', { class: 'sched-grid' });
 
-    replace(root, [infoBar, dayTabs, floorTabs, toolbar, grid, note]);
+    const calendar = createTermCalendar({ onChanged: () => update() });
+
+    replace(root, [infoBar, calendar.element, dayTabs, floorTabs, toolbar, grid, note]);
 
     function update() {
       renderInfoBar();
+      calendar.render();
       const groups = roomsByFloor();
       if (
         selectedFloor !== ALL &&
@@ -234,6 +238,7 @@ export default {
         el('div', { class: 'grow' }, [
           el('div', { class: 'timetable-title', text: title }),
           el('div', { class: 'timetable-sub', text: details.join(' · ') }),
+          termStatusLine(semester, { onSetDates: (value) => calendar.setDatesFor(value) }),
         ]),
         el('div', { class: 'timetable-actions' }, [
           el(
@@ -282,7 +287,8 @@ export default {
           `ลบ ${count} คาบของ ${rooms} ห้อง${semester ? ` (ภาคเรียน ${semester})` : ''}\n\n` +
           'ข้อมูลไฟฟ้า ประวัติการแจ้งเตือน ห้อง และอุปกรณ์ ไม่ถูกลบ\n\n' +
           'ระหว่างที่ไม่มีตาราง ระบบถือว่าทุกห้องอยู่นอกคาบ: ห้องว่างเกิน 5 นาทีจะสั่งปิดแอร์ ' +
-          'และแจ้งเตือนเมื่อมีคนเปิดแอร์ใช้ — เหมาะกับช่วงปิดภาคเรียน\n\n' +
+          'และแจ้งเตือนเมื่อมีคนเปิดแอร์ใช้\n\n' +
+          'ถ้าตั้งวันเปิด–ปิดภาคเรียนไว้ในปฏิทินแล้ว ไม่ต้องล้างตารางตอนปิดภาค ระบบหยุดใช้ตารางเอง\n\n' +
           'ถ้ายังไม่ได้สำรอง กด "ยกเลิก" แล้วกด "ดาวน์โหลด CSV" ก่อน',
         confirmLabel: `ล้าง ${count} คาบ`,
         danger: true,
@@ -314,12 +320,14 @@ export default {
                 supportsReplaceAll: state.timetable !== undefined,
                 semester: state.timetable?.semester ?? '',
                 schedules: state.schedules,
+                terms: state.terms ?? [],
+                today: state.today,
               },
               onImported: async (result) => {
                 selectedFloor = ALL;
                 // ดึงห้องใหม่ด้วย: จำนวนคาบของแต่ละห้องเปลี่ยน และห้องที่ถูกสร้าง
                 // จากไฟล์ต้องขึ้นในแท็บชั้นและหน้าอื่นทันที
-                await Promise.all([loaders.schedules(), loaders.rooms()]);
+                await Promise.all([loaders.schedules(), loaders.rooms(), loaders.terms()]);
                 update();
               },
             }),
@@ -329,7 +337,7 @@ export default {
     }
 
     update();
-    await loaders.schedules();
+    await Promise.all([loaders.schedules(), loaders.terms()]);
     update();
 
     return { update };
