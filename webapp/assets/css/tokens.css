@@ -1,37 +1,140 @@
 /*
- * โทนสีและระยะห่างทั้งหมดของเว็บแอป
+ * โทนสี ขนาดตัวอักษร และระยะห่างทั้งหมดของเว็บแอป
  *
  * แยกไฟล์ไว้ต่างหากเพราะไฟล์นี้คือ "ภาษา" ของหน้าตา ถ้าจะเปลี่ยนธีมทั้งระบบ
- * ควรแก้ที่นี่ที่เดียว ไม่ใช่ไล่แก้ทีละหน้า ค่าทุกตัวตรงกับไฟล์ต้นแบบ
- * rmutt-save-energy-dashboard.html ที่ออกแบบไว้
+ * ควรแก้ที่นี่ที่เดียว ไม่ใช่ไล่แก้ทีละหน้า
+ *
+ * มีสองธีม: มืด (ค่าเริ่มต้น ตรงกับไฟล์ต้นแบบ rmutt-save-energy-dashboard.html)
+ * และสว่าง (สำหรับห้องที่แสงจ้าตอนกลางวัน) สลับได้จากปุ่มบนแถบบนหรือหน้าตั้งค่า
+ * ค่าที่ผู้ใช้เลือกถูกใส่เป็น data-theme บน <html> โดย prefs.js
+ *
+ * หลักการเรื่องสีตัวหนังสือ: ทุกระดับ (hi / mid / low) ต้องมีคอนทราสต์
+ * อย่างน้อย 4.5:1 กับพื้นการ์ด ตามเกณฑ์ WCAG AA — รุ่นก่อน text-low
+ * ได้แค่ 3:1 ทำให้หัวตาราง คำอธิบาย และเวลา อ่านยากมากบนจอจริง
  */
 :root {
+  color-scheme: dark;
+
   --bg: #060d09;
   --panel: #0e1b14;
-  --panel-raised: #132a1d;
-  --hairline: #1d3527;
-  --hairline-soft: #132a1d;
+  --panel-raised: #142a1e;
+  --panel-sunken: #0a1510;
+  --hairline: #22402f;
+  --hairline-soft: #183224;
   --accent: #3ecf8e;
-  --accent-dim: #1f6a48;
-  --accent-soft: rgba(62, 207, 142, 0.12);
+  --accent-strong: #3ecf8e;
+  --accent-dim: #26805a;
+  --accent-soft: rgba(62, 207, 142, 0.13);
+  --on-accent: #062012;
   --warn: #e8a33d;
-  --warn-soft: rgba(232, 163, 61, 0.12);
-  --danger: #e8695d;
-  --danger-soft: rgba(232, 105, 93, 0.13);
-  --info: #6aa9e8;
-  --info-soft: rgba(106, 169, 232, 0.13);
+  --warn-soft: rgba(232, 163, 61, 0.14);
+  --danger: #f07a6e;
+  --danger-soft: rgba(240, 122, 110, 0.14);
+  --info: #74b2ee;
+  --info-soft: rgba(116, 178, 238, 0.14);
+  --neutral-soft: rgba(163, 194, 176, 0.14);
   --text-hi: #eaf6ee;
-  --text-mid: #8fb39e;
-  --text-low: #4c6b5b;
+  --text-mid: #a3c2b0;
+  --text-low: #7a9888;
+
+  /* สีของช่องห้องใน Building Pulse ไล่จากพื้นการ์ดไปหาสีนี้ */
+  --heat: #3e8c5c;
+  --row-stripe: rgba(255, 255, 255, 0.025);
+  --row-hover: rgba(62, 207, 142, 0.07);
+  --topbar-bg: rgba(6, 13, 9, 0.88);
+  --overlay: rgba(4, 9, 6, 0.62);
+  --hero-tint: #0b1f15;
+  --shadow-drop: 0 18px 40px rgba(0, 0, 0, 0.45);
+  --shadow-card: none;
+  --focus-ring: 0 0 0 3px rgba(62, 207, 142, 0.35);
 
   --radius-lg: 16px;
   --radius-md: 12px;
   --radius-sm: 9px;
 
-  --font-body: 'Inter', 'Sarabun', 'Leelawadee UI', 'Tahoma', sans-serif;
-  --font-disp: 'Space Grotesk', 'Sarabun', 'Leelawadee UI', sans-serif;
-  --font-mono: 'IBM Plex Mono', 'Consolas', monospace;
+  /*
+   * ฟอนต์: ตัวละตินใช้ Inter ส่วนตัวไทยใช้ IBM Plex Sans Thai
+   * เพราะหัวตัวอักษรใหญ่และเส้นหนากว่า Sarabun อ่านง่ายกว่าที่ขนาดเล็กบนจอ
+   * (Inter ไม่มีอักษรไทย เบราว์เซอร์จึงหยิบตัวถัดไปมาใช้เฉพาะตัวไทยเอง)
+   * ถ้าโหลด Google Fonts ไม่ได้ จะถอยไปใช้ฟอนต์ไทยที่มีในเครื่อง
+   */
+  --font-thai: 'IBM Plex Sans Thai', 'Sarabun', 'Leelawadee UI', 'Tahoma',
+    'Noto Sans Thai', sans-serif;
+  --font-body: 'Inter', var(--font-thai);
+  --font-disp: 'Space Grotesk', var(--font-thai);
+  --font-mono: 'IBM Plex Mono', 'Consolas', var(--font-thai), monospace;
 
-  --sidebar-w: 236px;
-  --shadow-drop: 0 18px 40px rgba(0, 0, 0, 0.45);
+  /*
+   * ขนาดตัวอักษรทั้งระบบ คูณด้วย --text-scale ที่ผู้ใช้ปรับได้ในหน้าตั้งค่า
+   * (ปกติ / ใหญ่ / ใหญ่มาก) ทุกที่ในเว็บต้องใช้ค่าจากชุดนี้ ห้ามเขียน px เอง
+   * ตัวเล็กสุดคือ 12px — ภาษาไทยเล็กกว่านี้วรรณยุกต์จะชนกันจนอ่านไม่ออก
+   */
+  --text-scale: 1;
+  --fs-2xs: calc(12px * var(--text-scale));
+  --fs-xs: calc(12.5px * var(--text-scale));
+  --fs-sm: calc(13.5px * var(--text-scale));
+  --fs-base: calc(14.5px * var(--text-scale));
+  --fs-md: calc(15.5px * var(--text-scale));
+  --fs-lg: calc(17px * var(--text-scale));
+  --fs-xl: calc(20px * var(--text-scale));
+  --fs-2xl: calc(24px * var(--text-scale));
+  --lh-thai: 1.6;
+
+  --sidebar-w: 248px;
+  --content-max: 1680px;
+  --bottom-nav-h: 0px;
+  --tap: 40px;
+}
+
+/* ---------- ธีมสว่าง ---------- */
+:root[data-theme='light'] {
+  color-scheme: light;
+
+  --bg: #f2f5f3;
+  --panel: #ffffff;
+  --panel-raised: #edf2ef;
+  --panel-sunken: #f6f9f7;
+  --hairline: #d3dfd8;
+  --hairline-soft: #e4ebe7;
+  --accent: #0c7f4b;
+  --accent-strong: #0c7f4b;
+  --accent-dim: #8fcfb0;
+  --accent-soft: rgba(12, 127, 75, 0.1);
+  --on-accent: #ffffff;
+  --warn: #a35f00;
+  --warn-soft: rgba(214, 140, 20, 0.14);
+  --danger: #c0392b;
+  --danger-soft: rgba(192, 57, 43, 0.1);
+  --info: #2563a8;
+  --info-soft: rgba(37, 99, 168, 0.1);
+  --neutral-soft: rgba(65, 89, 76, 0.1);
+  --text-hi: #13251b;
+  --text-mid: #41594c;
+  --text-low: #587266;
+
+  --heat: #5cc896;
+  --row-stripe: rgba(19, 37, 27, 0.028);
+  --row-hover: rgba(12, 127, 75, 0.07);
+  --topbar-bg: rgba(242, 245, 243, 0.9);
+  --overlay: rgba(19, 37, 27, 0.42);
+  --hero-tint: #e6f4ec;
+  --shadow-drop: 0 18px 40px rgba(19, 37, 27, 0.18);
+  --shadow-card: 0 1px 2px rgba(19, 37, 27, 0.05);
+  --focus-ring: 0 0 0 3px rgba(12, 127, 75, 0.28);
+}
+
+/* ---------- ขนาดตัวอักษรที่ผู้ใช้เลือก ---------- */
+:root[data-text='large'] {
+  --text-scale: 1.1;
+}
+
+:root[data-text='xlarge'] {
+  --text-scale: 1.22;
+}
+
+/* จอสัมผัส: ปุ่มต้องใหญ่พอให้นิ้วกดโดนโดยไม่พลาดไปโดนปุ่มข้าง ๆ */
+@media (pointer: coarse) {
+  :root {
+    --tap: 44px;
+  }
 }

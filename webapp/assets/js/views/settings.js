@@ -10,6 +10,7 @@ import { api } from '../api.js';
 import { el, replace, svg, toggle } from '../dom.js';
 import { relativeTime, time } from '../format.js';
 import { icons } from '../icons.js';
+import { THEMES, TEXT_SIZES, prefs, setTextSize, setTheme } from '../prefs.js';
 import { loaders, refreshAll, state } from '../store.js';
 import { confirmAction, openForm, toastError, toastOk } from '../ui.js';
 
@@ -24,6 +25,7 @@ export default {
     function update() {
       const isAdmin = state.user?.role === 'admin';
       replace(box, [
+        displayCard(update),
         autoOffCard(isAdmin),
         profileCard(update),
         healthCard(),
@@ -35,6 +37,57 @@ export default {
     return { update };
   },
 };
+
+/**
+ * การแสดงผลของเครื่องนี้: ธีมและขนาดตัวอักษร
+ * อยู่บนสุดเพราะเป็นสิ่งเดียวในหน้านี้ที่ทุกคนเปลี่ยนได้และมีผลทันที
+ */
+function displayCard(onChanged) {
+  const segmented = (items, current, onPick) =>
+    el(
+      'div',
+      { class: 'segmented', role: 'group' },
+      items.map((item) =>
+        el('button', {
+          class: item.key === current ? 'sel' : '',
+          type: 'button',
+          text: item.label,
+          'aria-pressed': item.key === current ? 'true' : 'false',
+          onclick: () => {
+            onPick(item.key);
+            onChanged();
+          },
+        }),
+      ),
+    );
+
+  return el('div', { class: 'card', style: { marginBottom: '16px' } }, [
+    el('div', { class: 'panel-title' }, [
+      'การแสดงผล',
+      el('span', { class: 'count-badge', text: 'มีผลเฉพาะเครื่องนี้' }),
+    ]),
+    el('div', { class: 'pref-row' }, [
+      el('div', {}, [
+        el('div', { class: 'label', text: 'ธีมสี' }),
+        el('div', {
+          class: 'sub',
+          text: 'ธีมสว่างอ่านง่ายกว่าในห้องที่แสงจ้า ธีมมืดสบายตากว่าตอนกลางคืน',
+        }),
+      ]),
+      segmented(THEMES, prefs.theme, setTheme),
+    ]),
+    el('div', { class: 'pref-row' }, [
+      el('div', {}, [
+        el('div', { class: 'label', text: 'ขนาดตัวอักษร' }),
+        el('div', {
+          class: 'sub',
+          text: 'ขยายตัวหนังสือทั้งเว็บ ตารางและตัวเลขจะใหญ่ขึ้นตามกัน',
+        }),
+      ]),
+      segmented(TEXT_SIZES, prefs.textSize, setTextSize),
+    ]),
+  ]);
+}
 
 function autoOffCard(isAdmin) {
   const enabled = state.settings.autoOffEnabled;
@@ -105,7 +158,7 @@ function autoOffCard(isAdmin) {
     ]),
     el('div', {
       class: 'dim',
-      style: { fontSize: '11.5px', marginTop: '10px' },
+      style: { fontSize: 'var(--fs-xs)', marginTop: '10px' },
       text: `ตอนนี้มี ${counting} ห้องที่กำลังนับถอยหลังอยู่`,
     }),
   ]);
@@ -124,7 +177,7 @@ function profileCard(update) {
       ['เบอร์โทร', user.phone || '—'],
       ['สิทธิ์', user.role === 'admin' ? 'ผู้ดูแลระบบ' : 'เจ้าหน้าที่'],
     ].map(([label, value]) =>
-      el('div', { class: 'rate-example-row', style: { fontSize: '12.5px' } }, [
+      el('div', { class: 'rate-example-row', style: { fontSize: 'var(--fs-sm)' } }, [
         el('span', { class: 'muted', text: label }),
         el('span', { text: value }),
       ]),
@@ -253,7 +306,7 @@ function healthCard() {
         state.live.serverTime ? relativeTime(state.live.serverTime) : '—',
       ],
     ].map(([label, value]) =>
-      el('div', { class: 'rate-example-row', style: { fontSize: '12.5px' } }, [
+      el('div', { class: 'rate-example-row', style: { fontSize: 'var(--fs-sm)' } }, [
         el('span', { class: 'muted', text: label }),
         el('span', { text: value }),
       ]),
@@ -261,7 +314,7 @@ function healthCard() {
     Object.entries(state.errors).some(([, message]) => message)
       ? el('div', {
           class: 'bad',
-          style: { fontSize: '11.5px', marginTop: '10px', lineHeight: '1.7' },
+          style: { fontSize: 'var(--fs-xs)', marginTop: '10px', lineHeight: '1.7' },
           text:
             'โหลดข้อมูลบางส่วนไม่สำเร็จ: ' +
             Object.entries(state.errors)
@@ -278,7 +331,7 @@ function sessionCard(context) {
     el('div', { class: 'panel-title', text: 'ออกจากระบบ' }),
     el('div', {
       class: 'dim',
-      style: { fontSize: '12px', marginBottom: '12px', lineHeight: '1.7' },
+      style: { fontSize: 'var(--fs-xs)', marginBottom: '12px', lineHeight: '1.7' },
       text:
         'ออกจากระบบจะลบโทเคนออกจากเบราว์เซอร์เครื่องนี้เท่านั้น ' +
         'ไม่กระทบอุปกรณ์อื่นที่เข้าอยู่',

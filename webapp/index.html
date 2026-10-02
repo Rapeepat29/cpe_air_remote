@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="color-scheme" content="dark">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#060d09">
 <meta name="description" content="ระบบติดตามและควบคุมการใช้พลังงานของเครื่องปรับอากาศ อาคาร 16 มทร.ธัญบุรี">
 <title>RMUTT Save Energy — ระบบประหยัดพลังงาน อาคาร 16</title>
 
@@ -13,22 +14,27 @@
   ฟอนต์จาก Google Fonts เป็นของเสริมเท่านั้น
   ถ้าเครือข่ายเข้าไม่ถึง ตัวหนังสือจะถอยไปใช้ฟอนต์ไทยที่มีในเครื่อง
   (Sarabun / Leelawadee UI / Tahoma) ตามที่ประกาศไว้ใน tokens.css
+  ตัวไทยหลักคือ IBM Plex Sans Thai เพราะอ่านง่ายกว่าที่ขนาดเล็กบนจอ
 -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="assets/css/tokens.css">
-<link rel="stylesheet" href="assets/css/base.css">
-<link rel="stylesheet" href="assets/css/components.css">
-<link rel="stylesheet" href="assets/css/views.css">
+<!--
+  ?v= บังคับให้เบราว์เซอร์โหลด CSS ใหม่หลัง deploy (ไฟล์ใน /assets ถูกแคชหนึ่งชั่วโมง)
+  แก้หน้าตาเมื่อไร ให้เปลี่ยนเลขนี้ทั้งสี่บรรทัดและที่ main.js ด้านล่าง
+-->
+<link rel="stylesheet" href="assets/css/tokens.css?v=4.0">
+<link rel="stylesheet" href="assets/css/base.css?v=4.0">
+<link rel="stylesheet" href="assets/css/components.css?v=4.0">
+<link rel="stylesheet" href="assets/css/views.css?v=4.0">
 </head>
 <body>
 
 <div class="app" id="app" hidden>
 
   <!-- ================== แถบเมนูด้านข้าง ================== -->
-  <aside class="sidebar" id="sidebar">
+  <aside class="sidebar" id="sidebar" aria-label="เมนูหลัก">
     <div class="brand">
       <div class="brand-mark">
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -55,18 +61,18 @@
   <!-- ================== ส่วนเนื้อหา ================== -->
   <div class="main">
     <header class="topbar">
-      <div style="display:flex; align-items:center; gap:12px;">
+      <div class="topbar-left">
         <button class="menu-btn" id="menuBtn" type="button" aria-label="เปิดเมนู"></button>
         <div>
-          <div class="page-title" id="pageTitle">กำลังโหลด…</div>
+          <h1 class="page-title" id="pageTitle">กำลังโหลด…</h1>
           <div class="page-sub" id="pageSub"></div>
-          <div class="page-sub dim" id="todayLine" style="font-size:11.5px;"></div>
+          <div class="page-sub dim" id="todayLine"></div>
         </div>
       </div>
       <div class="topbar-right" id="topbarRight"></div>
     </header>
 
-    <section class="view active" id="viewRoot"></section>
+    <main class="view active" id="viewRoot"></main>
   </div>
 </div>
 
@@ -85,7 +91,7 @@
 </noscript>
 
 <!-- สคริปต์อยู่ในไฟล์แยก เพราะ Content-Security-Policy ไม่อนุญาตสคริปต์ในหน้า -->
-<script type="module" src="assets/js/main.js"></script>
+<script type="module" src="assets/js/main.js?v=4.0"></script>
 
 </body>
 </html>

@@ -8,13 +8,19 @@
 
 import { api } from '../api.js';
 import { el, replace, emptyState, svg } from '../dom.js';
-import { DAY_NAMES, DAY_NAMES_SHORT, floorLabel } from '../format.js';
+import { DAY_NAMES, floorLabel } from '../format.js';
 import { icons } from '../icons.js';
 import { loaders, roomsByFloor, state } from '../store.js';
 import { confirmAction, openForm, toastError, toastOk } from '../ui.js';
 
 let selectedDay = new Date().getDay();
-let selectedFloor = null;
+
+/**
+ * 'all' = ทุกชั้น แสดงเฉพาะห้องที่มีคาบในวันนั้น
+ * คำถามที่ถามบ่อยคือ "วันนี้ห้องไหนมีเรียนบ้าง" ไม่ใช่ "ชั้น 2 มีห้องอะไร"
+ */
+const ALL = 'all';
+let selectedFloor = ALL;
 
 export default {
   title: 'ตารางเรียน',
@@ -23,31 +29,33 @@ export default {
   async mount(root) {
     const dayTabs = el('div', { class: 'tabbar' });
     const floorTabs = el('div', { class: 'tabbar section-gap' });
-    const toolbar = el('div', {
-      class: 'row between',
-      style: { marginTop: '16px' },
-    });
+    const toolbar = el('div', { class: 'sched-toolbar' });
+    const note = el('div', { class: 'hidden-note' });
     const grid = el('div', { class: 'sched-grid' });
 
-    replace(root, [dayTabs, floorTabs, toolbar, grid]);
+    replace(root, [dayTabs, floorTabs, toolbar, grid, note]);
 
     function update() {
       const groups = roomsByFloor();
       if (
-        selectedFloor == null ||
+        selectedFloor !== ALL &&
         !groups.some((group) => group.floor === selectedFloor)
       ) {
-        selectedFloor = groups[0]?.floor ?? null;
+        selectedFloor = ALL;
       }
 
+      const todayIndex = new Date().getDay();
       replace(
         dayTabs,
         DAY_NAMES.map((name, index) =>
           el('button', {
-            class: `tab small${index === selectedDay ? ' active' : ''}`,
+            class:
+              `tab small${index === selectedDay ? ' active' : ''}` +
+              `${index === todayIndex ? ' today' : ''}`,
             type: 'button',
-            text: `${DAY_NAMES_SHORT[index]}.`,
-            title: `วัน${name}`,
+            text: name,
+            title: index === todayIndex ? `วัน${name} (วันนี้)` : `วัน${name}`,
+            'aria-pressed': index === selectedDay ? 'true' : 'false',
             onclick: () => {
               selectedDay = index;
               update();
@@ -56,23 +64,27 @@ export default {
         ),
       );
 
-      replace(
-        floorTabs,
-        groups.map((group) =>
-          el('button', {
-            class: `tab${group.floor === selectedFloor ? ' active' : ''}`,
-            type: 'button',
-            text: floorLabel(group.floor),
-            onclick: () => {
-              selectedFloor = group.floor;
-              update();
-            },
-          }),
-        ),
-      );
+      const floorTab = (key, label) =>
+        el('button', {
+          class: `tab${key === selectedFloor ? ' active' : ''}`,
+          type: 'button',
+          text: label,
+          'aria-pressed': key === selectedFloor ? 'true' : 'false',
+          onclick: () => {
+            selectedFloor = key;
+            update();
+          },
+        });
+      replace(floorTabs, [
+        floorTab(ALL, 'ทุกชั้น'),
+        ...groups.map((group) => floorTab(group.floor, floorLabel(group.floor))),
+      ]);
 
-      const rooms =
-        groups.find((group) => group.floor === selectedFloor)?.rooms ?? [];
+      const allRooms = groups.flatMap((group) => group.rooms);
+      const floorRooms =
+        selectedFloor === ALL
+          ? allRooms
+          : groups.find((group) => group.floor === selectedFloor)?.rooms ?? [];
       const today = new Date();
       const isToday = today.getDay() === selectedDay;
       const nowText =
@@ -90,9 +102,26 @@ export default {
         (sum, list) => sum + list.length,
         0,
       );
+      const floorRows = floorRooms.reduce(
+        (sum, room) => sum + (byRoom.get(room.roomNumber)?.length ?? 0),
+        0,
+      );
+
+      // ทุกชั้น: ซ่อนห้องที่ว่างทั้งวัน ไม่งั้นการ์ดว่าง ๆ 20 ใบจะดันห้องที่มีเรียนลงไปข้างล่าง
+      const rooms =
+        selectedFloor === ALL
+          ? floorRooms.filter((room) => byRoom.has(room.roomNumber))
+          : floorRooms;
+      const hiddenCount = floorRooms.length - rooms.length;
+
+      const summary =
+        selectedFloor === ALL
+          ? `วัน${DAY_NAMES[selectedDay]} · ทั้งอาคาร ${totalRows} คาบ ใน ${byRoom.size} ห้อง`
+          : `วัน${DAY_NAMES[selectedDay]} · ${floorLabel(selectedFloor)} ${floorRows} คาบ ` +
+            `(ทั้งอาคาร ${totalRows} คาบ)`;
 
       replace(toolbar, [
-        el('div', { class: 'pill', text: `วัน${DAY_NAMES[selectedDay]} · ${totalRows} คาบในชั้นนี้และชั้นอื่น` }),
+        el('div', { class: 'pill', text: summary }),
         state.user?.role === 'admin'
           ? el(
               'button',
@@ -106,8 +135,21 @@ export default {
           : null,
       ]);
 
+      note.textContent =
+        hiddenCount > 0
+          ? `ไม่แสดง ${hiddenCount} ห้องที่ไม่มีคาบเรียนในวันนี้ · เลือกชั้นด้านบนเพื่อดูทุกห้องของชั้นนั้น`
+          : '';
+      note.hidden = hiddenCount === 0;
+
       if (rooms.length === 0) {
-        replace(grid, emptyState('ยังไม่มีห้องในชั้นนี้'));
+        replace(
+          grid,
+          emptyState(
+            selectedFloor === ALL
+              ? `ไม่มีคาบเรียนในวัน${DAY_NAMES[selectedDay]}`
+              : 'ยังไม่มีห้องในชั้นนี้',
+          ),
+        );
         return;
       }
 
@@ -193,7 +235,6 @@ function iconAction(markup, title, onclick) {
     type: 'button',
     title,
     'aria-label': title,
-    style: { width: '26px', height: '26px' },
     onclick,
   });
   button.innerHTML = markup;

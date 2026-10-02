@@ -206,34 +206,71 @@ export function floorLabel(floorNumber) {
   return `ชั้น ${floor}`;
 }
 
+/**
+ * รหัสรายละเอียดที่ Backend ใส่มาในช่อง detail (ดู services/auto-off.js)
+ * เก็บเป็นรหัสเพื่อให้แปลได้หลายภาษา ถ้าเอาไปแสดงตรง ๆ ผู้ใช้จะเห็น
+ * "noScheduleAtAll" ซึ่งไม่มีความหมายอะไรสำหรับคนดูแลอาคาร
+ */
+const ALERT_DETAIL_TEXT = {
+  noClassNow: 'มีคนอยู่ในห้องและแอร์ทำงานอยู่ แต่ช่วงเวลานี้ไม่มีคาบเรียน',
+  noScheduleAtAll:
+    'มีคนอยู่ในห้องและแอร์ทำงานอยู่ แต่ห้องนี้ยังไม่มีตารางเรียนในระบบ',
+};
+
+/** ดึงจำนวนครั้งจากรายละเอียดรูปแบบ "attempts=3" ที่ระบบปิดอัตโนมัติใส่มา */
+function attemptsOf(alert) {
+  const match = /^attempts=(\d+)$/.exec(String(alert.detail ?? '').trim());
+  return match ? Number(match[1]) : null;
+}
+
+function alertDetail(alert, fallback) {
+  const detail = String(alert.detail ?? '').trim();
+  if (!detail || attemptsOf(alert) != null) return fallback;
+  return ALERT_DETAIL_TEXT[detail] ?? detail;
+}
+
 /** ข้อความอธิบายการแจ้งเตือนแต่ละชนิด ให้ตรงกับที่แอปมือถือใช้ */
 export function describeAlert(alert) {
   const room = alert.roomNumber ?? '—';
   const device = alert.deviceName || alert.deviceId || '';
   switch (alert.kind) {
-    case 'outside_schedule_occupied':
+    case 'outside_schedule_occupied': {
+      const body = alertDetail(
+        alert,
+        'มีคนอยู่ในห้องและแอร์ทำงานอยู่ แต่ช่วงเวลานี้ไม่มีคาบเรียน',
+      );
       return {
         title: `ห้อง ${room} ใช้แอร์นอกคาบเรียน`,
-        body:
-          alert.detail ||
-          'มีคนอยู่ในห้องและแอร์ทำงานอยู่ แต่ช่วงเวลานี้ไม่มีคาบเรียน',
+        body: device ? `${device} · ${body}` : body,
       };
-    case 'auto_off_succeeded':
+    }
+    case 'auto_off_succeeded': {
+      const attempts = attemptsOf(alert);
       return {
         title: `ปิดแอร์อัตโนมัติสำเร็จ · ห้อง ${room}`,
-        body: alert.detail || `${device} หยุดทำงานแล้วหลังจากห้องว่าง`,
+        body: alertDetail(
+          alert,
+          `${device} หยุดทำงานแล้วหลังจากห้องว่าง` +
+            (attempts ? ` (ส่งคำสั่ง ${attempts} ครั้ง)` : ''),
+        ),
       };
-    case 'auto_off_failed':
+    }
+    case 'auto_off_failed': {
+      const attempts = attemptsOf(alert);
       return {
         title: `สั่งปิดแอร์ไม่สำเร็จ · ห้อง ${room}`,
-        body:
-          alert.detail ||
-          `${device} ยังทำงานอยู่หลังส่งคำสั่งปิดครบจำนวนครั้งแล้ว`,
+        body: alertDetail(
+          alert,
+          attempts
+            ? `${device} ยังทำงานอยู่ แม้ส่งคำสั่งปิดครบ ${attempts} ครั้งแล้ว ควรไปตรวจที่ห้อง`
+            : `${device} ยังทำงานอยู่หลังส่งคำสั่งปิดครบจำนวนครั้งแล้ว`,
+        ),
       };
+    }
     default:
       return {
         title: `ห้อง ${room}`,
-        body: alert.detail || alert.kind,
+        body: alertDetail(alert, alert.kind),
       };
   }
 }
