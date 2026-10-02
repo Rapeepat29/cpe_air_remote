@@ -1,0 +1,70 @@
+# Build แอป iOS บนเครื่อง Mac ของ GitHub แล้วได้ไฟล์ .ipa ที่ยังไม่เซ็น
+#
+# ทำไมต้องมีไฟล์นี้: Apple ให้ build แอป iOS ได้บน macOS เท่านั้น
+# เครื่องพัฒนาเป็น Windows จึงยืม Mac ของ GitHub Actions มา build แทน
+# จากนั้นใช้ Sideloadly บน Windows เซ็นด้วย Apple ID ฟรีแล้วลง iPhone
+#
+# วิธีใช้: แท็บ Actions บน GitHub -> "Build iOS (IPA ไม่เซ็น)" -> Run workflow
+# เสร็จแล้วดาวน์โหลดจากหัวข้อ Artifacts ท้ายหน้าผลลัพธ์
+#
+# ตั้งให้รันเมื่อกดเองเท่านั้น เพราะเครื่อง macOS กินโควตานาทีฟรีมากกว่า Linux
+
+name: Build iOS (IPA ไม่เซ็น)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-ios:
+    runs-on: macos-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: ดึงโค้ด
+        uses: actions/checkout@v4
+
+      - name: ติดตั้ง Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: สร้างโฟลเดอร์ ios/ (ถ้ายังไม่มี)
+        run: |
+          # โปรเจกต์ไม่ได้เก็บ ios/ ไว้ใน git จึงสร้างใหม่บนเครื่อง build ทุกครั้ง
+          # --project-name ต้องระบุ เพราะชื่อ repo อาจมีขีด (-) ซึ่ง Dart ไม่รับ
+          # --org ตั้งให้ Bundle ID ใกล้เคียงกับ applicationId ของ Android
+          if [ ! -d ios ]; then
+            flutter create --platforms=ios --org th.ac.rmutt.cpe --project-name cpe_air_remote .
+          fi
+
+      - name: ตั้งค่า Info.plist
+        run: |
+          PLIST=ios/Runner/Info.plist
+          # ถ้าไม่มีข้อความขอสิทธิ์บลูทูธ iOS จะปิดแอปทันทีที่เริ่มสแกนหาบอร์ด
+          plutil -replace NSBluetoothAlwaysUsageDescription -string "ใช้บลูทูธเพื่อค้นหาและตั้งค่าบอร์ด ESP32 ที่ควบคุมแอร์และตรวจจับคนในห้อง" "$PLIST"
+          plutil -replace NSBluetoothPeripheralUsageDescription -string "ใช้บลูทูธเพื่อค้นหาและตั้งค่าบอร์ด ESP32 ที่ควบคุมแอร์และตรวจจับคนในห้อง" "$PLIST"
+          plutil -replace CFBundleDisplayName -string "RMUTT Energy" "$PLIST"
+          plutil -lint "$PLIST"
+
+      - name: ติดตั้งแพ็กเกจ
+        run: flutter pub get
+
+      - name: Build แอป iOS (ยังไม่เซ็น)
+        # ต้องเป็น release เพราะแอป debug บน iOS เปิดจากหน้าโฮมเองไม่ได้
+        run: flutter build ios --release --no-codesign
+
+      - name: แพ็กเป็นไฟล์ .ipa
+        run: |
+          VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}' | tr '+' '-')
+          mkdir -p dist/Payload
+          cp -R build/ios/iphoneos/Runner.app dist/Payload/
+          (cd dist && zip -qry "../RMUTT-Energy-${VERSION}-unsigned.ipa" Payload)
+          ls -lh *.ipa
+
+      - name: เก็บไฟล์ให้ดาวน์โหลด
+        uses: actions/upload-artifact@v4
+        with:
+          name: RMUTT-Energy-iOS
+          path: "*.ipa"
+          retention-days: 14

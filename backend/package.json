@@ -1,0 +1,45 @@
+{
+  "name": "rmutt-save-energy-api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Authentication and password reset API for RMUTT Save Energy.",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "db:init": "node scripts/init-db.js",
+    "db:doctor": "node scripts/doctor.js",
+    "db:migrate:username": "node scripts/migrate-user-primary-key.js",
+    "db:migrate:schedules": "node scripts/migrate-class-schedules.js",
+    "db:migrate:air": "node scripts/migrate-air-conditioners.js",
+    "db:migrate:pzem": "node scripts/migrate-pzem-v200.js",
+    "db:migrate:occupancy": "node scripts/migrate-occupancy-v210.js",
+    "db:migrate:rooms": "node scripts/migrate-rooms-v180.js",
+    "db:migrate:energy": "node scripts/migrate-energy-history-v370.js",
+    "db:migrate:autooff": "node scripts/migrate-auto-off-v380.js",
+    "db:migrate:settings": "node scripts/migrate-system-settings-v3100.js",
+    "schedules:convert": "node scripts/convert-schedule-file.js",
+    "seed:admin": "node scripts/seed-admin.js",
+    "migrate:legacy": "node scripts/migrate-legacy-user.js",
+    "test": "node --test",
+    "db:migrate:firmware": "node scripts/migrate-firmware-v3140.js",
+    "db:migrate:history": "node scripts/migrate-offline-history-v3150.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "express-rate-limit": "^7.5.0",
+    "fast-xml-parser": "^5.10.1",
+    "fflate": "^0.8.3",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mariadb": "^3.4.2",
+    "mqtt": "^5.15.2",
+    "nodemailer": "^9.0.3"
+  }
+}

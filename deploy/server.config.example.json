@@ -1,0 +1,7 @@
+{
+  "_comment": "คัดลอกเป็น server.config.json แล้วแก้ค่า (ไฟล์นั้นไม่ถูก commit และไม่ถูกอัปโหลด)",
+  "host": "energy.example.rmutt.ac.th",
+  "user": "rmutt",
+  "port": 22,
+  "domain": "energy.example.rmutt.ac.th"
+}

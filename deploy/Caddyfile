@@ -1,0 +1,54 @@
+{$DOMAIN} {
+	encode gzip
+
+	# หัวความปลอดภัยของทุกหน้า
+	#
+	# CSP: รันได้เฉพาะสคริปต์ที่เป็นไฟล์บนโดเมนนี้ ต่อ API ได้เฉพาะโดเมนนี้
+	# เว็บเก็บ token ไว้ใน localStorage ถ้ามีใครฝังสคริปต์แปลกปลอมได้
+	# ก็ขโมย token ได้ CSP คือด่านที่กันไว้อีกชั้น
+	# style ยอมให้ inline เพราะหน้าเว็บใช้ style="" ในบางจุด (ความเสี่ยงต่ำ)
+	# ฟอนต์จาก Google Fonts เป็นของเสริม ถ้าโดนบล็อกจะใช้ฟอนต์ในเครื่องแทน
+	header {
+		Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+		-Server
+	}
+
+	handle /api/* {
+		reverse_proxy backend:3000
+	}
+
+	# ไฟล์เฟิร์มแวร์สำหรับอัปเดต ESP32 ผ่าน Wi-Fi (OTA)
+	# วางไฟล์ .bin ไว้ที่ /opt/rmutt/firmware บนเซิร์ฟเวอร์
+	handle /firmware/* {
+		root * /srv
+		header Cache-Control "no-store"
+		file_server
+	}
+
+	handle {
+		root * /srv/www
+
+		# ไฟล์ในโฟลเดอร์ assets มีแต่ CSS/JS ที่เปลี่ยนพร้อมกับ index.html
+		# เก็บแคชไว้หนึ่งชั่วโมง พอให้เร็วขึ้นแต่ไม่ค้างข้ามการ deploy
+		@assets path /assets/*
+		header @assets Cache-Control "public, max-age=3600"
+
+		# ห้ามแคชหน้าเปลือก ไม่งั้นอัปเดตเว็บแล้วผู้ใช้ยังเห็นของเก่า
+		# จนกว่าจะกด Ctrl+F5 เอง ซึ่งไม่มีใครรู้ว่าต้องทำ
+		@html path / /index.html /status.html
+		header @html Cache-Control "no-cache"
+
+		file_server
+	}
+
+	log {
+		output file /data/access.log {
+			roll_size 10MiB
+			roll_keep 5
+		}
+	}
+}

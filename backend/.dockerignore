@@ -1,0 +1,13 @@
+# ไฟล์ที่ห้ามติดไปใน Docker image ของ Backend
+# (image ถูก build บนเซิร์ฟเวอร์ ถ้ามีไฟล์ความลับหลงไปในโฟลเดอร์ backend
+#  คำสั่ง COPY . . จะฝังมันลงใน image ถาวร)
+.env
+.env.*
+*.bak-*
+node_modules
+npm-debug.log*
+test
+coverage
+rmutt_excel_import_v170_build
+*.tmp
+*.log

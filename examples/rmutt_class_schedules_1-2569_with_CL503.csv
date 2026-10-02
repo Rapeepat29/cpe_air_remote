@@ -1,0 +1,152 @@
+﻿semester,room_code,day,start_time,end_time,subject,section,instructor,enabled
+1/2569,16103,SUN,10:00,13:00,Computer Programming,(P) 69446ETE,ผศ.ดร.ปอลิน กองสุวรรณ,true
+1/2569,16103,SUN,15:00,18:00,Computer Programming,(P) 69443MEE,ดร.พชร ศรีมุกข์,true
+1/2569,16103,SUN,18:00,21:00,Computer Programming,(P) 69442EPE,ผศ.สมรรถชัย จันทรัตน์,true
+1/2569,16103,MON,10:00,13:00,Computer Programming,(P) 69343RWE,ผศ.ดร.ธนสิน บุญนาม,true
+1/2569,16103,MON,15:00,18:00,Computer Programming,(P) 69344INE2,ผศ.พัฒณ์รพี สุนันทพจน์,true
+1/2569,16103,TUE,15:00,18:00,Computer Programming,(P) EN02,ผศ.เจษฎา อรุณฤกษ์,true
+1/2569,16103,WED,10:00,13:00,Computer Programming,(P) EN03,ผศ.ดร.ปอลิน กองสุวรรณ,true
+1/2569,16103,WED,15:00,18:00,Computer Programming,(P) EN04,อ.สิทธิ รักถนอม,true
+1/2569,16103,THU,10:00,13:00,Computer Programming,(P) EN09,รศ.ดร.พฤศยน นินทนาวงศา,true
+1/2569,16103,THU,15:00,18:00,Computer Programming,(P) EN06,ผศ.เจษฎา อรุณฤกษ์,true
+1/2569,16103,FRI,10:00,13:00,Computer Programming,(P) 69342EPE2,รศ.นชิรัตน์ ราชบุรี,true
+1/2569,16103,FRI,15:00,18:00,Computer Programming,(P) 69346ETE1,ผศ.สมรรถชัย จันทรัตน์,true
+1/2569,16103,SAT,10:00,13:00,Computer Programming,(P) 68441CVE,อ.มาโนช ประชา,true
+1/2569,16105,SUN,08:00,10:00,Computer Programming,(T) 69446ETE,ผศ.ดร.ปอลิน กองสุวรรณ,true
+1/2569,16105,SUN,13:00,15:00,Computer Programming,(T) 69443MEE,ดร.พชร ศรีมุกข์,true
+1/2569,16105,SUN,16:00,18:00,Computer Programming,(T) 69442EPE,ผศ.สมรรถชัย จันทรัตน์,true
+1/2569,16105,MON,08:00,10:00,Computer Programming,(T) 69343RWE,ผศ.ดร.ธนสิน บุญนาม,true
+1/2569,16105,MON,13:00,15:00,Computer Programming,(T) 69344INE2,ผศ.พัฒณ์รพี สุนันทพจน์,true
+1/2569,16105,TUE,13:00,15:00,Computer Programming,(T) EN02,ผศ.เจษฎา อรุณฤกษ์,true
+1/2569,16105,WED,08:00,10:00,Computer Programming,(T) EN03,ผศ.ดร.ปอลิน กองสุวรรณ,true
+1/2569,16105,WED,13:00,15:00,Computer Programming,(T) EN04,อ.สิทธิ รักถนอม,true
+1/2569,16105,THU,08:00,10:00,Computer Programming,(T) EN09,รศ.ดร.พฤศยน นินทนาวงศา,true
+1/2569,16105,THU,13:00,15:00,Computer Programming,(T) EN06,ผศ.เจษฎา อรุณฤกษ์,true
+1/2569,16105,FRI,08:00,10:00,Computer Programming,(T) 69342EPE2,รศ.นชิรัตน์ ราชบุรี,true
+1/2569,16105,FRI,13:00,15:00,Computer Programming,(T) 69346ETE1,ผศ.สมรรถชัย จันทรัตน์,true
+1/2569,16105,SAT,08:00,10:00,Computer Programming,(T) 68441CVE,อ.มาโนช ประชา,true
+1/2569,16202,MON,09:00,12:00,Operating System,(T) 68346CPE,ดร.พชร ศรีมุกข์,true
+1/2569,16202,MON,13:00,16:00,Computer Engineering Pre-Project,(P1) 67346CPE,อ.สิทธิ รักถนอม,true
+1/2569,16202,TUE,13:00,16:00,Operating Systems,(T) 67346CPE,ดร.พชร ศรีมุกข์,true
+1/2569,16202,WED,08:00,10:00,Data Structure and Algorithms,(T) 68146CPE1,รศ.นชิรัตน์ ราชบุรี,true
+1/2569,16202,WED,13:00,16:00,Theory of Computation,(T) 68146CPE1,อ.มาโนช ประชา,true
+1/2569,16202,THU,18:00,21:00,Software Engineering,(P2) 67146CPE1,ผศ.ดร.ปอลิน กองสุวรรณ,true
+1/2569,16202,FRI,13:00,15:00,Software Engineering,(T) 67146CPE2,ผศ.ดร.ปอลิน กองสุวรรณ,true
+1/2569,16202,FRI,15:00,18:00,Software Engineering,(P1) 67146CPE2,ผศ.ดร.ปอลิน กองสุวรรณ,true
+1/2569,16202,FRI,18:00,21:00,Software Engineering,(P2) 67146CPE2,ผศ.ดร.ปอลิน กองสุวรรณ,true
+1/2569,16203,TUE,08:00,10:00,Digital Circuit and Logic Design,(T) 68146CPE1,ผศ.ณัชติพงศ์ อูทอง,true
+1/2569,16203,TUE,10:00,13:00,Digital Circuit and Logic Design,(P1) 68146CPE1,ผศ.ณัชติพงศ์ อูทอง,true
+1/2569,16203,TUE,13:00,15:00,Digital Circuit and Logic Design,(T) 68146CPE2,ผศ.ณัชติพงศ์ อูทอง,true
+1/2569,16203,TUE,15:00,18:00,Digital Circuit and Logic Design,(P1) 68146CPE2,ผศ.ณัชติพงศ์ อูทอง,true
+1/2569,16203,TUE,18:00,21:00,Digital Circuit and Logic Design,(P2) 68146CPE2,ผศ.ณัชติพงศ์ อูทอง,true
+1/2569,16203,WED,08:00,10:00,Internet of Things,(T) 67146CPE2,ดร.พชร ศรีมุกข์,true
+1/2569,16203,WED,10:00,13:00,Internet of Things,(P1) 67146CPE2,ดร.พชร ศรีมุกข์,true
+1/2569,16203,WED,13:00,15:00,Internet of Things,(T) 67146CPE1,ดร.พชร ศรีมุกข์,true
+1/2569,16203,WED,15:00,18:00,Internet of Things,(P1) 67146CPE1,ดร.พชร ศรีมุกข์,true
+1/2569,16203,WED,18:00,21:00,Internet of Things,(P2) 67146CPE1,ดร.พชร ศรีมุกข์,true
+1/2569,16203,SAT,15:00,18:00,Internet of Things,(P2) 67146CPE2,ดร.พชร ศรีมุกข์,true
+1/2569,16204,SUN,18:00,21:00,Database System,(P2) 68346CPE,ผศ.พัฒณ์รพี สุนันทพจน์,true
+1/2569,16204,MON,09:00,12:00,Data Communication and Computer Networking,(T) 68146CPE1,รศ.ดร.พฤศยน นินทนาวงศา,true
+1/2569,16204,MON,13:00,15:00,Advanced Topics in Computer Network,(T) 66146CPE2,ผศ.ดร.นิสิต ภูครองตา,true
+1/2569,16204,MON,15:00,18:00,Advanced Topics in Computer Network,(P1) 66146CPE2,ผศ.ดร.นิสิต ภูครองตา,true
+1/2569,16204,MON,18:00,21:00,Advanced Topics in Computer Network,(P2) 66146CPE2,ผศ.ดร.นิสิต ภูครองตา,true
+1/2569,16204,TUE,09:00,12:00,Computer Security,(T) 66146CPE2,รศ.ดร.พฤศยน นินทนาวงศา,true
+1/2569,16204,TUE,15:00,17:00,Database System,(T) 68346CPE,ผศ.พัฒณ์รพี สุนันทพจน์,true
+1/2569,16204,TUE,17:00,20:00,Database System,(P1) 68346CPE,ผศ.พัฒณ์รพี สุนันทพจน์,true
+1/2569,16204,WED,09:00,12:00,Computer Network Laboratory,(P1) 67146CPE1,อ.วีระชัย แย้มวจี,true
+1/2569,16204,WED,13:00,15:00,TCP/IP Networks,(T) 68346CPE,อ.วีระชัย แย้มวจี,true
+1/2569,16204,WED,15:00,18:00,TCP/IP Networks,(P1) 68346CPE,อ.วีระชัย แย้มวจี,true
+1/2569,16204,WED,18:00,21:00,Computer Network Laboratory,(P2) 67146CPE2,อ.วีระชัย แย้มวจี,true
+1/2569,16204,THU,08:00,10:00,Computer and Information Technology Skills,(T) 68141EVE2,ผศ.ดร.ศิริชัย เตรียมล้ำเลิศ,true
+1/2569,16204,THU,10:00,12:00,Computer and Information Technology Skills,(P) 68141EVE2,ผศ.ดร.ศิริชัย เตรียมล้ำเลิศ,true
+1/2569,16204,THU,15:00,18:00,Object Oriented Software Engineering Laboratory,(P1) 67346CPE,ผศ.พัฒณ์รพี สุนันทพจน์,true
+1/2569,16204,THU,18:00,21:00,Object Oriented Software Engineering Laboratory,(P2) 67346CPE,ผศ.พัฒณ์รพี สุนันทพจน์,true
+1/2569,16204,FRI,09:00,12:00,Computer Network Laboratory,(P1) 67146CPE2,อ.วีระชัย แย้มวจี,true
+1/2569,16204,FRI,13:00,16:00,TCP/IP Networks,(T) 67146CPE1,อ.วีระชัย แย้มวจี,true
+1/2569,16204,FRI,18:00,21:00,TCP/IP Networks,(P2) 68346CPE,อ.วีระชัย แย้มวจี,true
+1/2569,16204,SAT,18:00,21:00,Computer Network Laboratory,(P2) 67146CPE1,อ.วีระชัย แย้มวจี,true
+1/2569,16207,MON,08:00,10:00,Mobile Device Programming for Digital Industry,(T) 67346CPE,อ.สิทธิ รักถนอม,true
+1/2569,16207,MON,10:00,13:00,Mobile Device Programming for Digital Industry,(P1) 67346CPE,อ.สิทธิ รักถนอม,true
+1/2569,16207,MON,13:00,16:00,Version Control Laboratory,(P1) 68146CPE2,ผศ.สมรรถชัย จันทรัตน์,true
+1/2569,16207,MON,18:00,21:00,Mobile Device Programming for Digital Industry,(P2) 67346CPE,อ.สิทธิ รักถนอม,true
+1/2569,16207,TUE,13:00,16:00,Version Control Laboratory,(P1) 68146CPE1,ผศ.สมรรถชัย จันทรัตน์,true
+1/2569,16207,TUE,16:00,19:00,Version Control Laboratory,(P2) 68146CPE1,ผศ.สมรรถชัย จันทรัตน์,true
+1/2569,16207,WED,10:00,13:00,Data Structure and Algorithms,(P1) 68146CPE1,รศ.นชิรัตน์ ราชบุรี,true
+1/2569,16207,WED,13:00,15:00,Data Structure and Algorithms,(T) 68146CPE2,รศ.นชิรัตน์ ราชบุรี,true
+1/2569,16207,WED,15:00,18:00,Data Structure and Algorithms,(P1) 68146CPE2,รศ.นชิรัตน์ ราชบุรี,true
+1/2569,16207,WED,18:00,21:00,Data Structure and Algorithms,(P2) 68146CPE1,รศ.นชิรัตน์ ราชบุรี,true
+1/2569,16207,THU,09:00,12:00,Python Programming Laboratory,(P1) 68146CPE2,ผศ.ดร.พิชยพัชยา ศรีคร้าม,true
+1/2569,16207,THU,13:00,15:00,Computer and Information Technology Skills,(T) 68141EVE1,ผศ.ดร.ศิริชัย เตรียมล้ำเลิศ,true
+1/2569,16207,THU,15:00,17:00,Computer and Information Technology Skills,(P) 68141EVE1,ผศ.ดร.ศิริชัย เตรียมล้ำเลิศ,true
+1/2569,16207,THU,18:00,21:00,Data Structure and Algorithms,(P2) 68146CPE2,รศ.นชิรัตน์ ราชบุรี,true
+1/2569,16207,FRI,09:00,12:00,Computer Software Laboratory,(P1) 67146CPE1,ผศ.ดร.พิชยพัชยา ศรีคร้าม,true
+1/2569,16207,FRI,13:00,16:00,Python Programming Laboratory,(P1) 68146CPE1,ผศ.ดร.พิชยพัชยา ศรีคร้าม,true
+1/2569,16207,FRI,16:00,19:00,Python Programming Laboratory,(P2) 68146CPE1,ผศ.ดร.พิชยพัชยา ศรีคร้าม,true
+1/2569,16207,SAT,08:00,11:00,Version Control Laboratory,(P2) 68146CPE2,ผศ.สมรรถชัย จันทรัตน์,true
+1/2569,16207,SAT,11:00,14:00,Python Programming Laboratory,(P2) 68146CPE2,ผศ.ดร.พิชยพัชยา ศรีคร้าม,true
+1/2569,16207,SAT,15:00,18:00,Computer Software Laboratory,(P2) 67146CPE1,ผศ.ดร.พิชยพัชยา ศรีคร้าม,true
+1/2569,16207,SAT,18:00,21:00,Server Programming,(P2) 67146CPE2,ผศ.เดชรัชต์ ใจถวิล,true
+1/2569,16303,MON,08:00,10:00,Electrical Circuits for Computer Engineering,(T) 68146CPE2,ผศ.ทินวัฒน์ จังจริง,true
+1/2569,16303,MON,10:00,13:00,Electrical Circuits for Computer Engineering,(P1) 68146CPE2,ผศ.ทินวัฒน์ จังจริง,true
+1/2569,16303,MON,18:00,21:00,Electrical Circuits for Computer Engineering,(P2) 68146CPE2,ผศ.ทินวัฒน์ จังจริง,true
+1/2569,16303,TUE,13:00,15:00,Electronics Circuits for Computer Engineering,(T) 69346CPE,ผศ.ดร.ธนสิน บุญนาม,true
+1/2569,16303,TUE,15:00,18:00,Electronics Circuits for Computer Engineering,(P1) 69346CPE,ผศ.ดร.ธนสิน บุญนาม,true
+1/2569,16303,TUE,18:00,21:00,Electronics Circuits for Computer Engineering,(P2) 69346CPE,ผศ.ดร.ธนสิน บุญนาม,true
+1/2569,16303,WED,08:00,10:00,Microcontroller and Interfacing,(T) 68346CPE,ผศ.สมรรถชัย จันทรัตน์,true
+1/2569,16303,WED,10:00,13:00,Microcontroller and Interfacing,(P1) 68346CPE,ผศ.สมรรถชัย จันทรัตน์,true
+1/2569,16303,WED,18:00,21:00,Microcontroller and Interfacing,(P2) 68346CPE,ผศ.สมรรถชัย จันทรัตน์,true
+1/2569,16303,THU,08:00,10:00,Electrical Circuits for Computer Engineering,(T) 68146CPE1,ผศ.ดร.วันเฉลิม ชั้นวัฒนพงศ์,true
+1/2569,16303,THU,10:00,13:00,Electrical Circuits for Computer Engineering,(P1) 68146CPE1,ผศ.ดร.วันเฉลิม ชั้นวัฒนพงศ์,true
+1/2569,16303,THU,18:00,21:00,Electrical Circuits for Computer Engineering,(P2) 68146CPE1,ผศ.ดร.วันเฉลิม ชั้นวัฒนพงศ์,true
+1/2569,16305,MON,18:00,21:00,Digital Circuit and Logic Design,(P2) 68146CPE1,ผศ.ณัชติพงศ์ อูทอง,true
+1/2569,16305,THU,13:00,14:00,Computer Engineering Project,(T) 66146CPE2,อ.สิทธิ รักถนอม,true
+1/2569,16305,THU,14:00,20:00,Computer Engineering Project,(P1) 66146CPE2,ผศ.ดร.ธนสิน บุญนาม,true
+1/2569,16305,SAT,08:00,14:00,Computer Engineering Project,(P2) 66146CPE2,ผศ.ดร.ธนสิน บุญนาม,true
+1/2569,16306,MON,08:00,10:00,Machine Learning,(T) 67146CPE1,ดร.อนุรักษ์ พรหมโคตร,true
+1/2569,16306,MON,10:00,13:00,Machine Learning,(P1) 67146CPE1,ดร.อนุรักษ์ พรหมโคตร,true
+1/2569,16306,MON,13:00,15:00,Machine Learning,(T) 67146CPE2,ดร.อนุรักษ์ พรหมโคตร,true
+1/2569,16306,MON,15:00,18:00,Machine Learning,(P1) 67146CPE2,ดร.อนุรักษ์ พรหมโคตร,true
+1/2569,16306,MON,18:00,21:00,Machine Learning,(P2) 67146CPE2,ดร.อนุรักษ์ พรหมโคตร,true
+1/2569,16306,TUE,13:00,15:00,Server Programming,(T) 67146CPE1,ผศ.เดชรัชต์ ใจถวิล,true
+1/2569,16306,TUE,15:00,18:00,Server Programming,(P1) 67146CPE1,ผศ.เดชรัชต์ ใจถวิล,true
+1/2569,16306,TUE,18:00,21:00,Server Programming,(P2) 67146CPE1,ผศ.เดชรัชต์ ใจถวิล,true
+1/2569,16306,WED,08:00,10:00,Advanced Topics in Computer Software,(T) 67346CPE,ดร.อนุรักษ์ พรหมโคตร,true
+1/2569,16306,WED,10:00,13:00,Advanced Topics in Computer Software,(P1) 67346CPE,ดร.อนุรักษ์ พรหมโคตร,true
+1/2569,16306,WED,13:00,15:00,Image and Audio Processing,(T) 67346CPE,ผศ.ดร.พิชยพัชยา ศรีคร้าม,true
+1/2569,16306,WED,15:00,18:00,Image and Audio Processing,(P1) 67346CPE,ผศ.ดร.พิชยพัชยา ศรีคร้าม,true
+1/2569,16306,WED,18:00,21:00,Image and Audio Processing,(P2) 67346CPE,ผศ.ดร.พิชยพัชยา ศรีคร้าม,true
+1/2569,16306,THU,08:00,10:00,Server Programming,(T) 67146CPE2,ผศ.เดชรัชต์ ใจถวิล,true
+1/2569,16306,THU,10:00,13:00,Server Programming,(P1) 67146CPE2,ผศ.เดชรัชต์ ใจถวิล,true
+1/2569,16306,THU,13:00,16:00,Computer Software Laboratory,(P1) 67146CPE2,ผศ.ดร.พิชยพัชยา ศรีคร้าม,true
+1/2569,16306,THU,16:00,19:00,Computer Software Laboratory,(P2) 67146CPE2,ผศ.ดร.พิชยพัชยา ศรีคร้าม,true
+1/2569,16306,FRI,08:00,10:00,Object-oriented Programming,(T) 68346CPE,ผศ.ดร.ศิริชัย เตรียมล้ำเลิศ,true
+1/2569,16306,FRI,10:00,13:00,Object-oriented Programming,(P1) 68346CPE,ผศ.ดร.ศิริชัย เตรียมล้ำเลิศ,true
+1/2569,16306,FRI,18:00,21:00,Machine Learning,(P2) 67146CPE1,ดร.อนุรักษ์ พรหมโคตร,true
+1/2569,16306,SAT,08:00,11:00,Object-oriented Programming,(P2) 68346CPE,ผศ.ดร.ศิริชัย เตรียมล้ำเลิศ,true
+1/2569,16306,SAT,18:00,21:00,Advanced Topics in Computer Software,(P2) 67346CPE,ดร.อนุรักษ์ พรหมโคตร,true
+1/2569,16307,MON,09:00,12:00,TCP/IP Networks,(T) 67146CPE2,อ.วีระชัย แย้มวจี,true
+1/2569,16307,MON,13:00,16:00,Theory of Computation,(T) 68346CPE,อ.มาโนช ประชา,true
+1/2569,16307,TUE,18:00,21:00,Computer Engineering Pre-Project,(P2) 67346CPE,อ.สิทธิ รักถนอม,true
+1/2569,16307,WED,09:00,12:00,Data Communication and Computer Networking,(T) 68146CPE2,รศ.ดร.พฤศยน นินทนาวงศา,true
+1/2569,16307,WED,13:00,15:00,Preparation for Professional Experience,(T) 66146CPE2,ผศ.ดร.ปอลิน กองสุวรรณ,true
+1/2569,16307,THU,08:00,10:00,Software Engineering,(T) 67146CPE1,ผศ.ดร.ปอลิน กองสุวรรณ,true
+1/2569,16307,THU,10:00,13:00,Software Engineering,(P1) 67146CPE1,ผศ.ดร.ปอลิน กองสุวรรณ,true
+1/2569,16307,THU,13:00,16:00,Theory of Computation,(T) 68146CPE2,อ.มาโนช ประชา,true
+1/2569,CL503,MON,08:00,10:00,Computer Programming,(T) 69344INE1,ผศ.สมรรถชัย จันทรัตน์,true
+1/2569,CL503,MON,10:00,13:00,Computer Programming,(P) 69344INE1,ผศ.สมรรถชัย จันทรัตน์,true
+1/2569,CL503,MON,13:00,15:00,Computer Programming,(T) EN10,ดร.พชร ศรีมุกข์,true
+1/2569,CL503,MON,15:00,18:00,Computer Programming,(P) EN10,ดร.พชร ศรีมุกข์,true
+1/2569,CL503,TUE,13:00,15:00,Computer Programming,(T) EN01,อ.สิทธิ รักถนอม,true
+1/2569,CL503,TUE,15:00,18:00,Computer Programming,(P) EN01,อ.สิทธิ รักถนอม,true
+1/2569,CL503,WED,08:00,10:00,Computer Programming,(T) 69444INE,ผศ.ดร.ศิริชัย เตรียมล้ำเลิศ,true
+1/2569,CL503,WED,10:00,13:00,Computer Programming,(P) 69444INE,ผศ.ดร.ศิริชัย เตรียมล้ำเลิศ,true
+1/2569,CL503,WED,13:00,15:00,Computer Programming,(T) EN08,ดร.อนุรักษ์ พรหมโคตร,true
+1/2569,CL503,WED,15:00,18:00,Computer Programming,(P) EN08,ดร.อนุรักษ์ พรหมโคตร,true
+1/2569,CL503,THU,08:00,10:00,Computer Programming,(T) 69346CPE,อ.มาโนช ประชา,true
+1/2569,CL503,THU,10:00,13:00,Computer Programming,(P) 69346CPE,อ.มาโนช ประชา,true
+1/2569,CL503,THU,13:00,15:00,Computer Programming,(T) EN07,รศ.นชิรัตน์ ราชบุรี,true
+1/2569,CL503,THU,15:00,18:00,Computer Programming,(P) EN07,รศ.นชิรัตน์ ราชบุรี,true
+1/2569,CL503,FRI,08:00,10:00,Computer Programming,(T) 69342EPE1,ผศ.เดชรัชต์ ใจถวิล,true
+1/2569,CL503,FRI,10:00,13:00,Computer Programming,(P) 69342EPE1,ผศ.เดชรัชต์ ใจถวิล,true
+1/2569,CL503,FRI,13:00,15:00,Computer Programming,(T) 69346ETE2,ผศ.เจษฎา อรุณฤกษ์,true
+1/2569,CL503,FRI,15:00,18:00,Computer Programming,(P) 69346ETE2,ผศ.เจษฎา อรุณฤกษ์,true

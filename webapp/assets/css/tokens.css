@@ -1,0 +1,37 @@
+/*
+ * โทนสีและระยะห่างทั้งหมดของเว็บแอป
+ *
+ * แยกไฟล์ไว้ต่างหากเพราะไฟล์นี้คือ "ภาษา" ของหน้าตา ถ้าจะเปลี่ยนธีมทั้งระบบ
+ * ควรแก้ที่นี่ที่เดียว ไม่ใช่ไล่แก้ทีละหน้า ค่าทุกตัวตรงกับไฟล์ต้นแบบ
+ * rmutt-save-energy-dashboard.html ที่ออกแบบไว้
+ */
+:root {
+  --bg: #060d09;
+  --panel: #0e1b14;
+  --panel-raised: #132a1d;
+  --hairline: #1d3527;
+  --hairline-soft: #132a1d;
+  --accent: #3ecf8e;
+  --accent-dim: #1f6a48;
+  --accent-soft: rgba(62, 207, 142, 0.12);
+  --warn: #e8a33d;
+  --warn-soft: rgba(232, 163, 61, 0.12);
+  --danger: #e8695d;
+  --danger-soft: rgba(232, 105, 93, 0.13);
+  --info: #6aa9e8;
+  --info-soft: rgba(106, 169, 232, 0.13);
+  --text-hi: #eaf6ee;
+  --text-mid: #8fb39e;
+  --text-low: #4c6b5b;
+
+  --radius-lg: 16px;
+  --radius-md: 12px;
+  --radius-sm: 9px;
+
+  --font-body: 'Inter', 'Sarabun', 'Leelawadee UI', 'Tahoma', sans-serif;
+  --font-disp: 'Space Grotesk', 'Sarabun', 'Leelawadee UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', 'Consolas', monospace;
+
+  --sidebar-w: 236px;
+  --shadow-drop: 0 18px 40px rgba(0, 0, 0, 0.45);
+}

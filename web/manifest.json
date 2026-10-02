@@ -1,0 +1,12 @@
+{
+  "name": "RMUTT Save Energy",
+  "short_name": "Save Energy",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#F3F8F4",
+  "theme_color": "#16834B",
+  "description": "Energy and air-conditioner control for Building 16.",
+  "orientation": "portrait-primary",
+  "prefer_related_applications": false,
+  "icons": []
+}

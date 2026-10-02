@@ -1,0 +1,165 @@
+class ScheduleImportEntry {
+  const ScheduleImportEntry({
+    required this.semester,
+    required this.roomNumber,
+    required this.dayOfWeek,
+    required this.subjectName,
+    required this.startTime,
+    required this.endTime,
+    required this.section,
+    required this.instructor,
+  });
+
+  final String semester;
+  final String roomNumber;
+  final int dayOfWeek;
+  final String subjectName;
+  final String startTime;
+  final String endTime;
+  final String section;
+  final String instructor;
+
+  factory ScheduleImportEntry.fromJson(Map<String, dynamic> json) {
+    return ScheduleImportEntry(
+      semester: json['semester'] as String? ?? '',
+      roomNumber: json['roomNumber'] as String? ?? '',
+      dayOfWeek: (json['dayOfWeek'] as num?)?.toInt() ?? 0,
+      subjectName: json['subjectName'] as String? ?? '',
+      startTime: json['startTime'] as String? ?? '',
+      endTime: json['endTime'] as String? ?? '',
+      section: json['section'] as String? ?? '',
+      instructor: json['instructor'] as String? ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'semester': semester,
+      'roomNumber': roomNumber,
+      'dayOfWeek': dayOfWeek,
+      'subjectName': subjectName,
+      'startTime': startTime,
+      'endTime': endTime,
+      'section': section,
+      'instructor': instructor,
+    };
+  }
+}
+
+class ScheduleImportRoom {
+  const ScheduleImportRoom({
+    required this.roomNumber,
+    required this.floorNumber,
+    required this.roomIndex,
+    required this.roomType,
+  });
+
+  final String roomNumber;
+  final int floorNumber;
+  final int roomIndex;
+  final String roomType;
+
+  factory ScheduleImportRoom.fromJson(Map<String, dynamic> json) {
+    return ScheduleImportRoom(
+      roomNumber: json['roomNumber'] as String? ?? '',
+      floorNumber: (json['floorNumber'] as num?)?.toInt() ?? 0,
+      roomIndex: (json['roomIndex'] as num?)?.toInt() ?? 0,
+      roomType: json['roomType'] as String? ?? 'Special',
+    );
+  }
+}
+
+class ScheduleImportPreview {
+  const ScheduleImportPreview({
+    required this.fileName,
+    required this.semester,
+    required this.schedules,
+    required this.roomNumbers,
+    required this.existingRoomNumbers,
+    required this.newRooms,
+    required this.warnings,
+    required this.skippedSheets,
+    required this.csv,
+  });
+
+  final String fileName;
+  final String semester;
+  final List<ScheduleImportEntry> schedules;
+  final List<String> roomNumbers;
+  final List<String> existingRoomNumbers;
+  final List<ScheduleImportRoom> newRooms;
+  final List<String> warnings;
+  final List<String> skippedSheets;
+  final String csv;
+
+  int get scheduleCount => schedules.length;
+
+  int get roomCount => roomNumbers.length;
+
+  int get newRoomCount => newRooms.length;
+
+  factory ScheduleImportPreview.fromJson(Map<String, dynamic> json) {
+    final schedules = json['schedules'];
+    final newRooms = json['newRooms'];
+    return ScheduleImportPreview(
+      fileName: json['fileName'] as String? ?? '',
+      semester: json['semester'] as String? ?? '',
+      schedules: schedules is List
+          ? schedules
+                .whereType<Map<String, dynamic>>()
+                .map(ScheduleImportEntry.fromJson)
+                .toList()
+          : const [],
+      roomNumbers: _strings(json['roomNumbers']),
+      existingRoomNumbers: _strings(json['existingRoomNumbers']),
+      newRooms: newRooms is List
+          ? newRooms
+                .whereType<Map<String, dynamic>>()
+                .map(ScheduleImportRoom.fromJson)
+                .toList()
+          : const [],
+      warnings: _strings(json['warnings']),
+      skippedSheets: _strings(json['skippedSheets']),
+      csv: json['csv'] as String? ?? '',
+    );
+  }
+
+  Map<String, dynamic> toCommitJson() {
+    return {
+      'createMissingRooms': newRooms.isNotEmpty,
+      'schedules': schedules.map((schedule) => schedule.toJson()).toList(),
+    };
+  }
+
+  static List<String> _strings(Object? value) {
+    return value is List ? value.whereType<String>().toList() : const [];
+  }
+}
+
+class ScheduleImportResult {
+  const ScheduleImportResult({
+    required this.importedCount,
+    required this.replacedRooms,
+    required this.createdRooms,
+  });
+
+  final int importedCount;
+  final List<String> replacedRooms;
+  final List<ScheduleImportRoom> createdRooms;
+
+  factory ScheduleImportResult.fromJson(Map<String, dynamic> json) {
+    final createdRooms = json['createdRooms'];
+    return ScheduleImportResult(
+      importedCount: (json['importedCount'] as num?)?.toInt() ?? 0,
+      replacedRooms: json['replacedRooms'] is List
+          ? (json['replacedRooms'] as List).whereType<String>().toList()
+          : const [],
+      createdRooms: createdRooms is List
+          ? createdRooms
+                .whereType<Map<String, dynamic>>()
+                .map(ScheduleImportRoom.fromJson)
+                .toList()
+          : const [],
+    );
+  }
+}

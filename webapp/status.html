@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>RMUTT Save Energy</title>
+<style>
+  :root {
+    --bg: #0d1911;
+    --panel: #14251b;
+    --line: #23402e;
+    --green: #22c55e;
+    --red: #ef4444;
+    --amber: #f59e0b;
+    --text: #e8f2ec;
+    --muted: #8fae9c;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: radial-gradient(circle at 20% 0%, #16301f 0%, var(--bg) 60%);
+    color: var(--text);
+    font-family: "Segoe UI", "Noto Sans Thai", system-ui, sans-serif;
+  }
+  .card {
+    width: 100%;
+    max-width: 520px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 28px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, .45);
+  }
+  .brand { display: flex; align-items: center; gap: 14px; }
+  .mark {
+    width: 46px; height: 46px; flex: none;
+    display: grid; place-items: center;
+    border-radius: 14px;
+    background: linear-gradient(140deg, #1f7a45, #34d27b);
+    font-size: 22px;
+  }
+  h1 { margin: 0; font-size: 20px; letter-spacing: .2px; }
+  .sub { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
+  .rows { margin: 24px 0 0; border-top: 1px solid var(--line); }
+  .row {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px; padding: 13px 2px;
+    border-bottom: 1px solid var(--line);
+    font-size: 14px;
+  }
+  .row span:first-child { color: var(--muted); }
+  .val { font-variant-numeric: tabular-nums; text-align: right; }
+  .pill {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 5px 11px; border-radius: 999px;
+    font-size: 12px; font-weight: 700;
+    background: rgba(255, 255, 255, .05);
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
+  .ok .dot { background: var(--green); box-shadow: 0 0 10px var(--green); }
+  .ok { color: var(--green); }
+  .bad .dot { background: var(--red); }
+  .bad { color: var(--red); }
+  .wait .dot { background: var(--amber); }
+  .wait { color: var(--amber); }
+  footer {
+    margin-top: 22px; color: var(--muted);
+    font-size: 12px; display: flex; justify-content: space-between;
+  }
+  code {
+    background: rgba(255, 255, 255, .06);
+    padding: 2px 7px; border-radius: 6px; font-size: 12px;
+  }
+</style>
+</head>
+<body>
+  <main class="card">
+    <div class="brand">
+      <div class="mark">❄</div>
+      <div>
+        <h1>RMUTT Save Energy</h1>
+        <p class="sub">ระบบควบคุมเครื่องปรับอากาศอาคาร 16</p>
+      </div>
+    </div>
+
+    <div class="rows">
+      <div class="row">
+        <span>API</span>
+        <span class="pill wait" id="api"><i class="dot"></i>กำลังตรวจสอบ</span>
+      </div>
+      <div class="row">
+        <span>MQTT Broker</span>
+        <span class="pill wait" id="mqtt"><i class="dot"></i>กำลังตรวจสอบ</span>
+      </div>
+      <div class="row">
+        <span>Topic</span>
+        <span class="val" id="topic">—</span>
+      </div>
+      <div class="row">
+        <span>ตรวจสอบล่าสุด</span>
+        <span class="val" id="time">—</span>
+      </div>
+    </div>
+
+    <footer>
+      <span>เข้าใช้งานผ่านแอปบนมือถือ</span>
+      <code>/api/health</code>
+    </footer>
+  </main>
+
+<script src="assets/js/status.js"></script>
+</body>
+</html>

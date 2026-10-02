@@ -1,0 +1,49 @@
+# Flutter/Dart
+.dart_tool/
+.packages
+.pub/
+build/
+coverage/
+pubspec.lock
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Platform generated files
+android/.gradle/
+android/local.properties
+ios/Pods/
+macos/Pods/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local MQTT broker credentials and runtime data
+mqtt/.env
+mqtt/config/passwords
+mqtt/config/acl
+mqtt/data/*
+!mqtt/data/.gitkeep
+mqtt/log/*
+!mqtt/log/.gitkeep
+
+# ค่าเซิร์ฟเวอร์และความลับของการ deploy (ห้าม commit)
+deploy/server.config.json
+deploy/.env
+deploy/.env.*
+!deploy/.env.example
+backend/.env.*
+!backend/.env.example
+
+# กุญแจเซ็น APK (หายแล้วอัปเดตแอปทับของเดิมไม่ได้ เก็บสำรองไว้นอก git)
+android/key.properties
+*.jks
+*.keystore
+
+# ไฟล์สำรองและแพตช์ชั่วคราว
+*.bak-*
+_patch/
+_to_delete/
