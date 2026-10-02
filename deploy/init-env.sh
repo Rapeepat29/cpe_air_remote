@@ -23,9 +23,22 @@ fi
 
 secret() { openssl rand -base64 64 | tr -dc 'A-Za-z0-9' | head -c "${1:-40}"; }
 
-DOMAIN_DEFAULT="$(grep -E '^DOMAIN=' .env.example | cut -d= -f2)"
+# upload.ps1 ไม่ส่งไฟล์ .env* ขึ้นเซิร์ฟเวอร์ .env.example จึงอาจไม่มี
+# (ถ้าไม่มี grep จะ error แล้ว set -e ทำให้สคริปต์หยุดเงียบ ๆ)
+DOMAIN_DEFAULT="$(grep -E '^DOMAIN=' .env.example 2>/dev/null | cut -d= -f2 || true)"
+DOMAIN_DEFAULT="${DOMAIN_DEFAULT:-rmutt-energy.duckdns.org}"
 read -r -p "โดเมนของเซิร์ฟเวอร์ [$DOMAIN_DEFAULT]: " DOMAIN
 DOMAIN="${DOMAIN:-$DOMAIN_DEFAULT}"
+
+DUCKDNS_TOKEN=""
+case "$DOMAIN" in
+  *.duckdns.org)
+    echo "ใช้ DuckDNS: ต้องใช้ token จากหน้า https://www.duckdns.org (บรรทัด token)"
+    while [ -z "$DUCKDNS_TOKEN" ]; do
+      read -r -p "  DuckDNS token: " DUCKDNS_TOKEN
+    done
+    ;;
+esac
 
 read -r -s -p "รหัสผ่านแอดมินตัวแรกของแอป (อย่างน้อย 8 ตัว): " ADMIN_PASSWORD
 echo ""
@@ -62,6 +75,7 @@ MQTT_DEVICE_SECRET="$(secret 48)"
 
 cat > .env <<EOF
 DOMAIN=$DOMAIN
+DUCKDNS_TOKEN=$DUCKDNS_TOKEN
 
 DB_DATABASE=rmutt_save_energy
 DB_ROOT_PASSWORD=$DB_ROOT_PASSWORD

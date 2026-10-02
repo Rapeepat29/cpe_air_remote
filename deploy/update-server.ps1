@@ -17,10 +17,10 @@ $projectDirectory = Split-Path -Parent $deployDirectory
 $backendDirectory = Join-Path $projectDirectory 'backend'
 $webDirectory = Join-Path $projectDirectory 'webapp'
 . (Join-Path $PSScriptRoot 'ServerConfig.ps1')
-$server = Get-RmuttServer -HostOverride $Server -UserOverride $User
-$target = $server.Target
-$sshArgs = $server.SshArgs
-$scpArgs = $server.ScpArgs
+$srv = Get-RmuttServer -HostOverride $Server -UserOverride $User
+$target = $srv.Target
+$sshArgs = $srv.SshArgs
+$scpArgs = $srv.ScpArgs
 
 function Write-Step {
   param([string]$Text)
@@ -55,7 +55,7 @@ if (-not $SkipUpload) {
   if ($LASTEXITCODE -ne 0) {
     Write-Host ''
     Write-Host 'ถ้าขึ้นว่าไม่มีโฟลเดอร์ ให้สร้างก่อนด้วย:' -ForegroundColor Yellow
-    Write-Host "  ssh -p $($server.Port) $target 'mkdir -p /opt/rmutt/backend'"
+    Write-Host "  ssh -p $($srv.Port) $target 'mkdir -p /opt/rmutt/backend'"
     throw 'อัปโหลด backend ไม่สำเร็จ'
   }
 
@@ -70,7 +70,7 @@ if (-not $SkipUpload) {
   # ไฟล์ตั้งค่าและสคริปต์ดูแลระบบอาจมีการแก้ ส่งไปด้วยทุกครั้ง
   # (ไม่ส่ง mosquitto.conf เพราะ init-env.sh ปรับ path ของ plugin ไว้บนเครื่องนั้น)
   $deployFiles = @(
-    'Caddyfile', 'docker-compose.yml', 'backend.Dockerfile',
+    'Caddyfile', 'docker-compose.yml', 'backend.Dockerfile', 'caddy.Dockerfile', 'tailscale-serve.json',
     'sync-mqtt-cert.sh', 'backup-db.sh', 'fix-mqtt-permissions.sh', 'db-view.sh'
   ) | ForEach-Object { Join-Path $deployDirectory $_ } |
     Where-Object { Test-Path -LiteralPath $_ }
@@ -114,7 +114,7 @@ ssh @sshArgs $target $remoteCommand
 if ($LASTEXITCODE -ne 0) {
   Write-Host ''
   Write-Host 'อัปเดตไม่สำเร็จ ดู log ด้วยคำสั่งนี้:' -ForegroundColor Red
-  Write-Host "  ssh -p $($server.Port) $target 'cd /opt/rmutt && docker compose logs --tail 80 backend'"
+  Write-Host "  ssh -p $($srv.Port) $target 'cd /opt/rmutt && docker compose logs --tail 80 backend'"
   throw 'ขั้นตอนบนเซิร์ฟเวอร์ล้มเหลว'
 }
 
@@ -122,9 +122,9 @@ Write-Host ''
 Write-Host '===== เซิร์ฟเวอร์อัปเดตแล้ว =====' -ForegroundColor Green
 Write-Host ''
 Write-Host 'เปิดใช้งาน' -ForegroundColor Cyan
-Write-Host "  เว็บแอป   https://$($server.Domain)/"
-Write-Host "  หน้าสถานะ https://$($server.Domain)/status.html"
-Write-Host "  API       https://$($server.Domain)/api/health"
+Write-Host "  เว็บแอป   https://$($srv.Domain)/"
+Write-Host "  หน้าสถานะ https://$($srv.Domain)/status.html"
+Write-Host "  API       https://$($srv.Domain)/api/health"
 Write-Host ''
 Write-Host 'ขั้นถัดไป' -ForegroundColor Cyan
 Write-Host '  1. .\build-apk.ps1        สร้าง APK ตัวใหม่ลงมือถือ'

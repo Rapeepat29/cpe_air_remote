@@ -17,7 +17,21 @@ echo "โดเมน: $DOMAIN"
 
 # ระบบเก่าใช้บัญชี MQTT เดียวทุกบอร์ด (ไฟล์ passwords) ระบบใหม่ใช้
 # Dynamic Security ถ้ายังไม่มีไฟล์บัญชี Mosquitto จะไม่ยอมให้ใครต่อเลย
-if [ ! -f mosquitto/data/dynamic-security.json ]; then
+# โฟลเดอร์ mosquitto/data เป็นของ uid 1883 สิทธิ์ 700 ผู้ใช้ทั่วไปมองไม่เห็นไฟล์ข้างใน
+# [ -f ] ตรง ๆ จึงตอบว่าไม่มีเสมอ ทั้งที่มีอยู่จริง ให้ถามผ่าน container mqtt หรือ sudo แทน
+dynsec_exists() {
+  local f=mosquitto/data/dynamic-security.json
+  [ -f "$f" ] && return 0
+  docker exec rmutt-mqtt test -f /mosquitto/data/dynamic-security.json 2>/dev/null && return 0
+  sudo -n test -f "$f" 2>/dev/null && return 0
+  # อ่านโฟลเดอร์ไม่ได้และตรวจทางอื่นไม่ได้ อย่าสรุปว่าไม่มี
+  if [ -d mosquitto/data ] && [ ! -x mosquitto/data ]; then
+    echo 'เตือน: ตรวจ dynamic-security.json ไม่ได้ (ไม่มีสิทธิ์อ่าน mosquitto/data) ข้ามการตรวจ'
+    return 0
+  fi
+  return 1
+}
+if ! dynsec_exists; then
   fail 'ยังไม่มี mosquitto/data/dynamic-security.json ให้รัน: sudo bash init-env.sh'
 fi
 if ! grep -q '^MQTT_DEVICE_SECRET=.\+' .env; then
