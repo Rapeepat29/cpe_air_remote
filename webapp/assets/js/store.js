@@ -29,6 +29,11 @@ const initialState = {
   summary: null,
   summaryQuery: { period: 'week', floor: null },
   schedules: [],
+  /**
+   * ภาคเรียนของตารางที่ใช้อยู่ { semester, importedBy, importedAt }
+   * null = ยังไม่เคยนำเข้าจากไฟล์, undefined = Backend รุ่นเก่าที่ยังไม่รองรับ
+   */
+  timetable: undefined,
   users: [],
   metricCatalog: null,
   loading: {},
@@ -183,9 +188,13 @@ export const loaders = {
   },
 
   async schedules(query) {
-    const result = await load('schedules', () => api.schedules(query));
+    // เผื่อเบราว์เซอร์ยังถือ api.js ตัวเก่าในแคช (ช่วงหนึ่งชั่วโมงหลัง deploy)
+    const fetchSchedules = api.schedulesWithInfo
+      ?? ((q) => api.schedules(q).then((schedules) => ({ schedules })));
+    const result = await load('schedules', () => fetchSchedules(query));
     if (result) {
-      state.schedules = result;
+      state.schedules = result.schedules ?? [];
+      state.timetable = 'timetable' in result ? result.timetable : undefined;
       emit();
     }
     return state.schedules;

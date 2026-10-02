@@ -267,6 +267,11 @@ export const api = {
 
   // ------------------------------------------------------------- ตารางเรียน
   schedules: (query) => get('/schedules', query).then((r) => r.schedules),
+  /**
+   * ตารางเรียนพร้อมข้อมูลภาคเรียนที่ใช้อยู่ ({ schedules, timetable })
+   * Backend รุ่นก่อนไม่มีช่อง timetable หน้าเว็บใช้ข้อนี้รู้ว่าทำ "เปลี่ยนภาคเรียน" ได้ไหม
+   */
+  schedulesWithInfo: (query) => get('/schedules', query),
   createSchedule: (input) => post('/schedules', input).then((r) => r.schedule),
   updateSchedule: (id, input) =>
     put(`/schedules/${encodeURIComponent(id)}`, input).then((r) => r.schedule),
@@ -287,10 +292,15 @@ export const api = {
         'X-File-Name': encodeURIComponent(file.name),
       },
     }).then((r) => r.preview),
-  /** บันทึกตารางจากผลตรวจ แทนที่ตารางเดิมเฉพาะห้องที่อยู่ในไฟล์ */
-  commitScheduleImport: (preview) =>
+  /**
+   * บันทึกตารางจากผลตรวจ
+   * ปกติแทนที่ตารางเดิมเฉพาะห้องที่อยู่ในไฟล์ ส่ง replaceAll: true เมื่อเปลี่ยน
+   * ภาคเรียน เพื่อล้างตารางเดิมของทุกห้องก่อน (ทำใน transaction เดียวกัน)
+   */
+  commitScheduleImport: (preview, { replaceAll = false } = {}) =>
     post('/schedules/import/commit', {
       createMissingRooms: (preview.newRooms ?? []).length > 0,
+      replaceAll: replaceAll === true,
       schedules: preview.schedules,
     }).then((r) => r.result),
 

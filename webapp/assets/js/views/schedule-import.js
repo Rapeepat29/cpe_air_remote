@@ -16,6 +16,11 @@
  *
  * ขั้นยืนยันวางไว้ในกล่องเดียวกัน ไม่เปิดกล่องยืนยันซ้อนอีกชั้น
  * เพราะกด Esc แล้วกล่องซ้อนจะปิดพร้อมกันทั้งสองชั้น
+ *
+ * เรื่องเปลี่ยนภาคเรียน: ไฟล์ของเทอมใหม่มักไม่มีชีตของห้องที่เทอมนี้ไม่มีเรียน
+ * ถ้านำเข้าแบบ "แทนที่เฉพาะห้องในไฟล์" ห้องพวกนั้นจะค้างตารางเทอมเก่า และระบบปิด
+ * แอร์อัตโนมัติจะคิดว่ายังมีคาบ (รอ 15 นาทีแทน 5 และไม่แจ้งเตือน) จึงให้เลือก
+ * ชัด ๆ ว่าจะ "ล้างตารางเดิมทุกห้อง" หรือไม่ เมื่อมีห้องแบบนั้นอยู่จริง
  */
 
 import { api } from '../api.js';
@@ -54,9 +59,44 @@ const STEPS = ['เลือกไฟล์', 'ตรวจตัวอย่า
  * @param {{ onImported?: (result: object) => (void|Promise<void>) }} options
  *   onImported ถูกเรียกหลังบันทึกสำเร็จ ให้หน้าที่เปิดไว้ดึงตารางใหม่
  */
-export function openScheduleImport({ onImported = null } = {}) {
+export function openScheduleImport({ onImported = null, current = null } = {}) {
   let busy = false;
   let closed = false;
+  /** 'rooms' = แทนที่เฉพาะห้องในไฟล์, 'all' = ล้างทุกห้อง (เปลี่ยนภาคเรียน), null = ยังไม่เลือก */
+  let mode = 'rooms';
+
+  const currentSchedules = current?.schedules ?? [];
+  const currentSemester = current?.semester ?? '';
+
+  /** ห้องที่ตอนนี้มีตารางอยู่ แต่ไม่มีในไฟล์ที่กำลังนำเข้า พร้อมจำนวนคาบ */
+  function roomsOutsideFile(preview) {
+    const inFile = new Set(preview.roomNumbers ?? []);
+    const counts = new Map();
+    for (const row of currentSchedules) {
+      if (inFile.has(row.roomNumber)) continue;
+      counts.set(row.roomNumber, (counts.get(row.roomNumber) ?? 0) + 1);
+    }
+    return [...counts.entries()]
+      .map(([roomNumber, count]) => ({ roomNumber, count }))
+      .sort((a, b) => a.roomNumber.localeCompare(b.roomNumber));
+  }
+
+  function needsModeChoice(preview) {
+    return current?.supportsReplaceAll === true && roomsOutsideFile(preview).length > 0;
+  }
+
+  /**
+   * ค่าเริ่มต้นของวิธีนำเข้า
+   * ภาคเรียนในไฟล์ต่างจากในระบบ = น่าจะเปลี่ยนเทอม เลือก "ล้างทุกห้อง" ไว้ให้
+   * ภาคเรียนเดียวกัน = แก้บางห้อง, ไม่รู้ภาคเรียนฝั่งใดฝั่งหนึ่ง = ให้ผู้ใช้เลือกเอง
+   */
+  function defaultMode(preview) {
+    if (!needsModeChoice(preview)) return 'rooms';
+    if (preview.semester && currentSemester) {
+      return preview.semester === currentSemester ? 'rooms' : 'all';
+    }
+    return null;
+  }
 
   const overlay = el('div', { class: 'modal-overlay' });
   const modal = el('div', {
@@ -243,6 +283,7 @@ export function openScheduleImport({ onImported = null } = {}) {
     renderReading(file);
     try {
       const preview = await api.previewScheduleImport(file);
+      mode = defaultMode(preview);
       if (!closed) renderPreview(preview);
     } catch (error) {
       if (!closed) renderPick(error.message);
@@ -345,6 +386,12 @@ export function openScheduleImport({ onImported = null } = {}) {
       );
     }
 
+    const primaryButton = el('button', {
+      class: 'btn btn-primary',
+      type: 'button',
+      onclick: () => renderConfirm(preview),
+    });
+
     const stat = (value, label, tone = '') =>
       el('div', { class: `import-stat${tone ? ` ${tone}` : ''}` }, [
         el('b', { text: String(value) }),
@@ -392,9 +439,12 @@ export function openScheduleImport({ onImported = null } = {}) {
               { class: 'import-rooms' },
               replacedRooms.map((room) => el('span', { class: 'count-badge', text: room })),
             ),
-            el('div', { class: 'dim small-note', text: 'ห้องที่ไม่อยู่ในไฟล์จะไม่ถูกแตะ' }),
+            needsModeChoice(preview)
+              ? null
+              : el('div', { class: 'dim small-note', text: 'ห้องที่ไม่อยู่ในไฟล์จะไม่ถูกแตะ' }),
           ])
         : null,
+      needsModeChoice(preview) ? modeChooser(preview, () => paintPrimary()) : null,
       el('div', { class: 'import-table-head' }, [
         el('div', { class: 'row', style: { gap: '8px' } }, [
           el('b', { class: 'small-note', text: 'ตัวอย่างรายการ' }),
@@ -429,14 +479,89 @@ export function openScheduleImport({ onImported = null } = {}) {
         [svg(uiIcons.sheet(15)), 'บันทึก CSV'],
       ),
       el('span', { class: 'actions-spacer' }),
-      el('button', {
-        class: 'btn btn-primary',
-        type: 'button',
-        disabled: schedules.length === 0,
-        text: `นำเข้า ${preview.scheduleCount} รายการ`,
-        onclick: () => renderConfirm(preview),
-      }),
+      primaryButton,
     ]);
+    paintPrimary();
+
+    function paintPrimary() {
+      primaryButton.disabled = schedules.length === 0 || mode == null;
+      primaryButton.textContent =
+        mode == null
+          ? 'เลือกวิธีนำเข้าด้านบนก่อน'
+          : mode === 'all'
+            ? `เปลี่ยนภาคเรียน · นำเข้า ${preview.scheduleCount} รายการ`
+            : `นำเข้า ${preview.scheduleCount} รายการ`;
+    }
+  }
+
+  /**
+   * ตัวเลือกว่าห้องที่มีตารางอยู่แต่ไม่อยู่ในไฟล์ จะเก็บตารางเดิมไว้หรือล้างทิ้ง
+   * ใช้ radio จริง (ไม่ใช่ปุ่มหน้าตาเหมือน radio) กด Tab และลูกศรเลือกได้
+   */
+  function modeChooser(preview, onChange) {
+    const outside = roomsOutsideFile(preview);
+    const outsideClasses = outside.reduce((sum, room) => sum + room.count, 0);
+    const sample = outside.slice(0, 8).map((room) => room.roomNumber).join(', ') +
+      (outside.length > 8 ? ` และอีก ${outside.length - 8} ห้อง` : '');
+    const semesterDiffers =
+      preview.semester && currentSemester && preview.semester !== currentSemester;
+
+    const option = (value, title, detail) => {
+      const input = el('input', {
+        type: 'radio',
+        name: 'importMode',
+        value,
+        checked: mode === value,
+        onchange: () => {
+          mode = value;
+          for (const card of box.querySelectorAll('.mode-option')) {
+            card.classList.toggle('sel', card.dataset.value === value);
+          }
+          onChange();
+        },
+      });
+      return el(
+        'label',
+        { class: `mode-option${mode === value ? ' sel' : ''}`, dataset: { value } },
+        [
+          input,
+          el('span', { class: 'mode-text' }, [
+            el('b', { text: title }),
+            el('span', { text: detail }),
+          ]),
+        ],
+      );
+    };
+
+    const box = el('fieldset', { class: 'import-mode' }, [
+      el('legend', {
+        text: `อีก ${outside.length} ห้องมีตารางอยู่ในระบบแต่ไม่อยู่ในไฟล์นี้ ให้ทำอย่างไร?`,
+      }),
+      semesterDiffers
+        ? el('div', {
+            class: 'mode-hint',
+            text:
+              `ไฟล์นี้เป็นภาคเรียน ${preview.semester} แต่ตารางในระบบเป็น ${currentSemester} ` +
+              'จึงเลือก "เปลี่ยนภาคเรียน" ไว้ให้',
+          })
+        : !preview.semester || !currentSemester
+          ? el('div', {
+              class: 'mode-hint',
+              text: 'ระบบไม่รู้ว่าไฟล์นี้เป็นภาคเรียนเดียวกับตารางที่ใช้อยู่หรือไม่ กรุณาเลือก',
+            })
+          : null,
+      option(
+        'all',
+        'เปลี่ยนภาคเรียน — ล้างตารางเดิมของทุกห้อง',
+        `${sample} จะไม่มีคาบเรียนเหลือ (${outsideClasses} คาบ) · ใช้ตอนขึ้นภาคเรียนใหม่`,
+      ),
+      option(
+        'rooms',
+        'เก็บตารางเดิมของห้องเหล่านั้นไว้',
+        `แทนที่เฉพาะ ${preview.roomCount} ห้องที่อยู่ในไฟล์ · ใช้เมื่อแก้ตารางบางห้องระหว่างภาคเรียน`,
+      ),
+    ]);
+    return box;
   }
 
   // --------------------------------------------------------------- 3. ยืนยัน
@@ -448,10 +573,19 @@ export function openScheduleImport({ onImported = null } = {}) {
     const parts = [];
     if (replaced > 0) parts.push(`แทนที่ตารางเดิมของ ${replaced} ห้อง`);
     if (newRooms.length > 0) parts.push(`สร้างห้องใหม่ ${newRooms.length} ห้อง`);
-    const message =
+    let message =
       `นำเข้า ${preview.scheduleCount} รายการให้ ${preview.roomCount} ห้อง` +
       (parts.length > 0 ? ` (${parts.join(' และ')})` : '') +
       ' ยืนยันไหม?';
+    if (mode === 'all') {
+      const rooms = new Set(currentSchedules.map((row) => row.roomNumber)).size;
+      message =
+        `เปลี่ยนเป็นตาราง${preview.semester ? `ภาคเรียน ${preview.semester}` : 'ชุดใหม่'}: ` +
+        `ล้างตารางเดิมทุกห้อง (${currentSchedules.length} คาบ ใน ${rooms} ห้อง) ` +
+        `แล้วนำเข้า ${preview.scheduleCount} รายการให้ ${preview.roomCount} ห้อง` +
+        (newRooms.length > 0 ? ` และสร้างห้องใหม่ ${newRooms.length} ห้อง` : '') +
+        ' ยืนยันไหม?';
+    }
 
     const confirmButton = el('button', {
       class: 'btn btn-primary',
@@ -484,7 +618,9 @@ export function openScheduleImport({ onImported = null } = {}) {
     closeButton.disabled = true;
     confirmButton.textContent = 'กำลังนำเข้า…';
     try {
-      const result = await api.commitScheduleImport(preview);
+      const result = await api.commitScheduleImport(preview, {
+        replaceAll: mode === 'all',
+      });
       busy = false;
       closeButton.disabled = false;
       renderDone(result);
@@ -509,6 +645,13 @@ export function openScheduleImport({ onImported = null } = {}) {
             `นำเข้า ${result.importedCount} รายการ สำหรับ ${result.replacedRooms?.length ?? 0} ห้อง` +
             (created.length > 0 ? ` · สร้างห้องใหม่ ${created.length} ห้อง` : ''),
         }),
+        result.replacedAll
+          ? el('p', {
+              text:
+                `ล้างตารางเดิมของทุกห้องแล้ว (${result.removedCount ?? 0} คาบ)` +
+                (result.semester ? ` · ตอนนี้ใช้ตารางภาคเรียน ${result.semester}` : ''),
+            })
+          : null,
         el('p', {
           class: 'dim small-note',
           text: 'ระบบปิดแอร์อัตโนมัติใช้ตารางใหม่นี้ตัดสินว่า "ในคาบ" หรือ "นอกคาบ" ทันที',
@@ -564,8 +707,45 @@ function baseName(fileName) {
   return String(fileName ?? 'ตารางเรียน').replace(/\.[^.]+$/, '') || 'ตารางเรียน';
 }
 
-/** ให้เบราว์เซอร์บันทึกข้อความเป็นไฟล์ (ใช้กับ CSV ที่ Backend แปลงมาให้แล้ว) */
-function downloadText(text, fileName, type) {
+const DAY_CODES = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+
+/**
+ * ตารางเรียนเป็น CSV รูปแบบเดียวกับที่ Backend ส่งออก (schedulesToCsv ใน
+ * backend/src/utils/schedule-import.js) จึงนำกลับเข้ามาด้วยปุ่มนำเข้าได้ทันที
+ * ใช้สำรองตารางที่ใช้อยู่ก่อนล้างหรือเปลี่ยนภาคเรียน
+ */
+export function schedulesToCsv(schedules, semester = '') {
+  const header = [
+    'semester',
+    'room_code',
+    'day',
+    'start_time',
+    'end_time',
+    'subject',
+    'section',
+    'instructor',
+    'enabled',
+  ];
+  const rows = [...schedules].sort(compareSchedules).map((row) => [
+    semester,
+    row.roomNumber,
+    DAY_CODES[row.dayOfWeek] ?? '',
+    row.startTime,
+    row.endTime,
+    row.subjectName,
+    row.section ?? '',
+    row.instructor ?? '',
+    'true',
+  ]);
+  const escape = (value) => {
+    const text = String(value ?? '');
+    return /[",\r\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+  };
+  return '\uFEFF' + [header, ...rows].map((row) => row.map(escape).join(',')).join('\r\n') + '\r\n';
+}
+
+/** ให้เบราว์เซอร์บันทึกข้อความเป็นไฟล์ (ใช้กับ CSV) */
+export function downloadText(text, fileName, type) {
   const url = URL.createObjectURL(new Blob([text], { type }));
   const link = el('a', { href: url, download: fileName });
   document.body.appendChild(link);

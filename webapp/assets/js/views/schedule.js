@@ -8,12 +8,12 @@
 
 import { api } from '../api.js';
 import { el, replace, emptyState, svg } from '../dom.js';
-import { DAY_NAMES, floorLabel } from '../format.js';
+import { DAY_NAMES, floorLabel, isoDate, thaiShortDate } from '../format.js';
 import { icons } from '../icons.js';
 import { uiIcons } from '../icons-ui.js';
 import { loaders, roomsByFloor, state } from '../store.js';
 import { confirmAction, openForm, toastError, toastOk } from '../ui.js';
-import { openScheduleImport } from './schedule-import.js';
+import { openScheduleImport, schedulesToCsv, downloadText } from './schedule-import.js';
 
 let selectedDay = new Date().getDay();
 
@@ -29,15 +29,17 @@ export default {
   subtitle: 'ตารางการใช้ห้องตามคาบเรียน ใช้กำหนดจังหวะปิดแอร์อัตโนมัติ',
 
   async mount(root) {
+    const infoBar = el('div', { class: 'timetable-bar' });
     const dayTabs = el('div', { class: 'tabbar' });
     const floorTabs = el('div', { class: 'tabbar section-gap' });
     const toolbar = el('div', { class: 'sched-toolbar' });
     const note = el('div', { class: 'hidden-note' });
     const grid = el('div', { class: 'sched-grid' });
 
-    replace(root, [dayTabs, floorTabs, toolbar, grid, note]);
+    replace(root, [infoBar, dayTabs, floorTabs, toolbar, grid, note]);
 
     function update() {
+      renderInfoBar();
       const groups = roomsByFloor();
       if (
         selectedFloor !== ALL &&
@@ -196,6 +198,108 @@ export default {
       );
     }
 
+    /**
+     * แถบบอกว่าตารางที่ใช้อยู่เป็นของภาคเรียนไหน ใครนำเข้าเมื่อไร
+     *
+     * ตารางแต่ละเทอมไม่เหมือนกัน ถ้าลืมเปลี่ยน ระบบปิดแอร์อัตโนมัติจะใช้คาบของเทอมเก่า
+     * แถบนี้จึงอยู่บนสุดของหน้า ให้เห็นทันทีว่าตารางค้างของเทอมก่อนหรือเปล่า
+     */
+    function renderInfoBar() {
+      const isAdmin = state.user?.role === 'admin';
+      const schedules = state.schedules;
+      if (schedules.length === 0) {
+        infoBar.hidden = true;
+        return;
+      }
+      infoBar.hidden = false;
+
+      const roomCount = new Set(schedules.map((row) => row.roomNumber)).size;
+      const info = state.timetable;
+      const semester = info?.semester ?? '';
+      const title = semester
+        ? `ตารางเรียนภาคเรียน ${semester}`
+        : 'ตารางเรียนที่ใช้อยู่';
+      const details = [`${schedules.length} คาบ ใน ${roomCount} ห้อง`];
+      if (info?.importedAt) {
+        details.push(
+          `นำเข้าเมื่อ ${thaiShortDate(info.importedAt)}` +
+            (info.importedBy ? ` โดย ${info.importedBy}` : ''),
+        );
+      } else if (info === null) {
+        details.push('ยังไม่ระบุภาคเรียน — นำเข้าจากไฟล์ครั้งถัดไประบบจะจำให้');
+      }
+
+      replace(infoBar, [
+        el('span', { class: 'timetable-icon', html: uiIcons.sheet(18) }),
+        el('div', { class: 'grow' }, [
+          el('div', { class: 'timetable-title', text: title }),
+          el('div', { class: 'timetable-sub', text: details.join(' · ') }),
+        ]),
+        el('div', { class: 'timetable-actions' }, [
+          el(
+            'button',
+            {
+              class: 'btn btn-sm',
+              type: 'button',
+              title: 'เก็บตารางทั้งหมดเป็นไฟล์ CSV ไว้สำรอง นำกลับเข้ามาได้ด้วยปุ่มนำเข้า',
+              onclick: downloadCurrentCsv,
+            },
+            [svg(icons.download(14)), 'ดาวน์โหลด CSV'],
+          ),
+          isAdmin
+            ? el(
+                'button',
+                {
+                  class: 'btn btn-sm btn-danger',
+                  type: 'button',
+                  title: 'ใช้ตอนปิดภาคเรียน ข้อมูลไฟฟ้าไม่ถูกลบ',
+                  onclick: (event) => clearAll(event.currentTarget),
+                },
+                [svg(icons.trash(14)), 'ล้างตารางทั้งหมด'],
+              )
+            : null,
+        ]),
+      ]);
+    }
+
+    function downloadCurrentCsv() {
+      const semester = state.timetable?.semester ?? '';
+      const label = semester ? semester.replace('/', '-') : 'ปัจจุบัน';
+      downloadText(
+        schedulesToCsv(state.schedules, semester),
+        `ตารางเรียน-${label}-สำรอง-${isoDate()}.csv`,
+        'text/csv;charset=utf-8',
+      );
+    }
+
+    async function clearAll(button) {
+      const count = state.schedules.length;
+      const rooms = new Set(state.schedules.map((row) => row.roomNumber)).size;
+      const semester = state.timetable?.semester;
+      const ok = await confirmAction({
+        title: 'ล้างตารางเรียนทั้งหมด?',
+        subtitle:
+          `ลบ ${count} คาบของ ${rooms} ห้อง${semester ? ` (ภาคเรียน ${semester})` : ''}\n\n` +
+          'ข้อมูลไฟฟ้า ประวัติการแจ้งเตือน ห้อง และอุปกรณ์ ไม่ถูกลบ\n\n' +
+          'ระหว่างที่ไม่มีตาราง ระบบถือว่าทุกห้องอยู่นอกคาบ: ห้องว่างเกิน 5 นาทีจะสั่งปิดแอร์ ' +
+          'และแจ้งเตือนเมื่อมีคนเปิดแอร์ใช้ — เหมาะกับช่วงปิดภาคเรียน\n\n' +
+          'ถ้ายังไม่ได้สำรอง กด "ยกเลิก" แล้วกด "ดาวน์โหลด CSV" ก่อน',
+        confirmLabel: `ล้าง ${count} คาบ`,
+        danger: true,
+      });
+      if (!ok) return;
+      button.disabled = true;
+      try {
+        const result = await api.deleteAllSchedules();
+        await Promise.all([loaders.schedules(), loaders.rooms()]);
+        update();
+        toastOk(`ล้างตารางเรียนแล้ว ${result?.deletedCount ?? count} คาบ`);
+      } catch (error) {
+        button.disabled = false;
+        toastError(error.message);
+      }
+    }
+
     function importButton(className) {
       return el(
         'button',
@@ -205,6 +309,12 @@ export default {
           title: 'นำเข้าตารางเรียนจากไฟล์ Excel (.xlsx) หรือ CSV เหมือนในแอปมือถือ',
           onclick: () =>
             openScheduleImport({
+              current: {
+                // undefined = Backend รุ่นเก่า ยังไม่รองรับ "เปลี่ยนภาคเรียน"
+                supportsReplaceAll: state.timetable !== undefined,
+                semester: state.timetable?.semester ?? '',
+                schedules: state.schedules,
+              },
               onImported: async (result) => {
                 selectedFloor = ALL;
                 // ดึงห้องใหม่ด้วย: จำนวนคาบของแต่ละห้องเปลี่ยน และห้องที่ถูกสร้าง

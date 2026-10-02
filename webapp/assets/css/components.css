@@ -744,6 +744,7 @@ table.data.sticky-first tfoot td:first-child {
   color: var(--text-mid);
   margin-bottom: 16px;
   line-height: 1.6;
+  white-space: pre-line;
 }
 
 .modal-actions {

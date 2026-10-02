@@ -159,12 +159,31 @@ export function thaiFullDate(value = new Date()) {
   );
 }
 
+/**
+ * ชื่อเดือนย่อตามแบบราชการ ตัดสามตัวแรกของชื่อเต็มไม่ได้
+ * (ตุลาคม → "ตุล." สิงหาคม → "สิง." ซึ่งไม่มีใครเขียนแบบนั้น)
+ */
+const thaiMonthsShort = [
+  'ม.ค.',
+  'ก.พ.',
+  'มี.ค.',
+  'เม.ย.',
+  'พ.ค.',
+  'มิ.ย.',
+  'ก.ค.',
+  'ส.ค.',
+  'ก.ย.',
+  'ต.ค.',
+  'พ.ย.',
+  'ธ.ค.',
+];
+
 /** วันที่สั้น 25 ส.ค. 69 */
 export function thaiShortDate(value) {
   const date = toDate(value);
   if (!date) return '—';
-  const month = thaiMonths[date.getMonth()].slice(0, 3);
-  return `${date.getDate()} ${month}. ${(date.getFullYear() + 543) % 100}`;
+  const month = thaiMonthsShort[date.getMonth()];
+  return `${date.getDate()} ${month} ${String((date.getFullYear() + 543) % 100).padStart(2, '0')}`;
 }
 
 /** เวลาที่ผ่านมาแล้ว เช่น 5 นาทีที่แล้ว */
