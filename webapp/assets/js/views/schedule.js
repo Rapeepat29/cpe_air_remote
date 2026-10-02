@@ -10,8 +10,10 @@ import { api } from '../api.js';
 import { el, replace, emptyState, svg } from '../dom.js';
 import { DAY_NAMES, floorLabel } from '../format.js';
 import { icons } from '../icons.js';
+import { uiIcons } from '../icons-ui.js';
 import { loaders, roomsByFloor, state } from '../store.js';
 import { confirmAction, openForm, toastError, toastOk } from '../ui.js';
+import { openScheduleImport } from './schedule-import.js';
 
 let selectedDay = new Date().getDay();
 
@@ -120,18 +122,22 @@ export default {
           : `วัน${DAY_NAMES[selectedDay]} · ${floorLabel(selectedFloor)} ${floorRows} คาบ ` +
             `(ทั้งอาคาร ${totalRows} คาบ)`;
 
+      const isAdmin = state.user?.role === 'admin';
       replace(toolbar, [
         el('div', { class: 'pill', text: summary }),
-        state.user?.role === 'admin'
-          ? el(
-              'button',
-              {
-                class: 'btn btn-sm btn-primary',
-                type: 'button',
-                onclick: () => addSchedule(update),
-              },
-              [svg(icons.plus(14)), 'เพิ่มคาบเรียน'],
-            )
+        isAdmin
+          ? el('div', { class: 'row', style: { gap: '8px' } }, [
+              importButton('btn btn-sm'),
+              el(
+                'button',
+                {
+                  class: 'btn btn-sm btn-primary',
+                  type: 'button',
+                  onclick: () => addSchedule(update),
+                },
+                [svg(icons.plus(14)), 'เพิ่มคาบเรียน'],
+              ),
+            ])
           : null,
       ]);
 
@@ -140,6 +146,28 @@ export default {
           ? `ไม่แสดง ${hiddenCount} ห้องที่ไม่มีคาบเรียนในวันนี้ · เลือกชั้นด้านบนเพื่อดูทุกห้องของชั้นนั้น`
           : '';
       note.hidden = hiddenCount === 0;
+
+      // ยังไม่มีตารางเรียนเลยทั้งระบบ (เช่นเพิ่งตั้งระบบหรือขึ้นภาคเรียนใหม่)
+      // ชี้ทางไปที่การนำเข้าจากไฟล์ ซึ่งเร็วกว่าการเพิ่มทีละคาบหลายเท่า
+      if (state.schedules.length === 0 && !state.loading.schedules) {
+        replace(grid, [
+          el('div', { class: 'card empty-cta' }, [
+            el('span', { class: 'dz-icon', html: uiIcons.sheet(26) }),
+            el('div', { class: 'empty-cta-title', text: 'ยังไม่มีตารางเรียนในระบบ' }),
+            el('div', {
+              class: 'muted small-note',
+              text: isAdmin
+                ? 'นำเข้าไฟล์ Excel ตารางการใช้ห้องของคณะ หรือไฟล์ CSV ได้ในครั้งเดียว ' +
+                  'ระบบปิดแอร์อัตโนมัติต้องใช้ตารางนี้แยก "ในคาบ" กับ "นอกคาบ"'
+                : 'ติดต่อผู้ดูแลระบบให้นำเข้าตารางเรียน ' +
+                  'ระบบปิดแอร์อัตโนมัติต้องใช้ตารางนี้แยก "ในคาบ" กับ "นอกคาบ"',
+            }),
+            isAdmin ? importButton('btn btn-primary') : null,
+          ]),
+        ]);
+        note.hidden = true;
+        return;
+      }
 
       if (rooms.length === 0) {
         replace(
@@ -165,6 +193,28 @@ export default {
             onChanged: update,
           });
         }),
+      );
+    }
+
+    function importButton(className) {
+      return el(
+        'button',
+        {
+          class: className,
+          type: 'button',
+          title: 'นำเข้าตารางเรียนจากไฟล์ Excel (.xlsx) หรือ CSV เหมือนในแอปมือถือ',
+          onclick: () =>
+            openScheduleImport({
+              onImported: async (result) => {
+                selectedFloor = ALL;
+                // ดึงห้องใหม่ด้วย: จำนวนคาบของแต่ละห้องเปลี่ยน และห้องที่ถูกสร้าง
+                // จากไฟล์ต้องขึ้นในแท็บชั้นและหน้าอื่นทันที
+                await Promise.all([loaders.schedules(), loaders.rooms()]);
+                update();
+              },
+            }),
+        },
+        [svg(uiIcons.upload(14)), 'นำเข้าจาก Excel / CSV'],
       );
     }
 

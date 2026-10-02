@@ -96,9 +96,17 @@ function buildUrl(path, query) {
 async function request(
   method,
   path,
-  { body = null, query = null, raw = false, signal = null } = {},
+  {
+    body = null,
+    query = null,
+    raw = false,
+    signal = null,
+    // ส่งไฟล์ (Blob/File) ตรง ๆ ไม่แปลงเป็น JSON ใช้กับการอัปโหลดตารางเรียน
+    upload = null,
+    headers: extraHeaders = null,
+  } = {},
 ) {
-  const headers = {};
+  const headers = { ...(extraHeaders ?? {}) };
   if (token) headers.Authorization = `Bearer ${token}`;
   if (body != null) headers['Content-Type'] = 'application/json';
 
@@ -108,7 +116,7 @@ async function request(
       method,
       headers,
       signal,
-      body: body == null ? undefined : JSON.stringify(body),
+      body: upload ?? (body == null ? undefined : JSON.stringify(body)),
     });
   } catch (error) {
     if (error?.name === 'AbortError') throw error;
@@ -264,6 +272,27 @@ export const api = {
     put(`/schedules/${encodeURIComponent(id)}`, input).then((r) => r.schedule),
   deleteSchedule: (id) => remove(`/schedules/${encodeURIComponent(id)}`),
   deleteAllSchedules: () => remove('/schedules').then((r) => r.result),
+  /**
+   * ส่งไฟล์ Excel (.xlsx) หรือ CSV ให้ Backend อ่านและตรวจ ยังไม่บันทึกอะไร
+   *
+   * ส่งเป็นไฟล์ดิบ (ไม่ใช่ multipart) ตามที่ Backend รับ และแนบชื่อไฟล์ไว้ใน
+   * X-File-Name แบบ percent-encoding เพราะหัว HTTP ใส่อักษรไทยตรง ๆ ไม่ได้
+   * — วิธีเดียวกับแอปมือถือ (schedule_service.dart)
+   */
+  previewScheduleImport: (file) =>
+    request('POST', '/schedules/import/preview', {
+      upload: file,
+      headers: {
+        'Content-Type': 'application/octet-stream',
+        'X-File-Name': encodeURIComponent(file.name),
+      },
+    }).then((r) => r.preview),
+  /** บันทึกตารางจากผลตรวจ แทนที่ตารางเดิมเฉพาะห้องที่อยู่ในไฟล์ */
+  commitScheduleImport: (preview) =>
+    post('/schedules/import/commit', {
+      createMissingRooms: (preview.newRooms ?? []).length > 0,
+      schedules: preview.schedules,
+    }).then((r) => r.result),
 
   // ------------------------------------------------------------- ผู้ใช้งาน
   users: () => get('/users').then((r) => r.users),
