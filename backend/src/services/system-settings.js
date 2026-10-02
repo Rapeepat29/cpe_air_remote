@@ -11,6 +11,12 @@ export const SETTING_KEYS = {
   AUTO_OFF_ENABLED: 'auto_off_enabled',
   /** อัตราค่าไฟต่อ kWh ที่ใช้คำนวณตัวเลขค่าใช้จ่ายโดยประมาณ */
   ELECTRICITY_RATE: 'electricity_rate',
+  /**
+   * ภาคเรียนของตารางเรียนที่ใช้อยู่ (เช่น "2/2569") พร้อมผู้นำเข้าและเวลา
+   * (updated_by / updated_at) มีไว้ให้คนดูแลเห็นว่าตารางในระบบเป็นของเทอมไหน
+   * ไม่ได้ใช้ตัดสินอะไรในระบบปิดแอร์อัตโนมัติ
+   */
+  TIMETABLE_SEMESTER: 'timetable_semester',
 };
 
 /**
@@ -169,4 +175,72 @@ export async function setElectricityRate(rate, username) {
     (Math.round(value * 100) / 100).toFixed(2),
     username,
   );
+}
+
+// ------------------------------------------------------- ข้อมูลตารางเรียน
+
+/**
+ * ภาคเรียนของตารางเรียนที่ใช้อยู่ และใครนำเข้าเมื่อไร
+ *
+ * คืน null ถ้ายังไม่เคยนำเข้าจากไฟล์ (หรือเพิ่งล้างตารางทั้งหมด)
+ * ไม่ผ่านแคชของค่าตั้งอื่น เพราะอ่านเฉพาะตอนเปิดหน้าตารางเรียน
+ */
+export async function readTimetableInfo(database = pool) {
+  try {
+    const rows = await database.query(
+      `SELECT setting_value, updated_by, updated_at
+         FROM system_settings
+        WHERE setting_key = ?
+        LIMIT 1`,
+      [SETTING_KEYS.TIMETABLE_SEMESTER],
+    );
+    const row = rows[0];
+    if (!row) return null;
+    return {
+      semester: String(row.setting_value ?? ''),
+      importedBy: row.updated_by ?? null,
+      importedAt: row.updated_at == null
+        ? null
+        : new Date(row.updated_at).toISOString(),
+    };
+  } catch (error) {
+    if (error?.code === 'ER_NO_SUCH_TABLE') return null;
+    throw error;
+  }
+}
+
+/**
+ * บันทึกว่าเพิ่งนำเข้าตารางเรียน
+ *
+ * ไฟล์ CSV บางไฟล์ไม่มีคอลัมน์ภาคเรียน: ถ้านำเข้าบางห้องก็คงภาคเรียนเดิมไว้
+ * แต่ถ้าล้างทุกห้อง (เปลี่ยนภาคเรียน) ภาคเรียนเดิมไม่จริงแล้ว จึงเว้นว่าง
+ */
+export async function recordTimetableImport(
+  { semester, replaceAll, username },
+  database = pool,
+) {
+  let value = String(semester ?? '').trim();
+  if (!value && !replaceAll) {
+    value = (await readTimetableInfo(database))?.semester ?? '';
+  }
+  await database.query(
+    `INSERT INTO system_settings (setting_key, setting_value, updated_by)
+     VALUES (?, ?, ?)
+     ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value),
+                             updated_by = VALUES(updated_by),
+                             updated_at = CURRENT_TIMESTAMP`,
+    [SETTING_KEYS.TIMETABLE_SEMESTER, value.slice(0, 255), username ?? null],
+  );
+}
+
+/** ลืมภาคเรียนที่บันทึกไว้ ใช้ตอนล้างตารางเรียนทั้งหมด */
+export async function clearTimetableInfo(database = pool) {
+  try {
+    await database.query(
+      'DELETE FROM system_settings WHERE setting_key = ?',
+      [SETTING_KEYS.TIMETABLE_SEMESTER],
+    );
+  } catch (error) {
+    if (error?.code !== 'ER_NO_SUCH_TABLE') throw error;
+  }
 }

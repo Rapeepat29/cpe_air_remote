@@ -88,7 +88,7 @@ export default {
         ]),
         el('div', {
           class: 'dim',
-          style: { fontSize: '11.5px', alignSelf: 'flex-end' },
+          style: { fontSize: 'var(--fs-xs)', alignSelf: 'flex-end' },
           text:
             'ใบที่ระบบปิดเองเมื่อเงื่อนไขหมดไป จะย้ายไปสถานะ ' +
             `"${ALERT_STATUS_LABEL.resolved}" โดยอัตโนมัติ`,

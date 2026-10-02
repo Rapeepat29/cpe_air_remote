@@ -8,14 +8,14 @@
   margin-bottom: 16px;
 }
 
-@media (max-width: 980px) {
+@media (max-width: 1100px) {
   .hero-row {
     grid-template-columns: 1fr;
   }
 }
 
 .hero-card {
-  background: linear-gradient(160deg, var(--panel) 55%, #0b1f15 100%);
+  background: linear-gradient(160deg, var(--panel) 55%, var(--hero-tint) 100%);
   position: relative;
   overflow: hidden;
 }
@@ -29,6 +29,7 @@
   height: 220px;
   border-radius: 50%;
   background: radial-gradient(circle, var(--accent-soft), transparent 70%);
+  pointer-events: none;
 }
 
 .hero-figure {
@@ -42,13 +43,13 @@
 
 .hero-num {
   font-family: var(--font-disp);
-  font-size: 52px;
+  font-size: calc(52px * var(--text-scale));
   font-weight: 700;
   line-height: 1;
 }
 
 .hero-unit {
-  font-size: 16px;
+  font-size: var(--fs-lg);
   color: var(--text-mid);
   font-weight: 600;
 }
@@ -56,7 +57,7 @@
 .hero-meta {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   flex-wrap: wrap;
   margin-top: 12px;
   position: relative;
@@ -65,7 +66,8 @@
 
 .cost-chip {
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: var(--fs-sm);
+  line-height: 1.4;
   background: var(--panel-raised);
   border: 1px solid var(--hairline);
   padding: 7px 12px;
@@ -77,8 +79,9 @@
   display: flex;
   align-items: center;
   gap: 5px;
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
   font-weight: 700;
+  line-height: 1.4;
   color: var(--accent);
   background: var(--accent-soft);
   padding: 6px 10px;
@@ -95,6 +98,21 @@
   background: var(--panel-raised);
 }
 
+.hero-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  margin-top: 10px;
+  font-size: var(--fs-xs);
+  color: var(--text-mid);
+}
+
+.hero-facts b {
+  color: var(--text-hi);
+  font-weight: 600;
+  font-family: var(--font-mono);
+}
+
 .spark-wrap {
   margin-top: 16px;
   position: relative;
@@ -104,14 +122,67 @@
 .spark-days {
   display: flex;
   justify-content: space-between;
-  font-size: 10.5px;
+  font-size: var(--fs-2xs);
   color: var(--text-low);
   margin-top: 6px;
   padding: 0 2px;
+  gap: 2px;
+  overflow: hidden;
+}
+
+.spark-days span {
+  white-space: nowrap;
+  flex: 0 1 auto;
 }
 
 .spark-hit {
   cursor: crosshair;
+  display: block;
+  touch-action: pan-y;
+}
+
+.chart-label {
+  position: absolute;
+  transform: translate(-50%, -165%);
+  font-family: var(--font-mono);
+  font-size: var(--fs-2xs);
+  color: var(--text-mid);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.chart-label.peak {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.chart-unit {
+  font-size: var(--fs-2xs);
+  color: var(--text-low);
+  margin-top: 4px;
+}
+
+/* เส้นตั้งและป้ายค่าที่ตามเมาส์/นิ้ว บอกค่าจริงของแต่ละจุดโดยไม่ต้องเดา */
+.chart-cursor {
+  position: absolute;
+  top: 0;
+  width: 1px;
+  background: var(--accent-dim);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.1s;
+}
+
+.chart-dot {
+  position: absolute;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid var(--panel);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  opacity: 0;
 }
 
 .spark-tip {
@@ -119,13 +190,28 @@
   background: var(--panel-raised);
   border: 1px solid var(--accent-dim);
   border-radius: var(--radius-sm);
-  padding: 6px 9px;
-  font-size: 11px;
-  font-family: var(--font-mono);
+  box-shadow: var(--shadow-drop);
+  padding: 7px 10px;
+  font-size: var(--fs-xs);
+  line-height: 1.45;
   pointer-events: none;
   white-space: nowrap;
-  transform: translate(-50%, -100%);
-  z-index: 3;
+  transform: translate(-50%, calc(-100% - 12px));
+  z-index: 4;
+  opacity: 0;
+}
+
+.spark-tip b {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  color: var(--accent);
+}
+
+.spark-wrap.hovering .chart-cursor,
+.spark-wrap.hovering .chart-dot,
+.spark-wrap.hovering .spark-tip {
+  opacity: 1;
 }
 
 .stat-mini-grid {
@@ -138,19 +224,37 @@
   background: var(--panel);
   border: 1px solid var(--hairline);
   border-radius: 14px;
+  box-shadow: var(--shadow-card);
   padding: 16px;
   display: flex;
   flex-direction: column;
   /* การ์ดสี่ช่องนี้ถูกยืดให้สูงเท่าการ์ดใหญ่ข้าง ๆ
-     ดันคำอธิบายไปชิดล่างเพื่อให้ช่องว่างดูตั้งใจ ไม่ใช่เหมือนวางผิด */
-  justify-content: space-between;
-  gap: 8px;
-  min-height: 108px;
+     ดันตัวเลขไปชิดล่างเพื่อให้ช่องว่างดูตั้งใจ ไม่ใช่เหมือนวางผิด */
+  gap: 10px;
+  min-height: 112px;
+  text-align: left;
+  color: inherit;
+}
+
+button.stat-mini {
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+button.stat-mini:hover {
+  border-color: var(--accent-dim);
+}
+
+.stat-mini-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .stat-mini-icon {
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
+  flex: none;
   border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
@@ -159,19 +263,48 @@
 
 .stat-mini-val {
   font-family: var(--font-disp);
-  font-size: 24px;
+  font-size: calc(34px * var(--text-scale));
   font-weight: 700;
+  line-height: 1.1;
+  margin-top: auto;
+}
+
+.stat-mini-foot {
+  font-size: var(--fs-2xs);
+  font-weight: 600;
+  color: var(--text-low);
+  transition: color 0.15s;
+}
+
+button.stat-mini:hover .stat-mini-foot {
+  color: var(--accent);
 }
 
 .stat-mini-val small {
-  font-size: 13px;
+  font-size: var(--fs-sm);
   color: var(--text-mid);
   font-weight: 600;
 }
 
 .stat-mini-label {
-  font-size: 11.5px;
+  font-size: var(--fs-xs);
   color: var(--text-mid);
+  line-height: 1.45;
+}
+
+@media (max-width: 820px) {
+  .hero-num {
+    font-size: calc(44px * var(--text-scale));
+  }
+
+  .stat-mini {
+    min-height: 0;
+    padding: 14px;
+  }
+
+  .stat-mini-val {
+    font-size: calc(28px * var(--text-scale));
+  }
 }
 
 /* ---------- Building Pulse ---------- */
@@ -183,22 +316,23 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
   flex-wrap: wrap;
   gap: 10px;
 }
 
 .pulse-title {
   font-family: var(--font-disp);
-  font-size: 16px;
+  font-size: var(--fs-lg);
   font-weight: 700;
+  line-height: 1.4;
 }
 
 .pulse-desc {
-  font-size: 12px;
+  font-size: var(--fs-xs);
   color: var(--text-mid);
   margin-top: 3px;
-  max-width: 460px;
+  max-width: 560px;
   line-height: 1.6;
 }
 
@@ -206,22 +340,37 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 11px;
+  flex-wrap: wrap;
+  font-size: var(--fs-2xs);
   color: var(--text-mid);
 }
 
 .legend-bar {
   width: 70px;
-  height: 6px;
-  border-radius: 3px;
-  background: linear-gradient(90deg, var(--panel-raised), var(--accent));
+  height: 7px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--panel-raised), var(--heat));
+}
+
+.legend-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legend-live::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
 }
 
 .pulse-floor {
   display: flex;
   align-items: stretch;
   gap: 14px;
-  padding: 9px 0;
+  padding: 10px 0;
   border-top: 1px solid var(--hairline-soft);
 }
 
@@ -230,10 +379,10 @@
 }
 
 .pulse-floor-label {
-  width: 64px;
+  width: 72px;
   flex: none;
-  font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: var(--fs-xs);
+  font-weight: 600;
   color: var(--text-mid);
   display: flex;
   align-items: center;
@@ -251,31 +400,41 @@
   position: relative;
   border-radius: var(--radius-sm);
   border: 1px solid var(--hairline);
-  padding: 9px 10px;
-  min-width: 78px;
+  padding: 9px 11px;
+  min-width: 86px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 14px;
-  transition: transform 0.15s;
-  color: inherit;
+  gap: 12px;
+  transition: transform 0.15s, border-color 0.15s;
+  color: var(--text-hi);
   text-align: left;
   background: var(--panel-raised);
 }
 
 .pulse-cell:hover {
   transform: translateY(-2px);
+  border-color: var(--accent);
   cursor: pointer;
 }
 
 .pulse-cell .room {
   font-family: var(--font-mono);
-  font-size: 11.5px;
+  font-size: var(--fs-xs);
   font-weight: 600;
+  line-height: 1.3;
 }
 
 .pulse-cell .kwh {
-  font-size: 10.5px;
+  font-size: var(--fs-2xs);
+  line-height: 1.3;
+  opacity: 0.88;
+}
+
+/* ห้องที่ยังไม่มีแอร์: กรอบประ ไม่ระบายสี จะได้ไม่ถูกอ่านว่า "ใช้ไฟน้อย" */
+.pulse-cell.vacant {
+  background: transparent !important;
+  border-style: dashed;
   color: var(--text-mid);
 }
 
@@ -283,10 +442,11 @@
   position: absolute;
   top: 8px;
   right: 8px;
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background: var(--accent);
+  box-shadow: 0 0 0 2px var(--panel);
 }
 
 .pulse-live::after {
@@ -321,23 +481,48 @@
   }
 }
 
+/* มือถือ: ชื่อชั้นขึ้นไปอยู่บนแถว ไม่กินความกว้างด้านซ้าย 70px
+   ช่องห้องจึงกว้างพอจะอ่านตัวเลขได้ */
+@media (max-width: 620px) {
+  .pulse-floor {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .pulse-floor-label {
+    width: auto;
+  }
+
+  .pulse-cell {
+    min-width: calc(33.333% - 4px);
+    flex-basis: calc(33.333% - 4px) !important;
+    flex-grow: 1 !important;
+  }
+}
+
 .two-col {
   display: grid;
   grid-template-columns: 1.15fr 1fr;
   gap: 16px;
 }
 
-@media (max-width: 980px) {
+@media (max-width: 1100px) {
   .two-col {
     grid-template-columns: 1fr;
   }
+}
+
+.card-link {
+  margin-top: 12px;
+  display: flex;
+  justify-content: flex-end;
 }
 
 /* ---------- การแจ้งเตือน ---------- */
 .alert-item {
   display: flex;
   gap: 12px;
-  padding: 12px 4px;
+  padding: 13px 4px;
   border-bottom: 1px solid var(--hairline-soft);
 }
 
@@ -346,7 +531,7 @@
 }
 
 .alert-bar {
-  width: 3px;
+  width: 4px;
   border-radius: 3px;
   flex: none;
   align-self: stretch;
@@ -372,27 +557,33 @@
 .alert-top {
   display: flex;
   justify-content: space-between;
-  gap: 8px;
+  gap: 10px;
   align-items: baseline;
 }
 
 .alert-room {
-  font-size: 13px;
+  font-size: var(--fs-base);
   font-weight: 600;
+  line-height: 1.45;
 }
 
 .alert-time {
-  font-family: var(--font-mono);
-  font-size: 10.5px;
+  font-size: var(--fs-2xs);
   color: var(--text-low);
   flex: none;
+  white-space: nowrap;
 }
 
 .alert-desc {
-  font-size: 12px;
+  font-size: var(--fs-sm);
   color: var(--text-mid);
-  margin: 3px 0 7px;
-  line-height: 1.5;
+  margin: 3px 0 8px;
+  line-height: 1.55;
+}
+
+.alert-actions .who {
+  font-size: var(--fs-2xs);
+  color: var(--text-low);
 }
 
 /* ---------- อันดับการใช้ไฟ ---------- */
@@ -400,7 +591,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 10px 4px;
+  padding: 11px 4px;
   border-bottom: 1px solid var(--hairline-soft);
 }
 
@@ -410,14 +601,15 @@
 
 .rank-num {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: var(--fs-xs);
   color: var(--text-low);
   width: 16px;
+  flex: none;
 }
 
 .rank-icon {
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   border-radius: 8px;
   background: var(--panel-raised);
   display: flex;
@@ -428,30 +620,33 @@
 }
 
 .rank-name {
-  font-size: 13px;
+  font-size: var(--fs-sm);
   font-weight: 600;
+  line-height: 1.4;
 }
 
 .rank-sub {
-  font-size: 11px;
+  font-size: var(--fs-2xs);
   color: var(--text-mid);
+  line-height: 1.45;
 }
 
 .rank-val {
   margin-left: auto;
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: var(--fs-sm);
   color: var(--text-hi);
   font-weight: 600;
   text-align: right;
+  white-space: nowrap;
 }
 
 .rank-bar-track {
-  width: 60px;
-  height: 4px;
+  width: 72px;
+  height: 5px;
   border-radius: 3px;
   background: var(--panel-raised);
-  margin-top: 4px;
+  margin-top: 5px;
   overflow: hidden;
   margin-left: auto;
 }
@@ -462,39 +657,90 @@
   border-radius: 3px;
 }
 
+.rank-foot {
+  font-size: var(--fs-xs);
+  color: var(--text-mid);
+  margin-top: 12px;
+}
+
 /* ================= ห้องและควบคุม ================= */
 .rooms-toolbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   margin-bottom: 18px;
   flex-wrap: wrap;
 }
 
+.rooms-filters {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.floor-heading {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-family: var(--font-disp);
+  font-size: var(--fs-md);
+  font-weight: 700;
+  margin: 22px 0 10px;
+}
+
+.floor-heading:first-child {
+  margin-top: 0;
+}
+
+.floor-heading .count-badge {
+  font-family: var(--font-body);
+}
+
 .room-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(232px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 14px;
+}
+
+@media (max-width: 620px) {
+  .room-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+}
+
+@media (max-width: 380px) {
+  .room-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .room-card {
   background: var(--panel);
   border: 1px solid var(--hairline);
   border-radius: 15px;
+  box-shadow: var(--shadow-card);
   padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
   transition: border-color 0.15s, transform 0.15s;
   text-align: left;
   color: inherit;
+  min-width: 0;
 }
 
 .room-card:hover {
   border-color: var(--accent-dim);
   transform: translateY(-2px);
   cursor: pointer;
+}
+
+.room-card.running {
+  border-color: var(--accent-dim);
 }
 
 .room-card.counting {
@@ -520,38 +766,65 @@
   flex: none;
 }
 
+.room-card.idle .room-icon {
+  background: var(--panel-raised);
+  color: var(--text-mid);
+}
+
 .room-card-name {
   font-family: var(--font-disp);
-  font-size: 15px;
+  font-size: var(--fs-md);
   font-weight: 700;
-  margin-top: 2px;
+  line-height: 1.35;
 }
 
 .room-card-desc {
-  font-size: 11.5px;
+  font-size: var(--fs-xs);
   color: var(--text-mid);
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.room-card-chips {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.room-card-energy {
+  font-size: var(--fs-xs);
+  color: var(--text-mid);
+}
+
+.room-card-energy b {
+  font-family: var(--font-mono);
+  color: var(--text-hi);
+  font-weight: 600;
 }
 
 .room-card-foot {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 11.5px;
+  font-size: var(--fs-xs);
   color: var(--text-mid);
   border-top: 1px solid var(--hairline-soft);
-  padding-top: 11px;
+  padding-top: 10px;
+  margin-top: auto;
   gap: 8px;
+  flex-wrap: wrap;
 }
 
 .status-dot-row {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 7px;
 }
 
 .status-dot {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
+  flex: none;
   border-radius: 50%;
   background: var(--text-low);
 }
@@ -567,27 +840,42 @@
 .devices-chip {
   font-family: var(--font-mono);
   background: var(--panel-raised);
-  padding: 3px 8px;
+  color: var(--text-mid);
+  padding: 2px 9px;
   border-radius: 100px;
-  font-size: 10.5px;
+  font-size: var(--fs-2xs);
+  white-space: nowrap;
 }
 
 .countdown-strip {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-wrap: wrap;
   background: var(--warn-soft);
-  border: 1px solid rgba(232, 163, 61, 0.35);
+  border: 1px solid rgba(232, 163, 61, 0.4);
   color: var(--warn);
   border-radius: var(--radius-sm);
   padding: 7px 10px;
-  font-size: 11.5px;
+  font-size: var(--fs-xs);
   font-weight: 600;
 }
 
 .countdown-strip .clock {
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: var(--fs-sm);
+  margin-left: auto;
+}
+
+@media (max-width: 620px) {
+  .room-card {
+    padding: 13px;
+    gap: 8px;
+  }
+
+  .room-icon {
+    display: none;
+  }
 }
 
 /* ---------- รีโมตแอร์ในลิ้นชัก ---------- */
@@ -608,48 +896,80 @@
 }
 
 .ac-name {
-  font-size: 12.5px;
-  color: var(--text-mid);
-  font-weight: 600;
+  font-size: var(--fs-md);
+  color: var(--text-hi);
+  font-weight: 700;
+  line-height: 1.4;
 }
 
 .ac-sub {
-  font-size: 10.5px;
+  font-size: var(--fs-2xs);
   color: var(--text-low);
   margin-top: 2px;
   font-family: var(--font-mono);
+  overflow-wrap: anywhere;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 7px 0;
+  font-size: var(--fs-sm);
+  border-top: 1px solid var(--hairline-soft);
+}
+
+.info-row:first-of-type {
+  border-top: none;
+}
+
+.info-row > :first-child {
+  flex: none;
+  white-space: nowrap;
+}
+
+.info-row > :last-child {
+  text-align: right;
+  overflow-wrap: anywhere;
 }
 
 .temp-row {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 22px;
-  margin-bottom: 6px;
+  gap: 24px;
+  margin: 4px 0 6px;
 }
 
 .temp-btn {
-  width: 34px;
-  height: 34px;
+  width: 44px;
+  height: 44px;
+  flex: none;
   border-radius: 50%;
   background: var(--panel);
   border: 1px solid var(--hairline);
   color: var(--text-hi);
-  font-size: 17px;
+  font-size: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.temp-btn:hover {
-  border-color: var(--accent-dim);
+.temp-btn:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.temp-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 .temp-val {
   font-family: var(--font-disp);
-  font-size: 34px;
+  font-size: calc(36px * var(--text-scale));
   font-weight: 700;
-  min-width: 108px;
+  min-width: 112px;
   text-align: center;
 }
 
@@ -657,75 +977,111 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 8px;
-  margin-top: 12px;
+  margin-top: 10px;
 }
 
 .metric-box {
   background: var(--panel);
   border: 1px solid var(--hairline);
   border-radius: var(--radius-sm);
-  padding: 8px;
+  padding: 9px 6px;
   text-align: center;
+  min-width: 0;
 }
 
 .metric-val {
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: var(--fs-sm);
   font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .metric-label {
-  font-size: 9.5px;
-  color: var(--text-low);
+  font-size: var(--fs-2xs);
+  color: var(--text-mid);
   margin-top: 2px;
+  line-height: 1.35;
 }
 
 .chip-row {
   display: flex;
   gap: 6px;
   flex-wrap: wrap;
-  margin-top: 10px;
+  margin-top: 12px;
 }
 
 .chip-row .chip-label {
-  font-size: 10.5px;
-  color: var(--text-low);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--text-mid);
   width: 100%;
-  margin-bottom: -4px;
+  margin-bottom: -2px;
 }
 
 .mode-chip {
-  font-size: 11px;
-  padding: 6px 10px;
+  font-size: var(--fs-xs);
+  min-height: 34px;
+  padding: 5px 12px;
   border-radius: 8px;
   background: var(--panel);
   border: 1px solid var(--hairline);
   color: var(--text-mid);
 }
 
+.mode-chip:hover:not(:disabled) {
+  color: var(--text-hi);
+  border-color: var(--accent-dim);
+}
+
 .mode-chip.sel {
   color: var(--accent);
-  border-color: var(--accent-dim);
+  border-color: var(--accent);
   background: var(--accent-soft);
+  font-weight: 600;
 }
 
 .mode-chip:disabled {
-  opacity: 0.4;
+  opacity: 0.45;
   cursor: not-allowed;
 }
 
+@media (pointer: coarse) {
+  .mode-chip {
+    min-height: 40px;
+    padding: 6px 13px;
+  }
+}
+
 /* ================= ตารางเรียน ================= */
+.sched-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+
 .sched-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 14px;
   margin-top: 16px;
+}
+
+@media (max-width: 620px) {
+  .sched-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .sched-card {
   background: var(--panel);
   border: 1px solid var(--hairline);
   border-radius: 15px;
+  box-shadow: var(--shadow-card);
   padding: 16px;
 }
 
@@ -733,43 +1089,45 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   gap: 8px;
 }
 
 .sched-room {
   font-family: var(--font-disp);
   font-weight: 700;
-  font-size: 14.5px;
+  font-size: var(--fs-md);
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
 .badge-soft {
-  font-size: 10px;
+  font-size: var(--fs-2xs);
   font-weight: 700;
+  line-height: 1.4;
   color: var(--accent);
   background: var(--accent-soft);
-  padding: 3px 9px;
+  padding: 3px 10px;
   border-radius: 100px;
+  white-space: nowrap;
 }
 
 .badge-soft.dim {
-  color: var(--text-low);
+  color: var(--text-mid);
   background: var(--panel-raised);
 }
 
 .sched-empty {
-  font-size: 12px;
-  color: var(--text-low);
+  font-size: var(--fs-sm);
+  color: var(--text-mid);
   padding: 10px 0;
 }
 
 .sched-row {
   display: flex;
-  gap: 10px;
-  padding: 9px 0;
+  gap: 12px;
+  padding: 10px 0;
   border-top: 1px solid var(--hairline-soft);
   align-items: flex-start;
 }
@@ -781,17 +1139,18 @@
 .sched-row.now {
   background: var(--accent-soft);
   border-radius: var(--radius-sm);
-  padding-left: 8px;
-  padding-right: 8px;
+  padding-left: 10px;
+  padding-right: 10px;
+  box-shadow: inset 3px 0 0 var(--accent);
 }
 
 .sched-time {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: var(--fs-xs);
   color: var(--text-mid);
-  width: 78px;
+  width: 92px;
   flex: none;
-  padding-top: 1px;
+  padding-top: 2px;
 }
 
 .sched-info {
@@ -800,28 +1159,34 @@
 }
 
 .sched-info .course {
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
   font-weight: 600;
   line-height: 1.45;
 }
 
 .sched-info .meta {
-  font-size: 11px;
-  color: var(--text-low);
+  font-size: var(--fs-xs);
+  color: var(--text-mid);
   margin-top: 2px;
   line-height: 1.5;
 }
 
+.hidden-note {
+  font-size: var(--fs-xs);
+  color: var(--text-mid);
+  margin-top: 14px;
+}
+
 /* ================= อัตราค่าไฟ ================= */
 .rate-wrap {
-  max-width: 540px;
+  max-width: 560px;
 }
 
 .rate-current {
   display: flex;
   align-items: center;
   gap: 14px;
-  background: linear-gradient(160deg, #1b3324, #0e1d15);
+  background: linear-gradient(160deg, var(--hero-tint), var(--panel));
   border: 1px solid var(--hairline);
   border-radius: 15px;
   padding: 18px;
@@ -829,8 +1194,8 @@
 }
 
 .rate-icon-box {
-  width: 44px;
-  height: 44px;
+  width: 46px;
+  height: 46px;
   border-radius: 11px;
   background: var(--warn-soft);
   display: flex;
@@ -842,13 +1207,14 @@
 
 .rate-value {
   font-family: var(--font-disp);
-  font-size: 22px;
+  font-size: var(--fs-2xl);
   font-weight: 700;
   margin-top: 2px;
+  line-height: 1.25;
 }
 
 .rate-value small {
-  font-size: 14px;
+  font-size: var(--fs-sm);
   color: var(--text-mid);
   font-weight: 600;
 }
@@ -864,18 +1230,23 @@
   margin-top: 10px;
 }
 
+.rate-input-row:focus-within {
+  border-color: var(--accent);
+  box-shadow: var(--focus-ring);
+}
+
 .rate-input-row input {
   background: none;
   border: none;
   color: var(--text-hi);
   font-family: var(--font-mono);
-  font-size: 16px;
+  font-size: var(--fs-lg);
   width: 100%;
   outline: none;
 }
 
 .rate-hint {
-  font-size: 11px;
+  font-size: var(--fs-2xs);
   color: var(--text-low);
   margin-top: 6px;
 }
@@ -892,57 +1263,159 @@
   display: flex;
   justify-content: space-between;
   padding: 8px 0;
-  font-size: 13px;
+  font-size: var(--fs-sm);
   border-top: 1px solid var(--hairline-soft);
-  gap: 10px;
+  gap: 12px;
 }
 
 .rate-example-row:first-of-type {
   border-top: none;
 }
 
+.rate-example-row > :last-child {
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
 .rate-example-row.total {
   font-weight: 700;
   color: var(--accent);
-  font-size: 15px;
+  font-size: var(--fs-md);
 }
 
 /* ================= ข้อมูลไฟฟ้า ================= */
+/* ใช้ flex แทน grid: ช่องที่มีแท็บกว้างเท่าที่แท็บต้องการ ไม่ถูกบีบจนตัวเลือกหลุดขอบ
+   ส่วนช่องวันที่และตัวเลือกยืดเติมที่ว่างที่เหลือ */
 .filter-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 12px;
-  align-items: end;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  align-items: flex-end;
+}
+
+.filter-grid > .field {
+  flex: 1 1 170px;
+  min-width: 0;
+}
+
+.filter-grid > .field.fit {
+  flex: 0 1 auto;
+}
+
+.filter-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 6px;
 }
 
 .metric-picker {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  margin-top: 4px;
+  margin-top: 2px;
 }
 
 .checkbox-chip {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  font-size: 11.5px;
-  padding: 6px 11px;
+  font-size: var(--fs-xs);
+  min-height: 34px;
+  padding: 5px 12px;
   border-radius: 8px;
   background: var(--panel-raised);
   border: 1px solid var(--hairline);
   color: var(--text-mid);
   cursor: pointer;
+  user-select: none;
+}
+
+.checkbox-chip:hover {
+  color: var(--text-hi);
+  border-color: var(--accent-dim);
+}
+
+/* เครื่องหมายถูกเล็ก ๆ หน้าชิปที่เลือก ไม่ต้องอาศัยสีอย่างเดียว */
+.checkbox-chip::before {
+  content: '';
+  width: 14px;
+  height: 14px;
+  flex: none;
+  border-radius: 4px;
+  border: 1.5px solid var(--text-low);
 }
 
 .checkbox-chip.sel {
   color: var(--accent);
-  border-color: var(--accent-dim);
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  font-weight: 600;
+}
+
+.checkbox-chip.sel::before {
+  border-color: var(--accent);
+  background: var(--accent)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 8.5 6.5 11.5 12.5 4.5' fill='none' stroke='white' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+    center / 12px no-repeat;
+}
+
+/* ซ่อนช่องติ๊กจริงไว้ (ยังกดผ่านป้ายได้และใช้คีย์บอร์ดได้) ต้องเขียนให้เจาะจง
+   กว่า .field input ไม่งั้นจะได้ width: 100% แล้วดันหน้าให้กว้างเกินจอ */
+.checkbox-chip {
+  position: relative;
+}
+
+.field .checkbox-chip input,
+.checkbox-chip input {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1px;
+  height: 1px;
+  min-height: 0;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.checkbox-chip:focus-within {
+  box-shadow: var(--focus-ring);
+}
+
+@media (pointer: coarse) {
+  .checkbox-chip {
+    min-height: 40px;
+  }
+}
+
+.picker-tools {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+}
+
+.link-btn {
+  border: none;
+  background: none;
+  color: var(--accent);
+  font-size: var(--fs-2xs);
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+
+.link-btn:hover {
   background: var(--accent-soft);
 }
 
-.checkbox-chip input {
-  display: none;
+.field-label-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 /* ================= ผู้ใช้ / อุปกรณ์ ================= */
@@ -950,10 +1423,11 @@
   background: var(--panel);
   border: 1px solid var(--hairline);
   border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
   padding: 14px 16px;
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px 14px;
   flex-wrap: wrap;
 }
 
@@ -962,12 +1436,13 @@
 }
 
 .list-title {
-  font-size: 13.5px;
+  font-size: var(--fs-base);
   font-weight: 600;
+  line-height: 1.45;
 }
 
 .list-sub {
-  font-size: 11.5px;
+  font-size: var(--fs-xs);
   color: var(--text-mid);
   margin-top: 3px;
   line-height: 1.6;
@@ -975,7 +1450,7 @@
 
 .token-box {
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: var(--fs-xs);
   background: var(--panel-raised);
   border: 1px solid var(--accent-dim);
   border-radius: var(--radius-sm);
@@ -983,4 +1458,586 @@
   word-break: break-all;
   line-height: 1.6;
   color: var(--accent);
+}
+
+/* ================= ตั้งค่าการแสดงผล ================= */
+.pref-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  flex-wrap: wrap;
+  padding: 12px 0;
+  border-top: 1px solid var(--hairline-soft);
+}
+
+.pref-row:first-of-type {
+  border-top: none;
+}
+
+.pref-row .label {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+}
+
+.pref-row .sub {
+  font-size: var(--fs-xs);
+  color: var(--text-mid);
+  margin-top: 2px;
+  line-height: 1.55;
+}
+
+/* การ์ดห้องที่ยังไม่ติดตั้งแอร์: จางลงและกรอบประ ให้ห้องที่ใช้งานจริงเด่นกว่า */
+.room-card.vacant {
+  background: transparent;
+  border-style: dashed;
+  box-shadow: none;
+}
+
+.room-card.vacant .room-card-name {
+  color: var(--text-mid);
+}
+
+/* ================= นำเข้าตารางเรียน ================= */
+.modal.wide {
+  width: 860px;
+}
+
+/* กล่องนำเข้า: เนื้อหาเลื่อนได้ แต่หัวกล่องและแถวปุ่มอยู่กับที่
+   ปุ่ม "นำเข้า" จึงเห็นเสมอ ไม่ต้องเลื่อนหาใต้ตารางตัวอย่างยาว ๆ */
+.modal.import-modal {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.import-modal .import-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  margin: 0 -22px;
+  padding: 0 22px 4px;
+}
+
+.import-modal .modal-actions {
+  flex: none;
+  margin-top: 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--hairline-soft);
+}
+
+@media (max-width: 620px) {
+  .import-modal .import-body {
+    margin: 0 -16px;
+    padding: 0 16px 4px;
+  }
+}
+
+.import-head {
+  flex: none;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.import-head h3 {
+  margin-bottom: 6px;
+}
+
+.import-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  font-size: var(--fs-2xs);
+  color: var(--text-low);
+}
+
+.import-steps .on {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.import-steps .done {
+  color: var(--text-mid);
+}
+
+.drop-zone {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 32px 16px;
+  border: 2px dashed var(--hairline);
+  border-radius: var(--radius-lg);
+  background: var(--panel-sunken);
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.drop-zone:hover,
+.drop-zone.dragging {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.drop-zone:focus-within {
+  border-color: var(--accent);
+  box-shadow: var(--focus-ring);
+}
+
+.dz-icon {
+  width: 54px;
+  height: 54px;
+  border-radius: 14px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dz-title {
+  font-size: var(--fs-md);
+  font-weight: 600;
+}
+
+.dz-sub {
+  font-size: var(--fs-xs);
+  color: var(--text-mid);
+}
+
+.import-formats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 14px 0 12px;
+}
+
+.format-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  font-size: var(--fs-xs);
+  color: var(--text-mid);
+  line-height: 1.6;
+}
+
+.format-card b {
+  font-size: var(--fs-sm);
+  color: var(--text-hi);
+}
+
+.format-card .link-btn {
+  margin-left: -6px;
+}
+
+.import-body > :last-child {
+  margin-bottom: 14px;
+}
+
+.import-note {
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  font-size: var(--fs-xs);
+  line-height: 1.6;
+  color: var(--text-mid);
+  margin-bottom: 10px;
+}
+
+.import-note.info {
+  background: var(--info-soft);
+  border-color: transparent;
+  color: var(--text-hi);
+}
+
+.import-note.warn {
+  background: var(--warn-soft);
+  border-color: rgba(232, 163, 61, 0.35);
+  color: var(--text-hi);
+}
+
+.import-note .note-title {
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--text-hi);
+  margin-bottom: 4px;
+}
+
+.import-note.warn .note-title {
+  color: var(--warn);
+}
+
+.import-note.info .note-title {
+  color: var(--info);
+}
+
+.import-note ul {
+  margin: 2px 0 2px 18px;
+}
+
+.import-rooms {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin: 4px 0 6px;
+}
+
+.import-file {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  background: var(--panel-raised);
+  margin-bottom: 12px;
+}
+
+.import-file-icon {
+  color: var(--accent);
+  display: flex;
+}
+
+.import-file-name {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.import-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.import-stat {
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+}
+
+.import-stat b {
+  display: block;
+  font-family: var(--font-disp);
+  font-size: var(--fs-xl);
+  line-height: 1.2;
+}
+
+.import-stat span {
+  font-size: var(--fs-2xs);
+  color: var(--text-mid);
+}
+
+.import-stat.warn b {
+  color: var(--warn);
+}
+
+.import-stat.info b {
+  color: var(--info);
+}
+
+.import-table-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px 12px;
+  flex-wrap: wrap;
+  margin: 14px 0 8px;
+}
+
+.table-wrap.import-table {
+  max-height: min(42vh, 340px);
+}
+
+table.data td.wrap {
+  white-space: normal;
+  min-width: 150px;
+}
+
+.import-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 48px 12px;
+  color: var(--text-mid);
+  text-align: center;
+}
+
+.spinner {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 3px solid var(--hairline);
+  border-top-color: var(--accent);
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation-duration: 2.4s;
+  }
+}
+
+.import-actions {
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.import-actions .btn {
+  flex: 0 1 auto;
+}
+
+.import-actions .actions-spacer {
+  flex: 1;
+}
+
+.import-confirm {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  background: var(--warn-soft);
+  border: 1px solid rgba(232, 163, 61, 0.35);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.import-confirm .note-icon {
+  color: var(--warn);
+  display: flex;
+  flex: none;
+}
+
+.import-done {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 26px 12px 10px;
+  text-align: center;
+}
+
+.import-done .done-icon {
+  color: var(--accent);
+  display: flex;
+}
+
+.import-done h4 {
+  font-family: var(--font-disp);
+  font-size: var(--fs-lg);
+}
+
+.import-done p {
+  font-size: var(--fs-sm);
+}
+
+.empty-cta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 36px 20px;
+  text-align: center;
+  max-width: 620px;
+  margin: 8px auto 0;
+}
+
+.empty-cta-title {
+  font-family: var(--font-disp);
+  font-size: var(--fs-lg);
+  font-weight: 700;
+}
+
+.empty-cta .btn {
+  margin-top: 6px;
+}
+
+@media (max-width: 620px) {
+  .import-formats {
+    grid-template-columns: 1fr;
+  }
+
+  .import-stats {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .import-actions .btn {
+    flex: 1 1 auto;
+  }
+
+  .import-actions .actions-spacer {
+    display: none;
+  }
+
+  /* มือถือเลื่อนกล่องทั้งกล่องที่เดียว ไม่ซ้อนแถบเลื่อนของตารางไว้ข้างใน */
+  .table-wrap.import-table {
+    max-height: none;
+  }
+
+  .drop-zone {
+    padding: 26px 14px;
+  }
+}
+
+/* ขั้นยืนยัน: กล่องเตือนเต็มแถว ปุ่มชิดขวาใต้กล่อง */
+.import-confirm + .btn {
+  margin-left: auto;
+}
+
+@media (max-width: 620px) {
+  .import-confirm + .btn {
+    margin-left: 0;
+  }
+}
+
+/* ================= ภาคเรียนของตารางเรียน ================= */
+.timetable-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px 14px;
+  flex-wrap: wrap;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-md);
+  background: var(--panel);
+  box-shadow: var(--shadow-card);
+}
+
+.timetable-icon {
+  width: 38px;
+  height: 38px;
+  flex: none;
+  border-radius: 10px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.timetable-title {
+  font-family: var(--font-disp);
+  font-size: var(--fs-md);
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.timetable-sub {
+  font-size: var(--fs-xs);
+  color: var(--text-mid);
+  line-height: 1.5;
+}
+
+.timetable-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 620px) {
+  .timetable-bar .grow {
+    flex-basis: calc(100% - 52px);
+  }
+
+  .timetable-actions {
+    width: 100%;
+  }
+
+  .timetable-actions .btn {
+    flex: 1 1 auto;
+  }
+}
+
+/* ตัวเลือกวิธีนำเข้าเมื่อมีห้องที่ไม่อยู่ในไฟล์ */
+.import-mode {
+  border: 1px solid var(--warn);
+  border-radius: var(--radius-md);
+  padding: 12px 14px 14px;
+  margin: 0 0 12px;
+  background: var(--warn-soft);
+}
+
+.import-mode legend {
+  float: left;
+  width: 100%;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--text-hi);
+  margin-bottom: 4px;
+  padding: 0;
+}
+
+.mode-hint {
+  clear: both;
+  font-size: var(--fs-xs);
+  color: var(--warn);
+  margin-bottom: 8px;
+}
+
+.mode-option {
+  clear: both;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  margin-top: 8px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.mode-option:hover {
+  border-color: var(--accent-dim);
+}
+
+.mode-option.sel {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+.mode-option input {
+  margin-top: 4px;
+  width: 17px;
+  height: 17px;
+  flex: none;
+  accent-color: var(--accent);
+}
+
+.mode-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.mode-text b {
+  font-size: var(--fs-sm);
+}
+
+.mode-text span {
+  font-size: var(--fs-xs);
+  color: var(--text-mid);
+  line-height: 1.55;
+  overflow-wrap: anywhere;
 }

@@ -90,7 +90,8 @@ function userRow(user, activeAdmins, update) {
     el(
       'select',
       {
-        style: { width: '120px' },
+        class: 'inline-select',
+        'aria-label': `สิทธิ์ของ ${user.username}`,
         disabled: isSelf || isLastAdmin,
         title: isSelf
           ? 'เปลี่ยนสิทธิ์ของตัวเองไม่ได้'
@@ -125,7 +126,7 @@ function userRow(user, activeAdmins, update) {
     el('div', { class: 'row', style: { gap: '6px' } }, [
       el('span', {
         class: 'dim',
-        style: { fontSize: '11px' },
+        style: { fontSize: 'var(--fs-2xs)' },
         text: 'เปิดใช้งาน',
       }),
       toggle(user.isActive, {

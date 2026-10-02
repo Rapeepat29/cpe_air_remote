@@ -38,6 +38,13 @@ const PERIODS = [
   { key: 'month', label: '30 วัน' },
 ];
 
+/** คำอธิบายจุดบนกราฟของแต่ละช่วง (วันนี้ = รายชั่วโมง ที่เหลือ = รายวัน) */
+const PERIOD_LABEL = {
+  day: 'ชั่วโมงนี้',
+  week: 'ทั้งวัน',
+  month: 'ทั้งวัน',
+};
+
 export default {
   title: 'ภาพรวม',
   subtitle: 'สรุปการใช้ไฟและสถานะของทั้งอาคารในหน้าจอเดียว',
@@ -137,23 +144,26 @@ function renderHero(box) {
       }),
       el('div', { class: `trend-chip ${trendClass}`, text: trendText }),
     ]),
-    areaChart(points, { height: 150 }),
-    el('div', { class: 'row', style: { marginTop: '10px', gap: '16px' } }, [
-      el('span', {
-        class: 'dim',
-        style: { fontSize: '11.5px' },
-        text: `เวลาทำงานรวม ${integer(summary.totals.runtimeMinutes)} นาที`,
-      }),
-      el('span', {
-        class: 'dim',
-        style: { fontSize: '11.5px' },
-        text: `กำลังไฟสูงสุด ${decimal(summary.totals.peakPowerWatts, 1)} W`,
-      }),
-      el('span', {
-        class: 'dim',
-        style: { fontSize: '11.5px' },
-        text: `มีข้อมูลจาก ${integer(summary.totals.deviceCount)} เครื่อง`,
-      }),
+    areaChart(points, {
+      height: 150,
+      tipLabel: (point) => `${point.label} · ${PERIOD_LABEL[period] ?? ''}`,
+    }),
+    el('div', { class: 'hero-facts' }, [
+      el('span', {}, [
+        'เวลาทำงานรวม ',
+        el('b', { text: integer(summary.totals.runtimeMinutes) }),
+        ' นาที',
+      ]),
+      el('span', {}, [
+        'กำลังไฟสูงสุด ',
+        el('b', { text: decimal(summary.totals.peakPowerWatts, 1) }),
+        ' W',
+      ]),
+      el('span', {}, [
+        'มีข้อมูลจาก ',
+        el('b', { text: integer(summary.totals.deviceCount) }),
+        ' เครื่อง',
+      ]),
     ]),
     tabs,
   ]);
@@ -161,7 +171,11 @@ function renderHero(box) {
 
 // ------------------------------------------------------------ ตัวเลขสี่ช่อง
 
-function statMini(iconMarkup, tone, value, suffix, label) {
+/**
+ * การ์ดตัวเลขเล็ก กดแล้วพาไปหน้าที่ดูรายละเอียดของตัวเลขนั้นได้
+ * ป้ายชื่ออยู่บนสุดคู่กับไอคอน คนจะรู้ก่อนว่ากำลังดูอะไร แล้วค่อยเห็นตัวเลข
+ */
+function statMini(iconMarkup, tone, value, suffix, label, target) {
   const iconBox = el('div', {
     class: 'stat-mini-icon',
     style: { background: tone.background, color: tone.color },
@@ -169,11 +183,27 @@ function statMini(iconMarkup, tone, value, suffix, label) {
   iconBox.innerHTML = iconMarkup;
   const valueNode = el('div', { class: 'stat-mini-val', text: value });
   if (suffix) valueNode.appendChild(el('small', { text: ` ${suffix}` }));
-  return el('div', { class: 'stat-mini' }, [
-    iconBox,
-    valueNode,
-    el('div', { class: 'stat-mini-label', text: label }),
-  ]);
+  return el(
+    target ? 'button' : 'div',
+    {
+      class: 'stat-mini',
+      type: target ? 'button' : null,
+      title: target ? 'ดูรายละเอียด' : null,
+      onclick: target
+        ? () => {
+            window.location.hash = `#/${target}`;
+          }
+        : null,
+    },
+    [
+      el('div', { class: 'stat-mini-head' }, [
+        iconBox,
+        el('div', { class: 'stat-mini-label', text: label }),
+      ]),
+      valueNode,
+      target ? el('div', { class: 'stat-mini-foot', text: 'ดูรายละเอียด ›' }) : null,
+    ],
+  );
 }
 
 function renderStats(box) {
@@ -182,9 +212,10 @@ function renderStats(box) {
   const accent = { background: 'var(--accent-soft)', color: 'var(--accent)' };
   const warn = { background: 'var(--warn-soft)', color: 'var(--warn)' };
   const neutral = {
-    background: 'rgba(143,179,158,.14)',
+    background: 'var(--neutral-soft)',
     color: 'var(--text-hi)',
   };
+  const isAdmin = state.user?.role === 'admin';
 
   replace(box, [
     statMini(
@@ -193,6 +224,7 @@ function renderStats(box) {
       totals ? String(totals.running) : '—',
       totals ? `/ ${totals.devices}` : '',
       'เครื่องปรับอากาศทำงานอยู่',
+      'rooms',
     ),
     statMini(
       icons.warning(15),
@@ -200,6 +232,7 @@ function renderStats(box) {
       String(openAlerts),
       '',
       'แจ้งเตือนรอดำเนินการ',
+      'alerts',
     ),
     statMini(
       icons.board(15),
@@ -207,13 +240,15 @@ function renderStats(box) {
       totals ? String(totals.online) : '—',
       totals ? `/ ${totals.devices}` : '',
       'ESP32 ออนไลน์',
+      isAdmin ? 'devices' : null,
     ),
     statMini(
       icons.clock(15),
       neutral,
       decimal(state.settings.electricityRate, 2),
       '',
-      'อัตราปัจจุบัน (บาท/kWh)',
+      'อัตราค่าไฟ (บาท/kWh)',
+      'rates',
     ),
   ]);
 }
@@ -239,6 +274,7 @@ function renderPulse(box, context) {
       'ใช้น้อย',
       el('span', { class: 'legend-bar' }),
       'ใช้มาก',
+      el('span', { class: 'legend-live', text: 'แอร์ทำงานอยู่' }),
     ]),
   ]);
 
@@ -266,10 +302,10 @@ function renderPulse(box, context) {
           const cell = el(
             'button',
             {
-              class: 'pulse-cell',
+              class: `pulse-cell${hasUnits ? '' : ' vacant'}`,
               type: 'button',
               style: {
-                background: heatColor(kwh, max),
+                background: hasUnits ? heatColor(kwh, max) : null,
                 flex: `${1 + (max > 0 ? (kwh / max) * 2.4 : 0)}`,
               },
               title:
@@ -327,7 +363,21 @@ function renderAlerts(box) {
     return;
   }
 
-  replace(box, [head, ...shown.map(alertRow)]);
+  const more = alerts.length - shown.length;
+  replace(box, [
+    head,
+    ...shown.map((alert) => alertRow(alert)),
+    el('div', { class: 'card-link' }, [
+      el('button', {
+        class: 'btn btn-sm',
+        type: 'button',
+        text: more > 0 ? `ดูทั้งหมด (อีก ${more} รายการ)` : 'ไปหน้าการแจ้งเตือน',
+        onclick: () => {
+          window.location.hash = '#/alerts';
+        },
+      }),
+    ]),
+  ]);
 }
 
 export function alertRow(alert, { onChanged = null } = {}) {
@@ -339,7 +389,7 @@ export function alertRow(alert, { onChanged = null } = {}) {
         ? 'ack'
         : 'done';
 
-  const actions = el('div', { class: 'row', style: { gap: '8px' } }, [
+  const actions = el('div', { class: 'row alert-actions', style: { gap: '8px' } }, [
     el('span', {
       class: `status-chip ${tone === 'ack' ? 'done' : tone}`,
       text: ALERT_STATUS_LABEL[alert.status] ?? alert.status,
@@ -366,8 +416,7 @@ export function alertRow(alert, { onChanged = null } = {}) {
       : null,
     alert.acknowledgedBy
       ? el('span', {
-          class: 'dim',
-          style: { fontSize: '11px' },
+          class: 'who',
           text: `โดย ${alert.acknowledgedBy}`,
         })
       : null,
@@ -378,7 +427,11 @@ export function alertRow(alert, { onChanged = null } = {}) {
     el('div', { class: 'alert-body' }, [
       el('div', { class: 'alert-top' }, [
         el('div', { class: 'alert-room', text: described.title }),
-        el('div', { class: 'alert-time', text: relativeTime(alert.createdAt) }),
+        el('div', {
+          class: 'alert-time',
+          text: relativeTime(alert.createdAt),
+          title: alert.createdAt ? new Date(alert.createdAt).toLocaleString('th-TH') : null,
+        }),
       ]),
       el('div', { class: 'alert-desc', text: described.body }),
       actions,
@@ -425,8 +478,7 @@ function renderRank(box) {
       icons.building(17),
     ),
     el('div', {
-      class: 'dim',
-      style: { fontSize: '11.5px', marginTop: '12px' },
+      class: 'rank-foot',
       text:
         `5 ห้องนี้กินไฟรวม ${energy(
           top.reduce((sum, row) => sum + Number(row.kwh || 0), 0),

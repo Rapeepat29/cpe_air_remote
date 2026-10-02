@@ -5,7 +5,9 @@ import { strToU8, zipSync } from 'fflate';
 
 import {
   parseScheduleFile,
+  pickSemester,
   scheduleLabelForDatabase,
+  validateScheduleImportPayload,
 } from '../src/utils/schedule-import.js';
 
 test('converts merged timetable cells in Excel into normalized schedules', async () => {
@@ -192,4 +194,53 @@ test('adds the section to the database display label', () => {
     }),
     'Operating System · (T) 68346CPE',
   );
+});
+
+const importRow = (overrides = {}) => ({
+  semester: '2/2569',
+  roomNumber: '16201',
+  dayOfWeek: 1,
+  startTime: '09:00',
+  endTime: '12:00',
+  subjectName: 'Computer Network',
+  section: '',
+  instructor: '',
+  ...overrides,
+});
+
+test('import commit replaces only rooms in the file unless replaceAll is true', () => {
+  const partial = validateScheduleImportPayload({
+    schedules: [importRow()],
+  });
+  assert.equal(partial.replaceAll, false);
+
+  // แอปมือถือรุ่นเดิมไม่ส่ง replaceAll และค่าที่ไม่ใช่ true จริงต้องไม่ล้างทุกห้อง
+  for (const value of ['true', 1, 'yes', null]) {
+    assert.equal(
+      validateScheduleImportPayload({ schedules: [importRow()], replaceAll: value })
+        .replaceAll,
+      false,
+    );
+  }
+
+  const all = validateScheduleImportPayload({
+    schedules: [importRow()],
+    replaceAll: true,
+  });
+  assert.equal(all.replaceAll, true);
+  assert.equal(all.semester, '2/2569');
+});
+
+test('pickSemester uses the most common semester and ignores blanks', () => {
+  assert.equal(
+    pickSemester([
+      importRow({ semester: '2/2569' }),
+      importRow({ semester: '2/2569' }),
+      importRow({ semester: '1/2569' }),
+      importRow({ semester: '' }),
+    ]),
+    '2/2569',
+  );
+  assert.equal(pickSemester([importRow({ semester: '' })]), '');
+  assert.equal(pickSemester([]), '');
 });
