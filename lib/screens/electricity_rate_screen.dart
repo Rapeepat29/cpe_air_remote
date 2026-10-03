@@ -303,7 +303,7 @@ class _CalculationRow extends StatelessWidget {
         Text(
           value,
           style: TextStyle(
-            color: emphasized ? AppColors.primary : colors.onSurface,
+            color: emphasized ? Theme.of(context).colorScheme.primary : colors.onSurface,
             fontSize: emphasized ? 18 : 13,
             fontWeight: FontWeight.w800,
           ),

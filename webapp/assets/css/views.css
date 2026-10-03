@@ -468,10 +468,10 @@ button.stat-mini:hover .stat-mini-foot {
 
 @keyframes pulse {
   0% {
-    box-shadow: 0 0 0 0 rgba(62, 207, 142, 0.55);
+    box-shadow: 0 0 0 0 rgba(46, 184, 114, 0.55);
   }
   100% {
-    box-shadow: 0 0 0 9px rgba(62, 207, 142, 0);
+    box-shadow: 0 0 0 9px rgba(46, 184, 114, 0);
   }
 }
 
@@ -1473,6 +1473,116 @@ button.stat-mini:hover .stat-mini-foot {
 
 .pref-row:first-of-type {
   border-top: none;
+}
+
+/* ตัวเลือกที่กว้าง (การ์ดธีม) ขึ้นบรรทัดใหม่ใต้หัวข้อเสมอ */
+.pref-row-stack {
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: stretch;
+}
+
+.theme-choices {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  align-items: start;
+  gap: 10px;
+}
+
+.theme-choice {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  padding: 8px 8px 10px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--hairline);
+  background: var(--panel);
+  color: var(--text-hi);
+  text-align: left;
+}
+
+.theme-choice:hover {
+  border-color: var(--accent-dim);
+}
+
+.theme-choice.sel {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+.theme-choice-name {
+  font-weight: 700;
+  font-size: var(--fs-sm);
+  margin-top: 4px;
+}
+
+.theme-choice.sel .theme-choice-name::after {
+  content: ' ✓';
+  color: var(--accent);
+}
+
+.theme-choice-desc {
+  font-size: var(--fs-2xs);
+  color: var(--text-mid);
+  line-height: 1.45;
+}
+
+/* ตัวอย่างธีมย่อส่วน: แถบเมนู + การ์ด ใช้สีจริงจาก tokens.css ผ่าน data-palette */
+.theme-preview {
+  display: flex;
+  height: 64px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(127, 127, 127, 0.35);
+  background: var(--bg);
+}
+
+.theme-preview .tp-side {
+  width: 22%;
+  background: var(--side-bg);
+  border-right: 1px solid var(--side-line);
+}
+
+.theme-preview .tp-body {
+  flex: 1;
+  padding: 10px 8px;
+}
+
+.theme-preview .tp-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  height: 100%;
+  padding: 8px;
+  border-radius: 6px;
+  background: var(--panel);
+  border: 1px solid var(--hairline);
+}
+
+.theme-preview .tp-line {
+  height: 5px;
+  width: 50%;
+  border-radius: 3px;
+  background: var(--hairline);
+}
+
+.theme-preview .tp-line.accent {
+  width: 70%;
+  background: var(--accent);
+}
+
+.theme-preview.auto .half {
+  flex: 1;
+  background: var(--bg);
+}
+
+.theme-preview.auto .half:first-child {
+  background: linear-gradient(var(--panel) 0 0) 50% 50% / 60% 40% no-repeat, var(--bg);
+}
+
+.theme-preview.auto .half:last-child {
+  background: linear-gradient(var(--panel) 0 0) 40% 50% / 60% 40% no-repeat, var(--bg);
 }
 
 .pref-row .label {

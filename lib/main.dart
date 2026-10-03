@@ -130,7 +130,9 @@ class _CpeAirRemoteAppState extends State<CpeAirRemoteApp> {
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
         ],
-        theme: AppTheme.light,
+        // ธีมที่ผู้ใช้เลือกอยู่ใน theme เสมอ ส่วน darkTheme ใช้เฉพาะตอนเลือก
+        // "ตามเครื่อง" แล้วเครื่องอยู่ในโหมดมืด
+        theme: AppTheme.forChoice(_appSettingsController.themeChoice),
         darkTheme: AppTheme.dark,
         // ขนาดตัวอักษรที่ผู้ใช้เลือกในแอป คูณกับที่ตั้งไว้ในระบบ Android
         // วางไว้ที่ builder เพื่อให้ครอบทั้ง route และ dialog ทุกใบ
@@ -148,8 +150,9 @@ class _CpeAirRemoteAppState extends State<CpeAirRemoteApp> {
             child: child,
           );
         },
-        themeMode: _appSettingsController.isDarkMode
-            ? ThemeMode.dark
+        themeMode:
+            _appSettingsController.themeChoice == AppThemeChoice.system
+            ? ThemeMode.system
             : ThemeMode.light,
         home: AnimatedBuilder(
           animation: _authController,

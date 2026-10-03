@@ -152,8 +152,6 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
         title: Text(
           context.tr('Manage User Permissions'),
           style: const TextStyle(fontWeight: FontWeight.w800),

@@ -7,6 +7,7 @@ import '../models/room.dart';
 import '../models/system_alert.dart';
 import '../theme/app_theme.dart';
 import '../utils/number_format.dart';
+import '../widgets/brand_mark.dart';
 import '../widgets/period_selector.dart';
 import '../widgets/section_title.dart';
 import '../widgets/status_pill.dart';
@@ -143,38 +144,30 @@ class _HomeHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = AppPalette.of(context);
+
     return Container(
       height: 58,
-      color: AppColors.primary,
-      padding: const EdgeInsets.symmetric(horizontal: 18),
+      color: palette.bar,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
         children: [
-          Expanded(
-            child: Text(
-              context.tr('CPE Green Office'),
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 19,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-          ),
+          const BrandMark(size: 32),
+          const SizedBox(width: 10),
+          const Expanded(child: BrandWordmark()),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             decoration: BoxDecoration(
-              color: openAlerts > 0
-                  ? AppColors.orange
-                  : const Color(0xFF247231),
-              borderRadius: BorderRadius.circular(8),
+              color: openAlerts > 0 ? palette.warnSoft : palette.accentSoft,
+              borderRadius: BorderRadius.circular(99),
             ),
             child: Text(
               openAlerts > 0
                   ? '${context.tr('Building 16')} · $openAlerts'
                   : context.tr('Building 16'),
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 11,
+              style: TextStyle(
+                color: openAlerts > 0 ? palette.warn : palette.accent,
+                fontSize: 12,
                 fontWeight: FontWeight.w800,
               ),
             ),
@@ -201,6 +194,8 @@ class _EnergyCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    final palette = AppPalette.of(context);
+    final isLight = Theme.of(context).brightness == Brightness.light;
     // สลับหน่วยตามขนาดของค่า ที่ชาร์จมือถือระดับ 0.005 kWh จะได้ไม่กลายเป็น 0.0
     final total = formatEnergy(summary.totalKwh);
 
@@ -209,13 +204,17 @@ class _EnergyCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: colors.surface,
         borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.13),
-            blurRadius: 18,
-            offset: const Offset(0, 8),
-          ),
-        ],
+        // ธีมพื้นเข้มใช้เส้นขอบแทนเงา เพราะเงาบนพื้นเข้มมองไม่เห็น
+        border: isLight ? null : Border.all(color: colors.outlineVariant),
+        boxShadow: isLight
+            ? [
+                BoxShadow(
+                  color: AppColors.charcoal.withValues(alpha: 0.08),
+                  blurRadius: 18,
+                  offset: const Offset(0, 8),
+                ),
+              ]
+            : null,
       ),
       child: Column(
         children: [
@@ -223,10 +222,14 @@ class _EnergyCard extends StatelessWidget {
             alignment: Alignment.centerRight,
             child: PeriodSelector(controller: controller),
           ),
-          const Icon(
-            Icons.bolt_rounded,
-            color: Color(0xFFFFB000),
-            size: 40,
+          Container(
+            width: 46,
+            height: 46,
+            decoration: BoxDecoration(
+              color: palette.accentSoft,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Icon(Icons.bolt_rounded, color: palette.accent, size: 28),
           ),
           const SizedBox(height: 2),
           Text(
@@ -244,9 +247,10 @@ class _EnergyCard extends StatelessWidget {
             children: [
               Text(
                 total.value,
-                style: const TextStyle(
-                  color: AppColors.primary,
-                  fontSize: 39,
+                style: TextStyle(
+                  color: palette.accent,
+                  fontFamily: kDisplayFont,
+                  fontSize: 42,
                   height: 1,
                   fontWeight: FontWeight.w700,
                 ),
@@ -256,10 +260,11 @@ class _EnergyCard extends StatelessWidget {
                 padding: const EdgeInsets.only(bottom: 4),
                 child: Text(
                   total.unit,
-                  style: const TextStyle(
-                    color: AppColors.primary,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w800,
+                  style: TextStyle(
+                    color: palette.accent,
+                    fontFamily: kDisplayFont,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ),
@@ -286,15 +291,15 @@ class _EnergyCard extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
               decoration: BoxDecoration(
-                color: AppColors.green.withValues(alpha: 0.14),
+                color: palette.accentSoft,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.payments_rounded,
-                    color: AppColors.green,
+                    color: palette.accent,
                     size: 18,
                   ),
                   const SizedBox(width: 7),
@@ -305,8 +310,8 @@ class _EnergyCard extends StatelessWidget {
                       // ต่อกันเองจะได้ `ค่าไฟโดยประมาณ: บาท 1,420.13` ซึ่งผิด
                       'Estimated cost: THB '
                       '${formatDecimal(electricityCost)}',
-                      style: const TextStyle(
-                        color: AppColors.green,
+                      style: TextStyle(
+                        color: palette.accent,
                         fontSize: 13,
                         fontWeight: FontWeight.w800,
                       ),
@@ -339,9 +344,9 @@ class _NoAlertsCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          const Icon(
+          Icon(
             Icons.verified_rounded,
-            color: AppColors.green,
+            color: colors.primary,
             size: 28,
           ),
           const SizedBox(height: 8),
@@ -424,7 +429,7 @@ class _AlertCard extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
     final statusColor = alert.isWarning
         ? (alert.isOpen ? AppColors.orange : colors.onSurfaceVariant)
-        : const Color(0xFF36A54A);
+        : colors.primary;
     final currentRoom = room;
     final title = currentRoom == null
         ? '${context.tr('Room')} ${alert.roomNumber}'

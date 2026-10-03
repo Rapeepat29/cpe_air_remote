@@ -685,6 +685,20 @@ const _thaiTranslations = <String, String>{
   'APPEARANCE': 'รูปแบบการแสดงผล',
   'Dark mode': 'โหมดมืด',
   'Use a dark color theme throughout the app': 'ใช้ชุดสีมืดกับทุกหน้าภายในแอป',
+  'Theme colors': 'ธีมสี',
+  'Colors come from the RMUTT Save Energy logo. Saved on this phone.':
+      'สีทั้งหมดมาจากโลโก้ RMUTT Save Energy บันทึกไว้ในเครื่องนี้',
+  'White': 'ขาว',
+  'Gray': 'เทา',
+  'Black': 'ดำ',
+  'Green': 'เขียว',
+  'Match phone': 'ตามเครื่อง',
+  'Bright and easy to read in sunny rooms': 'สว่าง อ่านง่ายในห้องที่แสงจ้า',
+  'The logo charcoal, gentle on the eyes': 'โทนเดียวกับพื้นโลโก้ สบายตา',
+  'Fully dark for screens left on at night': 'มืดสนิท สำหรับจอที่เปิดค้างตอนกลางคืน',
+  'Deep green header with light content': 'แถบหัวเขียวเข้ม เนื้อหาพื้นสว่าง',
+  'White in light mode, Gray in dark mode':
+      'เครื่องโหมดสว่างใช้ ขาว โหมดมืดใช้ เทา',
   'LANGUAGE': 'ภาษา',
   'App language': 'ภาษาของแอป',
   'Choose Thai or English. Your selection is saved automatically.':

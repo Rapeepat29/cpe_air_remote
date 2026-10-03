@@ -1,5 +1,5 @@
 /**
- * ค่าการแสดงผลของผู้ใช้แต่ละเครื่อง: ธีม (มืด/สว่าง) และขนาดตัวอักษร
+ * ค่าการแสดงผลของผู้ใช้แต่ละเครื่อง: ขนาดตัวอักษร (ธีมสีย้ายไปอยู่ใน theme.js)
  *
  * เก็บใน localStorage ของเบราว์เซอร์ ไม่ส่งขึ้นเซิร์ฟเวอร์ เพราะเป็นเรื่องของ
  * "จอเครื่องนี้" ไม่ใช่ของบัญชี — คนเดียวกันอาจอยากได้ธีมสว่างบนคอมในห้องทำงาน
@@ -13,15 +13,21 @@
  * จะไม่มีคีย์ใหม่ให้อ่าน
  */
 
+import {
+  THEMES as PALETTES,
+  activeTheme,
+  setTheme as setPalette,
+} from './theme.js';
+
 const STORAGE = {
-  theme: 'rmutt.theme',
   textSize: 'rmutt.textSize',
 };
 
-export const THEMES = [
-  { key: 'dark', label: 'มืด' },
-  { key: 'light', label: 'สว่าง' },
-];
+/*
+ * THEMES / setTheme / toggleTheme / prefs.theme คงไว้ให้ไฟล์รุ่นก่อนที่อาจค้าง
+ * ในแคชของเบราว์เซอร์เรียกได้โดยไม่พัง ของใหม่ให้ใช้จาก theme.js โดยตรง
+ */
+export const THEMES = PALETTES;
 
 export const TEXT_SIZES = [
   { key: 'normal', label: 'ปกติ' },
@@ -49,32 +55,28 @@ function write(key, value) {
 }
 
 export const prefs = {
-  theme: read(STORAGE.theme, THEMES, 'dark'),
+  get theme() {
+    return activeTheme();
+  },
   textSize: read(STORAGE.textSize, TEXT_SIZES, 'normal'),
 };
 
 /** ใส่ค่าลง <html> เรียกครั้งแรกก่อนวาดหน้าจอ และทุกครั้งที่ค่าเปลี่ยน */
 export function applyPrefs() {
   const root = document.documentElement;
-  root.dataset.theme = prefs.theme;
   if (prefs.textSize === 'normal') delete root.dataset.text;
   else root.dataset.text = prefs.textSize;
-
-  // สีของแถบเบราว์เซอร์บนมือถือให้กลืนกับหัวเว็บ
-  const meta = document.querySelector('meta[name="theme-color"]');
-  if (meta) meta.setAttribute('content', prefs.theme === 'light' ? '#f2f5f3' : '#060d09');
 }
 
 export function setTheme(theme) {
-  if (!THEMES.some((item) => item.key === theme)) return;
-  prefs.theme = theme;
-  write(STORAGE.theme, theme);
-  applyPrefs();
+  setPalette(theme);
   notify();
 }
 
+/** สลับไปธีมถัดไปตามลำดับ (เทา → ขาว → ดำ → เขียว) */
 export function toggleTheme() {
-  setTheme(prefs.theme === 'light' ? 'dark' : 'light');
+  const index = PALETTES.findIndex((item) => item.key === activeTheme());
+  setTheme(PALETTES[(index + 1) % PALETTES.length].key);
 }
 
 export function setTextSize(size) {

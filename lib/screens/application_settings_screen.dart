@@ -34,29 +34,7 @@ class ApplicationSettingsScreen extends StatelessWidget {
             children: [
               const _SectionLabel('APPEARANCE'),
               const SizedBox(height: 10),
-              Material(
-                color: colors.surface,
-                borderRadius: BorderRadius.circular(18),
-                clipBehavior: Clip.antiAlias,
-                child: SwitchListTile(
-                  key: const Key('dark-mode-switch'),
-                  value: controller.isDarkMode,
-                  onChanged: controller.setDarkMode,
-                  secondary: _SettingsIcon(
-                    icon: controller.isDarkMode
-                        ? Icons.dark_mode_rounded
-                        : Icons.light_mode_rounded,
-                    color: AppColors.primary,
-                  ),
-                  title: Text(
-                    context.tr('Dark mode'),
-                    style: const TextStyle(fontWeight: FontWeight.w800),
-                  ),
-                  subtitle: Text(
-                    context.tr('Use a dark color theme throughout the app'),
-                  ),
-                ),
-              ),
+              _ThemeCard(controller: controller),
               const SizedBox(height: 24),
               const _SectionLabel('LANGUAGE'),
               const SizedBox(height: 10),
@@ -141,6 +119,245 @@ class ApplicationSettingsScreen extends StatelessWidget {
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+/// การ์ดเลือกธีม: ตัวอย่างสีย่อส่วนของแต่ละธีมให้เห็นก่อนกด
+///
+/// ธีมเก็บไว้ในเครื่องนี้ เหมือนภาษาและขนาดตัวอักษร
+class _ThemeCard extends StatelessWidget {
+  const _ThemeCard({required this.controller});
+
+  final AppSettingsController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
+    return Material(
+      color: colors.surface,
+      borderRadius: BorderRadius.circular(18),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                _SettingsIcon(
+                  icon: Icons.palette_rounded,
+                  color: AppPalette.of(context).accent,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        context.tr('Theme colors'),
+                        style: const TextStyle(fontWeight: FontWeight.w800),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        context.tr(
+                          'Colors come from the RMUTT Save Energy logo. '
+                          'Saved on this phone.',
+                        ),
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 14),
+            LayoutBuilder(
+              builder: (context, constraints) {
+                // จอกว้าง (แท็บเล็ต/คอม) วางครบห้าแบบในแถวเดียว มือถือวางแถวละสาม
+                const gap = 8.0;
+                final columns = constraints.maxWidth >= 520 ? 5 : 3;
+                final width =
+                    (constraints.maxWidth - gap * (columns - 1)) / columns;
+                return Wrap(
+                  spacing: gap,
+                  runSpacing: gap,
+                  children: [
+                    for (final choice in AppThemeChoice.values)
+                      SizedBox(
+                        width: width,
+                        child: _ThemeOption(
+                          choice: choice,
+                          selected: controller.themeChoice == choice,
+                          onTap: () => controller.setTheme(choice),
+                        ),
+                      ),
+                  ],
+                );
+              },
+            ),
+            const SizedBox(height: 10),
+            Text(
+              context.tr(controller.themeChoice.description),
+              style: TextStyle(fontSize: 12, color: colors.onSurfaceVariant),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ThemeOption extends StatelessWidget {
+  const _ThemeOption({
+    required this.choice,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final AppThemeChoice choice;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
+    return Semantics(
+      selected: selected,
+      button: true,
+      child: Material(
+        color: colors.surface,
+        clipBehavior: Clip.antiAlias,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(14),
+          side: BorderSide(
+            color: selected ? colors.primary : colors.outlineVariant,
+            width: selected ? 2 : 1,
+          ),
+        ),
+        child: InkWell(
+          key: Key('theme-option-${choice.code}'),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.all(7),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (choice == AppThemeChoice.system)
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _MiniScreen(
+                          colors: AppTheme.previewColors(AppThemeChoice.white),
+                        ),
+                      ),
+                      const SizedBox(width: 3),
+                      Expanded(
+                        child: _MiniScreen(
+                          colors: AppTheme.previewColors(AppThemeChoice.gray),
+                        ),
+                      ),
+                    ],
+                  )
+                else
+                  _MiniScreen(colors: AppTheme.previewColors(choice)),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        context.tr(choice.label),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                    Icon(
+                      selected
+                          ? Icons.radio_button_checked_rounded
+                          : Icons.radio_button_unchecked_rounded,
+                      size: 18,
+                      color: selected
+                          ? colors.primary
+                          : colors.onSurfaceVariant,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// หน้าจอย่อส่วน: พื้น แถบหัว การ์ด และสีเน้นของธีมนั้น
+class _MiniScreen extends StatelessWidget {
+  const _MiniScreen({required this.colors});
+
+  /// ลำดับตาม AppTheme.previewColors: พื้น แถบหัว การ์ด สีเน้น
+  final List<Color> colors;
+
+  @override
+  Widget build(BuildContext context) {
+    final accent = colors[3];
+
+    return Container(
+      height: 50,
+      clipBehavior: Clip.antiAlias,
+      decoration: BoxDecoration(
+        color: colors[0],
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: const Color(0x55808080)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Container(height: 12, color: colors[1]),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(6),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6),
+                decoration: BoxDecoration(
+                  color: colors[2],
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Row(
+                  children: [
+                    Flexible(
+                      child: Container(
+                        width: 22,
+                        height: 5,
+                        decoration: BoxDecoration(
+                          color: accent,
+                          borderRadius: BorderRadius.circular(3),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Flexible(
+                      child: Container(
+                        width: 14,
+                        height: 5,
+                        decoration: BoxDecoration(
+                          color: accent.withValues(alpha: 0.35),
+                          borderRadius: BorderRadius.circular(3),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

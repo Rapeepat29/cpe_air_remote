@@ -14,6 +14,43 @@ SystemAlert _alert(String id, SystemAlertKind kind) {
 }
 
 void main() {
+  group('AppThemeChoice', () {
+    test('รหัสที่บันทึกไว้อ่านกลับมาได้ครบทุกธีม', () {
+      for (final choice in AppThemeChoice.values) {
+        expect(AppThemeChoice.fromCode(choice.code), choice);
+      }
+      expect(AppThemeChoice.fromCode('purple'), isNull);
+    });
+
+    test('ยังไม่เคยเลือกอะไรได้ธีมขาว', () async {
+      final controller = AppSettingsController(store: _MemoryStore());
+      await controller.initialize();
+
+      expect(controller.themeChoice, AppThemeChoice.white);
+      expect(controller.isDarkMode, isFalse);
+    });
+
+    test('ผู้ใช้รุ่นก่อนที่เปิดโหมดมืดไว้ ได้ธีมเทา', () async {
+      final store = _MemoryStore();
+      await store.saveDarkMode(true);
+      final controller = AppSettingsController(store: store);
+      await controller.initialize();
+
+      expect(controller.themeChoice, AppThemeChoice.gray);
+      expect(controller.isDarkMode, isTrue);
+    });
+
+    test('ธีมที่เลือกถูกบันทึกและอ่านกลับมาได้', () async {
+      final store = _MemoryStore();
+      await AppSettingsController(store: store).setTheme(AppThemeChoice.green);
+
+      final reloaded = AppSettingsController(store: store);
+      await reloaded.initialize();
+      expect(reloaded.themeChoice, AppThemeChoice.green);
+      expect(reloaded.isDarkMode, isFalse);
+    });
+  });
+
   group('AppTextScale', () {
     test('รหัสที่ไม่รู้จักหรือว่างเปล่าถอยไปขนาดปกติ', () {
       expect(AppTextScale.fromCode(null), AppTextScale.normal);
@@ -214,6 +251,14 @@ class _MemoryStore implements AppSettingsStore {
 
   @override
   Future<void> saveDarkMode(bool enabled) async => _darkMode = enabled;
+
+  String? _themeCode;
+
+  @override
+  Future<String?> loadThemeCode() async => _themeCode;
+
+  @override
+  Future<void> saveThemeCode(String code) async => _themeCode = code;
 
   @override
   Future<String?> loadLanguageCode() async => _languageCode;

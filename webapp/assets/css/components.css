@@ -841,6 +841,52 @@ table.data.sticky-first tfoot td:first-child {
   }
 }
 
+/* ---------- จุดเลือกธีมบนแถบบน ---------- */
+.theme-dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  padding: 0 3px;
+  height: var(--tap);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--hairline);
+  background: var(--panel);
+}
+
+.theme-dot {
+  width: 32px;
+  height: 100%;
+  border: none;
+  background: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.theme-dot > span {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid rgba(127, 127, 127, 0.5);
+  transition: transform 0.12s;
+}
+
+.theme-dot:hover > span {
+  transform: scale(1.12);
+}
+
+/* วงแหวนสองชั้น: ชั้นในสีพื้นการ์ด ชั้นนอกสีเน้น เห็นชัดทั้งจุดขาวและจุดดำ */
+.theme-dot.sel > span {
+  box-shadow: 0 0 0 2px var(--panel), 0 0 0 4px var(--accent);
+}
+
+@media (pointer: coarse) {
+  .theme-dot {
+    width: 38px;
+  }
+}
+
 /* ---------- หน้าเข้าสู่ระบบ ---------- */
 .login-screen {
   position: fixed;
@@ -872,8 +918,28 @@ table.data.sticky-first tfoot td:first-child {
 .login-brand {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   margin-bottom: 24px;
+}
+
+.login-brand .brand-mark {
+  width: 52px;
+  height: 52px;
+  box-shadow: none;
+}
+
+/* การ์ดเข้าสู่ระบบเป็นพื้นการ์ด ไม่ใช่พื้นเมนูข้าง จึงใช้สีตัวหนังสือปกติ */
+.login-brand .wordmark-name {
+  color: var(--text-hi);
+}
+
+.login-brand .wordmark-name b,
+.login-brand .wordmark-tag {
+  color: var(--accent);
+}
+
+.login-brand .user-role {
+  margin-top: 4px;
 }
 
 .login-error {

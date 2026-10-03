@@ -17,7 +17,8 @@ import { $, el, replace, svg } from './dom.js';
 import { thaiFullDate } from './format.js';
 import { icons } from './icons.js';
 import { uiIcons } from './icons-ui.js';
-import { onPrefsChange, prefs, toggleTheme } from './prefs.js';
+import { onPrefsChange } from './prefs.js';
+import { onThemeChange, themeDots } from './theme.js';
 import {
   bootstrap,
   loaders,
@@ -159,8 +160,11 @@ function wireShell() {
     else closeSidebar();
   });
   window.addEventListener('hashchange', () => navigate(readHash()));
-  // ปุ่มสลับธีมบนแถบบนต้องเปลี่ยนไอคอนตามเมื่อไปเปลี่ยนจากหน้าตั้งค่า
+  // จุดเลือกธีมบนแถบบนต้องเปลี่ยนตามเมื่อไปเปลี่ยนจากหน้าตั้งค่า
   onPrefsChange(() => {
+    if (state.user) renderTopbar();
+  });
+  onThemeChange(() => {
     if (state.user) renderTopbar();
   });
 }
@@ -400,17 +404,7 @@ function renderTopbar() {
       },
       [svg(icons.refresh(15))],
     ),
-    el(
-      'button',
-      {
-        class: 'icon-btn',
-        type: 'button',
-        title: prefs.theme === 'light' ? 'เปลี่ยนเป็นธีมมืด' : 'เปลี่ยนเป็นธีมสว่าง',
-        'aria-label': prefs.theme === 'light' ? 'เปลี่ยนเป็นธีมมืด' : 'เปลี่ยนเป็นธีมสว่าง',
-        onclick: toggleTheme,
-      },
-      [svg(prefs.theme === 'light' ? uiIcons.moon(16) : uiIcons.sun(16))],
-    ),
+    themeDots(),
   ];
 
   replace(dom.topbarRight, pills);

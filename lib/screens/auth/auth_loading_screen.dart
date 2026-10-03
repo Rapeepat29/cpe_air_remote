@@ -1,4 +1,5 @@
 import '../../localization/localized_material.dart';
+import '../../widgets/brand_mark.dart';
 
 class AuthLoadingScreen extends StatelessWidget {
   const AuthLoadingScreen({super.key});
@@ -10,13 +11,11 @@ class AuthLoadingScreen extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
-              Icons.energy_savings_leaf_rounded,
-              size: 64,
-              color: Color(0xFF16834B),
+            const BrandMark(size: 72),
+            const SizedBox(height: 22),
+            CircularProgressIndicator(
+              color: Theme.of(context).colorScheme.primary,
             ),
-            const SizedBox(height: 20),
-            const CircularProgressIndicator(color: Color(0xFF16834B)),
             const SizedBox(height: 14),
             Text(
               context.tr('Checking your session...'),

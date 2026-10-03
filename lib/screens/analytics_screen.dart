@@ -84,8 +84,8 @@ class AnalyticsScreen extends StatelessWidget {
                               : context.tr(
                                   'Floor ${dashboardController.floor}',
                                 ),
-                          style: const TextStyle(
-                            color: AppColors.primary,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
                             fontSize: 13,
                             fontWeight: FontWeight.w800,
                           ),
@@ -343,8 +343,8 @@ class _UsageRoomCard extends StatelessWidget {
                   '${context.tr('Runtime')} '
                   '${formatDecimal(usage.runtimeMinutes, decimalPlaces: 0)}'
                   ' ${context.tr('min')}',
-                  style: const TextStyle(
-                    color: AppColors.primary,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.primary,
                     fontSize: 9.5,
                     fontWeight: FontWeight.w600,
                   ),
@@ -357,8 +357,8 @@ class _UsageRoomCard extends StatelessWidget {
             children: [
               Text(
                 energy.text,
-                style: const TextStyle(
-                  color: AppColors.primary,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.primary,
                   fontSize: 16,
                   fontWeight: FontWeight.w800,
                 ),

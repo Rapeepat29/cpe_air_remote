@@ -1,7 +1,7 @@
 name: cpe_air_remote
 description: RMUTT Save Energy air-conditioner control app for Building 16.
 publish_to: "none"
-version: 3.12.0+29
+version: 3.13.0+30
 
 environment:
   sdk: ">=3.8.0 <4.0.0"
@@ -27,3 +27,13 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  # ฟอนต์หัวข้อและตัวเลขใหญ่ ตัวเดียวกับตัวหนังสือในโลโก้ (มีอักษรไทย)
+  # สัญญาอนุญาต SIL Open Font License อยู่ที่ assets/fonts/ChakraPetch-OFL.txt
+  fonts:
+    - family: ChakraPetch
+      fonts:
+        - asset: assets/fonts/ChakraPetch-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/ChakraPetch-Bold.ttf
+          weight: 700

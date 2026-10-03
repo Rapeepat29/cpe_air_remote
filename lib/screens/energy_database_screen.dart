@@ -183,14 +183,14 @@ class _EnergyDatabaseScreenState extends State<EnergyDatabaseScreen>
       builder: (context, _) {
         return Scaffold(
           appBar: AppBar(
-            backgroundColor: AppColors.primary,
-            foregroundColor: Colors.white,
             title: Text(context.tr('Database')),
             bottom: TabBar(
               controller: _tabController,
-              indicatorColor: Colors.white,
-              labelColor: Colors.white,
-              unselectedLabelColor: Colors.white70,
+              indicatorColor: AppPalette.of(context).accent,
+              labelColor: AppPalette.of(context).onBar,
+              unselectedLabelColor: AppPalette.of(
+                context,
+              ).onBar.withValues(alpha: 0.72),
               tabs: [
                 Tab(text: context.tr('Live readings')),
                 Tab(text: context.tr('Export to Excel')),
@@ -887,7 +887,7 @@ class _ScopeTile extends StatelessWidget {
                     ? Icons.radio_button_checked_rounded
                     : Icons.radio_button_unchecked_rounded,
                 size: 20,
-                color: selected ? AppColors.primary : colors.onSurfaceVariant,
+                color: selected ? Theme.of(context).colorScheme.primary : colors.onSurfaceVariant,
               ),
               const SizedBox(width: 11),
               Expanded(
@@ -1272,10 +1272,10 @@ class _TotalPill extends StatelessWidget {
         ),
         Text(
           value,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w800,
-            color: AppColors.primary,
+            color: Theme.of(context).colorScheme.primary,
           ),
         ),
       ],
