@@ -3,8 +3,10 @@ import {
   AUTO_OFF_MAX_ATTEMPTS,
   decideAutoOff,
 } from '../utils/auto-off.js';
-import { evaluateClassSchedule } from '../utils/class-schedule.js';
+import { bangkokDate, evaluateClassSchedule } from '../utils/class-schedule.js';
 import { readActiveTermGate } from './academic-terms.js';
+import { readTodayBookings } from './room-bookings.js';
+import { withBookings } from '../utils/room-booking.js';
 import { ALERT_KINDS, raiseAlert, resolveOpenAlerts } from './alerts.js';
 import { onAirStatus, onOccupancyStatus, publishAirCommand } from './mqtt.js';
 import { isAutoOffEnabled } from './system-settings.js';
@@ -340,7 +342,9 @@ async function readSchedule(roomNumber, now) {
   );
   // นอกวันเปิด-ปิดภาคเรียน ทุกห้องถือว่าอยู่นอกคาบ (ดู services/academic-terms.js)
   const term = await readActiveTermGate();
-  return evaluateClassSchedule(rows, now, { term });
+  // การจองห้อง (ประชุม สอบ กิจกรรม) ที่กำลังเกิดขึ้น ถือว่าห้องอยู่ในคาบด้วย
+  const bookings = await readTodayBookings(roomNumber, bangkokDate(now));
+  return withBookings(evaluateClassSchedule(rows, now, { term }), bookings, now);
 }
 
 function parseState(value) {

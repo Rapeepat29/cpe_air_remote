@@ -274,6 +274,11 @@ export const api = {
   schedulesWithInfo: (query) => get('/schedules', query),
   /** ปฏิทินภาคเรียน { today, terms: [{ semester, startDate, endDate, status }] } */
   academicTerms: () => get('/schedules/terms'),
+  /** การใช้ห้องนอกตารางเรียน (ประชุม สอบ กิจกรรม) ที่ทับช่วงวันที่ */
+  bookings: (query) => get('/bookings', query).then((r) => r.bookings),
+  createBooking: (input) => post('/bookings', input),
+  updateBooking: (id, input) => put(`/bookings/${encodeURIComponent(id)}`, input),
+  deleteBooking: (id) => remove(`/bookings/${encodeURIComponent(id)}`),
   saveAcademicTerm: (input) => put('/schedules/terms', input).then((r) => r.term),
   deleteAcademicTerm: (semester) =>
     request('DELETE', '/schedules/terms', { query: { semester } }),

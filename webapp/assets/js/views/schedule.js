@@ -1,9 +1,13 @@
 /**
- * หน้าตารางเรียน
+ * หน้าตารางเรียนและการใช้ห้อง
  *
  * ตารางเรียนไม่ได้มีไว้ดูเฉย ๆ — ระบบปิดแอร์อัตโนมัติใช้มันตัดสินว่าตอนนี้
  * เป็น "ในคาบเรียน" (รอ 15 นาที) หรือ "นอกคาบเรียน" (รอ 5 นาที) ข้อมูลผิด
  * จึงแปลว่าแอร์โดนปิดผิดจังหวะ หน้านี้เลยต้องแก้ไขได้ ไม่ใช่แค่แสดงผล
+ *
+ * ดูเป็นรายวันตามวันที่จริง (เลื่อนทีละสัปดาห์ได้) เพราะนอกจากคาบเรียนประจำ
+ * ยังมีการใช้ห้องที่มีวันที่กำกับ (ประชุม สอบ กิจกรรม) และวันเปิด-ปิดภาคเรียน
+ * วันเดียวกันในสัปดาห์คนละสัปดาห์จึงอาจมีรายการไม่เหมือนกัน
  */
 
 import { api } from '../api.js';
@@ -12,11 +16,27 @@ import { DAY_NAMES, floorLabel, isoDate, thaiShortDate } from '../format.js';
 import { icons } from '../icons.js';
 import { uiIcons } from '../icons-ui.js';
 import { loaders, roomsByFloor, state } from '../store.js';
-import { confirmAction, openForm, toastError, toastOk } from '../ui.js';
+import { confirmAction, openForm, openModal, toastError, toastOk } from '../ui.js';
 import { openScheduleImport, schedulesToCsv, downloadText } from './schedule-import.js';
-import { createTermCalendar, termStatusLine } from './term-calendar.js';
+import { createTermCalendar, termFor, termStatusLine } from './term-calendar.js';
+import {
+  CATEGORY_LABEL,
+  addDays,
+  bookingOccursOn,
+  dayOfWeekOf,
+  describeRepeat,
+  openBookingForm,
+} from './booking-form.js';
 
-let selectedDay = new Date().getDay();
+/** วันที่ที่กำลังดู (YYYY-MM-DD) null = วันนี้ */
+let selectedDate = null;
+
+const todayIso = () => state.today ?? isoDate();
+
+const DAY_SHORT = ['อา.', 'จ.', 'อ.', 'พ.', 'พฤ.', 'ศ.', 'ส.'];
+
+/** วันอาทิตย์ของสัปดาห์ที่มีวันนั้น (หัวตารางเรียงอาทิตย์-เสาร์ เหมือนเดิม) */
+const weekStartOf = (date) => addDays(date, -dayOfWeekOf(date));
 
 /**
  * 'all' = ทุกชั้น แสดงเฉพาะห้องที่มีคาบในวันนั้น
@@ -31,7 +51,8 @@ export default {
 
   async mount(root) {
     const infoBar = el('div', { class: 'timetable-bar' });
-    const dayTabs = el('div', { class: 'tabbar' });
+    const weekNav = el('div', { class: 'week-nav' });
+    const dayTabs = el('div', { class: 'tabbar day-tabs' });
     const floorTabs = el('div', { class: 'tabbar section-gap' });
     const toolbar = el('div', { class: 'sched-toolbar' });
     const note = el('div', { class: 'hidden-note' });
@@ -39,7 +60,19 @@ export default {
 
     const calendar = createTermCalendar({ onChanged: () => update() });
 
-    replace(root, [infoBar, calendar.element, dayTabs, floorTabs, toolbar, grid, note]);
+    replace(root, [infoBar, calendar.element, weekNav, dayTabs, floorTabs, toolbar, grid, note]);
+
+    /** เปลี่ยนวันที่ดู ถ้าข้ามสัปดาห์ ต้องดึงการใช้ห้องของสัปดาห์ใหม่ */
+    async function selectDate(date) {
+      const before = weekStartOf(selectedDate ?? todayIso());
+      selectedDate = date;
+      const start = weekStartOf(date);
+      update();
+      if (start !== before || !state.bookingsRange) {
+        await loaders.bookings({ from: start, to: addDays(start, 6) });
+        update();
+      }
+    }
 
     function update() {
       renderInfoBar();
@@ -52,24 +85,67 @@ export default {
         selectedFloor = ALL;
       }
 
-      const todayIndex = new Date().getDay();
+      const today = todayIso();
+      const date = selectedDate ?? today;
+      const selectedDay = dayOfWeekOf(date);
+      const weekStart = weekStartOf(date);
+      const weekEnd = addDays(weekStart, 6);
+      const thisWeek = weekStart === weekStartOf(today);
+
+      replace(weekNav, [
+        el('button', {
+          class: 'icon-btn',
+          type: 'button',
+          title: 'สัปดาห์ก่อน',
+          'aria-label': 'สัปดาห์ก่อน',
+          html: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>',
+          onclick: () => selectDate(addDays(date, -7)),
+        }),
+        el('div', { class: 'week-label' }, [
+          el('b', { text: `${thaiShortDate(weekStart)} – ${thaiShortDate(weekEnd)}` }),
+          el('span', { text: thisWeek ? 'สัปดาห์นี้' : weekStart > today ? 'สัปดาห์หน้า ๆ' : 'สัปดาห์ที่แล้ว ๆ' }),
+        ]),
+        el('button', {
+          class: 'icon-btn',
+          type: 'button',
+          title: 'สัปดาห์หน้า',
+          'aria-label': 'สัปดาห์หน้า',
+          html: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>',
+          onclick: () => selectDate(addDays(date, 7)),
+        }),
+        date !== today
+          ? el('button', {
+              class: 'btn btn-sm',
+              type: 'button',
+              text: 'วันนี้',
+              onclick: () => selectDate(today),
+            })
+          : null,
+      ]);
+
       replace(
         dayTabs,
-        DAY_NAMES.map((name, index) =>
-          el('button', {
-            class:
-              `tab small${index === selectedDay ? ' active' : ''}` +
-              `${index === todayIndex ? ' today' : ''}`,
-            type: 'button',
-            text: name,
-            title: index === todayIndex ? `วัน${name} (วันนี้)` : `วัน${name}`,
-            'aria-pressed': index === selectedDay ? 'true' : 'false',
-            onclick: () => {
-              selectedDay = index;
-              update();
+        DAY_NAMES.map((name, index) => {
+          const day = addDays(weekStart, index);
+          const dayNumber = Number(day.slice(8, 10));
+          return el(
+            'button',
+            {
+              class:
+                `tab small day-tab${day === date ? ' active' : ''}` +
+                `${day === today ? ' today' : ''}`,
+              type: 'button',
+              title: `วัน${name}ที่ ${thaiShortDate(day)}${day === today ? ' (วันนี้)' : ''}`,
+              'aria-pressed': day === date ? 'true' : 'false',
+              onclick: () => selectDate(day),
             },
-          }),
-        ),
+            [
+              el('span', { class: 'day-name long', text: name }),
+              el('span', { class: 'day-name short', text: DAY_SHORT[index] }),
+              el('span', { class: 'day-num', text: String(dayNumber) }),
+            ],
+          );
+        }),
       );
 
       const floorTab = (key, label) =>
@@ -93,17 +169,28 @@ export default {
         selectedFloor === ALL
           ? allRooms
           : groups.find((group) => group.floor === selectedFloor)?.rooms ?? [];
-      const today = new Date();
-      const isToday = today.getDay() === selectedDay;
+      const clock = new Date();
+      const isToday = date === today;
       const nowText =
-        `${String(today.getHours()).padStart(2, '0')}:` +
-        `${String(today.getMinutes()).padStart(2, '0')}`;
+        `${String(clock.getHours()).padStart(2, '0')}:` +
+        `${String(clock.getMinutes()).padStart(2, '0')}`;
+
+      // ตารางเรียนมีผลเฉพาะในวันเปิด-ปิดของภาคเรียนของมัน (ถ้าตั้งไว้)
+      const term = termFor(state.timetable?.semester);
+      const outsideTerm = term != null && (date < term.startDate || date > term.endDate);
 
       const byRoom = new Map();
-      for (const item of state.schedules) {
-        if (item.dayOfWeek !== selectedDay) continue;
-        if (!byRoom.has(item.roomNumber)) byRoom.set(item.roomNumber, []);
-        byRoom.get(item.roomNumber).push(item);
+      const push = (roomNumber, row) => {
+        if (!byRoom.has(roomNumber)) byRoom.set(roomNumber, []);
+        byRoom.get(roomNumber).push(row);
+      };
+      if (!outsideTerm) {
+        for (const item of state.schedules) {
+          if (item.dayOfWeek === selectedDay) push(item.roomNumber, { kind: 'class', ...item });
+        }
+      }
+      for (const booking of state.bookings ?? []) {
+        if (bookingOccursOn(booking, date)) push(booking.roomNumber, { kind: 'booking', ...booking });
       }
 
       const totalRows = [...byRoom.values()].reduce(
@@ -122,11 +209,12 @@ export default {
           : floorRooms;
       const hiddenCount = floorRooms.length - rooms.length;
 
+      const dayLabel = `วัน${DAY_NAMES[selectedDay]}ที่ ${thaiShortDate(date)}`;
       const summary =
         selectedFloor === ALL
-          ? `วัน${DAY_NAMES[selectedDay]} · ทั้งอาคาร ${totalRows} คาบ ใน ${byRoom.size} ห้อง`
-          : `วัน${DAY_NAMES[selectedDay]} · ${floorLabel(selectedFloor)} ${floorRows} คาบ ` +
-            `(ทั้งอาคาร ${totalRows} คาบ)`;
+          ? `${dayLabel} · ทั้งอาคาร ${totalRows} รายการ ใน ${byRoom.size} ห้อง`
+          : `${dayLabel} · ${floorLabel(selectedFloor)} ${floorRows} รายการ ` +
+            `(ทั้งอาคาร ${totalRows} รายการ)`;
 
       const isAdmin = state.user?.role === 'admin';
       replace(toolbar, [
@@ -139,13 +227,26 @@ export default {
                 {
                   class: 'btn btn-sm btn-primary',
                   type: 'button',
-                  onclick: () => addSchedule(update),
+                  title: 'ประชุม สอบ กิจกรรม หรือคาบเรียน · เลือกได้ว่าวันเดียว ทุกวัน หรือทุกสัปดาห์',
+                  onclick: () => addUsage(),
                 },
-                [svg(icons.plus(14)), 'เพิ่มคาบเรียน'],
+                [svg(icons.plus(14)), 'เพิ่มการใช้ห้อง'],
               ),
             ])
           : null,
       ]);
+
+      if (outsideTerm) {
+        toolbar.appendChild(
+          el('div', {
+            class: 'term-off-note',
+            text:
+              `วันที่นี้อยู่นอกภาคเรียน ${term.semester} ` +
+              `(${thaiShortDate(term.startDate)} – ${thaiShortDate(term.endDate)}) ` +
+              'ตารางเรียนไม่มีผล ห้องที่ไม่มีการใช้ห้องอื่นถือว่าว่าง',
+          }),
+        );
+      }
 
       note.textContent =
         hiddenCount > 0
@@ -155,7 +256,7 @@ export default {
 
       // ยังไม่มีตารางเรียนเลยทั้งระบบ (เช่นเพิ่งตั้งระบบหรือขึ้นภาคเรียนใหม่)
       // ชี้ทางไปที่การนำเข้าจากไฟล์ ซึ่งเร็วกว่าการเพิ่มทีละคาบหลายเท่า
-      if (state.schedules.length === 0 && !state.loading.schedules) {
+      if (state.schedules.length === 0 && !state.loading.schedules && byRoom.size === 0) {
         replace(grid, [
           el('div', { class: 'card empty-cta' }, [
             el('span', { class: 'dz-icon', html: uiIcons.sheet(26) }),
@@ -180,7 +281,7 @@ export default {
           grid,
           emptyState(
             selectedFloor === ALL
-              ? `ไม่มีคาบเรียนในวัน${DAY_NAMES[selectedDay]}`
+              ? `ไม่มีคาบเรียนหรือการใช้ห้องใน${dayLabel}`
               : 'ยังไม่มีห้องในชั้นนี้',
           ),
         );
@@ -196,7 +297,9 @@ export default {
           return scheduleCard(room, rows, {
             isToday,
             nowText,
-            onChanged: update,
+            date,
+            onChanged: refreshAll,
+            onAdd: () => addUsage(room.roomNumber),
           });
         }),
       );
@@ -306,6 +409,19 @@ export default {
       }
     }
 
+    async function refreshAll() {
+      await Promise.all([loaders.schedules(), loaders.bookings()]);
+      update();
+    }
+
+    async function addUsage(roomNumber = '') {
+      const saved = await openBookingForm({ date: selectedDate ?? todayIso(), roomNumber });
+      if (!saved) return;
+      toastOk(saved === 'timetable' ? 'เพิ่มคาบเรียนในตารางแล้ว' : 'เพิ่มการใช้ห้องแล้ว');
+      await Promise.all([loaders.schedules(), loaders.bookings(), loaders.rooms()]);
+      update();
+    }
+
     function importButton(className) {
       return el(
         'button',
@@ -338,13 +454,15 @@ export default {
 
     update();
     await Promise.all([loaders.schedules(), loaders.terms()]);
+    const start = weekStartOf(selectedDate ?? todayIso());
+    await loaders.bookings({ from: start, to: addDays(start, 6) });
     update();
 
     return { update };
   },
 };
 
-function scheduleCard(room, rows, { isToday, nowText, onChanged }) {
+function scheduleCard(room, rows, { isToday, nowText, date, onChanged, onAdd }) {
   const isAdmin = state.user?.role === 'admin';
 
   const head = el('div', { class: 'sched-card-head' }, [
@@ -352,10 +470,15 @@ function scheduleCard(room, rows, { isToday, nowText, onChanged }) {
       svg(icons.building(15)),
       `ห้อง ${room.roomNumber}`,
     ]),
-    el('span', {
-      class: `badge-soft${rows.length === 0 ? ' dim' : ''}`,
-      text: rows.length === 0 ? 'ว่างทั้งวัน' : `${rows.length} คาบ`,
-    }),
+    el('div', { class: 'row', style: { gap: '6px' } }, [
+      el('span', {
+        class: `badge-soft${rows.length === 0 ? ' dim' : ''}`,
+        text: rows.length === 0 ? 'ว่างทั้งวัน' : `${rows.length} รายการ`,
+      }),
+      isAdmin && state.bookings !== undefined
+        ? iconAction(icons.plus(13), `เพิ่มการใช้ห้อง ${room.roomNumber}`, onAdd)
+        : null,
+    ]),
   ]);
 
   if (rows.length === 0) {
@@ -370,6 +493,7 @@ function scheduleCard(room, rows, { isToday, nowText, onChanged }) {
     ...rows.map((item) => {
       const now =
         isToday && nowText >= item.startTime && nowText < item.endTime;
+      if (item.kind === 'booking') return bookingRow(item, { now, date, isAdmin, onChanged });
       return el('div', { class: `sched-row${now ? ' now' : ''}` }, [
         el('div', {
           class: 'sched-time',
@@ -395,6 +519,71 @@ function scheduleCard(room, rows, { isToday, nowText, onChanged }) {
       ]);
     }),
   ]);
+}
+
+/** แถวการใช้ห้องที่มีวันที่กำกับ (ประชุม สอบ กิจกรรม) */
+function bookingRow(item, { now, date, isAdmin, onChanged }) {
+  return el('div', { class: `sched-row booking-row${now ? ' now' : ''}` }, [
+    el('div', { class: 'sched-time', text: `${item.startTime}-${item.endTime}` }),
+    el('div', { class: 'sched-info' }, [
+      el('div', { class: 'course' }, [
+        el('span', { class: `booking-tag ${item.category}`, text: CATEGORY_LABEL[item.category] ?? 'อื่น ๆ' }),
+        item.title,
+      ]),
+      el('div', {
+        class: 'meta',
+        text: [item.note, describeRepeat(item)].filter(Boolean).join(' · '),
+      }),
+    ]),
+    isAdmin
+      ? el('div', { class: 'row', style: { gap: '4px' } }, [
+          iconAction(icons.edit(13), 'แก้ไข', async () => {
+            const saved = await openBookingForm({ booking: item, date });
+            if (saved) {
+              toastOk('บันทึกการแก้ไขแล้ว');
+              await onChanged();
+            }
+          }),
+          iconAction(icons.trash(13), 'ลบ', () => removeBooking(item, date, onChanged)),
+        ])
+      : null,
+  ]);
+}
+
+/**
+ * ลบการใช้ห้อง
+ * รายการที่ทำซ้ำเลือกได้ว่าจะหยุดตั้งแต่วันที่กำลังดู (เก็บครั้งที่ผ่านมาไว้)
+ * หรือลบทั้งชุด เพราะ "ประชุมทุกวันพุธ" ที่เลิกกลางเทอม ไม่ควรลบประวัติครั้งก่อน ๆ
+ */
+async function removeBooking(item, date, onChanged) {
+  const repeating = item.repeatType !== 'once';
+  const canStop = repeating && date > item.startDate;
+  const choice = await openModal({
+    title: `ลบ "${item.title}"?`,
+    subtitle:
+      `ห้อง ${item.roomNumber} · ${item.startTime}-${item.endTime} · ${describeRepeat(item)}` +
+      (canStop
+        ? `\n\nเลือก "หยุดตั้งแต่ ${thaiShortDate(date)}" ถ้าต้องการเก็บครั้งก่อนหน้าไว้`
+        : ''),
+    actions: [
+      { label: 'ยกเลิก', value: null },
+      canStop ? { label: `หยุดตั้งแต่ ${thaiShortDate(date)}`, value: 'stop' } : null,
+      { label: repeating ? 'ลบทั้งชุด' : 'ลบ', value: 'all', class: 'btn-danger' },
+    ].filter(Boolean),
+  });
+  if (!choice) return;
+  try {
+    if (choice === 'stop') {
+      await api.updateBooking(item.id, { ...item, endDate: addDays(date, -1) });
+      toastOk(`หยุด "${item.title}" ตั้งแต่ ${thaiShortDate(date)} แล้ว`);
+    } else {
+      await api.deleteBooking(item.id);
+      toastOk('ลบแล้ว');
+    }
+    await onChanged();
+  } catch (error) {
+    toastError(error.message);
+  }
 }
 
 function iconAction(markup, title, onclick) {
@@ -426,7 +615,7 @@ function scheduleFields(values = {}) {
       name: 'dayOfWeek',
       label: 'วัน',
       type: 'select',
-      value: String(values.dayOfWeek ?? selectedDay),
+      value: String(values.dayOfWeek ?? dayOfWeekOf(selectedDate ?? todayIso())),
       options: DAY_NAMES.map((name, index) => ({
         value: String(index),
         label: `วัน${name}`,

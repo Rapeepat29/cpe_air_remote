@@ -2136,3 +2136,266 @@ table.data td.wrap {
     display: none;
   }
 }
+
+/* ================= ตารางรายวัน (เลื่อนทีละสัปดาห์) ================= */
+.week-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.week-label {
+  display: flex;
+  flex-direction: column;
+  min-width: 150px;
+  text-align: center;
+  line-height: 1.3;
+}
+
+.week-label b {
+  font-family: var(--font-disp);
+  font-size: var(--fs-md);
+}
+
+.week-label span {
+  font-size: var(--fs-2xs);
+  color: var(--text-mid);
+}
+
+.day-tabs .day-tab {
+  flex-direction: column;
+  gap: 0;
+  min-width: 64px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  line-height: 1.25;
+}
+
+.day-tab .day-name {
+  font-size: var(--fs-2xs);
+  font-weight: 600;
+}
+
+.day-tab .day-num {
+  font-family: var(--font-disp);
+  font-size: var(--fs-md);
+  font-weight: 700;
+}
+
+.day-tabs .tab.today::after {
+  position: absolute;
+  top: 5px;
+  right: 6px;
+}
+
+.day-tabs .tab {
+  position: relative;
+}
+
+@media (max-width: 620px) {
+  .day-tabs {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+  }
+
+  .day-tabs .day-tab {
+    min-width: 0;
+    padding-left: 2px;
+    padding-right: 2px;
+  }
+}
+
+.term-off-note {
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--info-soft);
+  color: var(--text-hi);
+  font-size: var(--fs-xs);
+  line-height: 1.55;
+}
+
+/* แถวการใช้ห้อง (ไม่ใช่คาบในตารางเรียน) */
+.booking-row .course {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.booking-tag {
+  font-size: var(--fs-2xs);
+  font-weight: 700;
+  padding: 1px 8px;
+  border-radius: 100px;
+  background: var(--info-soft);
+  color: var(--info);
+  white-space: nowrap;
+}
+
+.booking-tag.meeting {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.booking-tag.exam {
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+
+.booking-tag.event {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+.booking-tag.other {
+  background: var(--panel-raised);
+  color: var(--text-mid);
+}
+
+/* ================= ฟอร์มเพิ่มการใช้ห้อง ================= */
+.modal.booking-modal {
+  width: 620px;
+}
+
+.chip-row.compact {
+  margin-top: 0;
+}
+
+.repeat-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 8px;
+}
+
+.repeat-option {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-sm);
+  background: var(--panel-raised);
+  cursor: pointer;
+}
+
+.repeat-option input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.repeat-option b {
+  font-size: var(--fs-sm);
+}
+
+.repeat-option span {
+  font-size: var(--fs-2xs);
+  color: var(--text-mid);
+  line-height: 1.45;
+}
+
+.repeat-option:hover {
+  border-color: var(--accent-dim);
+}
+
+.repeat-option.sel {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
+  background: var(--accent-soft);
+}
+
+.repeat-option.sel b {
+  color: var(--accent);
+}
+
+.repeat-option:focus-within {
+  box-shadow: var(--focus-ring);
+}
+
+.repeat-detail {
+  border-left: 3px solid var(--accent-dim);
+  padding-left: 12px;
+  margin-bottom: 12px;
+}
+
+.day-picker {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.day-toggle {
+  width: 42px;
+  height: 38px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--hairline);
+  background: var(--panel-raised);
+  color: var(--text-mid);
+  font-weight: 600;
+}
+
+.day-toggle.sel {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+}
+
+.quick-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: -6px;
+}
+
+.booking-summary {
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--panel-raised);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+@media (max-width: 620px) {
+  .repeat-options {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* ปุ่มบันทึกอยู่ติดล่างกล่องเสมอ ไม่ต้องเลื่อนหาใต้ฟอร์มยาว */
+.booking-modal .modal-actions {
+  position: sticky;
+  bottom: -22px;
+  margin: 14px -22px -22px;
+  padding: 12px 22px 16px;
+  background: var(--panel);
+  border-top: 1px solid var(--hairline-soft);
+}
+
+@media (max-width: 620px) {
+  .booking-modal .modal-actions {
+    bottom: calc(-20px - env(safe-area-inset-bottom));
+    margin: 14px -16px calc(-20px - env(safe-area-inset-bottom));
+    padding: 12px 16px calc(14px + env(safe-area-inset-bottom));
+  }
+}
+
+.day-tab .day-name.short {
+  display: none;
+}
+
+@media (max-width: 620px) {
+  .day-tab .day-name.long {
+    display: none;
+  }
+
+  .day-tab .day-name.short {
+    display: inline;
+  }
+}

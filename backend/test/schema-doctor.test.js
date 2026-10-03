@@ -33,6 +33,7 @@ test('every table in schema.sql is parsed with its create statement', () => {
       'energy_hourly',
       'system_settings',
       'academic_terms',
+      'room_bookings',
     ],
   );
 
@@ -131,6 +132,9 @@ test('diff reports missing tables and missing columns separately', () => {
     )],
     ['academic_terms', new Set(
       tables.get('academic_terms').columns.map((c) => c.name),
+    )],
+    ['room_bookings', new Set(
+      tables.get('room_bookings').columns.map((c) => c.name),
     )],
     // occupancy_sensors หายไปทั้งตาราง เหมือนฐานข้อมูลที่ยังไม่ได้ migrate
   ]);
