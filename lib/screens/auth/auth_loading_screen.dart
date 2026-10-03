@@ -1,5 +1,4 @@
 import '../../localization/localized_material.dart';
-import '../../widgets/brand_mark.dart';
 
 class AuthLoadingScreen extends StatelessWidget {
   const AuthLoadingScreen({super.key});
@@ -11,8 +10,14 @@ class AuthLoadingScreen extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const BrandMark(size: 72),
-            const SizedBox(height: 22),
+            Image.asset(
+              'assets/brand/rmutt_save_energy_icon.png',
+              width: 72,
+              height: 72,
+              filterQuality: FilterQuality.medium,
+              semanticLabel: 'RMUTT Save Energy',
+            ),
+            const SizedBox(height: 20),
             CircularProgressIndicator(
               color: Theme.of(context).colorScheme.primary,
             ),

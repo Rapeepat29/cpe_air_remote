@@ -27,6 +27,8 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/brand/
 
   # ฟอนต์หัวข้อและตัวเลขใหญ่ ตัวเดียวกับตัวหนังสือในโลโก้ (มีอักษรไทย)
   # สัญญาอนุญาต SIL Open Font License อยู่ที่ assets/fonts/ChakraPetch-OFL.txt

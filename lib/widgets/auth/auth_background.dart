@@ -1,7 +1,6 @@
 import '../../localization/localized_material.dart';
 
 import '../../theme/app_theme.dart';
-import '../brand_mark.dart';
 
 class AuthBackground extends StatelessWidget {
   const AuthBackground({
@@ -105,9 +104,12 @@ class EnergyBrand extends StatelessWidget {
 
     return Column(
       children: [
-        DecoratedBox(
+        Container(
+          width: logoSize,
+          height: logoSize,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(logoSize * 0.23),
+            // มุมมนเท่ากับไอคอนแอป (56/240 ของความกว้าง)
+            borderRadius: BorderRadius.circular(logoSize * 0.233),
             boxShadow: [
               BoxShadow(
                 color: AppColors.charcoal.withValues(alpha: 0.22),
@@ -116,7 +118,13 @@ class EnergyBrand extends StatelessWidget {
               ),
             ],
           ),
-          child: BrandMark(size: logoSize),
+          child: Image.asset(
+            'assets/brand/rmutt_save_energy_icon.png',
+            width: logoSize,
+            height: logoSize,
+            filterQuality: FilterQuality.medium,
+            semanticLabel: 'RMUTT Save Energy',
+          ),
         ),
         SizedBox(height: compact ? 14 : 18),
         Text(
