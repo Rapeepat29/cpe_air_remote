@@ -1171,6 +1171,19 @@ button.stat-mini:hover .stat-mini-foot {
   line-height: 1.5;
 }
 
+/* จอแคบมาก: เวลาขึ้นบรรทัดของตัวเอง ชื่อวิชาจะได้กว้างพอไม่ตัดคำทีละคำ */
+@media (max-width: 420px) {
+  .sched-row {
+    flex-wrap: wrap;
+    row-gap: 2px;
+  }
+
+  .sched-time {
+    width: 100%;
+    padding-top: 0;
+  }
+}
+
 .hidden-note {
   font-size: var(--fs-xs);
   color: var(--text-mid);
@@ -1431,6 +1444,13 @@ button.stat-mini:hover .stat-mini-foot {
   flex-wrap: wrap;
 }
 
+/* ส่วนข้อความของการ์ดต้องกว้างอย่างน้อย 220px ถ้าที่เหลือไม่พอ ปุ่มและสวิตช์
+   ด้านขวาจะตกลงไปแถวใหม่แทน (เดิม flex: 1 ยอมหดได้ถึง 0 บนมือถือจึงเหลือ
+   คอลัมน์แคบ ๆ ที่ตัดคำทีละคำ) */
+.list-card > .grow {
+  flex: 1 1 220px;
+}
+
 .list-card + .list-card {
   margin-top: 10px;
 }
@@ -1446,6 +1466,129 @@ button.stat-mini:hover .stat-mini-foot {
   color: var(--text-mid);
   margin-top: 3px;
   line-height: 1.6;
+}
+
+/* ---------- การ์ดผู้ใช้ ----------
+   จอกว้าง: ชื่อ | รายละเอียดสองคอลัมน์ | ปุ่มจัดการ ในแถวเดียว
+   จอกลาง: ชื่อ + ปุ่มจัดการแถวบน รายละเอียดแถวล่าง
+   มือถือ: ซ้อนกันทั้งหมด ปุ่มจัดการอยู่ล่างสุดคั่นด้วยเส้น */
+.list-card.user-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.5fr) auto;
+  align-items: center;
+  gap: 12px 24px;
+}
+
+.user-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.user-id {
+  min-width: 0;
+}
+
+.user-id .list-title {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  overflow-wrap: anywhere;
+}
+
+.user-id .list-sub {
+  margin-top: 0;
+}
+
+.user-meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px 18px;
+  min-width: 0;
+}
+
+.user-meta-item {
+  min-width: 0;
+}
+
+.user-meta dt {
+  font-size: var(--fs-2xs);
+  color: var(--text-low);
+  line-height: 1.4;
+}
+
+.user-meta dd {
+  font-size: var(--fs-xs);
+  color: var(--text-hi);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.user-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px 14px;
+  flex-wrap: wrap;
+}
+
+.user-active {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--fs-xs);
+  color: var(--text-mid);
+  white-space: nowrap;
+}
+
+@media (max-width: 1180px) {
+  .list-card.user-card {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .user-actions {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .user-meta {
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .list-card.user-card {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .user-meta {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding-left: 46px;
+  }
+
+  .user-actions {
+    grid-column: auto;
+    grid-row: auto;
+    justify-content: space-between;
+    padding-top: 12px;
+    border-top: 1px solid var(--hairline-soft);
+  }
+
+  .user-actions .inline-select {
+    flex: 1 1 140px;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 380px) {
+  .user-meta {
+    grid-template-columns: minmax(0, 1fr);
+    padding-left: 0;
+  }
 }
 
 .token-box {

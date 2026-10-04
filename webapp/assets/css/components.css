@@ -293,6 +293,28 @@
   color: var(--text-low);
 }
 
+/* ช่องวันที่/เวลาบน iOS Safari มีความกว้างขั้นต่ำในตัวเอง ไม่ฟัง width: 100%
+   จึงล้นกรอบการ์ดบนมือถือ และจัดตัวหนังสือไว้กลางช่อง
+   @supports นี้จริงเฉพาะ Safari บน iPhone/iPad เบราว์เซอร์อื่นไม่โดน */
+@supports (-webkit-touch-callout: none) {
+  input[type='date'],
+  input[type='time'],
+  input[type='datetime-local'] {
+    -webkit-appearance: none;
+    appearance: none;
+    display: block;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  input[type='date']::-webkit-date-and-time-value,
+  input[type='time']::-webkit-date-and-time-value,
+  input[type='datetime-local']::-webkit-date-and-time-value {
+    text-align: left;
+    margin: 0;
+  }
+}
+
 /* iOS ซูมหน้าจอเองเมื่อแตะช่องกรอกที่ตัวหนังสือเล็กกว่า 16px
    ทำให้หน้าเลื่อนไปมาจนงง จึงบังคับขั้นต่ำไว้บนจอสัมผัส */
 @media (pointer: coarse) {
@@ -884,6 +906,14 @@ table.data.sticky-first tfoot td:first-child {
 @media (pointer: coarse) {
   .theme-dot {
     width: 38px;
+  }
+}
+
+/* มือถือ: แถบบนเลื่อนซ้ายขวาได้ จุดธีมจะโดนตัดครึ่งที่ขอบจอ
+   จึงซ่อนไว้ ไปเลือกธีมที่ เมนู → ตั้งค่า แทน */
+@media (max-width: 820px) {
+  .topbar .theme-dots {
+    display: none;
   }
 }
 
