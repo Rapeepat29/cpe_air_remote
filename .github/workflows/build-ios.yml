@@ -13,6 +13,11 @@ name: Build iOS (IPA ไม่เซ็น)
 
 on:
   workflow_dispatch:
+    inputs:
+      api_base_url:
+        description: ที่อยู่ API ที่แอปจะใช้ (ต้องเข้าได้จากอินเทอร์เน็ต)
+        required: true
+        default: https://rmutt-energy.tailb292b4.ts.net/api
 
 jobs:
   build-ios:
@@ -52,7 +57,10 @@ jobs:
 
       - name: Build แอป iOS (ยังไม่เซ็น)
         # ต้องเป็น release เพราะแอป debug บน iOS เปิดจากหน้าโฮมเองไม่ได้
-        run: flutter build ios --release --no-codesign
+        # ส่งผ่าน env กันค่า input ถูกตีความเป็นคำสั่ง shell
+        env:
+          API_BASE_URL: ${{ inputs.api_base_url }}
+        run: flutter build ios --release --no-codesign --dart-define=API_BASE_URL="$API_BASE_URL"
 
       - name: แพ็กเป็นไฟล์ .ipa
         run: |

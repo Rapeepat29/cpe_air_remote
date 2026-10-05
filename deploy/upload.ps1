@@ -18,10 +18,10 @@ $deployDirectory = $PSScriptRoot
 $backendDirectory = Join-Path $projectDirectory 'backend'
 $webDirectory = Join-Path $projectDirectory 'webapp'
 . (Join-Path $PSScriptRoot 'ServerConfig.ps1')
-$server = Get-RmuttServer -HostOverride $Server -UserOverride $User
-$target = $server.Target
-$sshArgs = $server.SshArgs
-$scpArgs = $server.ScpArgs
+$srv = Get-RmuttServer -HostOverride $Server -UserOverride $User
+$target = $srv.Target
+$sshArgs = $srv.SshArgs
+$scpArgs = $srv.ScpArgs
 
 function Write-Step {
   param([string]$Text)
@@ -33,7 +33,7 @@ if (-not (Test-Path -LiteralPath $backendDirectory)) {
   throw "ไม่พบโฟลเดอร์ backend ที่ $backendDirectory"
 }
 
-Write-Step "สร้างโฟลเดอร์ปลายทางบน $($server.Host)"
+Write-Step "สร้างโฟลเดอร์ปลายทางบน $($srv.Host)"
 ssh @sshArgs $target 'mkdir -p /opt/rmutt/backend /opt/rmutt/www'
 if ($LASTEXITCODE -ne 0) { throw 'ต่อ SSH ไม่ได้' }
 
@@ -74,7 +74,7 @@ ssh @sshArgs $target 'cd /opt/rmutt && cp -f backend.Dockerfile backend/Dockerfi
 Write-Host ''
 Write-Host 'อัปโหลดเสร็จแล้ว' -ForegroundColor Green
 if ($BackendOnly) {
-  Write-Host "สั่ง build ใหม่ด้วย: ssh -p $($server.Port) $target 'cd /opt/rmutt && docker compose up -d --build backend'"
+  Write-Host "สั่ง build ใหม่ด้วย: ssh -p $($srv.Port) $target 'cd /opt/rmutt && docker compose up -d --build backend'"
 } else {
   Write-Host "ขั้นถัดไปบนเซิร์ฟเวอร์: cd /opt/rmutt && sudo bash init-env.sh"
 }
