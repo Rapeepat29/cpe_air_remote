@@ -64,33 +64,45 @@ function userRow(user, activeAdmins, update) {
   const isSelf = user.username === state.user?.username;
   const isLastAdmin = user.role === 'admin' && user.isActive && activeAdmins <= 1;
 
-  return el('div', { class: 'list-card' }, [
-    el('div', { class: 'avatar', text: initials(user) }),
-    el('div', { class: 'grow' }, [
-      el('div', { class: 'list-title' }, [
-        `${user.firstName} ${user.lastName}`.trim() || user.username,
-        isSelf
-          ? el('span', {
-              class: 'status-chip done',
-              style: { marginLeft: '8px' },
-              text: 'บัญชีของคุณ',
-            })
-          : null,
+  const meta = (label, value) =>
+    el('div', { class: 'user-meta-item' }, [
+      el('dt', { text: label }),
+      el('dd', { text: value }),
+    ]);
+
+  // การ์ดแบ่งสามส่วน: ชื่อ / รายละเอียด / ปุ่มจัดการ
+  // จอกว้างวางเรียงในแถวเดียว จอมือถือวางซ้อนกันและปุ่มอยู่แถวล่างสุด
+  // (เดิมเป็น flex แถวเดียว บนมือถือช่องชื่อถูกบีบจนตัดคำทีละคำ)
+  return el('div', { class: 'list-card user-card' }, [
+    el('div', { class: 'user-main' }, [
+      el('div', { class: 'avatar', text: initials(user) }),
+      el('div', { class: 'user-id' }, [
+        el('div', { class: 'list-title' }, [
+          el('span', {
+            text: `${user.firstName} ${user.lastName}`.trim() || user.username,
+          }),
+          isSelf
+            ? el('span', { class: 'status-chip done', text: 'บัญชีของคุณ' })
+            : null,
+        ]),
+        el('div', { class: 'list-sub', text: user.username }),
       ]),
-      el('div', {
-        class: 'list-sub',
-        text:
-          `${user.username} · ${user.email || 'ไม่มีอีเมล'} · ` +
-          `${user.phone || 'ไม่มีเบอร์'} · ` +
-          `เข้าใช้ล่าสุด ${
-            user.lastLoginAt ? relativeTime(user.lastLoginAt) : 'ยังไม่เคย'
-          } · สร้างเมื่อ ${thaiShortDate(user.createdAt)}`,
-      }),
     ]),
+    el('dl', { class: 'user-meta' }, [
+      meta('อีเมล', user.email || 'ไม่มีอีเมล'),
+      meta('โทรศัพท์', user.phone || 'ไม่มีเบอร์'),
+      meta(
+        'เข้าใช้ล่าสุด',
+        user.lastLoginAt ? relativeTime(user.lastLoginAt) : 'ยังไม่เคย',
+      ),
+      meta('สร้างเมื่อ', thaiShortDate(user.createdAt)),
+    ]),
+    el('div', { class: 'user-actions' }, [
     el(
       'select',
       {
-        style: { width: '120px' },
+        class: 'inline-select',
+        'aria-label': `สิทธิ์ของ ${user.username}`,
         disabled: isSelf || isLastAdmin,
         title: isSelf
           ? 'เปลี่ยนสิทธิ์ของตัวเองไม่ได้'
@@ -122,12 +134,8 @@ function userRow(user, activeAdmins, update) {
         }),
       ],
     ),
-    el('div', { class: 'row', style: { gap: '6px' } }, [
-      el('span', {
-        class: 'dim',
-        style: { fontSize: '11px' },
-        text: 'เปิดใช้งาน',
-      }),
+    el('div', { class: 'user-active' }, [
+      el('span', { text: 'เปิดใช้งาน' }),
       toggle(user.isActive, {
         disabled: isSelf || isLastAdmin,
         title: isSelf ? 'ปิดบัญชีตัวเองไม่ได้' : '',
@@ -150,6 +158,7 @@ function userRow(user, activeAdmins, update) {
       text: 'ลบ',
       onclick: () => removeUser(user, update),
     }),
+    ]),
   ]);
 }
 

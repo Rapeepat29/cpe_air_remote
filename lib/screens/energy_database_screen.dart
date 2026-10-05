@@ -6,6 +6,7 @@ import '../models/energy_data.dart';
 import '../theme/app_theme.dart';
 import '../utils/file_saver.dart';
 import '../utils/number_format.dart';
+import '../utils/thai_date.dart';
 import '../widgets/section_title.dart';
 
 /// หน้า `ฐานข้อมูล`
@@ -106,7 +107,7 @@ class _EnergyDatabaseScreenState extends State<EnergyDatabaseScreen>
     final firstDate = oldest != null && oldest.isBefore(DateTime(2024))
         ? DateTime(oldest.year)
         : DateTime(2024);
-    final picked = await showDatePicker(
+    final picked = await showAppDatePicker(
       context: context,
       initialDate: isStart ? _from : _to,
       firstDate: firstDate,
@@ -183,14 +184,14 @@ class _EnergyDatabaseScreenState extends State<EnergyDatabaseScreen>
       builder: (context, _) {
         return Scaffold(
           appBar: AppBar(
-            backgroundColor: AppColors.primary,
-            foregroundColor: Colors.white,
             title: Text(context.tr('Database')),
             bottom: TabBar(
               controller: _tabController,
-              indicatorColor: Colors.white,
-              labelColor: Colors.white,
-              unselectedLabelColor: Colors.white70,
+              indicatorColor: AppPalette.of(context).accent,
+              labelColor: AppPalette.of(context).onBar,
+              unselectedLabelColor: AppPalette.of(
+                context,
+              ).onBar.withValues(alpha: 0.72),
               tabs: [
                 Tab(text: context.tr('Live readings')),
                 Tab(text: context.tr('Export to Excel')),
@@ -368,7 +369,10 @@ class _EnergyDatabaseScreenState extends State<EnergyDatabaseScreen>
                   label: _rangeMode
                       ? context.tr('From')
                       : context.tr('Date'),
-                  value: EnergyQuery.formatDate(_from),
+                  value: formatDisplayDate(
+                    _from,
+                    AppLocalizations.of(context).isThai,
+                  ),
                   onTap: () => _pickDate(isStart: true),
                 ),
               ),
@@ -377,7 +381,10 @@ class _EnergyDatabaseScreenState extends State<EnergyDatabaseScreen>
                 Expanded(
                   child: _DateField(
                     label: context.tr('To'),
-                    value: EnergyQuery.formatDate(_to),
+                    value: formatDisplayDate(
+                      _to,
+                      AppLocalizations.of(context).isThai,
+                    ),
                     onTap: () => _pickDate(isStart: false),
                   ),
                 ),
@@ -401,9 +408,10 @@ class _EnergyDatabaseScreenState extends State<EnergyDatabaseScreen>
     if (oldest == null || newest == null) {
       return context.tr('No stored hours yet.');
     }
+    final isThai = AppLocalizations.of(context).isThai;
     return '${context.tr('Stored data covers')} '
-        '${EnergyQuery.formatDate(oldest)} – '
-        '${EnergyQuery.formatDate(newest)}';
+        '${formatDisplayDate(oldest, isThai)} – '
+        '${formatDisplayDate(newest, isThai)}';
   }
 
   Widget _buildScopeSection(BuildContext context) {
@@ -887,7 +895,7 @@ class _ScopeTile extends StatelessWidget {
                     ? Icons.radio_button_checked_rounded
                     : Icons.radio_button_unchecked_rounded,
                 size: 20,
-                color: selected ? AppColors.primary : colors.onSurfaceVariant,
+                color: selected ? Theme.of(context).colorScheme.primary : colors.onSurfaceVariant,
               ),
               const SizedBox(width: 11),
               Expanded(
@@ -1272,10 +1280,10 @@ class _TotalPill extends StatelessWidget {
         ),
         Text(
           value,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w800,
-            color: AppColors.primary,
+            color: Theme.of(context).colorScheme.primary,
           ),
         ),
       ],

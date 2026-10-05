@@ -200,10 +200,11 @@ class _ScheduleHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final selectedDateLabel = _formatScheduleDate(context, selectedDate);
+    final palette = AppPalette.of(context);
 
     return Container(
       height: 74,
-      color: AppColors.primary,
+      color: palette.bar,
       padding: const EdgeInsets.symmetric(horizontal: 8),
       child: Row(
         children: [
@@ -214,10 +215,11 @@ class _ScheduleHeader extends StatelessWidget {
               children: [
                 Text(
                   context.tr('Room Schedule'),
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: palette.onBar,
+                    fontFamily: kDisplayFont,
                     fontSize: 19,
-                    fontWeight: FontWeight.w800,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
                 const SizedBox(height: 3),
@@ -237,7 +239,7 @@ class _ScheduleHeader extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.90),
+                      color: palette.onBar.withValues(alpha: 0.90),
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
                     ),
@@ -251,9 +253,9 @@ class _ScheduleHeader extends StatelessWidget {
               key: const Key('manage-schedule-button'),
               tooltip: context.tr('Manage Timetable'),
               onPressed: onManage,
-              icon: const Icon(
+              icon: Icon(
                 Icons.edit_calendar_rounded,
-                color: Colors.white,
+                color: palette.onBar,
               ),
             )
           else

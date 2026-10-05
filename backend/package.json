@@ -40,6 +40,6 @@
     "jsonwebtoken": "^9.0.2",
     "mariadb": "^3.4.2",
     "mqtt": "^5.15.2",
-    "nodemailer": "^9.0.3"
+    "nodemailer": "^10.0.14"
   }
 }

@@ -16,6 +16,9 @@ import { BUILDING, STORAGE } from './config.js';
 import { $, el, replace, svg } from './dom.js';
 import { thaiFullDate } from './format.js';
 import { icons } from './icons.js';
+import { uiIcons } from './icons-ui.js';
+import { onPrefsChange } from './prefs.js';
+import { onThemeChange, themeDots } from './theme.js';
 import {
   bootstrap,
   loaders,
@@ -48,6 +51,19 @@ const VIEWS = [
   { key: 'users', icon: 'users', group: 'system', module: users },
   { key: 'settings', icon: 'gear', group: 'system', module: settings },
 ];
+
+/**
+ * หน้าที่อยู่บนแถบเมนูล่างของมือถือ เลือกจากที่คนดูแลอาคารเปิดบ่อยที่สุด
+ * หน้าอื่นเข้าจากปุ่ม "เมนู" ช่องสุดท้าย ซึ่งเปิดแถบข้างแบบเต็มขึ้นมา
+ */
+const BOTTOM_NAV = ['overview', 'rooms', 'energy', 'alerts'];
+
+const SHORT_LABELS = {
+  overview: 'ภาพรวม',
+  rooms: 'ห้อง',
+  energy: 'ข้อมูลไฟ',
+  alerts: 'แจ้งเตือน',
+};
 
 const NAV_LABELS = {
   overview: 'ภาพรวม',
@@ -106,23 +122,51 @@ function cacheDom() {
   dom.drawerOverlay = $('#drawerOverlay');
   dom.menuBtn = $('#menuBtn');
   dom.scrim = $('#scrim');
+  dom.bottomNav = buildBottomNav();
+}
+
+/**
+ * แถบเมนูล่างสร้างจาก JavaScript ไม่ได้เขียนไว้ใน index.html
+ * เพราะถ้าเบราว์เซอร์ยังถือ app.js ตัวเก่าในแคช จะได้ไม่มีแถบว่าง ๆ โผล่มา
+ */
+function buildBottomNav() {
+  const nav = el('nav', { class: 'bottom-nav', 'aria-label': 'เมนูด่วน' });
+  dom.app.appendChild(nav);
+  dom.app.classList.add('has-bottom-nav');
+  return nav;
+}
+
+function openSidebar() {
+  dom.sidebar.classList.add('open');
+  dom.scrim.classList.add('open');
+}
+
+function closeSidebar() {
+  dom.sidebar.classList.remove('open');
+  dom.scrim.classList.remove('open');
 }
 
 function wireShell() {
-  dom.menuBtn.innerHTML = icons.menu(16);
+  dom.menuBtn.innerHTML = icons.menu(18);
   dom.menuBtn.addEventListener('click', () => {
-    dom.sidebar.classList.toggle('open');
-    dom.scrim.classList.toggle('open', dom.sidebar.classList.contains('open'));
+    if (dom.sidebar.classList.contains('open')) closeSidebar();
+    else openSidebar();
   });
-  dom.scrim.addEventListener('click', () => {
-    dom.sidebar.classList.remove('open');
-    dom.scrim.classList.remove('open');
-  });
+  dom.scrim.addEventListener('click', closeSidebar);
   dom.drawerOverlay.addEventListener('click', closeDrawer);
   document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape' && drawerRoom) closeDrawer();
+    if (event.key !== 'Escape') return;
+    if (drawerRoom) closeDrawer();
+    else closeSidebar();
   });
   window.addEventListener('hashchange', () => navigate(readHash()));
+  // จุดเลือกธีมบนแถบบนต้องเปลี่ยนตามเมื่อไปเปลี่ยนจากหน้าตั้งค่า
+  onPrefsChange(() => {
+    if (state.user) renderTopbar();
+  });
+  onThemeChange(() => {
+    if (state.user) renderTopbar();
+  });
 }
 
 function showLogin() {
@@ -202,8 +246,7 @@ function renderNav() {
         dataset: { view: view.key },
         onclick: () => {
           window.location.hash = `#/${view.key}`;
-          dom.sidebar.classList.remove('open');
-          dom.scrim.classList.remove('open');
+          closeSidebar();
         },
       });
       button.innerHTML = icons[view.icon](16);
@@ -218,17 +261,55 @@ function renderNav() {
   const systemItems = build('system');
   replace(dom.navSystem, systemItems);
   dom.navSystemLabel.hidden = systemItems.length === 0;
+  renderBottomNav();
   highlightNav();
 }
 
+function renderBottomNav() {
+  const item = (key, iconMarkup, label, onclick) => {
+    const button = el(
+      'button',
+      {
+        class: 'bottom-nav-item',
+        type: 'button',
+        dataset: { view: key },
+        onclick,
+      },
+      [el('span', { class: 'bn-icon', html: iconMarkup }), el('span', { text: label })],
+    );
+    if (key === 'alerts') {
+      button.appendChild(el('span', { class: 'nav-badge', hidden: true }));
+    }
+    return button;
+  };
+
+  replace(dom.bottomNav, [
+    ...BOTTOM_NAV.map((key) => {
+      const view = VIEWS.find((entry) => entry.key === key);
+      return item(key, icons[view.icon](20), SHORT_LABELS[key], () => {
+        window.location.hash = `#/${key}`;
+        closeSidebar();
+      });
+    }),
+    item('more', uiIcons.more(20), 'เมนู', () => {
+      if (dom.sidebar.classList.contains('open')) closeSidebar();
+      else openSidebar();
+    }),
+  ]);
+}
+
 function renderNavBadges() {
-  const badge = dom.navSystem
-    .querySelector('[data-view="alerts"] .nav-badge')
-    ?? dom.navMain.querySelector('[data-view="alerts"] .nav-badge');
-  if (!badge) return;
   const open = Number(state.alerts.counts?.open ?? 0);
-  badge.hidden = open === 0;
-  badge.textContent = String(open);
+  const badges = [
+    dom.navSystem.querySelector('[data-view="alerts"] .nav-badge'),
+    dom.navMain.querySelector('[data-view="alerts"] .nav-badge'),
+    dom.bottomNav?.querySelector('[data-view="alerts"] .nav-badge'),
+  ];
+  for (const badge of badges) {
+    if (!badge) continue;
+    badge.hidden = open === 0;
+    badge.textContent = open > 99 ? '99+' : String(open);
+  }
 }
 
 function highlightNav() {
@@ -236,7 +317,19 @@ function highlightNav() {
     ...dom.navMain.querySelectorAll('.nav-item'),
     ...dom.navSystem.querySelectorAll('.nav-item'),
   ]) {
-    button.classList.toggle('active', button.dataset.view === currentKey);
+    const active = button.dataset.view === currentKey;
+    button.classList.toggle('active', active);
+    if (active) button.setAttribute('aria-current', 'page');
+    else button.removeAttribute('aria-current');
+  }
+  // หน้าที่ไม่มีบนแถบล่าง ให้ปุ่ม "เมนู" สว่างแทน คนจะได้รู้ว่าอยู่ในเมนูนั้น
+  const onBar = BOTTOM_NAV.includes(currentKey);
+  for (const button of dom.bottomNav?.querySelectorAll('.bottom-nav-item') ?? []) {
+    const key = button.dataset.view;
+    button.classList.toggle(
+      'active',
+      key === currentKey || (key === 'more' && !onBar && currentKey != null),
+    );
   }
 }
 
@@ -298,9 +391,10 @@ function renderTopbar() {
     el(
       'button',
       {
-        class: 'btn btn-sm',
+        class: 'icon-btn',
         type: 'button',
         title: 'ดึงข้อมูลใหม่ทันที',
+        'aria-label': 'ดึงข้อมูลใหม่ทันที',
         onclick: async (event) => {
           const button = event.currentTarget;
           button.disabled = true;
@@ -308,8 +402,9 @@ function renderTopbar() {
           button.disabled = false;
         },
       },
-      [svg(icons.refresh(14))],
+      [svg(icons.refresh(15))],
     ),
+    themeDots(),
   ];
 
   replace(dom.topbarRight, pills);
@@ -340,6 +435,11 @@ async function navigate(key) {
     return;
   }
 
+  // เปลี่ยนหน้าแล้วต้องปิดลิ้นชักรีโมตและเมนูที่เปิดค้าง ไม่งั้นฉากทึบ
+  // ของลิ้นชักจะบังหน้าใหม่ทั้งหน้า (เกิดตอนกดย้อนกลับในเบราว์เซอร์)
+  if (drawerRoom) closeDrawer();
+  closeSidebar();
+
   if (currentKey === key) return;
   current?.destroy?.();
   currentKey = key;
@@ -352,6 +452,7 @@ async function navigate(key) {
 
   dom.pageTitle.textContent = view.module.title;
   dom.pageSub.textContent = `${BUILDING.name} · ${view.module.subtitle}`;
+  document.title = `${view.module.title} · RMUTT Save Energy`;
   highlightNav();
   replace(dom.viewRoot, []);
   window.scrollTo({ top: 0 });
@@ -392,11 +493,11 @@ function renderDrawer() {
   const closeButton = el('button', {
     class: 'icon-btn',
     type: 'button',
-    title: 'ปิด',
+    title: 'ปิด (Esc)',
     'aria-label': 'ปิด',
     onclick: closeDrawer,
   });
-  closeButton.innerHTML = icons.close(14);
+  closeButton.innerHTML = icons.close(16);
 
   replace(dom.drawer, [
     el('div', { class: 'drawer-head' }, [

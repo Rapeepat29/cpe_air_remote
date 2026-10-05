@@ -5,6 +5,7 @@ import '../localization/localized_material.dart';
 import '../controllers/user_controller.dart';
 import '../models/managed_user.dart';
 import '../theme/app_theme.dart';
+import '../utils/thai_date.dart';
 import '../widgets/status_pill.dart';
 
 class UserManagementScreen extends StatefulWidget {
@@ -152,8 +153,6 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
         title: Text(
           context.tr('Manage User Permissions'),
           style: const TextStyle(fontWeight: FontWeight.w800),
@@ -422,13 +421,8 @@ class _UserCard extends StatelessWidget {
     if (lastLogin == null) {
       return context.tr('Never signed in');
     }
-    return '${context.tr('Last sign-in')} ${_formatDateTime(lastLogin)}';
-  }
-
-  static String _formatDateTime(DateTime value) {
-    String two(int number) => number.toString().padLeft(2, '0');
-    return '${value.year}-${two(value.month)}-${two(value.day)} '
-        '${two(value.hour)}:${two(value.minute)}';
+    return '${context.tr('Last sign-in')} '
+        '${formatDisplayDateTime(lastLogin, AppLocalizations.of(context).isThai)}';
   }
 }
 

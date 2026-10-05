@@ -41,9 +41,15 @@ class AlertChannels {
 /// เก็บเป็น JSON ก้อนเดียวใน secure storage โดยใช้ชื่อสมาชิกของ enum เป็นคีย์
 /// ไม่ใช้รหัสฝั่ง Backend เพราะค่าตั้งนี้เป็นของเครื่องผู้ใช้ ไม่ได้ส่งขึ้นเซิร์ฟเวอร์
 class AlertPreferences {
-  const AlertPreferences(this._byKind);
+  const AlertPreferences(this._byKind, {this.enabled = true});
 
   final Map<SystemAlertKind, AlertChannels> _byKind;
+
+  /// สวิตช์หลักของการแจ้งเตือนบนอุปกรณ์นี้
+  ///
+  /// ปิดแล้วไม่มีการแจ้งเตือนเลยสักชนิด แต่ค่าที่เลือกไว้รายชนิดยังจำไว้
+  /// เปิดกลับมาเมื่อไรก็ได้แบบเดิม ไม่ต้องไปไล่เปิดใหม่ทีละชนิด
+  final bool enabled;
 
   /// ชนิดที่ให้ผู้ใช้ตั้งค่าเองได้ เรียงตามลำดับที่แสดงในหน้าตั้งค่า
   ///
@@ -71,13 +77,23 @@ class AlertPreferences {
     return _byKind[kind] ?? const AlertChannels(inApp: true, push: true);
   }
 
-  bool showsInApp(SystemAlertKind kind) => channelsFor(kind).inApp;
+  /// ในแอปแสดงทุกชนิดเสมอ ผู้ใช้ปิดไม่ได้ (ไม่สนค่า inApp ที่เคยเก็บไว้)
+  bool showsInApp(SystemAlertKind kind) => true;
 
-  bool pushesToPhone(SystemAlertKind kind) => channelsFor(kind).push;
+  /// ชนิดนี้จะแจ้งเตือนบนอุปกรณ์จริงหรือไม่ (ต้องเปิดทั้งสวิตช์หลักและรายชนิด)
+  bool pushesToPhone(SystemAlertKind kind) =>
+      enabled && channelsFor(kind).push;
+
+  /// ค่าที่ผู้ใช้เลือกไว้สำหรับชนิดนี้ ไม่สนสวิตช์หลัก ใช้แสดงในหน้าตั้งค่า
+  bool typeSelected(SystemAlertKind kind) => channelsFor(kind).push;
 
   AlertPreferences withChannels(SystemAlertKind kind, AlertChannels channels) {
     if (kind == SystemAlertKind.unknown) return this;
-    return AlertPreferences({..._byKind, kind: channels});
+    return AlertPreferences({..._byKind, kind: channels}, enabled: enabled);
+  }
+
+  AlertPreferences withEnabled(bool value) {
+    return AlertPreferences(_byKind, enabled: value);
   }
 
   /// ใบที่ควรขึ้นในรายการของแอป
@@ -85,13 +101,14 @@ class AlertPreferences {
     return alerts.where((alert) => showsInApp(alert.kind)).toList();
   }
 
-  /// ใบที่ควรเด้งบนมือถือ
+  /// ใบที่ควรแจ้งเตือนบนอุปกรณ์
   List<SystemAlert> pushable(Iterable<SystemAlert> alerts) {
     return alerts.where((alert) => pushesToPhone(alert.kind)).toList();
   }
 
   String encode() {
     return jsonEncode({
+      'enabled': enabled,
       for (final entry in _byKind.entries)
         entry.key.name: {
           'inApp': entry.value.inApp,
@@ -124,16 +141,23 @@ class AlertPreferences {
         continue;
       }
       result[kind] = AlertChannels(
-        inApp: saved['inApp'] is bool ? saved['inApp'] as bool : true,
+        // ทิ้งค่า inApp เก่าที่ผู้ใช้เคยปิดไว้ เพราะตอนนี้แสดงในแอปเสมอ
+        inApp: true,
         push: saved['push'] is bool ? saved['push'] as bool : true,
       );
     }
-    return AlertPreferences(result);
+    // ข้อมูลรุ่นก่อนไม่มีสวิตช์หลัก ถือว่าเปิดอยู่
+    final savedEnabled = parsed['enabled'];
+    return AlertPreferences(
+      result,
+      enabled: savedEnabled is bool ? savedEnabled : true,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     if (other is! AlertPreferences) return false;
+    if (other.enabled != enabled) return false;
     for (final kind in configurableKinds) {
       if (channelsFor(kind) != other.channelsFor(kind)) return false;
     }
@@ -142,6 +166,7 @@ class AlertPreferences {
 
   @override
   int get hashCode => Object.hashAll([
+    enabled,
     for (final kind in configurableKinds) channelsFor(kind),
   ]);
 }

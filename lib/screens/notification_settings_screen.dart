@@ -5,10 +5,11 @@ import '../models/system_alert.dart';
 import '../theme/app_theme.dart';
 import '../utils/alert_preferences.dart';
 
-/// หน้าตั้งค่าการแจ้งเตือนแยกตามชนิด
+/// หน้าตั้งค่าการแจ้งเตือน
 ///
-/// แยกออกมาจากหน้าตั้งค่าหลักเพราะการ์ดสามใบกินพื้นที่กว่า 500px
-/// หน้าตั้งค่าหลักควรกวาดตาผ่านได้เร็ว ส่วนหน้านี้มีที่ให้อธิบายเต็ม ๆ
+/// หน้าตาแบบเดียวกับหน้าตั้งค่าแอป (รายการเรียบ) สวิตช์หลักอยู่บนสุด
+/// แล้วตามด้วยสวิตช์รายประเภท ปิดสวิตช์หลักแล้วรายประเภทจะจางลงและกดไม่ได้
+/// แต่ค่าที่เลือกไว้ยังจำไว้ ในแอปแสดงรายการแจ้งเตือนครบทุกประเภทเสมอ
 class NotificationSettingsScreen extends StatelessWidget {
   const NotificationSettingsScreen({
     required this.controller,
@@ -22,34 +23,55 @@ class NotificationSettingsScreen extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(title: Text(context.tr('Alerts by type'))),
+      backgroundColor: colors.surface,
+      appBar: AppBar(title: Text(context.tr('Notification settings'))),
       body: AnimatedBuilder(
         animation: controller,
         builder: (context, _) {
+          final preferences = controller.alertPreferences;
+
           return ListView(
-            padding: const EdgeInsets.fromLTRB(18, 18, 18, 28),
+            padding: const EdgeInsets.only(bottom: 28),
             children: [
-              Text(
-                context.tr(
-                  'Choose what appears in the app and what alerts this '
-                  'phone.',
-                ),
-                style: TextStyle(
-                  color: colors.onSurfaceVariant,
-                  fontSize: 12,
-                ),
+              const SizedBox(height: 12),
+              _FlatGroup(
+                children: [
+                  _SwitchRow(
+                    switchKey: const Key('notifications-master-switch-page'),
+                    icon: preferences.enabled
+                        ? Icons.notifications_none_rounded
+                        : Icons.notifications_off_outlined,
+                    iconColor: AppPalette.of(context).accent,
+                    title: context.tr('Allow notifications'),
+                    subtitle: context.tr(
+                      'Receive notifications on this device for the types '
+                      'selected below.',
+                    ),
+                    value: preferences.enabled,
+                    onChanged: controller.setNotificationsEnabled,
+                  ),
+                ],
               ),
-              const SizedBox(height: 14),
-              for (final kind in AlertPreferences.configurableKinds) ...[
-                _AlertKindCard(controller: controller, kind: kind),
-                const SizedBox(height: 10),
-              ],
-              const SizedBox(height: 6),
-              _FootNote(
-                text: context.tr(
-                  'Turning off the in-app list also stops the alert from '
-                  'reaching this phone, because there would be nothing to '
-                  'open.',
+              const _SectionLabel('Notification types'),
+              _FlatGroup(
+                children: [
+                  for (final kind in AlertPreferences.configurableKinds)
+                    _AlertKindRow(
+                      controller: controller,
+                      kind: kind,
+                      masterEnabled: preferences.enabled,
+                    ),
+                ],
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
+                child: Text(
+                  context.tr('All notifications remain available in the app.'),
+                  style: TextStyle(
+                    fontSize: 12,
+                    height: 1.5,
+                    color: colors.onSurfaceVariant,
+                  ),
                 ),
               ),
             ],
@@ -60,154 +82,181 @@ class NotificationSettingsScreen extends StatelessWidget {
   }
 }
 
-class _FootNote extends StatelessWidget {
-  const _FootNote({required this.text});
-
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Icon(
-          Icons.info_outline_rounded,
-          size: 16,
-          color: colors.onSurfaceVariant,
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Text(
-            text,
-            style: TextStyle(fontSize: 11.5, color: colors.onSurfaceVariant),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _AlertKindCard extends StatelessWidget {
-  const _AlertKindCard({required this.controller, required this.kind});
+class _AlertKindRow extends StatelessWidget {
+  const _AlertKindRow({
+    required this.controller,
+    required this.kind,
+    required this.masterEnabled,
+  });
 
   final AppSettingsController controller;
   final SystemAlertKind kind;
+  final bool masterEnabled;
 
-  ({String title, IconData icon, Color color}) get _look => switch (kind) {
+  ({String title, IconData icon}) get _look => switch (kind) {
     SystemAlertKind.outsideScheduleOccupied => (
       title: 'Running outside class hours',
       icon: Icons.schedule_rounded,
-      color: AppColors.orange,
     ),
     SystemAlertKind.autoOffSucceeded => (
       title: 'Air conditioner switched off',
       icon: Icons.power_settings_new_rounded,
-      color: AppColors.green,
     ),
     SystemAlertKind.autoOffFailed => (
       title: 'Automatic shutdown failed',
       icon: Icons.error_outline_rounded,
-      color: AppColors.red,
     ),
     SystemAlertKind.unknown => (
       title: 'System event',
-      icon: Icons.notifications_rounded,
-      color: AppColors.blue,
+      icon: Icons.notifications_none_rounded,
     ),
+  };
+
+  Color _iconColor(AppPalette palette) => switch (kind) {
+    SystemAlertKind.outsideScheduleOccupied => palette.warn,
+    SystemAlertKind.autoOffSucceeded => palette.accent,
+    SystemAlertKind.autoOffFailed => palette.danger,
+    SystemAlertKind.unknown => palette.info,
   };
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
     final look = _look;
     final channels = controller.alertPreferences.channelsFor(kind);
 
-    return Material(
-      color: colors.surface,
-      borderRadius: BorderRadius.circular(18),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                _SettingsIcon(icon: look.icon, color: look.color),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        context.tr(look.title),
-                        style: const TextStyle(fontWeight: FontWeight.w800),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        context.tr(kind.message),
-                        style: const TextStyle(fontSize: 12),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            SwitchListTile(
-              key: Key('alert-${kind.name}-in-app'),
-              dense: true,
-              contentPadding: EdgeInsets.zero,
-              value: channels.inApp,
-              onChanged: (value) => controller.setAlertChannels(
+    return Opacity(
+      // สวิตช์หลักปิดอยู่ ให้รายประเภทจางลง จะได้เห็นว่าตอนนี้ไม่มีผล
+      opacity: masterEnabled ? 1 : 0.5,
+      child: _SwitchRow(
+        switchKey: Key('alert-${kind.name}-push'),
+        icon: look.icon,
+        iconColor: _iconColor(AppPalette.of(context)),
+        title: context.tr(look.title),
+        subtitle: context.tr(kind.message),
+        value: channels.push,
+        onChanged: masterEnabled
+            ? (value) => controller.setAlertChannels(
                 kind,
-                channels.copyWith(inApp: value),
+                channels.copyWith(push: value),
+              )
+            : null,
+      ),
+    );
+  }
+}
+
+/// แถวมาตรฐานของหน้านี้: ไอคอนเส้น ชื่อ คำอธิบาย และสวิตช์ทางขวา
+///
+/// แตะที่ไหนของแถวก็สลับสวิตช์ได้ ไม่ต้องเล็งที่ตัวสวิตช์
+class _SwitchRow extends StatelessWidget {
+  const _SwitchRow({
+    required this.switchKey,
+    required this.icon,
+    required this.iconColor,
+    required this.title,
+    required this.subtitle,
+    required this.value,
+    required this.onChanged,
+  });
+
+  final Key switchKey;
+  final IconData icon;
+  final Color iconColor;
+  final String title;
+  final String subtitle;
+  final bool value;
+  final ValueChanged<bool>? onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
+    return MergeSemantics(
+      child: InkWell(
+        onTap: onChanged == null ? null : () => onChanged!(!value),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 12, 16, 12),
+          child: Row(
+            children: [
+              Icon(icon, size: 22, color: iconColor),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        fontSize: 12.5,
+                        height: 1.4,
+                        color: colors.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              title: Text(
-                context.tr('Show in the app'),
-                style: const TextStyle(fontSize: 13),
-              ),
-            ),
-            SwitchListTile(
-              key: Key('alert-${kind.name}-push'),
-              dense: true,
-              contentPadding: EdgeInsets.zero,
-              // ปิดรายการในแอปแล้วก็ไม่ควรเด้ง เพราะจะกดดูต่อไม่ได้
-              value: channels.inApp && channels.push,
-              onChanged: channels.inApp
-                  ? (value) => controller.setAlertChannels(
-                      kind,
-                      channels.copyWith(push: value),
-                    )
-                  : null,
-              title: Text(
-                context.tr('Alert me on this phone'),
-                style: const TextStyle(fontSize: 13),
-              ),
-            ),
-          ],
+              const SizedBox(width: 12),
+              Switch(key: switchKey, value: value, onChanged: onChanged),
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-class _SettingsIcon extends StatelessWidget {
-  const _SettingsIcon({required this.icon, required this.color});
+/// กลุ่มของแถว: เส้นบนล่าง และเส้นคั่นระหว่างแถว (แบบเดียวกับหน้าตั้งค่าแอป)
+class _FlatGroup extends StatelessWidget {
+  const _FlatGroup({required this.children});
 
-  final IconData icon;
-  final Color color;
+  final List<Widget> children;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 42,
-      height: 42,
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(12),
+    final colors = Theme.of(context).colorScheme;
+    final line = BorderSide(color: colors.outlineVariant);
+
+    return Material(
+      color: colors.surface,
+      shape: Border(top: line, bottom: line),
+      child: Column(
+        children: [
+          for (var i = 0; i < children.length; i++) ...[
+            if (i > 0) Divider(height: 1, thickness: 1, color: line.color),
+            children[i],
+          ],
+        ],
       ),
-      child: Icon(icon, color: color, size: 22),
+    );
+  }
+}
+
+class _SectionLabel extends StatelessWidget {
+  const _SectionLabel(this.label);
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 22, 20, 8),
+      child: Text(
+        context.tr(label),
+        style: TextStyle(
+          color: AppPalette.of(context).accent,
+          fontSize: 12.5,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 0.4,
+        ),
+      ),
     );
   }
 }

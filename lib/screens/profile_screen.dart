@@ -178,7 +178,7 @@ class ProfileScreen extends StatelessWidget {
                 _ProfileTile(
                   key: const Key('account-settings-tile'),
                   icon: Icons.manage_accounts_outlined,
-                  iconColor: AppColors.primary,
+                  iconColor: Theme.of(context).colorScheme.primary,
                   title: context.tr('Account Settings'),
                   subtitle: context.tr(
                     'Name, email, phone number and password',

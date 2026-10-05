@@ -118,9 +118,8 @@ function renderRooms(panel, update) {
     ...(groups.length === 0
       ? [emptyState('ยังไม่มีห้องในระบบ')]
       : groups.flatMap((group) => [
-          el('div', {
-            class: 'nav-label',
-            style: { paddingLeft: '2px' },
+          el('h2', {
+            class: 'floor-heading',
             text: floorLabel(group.floor),
           }),
           ...group.rooms.map((room) => roomRow(room, update)),
@@ -317,7 +316,7 @@ function airRow(unit, update) {
     el('div', { class: 'row', style: { gap: '6px' } }, [
       el('span', {
         class: 'dim',
-        style: { fontSize: '11px' },
+        style: { fontSize: 'var(--fs-2xs)' },
         text: 'ปิดอัตโนมัติ',
       }),
       toggle(unit.autoOffEnabled !== false, {
@@ -536,7 +535,7 @@ function showReservation(reservation, kind) {
     body: el('div', {}, [
       el('div', { class: 'token-box', text: reservation.provisioningToken }),
       ...lines.map(([label, value]) =>
-        el('div', { class: 'rate-example-row', style: { fontSize: '12px' } }, [
+        el('div', { class: 'rate-example-row', style: { fontSize: 'var(--fs-xs)' } }, [
           el('span', { class: 'muted', text: label }),
           el('span', { class: 'mono', text: value }),
         ]),
@@ -609,7 +608,7 @@ function renderOccupancy(panel, update) {
     ]),
     el('div', {
       class: 'dim',
-      style: { fontSize: '11.5px', marginBottom: '12px' },
+      style: { fontSize: 'var(--fs-xs)', marginBottom: '12px' },
       text:
         'ระบบปิดแอร์อัตโนมัติจะไม่ทำงานกับห้องที่เซ็นเซอร์ออฟไลน์หรือเรดาร์ยังไม่พร้อม ' +
         'เพราะถ้าไม่รู้ว่ามีคนอยู่หรือไม่ การเดาแล้วปิดคือความเสียหายที่แก้ยากกว่า',

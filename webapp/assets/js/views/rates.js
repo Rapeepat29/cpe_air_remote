@@ -41,7 +41,7 @@ export default {
         replace(preview, [
           el('div', {
             class: 'panel-title',
-            style: { fontSize: '13.5px', marginBottom: '4px' },
+            style: { fontSize: 'var(--fs-sm)', marginBottom: '4px' },
             text: 'ตัวอย่างการคำนวณจากข้อมูลจริงของช่วงที่เลือกอยู่',
           }),
           row('พลังงานที่ใช้', energy(sampleKwh)),
@@ -84,7 +84,7 @@ export default {
             input,
             el('span', {
               style: {
-                fontSize: '12.5px',
+                fontSize: 'var(--fs-sm)',
                 color: 'var(--text-mid)',
                 flex: 'none',
               },
@@ -113,7 +113,7 @@ export default {
         ]),
         el('div', {
           class: 'card dim',
-          style: { marginTop: '16px', fontSize: '12px', lineHeight: '1.8' },
+          style: { marginTop: '16px', fontSize: 'var(--fs-xs)', lineHeight: '1.8' },
           text:
             'อัตรานี้ใช้คำนวณเฉพาะตัวเลข "โดยประมาณ" ที่แสดงในหน้าภาพรวม ' +
             'หน้าข้อมูลไฟฟ้า และคอลัมน์ค่าไฟในไฟล์ Excel เท่านั้น ' +

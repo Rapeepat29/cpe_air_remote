@@ -123,10 +123,38 @@ export function validateScheduleImportPayload(body) {
   return {
     schedules,
     createMissingRooms: body?.createMissingRooms === true,
+    // true = เปลี่ยนภาคเรียน: ล้างตารางเดิมของทุกห้องก่อน ไม่ใช่แค่ห้องที่อยู่ในไฟล์
+    // ต้องเป็น true จริง ๆ เท่านั้น แอปมือถือรุ่นเดิมไม่ส่งช่องนี้มา จึงทำงานแบบเดิม
+    replaceAll: body?.replaceAll === true,
+    semester: pickSemester(schedules),
     roomNumbers: [...new Set(
       schedules.map((schedule) => schedule.roomNumber),
     )].sort(),
   };
+}
+
+/**
+ * ภาคเรียนของตารางชุดนี้ เช่น "2/2569"
+ *
+ * ใช้ค่าที่พบบ่อยที่สุด เพราะไฟล์ Excel ของคณะบางชีตอาจพิมพ์ภาคเรียนผิด
+ * (ตัวตรวจไฟล์เตือนไว้แล้วตอนดูตัวอย่าง) คืนข้อความว่างถ้าไฟล์ไม่ระบุเลย
+ */
+export function pickSemester(schedules) {
+  const counts = new Map();
+  for (const schedule of schedules ?? []) {
+    const semester = String(schedule?.semester ?? '').trim();
+    if (!semester) continue;
+    counts.set(semester, (counts.get(semester) ?? 0) + 1);
+  }
+  let best = '';
+  let bestCount = 0;
+  for (const [semester, count] of counts) {
+    if (count > bestCount) {
+      best = semester;
+      bestCount = count;
+    }
+  }
+  return best;
 }
 
 export function scheduleLabelForDatabase(schedule) {

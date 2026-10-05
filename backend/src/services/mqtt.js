@@ -9,7 +9,10 @@ import {
   OCCUPANCY_RETAINED_SUFFIXES,
   retainedTopics,
 } from '../utils/mqtt-topics.js';
-import { evaluateClassSchedule } from '../utils/class-schedule.js';
+import { bangkokDate, evaluateClassSchedule } from '../utils/class-schedule.js';
+import { readActiveTermGate } from './academic-terms.js';
+import { readTodayBookings } from './room-bookings.js';
+import { withBookings } from '../utils/room-booking.js';
 import { normalizeOccupancyStatus } from '../utils/occupancy-sensor.js';
 import { hashSecret, safeHashEquals } from '../utils/security.js';
 import {
@@ -630,7 +633,12 @@ async function publishScheduleEvaluation(deviceId) {
       ORDER BY day_of_week, start_time`,
     [deviceRows[0].room_number],
   );
-  const evaluation = evaluateClassSchedule(schedules, new Date());
+  const now = new Date();
+  const evaluation = withBookings(
+    evaluateClassSchedule(schedules, now, { term: await readActiveTermGate() }),
+    await readTodayBookings(deviceRows[0].room_number, bangkokDate(now)),
+    now,
+  );
   await publish(
     `${config.mqtt.topicPrefix}/${deviceId}/schedule-status`,
     JSON.stringify({

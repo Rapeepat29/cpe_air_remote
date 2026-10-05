@@ -26,7 +26,9 @@ export function parseSchemaTables(sql) {
     tables.set(tableName, {
       name: tableName,
       createStatement: statement.replace(/;\s*$/, ''),
-      columns: parseColumns(body),
+      // ตัดคอมเมนต์ -- ออกก่อน ไม่งั้นคอลัมน์ที่มีคอมเมนต์อยู่บรรทัดก่อนหน้า
+      // จะถูกอ่านเป็นคอลัมน์ชื่อ "--" แล้ว --fix สร้าง ALTER TABLE ที่ผิด syntax
+      columns: parseColumns(stripLineComments(body)),
     });
     match = pattern.exec(source);
   }
@@ -106,4 +108,31 @@ function splitTopLevel(body) {
   }
   if (current.trim()) parts.push(current);
   return parts;
+}
+
+// ตัดคอมเมนต์ SQL แบบ -- จนจบบรรทัด (ไม่แตะ -- ที่อยู่ในเครื่องหมายคำพูด)
+export function stripLineComments(sql) {
+  let out = '';
+  let quote = null;
+  const text = String(sql ?? '');
+  for (let i = 0; i < text.length; i += 1) {
+    const char = text[i];
+    if (quote) {
+      out += char;
+      if (char === quote) quote = null;
+      continue;
+    }
+    if (char === "'" || char === '"' || char === '`') {
+      quote = char;
+      out += char;
+      continue;
+    }
+    if (char === '-' && text[i + 1] === '-') {
+      while (i < text.length && text[i] !== '\n') i += 1;
+      out += '\n';
+      continue;
+    }
+    out += char;
+  }
+  return out;
 }

@@ -18,10 +18,10 @@ $deployDirectory = $PSScriptRoot
 $projectDirectory = Split-Path -Parent $deployDirectory
 $webDirectory = Join-Path $projectDirectory 'webapp'
 . (Join-Path $PSScriptRoot 'ServerConfig.ps1')
-$server = Get-RmuttServer -HostOverride $Server -UserOverride $User
-$target = $server.Target
-$sshArgs = $server.SshArgs
-$scpArgs = $server.ScpArgs
+$srv = Get-RmuttServer -HostOverride $Server -UserOverride $User
+$target = $srv.Target
+$sshArgs = $srv.SshArgs
+$scpArgs = $srv.ScpArgs
 
 if (-not (Test-Path -LiteralPath $webDirectory)) {
   throw "ไม่พบโฟลเดอร์เว็บแอปที่ $webDirectory"
@@ -52,5 +52,5 @@ if ($LASTEXITCODE -ne 0) { throw 'สลับโฟลเดอร์เว็�
 
 Write-Host ''
 Write-Host 'อัปโหลดเสร็จแล้ว' -ForegroundColor Green
-Write-Host "เปิดดูได้ที่ https://$($server.Domain)/"
+Write-Host "เปิดดูได้ที่ https://$($srv.Domain)/"
 Write-Host 'ถ้ายังเห็นของเก่า ให้กด Ctrl+F5 หนึ่งครั้ง'

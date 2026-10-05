@@ -34,11 +34,13 @@ abstract interface class AuthRepository {
   });
 
   /// แก้ข้อมูลบัญชีของตัวเอง คืนข้อมูลผู้ใช้ชุดใหม่
+  /// ถ้าเปลี่ยนอีเมล ต้องส่ง [currentPassword] มาด้วย ไม่งั้น Backend จะปฏิเสธ
   Future<AuthUser> updateProfile({
     required String firstName,
     required String lastName,
     required String email,
     required String phone,
+    String? currentPassword,
   });
 
   /// เปลี่ยนรหัสผ่านโดยยืนยันด้วยรหัสเดิม

@@ -69,27 +69,52 @@ services:
     container_name: rmutt-backend
     restart: unless-stopped
     logging: *default-logging
-    env_file: .env
+    # ส่งเข้า Backend เฉพาะค่าที่ Backend ใช้จริง ไม่ใช้ `env_file: .env` ทั้งไฟล์
+    # เพราะ .env มีรหัส root ของ MariaDB, token DuckDNS/Tailscale และรหัสแอดมินตัวแรก
+    # ถ้าส่งไปทั้งไฟล์ ค่าพวกนั้นจะอยู่ใน container และเห็นได้จาก `docker inspect`
+    # (ค่าใน ${...} ยังอ่านจาก .env ไฟล์เดิม ไม่ต้องแก้ .env บนเซิร์ฟเวอร์)
+    # เพิ่มตัวแปรใหม่ให้ Backend เมื่อไร ต้องมาเพิ่มในรายการนี้ด้วย
     environment:
       NODE_ENV: production
       PORT: 3000
-      # Backend อยู่หลัง Caddy หนึ่งชั้น ต้องเชื่อ X-Forwarded-For หนึ่งชั้น
-      # ไม่งั้น rate limit ของหน้า login จะนับทุกคนเป็น IP เดียวกัน
-      TRUST_PROXY: 1
+      # คำขอเข้ามาได้สองทาง: โดเมนหลัก (Caddy ชั้นเดียว) และ Tailscale Funnel
+      # (Tailscale -> Caddy สองชั้น) ต้องเชื่อ X-Forwarded-For สองชั้น ไม่งั้นทุกคน
+      # ที่เข้าผ่าน Funnel (รวมแอปมือถือ) จะถูกนับเป็น IP เดียวกัน คนหนึ่งพิมพ์รหัสผิด
+      # 10 ครั้ง ทุกคนจะล็อกอินไม่ได้ 15 นาที
+      # ทางโดเมนหลักปลอมไม่ได้ เพราะ Caddy ทิ้ง X-Forwarded-For ที่ผู้ใช้ส่งมาเอง
+      TRUST_PROXY: 2
       # เว็บกับ API อยู่โดเมนเดียวกัน แอปมือถือไม่ถูกตรวจ CORS
-      APP_ORIGIN: https://${DOMAIN}
+      # PUBLIC_URL = ที่อยู่สาธารณะจาก Tailscale Funnel (เว้นว่างได้)
+      APP_ORIGIN: https://${DOMAIN},${PUBLIC_URL:-}
       DB_HOST: db
       DB_PORT: 3306
+      DB_DATABASE: ${DB_DATABASE}
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
+      DB_CONNECTION_LIMIT: ${DB_CONNECTION_LIMIT:-5}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-8h}
+      OTP_PEPPER: ${OTP_PEPPER}
+      OTP_EXPIRES_MINUTES: ${OTP_EXPIRES_MINUTES:-10}
+      MAIL_MODE: ${MAIL_MODE:-smtp}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-465}
+      SMTP_SECURE: ${SMTP_SECURE:-true}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      SMTP_FROM: ${SMTP_FROM:-}
       MQTT_URL: mqtt://mqtt:1883
+      MQTT_USERNAME: ${MQTT_USERNAME}
+      MQTT_PASSWORD: ${MQTT_PASSWORD}
       # ที่อยู่ที่ส่งให้ ESP32 ตอน provisioning (ต่างจากที่ Backend ใช้เอง)
       MQTT_DEVICE_URL: mqtts://${DOMAIN}:8883
       MQTT_REQUIRED: "true"
       # บอร์ดแต่ละตัวมีบัญชี MQTT ของตัวเอง เห็นเฉพาะ topic ของตัวเอง
       MQTT_DEVICE_AUTH: dynsec
+      MQTT_DEVICE_SECRET: ${MQTT_DEVICE_SECRET}
       MQTT_TOPIC_PREFIX: rmutt/ac
       MQTT_OCCUPANCY_TOPIC_PREFIX: rmutt/occupancy
+      LEGACY_PHONE_PREFIX: ${LEGACY_PHONE_PREFIX:-0}
       # โฟลเดอร์เดียวกับที่ Caddy เสิร์ฟ /firmware/ ใช้แสดงรายการไฟล์ในเว็บ
       FIRMWARE_DIR: /firmware
       TZ: Asia/Bangkok
@@ -114,7 +139,11 @@ services:
         condition: service_started
 
   caddy:
-    image: caddy:2
+    # Caddy + ปลั๊กอิน DuckDNS (ดู caddy.Dockerfile)
+    build:
+      context: .
+      dockerfile: caddy.Dockerfile
+    image: rmutt-caddy:duckdns
     container_name: rmutt-caddy
     restart: unless-stopped
     logging: *default-logging
@@ -123,6 +152,8 @@ services:
       - "443:443"
     environment:
       DOMAIN: ${DOMAIN}
+      # token จากหน้า duckdns.org ใช้เขียน TXT record ตอนขอใบรับรอง
+      DUCKDNS_TOKEN: ${DUCKDNS_TOKEN:-}
       TZ: Asia/Bangkok
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
@@ -133,3 +164,27 @@ services:
       - ./caddy/config:/config
     depends_on:
       - backend
+
+  # ทางเข้าจากอินเทอร์เน็ต (Tailscale Funnel) สำหรับเว็บและแอปเท่านั้น
+  # - ต่อออกไปหา Tailscale เอง ไม่ต้องเปิดพอร์ตขาเข้าบน firewall ของมหาวิทยาลัย
+  # - โหมด userspace: ไม่ต้องใช้ /dev/net/tun หรือสิทธิ์ NET_ADMIN ไม่แตะเครือข่ายของเครื่อง
+  # - ส่งต่อเฉพาะไปที่ caddy:8080 (เว็บ + /api) ฐานข้อมูล MQTT และ SSH ไม่ถูกเปิดออก
+  # - ปิดได้ทันที: docker compose stop tailscale
+  tailscale:
+    image: tailscale/tailscale:stable
+    container_name: rmutt-tailscale
+    hostname: rmutt-energy
+    restart: unless-stopped
+    logging: *default-logging
+    environment:
+      TS_HOSTNAME: rmutt-energy
+      TS_USERSPACE: "true"
+      TS_STATE_DIR: /var/lib/tailscale
+      TS_SERVE_CONFIG: /config/serve.json
+      # เว้นว่างได้: ครั้งแรกให้ดูลิงก์ล็อกอินใน docker compose logs tailscale
+      TS_AUTHKEY: ${TS_AUTHKEY:-}
+    volumes:
+      - ./tailscale/state:/var/lib/tailscale
+      - ./tailscale-serve.json:/config/serve.json:ro
+    depends_on:
+      - caddy

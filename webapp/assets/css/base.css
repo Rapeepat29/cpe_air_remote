@@ -1,4 +1,4 @@
-/* โครงหน้าหลัก: แถบข้าง แถบบน และพื้นที่เนื้อหา */
+/* โครงหน้าหลัก: แถบข้าง แถบบน แถบเมนูล่าง (มือถือ) และพื้นที่เนื้อหา */
 
 * {
   box-sizing: border-box;
@@ -11,12 +11,22 @@ body {
   min-height: 100%;
 }
 
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 body {
   background: var(--bg);
   color: var(--text-hi);
   font-family: var(--font-body);
-  font-size: 14px;
+  font-size: var(--fs-base);
+  /* ภาษาไทยมีสระบน-ล่างและวรรณยุกต์ ต้องเว้นบรรทัดมากกว่าภาษาอังกฤษ
+     ค่าเริ่มต้นของเบราว์เซอร์ (~1.2) ทำให้บรรทัดชนกันจนตาล้า */
+  line-height: var(--lh-thai);
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-variant-numeric: tabular-nums;
 }
 
 ::selection {
@@ -31,13 +41,23 @@ a {
 
 button {
   font-family: inherit;
+  font-size: inherit;
+  line-height: 1.35;
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 
 input,
 select,
 textarea {
   font-family: inherit;
+  font-size: inherit;
+}
+
+/* ขอบโฟกัสชัด ๆ สำหรับคนใช้คีย์บอร์ด (Tab) แต่ไม่โผล่ตอนคลิกด้วยเมาส์ */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 .mono {
@@ -52,123 +72,197 @@ textarea {
   display: none !important;
 }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
 /* ---------- เปลือกแอป ---------- */
 .app {
   display: flex;
   min-height: 100vh;
+  min-height: 100dvh;
 }
 
 .sidebar {
   width: var(--sidebar-w);
   flex: none;
-  background: var(--panel);
-  border-right: 1px solid var(--hairline);
+  background: var(--side-bg);
+  color: var(--side-text);
+  border-right: 1px solid var(--side-line);
   display: flex;
   flex-direction: column;
-  padding: 22px 16px;
+  padding: 22px 14px 18px;
   position: sticky;
   top: 0;
   height: 100vh;
+  height: 100dvh;
   overflow-y: auto;
 }
 
 .brand {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 4px 8px 22px;
+  gap: 11px;
+  padding: 2px 8px 20px;
 }
 
 .brand-mark {
-  width: 34px;
-  height: 34px;
-  border-radius: 10px;
-  background: radial-gradient(circle at 30% 20%, #4ee39e, #1b7a4c 75%);
+  width: 42px;
+  height: 42px;
+  flex: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex: none;
-  box-shadow: 0 0 0 1px rgba(62, 207, 142, 0.25),
-    0 4px 14px rgba(62, 207, 142, 0.18);
+  /* มุมโค้งเท่ากับมุมของไอคอน (rx 56 จาก 240) เส้นขอบบาง ๆ ช่วยให้ไอคอน
+     สีเทาถ่านไม่จมหายไปกับเมนูข้างของธีมเทาและดำ */
+  border-radius: 23%;
+  box-shadow: 0 0 0 1px var(--side-line);
+}
+
+.brand-mark > svg {
+  width: 100%;
+  height: 100%;
 }
 
 .brand-name {
   font-family: var(--font-disp);
-  font-size: 14.5px;
+  font-size: var(--fs-md);
   font-weight: 700;
   letter-spacing: 0.2px;
-  line-height: 1.15;
+  line-height: 1.2;
 }
 
+/* ชื่อแบบโลโก้: R สีเขียว MUTT สีตามพื้น และ SAVE ENERGY ตัวเล็กใต้ชื่อ
+   letter-spacing ใช้ได้เพราะเป็นตัวละตินล้วน */
+.wordmark {
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-disp);
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.wordmark-name {
+  font-size: calc(var(--fs-xl) + 1px);
+  letter-spacing: 0.4px;
+  color: var(--logo-mutt);
+}
+
+.wordmark-name b,
+.wordmark-tag {
+  color: var(--logo-green);
+}
+
+.wordmark-tag {
+  font-size: 11px;
+  letter-spacing: 3px;
+  margin-top: 1px;
+}
+
+.brand .user-role {
+  font-size: var(--fs-2xs);
+  margin-top: 4px;
+  color: var(--side-muted);
+}
+
+/* หัวกลุ่มเมนู: ไม่ใช้ตัวพิมพ์ใหญ่/ระยะห่างตัวอักษร เพราะกับภาษาไทย
+   letter-spacing ทำให้สระลอยแยกจากพยัญชนะ */
 .nav-label {
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 1.2px;
-  color: var(--text-low);
-  padding: 14px 10px 6px;
+  font-size: var(--fs-2xs);
+  font-weight: 600;
+  color: var(--side-muted);
+  padding: 16px 12px 6px;
 }
 
 .nav {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
 }
 
 .nav-item {
   display: flex;
   align-items: center;
-  gap: 11px;
-  padding: 9px 11px;
+  gap: 12px;
+  min-height: var(--tap);
+  padding: 8px 12px;
   border-radius: var(--radius-sm);
   border: none;
   background: none;
-  color: var(--text-mid);
-  font-size: 13.5px;
+  color: var(--side-text);
+  font-size: var(--fs-base);
   font-weight: 500;
   text-align: left;
   width: 100%;
+  position: relative;
   transition: background 0.15s, color 0.15s;
 }
 
 .nav-item svg {
   flex: none;
-  opacity: 0.85;
+  opacity: 0.9;
 }
 
 .nav-item:hover {
-  background: var(--panel-raised);
-  color: var(--text-hi);
+  background: var(--side-hover);
+  color: var(--side-text);
 }
 
 .nav-item.active {
-  background: var(--accent-soft);
-  color: var(--accent);
+  background: var(--side-active-bg);
+  color: var(--side-active);
+  font-weight: 700;
+}
+
+/* แถบสีด้านซ้ายบอกหน้าปัจจุบัน ช่วยให้เห็นได้แม้คนตาบอดสีแดง-เขียว */
+.nav-item.active::before {
+  content: '';
+  position: absolute;
+  left: -14px;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--side-active);
 }
 
 .nav-item.active svg {
   opacity: 1;
 }
 
-.nav-item:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 1px;
-}
-
 .nav-badge {
   margin-left: auto;
   font-family: var(--font-mono);
-  font-size: 10.5px;
+  font-size: var(--fs-2xs);
   font-weight: 700;
+  line-height: 1.3;
   color: var(--warn);
   background: var(--warn-soft);
   border-radius: 100px;
-  padding: 2px 7px;
+  padding: 2px 8px;
+}
+
+/* ธีมเขียว: เมนูข้างเป็นพื้นเขียวเข้ม ป้ายตัวเลขและรูปผู้ใช้ต้องเป็นแบบทึบ
+   ไม่งั้นสีส้มโปร่งใสจะจมหายไปกับพื้นเขียว */
+:root[data-palette='green'] .sidebar .nav-badge {
+  background: #f6c76e;
+  color: #3d2500;
+}
+
+:root[data-palette='green'] .sidebar .avatar {
+  background: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
 }
 
 .sidebar-foot {
   margin-top: auto;
   padding-top: 14px;
-  border-top: 1px solid var(--hairline);
+  border-top: 1px solid var(--side-line);
 }
 
 .user-chip {
@@ -185,33 +279,38 @@ textarea {
 }
 
 .user-chip:hover {
-  background: var(--panel-raised);
+  background: var(--side-hover);
+}
+
+.sidebar .user-role {
+  color: var(--side-muted);
 }
 
 .avatar {
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
-  background: linear-gradient(155deg, #1f6a48, #0e2e1d);
-  border: 1px solid var(--hairline);
+  background: var(--avatar-bg);
+  border: 1px solid var(--side-line);
   flex: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--accent);
+  font-size: var(--fs-2xs);
+  font-weight: 700;
+  color: var(--avatar-text);
 }
 
 .user-name {
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
   font-weight: 600;
-  line-height: 1.3;
+  line-height: 1.35;
 }
 
 .user-role {
-  font-size: 10.5px;
+  font-size: var(--fs-2xs);
   color: var(--text-mid);
+  line-height: 1.4;
 }
 
 /* ---------- ส่วนเนื้อหา ---------- */
@@ -226,40 +325,58 @@ textarea {
   position: sticky;
   top: 0;
   z-index: 20;
-  background: rgba(6, 13, 9, 0.86);
+  background: var(--topbar-bg);
   backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--hairline);
-  padding: 18px 32px;
+  padding: 16px 32px;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
-  gap: 20px;
+  gap: 12px 20px;
   flex-wrap: wrap;
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
 }
 
 .page-title {
   font-family: var(--font-disp);
-  font-size: 21px;
+  font-size: var(--fs-xl);
   font-weight: 700;
   letter-spacing: 0.1px;
+  line-height: 1.3;
 }
 
 .page-sub {
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
   color: var(--text-mid);
-  margin-top: 3px;
+  margin-top: 2px;
+  line-height: 1.5;
+}
+
+.page-sub.dim {
+  font-size: var(--fs-xs);
+  color: var(--text-low);
 }
 
 .topbar-right {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   flex-wrap: wrap;
 }
 
 .view {
   display: none;
-  padding: 26px 32px 60px;
+  width: 100%;
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: 26px 32px 64px;
 }
 
 .view.active {
@@ -268,8 +385,9 @@ textarea {
 
 .menu-btn {
   display: none;
-  width: 34px;
-  height: 34px;
+  width: var(--tap);
+  height: var(--tap);
+  flex: none;
   border-radius: var(--radius-sm);
   background: var(--panel-raised);
   border: 1px solid var(--hairline);
@@ -281,9 +399,9 @@ textarea {
 .scrim {
   position: fixed;
   inset: 0;
-  background: rgba(4, 9, 6, 0.6);
+  background: var(--overlay);
   backdrop-filter: blur(2px);
-  z-index: 25;
+  z-index: 35;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.2s;
@@ -294,27 +412,162 @@ textarea {
   pointer-events: auto;
 }
 
+/* ---------- แถบเมนูล่าง (เฉพาะจอเล็ก) ----------
+   บนมือถือ การต้องกดปุ่มสามขีดทุกครั้งที่จะเปลี่ยนหน้าช้าและนิ้วเอื้อมไม่ถึง
+   มุมบนซ้าย จึงย้ายหน้าที่ใช้บ่อยที่สุดมาไว้ใต้นิ้วโป้ง */
+.bottom-nav {
+  display: none;
+}
+
+/* ---------- จอแท็บเล็ตแนวตั้งและมือถือ ---------- */
 @media (max-width: 820px) {
+  :root {
+    --bottom-nav-h: 64px;
+  }
+
   .sidebar {
     position: fixed;
-    z-index: 30;
+    z-index: 40;
+    width: min(86vw, 300px);
     transform: translateX(-100%);
-    transition: transform 0.2s;
+    transition: transform 0.22s ease;
+    box-shadow: var(--shadow-drop);
+    padding-bottom: calc(18px + env(safe-area-inset-bottom));
   }
 
   .sidebar.open {
     transform: translateX(0);
   }
 
+  /* แถบบนไม่ติดหน้าจอบนมือถือ เพราะจอสูงแค่ ~700px
+     ถ้าติดไว้จะกินพื้นที่ไปเกือบหนึ่งในห้า ชื่อหน้ายังเห็นได้จากแถบล่าง */
   .topbar {
-    padding: 16px 18px;
+    position: relative;
+    padding: 12px 16px 10px;
+    padding-top: calc(12px + env(safe-area-inset-top));
+    gap: 10px;
   }
 
-  .view {
-    padding: 20px 18px 50px;
+  .page-title {
+    font-size: var(--fs-lg);
   }
 
   .menu-btn {
-    display: flex !important;
+    display: flex;
+  }
+
+  /* มีแถบเมนูล่างแล้ว ปุ่มสามขีดด้านบนซ้ำซ้อน (แถบล่างมีปุ่ม "เมนู" อยู่แล้ว) */
+  .app.has-bottom-nav .menu-btn {
+    display: none;
+  }
+
+  .page-sub,
+  .page-sub.dim {
+    display: none;
+  }
+
+  .topbar-right {
+    width: 100%;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    margin: 0 -16px;
+    padding: 0 16px;
+    width: calc(100% + 32px);
+  }
+
+  .topbar-right::-webkit-scrollbar {
+    display: none;
+  }
+
+  .topbar-right > * {
+    flex: none;
+  }
+
+  .view {
+    padding: 18px 16px calc(var(--bottom-nav-h) + 32px + env(safe-area-inset-bottom));
+  }
+
+  .bottom-nav {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 30;
+    height: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom));
+    padding-bottom: env(safe-area-inset-bottom);
+    background: var(--topbar-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-top: 1px solid var(--hairline);
+  }
+
+  .bottom-nav-item {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    border: none;
+    background: none;
+    color: var(--text-mid);
+    font-size: var(--fs-2xs);
+    font-weight: 500;
+    line-height: 1.2;
+    padding: 6px 2px;
+    min-width: 0;
+  }
+
+  .bottom-nav-item span {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .bottom-nav-item .bn-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 28px;
+    border-radius: 100px;
+    transition: background 0.15s;
+  }
+
+  .bottom-nav-item.active {
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  .bottom-nav-item.active .bn-icon {
+    background: var(--accent-soft);
+  }
+
+  .bottom-nav-item .nav-badge {
+    position: absolute;
+    top: 3px;
+    left: calc(50% + 6px);
+    margin: 0;
+    padding: 0 6px;
+    font-size: 11px;
+    background: var(--warn);
+    color: #1d1300;
+  }
+}
+
+/* จอกว้างมาก: เนื้อหาไม่ยืดเต็มจอ เพราะบรรทัดยาวเกินไปอ่านยาก */
+@media (min-width: 1500px) {
+  .topbar {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+
+  .view {
+    padding-left: 40px;
+    padding-right: 40px;
   }
 }

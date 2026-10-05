@@ -80,6 +80,9 @@ class ScheduleImportPreview {
     required this.warnings,
     required this.skippedSheets,
     required this.csv,
+    this.termSemester,
+    this.termStartDate,
+    this.termEndDate,
   });
 
   final String fileName;
@@ -91,6 +94,43 @@ class ScheduleImportPreview {
   final List<String> warnings;
   final List<String> skippedSheets;
   final String csv;
+
+  /// ภาคเรียนที่ผู้ใช้ยืนยันก่อนนำเข้า เช่น 1/2569 (null = ใช้ค่าที่อ่านจากไฟล์)
+  final String? termSemester;
+
+  /// ช่วงวันที่ใช้ตารางนี้ รูปแบบ yyyy-MM-dd ทั้งคู่ หรือ null ทั้งคู่
+  final String? termStartDate;
+  final String? termEndDate;
+
+  bool get hasTerm => termStartDate != null && termEndDate != null;
+
+  /// สำเนาที่ติดภาคเรียนและวันเปิด-ปิดภาคไว้ ส่งไปพร้อมตอนยืนยันนำเข้า
+  ScheduleImportPreview withTerm({
+    required String semester,
+    required DateTime startDate,
+    required DateTime endDate,
+  }) {
+    return ScheduleImportPreview(
+      fileName: fileName,
+      semester: semester,
+      schedules: schedules,
+      roomNumbers: roomNumbers,
+      existingRoomNumbers: existingRoomNumbers,
+      newRooms: newRooms,
+      warnings: warnings,
+      skippedSheets: skippedSheets,
+      csv: csv,
+      termSemester: semester,
+      termStartDate: isoDate(startDate),
+      termEndDate: isoDate(endDate),
+    );
+  }
+
+  static String isoDate(DateTime date) {
+    final month = date.month.toString().padLeft(2, '0');
+    final day = date.day.toString().padLeft(2, '0');
+    return '${date.year}-$month-$day';
+  }
 
   int get scheduleCount => schedules.length;
 
@@ -128,6 +168,9 @@ class ScheduleImportPreview {
     return {
       'createMissingRooms': newRooms.isNotEmpty,
       'schedules': schedules.map((schedule) => schedule.toJson()).toList(),
+      if (termSemester != null) 'semester': termSemester,
+      if (hasTerm) 'startDate': termStartDate,
+      if (hasTerm) 'endDate': termEndDate,
     };
   }
 

@@ -10,6 +10,8 @@ import { api } from '../api.js';
 import { el, replace, svg, toggle } from '../dom.js';
 import { relativeTime, time } from '../format.js';
 import { icons } from '../icons.js';
+import { TEXT_SIZES, prefs, setTextSize } from '../prefs.js';
+import { THEME_CHOICES, setTheme, themeChoice } from '../theme.js';
 import { loaders, refreshAll, state } from '../store.js';
 import { confirmAction, openForm, toastError, toastOk } from '../ui.js';
 
@@ -24,6 +26,7 @@ export default {
     function update() {
       const isAdmin = state.user?.role === 'admin';
       replace(box, [
+        displayCard(update),
         autoOffCard(isAdmin),
         profileCard(update),
         healthCard(),
@@ -35,6 +38,102 @@ export default {
     return { update };
   },
 };
+
+/**
+ * การแสดงผลของเครื่องนี้: ธีมและขนาดตัวอักษร
+ * อยู่บนสุดเพราะเป็นสิ่งเดียวในหน้านี้ที่ทุกคนเปลี่ยนได้และมีผลทันที
+ */
+function displayCard(onChanged) {
+  const segmented = (items, current, onPick) =>
+    el(
+      'div',
+      { class: 'segmented', role: 'group' },
+      items.map((item) =>
+        el('button', {
+          class: item.key === current ? 'sel' : '',
+          type: 'button',
+          text: item.label,
+          'aria-pressed': item.key === current ? 'true' : 'false',
+          onclick: () => {
+            onPick(item.key);
+            onChanged();
+          },
+        }),
+      ),
+    );
+
+  return el('div', { class: 'card', style: { marginBottom: '16px' } }, [
+    el('div', { class: 'panel-title' }, [
+      'การแสดงผล',
+      el('span', { class: 'count-badge', text: 'มีผลเฉพาะเครื่องนี้' }),
+    ]),
+    el('div', { class: 'pref-row pref-row-stack' }, [
+      el('div', {}, [
+        el('div', { class: 'label', text: 'ธีมสี' }),
+        el('div', {
+          class: 'sub',
+          text: 'สีทั้งหมดมาจากโลโก้ เลือกได้ตามสภาพแสงของห้อง',
+        }),
+      ]),
+      themeChooser(onChanged),
+    ]),
+    el('div', { class: 'pref-row' }, [
+      el('div', {}, [
+        el('div', { class: 'label', text: 'ขนาดตัวอักษร' }),
+        el('div', {
+          class: 'sub',
+          text: 'ขยายตัวหนังสือทั้งเว็บ ตารางและตัวเลขจะใหญ่ขึ้นตามกัน',
+        }),
+      ]),
+      segmented(TEXT_SIZES, prefs.textSize, setTextSize),
+    ]),
+  ]);
+}
+
+/** การ์ดเลือกธีม: ตัวอย่างสีเล็ก ๆ ของแต่ละธีมให้เห็นก่อนกด */
+function themeChooser(onChanged) {
+  const current = themeChoice();
+  return el(
+    'div',
+    { class: 'theme-choices', role: 'radiogroup', 'aria-label': 'ธีมสี' },
+    THEME_CHOICES.map((theme) => {
+      const selected = theme.key === current;
+      const preview =
+        theme.key === 'auto'
+          ? el('span', { class: 'theme-preview auto' }, [
+              el('span', { class: 'half', dataset: { palette: 'white' } }),
+              el('span', { class: 'half', dataset: { palette: 'gray' } }),
+            ])
+          : el('span', { class: 'theme-preview', dataset: { palette: theme.key } }, [
+              el('span', { class: 'tp-side' }),
+              el('span', { class: 'tp-body' }, [
+                el('span', { class: 'tp-card' }, [
+                  el('span', { class: 'tp-line accent' }),
+                  el('span', { class: 'tp-line' }),
+                ]),
+              ]),
+            ]);
+      return el(
+        'button',
+        {
+          class: `theme-choice${selected ? ' sel' : ''}`,
+          type: 'button',
+          role: 'radio',
+          'aria-checked': selected ? 'true' : 'false',
+          onclick: () => {
+            setTheme(theme.key);
+            onChanged();
+          },
+        },
+        [
+          preview,
+          el('span', { class: 'theme-choice-name', text: theme.label }),
+          el('span', { class: 'theme-choice-desc', text: theme.desc }),
+        ],
+      );
+    }),
+  );
+}
 
 function autoOffCard(isAdmin) {
   const enabled = state.settings.autoOffEnabled;
@@ -105,7 +204,7 @@ function autoOffCard(isAdmin) {
     ]),
     el('div', {
       class: 'dim',
-      style: { fontSize: '11.5px', marginTop: '10px' },
+      style: { fontSize: 'var(--fs-xs)', marginTop: '10px' },
       text: `ตอนนี้มี ${counting} ห้องที่กำลังนับถอยหลังอยู่`,
     }),
   ]);
@@ -124,7 +223,7 @@ function profileCard(update) {
       ['เบอร์โทร', user.phone || '—'],
       ['สิทธิ์', user.role === 'admin' ? 'ผู้ดูแลระบบ' : 'เจ้าหน้าที่'],
     ].map(([label, value]) =>
-      el('div', { class: 'rate-example-row', style: { fontSize: '12.5px' } }, [
+      el('div', { class: 'rate-example-row', style: { fontSize: 'var(--fs-sm)' } }, [
         el('span', { class: 'muted', text: label }),
         el('span', { text: value }),
       ]),
@@ -162,11 +261,27 @@ async function editProfile(update) {
         required: true,
       },
       { name: 'phone', label: 'เบอร์โทร', value: user.phone },
+      {
+        name: 'currentPassword',
+        label: 'รหัสผ่านปัจจุบัน (กรอกเฉพาะตอนเปลี่ยนอีเมล)',
+        type: 'password',
+        autocomplete: 'current-password',
+        hint: 'OTP ลืมรหัสผ่านจะส่งไปที่อีเมลนี้ จึงต้องยืนยันด้วยรหัสผ่านก่อนเปลี่ยน',
+      },
     ],
   });
   if (!values) return;
+  const { currentPassword, ...profile } = values;
+  const emailChanged =
+    profile.email.toLowerCase() !== String(user.email ?? '').toLowerCase();
+  if (emailChanged && !currentPassword) {
+    toastError('เปลี่ยนอีเมลต้องกรอกรหัสผ่านปัจจุบันด้วย');
+    return;
+  }
   try {
-    const updated = await api.updateProfile(values);
+    const updated = await api.updateProfile(
+      emailChanged ? { ...profile, currentPassword } : profile,
+    );
     state.user = updated;
     toastOk('บันทึกข้อมูลแล้ว');
     update();
@@ -253,7 +368,7 @@ function healthCard() {
         state.live.serverTime ? relativeTime(state.live.serverTime) : '—',
       ],
     ].map(([label, value]) =>
-      el('div', { class: 'rate-example-row', style: { fontSize: '12.5px' } }, [
+      el('div', { class: 'rate-example-row', style: { fontSize: 'var(--fs-sm)' } }, [
         el('span', { class: 'muted', text: label }),
         el('span', { text: value }),
       ]),
@@ -261,7 +376,7 @@ function healthCard() {
     Object.entries(state.errors).some(([, message]) => message)
       ? el('div', {
           class: 'bad',
-          style: { fontSize: '11.5px', marginTop: '10px', lineHeight: '1.7' },
+          style: { fontSize: 'var(--fs-xs)', marginTop: '10px', lineHeight: '1.7' },
           text:
             'โหลดข้อมูลบางส่วนไม่สำเร็จ: ' +
             Object.entries(state.errors)
@@ -278,7 +393,7 @@ function sessionCard(context) {
     el('div', { class: 'panel-title', text: 'ออกจากระบบ' }),
     el('div', {
       class: 'dim',
-      style: { fontSize: '12px', marginBottom: '12px', lineHeight: '1.7' },
+      style: { fontSize: 'var(--fs-xs)', marginBottom: '12px', lineHeight: '1.7' },
       text:
         'ออกจากระบบจะลบโทเคนออกจากเบราว์เซอร์เครื่องนี้เท่านั้น ' +
         'ไม่กระทบอุปกรณ์อื่นที่เข้าอยู่',

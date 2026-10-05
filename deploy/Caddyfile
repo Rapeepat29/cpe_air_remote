@@ -1,4 +1,13 @@
-{$DOMAIN} {
+{
+	# คำขอจาก Funnel ผ่าน container tailscale หนึ่งชั้น ให้เชื่อ X-Forwarded-For จากวงภายใน
+	# ไม่งั้น rate limit หน้า login จะนับคนนอกมหาวิทยาลัยทุกคนเป็น IP เดียวกัน
+	servers :8080 {
+		trusted_proxies static private_ranges
+	}
+}
+
+# เนื้อหาเว็บ/API ใช้ร่วมกันทั้งโดเมนหลักและทางเข้าจากอินเทอร์เน็ต (Tailscale Funnel)
+(app) {
 	encode gzip
 
 	# หัวความปลอดภัยของทุกหน้า
@@ -44,6 +53,22 @@
 
 		file_server
 	}
+}
+
+{$DOMAIN} {
+	# ขอใบรับรองผ่าน DNS ของ DuckDNS แทนพอร์ต 80 (เซิร์ฟเวอร์อยู่ในเครือข่ายภายใน)
+	# propagation_timeout -1 = ไม่ให้เซิร์ฟเวอร์ถาม DNS ภายนอกเอง
+	# (เครือข่ายมหาวิทยาลัยอาจบล็อกพอร์ต 53) รอ 60 วินาทีแล้วให้ Let's Encrypt ตรวจเลย
+	# ถ้าเปลี่ยนไปใช้โดเมน .rmutt.ac.th ที่เปิดพอร์ต 80 ได้ ให้ลบบล็อก tls นี้ออก
+	tls {
+		dns duckdns {env.DUCKDNS_TOKEN}
+		# DNS ของมหาวิทยาลัยตอบ SERVFAIL ตอนหา zone ของ _acme-challenge จึงถาม DNS สาธารณะแทน
+		resolvers 1.1.1.1 8.8.8.8
+		propagation_delay 60s
+		propagation_timeout -1
+	}
+
+	import app
 
 	log {
 		output file /data/access.log {
@@ -51,4 +76,10 @@
 			roll_keep 5
 		}
 	}
+}
+
+# ทางเข้าจากอินเทอร์เน็ตผ่าน Tailscale Funnel
+# container tailscale ถอด HTTPS ให้แล้วส่งต่อมาที่ caddy:8080 ภายในเครือข่าย docker (ไม่เปิดพอร์ตบนเครื่อง)
+http://:8080 {
+	import app
 }

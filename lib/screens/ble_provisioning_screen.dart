@@ -120,23 +120,33 @@ class _BleProvisioningScreenState extends State<BleProvisioningScreen> {
                   'Turn on the ESP32 in setup mode. Its name must start with RMUTT-AC-.',
                 ),
               ),
-            ..._devices.map(
-              (candidate) => RadioListTile<BleDeviceCandidate>(
-                value: candidate,
-                groupValue: _selectedDevice,
-                onChanged: _isReadingIdentity || _isProvisioning
-                    ? null
-                    : (value) => _selectDevice(value!),
-                title: Text(
-                  candidate.name,
-                  style: const TextStyle(fontWeight: FontWeight.w800),
-                ),
-                subtitle: Text(
-                  _isReadingIdentity && _selectedDevice == candidate
-                      ? context.tr('Connecting and checking ESP32...')
-                      : 'RSSI ${candidate.rssi} dBm',
-                ),
-                secondary: const Icon(Icons.memory_rounded),
+            // Flutter 3.35 ขึ้นไปให้ RadioGroup ถือค่าที่เลือก แทน groupValue ของแต่ละปุ่ม
+            RadioGroup<BleDeviceCandidate>(
+              groupValue: _selectedDevice,
+              onChanged: (value) {
+                if (value == null || _isReadingIdentity || _isProvisioning) {
+                  return;
+                }
+                _selectDevice(value);
+              },
+              child: Column(
+                children: [
+                  for (final candidate in _devices)
+                    RadioListTile<BleDeviceCandidate>(
+                      value: candidate,
+                      enabled: !(_isReadingIdentity || _isProvisioning),
+                      title: Text(
+                        candidate.name,
+                        style: const TextStyle(fontWeight: FontWeight.w800),
+                      ),
+                      subtitle: Text(
+                        _isReadingIdentity && _selectedDevice == candidate
+                            ? context.tr('Connecting and checking ESP32...')
+                            : 'RSSI ${candidate.rssi} dBm',
+                      ),
+                      secondary: const Icon(Icons.memory_rounded),
+                    ),
+                ],
               ),
             ),
             if (_isReadingIdentity)

@@ -10,23 +10,23 @@ $ErrorActionPreference = 'Stop'
 try { [Console]::OutputEncoding = [System.Text.Encoding]::UTF8 } catch {}
 
 . (Join-Path $PSScriptRoot 'deploy\ServerConfig.ps1')
-$server = Get-RmuttServer -HostOverride $Server -UserOverride $User
-$target = $server.Target
+$srv = Get-RmuttServer -HostOverride $Server -UserOverride $User
+$target = $srv.Target
 
 Write-Host ''
 Write-Host '=== เปิดอุโมงค์ไปฐานข้อมูลบนเซิร์ฟเวอร์ ===' -ForegroundColor Cyan
 
 # ---------------------------------------------- 1. ดึงรหัสผ่านฐานข้อมูล
 Write-Host ''
-Write-Host "1/3 ดึงรหัสผ่านฐานข้อมูลจาก $($server.Host)"
+Write-Host "1/3 ดึงรหัสผ่านฐานข้อมูลจาก $($srv.Host)"
 Write-Host '    (ถ้าถามรหัส SSH ให้พิมพ์รหัสของบัญชีบนเซิร์ฟเวอร์)'
 Write-Host '    ใช้ user ของแอป (สิทธิ์เฉพาะฐานข้อมูลนี้) ไม่ใช้ root'
 
 # PowerShell ใช้ backtick เป็นตัว escape ไม่ใช่ backslash
 # จึงห้ามมีเครื่องหมายคำพูดคู่ในคำสั่งนี้ เลยใช้สตริงเดี่ยวล้วน
 $remoteCommand = 'grep -E ''^DB_PASSWORD='' /opt/rmutt/.env | cut -d= -f2-'
-$dbPassword = ssh -p $server.Port $target $remoteCommand
-$dbUser = ssh -p $server.Port $target 'grep -E ''^DB_USER='' /opt/rmutt/.env | cut -d= -f2-'
+$dbPassword = ssh -p $srv.Port $target $remoteCommand
+$dbUser = ssh -p $srv.Port $target 'grep -E ''^DB_USER='' /opt/rmutt/.env | cut -d= -f2-'
 if ($dbUser) { $dbUser = ([string]$dbUser).Trim().Trim([char]34) }
 # .env รุ่นเก่าไม่มี DB_USER และใช้ root
 if ([string]::IsNullOrWhiteSpace($dbUser)) { $dbUser = 'root' }
@@ -54,7 +54,7 @@ if ($existing) {
     '-NoExit'
     '-Command'
     "Write-Host 'อุโมงค์ฐานข้อมูล - ห้ามปิดหน้าต่างนี้ระหว่างใช้งาน HeidiSQL' -ForegroundColor Yellow; " +
-    "ssh -N -p $($server.Port) -L ${LocalPort}:127.0.0.1:3306 $target"
+    "ssh -N -p $($srv.Port) -L ${LocalPort}:127.0.0.1:3306 $target"
   )
   Write-Host '    เปิดหน้าต่างใหม่แล้ว ถ้าถามรหัสให้พิมพ์ในหน้าต่างนั้น'
   Start-Sleep -Seconds 8

@@ -9,8 +9,6 @@ import '../services/ble_provisioning_service.dart';
 import '../services/occupancy_sensor_repository.dart';
 import '../theme/app_theme.dart';
 import '../widgets/air_control_card.dart';
-import '../widgets/auto_off_countdown.dart';
-import '../widgets/status_pill.dart';
 import 'ble_provisioning_screen.dart';
 import 'occupancy_provisioning_screen.dart';
 
@@ -63,9 +61,6 @@ class _RoomControlScreenState extends State<RoomControlScreen> {
       ]),
       builder: (context, _) {
         final colors = Theme.of(context).colorScheme;
-        final onlineCount = room.airConditioners
-            .where((air) => air.isOnline)
-            .length;
         return Scaffold(
           appBar: AppBar(
             toolbarHeight: 62,
@@ -73,17 +68,19 @@ class _RoomControlScreenState extends State<RoomControlScreen> {
               children: [
                 Text(
                   context.tr('${context.tr('Room')} ${room.number}'),
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: AppPalette.of(context).onBar,
                     fontSize: 17,
-                    fontWeight: FontWeight.w800,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
                 Text(
                   context.tr(room.type),
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.8),
-                    fontSize: 10,
+                    color: AppPalette.of(context)
+                        .onBar
+                        .withValues(alpha: 0.75),
+                    fontSize: 12,
                   ),
                 ),
               ],
@@ -95,56 +92,28 @@ class _RoomControlScreenState extends State<RoomControlScreen> {
                     ? null
                     : _refreshAll,
                 icon: widget.controller.isLoading
-                    ? const SizedBox.square(
+                    ? SizedBox.square(
                         dimension: 18,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          color: Colors.white,
+                          color: AppPalette.of(context).onBar,
                         ),
                       )
-                    : const Icon(Icons.refresh_rounded, color: Colors.white),
+                    : Icon(
+                        Icons.refresh_rounded,
+                        color: AppPalette.of(context).onBar,
+                      ),
               ),
             ],
           ),
           body: ListView(
-            padding: const EdgeInsets.fromLTRB(16, 15, 16, 100),
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
             children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: _SummaryCard(
-                      icon: Icons.cloud_done_rounded,
-                      title: '$onlineCount/${room.airConditioners.length}',
-                      subtitle: context.tr('ESP32 online'),
-                      color: AppColors.green,
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: _SummaryCard(
-                      icon: Icons.hub_rounded,
-                      title: context.tr('MQTT'),
-                      subtitle: context.tr('Real control'),
-                      color: AppColors.orange,
-                    ),
-                  ),
-                ],
-              ),
-              if (room.isAutoOffPending) ...[
-                const SizedBox(height: 12),
-                AutoOffCountdown(
-                  key: const Key('control-auto-off-countdown'),
-                  deadline: room.autoOffDeadlineAt,
-                  attempts: room.autoOffAttempts,
-                  inClass: room.autoOffInClass,
-                ),
-              ],
-              const SizedBox(height: 12),
-              _OccupancyCard(
+              _RoomSummaryCard(
                 room: room,
                 isAdmin: widget.isAdmin,
-                onConfigure: _openOccupancyProvisioning,
-                onRemove: room.hasOccupancySensor
+                onConfigureSensor: _openOccupancyProvisioning,
+                onRemoveSensor: room.hasOccupancySensor
                     ? _confirmRemoveOccupancySensor
                     : null,
               ),
@@ -159,38 +128,37 @@ class _RoomControlScreenState extends State<RoomControlScreen> {
                   child: Text(widget.controller.errorMessage!),
                 ),
               ],
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
               Row(
+                crossAxisAlignment: CrossAxisAlignment.baseline,
+                textBaseline: TextBaseline.alphabetic,
                 children: [
                   Expanded(
                     child: Text(
-                      context.tr('Air Conditioners'),
+                      context.tr('Air conditioner list'),
                       style: const TextStyle(
                         fontSize: 16,
-                        fontWeight: FontWeight.w800,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                   ),
-                  StatusPill(
-                    label: context.tr(
-                      '${room.airConditioners.length}/6 ${context.tr('units')}',
+                  Text(
+                    '${room.airConditioners.length} / 6 ${context.tr('units')}',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: colors.onSurfaceVariant,
                     ),
-                    color: AppColors.primary,
-                    backgroundColor: colors.surfaceContainerHighest,
                   ),
                 ],
               ),
-              const SizedBox(height: 11),
+              const SizedBox(height: 10),
               if (room.airConditioners.isEmpty)
-                _EmptyAirCard(
-                  isAdmin: widget.isAdmin,
-                  onAdd: _openProvisioning,
-                )
+                _EmptyAirCard(isAdmin: widget.isAdmin)
               else
                 ...room.airConditioners.map(
                   (air) => Padding(
                     key: ValueKey(air.deviceId ?? air.id),
-                    padding: const EdgeInsets.only(bottom: 13),
+                    padding: const EdgeInsets.only(bottom: 12),
                     child: AirControlCard(
                       air: air,
                       isAdmin: widget.isAdmin,
@@ -198,26 +166,21 @@ class _RoomControlScreenState extends State<RoomControlScreen> {
                       onRename: (name) => widget.controller.rename(air, name),
                       onReconfigure: () => _openProvisioning(air),
                       onDelete: () => _confirmDeleteAir(air),
+                      onRetry: _refreshAll,
+                      roomAutoOffDeadline: room.autoOffDeadlineAt,
+                      roomAutoOffAttempts: room.autoOffAttempts,
                     ),
                   ),
                 ),
             ],
           ),
-          floatingActionButton: widget.isAdmin
-              ? FloatingActionButton.extended(
-                  onPressed: room.airConditioners.length >= 6
-                      ? null
-                      : _openProvisioning,
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: Colors.white,
-                  icon: const Icon(Icons.bluetooth_rounded),
-                  label: Text(
-                    context.tr(
-                      room.airConditioners.length >= 6
-                          ? '6-unit limit reached'
-                          : 'Add ESP32 Air Conditioner',
-                    ),
-                  ),
+          // ปุ่มล่าง: เพิ่มเซนเซอร์ (เมื่อยังไม่มี) และเพิ่มอุปกรณ์ ESP32
+          bottomNavigationBar: widget.isAdmin
+              ? _BottomActions(
+                  showAddSensor: !room.hasOccupancySensor,
+                  canAddAir: room.airConditioners.length < 6,
+                  onAddSensor: _openOccupancyProvisioning,
+                  onAddAir: () => _openProvisioning(),
                 )
               : null,
         );
@@ -379,233 +342,323 @@ class _RoomControlScreenState extends State<RoomControlScreen> {
   }
 }
 
-class _OccupancyCard extends StatelessWidget {
-  const _OccupancyCard({
+/// การ์ดสรุปห้อง: แอร์ที่เปิดอยู่ กำลังไฟรวม และสถานะของห้องเป็นรายการ ชื่อ–ค่า
+class _RoomSummaryCard extends StatelessWidget {
+  const _RoomSummaryCard({
     required this.room,
     required this.isAdmin,
-    required this.onConfigure,
-    required this.onRemove,
+    required this.onConfigureSensor,
+    required this.onRemoveSensor,
   });
 
   final Room room;
   final bool isAdmin;
-  final VoidCallback onConfigure;
-  final VoidCallback? onRemove;
+  final VoidCallback onConfigureSensor;
+  final VoidCallback? onRemoveSensor;
 
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    final hasSensor = room.hasOccupancySensor;
-    final ready = hasSensor &&
-        room.occupancySensorOnline &&
-        room.occupancySensorAvailable;
-
-    late final IconData icon;
-    late final String title;
-    late final String subtitle;
-    late final Color color;
-    if (!hasSensor) {
-      icon = Icons.sensors_off_rounded;
-      title = 'No occupancy sensor';
-      subtitle = 'Add one ESP32 + LD2410 for this room';
-      color = colors.onSurfaceVariant;
-    } else if (room.occupancySensorProvisionStatus == 'reserved') {
-      icon = Icons.pending_rounded;
-      title = 'Occupancy sensor not activated yet';
-      subtitle = 'Saved in the database but the ESP32 has not confirmed '
-          'over MQTT. Set it up over Bluetooth again.';
-      color = AppColors.orange;
-    } else if (!room.occupancySensorOnline) {
-      icon = Icons.cloud_off_rounded;
-      title = 'Occupancy sensor offline';
-      subtitle = 'The last room state may be out of date';
-      color = AppColors.orange;
-    } else if (!room.occupancySensorAvailable) {
-      icon = Icons.radar_rounded;
-      title = 'LD2410 data unavailable';
-      subtitle = 'Check the radar UART connection';
-      color = AppColors.orange;
-    } else if (room.isOccupied) {
-      icon = Icons.groups_rounded;
-      title = 'People detected in this room';
-      subtitle = 'A static target gate is greater than 25';
-      color = AppColors.green;
-    } else {
-      icon = Icons.person_off_outlined;
-      title = 'No people detected in this room';
-      subtitle = 'Every static target gate is 25 or lower';
-      color = colors.onSurfaceVariant;
-    }
+    final palette = AppPalette.of(context);
+    final airs = room.airConditioners;
+    final onCount = airs.where((air) => air.canControl && air.isOn).length;
+    final onlineCount = airs.where((air) => air.isOnline).length;
+    final (sensorText, sensorColor) = _sensorStatus(context, palette);
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(13, 12, 8, 12),
+      clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.10),
+        color: colors.surface,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: color.withValues(alpha: 0.32)),
+        border: Border.all(color: colors.outlineVariant),
       ),
-      child: Row(
+      child: Column(
         children: [
-          Icon(icon, color: color, size: 26),
-          const SizedBox(width: 11),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text(
-                  context.tr(title),
-                  style: TextStyle(
-                    color: color,
-                    fontWeight: FontWeight.w900,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        context.tr('Air conditioners running'),
+                        style: TextStyle(
+                          fontSize: 12.5,
+                          color: colors.onSurfaceVariant,
+                        ),
+                      ),
+                      Text.rich(
+                        TextSpan(
+                          children: [
+                            TextSpan(
+                              text: '$onCount',
+                              style: const TextStyle(
+                                fontSize: 32,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            TextSpan(
+                              text:
+                                  ' / ${airs.length} ${context.tr('units')}',
+                              style: TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.w600,
+                                color: colors.onSurfaceVariant,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                Text(
-                  context.tr(subtitle),
-                  style: TextStyle(
-                    color: color,
-                    fontSize: 10,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                if (ready)
-                  Text(
-                    'LD2410 • threshold > ${room.occupancyStaticThreshold}',
-                    style: TextStyle(
-                      color: color.withValues(alpha: 0.82),
-                      fontSize: 9,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      context.tr('Total power'),
+                      style: TextStyle(
+                        fontSize: 12.5,
+                        color: colors.onSurfaceVariant,
+                      ),
                     ),
-                  ),
+                    Text(
+                      '${(room.totalPower / 1000).toStringAsFixed(2)} kW',
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
-          if (isAdmin)
-            PopupMenuButton<String>(
-              onSelected: (value) {
-                if (value == 'configure') onConfigure();
-                if (value == 'remove') onRemove?.call();
-              },
-              itemBuilder: (context) => [
-                PopupMenuItem(
-                  value: 'configure',
-                  child: Text(
-                    context.tr(hasSensor ? 'Reconfigure' : 'Add sensor'),
-                  ),
-                ),
-                if (hasSensor)
-                  PopupMenuItem(
-                    value: 'remove',
-                    child: Text(
-                      context.tr('Remove'),
-                      style: const TextStyle(color: AppColors.red),
-                    ),
-                  ),
-              ],
+          _SummaryRow(
+            label: context.tr('ESP32 online'),
+            value:
+                '$onlineCount ${context.tr('of')} ${airs.length}',
+          ),
+          _SummaryRow(
+            label: context.tr('Control mode'),
+            value: context.tr('MQTT (real devices)'),
+          ),
+          _SummaryRow(
+            label: context.tr('Occupancy sensor'),
+            value: sensorText,
+            valueColor: sensorColor,
+            trailing: isAdmin
+                ? PopupMenuButton<String>(
+                    tooltip: context.tr('Options'),
+                    padding: EdgeInsets.zero,
+                    onSelected: (value) {
+                      if (value == 'configure') onConfigureSensor();
+                      if (value == 'remove') onRemoveSensor?.call();
+                    },
+                    itemBuilder: (context) => [
+                      PopupMenuItem(
+                        value: 'configure',
+                        child: Text(
+                          context.tr(
+                            room.hasOccupancySensor
+                                ? 'Reconfigure'
+                                : 'Add sensor',
+                          ),
+                        ),
+                      ),
+                      if (room.hasOccupancySensor)
+                        PopupMenuItem(
+                          value: 'remove',
+                          child: Text(
+                            context.tr('Remove'),
+                            style: TextStyle(color: palette.danger),
+                          ),
+                        ),
+                    ],
+                  )
+                : null,
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// ข้อความสั้นของสถานะเซนเซอร์ เรียงจากเรื่องที่ต้องแก้ก่อน
+  (String, Color) _sensorStatus(BuildContext context, AppPalette palette) {
+    final colors = Theme.of(context).colorScheme;
+    if (!room.hasOccupancySensor) {
+      return (context.tr('Not installed'), palette.warn);
+    }
+    if (room.occupancySensorProvisionStatus == 'reserved') {
+      return (context.tr('Awaiting confirmation'), palette.warn);
+    }
+    if (!room.occupancySensorOnline) {
+      return (context.tr('Sensor offline'), palette.warn);
+    }
+    if (!room.occupancySensorAvailable) {
+      return (context.tr('Radar data unavailable'), palette.warn);
+    }
+    if (room.isOccupied) {
+      return (context.tr('People detected'), palette.accent);
+    }
+    return (context.tr('No people detected'), colors.onSurface);
+  }
+}
+
+class _SummaryRow extends StatelessWidget {
+  const _SummaryRow({
+    required this.label,
+    required this.value,
+    this.valueColor,
+    this.trailing,
+  });
+
+  final String label;
+  final String value;
+  final Color? valueColor;
+  final Widget? trailing;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return Container(
+      constraints: const BoxConstraints(minHeight: 44),
+      padding: EdgeInsets.only(left: 16, right: trailing == null ? 16 : 0),
+      decoration: BoxDecoration(
+        border: Border(top: BorderSide(color: colors.outlineVariant)),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 13.5,
+                color: colors.onSurfaceVariant,
+              ),
             ),
+          ),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 13.5,
+              fontWeight: FontWeight.w600,
+              color: valueColor ?? colors.onSurface,
+            ),
+          ),
+          if (trailing != null) trailing!,
         ],
       ),
     );
   }
 }
 
-class _SummaryCard extends StatelessWidget {
-  const _SummaryCard({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.color,
+/// ปุ่มล่างของหน้าห้อง (แอดมินเท่านั้น)
+class _BottomActions extends StatelessWidget {
+  const _BottomActions({
+    required this.showAddSensor,
+    required this.canAddAir,
+    required this.onAddSensor,
+    required this.onAddAir,
   });
 
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final Color color;
+  final bool showAddSensor;
+  final bool canAddAir;
+  final VoidCallback onAddSensor;
+  final VoidCallback onAddAir;
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     return Container(
-      height: 78,
-      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: color.withValues(alpha: 0.38)),
+        color: colors.surface,
+        border: Border(top: BorderSide(color: colors.outlineVariant)),
       ),
-      child: Row(
-        children: [
-          Icon(icon, color: color),
-          const SizedBox(width: 9),
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    color: color,
-                    fontWeight: FontWeight.w900,
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+          child: Row(
+            children: [
+              if (showAddSensor) ...[
+                Expanded(
+                  child: OutlinedButton(
+                    key: const Key('room-add-sensor-button'),
+                    onPressed: onAddSensor,
+                    style: OutlinedButton.styleFrom(
+                      minimumSize: const Size.fromHeight(48),
+                    ),
+                    child: Text(context.tr('Add sensor')),
                   ),
                 ),
-                Text(
-                  subtitle,
-                  style: TextStyle(color: color, fontSize: 10),
-                ),
+                const SizedBox(width: 10),
               ],
-            ),
+              Expanded(
+                child: FilledButton(
+                  key: const Key('room-add-air-button'),
+                  onPressed: canAddAir ? onAddAir : null,
+                  style: FilledButton.styleFrom(
+                    minimumSize: const Size.fromHeight(48),
+                  ),
+                  child: Text(
+                    context.tr(
+                      canAddAir ? 'Add ESP32 device' : '6-unit limit reached',
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
 }
 
 class _EmptyAirCard extends StatelessWidget {
-  const _EmptyAirCard({required this.isAdmin, required this.onAdd});
+  const _EmptyAirCard({required this.isAdmin});
 
   final bool isAdmin;
-  final VoidCallback onAdd;
 
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 26),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 28),
       decoration: BoxDecoration(
-        color: colors.surface,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: colors.outline),
       ),
       child: Column(
         children: [
           Icon(
             Icons.bluetooth_searching_rounded,
             color: colors.onSurfaceVariant,
-            size: 42,
+            size: 34,
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 8),
           Text(
-            context.tr('This room has no registered ESP32 yet'),
+            context.tr('This room has no ESP32 device yet'),
+            textAlign: TextAlign.center,
             style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w800,
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
             ),
           ),
-          const SizedBox(height: 5),
+          const SizedBox(height: 4),
           Text(
             context.tr(
               isAdmin
-                  ? 'Find the board via Bluetooth to configure Wi-Fi and MQTT.'
+                  ? 'Find the device via Bluetooth to set up Wi-Fi and MQTT.'
                   : 'An administrator must configure the ESP32 via Bluetooth.',
             ),
             textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 12.5, color: colors.onSurfaceVariant),
           ),
-          if (isAdmin) ...[
-            const SizedBox(height: 14),
-            FilledButton.icon(
-              onPressed: onAdd,
-              icon: const Icon(Icons.bluetooth_rounded),
-              label: Text(context.tr('Find ESP32')),
-            ),
-          ],
         ],
       ),
     );

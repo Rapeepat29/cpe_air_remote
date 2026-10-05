@@ -19,10 +19,13 @@ import {
   energy,
   floorLabel,
   integer,
+  isoDate,
   relativeTime,
   scaleReference,
+  thaiDate,
 } from '../format.js';
 import { icons } from '../icons.js';
+import { thaiDateInput } from '../thai-date-input.js';
 import {
   airConditionersOf,
   loaders,
@@ -38,12 +41,32 @@ const PERIODS = [
   { key: 'month', label: '30 วัน' },
 ];
 
+/** คำอธิบายจุดบนกราฟของแต่ละช่วง (วันนี้ = รายชั่วโมง ที่เหลือ = รายวัน) */
+const PERIOD_LABEL = {
+  day: 'ชั่วโมงนี้',
+  week: 'ทั้งวัน',
+  month: 'ทั้งวัน',
+};
+
+/** Backend ยอมให้เลือกช่วงเองได้ไม่เกินเท่านี้ (resolvePeriod) */
+const MAX_CUSTOM_DAYS = 366;
+
 export default {
   title: 'ภาพรวม',
   subtitle: 'สรุปการใช้ไฟและสถานะของทั้งอาคารในหน้าจอเดียว',
 
   mount(root, context) {
-    const heroBox = el('div', { class: 'card hero-card' });
+    // การ์ดใหญ่แยกเป็นสองชั้น: เนื้อหาที่วาดใหม่ทุกครั้งที่ข้อมูลอัปเดต
+    // กับแผงเลือกวันที่สร้างครั้งเดียว ระหว่างที่ผู้ใช้กำลังพิมพ์วันที่
+    // การดึงข้อมูลรอบถัดไปจะได้ไม่ลบช่องที่พิมพ์ค้างอยู่ทิ้ง
+    const heroContent = el('div');
+    const heroTabs = el('div', { class: 'tabbar', style: { marginTop: '14px' } });
+    const rangePanel = createRangePanel(() => renderHeroTabs(heroTabs, rangePanel));
+    const heroBox = el('div', { class: 'card hero-card' }, [
+      heroContent,
+      heroTabs,
+      rangePanel.node,
+    ]);
     const statBox = el('div', { class: 'stat-mini-grid' });
     const pulseBox = el('div', { class: 'card pulse-card' });
     const alertBox = el('div', { class: 'card' });
@@ -56,7 +79,8 @@ export default {
     ]);
 
     function update() {
-      renderHero(heroBox);
+      renderHero(heroContent);
+      renderHeroTabs(heroTabs, rangePanel);
       renderStats(statBox);
       renderPulse(pulseBox, context);
       renderAlerts(alertBox);
@@ -70,22 +94,170 @@ export default {
 
 // ---------------------------------------------------------------- การ์ดใหญ่
 
+/**
+ * ปุ่มช่วงเวลา: วันนี้ / 7 วัน / 30 วัน / เลือกวัน
+ * ถ้ากำลังดูช่วงที่เลือกเอง ปุ่มสุดท้ายจะบอกช่วงนั้นแทนคำว่า "เลือกวัน"
+ */
+function renderHeroTabs(box, rangePanel) {
+  const query = state.summaryQuery;
+  const period = query.period ?? 'week';
+  const isCustom = period === 'custom' && query.from;
+
+  const presets = PERIODS.map((item) =>
+    el('button', {
+      class: `tab small${item.key === period ? ' active' : ''}`,
+      type: 'button',
+      text: item.label,
+      onclick: () => {
+        rangePanel.close();
+        // ช่วงสำเร็จรูปใช้ from เป็น "วันสุดท้าย" ของช่วง ต้องล้างค่าที่เลือกเองไว้ก่อน
+        loaders.summary({ period: item.key, from: null, to: null });
+      },
+    }),
+  );
+
+  const customLabel = isCustom
+    ? query.from === query.to
+      ? thaiDate(query.from)
+      : `${thaiDate(query.from)} – ${thaiDate(query.to)}`
+    : 'เลือกวัน';
+
+  const customTab = el(
+    'button',
+    {
+      class:
+        `tab small${isCustom ? ' active' : ''}` +
+        `${rangePanel.isOpen() ? ' open' : ''}`,
+      type: 'button',
+      title: 'เลือกช่วงวันที่ต้องการดูเอง',
+      'aria-expanded': rangePanel.isOpen() ? 'true' : 'false',
+      onclick: () => rangePanel.toggle(),
+    },
+    [svg(icons.calendar(14)), customLabel],
+  );
+
+  replace(box, [...presets, customTab]);
+}
+
+/**
+ * แผงเลือกช่วงวันเอง (สร้างครั้งเดียวต่อการเปิดหน้า)
+ * ช่องวันที่เป็น พ.ศ. พิมพ์ วว/ดด/ปปปป หรือกดปฏิทินก็ได้
+ */
+function createRangePanel(onToggle) {
+  const today = isoDate();
+  const fromInput = thaiDateInput({ name: 'overview-from', max: today });
+  const toInput = thaiDateInput({ name: 'overview-to', max: today });
+  const message = el('div', { class: 'hero-range-msg' });
+
+  const showError = (text) => {
+    message.textContent = text;
+    message.classList.add('error');
+  };
+  const showHint = () => {
+    message.textContent =
+      'พิมพ์ วว/ดด/ปปปป (พ.ศ.) หรือกดไอคอนปฏิทิน · เลือกได้สูงสุด 366 วัน';
+    message.classList.remove('error');
+  };
+
+  const node = el('div', { class: 'hero-range', hidden: true }, [
+    el('div', { class: 'hero-range-fields' }, [
+      el('div', { class: 'hero-range-field' }, [
+        el('span', { text: 'ตั้งแต่วันที่' }),
+        fromInput,
+      ]),
+      el('div', { class: 'hero-range-field' }, [
+        el('span', { text: 'ถึงวันที่' }),
+        toInput,
+      ]),
+      el('div', { class: 'hero-range-actions' }, [
+        el('button', {
+          class: 'btn btn-sm',
+          type: 'button',
+          text: 'ยกเลิก',
+          onclick: () => close(),
+        }),
+        el('button', {
+          class: 'btn btn-sm btn-primary',
+          type: 'button',
+          text: 'แสดงผล',
+          onclick: () => apply(),
+        }),
+      ]),
+    ]),
+    message,
+  ]);
+
+  node.addEventListener('keydown', (event) => {
+    // Enter ในช่องวันที่ = กดแสดงผล (ปุ่มยังทำงานตามปกติของมัน)
+    if (event.key === 'Enter' && event.target.tagName === 'INPUT') {
+      event.preventDefault();
+      apply();
+    }
+  });
+
+  function isOpen() {
+    return !node.hidden;
+  }
+
+  function open() {
+    // เติมช่วงที่ดูอยู่ตอนนี้ให้ก่อน แก้แค่วันเดียวก็กดแสดงผลได้เลย
+    const query = state.summaryQuery;
+    const current = state.summary?.period;
+    fromInput.value =
+      query.period === 'custom' && query.from ? query.from : (current?.from ?? today);
+    toInput.value =
+      query.period === 'custom' && query.to ? query.to : (current?.to ?? today);
+    showHint();
+    node.hidden = false;
+    onToggle();
+    fromInput.focus();
+  }
+
+  function close() {
+    if (node.hidden) return;
+    node.hidden = true;
+    onToggle();
+  }
+
+  function toggle() {
+    if (isOpen()) close();
+    else open();
+  }
+
+  async function apply() {
+    const from = fromInput.value;
+    const to = toInput.value || from;
+    if (!from) {
+      showError('กรุณาระบุวันที่เริ่มต้นให้ถูกต้อง เช่น 01/09/2569');
+      fromInput.focus();
+      return;
+    }
+    if (!to) {
+      showError('กรุณาระบุวันที่สิ้นสุดให้ถูกต้อง');
+      toInput.focus();
+      return;
+    }
+    if (from > to) {
+      showError('วันที่เริ่มต้นต้องไม่อยู่หลังวันที่สิ้นสุด');
+      return;
+    }
+    const days =
+      Math.round((Date.parse(`${to}T00:00:00Z`) - Date.parse(`${from}T00:00:00Z`)) / 86400000) + 1;
+    if (days > MAX_CUSTOM_DAYS) {
+      showError(`เลือกได้สูงสุด ${MAX_CUSTOM_DAYS} วันต่อครั้ง (ตอนนี้เลือกไว้ ${days} วัน)`);
+      return;
+    }
+    close();
+    await loaders.summary({ period: 'custom', from, to });
+    if (state.errors?.summary) toastError(state.errors.summary);
+  }
+
+  return { node, isOpen, open, close, toggle };
+}
+
 function renderHero(box) {
   const summary = state.summary;
   const period = state.summaryQuery.period ?? 'week';
-
-  const tabs = el(
-    'div',
-    { class: 'tabbar', style: { marginTop: '14px' } },
-    PERIODS.map((item) =>
-      el('button', {
-        class: `tab small${item.key === period ? ' active' : ''}`,
-        type: 'button',
-        text: item.label,
-        onclick: () => loaders.summary({ period: item.key }),
-      }),
-    ),
-  );
 
   if (!summary) {
     replace(box, [
@@ -94,10 +266,15 @@ function renderHero(box) {
         'พลังงานที่ใช้ · ทั้งอาคาร',
       ]),
       el('div', { class: 'empty', text: 'กำลังโหลดข้อมูลค่าไฟ…' }),
-      tabs,
     ]);
     return;
   }
+
+  const sameDay = summary.period.from === summary.period.to;
+  const pointLabel =
+    period === 'custom'
+      ? (sameDay ? 'ทั้งชั่วโมง' : 'ทั้งวัน')
+      : (PERIOD_LABEL[period] ?? '');
 
   const kwh = Number(summary.totals.kwh) || 0;
   const rate = state.settings.electricityRate;
@@ -121,7 +298,9 @@ function renderHero(box) {
   replace(box, [
     el('div', { class: 'eyebrow' }, [
       svg(icons.bolt(13)),
-      `พลังงานที่ใช้ · ${summary.period.from} ถึง ${summary.period.to}`,
+      sameDay
+        ? `พลังงานที่ใช้ · ${thaiDate(summary.period.from)}`
+        : `พลังงานที่ใช้ · ${thaiDate(summary.period.from)} ถึง ${thaiDate(summary.period.to)}`,
     ]),
     el('div', { class: 'hero-figure' }, [
       // ตัวเลขใหญ่ตัวนี้แสดงทศนิยมหนึ่งตำแหน่งเสมอ ต่างจากที่อื่นที่ปัดตามขนาด
@@ -137,31 +316,37 @@ function renderHero(box) {
       }),
       el('div', { class: `trend-chip ${trendClass}`, text: trendText }),
     ]),
-    areaChart(points, { height: 150 }),
-    el('div', { class: 'row', style: { marginTop: '10px', gap: '16px' } }, [
-      el('span', {
-        class: 'dim',
-        style: { fontSize: '11.5px' },
-        text: `เวลาทำงานรวม ${integer(summary.totals.runtimeMinutes)} นาที`,
-      }),
-      el('span', {
-        class: 'dim',
-        style: { fontSize: '11.5px' },
-        text: `กำลังไฟสูงสุด ${decimal(summary.totals.peakPowerWatts, 1)} W`,
-      }),
-      el('span', {
-        class: 'dim',
-        style: { fontSize: '11.5px' },
-        text: `มีข้อมูลจาก ${integer(summary.totals.deviceCount)} เครื่อง`,
-      }),
+    areaChart(points, {
+      height: 150,
+      tipLabel: (point) => `${point.label} · ${pointLabel}`,
+    }),
+    el('div', { class: 'hero-facts' }, [
+      el('span', {}, [
+        'เวลาทำงานรวม ',
+        el('b', { text: integer(summary.totals.runtimeMinutes) }),
+        ' นาที',
+      ]),
+      el('span', {}, [
+        'กำลังไฟสูงสุด ',
+        el('b', { text: decimal(summary.totals.peakPowerWatts, 1) }),
+        ' W',
+      ]),
+      el('span', {}, [
+        'มีข้อมูลจาก ',
+        el('b', { text: integer(summary.totals.deviceCount) }),
+        ' เครื่อง',
+      ]),
     ]),
-    tabs,
   ]);
 }
 
 // ------------------------------------------------------------ ตัวเลขสี่ช่อง
 
-function statMini(iconMarkup, tone, value, suffix, label) {
+/**
+ * การ์ดตัวเลขเล็ก กดแล้วพาไปหน้าที่ดูรายละเอียดของตัวเลขนั้นได้
+ * ป้ายชื่ออยู่บนสุดคู่กับไอคอน คนจะรู้ก่อนว่ากำลังดูอะไร แล้วค่อยเห็นตัวเลข
+ */
+function statMini(iconMarkup, tone, value, suffix, label, target) {
   const iconBox = el('div', {
     class: 'stat-mini-icon',
     style: { background: tone.background, color: tone.color },
@@ -169,11 +354,27 @@ function statMini(iconMarkup, tone, value, suffix, label) {
   iconBox.innerHTML = iconMarkup;
   const valueNode = el('div', { class: 'stat-mini-val', text: value });
   if (suffix) valueNode.appendChild(el('small', { text: ` ${suffix}` }));
-  return el('div', { class: 'stat-mini' }, [
-    iconBox,
-    valueNode,
-    el('div', { class: 'stat-mini-label', text: label }),
-  ]);
+  return el(
+    target ? 'button' : 'div',
+    {
+      class: 'stat-mini',
+      type: target ? 'button' : null,
+      title: target ? 'ดูรายละเอียด' : null,
+      onclick: target
+        ? () => {
+            window.location.hash = `#/${target}`;
+          }
+        : null,
+    },
+    [
+      el('div', { class: 'stat-mini-head' }, [
+        iconBox,
+        el('div', { class: 'stat-mini-label', text: label }),
+      ]),
+      valueNode,
+      target ? el('div', { class: 'stat-mini-foot', text: 'ดูรายละเอียด ›' }) : null,
+    ],
+  );
 }
 
 function renderStats(box) {
@@ -182,9 +383,10 @@ function renderStats(box) {
   const accent = { background: 'var(--accent-soft)', color: 'var(--accent)' };
   const warn = { background: 'var(--warn-soft)', color: 'var(--warn)' };
   const neutral = {
-    background: 'rgba(143,179,158,.14)',
+    background: 'var(--neutral-soft)',
     color: 'var(--text-hi)',
   };
+  const isAdmin = state.user?.role === 'admin';
 
   replace(box, [
     statMini(
@@ -193,6 +395,7 @@ function renderStats(box) {
       totals ? String(totals.running) : '—',
       totals ? `/ ${totals.devices}` : '',
       'เครื่องปรับอากาศทำงานอยู่',
+      'rooms',
     ),
     statMini(
       icons.warning(15),
@@ -200,6 +403,7 @@ function renderStats(box) {
       String(openAlerts),
       '',
       'แจ้งเตือนรอดำเนินการ',
+      'alerts',
     ),
     statMini(
       icons.board(15),
@@ -207,13 +411,15 @@ function renderStats(box) {
       totals ? String(totals.online) : '—',
       totals ? `/ ${totals.devices}` : '',
       'ESP32 ออนไลน์',
+      isAdmin ? 'devices' : null,
     ),
     statMini(
       icons.clock(15),
       neutral,
       decimal(state.settings.electricityRate, 2),
       '',
-      'อัตราปัจจุบัน (บาท/kWh)',
+      'อัตราค่าไฟ (บาท/kWh)',
+      'rates',
     ),
   ]);
 }
@@ -239,6 +445,7 @@ function renderPulse(box, context) {
       'ใช้น้อย',
       el('span', { class: 'legend-bar' }),
       'ใช้มาก',
+      el('span', { class: 'legend-live', text: 'แอร์ทำงานอยู่' }),
     ]),
   ]);
 
@@ -266,10 +473,10 @@ function renderPulse(box, context) {
           const cell = el(
             'button',
             {
-              class: 'pulse-cell',
+              class: `pulse-cell${hasUnits ? '' : ' vacant'}`,
               type: 'button',
               style: {
-                background: heatColor(kwh, max),
+                background: hasUnits ? heatColor(kwh, max) : null,
                 flex: `${1 + (max > 0 ? (kwh / max) * 2.4 : 0)}`,
               },
               title:
@@ -327,7 +534,21 @@ function renderAlerts(box) {
     return;
   }
 
-  replace(box, [head, ...shown.map(alertRow)]);
+  const more = alerts.length - shown.length;
+  replace(box, [
+    head,
+    ...shown.map((alert) => alertRow(alert)),
+    el('div', { class: 'card-link' }, [
+      el('button', {
+        class: 'btn btn-sm',
+        type: 'button',
+        text: more > 0 ? `ดูทั้งหมด (อีก ${more} รายการ)` : 'ไปหน้าการแจ้งเตือน',
+        onclick: () => {
+          window.location.hash = '#/alerts';
+        },
+      }),
+    ]),
+  ]);
 }
 
 export function alertRow(alert, { onChanged = null } = {}) {
@@ -339,7 +560,7 @@ export function alertRow(alert, { onChanged = null } = {}) {
         ? 'ack'
         : 'done';
 
-  const actions = el('div', { class: 'row', style: { gap: '8px' } }, [
+  const actions = el('div', { class: 'row alert-actions', style: { gap: '8px' } }, [
     el('span', {
       class: `status-chip ${tone === 'ack' ? 'done' : tone}`,
       text: ALERT_STATUS_LABEL[alert.status] ?? alert.status,
@@ -366,8 +587,7 @@ export function alertRow(alert, { onChanged = null } = {}) {
       : null,
     alert.acknowledgedBy
       ? el('span', {
-          class: 'dim',
-          style: { fontSize: '11px' },
+          class: 'who',
           text: `โดย ${alert.acknowledgedBy}`,
         })
       : null,
@@ -378,7 +598,11 @@ export function alertRow(alert, { onChanged = null } = {}) {
     el('div', { class: 'alert-body' }, [
       el('div', { class: 'alert-top' }, [
         el('div', { class: 'alert-room', text: described.title }),
-        el('div', { class: 'alert-time', text: relativeTime(alert.createdAt) }),
+        el('div', {
+          class: 'alert-time',
+          text: relativeTime(alert.createdAt),
+          title: alert.createdAt ? new Date(alert.createdAt).toLocaleString('th-TH') : null,
+        }),
       ]),
       el('div', { class: 'alert-desc', text: described.body }),
       actions,
@@ -425,8 +649,7 @@ function renderRank(box) {
       icons.building(17),
     ),
     el('div', {
-      class: 'dim',
-      style: { fontSize: '11.5px', marginTop: '12px' },
+      class: 'rank-foot',
       text:
         `5 ห้องนี้กินไฟรวม ${energy(
           top.reduce((sum, row) => sum + Number(row.kwh || 0), 0),

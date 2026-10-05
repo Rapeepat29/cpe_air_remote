@@ -93,6 +93,16 @@ export function assertServerConfig() {
     }
   }
 
+  if (config.mail.mode === 'console' && config.env === 'production') {
+    // ไม่หยุดเซิร์ฟเวอร์ เพราะระบบที่ยังไม่มี SMTP ต้องใช้งานส่วนอื่นได้ต่อ
+    // แต่ต้องเตือนดัง ๆ: OTP จะไปอยู่ใน docker log แทนอีเมล ผู้ใช้จะไม่ได้รับ
+    // และใครที่อ่าน log ได้ก็รีเซ็ตรหัสผ่านของทุกบัญชีได้
+    console.warn(
+      '[config] MAIL_MODE=console บนเซิร์ฟเวอร์จริง: OTP ลืมรหัสผ่านจะถูกพิมพ์ลง log'
+        + ' แทนการส่งอีเมล ควรตั้ง SMTP_* แล้วเปลี่ยนเป็น MAIL_MODE=smtp',
+    );
+  }
+
   if (config.mqtt.required) {
     if (!config.mqtt.url) missing.push('MQTT_URL');
     if (!config.mqtt.username) missing.push('MQTT_USERNAME');

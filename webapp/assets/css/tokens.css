@@ -1,37 +1,275 @@
 /*
- * โทนสีและระยะห่างทั้งหมดของเว็บแอป
+ * โทนสี ขนาดตัวอักษร และระยะห่างทั้งหมดของเว็บแอป
  *
  * แยกไฟล์ไว้ต่างหากเพราะไฟล์นี้คือ "ภาษา" ของหน้าตา ถ้าจะเปลี่ยนธีมทั้งระบบ
- * ควรแก้ที่นี่ที่เดียว ไม่ใช่ไล่แก้ทีละหน้า ค่าทุกตัวตรงกับไฟล์ต้นแบบ
- * rmutt-save-energy-dashboard.html ที่ออกแบบไว้
+ * ควรแก้ที่นี่ที่เดียว ไม่ใช่ไล่แก้ทีละหน้า
+ *
+ * สีทั้งหมดมาจากโลโก้: เทาถ่าน #2F3438 (พื้นไอคอน) กับเขียวใบไม้ #2EB872
+ * ส่วนเขียวเข้ม #128C4E / เขียวอ่อน #5FD394 คือสีตัว R บนพื้นสว่าง / พื้นเข้ม
+ *
+ * มีสี่ธีม ผู้ใช้เลือกได้จากจุดสีบนแถบบนหรือหน้าตั้งค่า (theme.js ใส่เป็น
+ * data-palette บน <html>; ตัวอย่างสีในหน้าตั้งค่าใช้ data-palette บนอิลิเมนต์ย่อยได้ด้วย)
+ *   gray  เทา   โทนเดียวกับพื้นโลโก้ ค่าเริ่มต้น
+ *   white ขาว   สว่างทั้งหน้า สำหรับห้องที่แสงจ้า
+ *   black ดำ    มืดสนิท สำหรับจอที่เปิดค้างตอนกลางคืน
+ *   green เขียว เมนูข้างเขียวเข้ม เนื้อหาพื้นสว่าง
+ * ธีมเพิ่มใหม่ต้องกำหนดตัวแปรให้ครบทุกตัวในบล็อกของธีมเทา
+ *
+ * หลักการเรื่องสีตัวหนังสือ: ทุกระดับ (hi / mid / low) ต้องมีคอนทราสต์
+ * อย่างน้อย 4.5:1 กับพื้นการ์ดและพื้นยกระดับ ตามเกณฑ์ WCAG AA
+ * ธีมสว่างใช้ #0F7D45 เป็นตัวหนังสือเน้น (เข้มกว่า #128C4E ของโลโก้นิดเดียว)
+ * เพราะ #128C4E บนพื้นขาวได้แค่ 4.3:1
  */
 :root {
-  --bg: #060d09;
-  --panel: #0e1b14;
-  --panel-raised: #132a1d;
-  --hairline: #1d3527;
-  --hairline-soft: #132a1d;
-  --accent: #3ecf8e;
-  --accent-dim: #1f6a48;
-  --accent-soft: rgba(62, 207, 142, 0.12);
-  --warn: #e8a33d;
-  --warn-soft: rgba(232, 163, 61, 0.12);
-  --danger: #e8695d;
-  --danger-soft: rgba(232, 105, 93, 0.13);
-  --info: #6aa9e8;
-  --info-soft: rgba(106, 169, 232, 0.13);
-  --text-hi: #eaf6ee;
-  --text-mid: #8fb39e;
-  --text-low: #4c6b5b;
+  /*
+   * ฟอนต์: ตัวหนังสือทั่วไปใช้ IBM Plex Sans Thai (มีตัวละตินในตัว)
+   * หัวข้อและตัวเลขใช้ Chakra Petch ซึ่งเป็นฟอนต์เดียวกับตัวหนังสือในโลโก้
+   * และมีอักษรไทย ถ้าโหลด Google Fonts ไม่ได้ จะถอยไปใช้ฟอนต์ไทยในเครื่อง
+   */
+  --font-thai: 'IBM Plex Sans Thai', 'Sarabun', 'Leelawadee UI', 'Tahoma',
+    'Noto Sans Thai', sans-serif;
+  --font-body: var(--font-thai);
+  --font-disp: 'Chakra Petch', var(--font-thai);
+  --font-mono: 'Chakra Petch', 'Consolas', var(--font-thai), monospace;
 
   --radius-lg: 16px;
   --radius-md: 12px;
   --radius-sm: 9px;
 
-  --font-body: 'Inter', 'Sarabun', 'Leelawadee UI', 'Tahoma', sans-serif;
-  --font-disp: 'Space Grotesk', 'Sarabun', 'Leelawadee UI', sans-serif;
-  --font-mono: 'IBM Plex Mono', 'Consolas', monospace;
+  /*
+   * ขนาดตัวอักษรทั้งระบบ คูณด้วย --text-scale ที่ผู้ใช้ปรับได้ในหน้าตั้งค่า
+   * (ปกติ / ใหญ่ / ใหญ่มาก) ทุกที่ในเว็บต้องใช้ค่าจากชุดนี้ ห้ามเขียน px เอง
+   * ตัวเล็กสุดคือ 12px — ภาษาไทยเล็กกว่านี้วรรณยุกต์จะชนกันจนอ่านไม่ออก
+   */
+  --text-scale: 1;
+  --fs-2xs: calc(12px * var(--text-scale));
+  --fs-xs: calc(12.5px * var(--text-scale));
+  --fs-sm: calc(13.5px * var(--text-scale));
+  --fs-base: calc(14.5px * var(--text-scale));
+  --fs-md: calc(15.5px * var(--text-scale));
+  --fs-lg: calc(17px * var(--text-scale));
+  --fs-xl: calc(20px * var(--text-scale));
+  --fs-2xl: calc(24px * var(--text-scale));
+  --lh-thai: 1.6;
 
-  --sidebar-w: 236px;
-  --shadow-drop: 0 18px 40px rgba(0, 0, 0, 0.45);
+  --sidebar-w: 248px;
+  --content-max: 1680px;
+  --bottom-nav-h: 0px;
+  --tap: 40px;
+}
+
+/* ---------- ธีมเทา (ค่าเริ่มต้น) ---------- */
+:root,
+[data-palette='gray'] {
+  color-scheme: dark;
+
+  --bg: #2a2f33;
+  --panel: #33393e;
+  --panel-raised: #3d4449;
+  --panel-sunken: #2e3337;
+  --hairline: #4a5257;
+  --hairline-soft: #40474c;
+  --accent: #6edb9f;
+  --accent-strong: #2eb872;
+  --accent-dim: #3e8f66;
+  --accent-soft: rgba(110, 219, 159, 0.14);
+  --on-accent: #0b1a12;
+  --warn: #f2b35a;
+  --warn-soft: rgba(242, 179, 90, 0.16);
+  --danger: #f79289;
+  --danger-soft: rgba(247, 146, 137, 0.16);
+  --info: #8cc0f2;
+  --info-soft: rgba(140, 192, 242, 0.16);
+  --neutral-soft: rgba(198, 205, 209, 0.14);
+  --text-hi: #f1f3f4;
+  --text-mid: #c6cdd1;
+  --text-low: #b0b9be;
+
+  /* สีของช่องห้องใน Building Pulse ไล่จากพื้นยกระดับไปหาสีนี้
+     ต้องเข้มพอให้ตัวหนังสือ --text-hi อ่านได้ที่ 100% */
+  --heat: #1b7a48;
+  --row-stripe: rgba(255, 255, 255, 0.025);
+  --row-hover: rgba(110, 219, 159, 0.07);
+  --topbar-bg: rgba(42, 47, 51, 0.9);
+  --overlay: rgba(10, 12, 14, 0.6);
+  --hero-tint: #2d3d35;
+  --shadow-drop: 0 18px 40px rgba(0, 0, 0, 0.4);
+  --shadow-card: none;
+  --focus-ring: 0 0 0 3px rgba(110, 219, 159, 0.35);
+  --avatar-bg: #2d5a42;
+  --avatar-text: #bff0d4;
+
+  /* แถบเมนูข้าง (ธีมเขียวใช้สีต่างจากเนื้อหา จึงแยกตัวแปรไว้) */
+  --side-bg: #23272b;
+  --side-line: #3a4146;
+  --side-text: #f1f3f4;
+  --side-muted: #b0b9be;
+  --side-hover: rgba(255, 255, 255, 0.06);
+  --side-active-bg: rgba(110, 219, 159, 0.14);
+  --side-active: #6edb9f;
+  --logo-green: #5fd394;
+  --logo-mutt: #ffffff;
+}
+
+/* ---------- ธีมขาว ---------- */
+[data-palette='white'] {
+  color-scheme: light;
+
+  --bg: #f3f5f6;
+  --panel: #ffffff;
+  --panel-raised: #eceff1;
+  --panel-sunken: #f7f8f9;
+  --hairline: #d8dde0;
+  --hairline-soft: #e6eaec;
+  --accent: #0f7d45;
+  --accent-strong: #0f7d45;
+  --accent-dim: #8fcfb0;
+  --accent-soft: rgba(15, 125, 69, 0.1);
+  --on-accent: #ffffff;
+  --warn: #a35f00;
+  --warn-soft: rgba(214, 140, 20, 0.14);
+  --danger: #c0392b;
+  --danger-soft: rgba(192, 57, 43, 0.1);
+  --info: #2563a8;
+  --info-soft: rgba(37, 99, 168, 0.1);
+  --neutral-soft: rgba(74, 85, 91, 0.1);
+  --text-hi: #1e2427;
+  --text-mid: #4a555b;
+  --text-low: #5e6a70;
+
+  --heat: #2eb872;
+  --row-stripe: rgba(30, 36, 39, 0.028);
+  --row-hover: rgba(15, 125, 69, 0.07);
+  --topbar-bg: rgba(243, 245, 246, 0.9);
+  --overlay: rgba(30, 36, 39, 0.42);
+  --hero-tint: #e5f4ec;
+  --shadow-drop: 0 18px 40px rgba(30, 36, 39, 0.18);
+  --shadow-card: 0 1px 2px rgba(30, 36, 39, 0.06);
+  --focus-ring: 0 0 0 3px rgba(15, 125, 69, 0.28);
+  --avatar-bg: #dff1e7;
+  --avatar-text: #0f7d45;
+
+  --side-bg: #ffffff;
+  --side-line: #d8dde0;
+  --side-text: #1e2427;
+  --side-muted: #5e6a70;
+  --side-hover: #eceff1;
+  --side-active-bg: rgba(15, 125, 69, 0.1);
+  --side-active: #0f7d45;
+  --logo-green: #128c4e;
+  --logo-mutt: #2f3438;
+}
+
+/* ---------- ธีมดำ ---------- */
+[data-palette='black'] {
+  color-scheme: dark;
+
+  --bg: #0b0d0e;
+  --panel: #151819;
+  --panel-raised: #1e2123;
+  --panel-sunken: #101213;
+  --hairline: #2a2f32;
+  --hairline-soft: #212528;
+  --accent: #5fd394;
+  --accent-strong: #2eb872;
+  --accent-dim: #2a7f55;
+  --accent-soft: rgba(95, 211, 148, 0.12);
+  --on-accent: #0b1a12;
+  --warn: #f0a84a;
+  --warn-soft: rgba(240, 168, 74, 0.14);
+  --danger: #f2867d;
+  --danger-soft: rgba(242, 134, 125, 0.14);
+  --info: #7db6f0;
+  --info-soft: rgba(125, 182, 240, 0.14);
+  --neutral-soft: rgba(179, 186, 190, 0.12);
+  --text-hi: #edeff0;
+  --text-mid: #b3babe;
+  --text-low: #8e979c;
+
+  --heat: #1f7a49;
+  --row-stripe: rgba(255, 255, 255, 0.02);
+  --row-hover: rgba(95, 211, 148, 0.06);
+  --topbar-bg: rgba(11, 13, 14, 0.88);
+  --overlay: rgba(0, 0, 0, 0.62);
+  --hero-tint: #10211a;
+  --shadow-drop: 0 18px 40px rgba(0, 0, 0, 0.55);
+  --shadow-card: none;
+  --focus-ring: 0 0 0 3px rgba(95, 211, 148, 0.35);
+  --avatar-bg: #1a4430;
+  --avatar-text: #a8ecc6;
+
+  --side-bg: #0b0d0e;
+  --side-line: #1e2123;
+  --side-text: #edeff0;
+  --side-muted: #8e979c;
+  --side-hover: rgba(255, 255, 255, 0.05);
+  --side-active-bg: rgba(95, 211, 148, 0.12);
+  --side-active: #5fd394;
+  --logo-green: #5fd394;
+  --logo-mutt: #ffffff;
+}
+
+/* ---------- ธีมเขียว ---------- */
+[data-palette='green'] {
+  color-scheme: light;
+
+  --bg: #edf5f0;
+  --panel: #ffffff;
+  --panel-raised: #e2eee7;
+  --panel-sunken: #f4f9f6;
+  --hairline: #cfe0d6;
+  --hairline-soft: #dde9e2;
+  --accent: #0f7d45;
+  --accent-strong: #0f7d45;
+  --accent-dim: #8fcfb0;
+  --accent-soft: rgba(15, 125, 69, 0.1);
+  --on-accent: #ffffff;
+  --warn: #a35f00;
+  --warn-soft: rgba(214, 140, 20, 0.14);
+  --danger: #c0392b;
+  --danger-soft: rgba(192, 57, 43, 0.1);
+  --info: #2563a8;
+  --info-soft: rgba(37, 99, 168, 0.1);
+  --neutral-soft: rgba(67, 88, 76, 0.1);
+  --text-hi: #14271d;
+  --text-mid: #43584c;
+  --text-low: #57695f;
+
+  --heat: #2eb872;
+  --row-stripe: rgba(20, 39, 29, 0.028);
+  --row-hover: rgba(15, 125, 69, 0.07);
+  --topbar-bg: rgba(237, 245, 240, 0.9);
+  --overlay: rgba(14, 40, 26, 0.42);
+  --hero-tint: #ddf0e5;
+  --shadow-drop: 0 18px 40px rgba(20, 39, 29, 0.18);
+  --shadow-card: 0 1px 2px rgba(20, 39, 29, 0.06);
+  --focus-ring: 0 0 0 3px rgba(15, 125, 69, 0.28);
+  --avatar-bg: #dff1e7;
+  --avatar-text: #0f7d45;
+
+  --side-bg: #0e5a34;
+  --side-line: rgba(255, 255, 255, 0.14);
+  --side-text: #ffffff;
+  --side-muted: #bfe3cf;
+  --side-hover: rgba(255, 255, 255, 0.08);
+  --side-active-bg: rgba(255, 255, 255, 0.14);
+  --side-active: #ffffff;
+  --logo-green: #7fe0a8;
+  --logo-mutt: #ffffff;
+}
+
+/* ---------- ขนาดตัวอักษรที่ผู้ใช้เลือก ---------- */
+:root[data-text='large'] {
+  --text-scale: 1.1;
+}
+
+:root[data-text='xlarge'] {
+  --text-scale: 1.22;
+}
+
+/* จอสัมผัส: ปุ่มต้องใหญ่พอให้นิ้วกดโดนโดยไม่พลาดไปโดนปุ่มข้าง ๆ */
+@media (pointer: coarse) {
+  :root {
+    --tap: 44px;
+  }
 }

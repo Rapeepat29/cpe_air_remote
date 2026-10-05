@@ -20,16 +20,29 @@ import {
   integer,
   isoDate,
   shiftDays,
+  thaiDate,
 } from '../format.js';
 import { icons } from '../icons.js';
 import { defaultHistoryRange, loaders, state } from '../store.js';
 import { toastError, toastInfo, toastOk } from '../ui.js';
+import { thaiDateInput } from '../thai-date-input.js';
 
 const SCOPES = [
   { key: 'building', label: 'รวมทั้งอาคาร' },
   { key: 'room', label: 'แยกรายห้อง' },
   { key: 'device', label: 'แยกรายเครื่อง' },
 ];
+
+/**
+ * ชื่อคอลัมน์นำหน้าที่แสดงบนเว็บ
+ *
+ * Backend ส่งชื่อคอลัมน์วันที่และเวลามาเป็นภาษาอังกฤษตัวเล็ก ('data', 'time')
+ * ซึ่งใช้เป็นหัวคอลัมน์ในไฟล์ Excel ด้วย จึงแปลเฉพาะบนหน้าเว็บ ไม่แตะของ Backend
+ */
+const LEAD_LABELS = {
+  date: 'วันที่',
+  time: 'ช่วงเวลา',
+};
 
 const PRESETS = [
   { label: 'วันนี้', days: 0 },
@@ -99,9 +112,24 @@ export default {
     drawAll();
     await run();
 
-    return { update: () => renderFilters(filterBox, run) };
+    // สถานะกลางเปลี่ยนทุก ~10 วินาที (ค่าไฟสด) แต่ตัวกรองหน้านี้สนใจแค่
+    // รายการค่าไฟกับอัตราค่าไฟ ถ้าวาดใหม่ทุกรอบ ช่องวันที่ที่กำลังพิมพ์หรือ
+    // รายการที่กำลังกางอยู่จะถูกสร้างใหม่จนหลุดโฟกัส จึงวาดเฉพาะตอนค่าที่ใช้เปลี่ยน
+    let lastSignature = filterSignature();
+    return {
+      update: () => {
+        const signature = filterSignature();
+        if (signature === lastSignature) return;
+        lastSignature = signature;
+        renderFilters(filterBox, run);
+      },
+    };
   },
 };
+
+function filterSignature() {
+  return `${state.metricCatalog ? 1 : 0}|${state.settings.electricityRate}`;
+}
 
 function queryFromFilters() {
   return {
@@ -158,18 +186,20 @@ function renderFilters(box, run) {
     ),
   );
 
-  const fromInput = el('input', {
-    type: 'date',
+  const fromInput = thaiDateInput({
+    name: 'energy-from',
     value: filters.from,
-    onchange: (event) => {
-      filters.from = event.target.value;
+    max: isoDate(),
+    onChange: (iso) => {
+      filters.from = iso;
     },
   });
-  const toInput = el('input', {
-    type: 'date',
+  const toInput = thaiDateInput({
+    name: 'energy-to',
     value: filters.to,
-    onchange: (event) => {
-      filters.to = event.target.value;
+    max: isoDate(),
+    onChange: (iso) => {
+      filters.to = iso;
     },
   });
 
@@ -240,16 +270,16 @@ function renderFilters(box, run) {
       coverage?.oldest
         ? el('span', {
             class: 'count-badge',
-            text: `มีข้อมูล ${coverage.oldest} ถึง ${coverage.newest}`,
+            text: `มีข้อมูล ${thaiDate(coverage.oldest)} ถึง ${thaiDate(coverage.newest)}`,
           })
         : null,
     ]),
     el('div', { class: 'filter-grid' }, [
-      el('div', { class: 'field' }, [
+      el('div', { class: 'field fit' }, [
         el('label', { text: 'ระดับการแยกข้อมูล' }),
         scopeTabs,
       ]),
-      el('div', { class: 'field' }, [
+      el('div', { class: 'field fit' }, [
         el('label', { text: 'ช่วงวันสำเร็จรูป' }),
         presetTabs,
       ]),
@@ -318,7 +348,7 @@ function renderFilters(box, run) {
           'เพราะค่าอย่างแรงดันต่ำสุดของทั้งอาคารไม่ได้บอกว่าเป็นของเครื่องไหน',
       }),
     ]),
-    el('div', { class: 'row', style: { marginTop: '6px' } }, [
+    el('div', { class: 'filter-actions' }, [
       el(
         'button',
         {
@@ -339,8 +369,7 @@ function renderFilters(box, run) {
         [svg(icons.download(15)), 'ส่งออกเป็น Excel'],
       ),
       el('span', {
-        class: 'dim',
-        style: { fontSize: '11.5px' },
+        class: 'dim small-note',
         text: `คิดค่าไฟที่อัตรา ${decimal(
           state.settings.electricityRate,
           2,
@@ -350,35 +379,76 @@ function renderFilters(box, run) {
   ]);
 }
 
+/**
+ * ตัวเลือกหลายรายการแบบชิปติ๊กถูก
+ *
+ * แทนช่อง <select multiple> ของเดิมที่ต้องกด Ctrl/Shift ค้างไว้ ซึ่งคนส่วนใหญ่
+ * ไม่รู้ และบนมือถือใช้แทบไม่ได้ ชิปกดทีละอันได้เลยและเห็นทันทีว่าเลือกอะไรอยู่
+ * การกดไม่ดึงข้อมูลใหม่ทันที ให้กด "แสดงข้อมูล" เหมือนการเปลี่ยนช่วงวัน
+ */
 function multiSelect(label, options, selected, onChange) {
-  const box = el('select', {
-    multiple: true,
-    size: Math.min(8, Math.max(3, options.length)),
-    style: { minHeight: '92px' },
-    onchange: (event) => {
-      onChange(
-        [...event.target.selectedOptions].map((option) => option.value),
-      );
-    },
+  const current = new Set(selected);
+  const counter = el('span', { class: 'count-badge' });
+  const paintCounter = () => {
+    counter.textContent =
+      current.size === 0 ? 'ทั้งหมด' : `เลือก ${current.size} รายการ`;
+  };
+
+  const chips = options.map((option) => {
+    const chip = el('label', {
+      class: `checkbox-chip${current.has(option.value) ? ' sel' : ''}`,
+    });
+    const input = el('input', {
+      type: 'checkbox',
+      checked: current.has(option.value),
+      onchange: (event) => {
+        if (event.target.checked) current.add(option.value);
+        else current.delete(option.value);
+        chip.classList.toggle('sel', event.target.checked);
+        paintCounter();
+        onChange([...current]);
+      },
+    });
+    chip.append(input, option.label);
+    return { chip, input, value: option.value };
   });
-  for (const option of options) {
-    box.appendChild(
-      el('option', {
-        value: option.value,
-        text: option.label,
-        selected: selected.includes(option.value),
-      }),
-    );
-  }
+
+  const setAll = (on) => {
+    current.clear();
+    for (const item of chips) {
+      item.input.checked = on;
+      item.chip.classList.toggle('sel', on);
+      if (on) current.add(item.value);
+    }
+    paintCounter();
+    onChange([...current]);
+  };
+
+  paintCounter();
   return el('div', { class: 'field' }, [
-    el('label', { text: label }),
+    el('div', { class: 'field-label-row' }, [
+      el('label', { text: label }),
+      counter,
+      options.length > 0
+        ? el('div', { class: 'picker-tools' }, [
+            el('button', {
+              class: 'link-btn',
+              type: 'button',
+              text: 'เลือกทั้งหมด',
+              onclick: () => setAll(true),
+            }),
+            el('button', {
+              class: 'link-btn',
+              type: 'button',
+              text: 'ล้าง',
+              onclick: () => setAll(false),
+            }),
+          ])
+        : null,
+    ]),
     options.length === 0
       ? el('div', { class: 'hint', text: 'ยังไม่มีข้อมูลให้เลือก' })
-      : box,
-    el('div', {
-      class: 'hint',
-      text: 'กด Ctrl หรือ Shift ค้างไว้เพื่อเลือกหลายรายการ',
-    }),
+      : el('div', { class: 'metric-picker' }, chips.map((item) => item.chip)),
   ]);
 }
 
@@ -414,6 +484,7 @@ function renderChart(box) {
     .sort((a, b) => a[0].localeCompare(b[0]))
     .map(([key, values]) => ({
       label: key.slice(5, 10),
+      tip: formatBucket(key),
       value: combine(values, mode),
     }));
 
@@ -431,6 +502,13 @@ function renderChart(box) {
       unitOverride: column.unit || '',
     }),
   ]);
+}
+
+/** '2026-09-28 13:00-14:00' → '28/09/2026 · 13:00-14:00' สำหรับป้ายบนกราฟ */
+function formatBucket(key) {
+  const [date, range] = key.split(' ');
+  const [year, month, day] = date.split('-');
+  return range ? `${day}/${month}/${year} · ${range}` : `${day}/${month}/${year}`;
 }
 
 const COMBINE_LABEL = {
@@ -503,7 +581,9 @@ function renderTable(box) {
   );
 
   const head = el('tr', {}, [
-    ...leadColumns.map((column) => el('th', { text: column.labelTh })),
+    ...leadColumns.map((column) =>
+      el('th', { text: LEAD_LABELS[column.key] ?? column.labelTh }),
+    ),
     ...metricColumns.map((column) =>
       el('th', {
         class: 'num',
@@ -512,10 +592,22 @@ function renderTable(box) {
     ),
   ]);
 
-  const body = result.rows.map((row) =>
-    el('tr', {}, [
+  // แถวแรกของแต่ละวันได้เส้นคั่นและวันที่ตัวหนา แถวที่เหลือของวันเดียวกัน
+  // ทำวันที่ให้จาง สายตาจะกวาดหาวันได้เร็วในตารางรายชั่วโมงหลายร้อยแถว
+  let previousDate = null;
+  const body = result.rows.map((row) => {
+    const newDay = row.date !== previousDate;
+    previousDate = row.date;
+    return el('tr', { class: newDay ? 'day-start' : null }, [
       ...leadColumns.map((column) =>
-        el('td', { text: String(row[column.key] ?? '—') }),
+        el('td', {
+          class:
+            column.key === 'date' ? `date-cell${newDay ? '' : ' repeat'}` : null,
+          text:
+            column.key === 'date' && row.date
+              ? thaiDate(row.date)
+              : String(row[column.key] ?? '—'),
+        }),
       ),
       ...metricColumns.map((column) =>
         el('td', {
@@ -526,8 +618,8 @@ function renderTable(box) {
               : decimal(row.values[column.key], column.decimals ?? 2),
         }),
       ),
-    ]),
-  );
+    ]);
+  });
 
   const totals = result.totals ?? {};
   const foot = el('tr', {}, [
@@ -562,17 +654,18 @@ function renderTable(box) {
           })
         : null,
     ]),
-    el('div', { class: 'table-wrap' }, [
-      el('table', { class: 'data' }, [
+    el('div', { class: 'table-wrap scroll-y' }, [
+      el('table', { class: 'data sticky-first' }, [
         el('thead', {}, [head]),
         el('tbody', {}, body),
         el('tfoot', {}, [foot]),
       ]),
     ]),
     el('div', {
-      class: 'dim',
-      style: { fontSize: '11px', marginTop: '8px' },
+      class: 'dim small-note',
+      style: { marginTop: '8px' },
       text:
+        'เลื่อนในกรอบตารางเพื่อดูแถวอื่น หัวตารางและแถวรวมจะค้างไว้ให้เห็นเสมอ · ' +
         'ค่าเฉลี่ยของแรงดัน ตัวประกอบกำลัง และความถี่ คำนวณแบบถ่วงน้ำหนัก ' +
         'ตามจำนวนครั้งที่อ่านได้จริง ไม่ใช่เฉลี่ยของค่าเฉลี่ย',
     }),

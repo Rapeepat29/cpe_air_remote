@@ -24,6 +24,7 @@ import {
   time,
 } from '../format.js';
 import { icons } from '../icons.js';
+import { uiIcons } from '../icons-ui.js';
 import {
   airConditionersOf,
   liveReading,
@@ -69,7 +70,22 @@ function limitsFor(protocol) {
   };
 }
 
-let selectedFloor = null;
+/**
+ * ตัวกรองของหน้านี้ จำไว้ข้ามการสลับหน้า
+ *
+ * ค่าเริ่มต้นคือ "ทุกชั้น" — รุ่นก่อนเปิดมาเห็นทีละชั้น คนที่อยากรู้ว่า
+ * "ตอนนี้ห้องไหนเปิดแอร์อยู่บ้าง" ต้องกดไล่ทีละแท็บ ซึ่งเป็นคำถามที่ถามบ่อยที่สุด
+ */
+const ALL = 'all';
+
+const view = {
+  floor: ALL,
+  search: '',
+  runningOnly: false,
+};
+
+const hasRunningUnit = (room) =>
+  airConditionersOf(room.roomNumber).some((unit) => unit.acRunning);
 
 export default {
   title: 'ห้องและควบคุม',
@@ -77,50 +93,139 @@ export default {
 
   mount(root, context) {
     const tabBar = el('div', { class: 'tabbar' });
-    const grid = el('div', { class: 'room-grid' });
+    const runningChip = el('button', { class: 'tab small', type: 'button' });
+    const grid = el('div', {});
+
+    // ช่องค้นหาสร้างครั้งเดียวตอน mount ไม่สร้างใหม่ทุกรอบที่ข้อมูลเข้า
+    // (ทุก 10 วินาที) ไม่งั้นเคอร์เซอร์จะหลุดระหว่างพิมพ์
+    const searchInput = el('input', {
+      class: 'search-input',
+      type: 'search',
+      placeholder: 'ค้นหาห้อง เช่น 16203 หรือ Lab',
+      'aria-label': 'ค้นหาห้อง',
+      value: view.search,
+      oninput: (event) => {
+        view.search = event.target.value;
+        update();
+      },
+    });
+    const searchBox = el('div', { class: 'search-box' }, [
+      svg(uiIcons.search(16)),
+      searchInput,
+    ]);
+
+    runningChip.addEventListener('click', () => {
+      view.runningOnly = !view.runningOnly;
+      update();
+    });
 
     replace(root, [
-      el('div', { class: 'rooms-toolbar' }, [
-        tabBar,
-        el('div', { class: 'pill', text: 'กดที่การ์ดห้องเพื่อเปิดรีโมต' }),
+      el('div', { class: 'rooms-toolbar' }, [tabBar, searchBox]),
+      el('div', { class: 'rooms-filters' }, [
+        runningChip,
+        el('span', {
+          class: 'dim small-note',
+          text: 'กดที่การ์ดห้องเพื่อเปิดรีโมต',
+        }),
       ]),
       grid,
     ]);
 
+    function floorTab(key, label, count) {
+      return el(
+        'button',
+        {
+          class: `tab${key === view.floor ? ' active' : ''}`,
+          type: 'button',
+          'aria-pressed': key === view.floor ? 'true' : 'false',
+          onclick: () => {
+            view.floor = key;
+            update();
+          },
+        },
+        [label, el('span', { class: 'tab-count', text: String(count) })],
+      );
+    }
+
     function update() {
       const groups = roomsByFloor();
       if (
-        selectedFloor == null ||
-        !groups.some((group) => group.floor === selectedFloor)
+        view.floor !== ALL &&
+        !groups.some((group) => group.floor === view.floor)
       ) {
-        selectedFloor = groups[0]?.floor ?? null;
+        view.floor = ALL;
       }
 
-      replace(
-        tabBar,
-        groups.map((group) =>
-          el('button', {
-            class: `tab${group.floor === selectedFloor ? ' active' : ''}`,
-            type: 'button',
-            text: `${floorLabel(group.floor)} (${group.rooms.length})`,
-            onclick: () => {
-              selectedFloor = group.floor;
-              update();
-            },
-          }),
+      const total = groups.reduce((sum, group) => sum + group.rooms.length, 0);
+      replace(tabBar, [
+        floorTab(ALL, 'ทุกชั้น', total),
+        ...groups.map((group) =>
+          floorTab(group.floor, floorLabel(group.floor), group.rooms.length),
         ),
-      );
+      ]);
 
-      const rooms =
-        groups.find((group) => group.floor === selectedFloor)?.rooms ?? [];
-      if (rooms.length === 0) {
-        replace(grid, emptyState('ยังไม่มีห้องในชั้นนี้'));
+      const runningRooms = state.rooms.filter(hasRunningUnit).length;
+      runningChip.className = `tab small${view.runningOnly ? ' active' : ''}`;
+      runningChip.setAttribute('aria-pressed', view.runningOnly ? 'true' : 'false');
+      replace(runningChip, [
+        el('span', { class: 'status-dot on' }),
+        `เฉพาะห้องที่แอร์ทำงาน (${runningRooms})`,
+      ]);
+
+      const query = view.search.trim().toLowerCase();
+      const matches = (room) => {
+        if (view.runningOnly && !hasRunningUnit(room)) return false;
+        if (!query) return true;
+        return `${room.roomNumber} ${room.roomType ?? ''}`
+          .toLowerCase()
+          .includes(query);
+      };
+
+      const visible = groups
+        .filter((group) => view.floor === ALL || group.floor === view.floor)
+        .map((group) => ({ ...group, rooms: group.rooms.filter(matches) }))
+        .filter((group) => group.rooms.length > 0);
+
+      if (visible.length === 0) {
+        replace(
+          grid,
+          emptyState(
+            query || view.runningOnly
+              ? 'ไม่พบห้องที่ตรงกับตัวกรอง\nลองล้างคำค้นหา หรือปิดตัวกรอง "เฉพาะห้องที่แอร์ทำงาน"'
+              : 'ยังไม่มีห้องในชั้นนี้',
+          ),
+        );
         return;
       }
+
       const energyByRoom = roomEnergyMap();
+      const cards = (rooms) =>
+        el(
+          'div',
+          { class: 'room-grid' },
+          rooms.map((room) => roomCard(room, energyByRoom, context)),
+        );
+
+      // ดูทีละชั้นไม่ต้องมีหัวข้อ ดูทุกชั้นแบ่งหัวข้อตามชั้นให้กวาดตาง่าย
+      if (view.floor !== ALL) {
+        replace(grid, cards(visible[0].rooms));
+        return;
+      }
       replace(
         grid,
-        rooms.map((room) => roomCard(room, energyByRoom, context)),
+        visible.flatMap((group) => {
+          const running = group.rooms.filter(hasRunningUnit).length;
+          return [
+            el('h2', { class: 'floor-heading' }, [
+              floorLabel(group.floor),
+              el('span', {
+                class: 'count-badge',
+                text: `${group.rooms.length} ห้อง · แอร์ทำงาน ${running} ห้อง`,
+              }),
+            ]),
+            cards(group.rooms),
+          ];
+        }),
       );
     }
 
@@ -151,49 +256,93 @@ function roomCard(room, energyByRoom, context) {
           ? 'มีคนอยู่ในห้อง'
           : 'ไม่มีคนอยู่ในห้อง';
 
+  const occupancyTone =
+    sensor?.isOnline && sensor?.radarAvailable && sensor?.isOccupied ? 'info' : 'off';
+
+  const stateClass = counting
+    ? ' counting'
+    : running > 0
+      ? ' running'
+      : units.length === 0
+        ? ' idle vacant'
+        : ' idle';
+
+  // ห้องที่ยังไม่ติดตั้งแอร์ ไม่มีอะไรให้ควบคุมหรือวัด แสดงแค่ชื่อกับป้ายเดียวพอ
+  // ไม่งั้นการ์ดจะเต็มไปด้วย "0 kWh · 0/0 · ยังไม่มี..." จนกลบห้องที่ใช้งานจริง
+  if (units.length === 0) {
+    return el(
+      'button',
+      {
+        class: `room-card${stateClass}`,
+        type: 'button',
+        'aria-label': `ห้อง ${room.roomNumber} ยังไม่ติดตั้งแอร์`,
+        onclick: () => context.openRoom(room.roomNumber),
+      },
+      [
+        el('div', { class: 'room-card-top' }, [
+          el('div', { class: 'grow' }, [
+            el('div', { class: 'room-card-name', text: `ห้อง ${room.roomNumber}` }),
+            el('div', { class: 'room-card-desc', text: room.roomType || '—' }),
+          ]),
+        ]),
+        el('div', { class: 'room-card-chips' }, [
+          el('span', { class: 'status-chip off', text: 'ยังไม่ติดตั้งแอร์' }),
+          sensor
+            ? el('span', { class: `status-chip ${occupancyTone}`, text: occupancyText })
+            : null,
+        ]),
+      ],
+    );
+  }
+
   const card = el(
     'button',
     {
-      class: `room-card${counting ? ' counting' : ''}`,
+      class: `room-card${stateClass}`,
       type: 'button',
+      'aria-label': `ห้อง ${room.roomNumber} เปิดรีโมต`,
       onclick: () => context.openRoom(room.roomNumber),
     },
     [
       el('div', { class: 'room-card-top' }, [
-        el('div', {}, [
+        el('div', { class: 'grow' }, [
           el('div', { class: 'room-card-name', text: `ห้อง ${room.roomNumber}` }),
           el('div', { class: 'room-card-desc', text: room.roomType || '—' }),
         ]),
         icon,
       ]),
-      el('div', { class: 'row', style: { gap: '8px', fontSize: '11.5px' } }, [
+      el('div', { class: 'room-card-chips' }, [
         el('span', {
-          class: sensor?.isOccupied ? 'good' : 'muted',
-          text: occupancyText,
+          class: `status-chip ${running > 0 ? 'done' : 'off'}`,
+          text:
+            running > 0 ? `แอร์เปิด ${running}/${units.length}` : 'แอร์ปิดทั้งหมด',
         }),
+        el('span', { class: `status-chip ${occupancyTone}`, text: occupancyText }),
       ]),
       counting
         ? countdownStrip(room)
-        : el('div', {
-            class: 'dim',
-            style: { fontSize: '11.5px' },
-            text: `ใช้ไฟ ${energy(energyByRoom.get(room.roomNumber) ?? 0)} ในช่วงที่เลือก`,
-          }),
+        : el('div', { class: 'room-card-energy' }, [
+            'ใช้ไฟ ',
+            el('b', { text: energy(energyByRoom.get(room.roomNumber) ?? 0) }),
+            ' ในช่วงที่เลือก',
+          ]),
       el('div', { class: 'room-card-foot' }, [
         el('div', { class: 'status-dot-row' }, [
           el('span', {
-            class: `status-dot${running > 0 ? ' on' : ''}`,
+            class: `status-dot${online === units.length ? ' on' : ' warn'}`,
           }),
           el('span', {
+            class: online === units.length ? null : 'warn',
             text:
-              units.length === 0
-                ? 'ยังไม่มีแอร์'
-                : `ทำงาน ${running} / ${units.length} เครื่อง`,
+              online === units.length
+                ? 'บอร์ดออนไลน์ครบ'
+                : `บอร์ดออฟไลน์ ${units.length - online} ตัว`,
           }),
         ]),
         el('span', {
           class: 'devices-chip',
-          text: `ออนไลน์ ${online}/${units.length}`,
+          text: `${online}/${units.length}`,
+          title: 'บอร์ด ESP32 ที่ออนไลน์ / ทั้งหมด',
         }),
       ]),
     ],
@@ -221,9 +370,18 @@ function countdownStrip(room) {
     ? new Date(room.autoOffDeadlineAt).getTime()
     : null;
 
+  // ตอนเรียก tick() ครั้งแรกแถบยังไม่ได้ถูกใส่ลงหน้า (isConnected = false)
+  // รุ่นก่อนจึงไปเรียก clearInterval(handle) ก่อนประกาศ handle แล้วพังทั้งหน้า
+  // ทุกครั้งที่มีห้องกำลังนับถอยหลัง จึงหยุดนาฬิกาเฉพาะเมื่อแถบ "เคยอยู่ในหน้า
+  // แล้วถูกเอาออก" (หน้าวาดใหม่หรือเปลี่ยนหน้า) หรือไม่เคยถูกใส่ลงหน้าเลยเกิน 5 วินาที
+  let handle = null;
+  let mounted = false;
+  const createdAt = Date.now();
   const tick = () => {
-    if (!strip.isConnected) {
-      window.clearInterval(handle);
+    if (strip.isConnected) {
+      mounted = true;
+    } else if (mounted || Date.now() - createdAt > 5000) {
+      if (handle != null) window.clearInterval(handle);
       return;
     }
     if (deadline == null) return;
@@ -241,7 +399,7 @@ function countdownStrip(room) {
   };
 
   tick();
-  const handle = window.setInterval(tick, 1000);
+  handle = window.setInterval(tick, 1000);
   return strip;
 }
 
@@ -332,17 +490,10 @@ function roomSummaryCard(room, sensor) {
         : null,
     ]),
     ...rows.map(([label, value]) =>
-      el(
-        'div',
-        {
-          class: 'rate-example-row',
-          style: { fontSize: '12px', padding: '6px 0' },
-        },
-        [
-          el('span', { class: 'muted', text: label }),
-          el('span', { style: { textAlign: 'right' }, text: value }),
-        ],
-      ),
+      el('div', { class: 'info-row' }, [
+        el('span', { class: 'muted', text: label }),
+        el('span', { text: value }),
+      ]),
     ),
   ]);
 }
@@ -420,6 +571,8 @@ function acCard(unit, isAdmin, context) {
         class: 'temp-btn',
         type: 'button',
         text: '−',
+        title: 'ลดอุณหภูมิ',
+        'aria-label': 'ลดอุณหภูมิ',
         disabled: !active,
         onclick: () => stepTemp(-1),
       }),
@@ -431,6 +584,8 @@ function acCard(unit, isAdmin, context) {
         class: 'temp-btn',
         type: 'button',
         text: '+',
+        title: 'เพิ่มอุณหภูมิ',
+        'aria-label': 'เพิ่มอุณหภูมิ',
         disabled: !active,
         onclick: () => stepTemp(1),
       }),
@@ -498,8 +653,8 @@ function acCard(unit, isAdmin, context) {
   if (limits.note) {
     card.appendChild(
       el('div', {
-        class: 'dim',
-        style: { fontSize: '10.5px', marginTop: '8px' },
+        class: 'dim small-note',
+        style: { marginTop: '8px' },
         text: limits.note,
       }),
     );
@@ -524,8 +679,8 @@ function acCard(unit, isAdmin, context) {
   if (!unit.pzemAvailable) {
     card.appendChild(
       el('div', {
-        class: 'warn',
-        style: { fontSize: '11px', marginTop: '8px' },
+        class: 'warn small-note',
+        style: { marginTop: '8px' },
         text:
           'อ่านค่าจาก PZEM ไม่ได้ ระบบปิดอัตโนมัติจะไม่ทำงานกับเครื่องนี้ ' +
           'เพราะยืนยันไม่ได้ว่าปิดสำเร็จหรือไม่',
@@ -535,8 +690,8 @@ function acCard(unit, isAdmin, context) {
 
   card.appendChild(
     el('div', {
-      class: 'dim',
-      style: { fontSize: '10.5px', marginTop: '8px' },
+      class: 'dim small-note',
+      style: { marginTop: '8px' },
       text: `อัปเดตล่าสุด ${relativeTime(unit.lastSeenAt)} · เวลาเปิดอัตโนมัติประจำวัน ${
         unit.dailyOn ?? '—'
       } / ปิด ${unit.dailyOff ?? '—'}`,

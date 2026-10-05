@@ -82,8 +82,6 @@ class RoomManagementScreen extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
         title: Text(
           context.tr('Manage Rooms'),
           style: const TextStyle(fontWeight: FontWeight.w800),
@@ -187,9 +185,9 @@ class _ManagedRoomCard extends StatelessWidget {
               color: AppColors.primary.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(11),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.meeting_room_rounded,
-              color: AppColors.primary,
+              color: Theme.of(context).colorScheme.primary,
             ),
           ),
           const SizedBox(width: 12),
