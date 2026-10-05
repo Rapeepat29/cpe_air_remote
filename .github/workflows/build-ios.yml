@@ -13,6 +13,11 @@ name: Build iOS (IPA ไม่เซ็น)
 
 on:
   workflow_dispatch:
+    inputs:
+      api_base_url:
+        description: ที่อยู่ API ที่แอปจะใช้ (ต้องเข้าได้จากอินเทอร์เน็ต)
+        required: true
+        default: https://rmutt-energy.tailb292b4.ts.net/api
 
 jobs:
   build-ios:
@@ -47,12 +52,27 @@ jobs:
           plutil -replace CFBundleDisplayName -string "RMUTT Energy" "$PLIST"
           plutil -lint "$PLIST"
 
+      - name: ใส่ไอคอนแอป RMUTT Energy
+        run: |
+          # flutter create ใส่ไอคอน Flutter มาให้ จึงต้องแทนทุกขนาดด้วยโลโก้ของเรา
+          # ต้นฉบับ 1024x1024 พื้นทึบเต็มกรอบ (iOS ตัดมุมมนเอง และไม่รับภาพโปร่งใส)
+          SRC=assets/app_icon/ios-1024.png
+          DIR=ios/Runner/Assets.xcassets/AppIcon.appiconset
+          for f in "$DIR"/*.png; do
+            SIZE=$(sips -g pixelWidth "$f" | awk '/pixelWidth/ {print $2}')
+            sips -s format png -z "$SIZE" "$SIZE" "$SRC" --out "$f" >/dev/null
+          done
+          ls -l "$DIR"
+
       - name: ติดตั้งแพ็กเกจ
         run: flutter pub get
 
       - name: Build แอป iOS (ยังไม่เซ็น)
         # ต้องเป็น release เพราะแอป debug บน iOS เปิดจากหน้าโฮมเองไม่ได้
-        run: flutter build ios --release --no-codesign
+        # ส่งผ่าน env กันค่า input ถูกตีความเป็นคำสั่ง shell
+        env:
+          API_BASE_URL: ${{ inputs.api_base_url }}
+        run: flutter build ios --release --no-codesign --dart-define=API_BASE_URL="$API_BASE_URL"
 
       - name: แพ็กเป็นไฟล์ .ipa
         run: |
