@@ -32,6 +32,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
   late final TextEditingController _email;
   late final TextEditingController _phone;
   final _currentPassword = TextEditingController();
+  final _emailChangePassword = TextEditingController();
   final _newPassword = TextEditingController();
   final _confirmPassword = TextEditingController();
 
@@ -57,6 +58,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
     _email.dispose();
     _phone.dispose();
     _currentPassword.dispose();
+    _emailChangePassword.dispose();
     _newPassword.dispose();
     _confirmPassword.dispose();
     super.dispose();
@@ -74,15 +76,64 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
       );
   }
 
+  /// ถามรหัสผ่านปัจจุบันก่อนเปลี่ยนอีเมล คืน null ถ้าผู้ใช้กดยกเลิก
+  ///
+  /// OTP ลืมรหัสผ่านถูกส่งไปที่อีเมลนี้ ถ้าเปลี่ยนได้โดยไม่ยืนยัน คนที่หยิบ
+  /// เครื่องที่ล็อกอินค้างไว้ไปได้จะเปลี่ยนเป็นอีเมลตัวเองแล้วยึดบัญชีได้
+  Future<String?> _askPasswordForEmailChange() async {
+    _emailChangePassword.clear();
+    final password = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(context.tr('Confirm your password')),
+        content: TextField(
+          key: const Key('account-email-change-password'),
+          controller: _emailChangePassword,
+          obscureText: true,
+          autofocus: true,
+          decoration: InputDecoration(
+            labelText: context.tr('Current password'),
+            helperText: context.tr(
+              'Changing the email requires your current password.',
+            ),
+            helperMaxLines: 3,
+          ),
+          onSubmitted: (value) => Navigator.of(context).pop(value),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(context.tr('Cancel')),
+          ),
+          FilledButton(
+            onPressed: () =>
+                Navigator.of(context).pop(_emailChangePassword.text),
+            child: Text(context.tr('Confirm')),
+          ),
+        ],
+      ),
+    );
+    if (password == null || password.isEmpty) return null;
+    return password;
+  }
+
   Future<void> _saveProfile() async {
     if (!(_profileFormKey.currentState?.validate() ?? false)) return;
+    final user = widget.controller.user ?? widget.user;
+    final email = _email.text.trim();
+    String? currentPassword;
+    if (email.toLowerCase() != user.email.trim().toLowerCase()) {
+      currentPassword = await _askPasswordForEmailChange();
+      if (currentPassword == null || !mounted) return;
+    }
     setState(() => _savingProfile = true);
     try {
       await widget.controller.updateProfile(
         firstName: _firstName.text.trim(),
         lastName: _lastName.text.trim(),
-        email: _email.text.trim(),
+        email: email,
         phone: _phone.text.trim(),
+        currentPassword: currentPassword,
       );
       // ผู้ใช้อาจกดออกจากหน้าไปแล้วระหว่างรอบันทึก ห้ามแตะ context ต่อ
       if (!mounted) return;
@@ -148,8 +199,6 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
         title: Text(context.tr('Account Settings')),
       ),
       body: ListView(

@@ -17,6 +17,9 @@ class StatusPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    // สีสถานะส่วนใหญ่ (AppColors) เข้มสำหรับพื้นสว่าง บนพื้นเข้มของธีมเทา/ดำ
+    // ตัวหนังสือจะจมหาย จึงผสมขาวเข้าไปให้สว่างขึ้นแต่ยังเป็นสีเดิม
+    final foreground = isDark ? Color.lerp(color, Colors.white, 0.45)! : color;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
@@ -30,13 +33,13 @@ class StatusPill extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           if (icon != null) ...[
-            Icon(icon, color: color, size: 14),
+            Icon(icon, color: foreground, size: 14),
             const SizedBox(width: 4),
           ],
           Text(
             label,
             style: TextStyle(
-              color: color,
+              color: foreground,
               fontSize: 11,
               fontWeight: FontWeight.w800,
             ),

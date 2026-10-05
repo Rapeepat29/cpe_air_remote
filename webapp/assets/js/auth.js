@@ -75,16 +75,19 @@ export function mountLoginScreen(onSuccess) {
   );
 
   const mark = el('div', { class: 'brand-mark' });
+  // โลโก้ RMUTT Save Energy (SVG เดียวกับ favicon.svg) เขียนไว้ในโค้ด ไม่ได้มาจากฐานข้อมูล
   mark.innerHTML =
-    '<svg width="17" height="17" viewBox="0 0 24 24" fill="none">' +
-    '<path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z" fill="#06150E"/></svg>';
+    '<svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" aria-hidden="true" focusable="false" viewBox="0 0 240 240"><rect width="240" height="240" rx="56" fill="#2F3438"/><g transform="translate(-2,-10)"><path d="M110 150 C150 144 184 170 184 208 C146 208 110 186 110 150 Z" fill="#2EB872"/><path d="M122 160 L172 198" stroke="#2F3438" stroke-width="4" stroke-linecap="round"/><path d="M82 184 L82 73 L126 73 A33 33 0 0 1 126 139 L82 139" fill="none" stroke="#FFFFFF" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/></g></svg>';
 
   replace(screen, [
     el('div', { class: 'login-card' }, [
       el('div', { class: 'login-brand' }, [
         mark,
         el('div', {}, [
-          el('div', { class: 'brand-name', text: 'RMUTT Save Energy' }),
+          el('div', { class: 'wordmark', 'aria-label': 'RMUTT Save Energy' }, [
+            el('span', { class: 'wordmark-name' }, [el('b', { text: 'R' }), 'MUTT']),
+            el('span', { class: 'wordmark-tag', text: 'SAVE ENERGY' }),
+          ]),
           el('div', {
             class: 'user-role',
             text: `${BUILDING.name} · ${BUILDING.subtitle}`,

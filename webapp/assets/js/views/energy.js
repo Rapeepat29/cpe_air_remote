@@ -20,10 +20,12 @@ import {
   integer,
   isoDate,
   shiftDays,
+  thaiDate,
 } from '../format.js';
 import { icons } from '../icons.js';
 import { defaultHistoryRange, loaders, state } from '../store.js';
 import { toastError, toastInfo, toastOk } from '../ui.js';
+import { thaiDateInput } from '../thai-date-input.js';
 
 const SCOPES = [
   { key: 'building', label: 'รวมทั้งอาคาร' },
@@ -184,18 +186,20 @@ function renderFilters(box, run) {
     ),
   );
 
-  const fromInput = el('input', {
-    type: 'date',
+  const fromInput = thaiDateInput({
+    name: 'energy-from',
     value: filters.from,
-    onchange: (event) => {
-      filters.from = event.target.value;
+    max: isoDate(),
+    onChange: (iso) => {
+      filters.from = iso;
     },
   });
-  const toInput = el('input', {
-    type: 'date',
+  const toInput = thaiDateInput({
+    name: 'energy-to',
     value: filters.to,
-    onchange: (event) => {
-      filters.to = event.target.value;
+    max: isoDate(),
+    onChange: (iso) => {
+      filters.to = iso;
     },
   });
 
@@ -266,7 +270,7 @@ function renderFilters(box, run) {
       coverage?.oldest
         ? el('span', {
             class: 'count-badge',
-            text: `มีข้อมูล ${coverage.oldest} ถึง ${coverage.newest}`,
+            text: `มีข้อมูล ${thaiDate(coverage.oldest)} ถึง ${thaiDate(coverage.newest)}`,
           })
         : null,
     ]),
@@ -599,7 +603,10 @@ function renderTable(box) {
         el('td', {
           class:
             column.key === 'date' ? `date-cell${newDay ? '' : ' repeat'}` : null,
-          text: String(row[column.key] ?? '—'),
+          text:
+            column.key === 'date' && row.date
+              ? thaiDate(row.date)
+              : String(row[column.key] ?? '—'),
         }),
       ),
       ...metricColumns.map((column) =>

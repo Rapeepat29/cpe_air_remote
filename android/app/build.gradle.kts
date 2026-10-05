@@ -14,6 +14,13 @@ val keystorePropertiesFile = rootProject.file("key.properties")
 val hasReleaseKey = keystorePropertiesFile.exists()
 if (hasReleaseKey) {
     FileInputStream(keystorePropertiesFile).use { keystoreProperties.load(it) }
+} else {
+    // ไม่มี key.properties = APK release จะเซ็นด้วย debug key ซึ่งใครก็มี
+    // แจกแบบนี้ไม่ได้ และอัปเดตทับแอปที่เซ็นด้วยกุญแจจริงไม่ได้ จึงเตือนให้เห็นชัด ๆ
+    logger.warn(
+        "WARNING: android/key.properties not found. Release builds will be signed " +
+            "with the DEBUG key. Run create-keystore.ps1 before distributing the APK."
+    )
 }
 
 android {

@@ -5,6 +5,7 @@ import helmet from 'helmet';
 import { config } from './config.js';
 import { pool } from './db.js';
 import { authRouter } from './routes/auth.js';
+import { bookingsRouter } from './routes/bookings.js';
 import { airConditionersRouter } from './routes/air-conditioners.js';
 import { alertsRouter } from './routes/alerts.js';
 import { energyRouter } from './routes/energy.js';
@@ -38,10 +39,21 @@ app.get(
   '/api/health',
   asyncHandler(async (request, response) => {
     await pool.query('SELECT 1');
+    const mqtt = getMqttBridgeStatus();
     response.json({
       status: 'ok',
       service: 'rmutt-save-energy-api',
-      mqtt: getMqttBridgeStatus(),
+      // หน้านี้เปิดได้โดยไม่ต้องล็อกอิน บนเซิร์ฟเวอร์จริงจึงบอกแค่สถานะ
+      // ไม่บอกที่อยู่ Broker หรือข้อความ error ภายในให้คนนอกเห็น
+      // (deviceAuth คงไว้ให้คู่มือ deploy ใช้ตรวจว่าเปิด dynsec แล้ว)
+      // ตอนพัฒนาบนเครื่องยังได้รายละเอียดครบ ให้ check_system.ps1/diagnose.ps1 ใช้
+      mqtt: config.env === 'production'
+        ? {
+          connected: mqtt.connected,
+          deviceAuth: mqtt.deviceAuth,
+          topicPrefix: mqtt.topicPrefix,
+        }
+        : mqtt,
     });
   }),
 );
@@ -50,6 +62,7 @@ app.use('/api/auth', authRouter);
 app.use('/api/public', publicRouter);
 app.use('/api/rooms', roomsRouter);
 app.use('/api/schedules', schedulesRouter);
+app.use('/api/bookings', bookingsRouter);
 app.use('/api/air-conditioners', airConditionersRouter);
 app.use('/api/occupancy-sensors', occupancySensorsRouter);
 app.use('/api/energy', energyRouter);

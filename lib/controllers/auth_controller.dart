@@ -65,12 +65,14 @@ class AuthController extends ChangeNotifier {
     required String lastName,
     required String email,
     required String phone,
+    String? currentPassword,
   }) async {
     final updated = await repository.updateProfile(
       firstName: firstName,
       lastName: lastName,
       email: email,
       phone: phone,
+      currentPassword: currentPassword,
     );
     user = updated;
     notifyListeners();

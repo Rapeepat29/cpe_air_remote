@@ -3,6 +3,7 @@ import '../localization/localized_material.dart';
 import '../controllers/dashboard_controller.dart';
 import '../models/energy_data.dart';
 import '../theme/app_theme.dart';
+import '../utils/thai_date.dart';
 
 /// ตัวเลือกช่วงเวลาของหน้าหลักและหน้าสถิติ
 ///
@@ -115,13 +116,12 @@ Future<void> pickCustomRange(
           end: today,
         );
 
-  final picked = await showDateRangePicker(
+  final picked = await showAppDateRangePicker(
     context: context,
     firstDate: DateTime(2024),
     lastDate: today,
-    initialDateRange: initial,
-    helpText: context.tr('Pick a date range'),
-    saveText: context.tr('Apply'),
+    initialRange: initial,
+    title: context.tr('Pick a date range'),
   );
   if (picked == null) return;
   await controller.setCustomRange(picked.start, picked.end);
@@ -135,8 +135,9 @@ String describeCustomRange(
   final from = controller.customFrom;
   final to = controller.customTo;
   if (from == null || to == null) return context.tr('Custom range');
-  final fromText = EnergyQuery.formatDate(from).substring(5);
-  final toText = EnergyQuery.formatDate(to).substring(5);
+  final isThai = AppLocalizations.of(context).isThai;
+  final fromText = formatDayMonth(from, isThai);
+  final toText = formatDayMonth(to, isThai);
   return fromText == toText ? fromText : '$fromText – $toText';
 }
 

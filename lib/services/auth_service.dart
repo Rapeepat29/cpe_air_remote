@@ -166,6 +166,7 @@ class AuthService implements AuthRepository {
     required String lastName,
     required String email,
     required String phone,
+    String? currentPassword,
   }) async {
     final token = await _storage.read(key: _tokenKey);
     if (token == null || token.isEmpty) {
@@ -180,6 +181,8 @@ class AuthService implements AuthRepository {
         'lastName': lastName,
         'email': email,
         'phone': phone,
+        if (currentPassword != null && currentPassword.isNotEmpty)
+          'currentPassword': currentPassword,
       },
     );
     return AuthUser.fromJson(_map(data['user']));

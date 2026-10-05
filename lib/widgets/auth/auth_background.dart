@@ -24,17 +24,15 @@ class AuthBackground extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: isDark
-                ? const [
-                    Color(0xFF12241A),
-                    Color(0xFF0F1B15),
-                    Color(0xFF0D1511),
-                  ]
-                : const [
-                    Color(0xFFE8F5EC),
-                    Color(0xFFF7FAF7),
-                    Colors.white,
-                  ],
+            // ไล่จากพื้นของธีมที่แต้มสีเน้นจาง ๆ ลงไปเป็นพื้นเรียบ
+            colors: [
+              Color.alphaBlend(
+                colors.primary.withValues(alpha: isDark ? 0.10 : 0.08),
+                theme.scaffoldBackgroundColor,
+              ),
+              theme.scaffoldBackgroundColor,
+              theme.scaffoldBackgroundColor,
+            ],
             stops: const [0, 0.62, 1],
           ),
         ),
@@ -110,24 +108,22 @@ class EnergyBrand extends StatelessWidget {
           width: logoSize,
           height: logoSize,
           decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: colors.surface,
-            border: Border.all(
-              color: AppColors.primary.withValues(alpha: 0.18),
-              width: 1.5,
-            ),
+            // มุมมนเท่ากับไอคอนแอป (56/240 ของความกว้าง)
+            borderRadius: BorderRadius.circular(logoSize * 0.233),
             boxShadow: [
               BoxShadow(
-                color: AppColors.primary.withValues(alpha: 0.16),
+                color: AppColors.charcoal.withValues(alpha: 0.22),
                 blurRadius: 28,
                 offset: const Offset(0, 12),
               ),
             ],
           ),
-          child: Icon(
-            Icons.energy_savings_leaf_rounded,
-            size: compact ? 44 : 56,
-            color: AppColors.primary,
+          child: Image.asset(
+            'assets/brand/rmutt_save_energy_icon.png',
+            width: logoSize,
+            height: logoSize,
+            filterQuality: FilterQuality.medium,
+            semanticLabel: 'RMUTT Save Energy',
           ),
         ),
         SizedBox(height: compact ? 14 : 18),
@@ -136,9 +132,9 @@ class EnergyBrand extends StatelessWidget {
           textAlign: TextAlign.center,
           style: TextStyle(
             color: colors.primary,
-            fontSize: compact ? 24 : 28,
-            fontWeight: FontWeight.w900,
-            letterSpacing: -0.4,
+            fontFamily: kDisplayFont,
+            fontSize: compact ? 25 : 29,
+            fontWeight: FontWeight.w700,
           ),
         ),
         const SizedBox(height: 5),
@@ -161,8 +157,8 @@ class _EnergyBackgroundPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final pale = Paint()..color = const Color(0x2216834B);
-    final lighter = Paint()..color = const Color(0x1043B86F);
+    final pale = Paint()..color = const Color(0x222EB872);
+    final lighter = Paint()..color = const Color(0x102EB872);
 
     final topShape = Path()
       ..moveTo(0, 0)

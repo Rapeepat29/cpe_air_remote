@@ -44,6 +44,16 @@ fi
 mkdir -p firmware backups
 
 step '1/6 Build backend ใหม่'
+# รหัสแอดมินตัวแรกใช้แค่ตอน seed ครั้งแรก ไม่ต้องค้างเป็นข้อความธรรมดาใน .env
+# (สร้างแอดมินใหม่หรือรีเซ็ตรหัสภายหลังได้ด้วย: bash seed-admin.sh)
+if grep -qE '^SEED_ADMIN_PASSWORD=.+' .env; then
+  if sed -i 's/^SEED_ADMIN_PASSWORD=.*/SEED_ADMIN_PASSWORD=/' .env 2>/dev/null; then
+    echo 'ลบ SEED_ADMIN_PASSWORD ที่ค้างอยู่ใน .env แล้ว'
+  else
+    echo 'เตือน: ลบ SEED_ADMIN_PASSWORD ใน .env ไม่ได้ ให้แก้เอง: sudo nano /opt/rmutt/.env'
+  fi
+fi
+
 cp -f backend.Dockerfile backend/Dockerfile
 docker compose up -d --build backend || fail 'build backend ไม่สำเร็จ'
 

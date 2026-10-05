@@ -3,9 +3,15 @@ import bcrypt from 'bcryptjs';
 import { pool } from '../src/db.js';
 import { isValidNewPassword } from '../src/utils/security.js';
 
+// บนเซิร์ฟเวอร์ deploy/seed-admin.sh ส่งรหัสผ่านเข้ามาทาง stdin (--password-stdin)
+// รหัสแอดมินจึงไม่ต้องค้างอยู่ใน environment ของ container หรือใน .env
+const passwordFromStdin = process.argv.includes('--password-stdin');
+
 const admin = {
   username: required('SEED_ADMIN_USERNAME'),
-  password: required('SEED_ADMIN_PASSWORD'),
+  password: passwordFromStdin
+    ? await readPasswordFromStdin()
+    : required('SEED_ADMIN_PASSWORD'),
   firstName: process.env.SEED_ADMIN_FIRST_NAME ?? '',
   lastName: process.env.SEED_ADMIN_LAST_NAME ?? '',
   email: required('SEED_ADMIN_EMAIL'),
@@ -43,6 +49,12 @@ try {
   console.log(`Admin account "${admin.username}" is ready.`);
 } finally {
   await pool.end();
+}
+
+async function readPasswordFromStdin() {
+  const chunks = [];
+  for await (const chunk of process.stdin) chunks.push(chunk);
+  return Buffer.concat(chunks).toString('utf8').replace(/\r?\n$/, '');
 }
 
 function required(name) {

@@ -3,6 +3,7 @@ import '../localization/localized_material.dart';
 import '../models/energy_data.dart';
 import '../theme/app_theme.dart';
 import '../utils/number_format.dart';
+import '../utils/thai_date.dart';
 
 /// กราฟการใช้พลังงาน พร้อมป้ายบอกค่าไฟของแต่ละจุด
 ///
@@ -145,11 +146,12 @@ class _Tooltip extends StatelessWidget {
   final EnergyDisplay energy;
   final String cost;
 
-  String get _title {
+  String _title(bool isThai) {
     if (point.date.isEmpty) return point.label;
+    final date = formatIsoDateText(point.date, isThai);
     final hour = point.hour;
-    if (hour == null) return point.date;
-    return '${point.date}  ${hour.toString().padLeft(2, '0')}:00';
+    if (hour == null) return date;
+    return '$date  ${hour.toString().padLeft(2, '0')}:00';
   }
 
   @override
@@ -181,7 +183,7 @@ class _Tooltip extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              _title,
+              _title(AppLocalizations.of(context).isThai),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(

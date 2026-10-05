@@ -32,6 +32,17 @@ const loginLimiter = rateLimit({
   message: { message: 'ลองเข้าสู่ระบบหลายครั้งเกินไป กรุณารอ 15 นาที' },
 });
 
+// ด่านที่ต้องพิมพ์รหัสผ่านเดิมยืนยัน (เปลี่ยนรหัสผ่าน / เปลี่ยนอีเมล)
+// นับเฉพาะครั้งที่ผิด กันคนที่ได้ Token ไปแล้วมาเดารหัสผ่านต่อ
+const passwordConfirmLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 10,
+  skipSuccessfulRequests: true,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  message: { message: 'ยืนยันรหัสผ่านผิดหลายครั้งเกินไป กรุณารอ 15 นาที' },
+});
+
 const resetLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
   limit: 8,
@@ -106,12 +117,43 @@ authRouter.get(
 );
 
 // แก้ข้อมูลบัญชีตัวเอง สิทธิ์กับสถานะบัญชีแก้ที่นี่ไม่ได้โดยตั้งใจ
+//
+// เปลี่ยนอีเมลต้องใส่รหัสผ่านปัจจุบันด้วย เพราะ OTP ลืมรหัสผ่านถูกส่งไปที่อีเมลนี้
+// ถ้าไม่บังคับ คนที่ได้ Token ไป (เช่น เครื่องที่ลืมออกจากระบบ) จะเปลี่ยนอีเมล
+// เป็นของตัวเอง แล้วใช้ลืมรหัสผ่านยึดบัญชีไปถาวรได้
 authRouter.patch(
   '/me',
   authenticate,
+  passwordConfirmLimiter,
   asyncHandler(async (request, response) => {
     const input = validateProfileUpdate(request.body);
     const username = request.authUser.username;
+
+    const currentEmail = String(request.authUser.email ?? '')
+      .trim()
+      .toLowerCase();
+    if (input.email !== currentEmail) {
+      const currentPassword =
+        typeof request.body?.currentPassword === 'string'
+          ? request.body.currentPassword
+          : '';
+      if (!currentPassword || currentPassword.length > 256) {
+        throw new ApiError(
+          400,
+          'กรุณากรอกรหัสผ่านปัจจุบันเพื่อยืนยันการเปลี่ยนอีเมล',
+        );
+      }
+      const passwordRows = await pool.query(
+        'SELECT password_hash FROM users WHERE username = ? LIMIT 1',
+        [username],
+      );
+      const isCorrect = passwordRows[0]
+        ? await bcrypt.compare(currentPassword, passwordRows[0].password_hash)
+        : false;
+      if (!isCorrect) {
+        throw new ApiError(400, 'รหัสผ่านปัจจุบันไม่ถูกต้อง');
+      }
+    }
 
     try {
       await pool.query(
@@ -146,6 +188,7 @@ authRouter.patch(
 authRouter.post(
   '/me/password',
   authenticate,
+  passwordConfirmLimiter,
   asyncHandler(async (request, response) => {
     const currentPassword = typeof request.body?.currentPassword === 'string'
       ? request.body.currentPassword

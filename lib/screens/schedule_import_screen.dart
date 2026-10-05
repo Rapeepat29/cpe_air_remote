@@ -7,6 +7,7 @@ import '../controllers/schedule_controller.dart';
 import '../localization/localized_material.dart';
 import '../models/schedule_import.dart';
 import '../theme/app_theme.dart';
+import '../utils/thai_date.dart';
 
 class ScheduleImportScreen extends StatefulWidget {
   const ScheduleImportScreen({
@@ -61,7 +62,39 @@ class _ScheduleImportScreenState extends State<ScheduleImportScreen> {
   bool _isImporting = false;
   String? _errorMessage;
 
+  /// ภาคเรียนและช่วงวันที่ใช้ตารางนี้ ต้องกรอกก่อนนำเข้า
+  final _semesterController = TextEditingController();
+  DateTimeRange? _termRange;
+
+  static final _semesterPattern = RegExp(r'^[1-3]/\d{4}$');
+
   bool get _isBusy => _isReading || _isImporting;
+
+  bool get _semesterValid =>
+      _semesterPattern.hasMatch(_semesterController.text.trim());
+
+  bool get _termReady => _semesterValid && _termRange != null;
+
+  @override
+  void dispose() {
+    _semesterController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _pickTermRange() async {
+    final now = DateTime.now();
+    // ใช้ปฏิทินของแอปเอง เพราะปฏิทินของ Flutter แสดงและรับปีเป็น ค.ศ. เท่านั้น
+    // ผู้ใช้คุ้นกับ พ.ศ. (เช่น 2569) จึงแสดงปี พ.ศ. เมื่อแอปเป็นภาษาไทย
+    final picked = await showAppDateRangePicker(
+      context: context,
+      title: context.tr('Semester dates'),
+      initialRange: _termRange,
+      firstDate: DateTime(now.year - 1),
+      lastDate: DateTime(now.year + 3, 12, 31),
+    );
+    if (picked == null || !mounted) return;
+    setState(() => _termRange = picked);
+  }
 
   Future<void> _chooseFile() async {
     if (_isBusy) return;
@@ -89,7 +122,12 @@ class _ScheduleImportScreenState extends State<ScheduleImportScreen> {
         bytes: bytes,
       );
       if (!mounted) return;
-      setState(() => _preview = preview);
+      setState(() {
+        _preview = preview;
+        // ไฟล์ใหม่อาจเป็นคนละเทอม ให้เลือกช่วงวันใหม่ทุกครั้ง
+        _semesterController.text = preview.semester;
+        _termRange = null;
+      });
     } catch (error) {
       if (!mounted) return;
       setState(() => _errorMessage = context.tr(error.toString()));
@@ -130,10 +168,18 @@ class _ScheduleImportScreenState extends State<ScheduleImportScreen> {
   }
 
   Future<void> _confirmImport() async {
-    final preview = _preview;
-    if (preview == null || _isBusy) return;
+    final range = _termRange;
+    if (_preview == null || _isBusy || range == null || !_termReady) return;
+    final preview = _preview!.withTerm(
+      semester: _semesterController.text.trim(),
+      startDate: range.start,
+      endDate: range.end,
+    );
 
     final isThai = AppLocalizations.of(context).isThai;
+    final rangeText =
+        '${formatDisplayDate(range.start, isThai)} – '
+        '${formatDisplayDate(range.end, isThai)}';
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
@@ -142,6 +188,13 @@ class _ScheduleImportScreenState extends State<ScheduleImportScreen> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Text(
+              isThai
+                  ? 'ภาคเรียน ${preview.semester} ใช้ตั้งแต่ $rangeText'
+                  : 'Semester ${preview.semester}, in use $rangeText',
+              style: const TextStyle(fontWeight: FontWeight.w700),
+            ),
+            const SizedBox(height: 10),
             Text(
               isThai
                   ? 'ระบบจะแทนที่ตารางเดิมเฉพาะ ${preview.roomCount} ห้อง'
@@ -269,6 +322,13 @@ class _ScheduleImportScreenState extends State<ScheduleImportScreen> {
               preview: preview,
               onChooseAnother: _chooseFile,
               onDownloadCsv: _downloadCsv,
+              termSection: _TermCard(
+                semesterController: _semesterController,
+                semesterValid: _semesterValid,
+                range: _termRange,
+                onSemesterChanged: () => setState(() {}),
+                onPickRange: _isBusy ? null : _pickTermRange,
+              ),
             ),
           if (_errorMessage != null) ...[
             const SizedBox(height: 14),
@@ -282,7 +342,7 @@ class _ScheduleImportScreenState extends State<ScheduleImportScreen> {
               minimum: const EdgeInsets.fromLTRB(18, 8, 18, 14),
               child: FilledButton.icon(
                 key: const Key('import-schedule-button'),
-                onPressed: _isBusy ? null : _confirmImport,
+                onPressed: _isBusy || !_termReady ? null : _confirmImport,
                 icon: _isImporting
                     ? const SizedBox(
                         width: 18,
@@ -294,7 +354,11 @@ class _ScheduleImportScreenState extends State<ScheduleImportScreen> {
                       )
                     : const Icon(Icons.cloud_upload_rounded),
                 label: Text(
-                  _isImporting ? 'Importing...' : 'Import Timetable',
+                  _isImporting
+                      ? 'Importing...'
+                      : _termReady
+                      ? 'Import Timetable'
+                      : 'Choose the semester dates first',
                 ),
               ),
             ),
@@ -422,11 +486,15 @@ class _PreviewContent extends StatelessWidget {
     required this.preview,
     required this.onChooseAnother,
     required this.onDownloadCsv,
+    required this.termSection,
   });
 
   final ScheduleImportPreview preview;
   final VoidCallback onChooseAnother;
   final VoidCallback onDownloadCsv;
+
+  /// ช่องกรอกภาคเรียนและช่วงวันที่ใช้ตาราง วางไว้ใต้ชื่อไฟล์
+  final Widget termSection;
 
   @override
   Widget build(BuildContext context) {
@@ -482,6 +550,8 @@ class _PreviewContent extends StatelessWidget {
             ],
           ),
         ),
+        const SizedBox(height: 12),
+        termSection,
         const SizedBox(height: 12),
         Row(
           children: [
@@ -619,6 +689,153 @@ class _PreviewContent extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// ภาคเรียนและวันเปิด-ปิดภาคของตารางที่จะนำเข้า
+///
+/// หนึ่งปีการศึกษามีหลายภาคเรียน ตารางแต่ละชุดจึงใช้ได้เฉพาะช่วงของมัน
+/// นอกช่วงนี้ระบบถือว่าไม่มีคาบเรียน (เช่นช่วงปิดภาค) และปิดแอร์ห้องว่างตามปกติ
+class _TermCard extends StatelessWidget {
+  const _TermCard({
+    required this.semesterController,
+    required this.semesterValid,
+    required this.range,
+    required this.onSemesterChanged,
+    required this.onPickRange,
+  });
+
+  final TextEditingController semesterController;
+  final bool semesterValid;
+  final DateTimeRange? range;
+  final VoidCallback onSemesterChanged;
+  final VoidCallback? onPickRange;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final palette = AppPalette.of(context);
+    final isThai = AppLocalizations.of(context).isThai;
+    final picked = range;
+    final showSemesterError =
+        semesterController.text.trim().isNotEmpty && !semesterValid;
+
+    return Container(
+      key: const Key('schedule-import-term'),
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: picked == null ? palette.warn : colors.outlineVariant,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.date_range_rounded, color: palette.accent, size: 22),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  context.tr('Period this timetable applies to'),
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            context.tr(
+              'Outside these dates the system treats every room as having no '
+              'classes, for example during the semester break.',
+            ),
+            style: TextStyle(
+              fontSize: 12,
+              height: 1.45,
+              color: colors.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: 14),
+          TextField(
+            key: const Key('schedule-import-semester'),
+            controller: semesterController,
+            onChanged: (_) => onSemesterChanged(),
+            keyboardType: TextInputType.datetime,
+            decoration: InputDecoration(
+              labelText: context.tr('Semester'),
+              hintText: isThai ? 'เช่น 1/2569' : 'e.g. 1/2569',
+              errorText: showSemesterError
+                  ? context.tr('Use semester/year, e.g. 1/2569')
+                  : null,
+              border: const OutlineInputBorder(),
+              isDense: true,
+            ),
+          ),
+          const SizedBox(height: 12),
+          OutlinedButton(
+            key: const Key('schedule-import-term-dates'),
+            onPressed: onPickRange,
+            style: OutlinedButton.styleFrom(
+              minimumSize: const Size.fromHeight(56),
+              alignment: Alignment.centerLeft,
+              padding: const EdgeInsets.symmetric(horizontal: 14),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.event_rounded,
+                  size: 20,
+                  color: picked == null ? palette.warn : palette.accent,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: picked == null
+                      ? Text(
+                          context.tr('Choose the first and last day'),
+                          style: TextStyle(
+                            color: palette.warn,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        )
+                      : Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              '${formatDisplayDate(picked.start, isThai)} – '
+                              '${formatDisplayDate(picked.end, isThai)}',
+                              style: TextStyle(
+                                color: colors.onSurface,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            Text(
+                              isThai
+                                  ? 'รวม ${picked.duration.inDays + 1} วัน'
+                                  : '${picked.duration.inDays + 1} days',
+                              style: TextStyle(
+                                color: colors.onSurfaceVariant,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                ),
+                Icon(
+                  Icons.chevron_right_rounded,
+                  color: colors.onSurfaceVariant,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

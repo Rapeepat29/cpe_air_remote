@@ -4,7 +4,7 @@
 .pub/
 build/
 coverage/
-pubspec.lock
+# pubspec.lock ต้อง commit ไว้ (แอปควรได้แพ็กเกจรุ่นเดียวกันทุกเครื่องที่ build)
 
 # IDE
 .idea/

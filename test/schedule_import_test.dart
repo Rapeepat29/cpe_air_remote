@@ -37,6 +37,19 @@ void main() {
     expect(preview.newRooms.single.roomNumber, 'CL503');
     expect(preview.newRooms.single.floorNumber, 0);
     expect(preview.toCommitJson()['createMissingRooms'], isTrue);
+    // ยังไม่ได้เลือกช่วงวัน = ไม่ส่งวันที่ไป (ทำงานแบบเดิม)
+    expect(preview.toCommitJson().containsKey('startDate'), isFalse);
+
+    final withTerm = preview.withTerm(
+      semester: '2/2569',
+      startDate: DateTime(2026, 11, 2),
+      endDate: DateTime(2027, 3, 5),
+    );
+    final json = withTerm.toCommitJson();
+    expect(json['semester'], '2/2569');
+    expect(json['startDate'], '2026-11-02');
+    expect(json['endDate'], '2027-03-05');
+    expect(json['createMissingRooms'], isTrue);
   });
 
   test('reads created rooms from a successful import result', () {

@@ -2,12 +2,21 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter/widgets.dart';
 
 import '../models/system_alert.dart';
+import '../theme/app_theme.dart';
 import '../utils/alert_preferences.dart';
 
+export '../theme/app_theme.dart' show AppThemeChoice;
+
 abstract interface class AppSettingsStore {
+  /// ค่าเปิด/ปิดโหมดมืดจากรุ่นก่อน v3.13 ใช้แปลงเป็นธีมใหม่ครั้งแรกเท่านั้น
   Future<bool> loadDarkMode();
 
   Future<void> saveDarkMode(bool enabled);
+
+  /// รหัสธีมที่เลือก (white / gray / black / green / system)
+  Future<String?> loadThemeCode();
+
+  Future<void> saveThemeCode(String code);
 
   Future<String?> loadLanguageCode();
 
@@ -32,6 +41,7 @@ class SecureAppSettingsStore implements AppSettingsStore {
   }) : _storage = storage ?? const FlutterSecureStorage();
 
   static const _darkModeKey = 'app_dark_mode';
+  static const _themeKey = 'app_theme';
   static const _languageCodeKey = 'app_language_code';
   static const _electricityRateKey = 'app_electricity_rate';
   static const _textScaleKey = 'app_text_scale';
@@ -50,6 +60,16 @@ class SecureAppSettingsStore implements AppSettingsStore {
       key: _darkModeKey,
       value: enabled.toString(),
     );
+  }
+
+  @override
+  Future<String?> loadThemeCode() {
+    return _storage.read(key: _themeKey);
+  }
+
+  @override
+  Future<void> saveThemeCode(String code) {
+    return _storage.write(key: _themeKey, value: code);
   }
 
   @override
@@ -158,13 +178,17 @@ class AppSettingsController extends ChangeNotifier {
   static const minimumElectricityRate = 0.01;
   static const maximumElectricityRate = 100.00;
 
-  bool _isDarkMode = false;
+  AppThemeChoice _theme = AppThemeChoice.white;
   AppLanguage _language = AppLanguage.thai;
   double _electricityRate = defaultElectricityRate;
   AppTextScale _textScale = AppTextScale.normal;
   AlertPreferences _alertPreferences = AlertPreferences.defaults();
 
-  bool get isDarkMode => _isDarkMode;
+  AppThemeChoice get themeChoice => _theme;
+
+  /// ธีมที่เลือกเป็นแบบพื้นเข้มหรือไม่ ("ตามเครื่อง" นับเป็นไม่ใช่)
+  bool get isDarkMode =>
+      _theme == AppThemeChoice.gray || _theme == AppThemeChoice.black;
 
   AppLanguage get language => _language;
 
@@ -199,9 +223,15 @@ class AppSettingsController extends ChangeNotifier {
 
   Future<void> initialize() async {
     try {
-      _isDarkMode = await _store.loadDarkMode();
+      final saved = AppThemeChoice.fromCode(await _store.loadThemeCode());
+      if (saved != null) {
+        _theme = saved;
+      } else if (await _store.loadDarkMode()) {
+        // ผู้ใช้รุ่นก่อนที่เปิดโหมดมืดไว้ ได้ธีมเทาซึ่งใกล้เคียงที่สุด
+        _theme = AppThemeChoice.gray;
+      }
     } catch (_) {
-      // Keep the light theme when its saved value is unavailable.
+      // Keep the white theme when its saved value is unavailable.
     }
 
     try {
@@ -236,16 +266,23 @@ class AppSettingsController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> setDarkMode(bool enabled) async {
-    if (_isDarkMode == enabled) {
+  /// สลับแบบเดิม (มืด/สว่าง) คงไว้ให้โค้ดที่ยังเรียกอยู่: มืด = เทา สว่าง = ขาว
+  Future<void> setDarkMode(bool enabled) {
+    return setTheme(enabled ? AppThemeChoice.gray : AppThemeChoice.white);
+  }
+
+  Future<void> setTheme(AppThemeChoice choice) async {
+    if (_theme == choice) {
       return;
     }
 
-    _isDarkMode = enabled;
+    _theme = choice;
     notifyListeners();
 
     try {
-      await _store.saveDarkMode(enabled);
+      await _store.saveThemeCode(choice.code);
+      // เก็บค่าแบบเดิมไว้ด้วย ถ้าย้อนไปลงแอปรุ่นก่อนจะยังได้โหมดใกล้เคียง
+      await _store.saveDarkMode(isDarkMode);
     } catch (_) {
       // The selected theme still applies for the current session.
     }
@@ -297,6 +334,23 @@ class AppSettingsController extends ChangeNotifier {
       await _store.saveAlertPreferences(next.encode());
     } catch (_) {
       // The selected switches still apply for the current session.
+    }
+  }
+
+  /// สวิตช์หลัก: เปิดหรือปิดการแจ้งเตือนทุกชนิดบนอุปกรณ์นี้
+  Future<void> setNotificationsEnabled(bool enabled) async {
+    if (_alertPreferences.enabled == enabled) {
+      return;
+    }
+
+    final next = _alertPreferences.withEnabled(enabled);
+    _alertPreferences = next;
+    notifyListeners();
+
+    try {
+      await _store.saveAlertPreferences(next.encode());
+    } catch (_) {
+      // The selected switch still applies for the current session.
     }
   }
 

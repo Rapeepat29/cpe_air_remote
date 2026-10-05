@@ -32,6 +32,8 @@ test('every table in schema.sql is parsed with its create statement', () => {
       'system_alerts',
       'energy_hourly',
       'system_settings',
+      'academic_terms',
+      'room_bookings',
     ],
   );
 
@@ -128,6 +130,12 @@ test('diff reports missing tables and missing columns separately', () => {
     ['system_settings', new Set(
       tables.get('system_settings').columns.map((c) => c.name),
     )],
+    ['academic_terms', new Set(
+      tables.get('academic_terms').columns.map((c) => c.name),
+    )],
+    ['room_bookings', new Set(
+      tables.get('room_bookings').columns.map((c) => c.name),
+    )],
     // occupancy_sensors หายไปทั้งตาราง เหมือนฐานข้อมูลที่ยังไม่ได้ migrate
   ]);
 
@@ -142,4 +150,16 @@ test('diff reports missing tables and missing columns separately', () => {
       column: { name: 'energy_kwh', definition: 'DECIMAL(12,3) NULL' },
     },
   ]);
+});
+
+test('SQL comments inside a table are not read as columns', () => {
+  const tables = parseSchemaTables(schemaSql);
+  for (const table of tables.values()) {
+    for (const column of table.columns) {
+      assert.doesNotMatch(column.name, /^--/, `${table.name} มีคอลัมน์ที่เป็นคอมเมนต์`);
+    }
+  }
+  const names = tables.get('air_conditioners').columns.map((c) => c.name);
+  assert.ok(names.includes('energy_chain_kwh'));
+  assert.ok(names.includes('history_pending'));
 });

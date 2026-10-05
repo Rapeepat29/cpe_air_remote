@@ -66,7 +66,7 @@ void main() {
     await tester.tap(find.widgetWithText(FilledButton, 'เข้าสู่ระบบ'));
     await tester.pumpAndSettle();
 
-    expect(find.text('CPE Green Office'), findsOneWidget);
+    expect(find.text('RMUTT Energy'), findsOneWidget);
     // ตัวเลขนี้มาจาก /api/energy/summary แล้ว ไม่ใช่ค่าตัวอย่างที่ฝังไว้
     expect(find.text('42.5'), findsOneWidget);
     expect(find.text('7 วันล่าสุด'), findsOneWidget);
@@ -91,7 +91,11 @@ void main() {
     final header = tester.widget<Container>(
       find.byKey(const Key('rooms-header')),
     );
-    expect(header.color, AppColors.primary);
+    // แถบหัวใช้สีของธีมที่เลือกอยู่ (ค่าเริ่มต้นคือธีมขาว)
+    expect(
+      header.color,
+      AppPalette.of(tester.element(find.byKey(const Key('rooms-header')))).bar,
+    );
     // ชื่อเรื่องอยู่ใน Expanded ขอบขวาจึงชนขอบซ้ายของปุ่มพอดีเสมอ
     // สิ่งที่ต้องกันคือชื่อเรื่องล้นไปทับปุ่ม ไม่ใช่ต้องมีช่องว่างคั่น
     expect(titleBounds.right, lessThanOrEqualTo(settingsBounds.left));
@@ -184,7 +188,9 @@ void main() {
 
     expect(find.byType(ApplicationSettingsScreen), findsOneWidget);
     expect(find.text('ภาษาไทย'), findsOneWidget);
-    expect(find.text('โหมดมืด'), findsOneWidget);
+    expect(find.text('ธีมสี'), findsOneWidget);
+    // ธีมเป็นแถวเดียว กดแล้วค่อยเปิดแผ่นเลือกธีม
+    expect(find.byKey(const Key('theme-row')), findsOneWidget);
     // ตั้งแต่ v3.10.0 หน้านี้มีหมวดขนาดตัวอักษรและหมวดแจ้งเตือนเพิ่มมา
     // ทั้งสองหมวดต้องเป็นภาษาไทยตามภาษาที่เลือกอยู่
     expect(find.text('ขนาดตัวอักษร'), findsWidgets);
@@ -196,19 +202,26 @@ void main() {
 
     expect(find.text('Application Settings'), findsOneWidget);
     expect(find.text('English'), findsOneWidget);
-    expect(find.text('Dark mode'), findsOneWidget);
+    expect(find.text('Theme colors'), findsOneWidget);
     // สลับเป็นอังกฤษแล้วหมวดใหม่ต้องสลับตามด้วย ไม่ใช่ค้างเป็นไทย
-    expect(find.text('NOTIFICATIONS'), findsOneWidget);
+    expect(find.text('Notifications'), findsOneWidget);
     expect(find.textContaining('การแจ้งเตือน'), findsNothing);
     expect(settingsStore.languageCode, 'en');
 
-    await tester.tap(find.byKey(const Key('dark-mode-switch')));
+    await tester.tap(find.byKey(const Key('theme-row')));
+    await tester.pumpAndSettle();
+    expect(find.text('Choose a theme'), findsOneWidget);
+    expect(find.text('Match phone'), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('theme-option-gray')));
     await tester.pumpAndSettle();
 
     final settingsContext = tester.element(
       find.byType(ApplicationSettingsScreen),
     );
     expect(Theme.of(settingsContext).brightness, Brightness.dark);
+    expect(settingsStore.themeCode, 'gray');
+    // ค่าแบบเดิมยังถูกเก็บด้วย เผื่อย้อนไปลงแอปรุ่นก่อน
     expect(settingsStore.darkMode, isTrue);
 
     await tester.pageBack();
@@ -498,6 +511,15 @@ class _MemorySystemSettingsRepository implements SystemSettingsRepository {
 
 class _MemoryAppSettingsStore implements AppSettingsStore {
   bool darkMode = false;
+  String? themeCode;
+
+  @override
+  Future<String?> loadThemeCode() async => themeCode;
+
+  @override
+  Future<void> saveThemeCode(String code) async {
+    themeCode = code;
+  }
   String? languageCode;
   double? electricityRate;
 
@@ -770,6 +792,7 @@ class _FakeAuthRepository implements AuthRepository {
     required String lastName,
     required String email,
     required String phone,
+    String? currentPassword,
   }) async {
     return AuthUser(
       username: 'admin',

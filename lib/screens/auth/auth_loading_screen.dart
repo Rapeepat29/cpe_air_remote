@@ -10,13 +10,17 @@ class AuthLoadingScreen extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
-              Icons.energy_savings_leaf_rounded,
-              size: 64,
-              color: Color(0xFF16834B),
+            Image.asset(
+              'assets/brand/rmutt_save_energy_icon.png',
+              width: 72,
+              height: 72,
+              filterQuality: FilterQuality.medium,
+              semanticLabel: 'RMUTT Save Energy',
             ),
             const SizedBox(height: 20),
-            const CircularProgressIndicator(color: Color(0xFF16834B)),
+            CircularProgressIndicator(
+              color: Theme.of(context).colorScheme.primary,
+            ),
             const SizedBox(height: 14),
             Text(
               context.tr('Checking your session...'),

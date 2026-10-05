@@ -293,6 +293,28 @@
   color: var(--text-low);
 }
 
+/* ช่องวันที่/เวลาบน iOS Safari มีความกว้างขั้นต่ำในตัวเอง ไม่ฟัง width: 100%
+   จึงล้นกรอบการ์ดบนมือถือ และจัดตัวหนังสือไว้กลางช่อง
+   @supports นี้จริงเฉพาะ Safari บน iPhone/iPad เบราว์เซอร์อื่นไม่โดน */
+@supports (-webkit-touch-callout: none) {
+  input[type='date'],
+  input[type='time'],
+  input[type='datetime-local'] {
+    -webkit-appearance: none;
+    appearance: none;
+    display: block;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  input[type='date']::-webkit-date-and-time-value,
+  input[type='time']::-webkit-date-and-time-value,
+  input[type='datetime-local']::-webkit-date-and-time-value {
+    text-align: left;
+    margin: 0;
+  }
+}
+
 /* iOS ซูมหน้าจอเองเมื่อแตะช่องกรอกที่ตัวหนังสือเล็กกว่า 16px
    ทำให้หน้าเลื่อนไปมาจนงง จึงบังคับขั้นต่ำไว้บนจอสัมผัส */
 @media (pointer: coarse) {
@@ -841,6 +863,60 @@ table.data.sticky-first tfoot td:first-child {
   }
 }
 
+/* ---------- จุดเลือกธีมบนแถบบน ---------- */
+.theme-dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  padding: 0 3px;
+  height: var(--tap);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--hairline);
+  background: var(--panel);
+}
+
+.theme-dot {
+  width: 32px;
+  height: 100%;
+  border: none;
+  background: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.theme-dot > span {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid rgba(127, 127, 127, 0.5);
+  transition: transform 0.12s;
+}
+
+.theme-dot:hover > span {
+  transform: scale(1.12);
+}
+
+/* วงแหวนสองชั้น: ชั้นในสีพื้นการ์ด ชั้นนอกสีเน้น เห็นชัดทั้งจุดขาวและจุดดำ */
+.theme-dot.sel > span {
+  box-shadow: 0 0 0 2px var(--panel), 0 0 0 4px var(--accent);
+}
+
+@media (pointer: coarse) {
+  .theme-dot {
+    width: 38px;
+  }
+}
+
+/* มือถือ: แถบบนเลื่อนซ้ายขวาได้ จุดธีมจะโดนตัดครึ่งที่ขอบจอ
+   จึงซ่อนไว้ ไปเลือกธีมที่ เมนู → ตั้งค่า แทน */
+@media (max-width: 820px) {
+  .topbar .theme-dots {
+    display: none;
+  }
+}
+
 /* ---------- หน้าเข้าสู่ระบบ ---------- */
 .login-screen {
   position: fixed;
@@ -872,8 +948,28 @@ table.data.sticky-first tfoot td:first-child {
 .login-brand {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   margin-bottom: 24px;
+}
+
+.login-brand .brand-mark {
+  width: 52px;
+  height: 52px;
+  box-shadow: none;
+}
+
+/* การ์ดเข้าสู่ระบบเป็นพื้นการ์ด ไม่ใช่พื้นเมนูข้าง จึงใช้สีตัวหนังสือปกติ */
+.login-brand .wordmark-name {
+  color: var(--text-hi);
+}
+
+.login-brand .wordmark-name b,
+.login-brand .wordmark-tag {
+  color: var(--accent);
+}
+
+.login-brand .user-role {
+  margin-top: 4px;
 }
 
 .login-error {
@@ -976,4 +1072,231 @@ table.data.sticky-first tfoot td:first-child {
 .status-chip.info {
   color: var(--info);
   background: var(--info-soft);
+}
+
+/* ---------------------------------------------------------------- ช่องวันที่ พ.ศ.
+   ใช้แทน input type=date ของเบราว์เซอร์ซึ่งแสดงปี ค.ศ. (ดู thai-date-input.js) */
+.thai-date {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+}
+
+.thai-date input {
+  flex: 1;
+  min-width: 0;
+  background: var(--panel-raised);
+  border: 1px solid var(--hairline);
+  border-right: 0;
+  border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+  color: var(--text-hi);
+  min-height: var(--tap);
+  padding: 8px 12px;
+  font-size: var(--fs-sm);
+  line-height: 1.4;
+  outline: none;
+  font-variant-numeric: tabular-nums;
+}
+
+.thai-date input:focus {
+  border-color: var(--accent);
+  box-shadow: var(--focus-ring);
+}
+
+.thai-date.invalid input {
+  border-color: var(--bad, #d9534f);
+}
+
+.thai-date-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--tap);
+  background: var(--panel-raised);
+  border: 1px solid var(--hairline);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  color: var(--text-mid);
+  cursor: pointer;
+}
+
+.thai-date-btn:hover {
+  color: var(--accent);
+}
+
+.thai-date-pop {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 60;
+  width: 288px;
+  max-width: calc(100vw - 32px);
+  padding: 10px;
+  background: var(--panel-raised);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-md);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
+}
+
+.thai-date-head {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+
+.thai-date-title {
+  flex: 1;
+  text-align: center;
+  font-weight: 700;
+  color: var(--text-hi);
+}
+
+.thai-date-nav {
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-hi);
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.thai-date-nav:hover {
+  background: var(--accent-soft);
+}
+
+.thai-date-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 2px;
+  text-align: center;
+}
+
+.thai-date-grid.weekdays span {
+  font-size: var(--fs-xs);
+  color: var(--text-low);
+  padding: 4px 0;
+}
+
+.thai-date-day {
+  aspect-ratio: 1;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-hi);
+  font-size: var(--fs-sm);
+  cursor: pointer;
+  font-variant-numeric: tabular-nums;
+}
+
+.thai-date-day:hover:not(:disabled) {
+  background: var(--accent-soft);
+}
+
+.thai-date-day.today {
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+.thai-date-day.selected {
+  background: var(--accent);
+  color: var(--on-accent, #fff);
+  font-weight: 700;
+}
+
+.thai-date-day:disabled {
+  color: var(--text-low);
+  opacity: 0.4;
+  cursor: default;
+}
+
+@media (pointer: coarse) {
+  .thai-date input {
+    font-size: max(16px, var(--fs-sm));
+  }
+}
+
+/* ---------------------------------------------------------------- เลือกช่วงวันเอง (หน้าภาพรวม)
+   อยู่ใต้ปุ่ม วันนี้ / 7 วัน / 30 วัน ในการ์ดใหญ่ */
+.tab.small svg {
+  flex: none;
+}
+
+.tab.open:not(.active) {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.hero-range {
+  margin-top: 10px;
+  padding: 12px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-md);
+  background: var(--panel);
+  position: relative;
+  z-index: 1;
+}
+
+.hero-range[hidden] {
+  display: none;
+}
+
+.hero-range-fields {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.hero-range-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1 1 170px;
+  min-width: 0;
+}
+
+.hero-range-field > span {
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--text-mid);
+}
+
+.hero-range-actions {
+  display: flex;
+  gap: 8px;
+  flex: none;
+  margin-left: auto;
+}
+
+.hero-range-actions .btn {
+  min-height: var(--tap);
+}
+
+.hero-range-msg {
+  margin-top: 8px;
+  font-size: var(--fs-xs);
+  color: var(--text-low);
+}
+
+.hero-range-msg.error {
+  color: var(--bad, #d9534f);
+  font-weight: 600;
+}
+
+/* การ์ดใหญ่ตัดขอบ (overflow: hidden) ปฏิทินจึงเปิดขึ้นด้านบนแทน */
+.hero-range .thai-date-pop {
+  top: auto;
+  bottom: calc(100% + 6px);
+}
+
+@media (max-width: 520px) {
+  .hero-range-actions {
+    width: 100%;
+  }
+
+  .hero-range-actions .btn {
+    flex: 1;
+  }
 }

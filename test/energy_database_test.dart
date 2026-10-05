@@ -250,6 +250,14 @@ class _MemorySettingsStore implements AppSettingsStore {
   @override
   Future<void> saveDarkMode(bool enabled) async => _darkMode = enabled;
 
+  String? _themeCode;
+
+  @override
+  Future<String?> loadThemeCode() async => _themeCode;
+
+  @override
+  Future<void> saveThemeCode(String code) async => _themeCode = code;
+
   @override
   Future<String?> loadLanguageCode() async => _languageCode;
 

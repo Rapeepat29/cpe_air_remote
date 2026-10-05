@@ -186,6 +186,21 @@ export function thaiShortDate(value) {
   return `${date.getDate()} ${month} ${String((date.getFullYear() + 543) % 100).padStart(2, '0')}`;
 }
 
+/**
+ * วันที่ย่อแบบปีเต็ม เช่น 25 ส.ค. 2569
+ *
+ * รับ YYYY-MM-DD ของ Backend ได้ตรง ๆ โดยอ่านเป็นวันท้องถิ่น
+ * (new Date('2026-08-25') ตีเป็นเที่ยงคืน UTC ซึ่งบางเขตเวลาเลื่อนไปเป็นวันก่อน)
+ */
+export function thaiDate(value) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(value ?? ''));
+  const date = match
+    ? new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]))
+    : toDate(value);
+  if (!date) return value ? String(value) : '—';
+  return `${date.getDate()} ${thaiMonthsShort[date.getMonth()]} ${date.getFullYear() + 543}`;
+}
+
 /** เวลาที่ผ่านมาแล้ว เช่น 5 นาทีที่แล้ว */
 export function relativeTime(value) {
   const date = toDate(value);
@@ -234,6 +249,7 @@ const ALERT_DETAIL_TEXT = {
   noClassNow: 'มีคนอยู่ในห้องและแอร์ทำงานอยู่ แต่ช่วงเวลานี้ไม่มีคาบเรียน',
   noScheduleAtAll:
     'มีคนอยู่ในห้องและแอร์ทำงานอยู่ แต่ห้องนี้ยังไม่มีตารางเรียนในระบบ',
+  outsideTerm: 'มีคนอยู่ในห้องและแอร์ทำงานอยู่ ระหว่างช่วงปิดภาคเรียน',
 };
 
 /** ดึงจำนวนครั้งจากรายละเอียดรูปแบบ "attempts=3" ที่ระบบปิดอัตโนมัติใส่มา */

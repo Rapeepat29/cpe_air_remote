@@ -14,6 +14,43 @@ SystemAlert _alert(String id, SystemAlertKind kind) {
 }
 
 void main() {
+  group('AppThemeChoice', () {
+    test('รหัสที่บันทึกไว้อ่านกลับมาได้ครบทุกธีม', () {
+      for (final choice in AppThemeChoice.values) {
+        expect(AppThemeChoice.fromCode(choice.code), choice);
+      }
+      expect(AppThemeChoice.fromCode('purple'), isNull);
+    });
+
+    test('ยังไม่เคยเลือกอะไรได้ธีมขาว', () async {
+      final controller = AppSettingsController(store: _MemoryStore());
+      await controller.initialize();
+
+      expect(controller.themeChoice, AppThemeChoice.white);
+      expect(controller.isDarkMode, isFalse);
+    });
+
+    test('ผู้ใช้รุ่นก่อนที่เปิดโหมดมืดไว้ ได้ธีมเทา', () async {
+      final store = _MemoryStore();
+      await store.saveDarkMode(true);
+      final controller = AppSettingsController(store: store);
+      await controller.initialize();
+
+      expect(controller.themeChoice, AppThemeChoice.gray);
+      expect(controller.isDarkMode, isTrue);
+    });
+
+    test('ธีมที่เลือกถูกบันทึกและอ่านกลับมาได้', () async {
+      final store = _MemoryStore();
+      await AppSettingsController(store: store).setTheme(AppThemeChoice.green);
+
+      final reloaded = AppSettingsController(store: store);
+      await reloaded.initialize();
+      expect(reloaded.themeChoice, AppThemeChoice.green);
+      expect(reloaded.isDarkMode, isFalse);
+    });
+  });
+
   group('AppTextScale', () {
     test('รหัสที่ไม่รู้จักหรือว่างเปล่าถอยไปขนาดปกติ', () {
       expect(AppTextScale.fromCode(null), AppTextScale.normal);
@@ -75,7 +112,7 @@ void main() {
       expect(prefs.pushesToPhone(SystemAlertKind.autoOffFailed), isTrue);
     });
 
-    test('กรองรายการที่แสดงและรายการที่เด้งแยกกัน', () {
+    test('ในแอปแสดงครบทุกใบเสมอ ส่วนที่เด้งตามที่ผู้ใช้เลือก', () {
       final prefs = AlertPreferences.defaults()
           .withChannels(
             SystemAlertKind.autoOffSucceeded,
@@ -83,6 +120,7 @@ void main() {
           )
           .withChannels(
             SystemAlertKind.outsideScheduleOccupied,
+            // ค่า inApp ที่เป็น false ต้องไม่มีผล เพราะผู้ใช้ปิดรายการในแอปไม่ได้
             const AlertChannels(inApp: false, push: false),
           );
 
@@ -92,7 +130,7 @@ void main() {
         _alert('c', SystemAlertKind.autoOffFailed),
       ];
 
-      expect(prefs.visible(alerts).map((a) => a.id), ['b', 'c']);
+      expect(prefs.visible(alerts).map((a) => a.id), ['a', 'b', 'c']);
       expect(prefs.pushable(alerts).map((a) => a.id), ['c']);
     });
 
@@ -112,7 +150,7 @@ void main() {
     test('บันทึกแล้วอ่านกลับได้เหมือนเดิม', () {
       final prefs = AlertPreferences.defaults().withChannels(
         SystemAlertKind.autoOffFailed,
-        const AlertChannels(inApp: false, push: false),
+        const AlertChannels(inApp: true, push: false),
       );
 
       expect(AlertPreferences.decode(prefs.encode()), prefs);
@@ -131,9 +169,39 @@ void main() {
         '{"autoOffFailed":{"inApp":false,"push":false}}',
       );
 
-      expect(prefs.showsInApp(SystemAlertKind.autoOffFailed), isFalse);
+      // ค่า inApp เก่าที่เคยปิดไว้ถูกทิ้ง ในแอปแสดงเสมอ แต่ค่าเด้งยังจำไว้
+      expect(prefs.showsInApp(SystemAlertKind.autoOffFailed), isTrue);
+      expect(prefs.pushesToPhone(SystemAlertKind.autoOffFailed), isFalse);
       expect(prefs.showsInApp(SystemAlertKind.autoOffSucceeded), isTrue);
       expect(prefs.pushesToPhone(SystemAlertKind.autoOffSucceeded), isTrue);
+    });
+
+    test('ปิดสวิตช์หลักแล้วไม่แจ้งเตือนเลย แต่ยังจำค่ารายประเภทไว้', () {
+      final prefs = AlertPreferences.defaults().withEnabled(false);
+      final alerts = [
+        _alert('a', SystemAlertKind.outsideScheduleOccupied),
+        _alert('b', SystemAlertKind.autoOffFailed),
+      ];
+
+      expect(prefs.pushable(alerts), isEmpty);
+      expect(prefs.visible(alerts).map((a) => a.id), ['a', 'b']);
+      expect(prefs.typeSelected(SystemAlertKind.autoOffFailed), isTrue);
+      expect(
+        prefs.withEnabled(true).pushable(alerts).map((a) => a.id),
+        ['a', 'b'],
+      );
+    });
+
+    test('สวิตช์หลักบันทึกแล้วอ่านกลับได้ ข้อมูลรุ่นก่อนถือว่าเปิด', () {
+      final off = AlertPreferences.defaults().withEnabled(false);
+
+      expect(AlertPreferences.decode(off.encode()), off);
+      expect(
+        AlertPreferences.decode(
+          '{"autoOffFailed":{"inApp":true,"push":true}}',
+        ).enabled,
+        isTrue,
+      );
     });
   });
 
@@ -186,6 +254,22 @@ void main() {
       );
     });
 
+    test('สวิตช์หลักของการแจ้งเตือนกลับมาหลังเปิดแอปใหม่', () async {
+      final store = _MemoryStore();
+      final first = AppSettingsController(store: store);
+      await first.initialize();
+      await first.setNotificationsEnabled(false);
+
+      final second = AppSettingsController(store: store);
+      await second.initialize();
+
+      expect(second.alertPreferences.enabled, isFalse);
+      expect(
+        second.alertPreferences.pushesToPhone(SystemAlertKind.autoOffFailed),
+        isFalse,
+      );
+    });
+
     test('ตั้งค่าเดิมซ้ำไม่แจ้งผู้ฟัง จะได้ไม่วาดใหม่เปล่า ๆ', () async {
       final controller = AppSettingsController(store: _MemoryStore());
       await controller.initialize();
@@ -214,6 +298,14 @@ class _MemoryStore implements AppSettingsStore {
 
   @override
   Future<void> saveDarkMode(bool enabled) async => _darkMode = enabled;
+
+  String? _themeCode;
+
+  @override
+  Future<String?> loadThemeCode() async => _themeCode;
+
+  @override
+  Future<void> saveThemeCode(String code) async => _themeCode = code;
 
   @override
   Future<String?> loadLanguageCode() async => _languageCode;

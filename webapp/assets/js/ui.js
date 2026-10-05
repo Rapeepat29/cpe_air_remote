@@ -2,6 +2,7 @@
 
 import { el, replace, append } from './dom.js';
 import { icons } from './icons.js';
+import { thaiDateInput } from './thai-date-input.js';
 
 let stack = null;
 
@@ -149,6 +150,15 @@ export function openForm({
             }),
           ),
         );
+      } else if (field.type === 'date') {
+        // ช่องวันที่ของเบราว์เซอร์แสดง ค.ศ. ใช้ช่องของเราที่แสดง พ.ศ. แทน
+        // ค่าที่อ่านได้ยังเป็น YYYY-MM-DD เหมือนเดิม
+        input = thaiDateInput({
+          name: field.name,
+          value: field.value ?? '',
+          min: field.min ?? '',
+          max: field.max ?? '',
+        });
       } else if (field.type === 'textarea') {
         input = el('textarea', { name: field.name, rows: field.rows ?? 3 });
         input.value = field.value ?? '';

@@ -99,19 +99,27 @@ class _OccupancyProvisioningScreenState
                   'Turn on the occupancy ESP32 in setup mode. Its name must start with RMUTT-OCC-.',
                 ),
               ),
-            ..._devices.map(
-              (candidate) => RadioListTile<BleDeviceCandidate>(
-                value: candidate,
-                groupValue: _selectedDevice,
-                onChanged: _isReadingIdentity || _isSaving
-                    ? null
-                    : (value) => _selectDevice(value!),
-                title: Text(
-                  candidate.name,
-                  style: const TextStyle(fontWeight: FontWeight.w800),
-                ),
-                subtitle: Text('RSSI ${candidate.rssi} dBm'),
-                secondary: const Icon(Icons.radar_rounded),
+            // Flutter 3.35 ขึ้นไปให้ RadioGroup ถือค่าที่เลือก แทน groupValue ของแต่ละปุ่ม
+            RadioGroup<BleDeviceCandidate>(
+              groupValue: _selectedDevice,
+              onChanged: (value) {
+                if (value == null || _isReadingIdentity || _isSaving) return;
+                _selectDevice(value);
+              },
+              child: Column(
+                children: [
+                  for (final candidate in _devices)
+                    RadioListTile<BleDeviceCandidate>(
+                      value: candidate,
+                      enabled: !(_isReadingIdentity || _isSaving),
+                      title: Text(
+                        candidate.name,
+                        style: const TextStyle(fontWeight: FontWeight.w800),
+                      ),
+                      subtitle: Text('RSSI ${candidate.rssi} dBm'),
+                      secondary: const Icon(Icons.radar_rounded),
+                    ),
+                ],
               ),
             ),
             if (_isReadingIdentity)

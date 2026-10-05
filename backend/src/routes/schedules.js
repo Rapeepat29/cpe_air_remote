@@ -20,6 +20,13 @@ import {
   readTimetableInfo,
   recordTimetableImport,
 } from '../services/system-settings.js';
+import {
+  clearTermCache,
+  deleteTerm,
+  readCalendar,
+  upsertTerm,
+  validateTermInput,
+} from '../services/academic-terms.js';
 
 export const schedulesRouter = express.Router();
 
@@ -64,11 +71,41 @@ schedulesRouter.post(
   }),
 );
 
+// ---------------------------------------------------------------- ปฏิทินภาคเรียน
+// ต้องประกาศก่อน /:id ไม่งั้น PUT /terms จะถูกจับเป็นแก้คาบเรียน id = "terms"
+
+schedulesRouter.get(
+  '/terms',
+  asyncHandler(async (request, response) => {
+    response.json(await readCalendar());
+  }),
+);
+
+schedulesRouter.put(
+  '/terms',
+  requireAdmin,
+  asyncHandler(async (request, response) => {
+    const term = await upsertTerm(request.body, request.authUser.username);
+    response.json({ term });
+  }),
+);
+
+schedulesRouter.delete(
+  '/terms',
+  requireAdmin,
+  asyncHandler(async (request, response) => {
+    await deleteTerm(request.query.semester);
+    response.status(204).end();
+  }),
+);
+
 schedulesRouter.post(
   '/import/commit',
   requireAdmin,
   asyncHandler(async (request, response) => {
     const input = validateScheduleImportPayload(request.body);
+    const term = readImportTerm(request.body, input.semester);
+    if (term) input.semester = term.semester;
     let createdRooms = [];
     let removedCount = 0;
 
@@ -118,6 +155,12 @@ schedulesRouter.post(
         );
       }
 
+      // ช่วงวันที่ใช้ตารางชุดนี้ (วันเปิด-ปิดภาคเรียน) บันทึกพร้อมกันในรายการเดียว
+      // ถ้าบันทึกไม่ผ่าน ตารางที่นำเข้าก็ถูกยกเลิกทั้งหมด ไม่มีตารางที่ไม่รู้ช่วงเวลา
+      if (term) {
+        await upsertTerm(term, request.authUser.username, connection);
+      }
+
       await recordTimetableImport(
         {
           semester: input.semester,
@@ -127,6 +170,8 @@ schedulesRouter.post(
         connection,
       );
     });
+    // ภาคเรียนของตารางอาจเปลี่ยน วันเปิด-ปิดที่ใช้ตัดสินต้องอ่านใหม่
+    clearTermCache();
 
     response.status(201).json({
       result: {
@@ -136,10 +181,25 @@ schedulesRouter.post(
         replacedAll: input.replaceAll,
         removedCount,
         semester: input.semester,
+        term,
       },
     });
   }),
 );
+
+/**
+ * ภาคเรียนและวันเปิด-ปิดภาคที่ส่งมากับการนำเข้า
+ *
+ * แอปรุ่นเดิมไม่ส่งวันที่มา คืน null แล้วระบบทำงานแบบเดิม (ใช้ภาคเรียนจากไฟล์)
+ * ถ้าส่งวันมา ต้องมีครบทั้งสองวันและมีภาคเรียน ไม่งั้นตอบ 400
+ */
+function readImportTerm(body, fileSemester) {
+  const startDate = String(body?.startDate ?? '').trim();
+  const endDate = String(body?.endDate ?? '').trim();
+  if (!startDate && !endDate) return null;
+  const semester = String(body?.semester ?? '').trim() || fileSemester;
+  return validateTermInput({ semester, startDate, endDate });
+}
 
 schedulesRouter.get(
   '/',
@@ -227,6 +287,7 @@ schedulesRouter.delete(
       deletedCount = await deleteAllSchedules(connection);
       await clearTimetableInfo(connection);
     });
+    clearTermCache();
     response.json({
       result: {
         deletedCount,

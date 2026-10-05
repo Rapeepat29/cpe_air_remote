@@ -3,7 +3,10 @@ import {
   AUTO_OFF_MAX_ATTEMPTS,
   decideAutoOff,
 } from '../utils/auto-off.js';
-import { evaluateClassSchedule } from '../utils/class-schedule.js';
+import { bangkokDate, evaluateClassSchedule } from '../utils/class-schedule.js';
+import { readActiveTermGate } from './academic-terms.js';
+import { readTodayBookings } from './room-bookings.js';
+import { withBookings } from '../utils/room-booking.js';
 import { ALERT_KINDS, raiseAlert, resolveOpenAlerts } from './alerts.js';
 import { onAirStatus, onOccupancyStatus, publishAirCommand } from './mqtt.js';
 import { isAutoOffEnabled } from './system-settings.js';
@@ -316,7 +319,9 @@ async function applyNotificationRules({ row, occupancy, schedule }) {
       roomNumber: row.room_number,
       deviceId: row.device_id,
       deviceName: row.name,
-      detail: schedule.configured ? 'noClassNow' : 'noScheduleAtAll',
+      detail: schedule.termStatus === 'before' || schedule.termStatus === 'after'
+        ? 'outsideTerm'
+        : schedule.configured ? 'noClassNow' : 'noScheduleAtAll',
     });
     return;
   }
@@ -335,7 +340,11 @@ async function readSchedule(roomNumber, now) {
       WHERE room_number = ?`,
     [roomNumber],
   );
-  return evaluateClassSchedule(rows, now);
+  // นอกวันเปิด-ปิดภาคเรียน ทุกห้องถือว่าอยู่นอกคาบ (ดู services/academic-terms.js)
+  const term = await readActiveTermGate();
+  // การจองห้อง (ประชุม สอบ กิจกรรม) ที่กำลังเกิดขึ้น ถือว่าห้องอยู่ในคาบด้วย
+  const bookings = await readTodayBookings(roomNumber, bangkokDate(now));
+  return withBookings(evaluateClassSchedule(rows, now, { term }), bookings, now);
 }
 
 function parseState(value) {

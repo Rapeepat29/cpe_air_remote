@@ -739,15 +739,15 @@ Setup Mode แล้วเลือก `ตั้งค่าใหม่ผ่�
 ตัวเลือกเพิ่มเติม:
 
 ```powershell
-.\deploy\update-server.ps1 -VpsIp 157.85.105.137   # เปลี่ยน IP ปลายทาง
+.\deploy\update-server.ps1 -Server <IP-เซิร์ฟเวอร์>  # เปลี่ยนเครื่องปลายทาง
 .\deploy\update-server.ps1 -SkipUpload             # รันขั้นบนเซิร์ฟเวอร์ซ้ำ
 ```
 
 ถ้ามีปัญหา ดู log ด้วย:
 
 ```powershell
-ssh root@157.85.105.137 "cd /opt/rmutt && docker compose logs --tail 80 backend"
-ssh root@157.85.105.137 "cd /opt/rmutt && docker compose ps"
+ssh <user>@<IP-เซิร์ฟเวอร์> "cd /opt/rmutt && docker compose logs --tail 80 backend"
+ssh <user>@<IP-เซิร์ฟเวอร์> "cd /opt/rmutt && docker compose ps"
 ```
 
 > ครั้งแรกสุด (เซิร์ฟเวอร์เปล่า) ให้ใช้ `deploy/setup-vps.sh` กับ

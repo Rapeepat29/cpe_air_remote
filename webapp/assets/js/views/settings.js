@@ -10,7 +10,8 @@ import { api } from '../api.js';
 import { el, replace, svg, toggle } from '../dom.js';
 import { relativeTime, time } from '../format.js';
 import { icons } from '../icons.js';
-import { THEMES, TEXT_SIZES, prefs, setTextSize, setTheme } from '../prefs.js';
+import { TEXT_SIZES, prefs, setTextSize } from '../prefs.js';
+import { THEME_CHOICES, setTheme, themeChoice } from '../theme.js';
 import { loaders, refreshAll, state } from '../store.js';
 import { confirmAction, openForm, toastError, toastOk } from '../ui.js';
 
@@ -66,15 +67,15 @@ function displayCard(onChanged) {
       'การแสดงผล',
       el('span', { class: 'count-badge', text: 'มีผลเฉพาะเครื่องนี้' }),
     ]),
-    el('div', { class: 'pref-row' }, [
+    el('div', { class: 'pref-row pref-row-stack' }, [
       el('div', {}, [
         el('div', { class: 'label', text: 'ธีมสี' }),
         el('div', {
           class: 'sub',
-          text: 'ธีมสว่างอ่านง่ายกว่าในห้องที่แสงจ้า ธีมมืดสบายตากว่าตอนกลางคืน',
+          text: 'สีทั้งหมดมาจากโลโก้ เลือกได้ตามสภาพแสงของห้อง',
         }),
       ]),
-      segmented(THEMES, prefs.theme, setTheme),
+      themeChooser(onChanged),
     ]),
     el('div', { class: 'pref-row' }, [
       el('div', {}, [
@@ -87,6 +88,51 @@ function displayCard(onChanged) {
       segmented(TEXT_SIZES, prefs.textSize, setTextSize),
     ]),
   ]);
+}
+
+/** การ์ดเลือกธีม: ตัวอย่างสีเล็ก ๆ ของแต่ละธีมให้เห็นก่อนกด */
+function themeChooser(onChanged) {
+  const current = themeChoice();
+  return el(
+    'div',
+    { class: 'theme-choices', role: 'radiogroup', 'aria-label': 'ธีมสี' },
+    THEME_CHOICES.map((theme) => {
+      const selected = theme.key === current;
+      const preview =
+        theme.key === 'auto'
+          ? el('span', { class: 'theme-preview auto' }, [
+              el('span', { class: 'half', dataset: { palette: 'white' } }),
+              el('span', { class: 'half', dataset: { palette: 'gray' } }),
+            ])
+          : el('span', { class: 'theme-preview', dataset: { palette: theme.key } }, [
+              el('span', { class: 'tp-side' }),
+              el('span', { class: 'tp-body' }, [
+                el('span', { class: 'tp-card' }, [
+                  el('span', { class: 'tp-line accent' }),
+                  el('span', { class: 'tp-line' }),
+                ]),
+              ]),
+            ]);
+      return el(
+        'button',
+        {
+          class: `theme-choice${selected ? ' sel' : ''}`,
+          type: 'button',
+          role: 'radio',
+          'aria-checked': selected ? 'true' : 'false',
+          onclick: () => {
+            setTheme(theme.key);
+            onChanged();
+          },
+        },
+        [
+          preview,
+          el('span', { class: 'theme-choice-name', text: theme.label }),
+          el('span', { class: 'theme-choice-desc', text: theme.desc }),
+        ],
+      );
+    }),
+  );
 }
 
 function autoOffCard(isAdmin) {
@@ -215,11 +261,27 @@ async function editProfile(update) {
         required: true,
       },
       { name: 'phone', label: 'เบอร์โทร', value: user.phone },
+      {
+        name: 'currentPassword',
+        label: 'รหัสผ่านปัจจุบัน (กรอกเฉพาะตอนเปลี่ยนอีเมล)',
+        type: 'password',
+        autocomplete: 'current-password',
+        hint: 'OTP ลืมรหัสผ่านจะส่งไปที่อีเมลนี้ จึงต้องยืนยันด้วยรหัสผ่านก่อนเปลี่ยน',
+      },
     ],
   });
   if (!values) return;
+  const { currentPassword, ...profile } = values;
+  const emailChanged =
+    profile.email.toLowerCase() !== String(user.email ?? '').toLowerCase();
+  if (emailChanged && !currentPassword) {
+    toastError('เปลี่ยนอีเมลต้องกรอกรหัสผ่านปัจจุบันด้วย');
+    return;
+  }
   try {
-    const updated = await api.updateProfile(values);
+    const updated = await api.updateProfile(
+      emailChanged ? { ...profile, currentPassword } : profile,
+    );
     state.user = updated;
     toastOk('บันทึกข้อมูลแล้ว');
     update();

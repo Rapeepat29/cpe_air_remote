@@ -38,6 +38,11 @@ class AppLocalizations {
 
     RegExpMatch? match;
 
+    match = RegExp(r'^On for (\d+) of (\d+) types$').firstMatch(source);
+    if (match != null) {
+      return 'เปิดรับ ${match[1]} จาก ${match[2]} ประเภท';
+    }
+
     match = RegExp(r'^Room ([A-Z0-9_-]+) \((.+)\)$').firstMatch(source);
     if (match != null) {
       return 'ห้อง ${match[1]} (${_translateToThai(match[2]!)})';
@@ -233,14 +238,86 @@ class _AppLocalizationsDelegate
 const _thaiTranslations = <String, String>{
   // หน้าตั้งค่าการแจ้งเตือนแยกตามชนิด (v3.12.0)
   'Alerts by type': 'แจ้งเตือนแยกตามชนิด',
+  // นำเข้าตารางเรียน: ช่วงวันที่ใช้ตาราง
+  'Use day/month/year, e.g. 01/06/2569': 'ใช้รูปแบบ วัน/เดือน/ปี พ.ศ. เช่น 01/06/2569',
+  'Choose a date between': 'เลือกวันที่ระหว่าง',
+  'The last day must not be before the first day': 'วันสุดท้ายต้องไม่อยู่ก่อนวันแรก',
+  'Tap a date': 'แตะเลือกวันที่',
+  'Tap the first day': 'แตะเลือกวันแรก',
+  'Choose a date range': 'เลือกช่วงวันที่',
+  'Choose a date': 'เลือกวันที่',
+  'Type the date': 'พิมพ์วันที่',
+  'Pick from calendar': 'เลือกจากปฏิทิน',
+  'First day': 'วันแรก',
+  'Last day': 'วันสุดท้าย',
+  'Tap the first day of the semester': 'แตะเลือกวันเปิดภาคเรียน',
+  'tap the last day': 'แตะเลือกวันปิดภาค',
+  'Previous month': 'เดือนก่อนหน้า',
+  'Next month': 'เดือนถัดไป',
+  'Semester dates': 'วันเปิด-ปิดภาคเรียน',
+  'Period this timetable applies to': 'ช่วงเวลาที่ใช้ตารางนี้',
+  'Outside these dates the system treats every room as having no classes, for example during the semester break.': 'นอกช่วงวันที่นี้ ระบบจะถือว่าทุกห้องไม่มีคาบเรียน เช่น ช่วงปิดภาคเรียน',
+  'Use semester/year, e.g. 1/2569': 'ใช้รูปแบบ ภาคเรียน/ปีการศึกษา เช่น 1/2569',
+  'Choose the first and last day': 'เลือกวันเปิดภาคและวันปิดภาค',
+  'Choose the semester dates first': 'เลือกช่วงวันที่ของภาคเรียนก่อน',
+  // หน้าห้อง: การ์ดสรุปและการ์ดแอร์แบบใหม่
+  'Running now': 'กำลังทำงาน',
+  'Switched off': 'ปิดอยู่',
+  'Lower temperature': 'ลดอุณหภูมิ',
+  'Raise temperature': 'เพิ่มอุณหภูมิ',
+  'Power now': 'กำลังไฟขณะนี้',
+  'Accumulated': 'สะสม',
+  'Turn off': 'ปิดเครื่อง',
+  'Turn on': 'เปิดเครื่อง',
+  'Mode': 'โหมด',
+  'Swing': 'สวิง',
+  'More': 'เพิ่มเติม',
+  'Awaiting confirmation': 'รอการยืนยัน',
+  'Not connected to MQTT': 'ยังไม่ได้เชื่อมต่อ MQTT',
+  'Commands and power readings are unavailable. Check the ESP32 power supply and Wi-Fi signal.': 'ยังสั่งงานและอ่านกำลังไฟของเครื่องนี้ไม่ได้ ตรวจสอบไฟเลี้ยงของ ESP32 และสัญญาณ Wi‑Fi',
+  'Set up again via Bluetooth': 'ตั้งค่าใหม่ผ่านบลูทูธ',
+  'Try again': 'ลองอีกครั้ง',
+  'Air conditioner list': 'รายการเครื่องปรับอากาศ',
+  'Air conditioners running': 'เครื่องปรับอากาศที่เปิดอยู่',
+  'Total power': 'กำลังไฟรวม',
+  'of': 'จาก',
+  'Control mode': 'โหมดควบคุม',
+  'MQTT (real devices)': 'MQTT (อุปกรณ์จริง)',
+  'Occupancy sensor': 'เซนเซอร์ตรวจจับคน',
+  'Not installed': 'ยังไม่ได้ติดตั้ง',
+  'Sensor offline': 'เซนเซอร์ออฟไลน์',
+  'Radar data unavailable': 'ไม่มีข้อมูลเรดาร์',
+  'People detected': 'พบคนในห้อง',
+  'No people detected': 'ไม่พบคนในห้อง',
+  'Add ESP32 device': 'เพิ่มอุปกรณ์ ESP32',
+  'This room has no ESP32 device yet': 'ยังไม่มีอุปกรณ์ ESP32 ในห้องนี้',
+  'Find the device via Bluetooth to set up Wi-Fi and MQTT.': 'ค้นหาอุปกรณ์ผ่านบลูทูธ เพื่อตั้งค่า Wi‑Fi และ MQTT',
+  // หน้าตั้งค่าแอปและหน้าตั้งค่าการแจ้งเตือน (รายการเรียบ ใช้ถ้อยคำทางการ)
+  'General': 'ทั่วไป',
+  'Text display': 'การแสดงผลตัวอักษร',
+  'For administrators': 'สำหรับผู้ดูแลระบบ',
+  'Notifications': 'การแจ้งเตือน',
+  'All notifications are off': 'ปิดการแจ้งเตือนทั้งหมด',
+  'Notification settings': 'ตั้งค่าการแจ้งเตือน',
+  'Allow notifications': 'รับการแจ้งเตือน',
+  'Receive notifications on this device for the types selected below.': 'รับการแจ้งเตือนบนอุปกรณ์นี้ตามประเภทที่เลือกไว้ด้านล่าง',
+  'Notification types': 'ประเภทการแจ้งเตือน',
+  'All notifications remain available in the app.': 'รายการแจ้งเตือนทั้งหมดยังคงแสดงในแอปพลิเคชันตามปกติ',
+  'Choose the display language': 'เลือกภาษาที่ใช้แสดงผล',
+  'Choose a theme': 'เลือกธีม',
+  'Applies to every screen and follows the text size set on this device.': 'มีผลกับทุกหน้า และปรับตามขนาดตัวอักษรที่ตั้งไว้ในอุปกรณ์',
+  'Sample text: Room 16103 is using 1.20 kWh': 'ตัวอย่างข้อความ: ห้อง 16103 ใช้พลังงานไฟฟ้า 1.20 kWh',
+  'When an air conditioner runs in an empty room, the system counts down 5 minutes and then sends the off command.': 'เมื่อแอร์ทำงานแต่ไม่มีผู้ใช้ห้อง ระบบจะนับถอยหลัง 5 นาที แล้วส่งคำสั่งปิด',
+  'Only administrators can change this setting because it applies to the whole building.': 'เฉพาะผู้ดูแลระบบเท่านั้นที่เปลี่ยนการตั้งค่านี้ได้ เนื่องจากมีผลกับทั้งอาคาร',
+  'This applies to every room. No countdown or off command will run until it is turned back on.': 'มีผลกับทุกห้อง ระบบจะไม่นับถอยหลังและไม่ส่งคำสั่งปิดจนกว่าจะเปิดใช้งานอีกครั้ง',
+  'The setting could not be saved. Please try again.': 'บันทึกการตั้งค่าไม่สำเร็จ กรุณาลองใหม่อีกครั้ง',
   'In the app': 'ในแอป',
-  'On this phone': 'บนมือถือ',
-  'Turning off the in-app list also stops the alert from reaching this phone, because there would be nothing to open.': 'ถ้าปิดการแสดงในแอป การเด้งบนมือถือจะถูกปิดตามไปด้วย เพราะเด้งแล้วกดเข้าไปดูต่อไม่ได้',
+  'On this phone': 'บนอุปกรณ์นี้',
   // สวิตช์รวมของระบบปิดแอร์อัตโนมัติ (v3.10.0)
   'AUTOMATIC SHUTDOWN': 'ระบบปิดแอร์อัตโนมัติ',
   'Switch air conditioners off automatically': 'ปิดแอร์อัตโนมัติเมื่อห้องว่าง',
   'Counts down 5 minutes when a room is empty with the air conditioner running, then sends the off signal.': 'เมื่อแอร์ทำงานอยู่แต่ไม่มีคนในห้อง จะนับถอยหลัง 5 นาที แล้วส่งสัญญาณปิด',
-  'Only an admin can change this. It applies to the whole building.': 'เฉพาะแอดมินเท่านั้นที่แก้ได้ เพราะมีผลกับทั้งอาคาร',
+  'Only an admin can change this. It applies to the whole building.': 'เฉพาะผู้ดูแลระบบเท่านั้นที่เปลี่ยนการตั้งค่านี้ได้ เนื่องจากมีผลกับทั้งอาคาร',
   'Every room is affected. No countdown runs and nothing is switched off until this is turned back on.': 'มีผลกับทุกห้อง จะไม่มีการนับถอยหลังและไม่มีการสั่งปิด จนกว่าจะเปิดใหม่',
   'Could not save the setting. Please try again.': 'บันทึกค่าไม่สำเร็จ ลองใหม่อีกครั้ง',
   // ตั้งค่าขนาดตัวอักษรและการแจ้งเตือน (v3.10.0)
@@ -253,9 +330,7 @@ const _thaiTranslations = <String, String>{
   'Large': 'ใหญ่',
   'Extra large': 'ใหญ่มาก',
   'Sample: room 16103 is using 1.20 kWh right now': 'ตัวอย่าง: ห้อง 16103 กำลังใช้ไฟ 1.20 kWh',
-  'Choose what appears in the app and what alerts this phone.': 'เลือกได้ว่าจะให้อะไรขึ้นในแอป และอะไรเด้งบนมือถือเครื่องนี้',
-  'Show in the app': 'แสดงในแอป',
-  'Alert me on this phone': 'เด้งบนมือถือเครื่องนี้',
+  'Alert me on this phone': 'รับการแจ้งเตือนบนอุปกรณ์นี้',
   'Running outside class hours': 'แอร์ทำงานนอกเวลาเรียน',
   'Air conditioner switched off': 'ปิดแอร์อัตโนมัติสำเร็จ',
   'Automatic shutdown failed': 'ปิดแอร์อัตโนมัติไม่สำเร็จ',
@@ -348,6 +423,8 @@ const _thaiTranslations = <String, String>{
       'ตรวจสอบ Wi-Fi และบันทึกการตั้งค่าแล้ว ESP32 กำลังเชื่อมต่อ MQTT',
   'Unable to connect to Wi-Fi. Check the SSID and password, then try again.':
       'เชื่อมต่อ Wi-Fi ไม่สำเร็จ กรุณาตรวจชื่อ SSID และรหัสผ่าน แล้วลองบันทึกอีกครั้ง',
+  'Wi-Fi recovery: only Wi-Fi can change. Hold BOOT and reset to change room or server.':
+      'บอร์ดอยู่ในโหมดกู้ Wi-Fi แก้ได้เฉพาะ Wi-Fi ถ้าจะเปลี่ยนห้องหรือเซิร์ฟเวอร์ ให้กดปุ่ม BOOT ค้างไว้แล้วกดรีเซ็ตบอร์ด',
   'Correct the Wi-Fi password and press Save again. You do not need to scan for the ESP32 again.':
       'แก้รหัสผ่าน Wi-Fi แล้วกดบันทึกซ้ำได้ทันที ไม่ต้องสแกนหา ESP32 ใหม่',
   'ESP32 did not finish testing Wi-Fi or saving the configuration.':
@@ -685,6 +762,20 @@ const _thaiTranslations = <String, String>{
   'APPEARANCE': 'รูปแบบการแสดงผล',
   'Dark mode': 'โหมดมืด',
   'Use a dark color theme throughout the app': 'ใช้ชุดสีมืดกับทุกหน้าภายในแอป',
+  'Theme colors': 'ธีมสี',
+  'Colors come from the RMUTT Save Energy logo. Saved on this phone.':
+      'สีทั้งหมดมาจากโลโก้ RMUTT Save Energy บันทึกไว้ในเครื่องนี้',
+  'White': 'ขาว',
+  'Gray': 'เทา',
+  'Black': 'ดำ',
+  'Green': 'เขียว',
+  'Match phone': 'ตามเครื่อง',
+  'Bright and easy to read in sunny rooms': 'สว่าง อ่านง่ายในห้องที่แสงจ้า',
+  'The logo charcoal, gentle on the eyes': 'โทนเดียวกับพื้นโลโก้ สบายตา',
+  'Fully dark for screens left on at night': 'มืดสนิท สำหรับจอที่เปิดค้างตอนกลางคืน',
+  'Deep green header with light content': 'แถบหัวเขียวเข้ม เนื้อหาพื้นสว่าง',
+  'White in light mode, Gray in dark mode':
+      'เครื่องโหมดสว่างใช้ ขาว โหมดมืดใช้ เทา',
   'LANGUAGE': 'ภาษา',
   'App language': 'ภาษาของแอป',
   'Choose Thai or English. Your selection is saved automatically.':
@@ -780,6 +871,9 @@ const _thaiTranslations = <String, String>{
   'Suspended': 'ถูกระงับ',
   'Delete User': 'ลบผู้ใช้',
   'Confirm': 'ยืนยัน',
+  'Confirm your password': 'ยืนยันรหัสผ่าน',
+  'Changing the email requires your current password.':
+      'OTP ลืมรหัสผ่านจะส่งไปที่อีเมลนี้ จึงต้องใส่รหัสผ่านปัจจุบันก่อนเปลี่ยน',
   'Role': 'สิทธิ์',
   'First name': 'ชื่อ',
   'Last name': 'นามสกุล',
@@ -1086,6 +1180,10 @@ const _englishTranslations = <String, String>{
   'รหัสผ่านใหม่ต้องไม่ซ้ำกับรหัสผ่านเดิม':
       'The new password must differ from the current one.',
   'รหัสผ่านปัจจุบันไม่ถูกต้อง': 'The current password is incorrect.',
+  'กรุณากรอกรหัสผ่านปัจจุบันเพื่อยืนยันการเปลี่ยนอีเมล':
+      'Enter your current password to change the email address.',
+  'ยืนยันรหัสผ่านผิดหลายครั้งเกินไป กรุณารอ 15 นาที':
+      'Too many incorrect password confirmations. Please wait 15 minutes.',
   'ชั้นต้องเป็นตัวเลข 0–99':
       'The floor must be a number between 0 and 99.',
 };

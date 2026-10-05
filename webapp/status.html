@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
 <title>RMUTT Save Energy</title>
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <style>
   :root {
     --bg: #0d1911;
@@ -41,10 +43,11 @@
   .mark {
     width: 46px; height: 46px; flex: none;
     display: grid; place-items: center;
-    border-radius: 14px;
-    background: linear-gradient(140deg, #1f7a45, #34d27b);
-    font-size: 22px;
+    border-radius: 11px;
+    overflow: hidden;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, .10);
   }
+  .mark svg { display: block; width: 100%; height: 100%; }
   h1 { margin: 0; font-size: 20px; letter-spacing: .2px; }
   .sub { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
   .rows { margin: 24px 0 0; border-top: 1px solid var(--line); }
@@ -82,7 +85,7 @@
 <body>
   <main class="card">
     <div class="brand">
-      <div class="mark">❄</div>
+      <div class="mark"><svg xmlns="http://www.w3.org/2000/svg" width="46" height="46" aria-hidden="true" focusable="false" viewBox="0 0 240 240"><rect width="240" height="240" rx="56" fill="#2F3438"/><g transform="translate(-2,-10)"><path d="M110 150 C150 144 184 170 184 208 C146 208 110 186 110 150 Z" fill="#2EB872"/><path d="M122 160 L172 198" stroke="#2F3438" stroke-width="4" stroke-linecap="round"/><path d="M82 184 L82 73 L126 73 A33 33 0 0 1 126 139 L82 139" fill="none" stroke="#FFFFFF" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/></g></svg></div>
       <div>
         <h1>RMUTT Save Energy</h1>
         <p class="sub">ระบบควบคุมเครื่องปรับอากาศอาคาร 16</p>

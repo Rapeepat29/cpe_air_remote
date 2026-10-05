@@ -91,8 +91,9 @@ textarea {
 .sidebar {
   width: var(--sidebar-w);
   flex: none;
-  background: var(--panel);
-  border-right: 1px solid var(--hairline);
+  background: var(--side-bg);
+  color: var(--side-text);
+  border-right: 1px solid var(--side-line);
   display: flex;
   flex-direction: column;
   padding: 22px 14px 18px;
@@ -111,16 +112,21 @@ textarea {
 }
 
 .brand-mark {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  background: radial-gradient(circle at 30% 20%, #4ee39e, #1b7a4c 75%);
+  width: 42px;
+  height: 42px;
+  flex: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex: none;
-  box-shadow: 0 0 0 1px rgba(62, 207, 142, 0.25),
-    0 4px 14px rgba(62, 207, 142, 0.18);
+  /* มุมโค้งเท่ากับมุมของไอคอน (rx 56 จาก 240) เส้นขอบบาง ๆ ช่วยให้ไอคอน
+     สีเทาถ่านไม่จมหายไปกับเมนูข้างของธีมเทาและดำ */
+  border-radius: 23%;
+  box-shadow: 0 0 0 1px var(--side-line);
+}
+
+.brand-mark > svg {
+  width: 100%;
+  height: 100%;
 }
 
 .brand-name {
@@ -131,9 +137,37 @@ textarea {
   line-height: 1.2;
 }
 
+/* ชื่อแบบโลโก้: R สีเขียว MUTT สีตามพื้น และ SAVE ENERGY ตัวเล็กใต้ชื่อ
+   letter-spacing ใช้ได้เพราะเป็นตัวละตินล้วน */
+.wordmark {
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-disp);
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.wordmark-name {
+  font-size: calc(var(--fs-xl) + 1px);
+  letter-spacing: 0.4px;
+  color: var(--logo-mutt);
+}
+
+.wordmark-name b,
+.wordmark-tag {
+  color: var(--logo-green);
+}
+
+.wordmark-tag {
+  font-size: 11px;
+  letter-spacing: 3px;
+  margin-top: 1px;
+}
+
 .brand .user-role {
   font-size: var(--fs-2xs);
-  margin-top: 2px;
+  margin-top: 4px;
+  color: var(--side-muted);
 }
 
 /* หัวกลุ่มเมนู: ไม่ใช้ตัวพิมพ์ใหญ่/ระยะห่างตัวอักษร เพราะกับภาษาไทย
@@ -141,7 +175,7 @@ textarea {
 .nav-label {
   font-size: var(--fs-2xs);
   font-weight: 600;
-  color: var(--text-low);
+  color: var(--side-muted);
   padding: 16px 12px 6px;
 }
 
@@ -160,7 +194,7 @@ textarea {
   border-radius: var(--radius-sm);
   border: none;
   background: none;
-  color: var(--text-mid);
+  color: var(--side-text);
   font-size: var(--fs-base);
   font-weight: 500;
   text-align: left;
@@ -175,14 +209,14 @@ textarea {
 }
 
 .nav-item:hover {
-  background: var(--panel-raised);
-  color: var(--text-hi);
+  background: var(--side-hover);
+  color: var(--side-text);
 }
 
 .nav-item.active {
-  background: var(--accent-soft);
-  color: var(--accent);
-  font-weight: 600;
+  background: var(--side-active-bg);
+  color: var(--side-active);
+  font-weight: 700;
 }
 
 /* แถบสีด้านซ้ายบอกหน้าปัจจุบัน ช่วยให้เห็นได้แม้คนตาบอดสีแดง-เขียว */
@@ -194,7 +228,7 @@ textarea {
   bottom: 8px;
   width: 3px;
   border-radius: 0 3px 3px 0;
-  background: var(--accent);
+  background: var(--side-active);
 }
 
 .nav-item.active svg {
@@ -213,10 +247,22 @@ textarea {
   padding: 2px 8px;
 }
 
+/* ธีมเขียว: เมนูข้างเป็นพื้นเขียวเข้ม ป้ายตัวเลขและรูปผู้ใช้ต้องเป็นแบบทึบ
+   ไม่งั้นสีส้มโปร่งใสจะจมหายไปกับพื้นเขียว */
+:root[data-palette='green'] .sidebar .nav-badge {
+  background: #f6c76e;
+  color: #3d2500;
+}
+
+:root[data-palette='green'] .sidebar .avatar {
+  background: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+}
+
 .sidebar-foot {
   margin-top: auto;
   padding-top: 14px;
-  border-top: 1px solid var(--hairline);
+  border-top: 1px solid var(--side-line);
 }
 
 .user-chip {
@@ -233,22 +279,26 @@ textarea {
 }
 
 .user-chip:hover {
-  background: var(--panel-raised);
+  background: var(--side-hover);
+}
+
+.sidebar .user-role {
+  color: var(--side-muted);
 }
 
 .avatar {
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  background: linear-gradient(155deg, #1f6a48, #0e2e1d);
-  border: 1px solid var(--hairline);
+  background: var(--avatar-bg);
+  border: 1px solid var(--side-line);
   flex: none;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: var(--fs-2xs);
-  font-weight: 600;
-  color: #6fe3ae;
+  font-weight: 700;
+  color: var(--avatar-text);
 }
 
 .user-name {

@@ -267,6 +267,62 @@ CREATE TABLE IF NOT EXISTS system_settings (
     ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ปฏิทินภาคเรียน: วันเปิด-ปิดของแต่ละเทอม เช่น 1/2569
+--
+-- ตารางเรียนที่ใช้อยู่จะมีผลเฉพาะระหว่างวันเปิด-ปิดของภาคเรียนของมัน
+-- (ภาคเรียนดูจาก system_settings.timetable_semester) นอกช่วงนั้นระบบถือว่า
+-- ทุกห้องอยู่นอกคาบ ห้องว่างช่วงปิดภาคจึงถูกปิดแอร์เร็ว (5 นาที) และมีแจ้งเตือน
+-- โดยไม่ต้องลบตารางทิ้ง ภาคเรียนที่ไม่ได้ตั้งวันไว้ ใช้ตารางได้ทุกวันเหมือนเดิม
+CREATE TABLE IF NOT EXISTS academic_terms (
+  semester VARCHAR(30) NOT NULL,
+  start_date DATE NOT NULL,
+  end_date DATE NOT NULL,
+  updated_by VARCHAR(100) NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (semester),
+  KEY idx_academic_terms_dates (start_date, end_date)
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci;
+
+-- การใช้ห้องนอกตารางเรียน เช่น ประชุมทุกวันพุธ สอบชดเชย กิจกรรม
+--
+-- ต่างจาก class_schedules ตรงที่มีวันที่กำกับเสมอ และทำซ้ำได้สามแบบ:
+--   once   = วันเดียว (start_date = end_date)
+--   daily  = ทุกวันตั้งแต่ start_date ถึง end_date
+--   weekly = ทุกวันในสัปดาห์ที่เลือก (days_of_week เช่น "1,3") ในช่วงวันที่นั้น
+-- ระหว่างเวลาที่จองไว้ ระบบปิดแอร์อัตโนมัติถือว่าห้องอยู่ในคาบ (รอ 15 นาที
+-- และไม่แจ้งเตือน) แม้อยู่นอกภาคเรียน ลบห้องแล้วการจองของห้องนั้นหายไปด้วย
+CREATE TABLE IF NOT EXISTS room_bookings (
+  id CHAR(36) NOT NULL,
+  room_number VARCHAR(20) NOT NULL,
+  title VARCHAR(150) NOT NULL,
+  category VARCHAR(20) NOT NULL DEFAULT 'other',
+  note VARCHAR(255) NOT NULL DEFAULT '',
+  repeat_type VARCHAR(10) NOT NULL DEFAULT 'once',
+  days_of_week VARCHAR(20) NOT NULL DEFAULT '',
+  start_date DATE NOT NULL,
+  end_date DATE NOT NULL,
+  start_time TIME NOT NULL,
+  end_time TIME NOT NULL,
+  created_by VARCHAR(100) NOT NULL,
+  updated_by VARCHAR(100) NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  KEY idx_room_bookings_lookup (room_number, start_date, end_date),
+  KEY idx_room_bookings_dates (start_date, end_date),
+  CONSTRAINT fk_room_booking_room
+    FOREIGN KEY (room_number) REFERENCES rooms (room_number)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci;
+
 INSERT IGNORE INTO system_settings (setting_key, setting_value)
 VALUES ('auto_off_enabled', 'true');
 

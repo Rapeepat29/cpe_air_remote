@@ -255,8 +255,6 @@ class _ScheduleManagementScreenState extends State<ScheduleManagementScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
         title: Text(
           context.tr('Manage Timetable'),
           style: const TextStyle(fontWeight: FontWeight.w800),
@@ -278,11 +276,11 @@ class _ScheduleManagementScreenState extends State<ScheduleManagementScreen> {
                     ? null
                     : _confirmClearAll,
             icon: _isClearingAll
-                ? const SizedBox.square(
+                ? SizedBox.square(
                     dimension: 20,
                     child: CircularProgressIndicator(
                       strokeWidth: 2.3,
-                      color: Colors.white,
+                      color: AppPalette.of(context).onBar,
                     ),
                   )
                 : const Icon(Icons.delete_sweep_rounded),

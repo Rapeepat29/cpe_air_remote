@@ -34,6 +34,13 @@ const initialState = {
    * null = ยังไม่เคยนำเข้าจากไฟล์, undefined = Backend รุ่นเก่าที่ยังไม่รองรับ
    */
   timetable: undefined,
+  /** ปฏิทินภาคเรียน undefined = Backend รุ่นเก่าที่ยังไม่รองรับ */
+  terms: undefined,
+  /** วันนี้ตามเวลาไทยจาก Backend (YYYY-MM-DD) */
+  today: null,
+  /** การใช้ห้องในช่วงที่หน้าตารางเรียนกำลังดู undefined = Backend รุ่นเก่า */
+  bookings: undefined,
+  bookingsRange: null,
   users: [],
   metricCatalog: null,
   loading: {},
@@ -198,6 +205,28 @@ export const loaders = {
       emit();
     }
     return state.schedules;
+  },
+
+  async terms() {
+    if (typeof api.academicTerms !== 'function') return state.terms;
+    const result = await load('terms', () => api.academicTerms());
+    if (result) {
+      state.terms = result.terms ?? [];
+      state.today = result.today ?? null;
+      emit();
+    }
+    return state.terms;
+  },
+
+  async bookings(range = state.bookingsRange) {
+    if (!range || typeof api.bookings !== 'function') return state.bookings;
+    state.bookingsRange = range;
+    const result = await load('bookings', () => api.bookings(range));
+    if (result) {
+      state.bookings = result;
+      emit();
+    }
+    return state.bookings;
   },
 
   async users() {

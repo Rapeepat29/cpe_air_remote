@@ -141,11 +141,13 @@ class _RoomsHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = AppPalette.of(context);
+
     return Container(
       key: const Key('rooms-header'),
       height: 58,
       padding: const EdgeInsets.symmetric(horizontal: 8),
-      color: AppColors.primary,
+      color: palette.bar,
       child: Row(
         children: [
           const SizedBox(width: 44),
@@ -155,11 +157,11 @@ class _RoomsHeader extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.w800,
-                letterSpacing: -0.2,
+              style: TextStyle(
+                color: palette.onBar,
+                fontFamily: kDisplayFont,
+                fontSize: 19,
+                fontWeight: FontWeight.w700,
               ),
             ),
           ),
@@ -168,7 +170,7 @@ class _RoomsHeader extends StatelessWidget {
               key: const Key('manage-rooms-button'),
               tooltip: context.tr('Manage Rooms'),
               onPressed: onManageRooms,
-              color: Colors.white,
+              color: palette.onBar,
               icon: const Icon(Icons.settings_rounded, size: 24),
             )
           else

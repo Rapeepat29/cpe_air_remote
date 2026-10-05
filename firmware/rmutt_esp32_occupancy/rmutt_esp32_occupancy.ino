@@ -54,7 +54,7 @@ constexpr uint32_t BLE_READVERTISE_DELAY_MS = 600;
 constexpr uint32_t ONLINE_SETUP_WINDOW_MS = 5UL * 60UL * 1000UL;
 constexpr size_t MAX_CONFIG_BYTES = 3072;
 constexpr uint32_t NTP_SYNC_TIMEOUT_MS = 15000;
-constexpr char FIRMWARE_VERSION[] = "1.3.0";
+constexpr char FIRMWARE_VERSION[] = "1.3.1";
 
 // The service layout is shared with the A/C board, while the advertised name
 // and identity clearly distinguish RMUTT-OCC devices.
@@ -110,6 +110,8 @@ bool bleBlocksNormalOperation = false;
 bool bleReadvertisePending = false;
 uint32_t bleReadvertiseAt = 0;
 uint32_t onlineSetupExpiresAt = 0;
+// true = BLE เปิดเองเพราะ Wi-Fi หลุด ยอมให้แก้เฉพาะ Wi-Fi (ดู processPendingConfig)
+bool bleWifiOnlyMode = false;
 uint32_t restartAt = 0;
 
 bool radarInitialised = false;
@@ -140,6 +142,7 @@ String createDeviceId();
 bool isValidRoomNumber(const String &value);
 void loadConfig();
 void saveConfig(const DeviceConfig &newConfig);
+bool keepsServerAssignment(const DeviceConfig &incoming);
 void startBleProvisioning();
 void startBleAdvertising();
 void enterBleRecovery(const String &reason, bool retryWifi = false);
@@ -545,6 +548,7 @@ void attemptWifiRecovery() {
 
   Serial.println("Wi-Fi is back: leaving BLE recovery and resuming");
   wifiRecoveryActive = false;
+  bleWifiOnlyMode = false;
   bleBlocksNormalOperation = false;
   bleAdvertisingEnabled = false;
   bleReadvertisePending = false;
@@ -558,6 +562,9 @@ void enterBleRecovery(const String &reason, bool retryWifi) {
   bleBlocksNormalOperation = true;
   onlineSetupExpiresAt = 0;
   wifiRecoveryActive = retryWifi;
+  // บอร์ดที่ตั้งค่าแล้วแต่ Wi-Fi หลุด: ใครอยู่ใกล้ก็ต่อ BLE ได้ จึงล็อกห้องและเซิร์ฟเวอร์ไว้
+  // ส่วนกรณียังไม่เคยตั้งค่า หรือกด BOOT ค้าง (ต้องเข้าถึงตัวบอร์ด) แก้ได้ทุกช่อง
+  bleWifiOnlyMode = retryWifi && config.configured;
   lastWifiRecoveryAttemptAt = millis();
   if (mqttClient.connected()) mqttClient.disconnect();
   WiFi.disconnect(false, false);
@@ -569,7 +576,22 @@ void enterBleReconfiguration(const String &reason) {
   Serial.printf("Online BLE setup: %s\n", reason.c_str());
   bleBlocksNormalOperation = false;
   onlineSetupExpiresAt = millis() + ONLINE_SETUP_WINDOW_MS;
+  // เปิดจากคำสั่ง MQTT ของ Backend (เฉพาะแอดมิน) แก้ได้ทุกช่อง
+  bleWifiOnlyMode = false;
   startBleProvisioning();
+}
+
+// ค่าที่ห้ามเปลี่ยนในโหมดกู้ Wi-Fi: ห้อง และบัญชี/เซิร์ฟเวอร์ MQTT
+// ถ้าเปลี่ยนได้ คนแปลกหน้าที่อยู่ใกล้บอร์ดตอน Wi-Fi หลุดจะชี้บอร์ดไปหา
+// MQTT ของตัวเองแล้วส่งสถานะห้องปลอมได้
+bool keepsServerAssignment(const DeviceConfig &incoming) {
+  return incoming.roomNumber == config.roomNumber &&
+         incoming.mqttHost == config.mqttHost &&
+         incoming.mqttPort == config.mqttPort &&
+         incoming.mqttTls == config.mqttTls &&
+         incoming.mqttUsername == config.mqttUsername &&
+         incoming.mqttPassword == config.mqttPassword &&
+         incoming.mqttTopic == config.mqttTopic;
 }
 
 void processPendingConfig() {
@@ -619,6 +641,15 @@ void processPendingConfig() {
       !incoming.mqttTopic.isEmpty();
   if (!valid) {
     notifyBle(false, "invalid_config", "Required settings are invalid");
+    return;
+  }
+  if (bleWifiOnlyMode && !keepsServerAssignment(incoming)) {
+    Serial.println(
+        "BLE config rejected: Wi-Fi recovery mode only accepts Wi-Fi changes");
+    notifyBle(
+        false,
+        "wifi_only_mode",
+        "Wi-Fi recovery: only Wi-Fi can change. Hold BOOT and reset to change room or server.");
     return;
   }
 

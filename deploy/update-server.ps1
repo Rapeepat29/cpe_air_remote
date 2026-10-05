@@ -71,7 +71,7 @@ if (-not $SkipUpload) {
   # (ไม่ส่ง mosquitto.conf เพราะ init-env.sh ปรับ path ของ plugin ไว้บนเครื่องนั้น)
   $deployFiles = @(
     'Caddyfile', 'docker-compose.yml', 'backend.Dockerfile', 'caddy.Dockerfile', 'tailscale-serve.json',
-    'sync-mqtt-cert.sh', 'backup-db.sh', 'fix-mqtt-permissions.sh', 'db-view.sh'
+    'sync-mqtt-cert.sh', 'backup-db.sh', 'fix-mqtt-permissions.sh', 'db-view.sh', 'seed-admin.sh'
   ) | ForEach-Object { Join-Path $deployDirectory $_ } |
     Where-Object { Test-Path -LiteralPath $_ }
   scp @scpArgs @deployFiles "${target}:/opt/rmutt/"
