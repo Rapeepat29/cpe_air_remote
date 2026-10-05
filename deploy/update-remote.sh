@@ -106,6 +106,14 @@ docker compose exec -T caddy caddy reload --config /etc/caddy/Caddyfile >/dev/nu
   && echo 'โหลด Caddyfile ใหม่แล้ว' \
   || echo 'เตือน: reload Caddy ไม่สำเร็จ ลองดู: docker compose logs --tail 40 caddy'
 
+# tailscale-serve.json ถูกอัปโหลดทับเป็นไฟล์ใหม่ container เดิมยังเห็นไฟล์เก่า
+# ต้องสร้าง container ใหม่ (สถานะล็อกอินอยู่ใน ./tailscale/state ไม่หาย)
+if docker compose ps --services 2>/dev/null | grep -qx tailscale; then
+  docker compose up -d --force-recreate tailscale >/dev/null 2>&1 \
+    && echo 'โหลด tailscale-serve.json ใหม่แล้ว (เว็บ 443 + MQTT 8443)' \
+    || echo 'เตือน: สร้าง container tailscale ใหม่ไม่สำเร็จ ลองดู: docker compose logs --tail 40 tailscale'
+fi
+
 step '6/6 ตรวจว่าใช้งานได้จริง'
 health=$(curl -s --max-time 20 "https://$DOMAIN/api/health")
 echo "health: $health"

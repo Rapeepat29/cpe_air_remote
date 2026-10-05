@@ -1,6 +1,10 @@
 {
   "TCP": {
-    "443": { "HTTPS": true }
+    "443": { "HTTPS": true },
+    "8443": {
+      "TCPForward": "mqtt:1883",
+      "TerminateTLS": "${TS_CERT_DOMAIN}"
+    }
   },
   "Web": {
     "${TS_CERT_DOMAIN}:443": {
@@ -10,6 +14,7 @@
     }
   },
   "AllowFunnel": {
-    "${TS_CERT_DOMAIN}:443": true
+    "${TS_CERT_DOMAIN}:443": true,
+    "${TS_CERT_DOMAIN}:8443": true
   }
 }
