@@ -1,5 +1,6 @@
 import 'package:cpe_air_remote/localization/app_localizations.dart';
 import 'package:cpe_air_remote/models/energy_data.dart';
+import 'package:cpe_air_remote/utils/thai_date.dart';
 import 'package:cpe_air_remote/widgets/energy_usage_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -125,7 +126,8 @@ void main() {
 
       // ค่าเล็กระดับที่ชาร์จมือถือต้องอ่านออก ไม่ใช่ 0.0 kWh
       expect(find.text('5.00 Wh'), findsOneWidget);
-      expect(find.text('2026-08-21'), findsOneWidget);
+      // ตั้งแต่ 3.13.1 กล่องรายละเอียดแสดงวันที่แบบไทย (เทสต์ใช้ locale th)
+      expect(find.text(formatIsoDateText('2026-08-21', true)), findsOneWidget);
       expect(find.text('บาท 0.02'), findsOneWidget);
     });
 
