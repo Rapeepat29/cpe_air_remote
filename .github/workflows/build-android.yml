@@ -1,0 +1,82 @@
+# Build APK ของ Android บนเครื่อง Linux ของ GitHub (ไม่ต้องลง Flutter ในเครื่องตัวเอง)
+#
+# กุญแจเซ็นแอปมาจาก Secrets ของ repo:
+#   ANDROID_KEYSTORE_BASE64  ไฟล์ .jks ที่แปลงเป็น base64
+#   ANDROID_KEY_PASSWORD     รหัสผ่าน (ใช้ทั้ง store และ key, alias = rmutt-upload)
+# ถ้ายังไม่ได้ตั้ง จะเซ็นด้วย debug key แทน และชื่อไฟล์ลงท้าย -DEBUG-KEY
+# ไฟล์แบบนั้นใช้ทดสอบได้ แต่ห้ามแจก เพราะอัปเดตทับด้วยไฟล์ที่เซ็นกุญแจจริงไม่ได้
+#
+# วิธีใช้: แท็บ Actions -> "Build Android (APK)" -> Run workflow
+
+name: Build Android (APK)
+
+on:
+  workflow_dispatch:
+    inputs:
+      api_base_url:
+        description: ที่อยู่ API ที่แอปจะใช้ (ต้องเข้าได้จากอินเทอร์เน็ต)
+        required: true
+        default: https://rmutt-energy.tailb292b4.ts.net/api
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+
+    steps:
+      - name: ดึงโค้ด
+        uses: actions/checkout@v4
+
+      - name: ติดตั้ง Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: ติดตั้ง Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: เตรียมกุญแจเซ็นแอป
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          if [ -n "$KEYSTORE_BASE64" ] && [ -n "$KEY_PASSWORD" ]; then
+            echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/upload.jks"
+            {
+              echo "storePassword=$KEY_PASSWORD"
+              echo "keyPassword=$KEY_PASSWORD"
+              echo "keyAlias=rmutt-upload"
+              echo "storeFile=$RUNNER_TEMP/upload.jks"
+            } > android/key.properties
+            echo "SIGN_SUFFIX=" >> "$GITHUB_ENV"
+          else
+            echo "::warning::ยังไม่ได้ตั้ง Secrets ของกุญแจ จะเซ็นด้วย debug key (ใช้ทดสอบเท่านั้น ห้ามแจก)"
+            echo "SIGN_SUFFIX=-DEBUG-KEY" >> "$GITHUB_ENV"
+          fi
+
+      - name: ติดตั้งแพ็กเกจ
+        run: flutter pub get
+
+      - name: Build APK
+        # ส่งผ่าน env กันค่า input ถูกตีความเป็นคำสั่ง shell
+        env:
+          API_BASE_URL: ${{ inputs.api_base_url }}
+        run: flutter build apk --release --dart-define=API_BASE_URL="$API_BASE_URL"
+
+      - name: ตั้งชื่อไฟล์
+        run: |
+          VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}' | tr '+' '-')
+          cp build/app/outputs/flutter-apk/app-release.apk "RMUTT-Energy-${VERSION}${SIGN_SUFFIX}.apk"
+          ls -lh *.apk
+          rm -f android/key.properties
+
+      - name: เก็บไฟล์ให้ดาวน์โหลด
+        uses: actions/upload-artifact@v4
+        with:
+          name: RMUTT-Energy-Android
+          path: "*.apk"
+          retention-days: 14
