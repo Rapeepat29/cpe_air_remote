@@ -17,5 +17,20 @@ jobs:
           channel: stable
           cache: true
       - run: flutter pub get
-      - run: flutter analyze --no-fatal-infos
-      - run: flutter test
+      # ผลลัพธ์ส่งออกเป็น annotation ด้วย จะได้เห็นในหน้า Summary โดยไม่ต้องเปิด log
+      - name: flutter analyze
+        run: |
+          set -o pipefail
+          flutter analyze --no-fatal-infos --no-fatal-warnings 2>&1 | tee analyze.txt || {
+            grep -E ' (error|warning) • ' analyze.txt | head -40 | while IFS= read -r line; do echo "::error::$line"; done
+            exit 1
+          }
+          grep -E ' warning • ' analyze.txt | head -20 | while IFS= read -r line; do echo "::warning::$line"; done
+      - name: flutter test
+        if: always()
+        run: |
+          set -o pipefail
+          flutter test --reporter expanded 2>&1 | tee test.txt || {
+            grep -E '\[E\]|Expected:|Actual:|Error:|error:' test.txt | head -40 | while IFS= read -r line; do echo "::error::$line"; done
+            exit 1
+          }
