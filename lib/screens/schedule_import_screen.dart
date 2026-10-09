@@ -7,6 +7,7 @@ import '../controllers/schedule_controller.dart';
 import '../localization/localized_material.dart';
 import '../models/schedule_import.dart';
 import '../theme/app_theme.dart';
+import '../utils/file_saver.dart';
 import '../utils/thai_date.dart';
 
 class ScheduleImportScreen extends StatefulWidget {
@@ -40,13 +41,6 @@ class _ScheduleImportScreenState extends State<ScheduleImportScreen> {
       'text/csv',
     ],
   );
-  static const _csvType = XTypeGroup(
-    label: 'CSV',
-    extensions: ['csv'],
-    mimeTypes: ['text/csv'],
-    uniformTypeIdentifiers: ['public.comma-separated-values-text'],
-    webWildCards: ['text/csv'],
-  );
   static const _days = [
     'Sunday',
     'Monday',
@@ -58,6 +52,10 @@ class _ScheduleImportScreenState extends State<ScheduleImportScreen> {
   ];
 
   ScheduleImportPreview? _preview;
+
+  /// true = เปลี่ยนภาคเรียน (ล้างตารางเดิมทุกห้อง), false = แทนที่เฉพาะห้องในไฟล์
+  /// null = ยังไม่เลือก (ต้องเลือกก่อนนำเข้า)
+  bool? _replaceAll = false;
   bool _isReading = false;
   bool _isImporting = false;
   String? _errorMessage;
@@ -127,6 +125,7 @@ class _ScheduleImportScreenState extends State<ScheduleImportScreen> {
         // ไฟล์ใหม่อาจเป็นคนละเทอม ให้เลือกช่วงวันใหม่ทุกครั้ง
         _semesterController.text = preview.semester;
         _termRange = null;
+        _replaceAll = _defaultReplaceAll(preview);
       });
     } catch (error) {
       if (!mounted) return;
@@ -138,31 +137,54 @@ class _ScheduleImportScreenState extends State<ScheduleImportScreen> {
     }
   }
 
+  /// ห้องที่มีตารางในระบบแต่ไม่อยู่ในไฟล์ พร้อมจำนวนคาบ
+  Map<String, int> _roomsOutsideFile(ScheduleImportPreview preview) {
+    final inFile = preview.roomNumbers.toSet();
+    final counts = <String, int>{};
+    for (final schedule in widget.controller.schedules) {
+      if (inFile.contains(schedule.roomNumber)) continue;
+      counts[schedule.roomNumber] = (counts[schedule.roomNumber] ?? 0) + 1;
+    }
+    return counts;
+  }
+
+  bool _needsModeChoice(ScheduleImportPreview preview) =>
+      widget.controller.supportsReplaceAll &&
+      _roomsOutsideFile(preview).isNotEmpty;
+
+  /// ค่าเริ่มต้นของวิธีนำเข้า (เหมือนเว็บ)
+  /// ภาคเรียนในไฟล์ต่างจากในระบบ = น่าจะเปลี่ยนเทอม เลือก "ล้างทุกห้อง" ไว้ให้
+  /// ภาคเรียนเดียวกัน = แก้บางห้อง, ไม่รู้ภาคเรียนฝั่งใดฝั่งหนึ่ง = ให้เลือกเอง
+  bool? _defaultReplaceAll(ScheduleImportPreview preview) {
+    if (!_needsModeChoice(preview)) return false;
+    final current = widget.controller.timetable?.semester ?? '';
+    if (preview.semester.isNotEmpty && current.isNotEmpty) {
+      return preview.semester != current;
+    }
+    return null;
+  }
+
   Future<void> _downloadCsv() async {
     final preview = _preview;
     if (preview == null || preview.csv.isEmpty || _isBusy) return;
 
-    try {
-      final location = await getSaveLocation(
-        suggestedName: 'rmutt_class_schedules_${preview.semester}.csv',
-        acceptedTypeGroups: const [_csvType],
-      );
-      if (location == null) return;
-
-      final file = XFile.fromData(
-        Uint8List.fromList(utf8.encode(preview.csv)),
-        mimeType: 'text/csv',
-        name: 'rmutt_class_schedules.csv',
-      );
-      await file.saveTo(location.path);
-      if (!mounted) return;
+    // ใช้ตัวบันทึกไฟล์กลาง: มือถือเปิดเมนูแชร์ คอมพิวเตอร์เปิดกล่องบันทึกเป็น
+    // (getSaveLocation ของ file_selector ใช้บน iOS/Android ไม่ได้)
+    final result = await saveExportFile(
+      fileName: 'rmutt_class_schedules_${preview.semester.replaceAll('/', '-')}.csv',
+      bytes: Uint8List.fromList(utf8.encode(preview.csv)),
+      fileExtension: 'csv',
+      mimeType: 'text/csv',
+      typeLabel: 'CSV',
+    );
+    if (!mounted) return;
+    if (result.status == FileSaveStatus.saved) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(context.tr('CSV file saved.'))),
       );
-    } catch (error) {
-      if (!mounted) return;
+    } else if (result.status == FileSaveStatus.failed) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.tr(error.toString()))),
+        SnackBar(content: Text(context.tr(result.error ?? 'Error'))),
       );
     }
   }
@@ -170,11 +192,14 @@ class _ScheduleImportScreenState extends State<ScheduleImportScreen> {
   Future<void> _confirmImport() async {
     final range = _termRange;
     if (_preview == null || _isBusy || range == null || !_termReady) return;
-    final preview = _preview!.withTerm(
-      semester: _semesterController.text.trim(),
-      startDate: range.start,
-      endDate: range.end,
-    );
+    if (_replaceAll == null) return;
+    final preview = _preview!
+        .withTerm(
+          semester: _semesterController.text.trim(),
+          startDate: range.start,
+          endDate: range.end,
+        )
+        .withReplaceAll(_replaceAll == true);
 
     final isThai = AppLocalizations.of(context).isThai;
     final rangeText =
@@ -196,7 +221,13 @@ class _ScheduleImportScreenState extends State<ScheduleImportScreen> {
             ),
             const SizedBox(height: 10),
             Text(
-              isThai
+              preview.replaceAll
+                  ? (isThai
+                        ? 'เปลี่ยนภาคเรียน: ล้างตารางเดิมของทุกห้อง แล้วนำเข้า '
+                              '${preview.scheduleCount} รายการให้ ${preview.roomCount} ห้อง'
+                        : 'Change semester: clear every room\'s timetable, then import '
+                              '${preview.scheduleCount} entries for ${preview.roomCount} rooms.')
+                  : isThai
                   ? 'ระบบจะแทนที่ตารางเดิมเฉพาะ ${preview.roomCount} ห้อง'
                         'ที่พบในไฟล์ และนำเข้า '
                         '${preview.scheduleCount} รายการ'
@@ -322,12 +353,31 @@ class _ScheduleImportScreenState extends State<ScheduleImportScreen> {
               preview: preview,
               onChooseAnother: _chooseFile,
               onDownloadCsv: _downloadCsv,
-              termSection: _TermCard(
-                semesterController: _semesterController,
-                semesterValid: _semesterValid,
-                range: _termRange,
-                onSemesterChanged: () => setState(() {}),
-                onPickRange: _isBusy ? null : _pickTermRange,
+              termSection: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _TermCard(
+                    semesterController: _semesterController,
+                    semesterValid: _semesterValid,
+                    range: _termRange,
+                    onSemesterChanged: () => setState(() {}),
+                    onPickRange: _isBusy ? null : _pickTermRange,
+                  ),
+                  if (_needsModeChoice(preview)) ...[
+                    const SizedBox(height: 12),
+                    _ImportModeCard(
+                      outside: _roomsOutsideFile(preview),
+                      fileSemester: preview.semester,
+                      currentSemester:
+                          widget.controller.timetable?.semester ?? '',
+                      roomCount: preview.roomCount,
+                      replaceAll: _replaceAll,
+                      onChanged: _isBusy
+                          ? null
+                          : (value) => setState(() => _replaceAll = value),
+                    ),
+                  ],
+                ],
               ),
             ),
           if (_errorMessage != null) ...[
@@ -342,7 +392,9 @@ class _ScheduleImportScreenState extends State<ScheduleImportScreen> {
               minimum: const EdgeInsets.fromLTRB(18, 8, 18, 14),
               child: FilledButton.icon(
                 key: const Key('import-schedule-button'),
-                onPressed: _isBusy || !_termReady ? null : _confirmImport,
+                onPressed: _isBusy || !_termReady || _replaceAll == null
+                    ? null
+                    : _confirmImport,
                 icon: _isImporting
                     ? const SizedBox(
                         width: 18,
@@ -356,9 +408,13 @@ class _ScheduleImportScreenState extends State<ScheduleImportScreen> {
                 label: Text(
                   _isImporting
                       ? 'Importing...'
-                      : _termReady
-                      ? 'Import Timetable'
-                      : 'Choose the semester dates first',
+                      : !_termReady
+                      ? 'Choose the semester dates first'
+                      : _replaceAll == null
+                      ? (AppLocalizations.of(context).isThai
+                            ? 'เลือกวิธีนำเข้าก่อน'
+                            : 'Choose how to import first')
+                      : 'Import Timetable',
                 ),
               ),
             ),
@@ -1110,6 +1166,123 @@ class _ErrorCard extends StatelessWidget {
                 color: Theme.of(context).colorScheme.onErrorContainer,
                 fontSize: 12,
               ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// เลือกว่าจะล้างตารางเดิมของห้องที่ไม่อยู่ในไฟล์ (เปลี่ยนภาคเรียน) หรือเก็บไว้
+class _ImportModeCard extends StatelessWidget {
+  const _ImportModeCard({
+    required this.outside,
+    required this.fileSemester,
+    required this.currentSemester,
+    required this.roomCount,
+    required this.replaceAll,
+    required this.onChanged,
+  });
+
+  final Map<String, int> outside;
+  final String fileSemester;
+  final String currentSemester;
+  final int roomCount;
+  final bool? replaceAll;
+  final ValueChanged<bool>? onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final isThai = AppLocalizations.of(context).isThai;
+    final rooms = outside.keys.toList()..sort();
+    final classes = outside.values.fold<int>(0, (sum, count) => sum + count);
+    final sample = rooms.take(8).join(', ') +
+        (rooms.length > 8
+            ? (isThai ? ' และอีก ${rooms.length - 8} ห้อง' : ' and ${rooms.length - 8} more')
+            : '');
+    final differs = fileSemester.isNotEmpty &&
+        currentSemester.isNotEmpty &&
+        fileSemester != currentSemester;
+    final unknown = fileSemester.isEmpty || currentSemester.isEmpty;
+
+    return Container(
+      key: const Key('schedule-import-mode'),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: replaceAll == null ? AppColors.orange : colors.outlineVariant,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            isThai
+                ? 'อีก ${rooms.length} ห้องมีตารางอยู่ในระบบแต่ไม่อยู่ในไฟล์นี้ ให้ทำอย่างไร?'
+                : '${rooms.length} more rooms have a timetable but are not in this file. What should happen?',
+            style: const TextStyle(fontWeight: FontWeight.w800),
+          ),
+          if (differs || unknown) ...[
+            const SizedBox(height: 4),
+            Text(
+              differs
+                  ? (isThai
+                        ? 'ไฟล์นี้เป็นภาคเรียน $fileSemester แต่ตารางในระบบเป็น $currentSemester จึงเลือก "เปลี่ยนภาคเรียน" ไว้ให้'
+                        : 'This file is semester $fileSemester but the system has $currentSemester, so "Change semester" is preselected.')
+                  : (isThai
+                        ? 'ระบบไม่รู้ว่าไฟล์นี้เป็นภาคเรียนเดียวกับตารางที่ใช้อยู่หรือไม่ กรุณาเลือก'
+                        : 'It is unclear whether this file is the same semester. Please choose.'),
+              style: TextStyle(color: colors.onSurfaceVariant, fontSize: 11.5),
+            ),
+          ],
+          const SizedBox(height: 6),
+          RadioGroup<bool>(
+            groupValue: replaceAll,
+            onChanged: (value) {
+              if (value == null) return;
+              onChanged?.call(value);
+            },
+            child: Column(
+              children: [
+                RadioListTile<bool>(
+                  key: const Key('schedule-import-replace-all'),
+                  value: true,
+                  enabled: onChanged != null,
+                  contentPadding: EdgeInsets.zero,
+                  title: Text(
+                    isThai
+                        ? 'เปลี่ยนภาคเรียน — ล้างตารางเดิมของทุกห้อง'
+                        : 'Change semester — clear every room\'s timetable',
+                    style: const TextStyle(fontWeight: FontWeight.w700),
+                  ),
+                  subtitle: Text(
+                    isThai
+                        ? '$sample จะไม่มีคาบเรียนเหลือ ($classes คาบ) · ใช้ตอนขึ้นภาคเรียนใหม่'
+                        : '$sample will have no classes left ($classes) · use for a new semester',
+                  ),
+                ),
+                RadioListTile<bool>(
+                  key: const Key('schedule-import-keep-others'),
+                  value: false,
+                  enabled: onChanged != null,
+                  contentPadding: EdgeInsets.zero,
+                  title: Text(
+                    isThai
+                        ? 'เก็บตารางเดิมของห้องเหล่านั้นไว้'
+                        : 'Keep those rooms\' timetables',
+                    style: const TextStyle(fontWeight: FontWeight.w700),
+                  ),
+                  subtitle: Text(
+                    isThai
+                        ? 'แทนที่เฉพาะ $roomCount ห้องที่อยู่ในไฟล์ · ใช้เมื่อแก้ตารางบางห้องระหว่างภาคเรียน'
+                        : 'Replace only the $roomCount rooms in the file · for mid-semester fixes',
+                  ),
+                ),
+              ],
             ),
           ),
         ],

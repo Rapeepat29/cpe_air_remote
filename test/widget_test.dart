@@ -7,6 +7,7 @@ import 'package:cpe_air_remote/models/admin_contact.dart';
 import 'package:cpe_air_remote/models/air_conditioner.dart';
 import 'package:cpe_air_remote/models/auth_user.dart';
 import 'package:cpe_air_remote/models/class_schedule.dart';
+import 'package:cpe_air_remote/models/room_calendar.dart';
 import 'package:cpe_air_remote/models/energy_data.dart';
 import 'package:cpe_air_remote/models/system_alert.dart';
 import 'package:cpe_air_remote/models/remembered_login.dart';
@@ -358,6 +359,22 @@ void main() {
     expect(find.text('ห้อง 16302'), findsOneWidget);
     expect(find.text('ดร.พชร ศรีมุกข์'), findsOneWidget);
 
+    // เพิ่มการใช้ห้อง (ประชุม) ให้ห้อง 16302 ในวันที่กำลังดู แล้วเห็นในการ์ดของห้อง
+    await tester.tap(find.byKey(const Key('add-booking-16302')));
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byKey(const Key('booking-title-field')),
+      'ประชุมภาควิชา',
+    );
+    final saveBooking = find.byKey(const Key('booking-save-button'));
+    await tester.ensureVisible(saveBooking);
+    await tester.pumpAndSettle();
+    await tester.tap(saveBooking);
+    await tester.pumpAndSettle();
+    expect(scheduleRepository.bookings.length, 1);
+    expect(scheduleRepository.bookings.single.roomNumber, '16302');
+    expect(find.textContaining('ประชุมภาควิชา'), findsOneWidget);
+
     await tester.tap(find.byKey(const Key('manage-schedule-button')));
     await tester.pumpAndSettle();
 
@@ -706,6 +723,61 @@ class _MemoryScheduleRepository implements ScheduleRepository {
   @override
   Future<List<ClassSchedule>> fetchSchedules() async {
     return List.of(schedules);
+  }
+
+  final List<RoomBooking> bookings = [];
+  final List<AcademicTerm> terms = [];
+
+  @override
+  Future<ScheduleBundle> fetchScheduleBundle() async {
+    return ScheduleBundle(schedules: List.of(schedules));
+  }
+
+  @override
+  Future<AcademicCalendar> fetchAcademicCalendar() async {
+    return AcademicCalendar(today: '', terms: List.of(terms));
+  }
+
+  @override
+  Future<AcademicTerm> saveAcademicTerm(AcademicTerm term) async {
+    terms
+      ..removeWhere((item) => item.semester == term.semester)
+      ..add(term);
+    return term;
+  }
+
+  @override
+  Future<void> deleteAcademicTerm(String semester) async {
+    terms.removeWhere((item) => item.semester == semester);
+  }
+
+  @override
+  Future<List<RoomBooking>> fetchBookings({
+    required String from,
+    required String to,
+  }) async {
+    return bookings.where((item) => item.overlapsRange(from, to)).toList();
+  }
+
+  @override
+  Future<void> createBooking(RoomBooking booking) async {
+    bookings.add(
+      RoomBooking.fromJson({
+        ...booking.toRequestJson(),
+        'id': 'booking-${_nextId++}',
+      }),
+    );
+  }
+
+  @override
+  Future<void> updateBooking(RoomBooking booking) async {
+    final index = bookings.indexWhere((item) => item.id == booking.id);
+    bookings[index] = booking;
+  }
+
+  @override
+  Future<void> deleteBooking(String id) async {
+    bookings.removeWhere((item) => item.id == id);
   }
 
   @override

@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 
 import '../config/api_config.dart';
 import '../models/class_schedule.dart';
+import '../models/room_calendar.dart';
 import '../models/schedule_import.dart';
 import 'auth_service.dart';
 import 'schedule_repository.dart';
@@ -29,16 +30,82 @@ class ScheduleService implements ScheduleRepository {
 
   @override
   Future<List<ClassSchedule>> fetchSchedules() async {
+    return (await fetchScheduleBundle()).schedules;
+  }
+
+  @override
+  Future<ScheduleBundle> fetchScheduleBundle() async {
     final data = await _request('GET', '/schedules');
     final schedules = data['schedules'];
     if (schedules is! List) {
       throw const ApiException('The server returned invalid schedule data.');
     }
 
-    return schedules
+    return ScheduleBundle(
+      schedules: schedules
+          .whereType<Map<String, dynamic>>()
+          .map(ClassSchedule.fromJson)
+          .toList(),
+      timetable: TimetableInfo.fromJson(data['timetable']),
+      supportsTimetable: data.containsKey('timetable'),
+    );
+  }
+
+  @override
+  Future<AcademicCalendar> fetchAcademicCalendar() async {
+    final data = await _request('GET', '/schedules/terms');
+    return AcademicCalendar.fromJson(data);
+  }
+
+  @override
+  Future<AcademicTerm> saveAcademicTerm(AcademicTerm term) async {
+    final data = await _request(
+      'PUT',
+      '/schedules/terms',
+      body: term.toRequestJson(),
+    );
+    return AcademicTerm.fromJson(_map(data['term']));
+  }
+
+  @override
+  Future<void> deleteAcademicTerm(String semester) async {
+    await _request(
+      'DELETE',
+      '/schedules/terms?semester=${Uri.encodeQueryComponent(semester)}',
+    );
+  }
+
+  @override
+  Future<List<RoomBooking>> fetchBookings({
+    required String from,
+    required String to,
+  }) async {
+    final data = await _request('GET', '/bookings?from=$from&to=$to');
+    final bookings = data['bookings'];
+    if (bookings is! List) return const [];
+    return bookings
         .whereType<Map<String, dynamic>>()
-        .map(ClassSchedule.fromJson)
+        .map(RoomBooking.fromJson)
         .toList();
+  }
+
+  @override
+  Future<void> createBooking(RoomBooking booking) async {
+    await _request('POST', '/bookings', body: booking.toRequestJson());
+  }
+
+  @override
+  Future<void> updateBooking(RoomBooking booking) async {
+    await _request(
+      'PUT',
+      '/bookings/${Uri.encodeComponent(booking.id)}',
+      body: booking.toRequestJson(),
+    );
+  }
+
+  @override
+  Future<void> deleteBooking(String id) async {
+    await _request('DELETE', '/bookings/${Uri.encodeComponent(id)}');
   }
 
   @override

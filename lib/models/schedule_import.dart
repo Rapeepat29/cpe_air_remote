@@ -83,6 +83,7 @@ class ScheduleImportPreview {
     this.termSemester,
     this.termStartDate,
     this.termEndDate,
+    this.replaceAll = false,
   });
 
   final String fileName;
@@ -101,6 +102,12 @@ class ScheduleImportPreview {
   /// ช่วงวันที่ใช้ตารางนี้ รูปแบบ yyyy-MM-dd ทั้งคู่ หรือ null ทั้งคู่
   final String? termStartDate;
   final String? termEndDate;
+
+  /// เปลี่ยนภาคเรียน: ล้างตารางเดิมของทุกห้องก่อนนำเข้า ไม่ใช่แค่ห้องในไฟล์
+  ///
+  /// ไฟล์ของเทอมใหม่มักไม่มีชีตของห้องที่เทอมนี้ไม่มีเรียน ถ้าไม่ล้าง ห้องพวกนั้น
+  /// จะค้างตารางเทอมเก่า และระบบปิดแอร์จะคิดว่ายังมีคาบ (รอ 15 นาทีแทน 5)
+  final bool replaceAll;
 
   bool get hasTerm => termStartDate != null && termEndDate != null;
 
@@ -123,6 +130,26 @@ class ScheduleImportPreview {
       termSemester: semester,
       termStartDate: isoDate(startDate),
       termEndDate: isoDate(endDate),
+      replaceAll: replaceAll,
+    );
+  }
+
+  /// สำเนาที่ตั้งว่าจะล้างตารางเดิมทุกห้อง (เปลี่ยนภาคเรียน) หรือไม่
+  ScheduleImportPreview withReplaceAll(bool value) {
+    return ScheduleImportPreview(
+      fileName: fileName,
+      semester: semester,
+      schedules: schedules,
+      roomNumbers: roomNumbers,
+      existingRoomNumbers: existingRoomNumbers,
+      newRooms: newRooms,
+      warnings: warnings,
+      skippedSheets: skippedSheets,
+      csv: csv,
+      termSemester: termSemester,
+      termStartDate: termStartDate,
+      termEndDate: termEndDate,
+      replaceAll: value,
     );
   }
 
@@ -167,6 +194,7 @@ class ScheduleImportPreview {
   Map<String, dynamic> toCommitJson() {
     return {
       'createMissingRooms': newRooms.isNotEmpty,
+      if (replaceAll) 'replaceAll': true,
       'schedules': schedules.map((schedule) => schedule.toJson()).toList(),
       if (termSemester != null) 'semester': termSemester,
       if (hasTerm) 'startDate': termStartDate,

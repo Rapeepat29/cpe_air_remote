@@ -41,8 +41,11 @@ class FileSaveResult {
 Future<FileSaveResult> saveExportFile({
   required String fileName,
   required Uint8List bytes,
+  String fileExtension = 'xlsx',
+  String mimeType = _xlsxMimeType,
+  String typeLabel = 'Excel',
 }) async {
-  final safeName = sanitizeFileName(fileName);
+  final safeName = sanitizeFileName(fileName, fileExtension: fileExtension);
 
   try {
     if (Platform.isAndroid || Platform.isIOS) {
@@ -52,7 +55,7 @@ Future<FileSaveResult> saveExportFile({
 
       final result = await SharePlus.instance.share(
         ShareParams(
-          files: [XFile(file.path, mimeType: _xlsxMimeType)],
+          files: [XFile(file.path, mimeType: mimeType)],
           subject: safeName,
         ),
       );
@@ -67,9 +70,9 @@ Future<FileSaveResult> saveExportFile({
       suggestedName: safeName,
       acceptedTypeGroups: const [
         picker.XTypeGroup(
-          label: 'Excel',
-          extensions: ['xlsx'],
-          mimeTypes: [_xlsxMimeType],
+          label: typeLabel,
+          extensions: [fileExtension],
+          mimeTypes: [mimeType],
         ),
       ],
     );
@@ -77,9 +80,9 @@ Future<FileSaveResult> saveExportFile({
       return const FileSaveResult(FileSaveStatus.cancelled);
     }
 
-    final path = location.path.toLowerCase().endsWith('.xlsx')
+    final path = location.path.toLowerCase().endsWith('.$fileExtension')
         ? location.path
-        : '${location.path}.xlsx';
+        : '${location.path}.$fileExtension';
     await File(path).writeAsBytes(bytes, flush: true);
     return FileSaveResult(FileSaveStatus.saved, path: path);
   } catch (error) {
@@ -88,11 +91,11 @@ Future<FileSaveResult> saveExportFile({
 }
 
 /// ตัดอักขระที่ระบบไฟล์ไม่รับออก ชื่อภาษาไทยยังใช้ได้ตามปกติ
-String sanitizeFileName(String value) {
+String sanitizeFileName(String value, {String fileExtension = 'xlsx'}) {
   final trimmed = value.trim();
   final cleaned = trimmed
       .replaceAll(RegExp(r'[\\/:*?"<>|]'), '_')
       .replaceAll(RegExp(r'\s+'), ' ');
-  final name = cleaned.isEmpty ? 'energy-export.xlsx' : cleaned;
-  return name.toLowerCase().endsWith('.xlsx') ? name : '$name.xlsx';
+  final name = cleaned.isEmpty ? 'energy-export.$fileExtension' : cleaned;
+  return name.toLowerCase().endsWith('.$fileExtension') ? name : '$name.$fileExtension';
 }
