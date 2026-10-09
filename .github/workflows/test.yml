@@ -22,7 +22,7 @@ jobs:
         run: |
           set -o pipefail
           flutter analyze --no-fatal-infos --no-fatal-warnings 2>&1 | tee analyze.txt || {
-            grep -E ' (error|warning) • ' analyze.txt | head -40 | while IFS= read -r line; do echo "::error::$line"; done
+            grep -iE '(error|warning)' analyze.txt | head -40 | while IFS= read -r line; do echo "::error::$line"; done
             exit 1
           }
           grep -E ' warning • ' analyze.txt | head -20 | while IFS= read -r line; do echo "::warning::$line"; done
