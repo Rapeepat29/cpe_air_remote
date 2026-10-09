@@ -68,7 +68,7 @@ Future<FileSaveResult> saveExportFile({
 
     final location = await picker.getSaveLocation(
       suggestedName: safeName,
-      acceptedTypeGroups: const [
+      acceptedTypeGroups: [
         picker.XTypeGroup(
           label: typeLabel,
           extensions: [fileExtension],

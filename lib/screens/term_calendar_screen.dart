@@ -176,15 +176,14 @@ class TermCalendarScreen extends StatelessWidget {
     );
     if (confirmed != true || !context.mounted) return;
     final messenger = ScaffoldMessenger.of(context);
+    final done = l10n(
+      context,
+      'ลบภาคเรียน ${term.semester} แล้ว',
+      'Semester ${term.semester} removed.',
+    );
     try {
       await controller.deleteAcademicTerm(term.semester);
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text(
-            l10n(context, 'ลบภาคเรียน ${term.semester} แล้ว', 'Semester ${term.semester} removed.'),
-          ),
-        ),
-      );
+      messenger.showSnackBar(SnackBar(content: Text(done)));
     } catch (error) {
       if (!context.mounted) return;
       messenger.showSnackBar(SnackBar(content: Text(context.tr(error.toString()))));
