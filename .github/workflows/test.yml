@@ -1,0 +1,21 @@
+# ตรวจโค้ดแอปทุกครั้งที่ push: flutter analyze + flutter test (เครื่อง Linux ไม่กินโควตา macOS)
+name: ทดสอบแอป Flutter
+
+on:
+  push:
+    paths: ['lib/**', 'test/**', 'pubspec.yaml', 'pubspec.lock', '.github/workflows/test.yml']
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: flutter analyze --no-fatal-infos
+      - run: flutter test

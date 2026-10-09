@@ -361,7 +361,7 @@ class _RoomSummaryCard extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
     final palette = AppPalette.of(context);
     final airs = room.airConditioners;
-    final onCount = airs.where((air) => air.canControl && air.isOn).length;
+    final onCount = airs.where((air) => air.canControl && air.isPoweredOn).length;
     final onlineCount = airs.where((air) => air.isOnline).length;
     final (sensorText, sensorColor) = _sensorStatus(context, palette);
 

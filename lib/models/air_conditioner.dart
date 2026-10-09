@@ -188,6 +188,13 @@ class AirConditioner {
 
   bool get isAutoOffPending => autoOffDeadlineAt != null;
 
+  /// เครื่องเปิดอยู่จริงหรือไม่ ใช้แสดงผลและเป็นค่าตั้งต้นของคำสั่งถัดไป
+  ///
+  /// `isOn` คือคำสั่งล่าสุดที่ระบบยิง IR ไป ถ้ามีคนเปิดแอร์ด้วยรีโมตจริง
+  /// ค่านี้จะยังเป็น false ทั้งที่แอร์กินไฟอยู่ จึงเชื่อ PZEM ด้วย:
+  /// ถ้าเฟิร์มแวร์ยืนยันแล้วว่าแอร์ทำงาน (>= 30 W ติดกัน 3 ครั้ง) ถือว่าเปิดอยู่
+  bool get isPoweredOn => isOn || (pzemAvailable && isRunning);
+
   bool get isProvisioned => provisionStatus == 'active';
   bool get canControl => isProvisioned && isOnline && deviceId != null;
   bool get isSaijoDenki => protocol == 'SAIJO_DENKI';
@@ -280,7 +287,8 @@ class AirConditioner {
     dailyOn: dailyOn,
     dailyOff: dailyOff,
     lastSeenAt: lastSeenAt,
-    isOn: isOn,
+    // เริ่มจากสถานะจริง กดปุ่มอื่นตอนแอร์เปิดด้วยรีโมตจะได้ไม่เผลอสั่งปิด
+    isOn: isPoweredOn,
     temperature: temperature,
     mode: mode,
     fanSpeed: fanSpeed,
@@ -307,6 +315,9 @@ class AirConditioner {
 
   void copyStateFrom(AirConditioner other) {
     isOn = other.isOn;
+    // สั่งปิดแล้ว ให้หน้าจอขึ้นว่าปิดทันที ไม่ต้องรอ PZEM ยืนยัน (~6 วินาที)
+    // ถ้าแอร์ไม่ดับจริง รอบรีเฟรชถัดไปจะได้ acRunning = true กลับมาเอง
+    if (!other.isOn) isRunning = false;
     temperature = other.temperature;
     mode = other.mode;
     fanSpeed = other.fanSpeed;

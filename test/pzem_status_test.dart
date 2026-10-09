@@ -49,4 +49,45 @@ void main() {
     expect(room.runningAirCount, 1);
     expect(room.totalPower, 450);
   });
+
+  test('air turned on with the physical remote shows as on', () {
+    final air = AirConditioner(
+      id: 1,
+      name: 'Air 1',
+      isOn: false,
+      isRunning: true,
+      pzemAvailable: true,
+      power: 158,
+    );
+
+    expect(air.isPoweredOn, isTrue);
+    // คำสั่งถัดไปต้องเริ่มจาก "เปิด" กดปรับอุณหภูมิจะได้ไม่เผลอสั่งปิดแอร์
+    expect(air.editableCopy().isOn, isTrue);
+  });
+
+  test('turning off clears the running flag until PZEM reports again', () {
+    final air = AirConditioner(
+      id: 1,
+      name: 'Air 1',
+      isOn: false,
+      isRunning: true,
+      pzemAvailable: true,
+    );
+    final draft = air.editableCopy()..isOn = false;
+    air.copyStateFrom(draft);
+
+    expect(air.isPoweredOn, isFalse);
+  });
+
+  test('without PZEM the IR command decides', () {
+    final air = AirConditioner(
+      id: 1,
+      name: 'Air 1',
+      isOn: false,
+      isRunning: true,
+      pzemAvailable: false,
+    );
+
+    expect(air.isPoweredOn, isFalse);
+  });
 }

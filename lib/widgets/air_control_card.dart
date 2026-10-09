@@ -56,7 +56,7 @@ class _AirControlCardState extends State<AirControlCard> {
 
   /// นาฬิกาปิดอัตโนมัติที่ใช้กับเครื่องนี้ (ของเครื่องก่อน แล้วค่อยของห้อง)
   DateTime? get _deadline {
-    if (!air.isOn) return null;
+    if (!air.isPoweredOn) return null;
     return air.autoOffDeadlineAt ?? widget.roomAutoOffDeadline;
   }
 
@@ -70,7 +70,7 @@ class _AirControlCardState extends State<AirControlCard> {
 
     final colors = Theme.of(context).colorScheme;
     final palette = AppPalette.of(context);
-    final on = air.isOn;
+    final on = air.isPoweredOn;
     final deadline = _deadline;
     final sending = deadline != null && _attempts > 0;
 

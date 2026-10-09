@@ -410,7 +410,13 @@ const drafts = new Map();
 
 function draftFor(unit) {
   if (!drafts.has(unit.deviceId)) {
-    drafts.set(unit.deviceId, { ...unit.state });
+    // state.power คือคำสั่งล่าสุดที่ระบบส่ง ถ้ามีคนเปิดด้วยรีโมตจริง ค่านี้ยังเป็น false
+    // จึงถือว่าเปิดอยู่ด้วยถ้า PZEM ยืนยันแล้วว่าแอร์กินไฟ (เหมือนแอปมือถือ)
+    const running = unit.pzemAvailable === true && unit.acRunning === true;
+    drafts.set(unit.deviceId, {
+      ...unit.state,
+      power: Boolean(unit.state?.power) || running,
+    });
   }
   return drafts.get(unit.deviceId);
 }
