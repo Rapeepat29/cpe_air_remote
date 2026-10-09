@@ -52,6 +52,12 @@ String formatDayMonth(DateTime date, bool isThai) {
   return '${date.day} ${months[date.month - 1]}';
 }
 
+/// ชื่อวันแบบย่อ เช่น `จ` / `Mo` ใช้ใต้กราฟรายวัน
+String formatWeekdayShort(DateTime date, bool isThai) {
+  final names = isThai ? _thaiWeekdaysShort : _englishWeekdaysShort;
+  return names[date.weekday % 7];
+}
+
 /// เช่น `มิถุนายน 2569`
 String formatMonthYear(DateTime date, bool isThai) {
   final months = isThai ? _thaiMonthsFull : _englishMonthsFull;

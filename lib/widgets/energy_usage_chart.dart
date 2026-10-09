@@ -5,13 +5,16 @@ import '../theme/app_theme.dart';
 import '../utils/number_format.dart';
 import '../utils/thai_date.dart';
 
-/// กราฟการใช้พลังงาน พร้อมป้ายบอกค่าไฟของแต่ละจุด
+/// กราฟแท่งการใช้พลังงาน หนึ่งแท่งต่อหนึ่งช่วง (ชั่วโมงหรือวัน)
 ///
-/// ป้ายค่าไฟจะติดอยู่เหนือจุดตลอด ถ้าจุดถี่จนป้ายจะทับกันเองจะเว้นระยะให้
-/// อัตโนมัติ และแตะหรือลากนิ้วบนกราฟเพื่อดูรายละเอียดของจุดที่ต้องการได้
+/// ออกแบบให้อ่านง่ายทุกช่วงเวลา ตั้งแต่ 24 แท่งของ "วันนี้" ไปจนถึง 30 แท่ง:
+/// - ไม่เขียนตัวเลขทุกแท่ง มีป้ายแค่แท่งที่สูงที่สุด ค่าของแท่งอื่นแตะเพื่อดู
+/// - ช่วงที่ไม่ใช้ไฟเหลือขีดจาง ๆ ไม่มีป้าย `0.00 kWh` ซ้ำเต็มแกน
+/// - แกนตั้งบอกขนาดด้วยตัวเลขกลม ๆ 3 ระดับ และบอกหน่วยไว้บนสุด
+/// - ข้อมูลรายวันตั้งแต่ 7 วันขึ้นไปมีเส้นประบอกค่าเฉลี่ยต่อวัน
 ///
-/// ทุกจุดใช้หน่วยเดียวกันเสมอ โดยคิดจากค่าที่สูงที่สุดของชุด เพราะถ้าปล่อยให้
-/// แต่ละจุดเลือกหน่วยเอง จุดที่เป็น `900 Wh` จะดูเหมือนมากกว่า `1.2 kWh`
+/// ทุกแท่งใช้หน่วยเดียวกันเสมอ โดยคิดจากค่าที่สูงที่สุดของชุด เพราะถ้าปล่อยให้
+/// แต่ละแท่งเลือกหน่วยเอง แท่งที่เป็น `900 Wh` จะดูเหมือนมากกว่า `1.2 kWh`
 class EnergyUsageChart extends StatefulWidget {
   const EnergyUsageChart({
     required this.points,
@@ -21,7 +24,7 @@ class EnergyUsageChart extends StatefulWidget {
 
   final List<EnergySeriesPoint> points;
 
-  /// ข้อความค่าเงินของหนึ่งจุด เช่น `บาท 0.02`
+  /// ข้อความค่าเงินของหนึ่งแท่ง เช่น `บาท 0.02`
   final String Function(double kwh) costLabel;
 
   @override
@@ -34,7 +37,7 @@ class _EnergyUsageChartState extends State<EnergyUsageChart> {
   @override
   void didUpdateWidget(covariant EnergyUsageChart oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // เปลี่ยนช่วงเวลาแล้วจำนวนจุดเปลี่ยน ดัชนีเดิมอาจชี้เลยขอบ
+    // เปลี่ยนช่วงเวลาแล้วจำนวนแท่งเปลี่ยน ดัชนีเดิมอาจชี้เลยขอบ
     final selected = _selectedIndex;
     if (selected != null && selected >= widget.points.length) {
       _selectedIndex = null;
@@ -42,24 +45,10 @@ class _EnergyUsageChartState extends State<EnergyUsageChart> {
   }
 
   void _selectAt(double dx, Size size, {bool toggle = false}) {
-    final positions = EnergyChartGeometry.resolve(
-      size,
-      widget.points.map((point) => point.kwh).toList(),
-    );
-    if (positions.isEmpty) return;
-
-    var nearest = 0;
-    var nearestDistance = double.infinity;
-    for (var i = 0; i < positions.length; i++) {
-      final distance = (positions[i].dx - dx).abs();
-      if (distance < nearestDistance) {
-        nearestDistance = distance;
-        nearest = i;
-      }
-    }
-
+    final index = EnergyChartGeometry.indexAt(dx, size, widget.points.length);
+    if (index == null) return;
     setState(() {
-      _selectedIndex = toggle && _selectedIndex == nearest ? null : nearest;
+      _selectedIndex = toggle && _selectedIndex == index ? null : index;
     });
   }
 
@@ -74,8 +63,19 @@ class _EnergyUsageChartState extends State<EnergyUsageChart> {
       );
     }
 
+    final isThai = AppLocalizations.of(context).isThai;
     final values = widget.points.map((point) => point.kwh).toList();
     final reference = energyScaleReference(values);
+    final daily = widget.points.every((point) => point.hour == null);
+
+    String? averageLabel;
+    if (daily && values.length >= 7) {
+      final average = values.reduce((a, b) => a + b) / values.length;
+      if (average > 0) {
+        final text = formatEnergy(average, scaleReference: reference).text;
+        averageLabel = isThai ? 'เฉลี่ย $text/วัน' : 'Avg $text/day';
+      }
+    }
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -101,11 +101,11 @@ class _EnergyUsageChartState extends State<EnergyUsageChart> {
                 child: CustomPaint(
                   painter: EnergyChartPainter(
                     values: values,
-                    labels: widget.points
-                        .map((point) => point.label)
-                        .toList(),
+                    labels: axisLabelsFor(widget.points, isThai),
                     scaleReference: reference,
                     selectedIndex: selected,
+                    peakPrefix: isThai ? 'สูงสุด' : 'Peak',
+                    averageLabel: averageLabel,
                   ),
                 ),
               ),
@@ -128,7 +128,45 @@ class _EnergyUsageChartState extends State<EnergyUsageChart> {
   }
 }
 
-/// กล่องรายละเอียดของจุดที่เลือก
+/// ป้ายใต้แกนนอน ช่องที่เป็น `''` คือไม่ต้องเขียน
+///
+/// - รายชั่วโมง: ทุก 6 ชั่วโมง (00:00 06:00 12:00 18:00) ไม่ต้องอ่าน 24 ป้าย
+/// - รายวันไม่เกิน 10 วัน: ชื่อวันแบบย่อ (จ อ พ …) เพราะคนจำเป็นวันในสัปดาห์
+/// - รายวันมากกว่านั้น: วันที่ทุก 7 วันกับวันสุดท้าย เว้นตัวที่ชิดวันสุดท้าย
+List<String> axisLabelsFor(List<EnergySeriesPoint> points, bool isThai) {
+  final count = points.length;
+  final last = count - 1;
+  final hourly = points.every((point) => point.hour != null);
+
+  return [
+    for (var i = 0; i < count; i++)
+      _axisLabel(points[i], i, last, hourly, isThai),
+  ];
+}
+
+String _axisLabel(
+  EnergySeriesPoint point,
+  int index,
+  int last,
+  bool hourly,
+  bool isThai,
+) {
+  if (hourly) {
+    final hour = point.hour!;
+    if (hour % 6 == 0) return '${hour.toString().padLeft(2, '0')}:00';
+    return '';
+  }
+
+  final date = DateTime.tryParse(point.date);
+  if (date == null) return index == 0 || index == last ? point.label : '';
+
+  if (last + 1 <= 10) return formatWeekdayShort(date, isThai);
+  if (index == last) return formatDayMonth(date, isThai);
+  if (index % 7 == 0 && index < last - 3) return formatDayMonth(date, isThai);
+  return '';
+}
+
+/// กล่องรายละเอียดของแท่งที่เลือก
 class _Tooltip extends StatelessWidget {
   const _Tooltip({
     required this.anchor,
@@ -156,10 +194,10 @@ class _Tooltip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // เกาะไว้เหนือจุด ถ้าชนขอบบนก็ย้ายไปอยู่ใต้จุดแทน
+    // เกาะไว้เหนือแท่ง ถ้าชนขอบบนก็ย้ายไปอยู่ใต้ยอดแท่งแทน
     const height = 66.0;
-    final above = anchor.dy - height - 12;
-    final top = above >= 0 ? above : anchor.dy + 14;
+    final above = anchor.dy - height - 10;
+    final top = above >= 0 ? above : anchor.dy + 12;
 
     return Positioned(
       left: clampToBox(anchor.dx - width / 2, size.width - width),
@@ -233,33 +271,76 @@ double clampToBox(double value, double limit) {
   return value;
 }
 
+/// ค่าบนสุดของแกนตั้งแบบตัวเลขกลม (1, 2, 2.5, 5 × 10^n) ที่ไม่น้อยกว่า [value]
+///
+/// แกนที่จบที่ 3.56 อ่านยาก จบที่ 4 แล้วมีเส้นกลางที่ 2 อ่านง่ายกว่ามาก
+double niceScaleMax(double value) {
+  if (value <= 0) return 1;
+  var magnitude = 1.0;
+  while (magnitude * 10 <= value) {
+    magnitude *= 10;
+  }
+  while (magnitude > value) {
+    magnitude /= 10;
+  }
+  for (final step in const [1.0, 2.0, 2.5, 4.0, 5.0, 10.0]) {
+    final candidate = step * magnitude;
+    if (candidate >= value - 1e-9) return candidate;
+  }
+  return 10 * magnitude;
+}
+
 /// พิกัดของกราฟ แยกออกมาให้ตัววาดกับตัวรับสัมผัสใช้สูตรเดียวกัน
 ///
-/// ถ้าสองที่คำนวณแยกกัน จุดที่แตะได้จะเลื่อนจากจุดที่เห็นทันทีที่แก้ระยะขอบ
+/// ถ้าสองที่คำนวณแยกกัน แท่งที่แตะได้จะเลื่อนจากแท่งที่เห็นทันทีที่แก้ระยะขอบ
 abstract final class EnergyChartGeometry {
-  static const double left = 18;
+  /// เว้นซ้ายไว้ให้ตัวเลขแกนตั้ง
+  static const double left = 30;
 
-  /// เว้นด้านบนไว้ให้ป้ายค่าไฟ ไม่ให้ป้ายของจุดสูงสุดโดนตัด
-  static const double top = 24;
-  static const double bottom = 28;
+  /// เว้นด้านบนไว้ให้ป้ายค่าสูงสุดและหน่วยของแกน
+  static const double top = 22;
+  static const double bottom = 22;
   static const double right = 4;
 
+  /// ความกว้างของช่องหนึ่งแท่ง
+  static double slot(Size size, int count) {
+    if (count <= 0) return 0;
+    return (size.width - left - right) / count;
+  }
+
+  /// ความกว้างของตัวแท่งเอง เว้นช่องไฟ ~40% และไม่อ้วนเกิน 28 px
+  static double barWidth(Size size, int count) {
+    final width = slot(size, count) * 0.62;
+    if (width > 28) return 28;
+    if (width < 1.5) return 1.5;
+    return width;
+  }
+
+  /// แท่งที่อยู่ตรง [dx] (คิดทั้งช่อง ไม่ต้องแตะโดนตัวแท่งพอดี)
+  static int? indexAt(double dx, Size size, int count) {
+    final width = slot(size, count);
+    if (width <= 0) return null;
+    final index = ((dx - left) / width).floor();
+    if (index < 0) return 0;
+    if (index >= count) return count - 1;
+    return index;
+  }
+
+  /// จุดกึ่งกลางยอดของแต่ละแท่ง
   static List<Offset> resolve(Size size, List<double> values) {
     if (values.length < 2) return const [];
 
     final chartHeight = size.height - top - bottom;
-    final chartWidth = size.width - left - right;
-    if (chartHeight <= 0 || chartWidth <= 0) return const [];
+    final width = slot(size, values.length);
+    if (chartHeight <= 0 || width <= 0) return const [];
 
-    final largest = energyScaleReference(values);
-    // ทุกค่าเป็นศูนย์ก็ยังต้องหารได้ จึงกันตัวหารเป็นศูนย์ไว้
-    final maxValue = largest > 0 ? largest : 1.0;
+    final maxValue = niceScaleMax(energyScaleReference(values));
 
     return [
       for (var i = 0; i < values.length; i++)
         Offset(
-          left + (chartWidth * i / (values.length - 1)),
-          top + chartHeight * (1 - values[i] / maxValue),
+          left + width * (i + 0.5),
+          top + chartHeight * (1 - (values[i] / maxValue).clamp(0.0, 1.0)),
         ),
     ];
   }
@@ -271,14 +352,26 @@ class EnergyChartPainter extends CustomPainter {
     required this.labels,
     required this.scaleReference,
     this.selectedIndex,
+    this.peakPrefix = 'Peak',
+    this.averageLabel,
   });
 
   final List<double> values;
+
+  /// ป้ายใต้แท่ง ช่องว่างคือไม่ต้องเขียน (ดู [axisLabelsFor])
   final List<String> labels;
   final double scaleReference;
   final int? selectedIndex;
 
-  static const Color _mutedText = Color(0xFFD5E1E5);
+  /// คำหน้าป้ายของแท่งสูงสุด เช่น `สูงสุด`
+  final String peakPrefix;
+
+  /// ป้ายของเส้นค่าเฉลี่ย null = ไม่ต้องวาดเส้น
+  final String? averageLabel;
+
+  static const Color _mutedText = Color(0xFFE3F7EA);
+  static const Color _barColor = Color(0xFFBFE8CF);
+  static const Color _averageColor = Color(0xFFFFE08A);
 
   TextPainter _text(String value, TextStyle style) {
     return TextPainter(
@@ -294,130 +387,158 @@ class EnergyChartPainter extends CustomPainter {
 
     const left = EnergyChartGeometry.left;
     const top = EnergyChartGeometry.top;
-    final chartHeight =
-        size.height - top - EnergyChartGeometry.bottom;
-    final chartWidth = size.width - left - EnergyChartGeometry.right;
+    final bottomY = size.height - EnergyChartGeometry.bottom;
+    final chartHeight = bottomY - top;
+    final chartRight = size.width - EnergyChartGeometry.right;
+    final maxValue = niceScaleMax(scaleReference);
 
-    final gridPaint = Paint()
-      ..color = Colors.white.withValues(alpha: 0.24)
-      ..strokeWidth = 1;
-    for (var i = 0; i <= 4; i++) {
-      final y = top + chartHeight * i / 4;
-      canvas.drawLine(Offset(left, y), Offset(left + chartWidth, y), gridPaint);
-    }
+    _paintGrid(canvas, left, chartRight, top, chartHeight, maxValue);
 
-    final path = Path()..moveTo(points.first.dx, points.first.dy);
-    for (var i = 0; i < points.length - 1; i++) {
-      final current = points[i];
-      final next = points[i + 1];
-      final middleX = (current.dx + next.dx) / 2;
-      path.cubicTo(middleX, current.dy, middleX, next.dy, next.dx, next.dy);
-    }
-
-    canvas.drawPath(
-      path,
-      Paint()
-        ..color = Colors.white
-        ..style = PaintingStyle.stroke
-        ..strokeCap = StrokeCap.round
-        ..strokeWidth = 2.3,
-    );
-
+    final barWidth = EnergyChartGeometry.barWidth(size, values.length);
+    final largest = values.reduce((a, b) => a > b ? a : b);
+    final peakIndex = largest > 0 ? values.indexOf(largest) : -1;
     final selected = selectedIndex;
-    if (selected != null && selected < points.length) {
-      canvas.drawLine(
-        Offset(points[selected].dx, top),
-        Offset(points[selected].dx, top + chartHeight),
-        Paint()
-          ..color = Colors.white.withValues(alpha: 0.55)
-          ..strokeWidth = 1.2,
+    final radius = Radius.circular(barWidth >= 6 ? 3 : 1);
+
+    for (var i = 0; i < points.length; i++) {
+      final x = points[i].dx - barWidth / 2;
+      if (values[i] <= 0) {
+        // ไม่ใช้ไฟเลย เหลือขีดจาง ๆ ให้รู้ว่ามีช่วงนี้อยู่ แต่ไม่แย่งสายตา
+        canvas.drawRRect(
+          RRect.fromRectAndRadius(
+            Rect.fromLTWH(x, bottomY - 2.5, barWidth, 2.5),
+            const Radius.circular(1),
+          ),
+          Paint()..color = Colors.white.withValues(alpha: 0.22),
+        );
+        continue;
+      }
+      // ค่าเล็กมากก็ยังต้องเห็นเป็นแท่ง ไม่ใช่หายไปกับเส้นฐาน
+      final barTop = points[i].dy > bottomY - 2.5 ? bottomY - 2.5 : points[i].dy;
+      final highlighted = i == selected || (selected == null && i == peakIndex);
+      canvas.drawRRect(
+        RRect.fromRectAndCorners(
+          Rect.fromLTRB(x, barTop, x + barWidth, bottomY),
+          topLeft: radius,
+          topRight: radius,
+        ),
+        Paint()..color = highlighted ? Colors.white : _barColor,
       );
     }
 
-    final pointFill = Paint()..color = AppColors.primary;
-    final pointBorder = Paint()
-      ..color = Colors.white
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2;
-    for (var i = 0; i < points.length; i++) {
-      final radius = i == selected ? 6.2 : 4.3;
-      canvas.drawCircle(points[i], radius, pointFill);
-      canvas.drawCircle(points[i], radius, pointBorder);
+    _paintAverage(canvas, left, chartRight, top, chartHeight, maxValue);
+
+    // ป้ายแท่งสูงสุด ซ่อนไว้ตอนมีแท่งที่เลือกอยู่ เพราะกล่องรายละเอียดบอกแล้ว
+    if (peakIndex >= 0 && selected == null) {
+      final text = '$peakPrefix '
+          '${formatEnergy(largest, scaleReference: scaleReference).text}';
+      final painter = _text(
+        text,
+        const TextStyle(
+          color: Colors.white,
+          fontSize: 10.5,
+          fontWeight: FontWeight.w700,
+        ),
+      );
+      final x = clampToBox(
+        points[peakIndex].dx - painter.width / 2,
+        size.width - painter.width,
+      );
+      final y = points[peakIndex].dy - painter.height - 4;
+      painter.paint(canvas, Offset(x, y < 0 ? 0 : y));
     }
 
-    _paintValueLabels(canvas, size, points);
-    _paintAxisLabels(canvas, size, chartWidth);
+    _paintAxisLabels(canvas, size, points);
   }
 
-  /// ป้ายค่าไฟเหนือจุด เว้นระยะเองเมื่อจุดถี่เกินกว่าที่ป้ายจะไม่ทับกัน
-  void _paintValueLabels(Canvas canvas, Size size, List<Offset> points) {
-    const style = TextStyle(
-      color: Colors.white,
-      fontSize: 9.5,
-      fontWeight: FontWeight.w700,
-    );
-    // ติดหน่วยไปกับป้ายทุกใบ เพราะกราฟสลับหน่วยตามชุดข้อมูลได้
-    // เห็นแค่ `5.00` ลอย ๆ จะไม่รู้ว่าเป็น Wh หรือ kWh
-    final texts = [
-      for (final value in values)
-        formatEnergy(value, scaleReference: scaleReference).text,
-    ];
+  void _paintGrid(
+    Canvas canvas,
+    double left,
+    double right,
+    double top,
+    double chartHeight,
+    double maxValue,
+  ) {
+    final reference = formatEnergy(maxValue);
+    final factor = switch (reference.unit) {
+      'Wh' => 1000.0,
+      'MWh' => 0.001,
+      _ => 1.0,
+    };
+    const style = TextStyle(color: _mutedText, fontSize: 9);
 
-    var widest = 0.0;
-    for (final text in texts) {
-      final painter = _text(text, style);
-      if (painter.width > widest) widest = painter.width;
+    for (var i = 0; i <= 2; i++) {
+      final y = top + chartHeight * i / 2;
+      canvas.drawLine(
+        Offset(left, y),
+        Offset(right, y),
+        Paint()
+          ..color = Colors.white.withValues(alpha: i == 2 ? 0.45 : 0.18)
+          ..strokeWidth = 1,
+      );
+      final value = maxValue * (2 - i) / 2 * factor;
+      final painter = _text(_tickText(value), style);
+      painter.paint(
+        canvas,
+        Offset(left - painter.width - 5, y - painter.height / 2),
+      );
     }
 
-    final spacing = points[1].dx - points.first.dx;
-    final needed = widest + 8;
-    // จุดถี่จนไม่มีที่ว่างเลย ก็เหลือแค่ป้ายแรกกับป้ายสุดท้าย
-    // ถ้าไม่กัน spacing เป็นศูนย์ไว้ การหารจะได้อนันต์ แล้ว ceil() จะโยน error
-    final step = spacing <= 0
-        ? points.length
-        : (spacing >= needed ? 1 : (needed / spacing).ceil());
+    // หน่วยของแกนอยู่บนสุดที่เดียว ไม่ต้องติดทุกตัวเลข
+    _text(reference.unit, style).paint(canvas, const Offset(0, 0));
+  }
 
-    var lastPaintedX = double.negativeInfinity;
-    for (var i = 0; i < points.length; i++) {
-      final isSelected = i == selectedIndex;
-      final isLast = i == points.length - 1;
-      // จุดที่เลือกอยู่มีกล่องรายละเอียดของตัวเองแล้ว ไม่ต้องมีป้ายซ้ำ
-      if (isSelected) {
-        lastPaintedX = points[i].dx;
-        continue;
-      }
-      // จุดสุดท้ายมักเป็นค่าล่าสุดที่คนอยากเห็น จึงพยายามวาดให้เสมอถ้ายังมีที่
-      final scheduled = i % step == 0;
-      if (!scheduled && !isLast) continue;
-      if (points[i].dx - lastPaintedX < needed) continue;
+  void _paintAverage(
+    Canvas canvas,
+    double left,
+    double right,
+    double top,
+    double chartHeight,
+    double maxValue,
+  ) {
+    final label = averageLabel;
+    if (label == null) return;
 
-      final painter = _text(texts[i], style);
+    final average = values.reduce((a, b) => a + b) / values.length;
+    final y = top + chartHeight * (1 - (average / maxValue).clamp(0.0, 1.0));
+    final paint = Paint()
+      ..color = _averageColor
+      ..strokeWidth = 1.5;
+    // เส้นประวาดเองเป็นช่วง ๆ เพราะ Canvas ไม่มีเส้นประให้
+    for (var x = left; x < right; x += 8) {
+      final end = x + 4 > right ? right : x + 4;
+      canvas.drawLine(Offset(x, y), Offset(end, y), paint);
+    }
+
+    final painter = _text(
+      label,
+      const TextStyle(
+        color: _averageColor,
+        fontSize: 9.5,
+        fontWeight: FontWeight.w700,
+      ),
+    );
+    painter.paint(
+      canvas,
+      Offset(right - painter.width, y - painter.height - 2),
+    );
+  }
+
+  void _paintAxisLabels(Canvas canvas, Size size, List<Offset> points) {
+    const style = TextStyle(color: _mutedText, fontSize: 9);
+    var lastRight = double.negativeInfinity;
+
+    for (var i = 0; i < labels.length && i < points.length; i++) {
+      if (labels[i].isEmpty) continue;
+      final painter = _text(labels[i], style);
       final x = clampToBox(
         points[i].dx - painter.width / 2,
         size.width - painter.width,
       );
-      final y = points[i].dy - painter.height - 7;
-      painter.paint(canvas, Offset(x, y < 0 ? 0 : y));
-      lastPaintedX = points[i].dx;
-    }
-  }
-
-  void _paintAxisLabels(Canvas canvas, Size size, double chartWidth) {
-    const style = TextStyle(color: _mutedText, fontSize: 9);
-    final step = labels.length > 12 ? (labels.length / 6).ceil() : 1;
-
-    for (var i = 0; i < labels.length; i++) {
-      if (i % step != 0 && i != labels.length - 1) continue;
-      final painter = _text(labels[i], style);
-      final x = EnergyChartGeometry.left +
-          (chartWidth * i / (labels.length - 1));
-      painter.paint(
-        canvas,
-        Offset(
-          clampToBox(x - painter.width / 2, size.width - painter.width),
-          size.height - 16,
-        ),
-      );
+      // ป้ายชนกันก็ข้ามตัวหลังไป ไม่ซ้อนทับจนอ่านไม่ออก
+      if (x < lastRight + 4) continue;
+      painter.paint(canvas, Offset(x, size.height - 15));
+      lastRight = x + painter.width;
     }
   }
 
@@ -428,8 +549,20 @@ class EnergyChartPainter extends CustomPainter {
     return !_sameItems(oldDelegate.values, values) ||
         !_sameItems(oldDelegate.labels, labels) ||
         oldDelegate.scaleReference != scaleReference ||
-        oldDelegate.selectedIndex != selectedIndex;
+        oldDelegate.selectedIndex != selectedIndex ||
+        oldDelegate.peakPrefix != peakPrefix ||
+        oldDelegate.averageLabel != averageLabel;
   }
+}
+
+/// ตัวเลขบนแกนตั้ง ตัดศูนย์ท้ายทิ้ง: 4 / 2.5 / 0.25
+String _tickText(double value) {
+  var text = value.toStringAsFixed(2);
+  if (text.contains('.')) {
+    text = text.replaceFirst(RegExp(r'0+$'), '');
+    text = text.replaceFirst(RegExp(r'\.$'), '');
+  }
+  return text;
 }
 
 /// เทียบรายการทีละสมาชิก

@@ -7,7 +7,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 const double _chartWidth = 300;
-const double _chartHeight = 162;
+const double _chartHeight = 190;
 
 List<EnergySeriesPoint> _series(List<double> values) {
   return [
@@ -61,17 +61,16 @@ Future<void> _tapPoint(WidgetTester tester, int index, int total) async {
 
 void main() {
   group('EnergyChartGeometry', () {
-    test('จุดแรกและจุดสุดท้ายอยู่ชิดขอบพื้นที่วาด', () {
-      final points = EnergyChartGeometry.resolve(
-        const Size(_chartWidth, _chartHeight),
-        const [0, 1, 2],
-      );
+    test('แท่งแรกและแท่งสุดท้ายอยู่กลางช่องของตัวเอง', () {
+      const size = Size(_chartWidth, _chartHeight);
+      final points = EnergyChartGeometry.resolve(size, const [0, 1, 2]);
+      final slot = EnergyChartGeometry.slot(size, 3);
 
       expect(points.length, 3);
-      expect(points.first.dx, EnergyChartGeometry.left);
+      expect(points.first.dx, closeTo(EnergyChartGeometry.left + slot / 2, 0.001));
       expect(
         points.last.dx,
-        _chartWidth - EnergyChartGeometry.right,
+        closeTo(_chartWidth - EnergyChartGeometry.right - slot / 2, 0.001),
       );
     });
 
@@ -81,7 +80,7 @@ void main() {
         const [0, 0.005],
       );
 
-      expect(points.last.dy, EnergyChartGeometry.top);
+      expect(points.last.dy, closeTo(EnergyChartGeometry.top, 0.001));
       expect(
         points.first.dy,
         _chartHeight - EnergyChartGeometry.bottom,
@@ -100,13 +99,95 @@ void main() {
       }
     });
 
-    test('จุดเดียวยังวาดเส้นไม่ได้ จึงคืนรายการว่าง', () {
+    test('จุดเดียวคืนรายการว่าง (หน้าจอขึ้นข้อความแทนกราฟ)', () {
       final points = EnergyChartGeometry.resolve(
         const Size(_chartWidth, _chartHeight),
         const [1.0],
       );
 
       expect(points, isEmpty);
+    });
+
+    test('แตะตรงไหนของช่องก็ได้แท่งของช่องนั้น และไม่หลุดขอบ', () {
+      const size = Size(_chartWidth, _chartHeight);
+      final slot = EnergyChartGeometry.slot(size, 24);
+
+      expect(EnergyChartGeometry.indexAt(0, size, 24), 0);
+      expect(
+        EnergyChartGeometry.indexAt(EnergyChartGeometry.left + slot * 15.9, size, 24),
+        15,
+      );
+      expect(EnergyChartGeometry.indexAt(_chartWidth + 50, size, 24), 23);
+    });
+  });
+
+  group('niceScaleMax', () {
+    test('ปัดขึ้นเป็นตัวเลขกลมที่อ่านง่าย', () {
+      expect(niceScaleMax(3.56), 4);
+      expect(niceScaleMax(17.3), 20);
+      expect(niceScaleMax(0.005), 0.005);
+      expect(niceScaleMax(0.42), 0.5);
+      expect(niceScaleMax(212), 250);
+      expect(niceScaleMax(0), 1);
+    });
+  });
+
+  group('axisLabelsFor', () {
+    test('รายชั่วโมงเขียนแค่ทุก 6 ชั่วโมง', () {
+      final points = [
+        for (var h = 0; h < 24; h++)
+          EnergySeriesPoint(
+            label: '${h.toString().padLeft(2, '0')}:00',
+            date: '2026-10-09',
+            hour: h,
+            kwh: 0,
+          ),
+      ];
+      final labels = axisLabelsFor(points, true);
+
+      expect(labels.where((label) => label.isNotEmpty).toList(), [
+        '00:00',
+        '06:00',
+        '12:00',
+        '18:00',
+      ]);
+    });
+
+    test('7 วันใช้ชื่อวันแบบย่อ', () {
+      final points = [
+        for (var d = 3; d <= 9; d++)
+          EnergySeriesPoint(
+            label: '10-0$d',
+            date: '2026-10-0$d',
+            kwh: 1,
+          ),
+      ];
+
+      // 3 ต.ค. 2569 เป็นวันเสาร์ ไล่ไปจนถึงศุกร์ 9 ต.ค.
+      expect(axisLabelsFor(points, true), ['ส', 'อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ']);
+    });
+
+    test('30 วันมีวันที่ทุก 7 วันกับวันสุดท้าย ไม่ชิดกันจนทับ', () {
+      final start = DateTime(2026, 9, 10);
+      final points = [
+        for (var i = 0; i < 30; i++)
+          EnergySeriesPoint(
+            label: '',
+            date: start
+                .add(Duration(days: i))
+                .toIso8601String()
+                .substring(0, 10),
+            kwh: 1,
+          ),
+      ];
+      final labels = axisLabelsFor(points, true);
+      final shown = [
+        for (var i = 0; i < labels.length; i++)
+          if (labels[i].isNotEmpty) i,
+      ];
+
+      expect(shown, [0, 7, 14, 21, 29]);
+      expect(labels.last, formatDayMonth(DateTime(2026, 10, 9), true));
     });
   });
 

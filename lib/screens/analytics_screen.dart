@@ -222,7 +222,7 @@ class _SummaryHeader extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           SizedBox(
-            height: 162,
+            height: 190,
             width: double.infinity,
             child: EnergyUsageChart(
               points: summary.series,
