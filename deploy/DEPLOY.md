@@ -114,10 +114,18 @@ docker compose exec backend npm run db:doctor
 docker compose restart backend
 ```
 
-ครั้งต่อไปที่อัปเดตโค้ด ใช้คำสั่งเดียวจากเครื่อง Windows:
+ครั้งต่อไปที่อัปเดตโค้ด ใช้คำสั่งเดียวจากเครื่อง Windows (ใน **PowerShell** ที่โฟลเดอร์ `cpe_air_remote`):
 
 ```powershell
+git pull
 .\deploy\update-server.ps1
+```
+
+ถ้า Terminal เป็น Command Prompt (บรรทัดขึ้นต้น `C:\...>` ไม่มี `PS`) การพิมพ์ชื่อไฟล์ `.ps1`
+จะเปิด Notepad แทนการรัน ให้ใช้:
+
+```bat
+powershell -ExecutionPolicy Bypass -File .\deploy\update-server.ps1
 ```
 
 ---

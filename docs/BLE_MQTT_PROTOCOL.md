@@ -25,9 +25,18 @@ The identity characteristic returns:
   "deviceId": "ESP32-AABBCCDDEEFF",
   "bleName": "RMUTT-AC-AABBCCDDEEFF",
   "firmwareVersion": "1.0.0",
-  "configured": false
+  "configured": false,
+  "controlType": "ir"
 }
 ```
+
+`controlType` (firmware 2.5.0+) tells the app how the board drives the A/C:
+`"ir"` for `rmutt_esp32_air`, `"wired"` for `rmutt_esp32_air_wired`. Older
+boards omit it and are treated as `"ir"`. A wired board also sends
+`"brand": "Daikin"`; the app then locks the brand field to *Daikin · Wired*
+and reserves the unit with protocol `DAIKIN_WIRED` instead of offering IR
+protocols. The wired firmware stores `DAIKIN_WIRED` whatever protocol it is
+sent.
 
 Firmware 1.6 keeps this identity payload compact so that Windows WinRT can
 verify a newly connected board without a long GATT read timing out. When the
@@ -132,6 +141,26 @@ Firmware 2.0 status example:
   "powerFactor": 0.94
 }
 ```
+
+The wired board (`rmutt_esp32_air_wired`) adds these fields to `/status`:
+
+```json
+{
+  "controlMode": "wired",
+  "airBrand": "Daikin",
+  "busOk": true,
+  "compressorRunning": true,
+  "unitRoomTemperature": 27,
+  "roomTemperature": 27.4
+}
+```
+
+When `controlMode` is `wired` and the database still holds an IR protocol for
+that device (for example, reserved from an older app), the Backend changes it
+to `DAIKIN_WIRED`. For `DAIKIN_WIRED` the Backend accepts only Cool/Dry/Fan,
+fan Auto/Low/Medium/High, vertical swing Auto/Off, and Sleep (not in Dry); Eco,
+Turbo, Quiet, Clean and horizontal swing are forced off. The REST API returns
+`controlType: "wired" | "ir"` with every air conditioner.
 
 The Backend checks `class_schedules` for the device's room using
 `Asia/Bangkok` and publishes a retained response to

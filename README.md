@@ -81,6 +81,14 @@ Backend API, MariaDB, การเปลี่ยนรหัสผ่านด�
 - เลือกโปรโตคอลของ Daikin, Mitsubishi, Panasonic, Gree, Midea, LG, Samsung,
   Toshiba, Hitachi, Fujitsu, Kelvinator, Sharp, Electra, Haier และ Saijo Denki
   ได้ในแอป
+- **บอร์ดสายแอร์ Daikin** (`firmware/rmutt_esp32_air_wired`) ต่อสายแอร์แทน
+  รีโมตติดผนัง ไม่ใช้ IR บอร์ดบอกแอปเองว่าเป็น **Daikin · สายแอร์**
+  (โปรโตคอล `DAIKIN_WIRED`) ผู้ใช้ไม่ต้องเลือกยี่ห้อ ทำได้: เปิด/ปิด, 16–30 °C,
+  Cool/Dry/Fan, พัดลม Low/Medium/High/Auto, ส่ายหรือหยุด และ Sleep
+- การ์ดแอร์ในแอปและเว็บมีป้ายบอกยี่ห้อและวิธีควบคุม เช่น `Daikin · สายแอร์`
+  หรือ `Haier · รีโมต IR` และแสดงเฉพาะปุ่มที่แอร์เครื่องนั้นทำได้จริง
+- บอร์ดแอร์ทั้งสองแบบต่อจอ OLED 1.3" I2C (SDA GPIO21, SCL GPIO22) แสดงห้อง
+  อุณหภูมิที่ตั้ง โหมด พัดลม และกำลังไฟ ไม่ต่อจอก็ทำงานได้ตามปกติ
 - หน้าควบคุมแอร์แสดงค่าที่วัดจาก PZEM และสถานะทำงานจริง ส่วนสรุป Dashboard
   และสถิติย้อนหลังบางส่วนยังเป็นข้อมูลตัวอย่างจนกว่าจะเพิ่มระบบเก็บประวัติ
 
@@ -715,12 +723,25 @@ Setup Mode แล้วเลือก `ตั้งค่าใหม่ผ่�
 
 ## อัปเดตเซิร์ฟเวอร์จริง (VPS)
 
-ตอนแก้โค้ด Backend แล้วอยากให้ของบนเซิร์ฟเวอร์ตามทัน ให้รันคำสั่งเดียวจาก
-โฟลเดอร์หลัก `cpe_air_remote`:
+ตอนแก้โค้ด Backend แล้วอยากให้ของบนเซิร์ฟเวอร์ตามทัน ให้ดึงโค้ดล่าสุดก่อน
+แล้วรันคำสั่งเดียวจากโฟลเดอร์หลัก `cpe_air_remote`:
 
 ```powershell
+git pull
 .\deploy\update-server.ps1
 ```
+
+> **ต้องรันใน PowerShell ไม่ใช่ Command Prompt (cmd)** ถ้าพิมพ์ชื่อไฟล์ `.ps1`
+> ใน cmd (บรรทัดขึ้นต้นด้วย `C:\...>`) Windows จะเปิดไฟล์ใน Notepad แทนการรัน
+> ใน VS Code ให้กดลูกศรข้างปุ่ม `+` ของ Terminal แล้วเลือก **PowerShell**
+> (บรรทัดจะขึ้นต้นด้วย `PS C:\...>`) หรือถ้าอยู่ใน cmd อยู่แล้วให้ใช้
+>
+> ```bat
+> powershell -ExecutionPolicy Bypass -File .\deploy\update-server.ps1
+> ```
+>
+> ต้องมี `deploy\server.config.json` (คัดลอกจาก `server.config.example.json`)
+> ในโฟลเดอร์ที่รัน ไฟล์นี้ไม่อยู่ใน git ถ้า clone ใหม่ต้องคัดลอกมาเอง
 
 สคริปต์จะถามรหัสผ่าน SSH ไม่เกิน 2 ครั้ง แล้วทำให้ครบทุกขั้น:
 
@@ -797,25 +818,43 @@ flutter test
 
 ## 4. อัปโหลด Firmware ESP32
 
-ไฟล์ Firmware อยู่ที่:
+บอร์ดแอร์มี 2 แบบ เลือกตามวิธีที่ต่อกับแอร์:
 
-```text
-firmware/rmutt_esp32_air/rmutt_esp32_air.ino
-```
+| แบบ | ไฟล์ | ใช้เมื่อ |
+|---|---|---|
+| รีโมต IR (2.5.0) | `firmware/rmutt_esp32_air/rmutt_esp32_air.ino` | แอร์ทุกยี่ห้อที่สั่งด้วยรีโมตมือถือ |
+| สายแอร์ Daikin (2.5.1-slm8) | `firmware/rmutt_esp32_air_wired/rmutt_esp32_air_wired.ino` | แอร์ Daikin ที่ถอดรีโมตติดผนังออก แล้วต่อ ESP32 แทน |
 
 ติดตั้ง Arduino libraries:
 
 - ArduinoJson 6.x
 - PubSubClient
-- IRremoteESP8266 2.9.0
 - PZEM004Tv30 (Jakub Mandula)
+- U8g2 by olikraus (จอ OLED ทั้งสองแบบ)
+- IRremoteESP8266 2.9.0 (เฉพาะแบบ IR)
+- DHT sensor library by Adafruit (เฉพาะแบบสายแอร์ ใช้กับ DHT11)
 
-ค่าเริ่มต้นใช้ `GPIO17` เป็นขาส่ง IR และ `GPIO0` เป็นปุ่มเข้า Setup Mode
+ห้ามลบไฟล์ `build_opt.h` ในโฟลเดอร์สเก็ตช์ ถ้าไม่มี แบบ IR จะใหญ่เกินแฟลช
+
+| ขา | แบบ IR | แบบสายแอร์ |
+|---|---|---|
+| `GPIO17` | ส่ง IR | ไม่ใช้ |
+| `GPIO21` / `GPIO22` | OLED SDA / SCL | OLED SDA / SCL |
+| `GPIO16` / `GPIO18` | PZEM RX / TX | PZEM RX / TX |
+| `GPIO25` / `26` / `27` | LED เขียว / แดง / เหลือง | LED เขียว / แดง / เหลือง |
+| `GPIO0` | ปุ่ม BOOT เข้า Setup Mode | ปุ่ม BOOT เข้า Setup Mode |
+| `GPIO33` | — | ส่งเข้าสายแอร์ผ่าน 1N4148 |
+| `GPIO35` / `GPIO34` | — | รับสถานะ / ตรวจสัญญาณตัวเอง (ผ่าน 100k/200k) |
+| `GPIO4` | — | DHT11 |
+
+วิธีต่อสายแอร์และทดสอบอยู่ใน `firmware/rmutt_esp32_air_wired/README_WIRED_TH.md`
+ส่วนจอ OLED อยู่ใน `firmware/rmutt_esp32_air/README_OLED_TH.md`
 รายละเอียดการต่อและลำดับคอนฟิกอยู่ใน `firmware/README.md` ส่วนสัญญา BLE/MQTT
 ฉบับเต็มอยู่ใน `docs/BLE_MQTT_PROTOCOL.md`
 
-หนึ่ง ESP32 ควบคุมหนึ่งแอร์ และต้องเลือกโปรโตคอลยี่ห้อ/รุ่นให้ตรงกับรีโมตจริง
+หนึ่ง ESP32 ควบคุมหนึ่งแอร์ บอร์ด IR ต้องเลือกโปรโตคอลยี่ห้อ/รุ่นให้ตรงกับรีโมตจริง
 ฟังก์ชันบางรายการ เช่น Eco, Clean หรือ Swing อาจไม่มีในแอร์บางรุ่น
+บอร์ดสายแอร์ไม่ต้องเลือก แอปล็อกเป็น Daikin · สายแอร์ ให้เอง
 
 Firmware ตรวจคนอยู่ที่:
 
