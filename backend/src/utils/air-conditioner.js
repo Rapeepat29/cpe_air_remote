@@ -5,8 +5,13 @@ const roomPattern = /^[A-Z0-9][A-Z0-9_-]{1,19}$/;
 const devicePattern = /^ESP32-[0-9A-F]{12}$/;
 const timePattern = /^(?:[01]\d|2[0-3]):[0-5]\d$/;
 
+// DAIKIN_WIRED = บอร์ดรุ่นสายแอร์ (rmutt_esp32_air_wired) ใช้แทนรีโมตติดผนัง Daikin
+// ไม่ได้ยิง IR จึงไม่ใช่ชื่อโปรโตคอลของ IRremoteESP8266
+export const WIRED_PROTOCOL = 'DAIKIN_WIRED';
+
 const protocols = new Set([
   'DAIKIN',
+  WIRED_PROTOCOL,
   'ELECTRA_AC',
   'FUJITSU_AC',
   'GREE',
@@ -104,6 +109,19 @@ export function validateAirState(body, protocol = '') {
     throw new ApiError(400, 'ตำแหน่ง Swing ไม่ถูกต้อง');
   }
 
+  const wired = cleanString(protocol).toUpperCase() === WIRED_PROTOCOL;
+  if (wired) {
+    if (mode !== 'cool' && mode !== 'dry' && mode !== 'fan') {
+      throw new ApiError(400, 'แอร์แบบสายแอร์รองรับโหมด Cool, Dry และ Fan');
+    }
+    if (fanSpeed === 'turbo') {
+      throw new ApiError(400, 'แอร์แบบสายแอร์ไม่มีพัดลมระดับ Turbo');
+    }
+    if (verticalSwing !== 'auto' && verticalSwing !== 'off') {
+      throw new ApiError(400, 'แอร์แบบสายแอร์มีเฉพาะส่าย (Auto) หรือหยุด (Off)');
+    }
+  }
+
   if (cleanString(protocol).toUpperCase() === 'SAIJO_DENKI') {
     if (temperature < 18 || temperature > 29) {
       throw new ApiError(400, 'Saijo Denki รองรับอุณหภูมิ 18–29°C');
@@ -116,22 +134,40 @@ export function validateAirState(body, protocol = '') {
     }
   }
 
+  // รุ่นสายแอร์ไม่มีฟังก์ชันเสริมเหล่านี้ ปิดไว้เลยให้ตรงกับที่แอร์ทำจริง
+  // (Sleep มีจริง ยกเว้นในโหมด Dry ที่แอร์ไม่รับ)
   return {
     power: source.power,
     temperature,
     mode,
     fanSpeed,
     verticalSwing,
-    horizontalSwing: boolean(source.horizontalSwing),
-    eco: boolean(source.eco),
-    turbo: boolean(source.turbo),
-    sleep: boolean(source.sleep),
-    quiet: boolean(source.quiet),
+    horizontalSwing: wired ? false : boolean(source.horizontalSwing),
+    eco: wired ? false : boolean(source.eco),
+    turbo: wired ? false : boolean(source.turbo),
+    sleep: wired && mode === 'dry' ? false : boolean(source.sleep),
+    quiet: wired ? false : boolean(source.quiet),
     displayLight: boolean(source.displayLight, true),
-    clean: boolean(source.clean),
+    clean: wired ? false : boolean(source.clean),
     timerOnMinutes,
     timerOffMinutes,
   };
+}
+
+export function controlTypeOf(protocol) {
+  return cleanString(protocol).toUpperCase() === WIRED_PROTOCOL ? 'wired' : 'ir';
+}
+
+/**
+ * บอร์ดรุ่นสายแอร์บอกตัวเองใน status ว่า controlMode = "wired"
+ * ถ้าในฐานข้อมูลยังเป็นยี่ห้อ IR (เช่น ตั้งค่าจากแอปรุ่นเก่า) ให้แก้เป็น DAIKIN_WIRED
+ * คืนค่า null เมื่อไม่ต้องเปลี่ยนอะไร
+ */
+export function protocolFromStatus(message) {
+  const mode = typeof message?.controlMode === 'string'
+    ? message.controlMode.trim().toLowerCase()
+    : '';
+  return mode === 'wired' ? WIRED_PROTOCOL : null;
 }
 
 export function validateDeviceId(value) {
@@ -151,6 +187,8 @@ export function publicAirConditioner(row) {
     name: row.name,
     bleName: row.ble_name,
     protocol: row.protocol,
+    // ir = ยิงรีโมต IR · wired = ต่อสายแอร์แทนรีโมตติดผนัง
+    controlType: controlTypeOf(row.protocol),
     provisionStatus: row.provision_status,
     isOnline: Boolean(row.is_online),
     mqttTopic: row.mqtt_topic,

@@ -11,7 +11,14 @@
 
 import { api } from '../api.js';
 import { el, replace, emptyState, svg, toggle } from '../dom.js';
-import { decimal, floorLabel, relativeTime } from '../format.js';
+import {
+  WIRED_PROTOCOL,
+  airBrand,
+  airControlSummary,
+  decimal,
+  floorLabel,
+  relativeTime,
+} from '../format.js';
 import { icons } from '../icons.js';
 import {
   airConditionersOf,
@@ -30,6 +37,7 @@ import {
 } from '../ui.js';
 
 const PROTOCOLS = [
+  WIRED_PROTOCOL,
   'DAIKIN',
   'ELECTRA_AC',
   'FUJITSU_AC',
@@ -305,7 +313,7 @@ function airRow(unit, update) {
       el('div', {
         class: 'list-sub',
         text:
-          `${unit.deviceId} · ${unit.protocol} · ` +
+          `${unit.deviceId} · ${airControlSummary(unit.protocol)} · ` +
           `${unit.provisionStatus} · ` +
           `${unit.isOnline ? 'ออนไลน์' : 'ออฟไลน์'} · ` +
           `${decimal(reading.powerWatts ?? 0, 1)} W · ` +
@@ -483,10 +491,16 @@ async function reserveAir(update) {
       { name: 'name', label: 'ชื่อที่จะแสดง', value: 'แอร์ 1', required: true },
       {
         name: 'protocol',
-        label: 'โปรโตคอลรีโมต',
+        label: 'ยี่ห้อแอร์ / วิธีควบคุม',
         type: 'select',
         value: 'SAIJO_DENKI',
-        options: PROTOCOLS.map((item) => ({ value: item, label: item })),
+        options: PROTOCOLS.map((item) => ({
+          value: item,
+          label:
+            item === WIRED_PROTOCOL
+              ? 'Daikin · สายแอร์ (บอร์ดแทนรีโมตติดผนัง)'
+              : `${airBrand(item)} · รีโมต IR (${item})`,
+        })),
         required: true,
       },
       { name: 'dailyOn', label: 'เวลาเปิดประจำวัน (ไม่บังคับ)', type: 'time' },

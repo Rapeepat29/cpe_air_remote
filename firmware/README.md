@@ -4,6 +4,21 @@ This folder contains two separate ESP32 firmwares. The A/C board controls one
 air conditioner. The occupancy board monitors one room with an HLK-LD2410.
 Both use BLE for first setup/reconfiguration and Wi-Fi/MQTT afterward.
 
+There are two A/C boards. They share the same BLE, MQTT, PZEM, LED, OTA and
+offline-history behaviour, so the app and Backend treat them alike:
+
+| Sketch | Talks to the A/C by | Brand in the app |
+|---|---|---|
+| `rmutt_esp32_air` (2.5.0) | IR, like a handheld remote | Chosen by the user (IRac protocol) |
+| `rmutt_esp32_air_wired` (2.5.1-slm8) | The Daikin wall-panel cable (SLM8), replacing the wall remote | Fixed by the board: **Daikin · Wired** (`DAIKIN_WIRED`) |
+
+Both boards now drive a 1.3" SH1106 I2C OLED (SDA GPIO21, SCL GPIO22) and need
+the **U8g2** library. The wired board also needs **DHT sensor library**
+(Adafruit) for its DHT11 room sensor and does not use IRremoteESP8266. See
+`rmutt_esp32_air/README_OLED_TH.md` and
+`rmutt_esp32_air_wired/README_WIRED_TH.md` for wiring and build notes. Keep the
+`build_opt.h` files: without them the IR sketch no longer fits in flash.
+
 ## Arduino libraries
 
 - ArduinoJson 6.x

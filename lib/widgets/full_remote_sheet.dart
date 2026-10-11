@@ -2,6 +2,7 @@ import '../localization/localized_material.dart';
 
 import '../models/air_conditioner.dart';
 import '../theme/app_theme.dart';
+import 'air_control_badge.dart';
 
 Future<AirConditioner?> showFullRemoteSheet(
   BuildContext context,
@@ -63,6 +64,21 @@ class _FullRemoteSheetState extends State<FullRemoteSheet> {
               '${context.tr('Full Remote')} · ${air.name}',
               style: const TextStyle(fontSize: 19, fontWeight: FontWeight.w900),
             ),
+            const SizedBox(height: 6),
+            Row(
+              children: [
+                AirControlBadge(protocol: air.protocol),
+              ],
+            ),
+            if (air.isWired) ...[
+              const SizedBox(height: 6),
+              Text(
+                context.tr(
+                  'This unit is controlled through its cable, so only the functions of the Daikin wall remote are available.',
+                ),
+                style: TextStyle(fontSize: 12, color: colors.onSurfaceVariant),
+              ),
+            ],
             const SizedBox(height: 12),
             _RemoteDisplay(
               air: air,
@@ -98,7 +114,10 @@ class _FullRemoteSheetState extends State<FullRemoteSheet> {
                         label: Text(context.tr(mode.label)),
                         selected: air.mode == mode,
                         onSelected: air.supportedModes.length > 1
-                            ? (_) => setState(() => air.mode = mode)
+                            ? (_) => setState(() {
+                                air.mode = mode;
+                                if (air.isWired) air.normalizeForProtocol();
+                              })
                             : null,
                       ),
                     )
@@ -143,51 +162,64 @@ class _FullRemoteSheetState extends State<FullRemoteSheet> {
                     .toList(),
               ),
             ),
-            if (air.supportsAdditionalFunctions) ...[
+            if (air.supportsHorizontalSwing ||
+                air.supportsEco ||
+                air.supportsTurbo ||
+                air.supportsSleep ||
+                air.supportsQuiet ||
+                air.supportsDisplayLight ||
+                air.supportsClean) ...[
               const SizedBox(height: 12),
               _Section(
                 title: context.tr('Additional functions'),
                 child: Column(
                   children: [
-                    _FeatureSwitch(
-                      title: context.tr('Horizontal Swing'),
-                      value: air.horizontalSwing,
-                      onChanged: (value) {
-                        setState(() => air.horizontalSwing = value);
-                      },
-                    ),
-                    _FeatureSwitch(
-                      title: context.tr('Eco'),
-                      value: air.eco,
-                      onChanged: (value) => setState(() => air.eco = value),
-                    ),
-                    _FeatureSwitch(
-                      title: context.tr('Turbo'),
-                      value: air.turbo,
-                      onChanged: (value) => setState(() => air.turbo = value),
-                    ),
-                    _FeatureSwitch(
-                      title: context.tr('Sleep'),
-                      value: air.sleep,
-                      onChanged: (value) => setState(() => air.sleep = value),
-                    ),
-                    _FeatureSwitch(
-                      title: context.tr('Quiet'),
-                      value: air.quiet,
-                      onChanged: (value) => setState(() => air.quiet = value),
-                    ),
-                    _FeatureSwitch(
-                      title: context.tr('Display Light'),
-                      value: air.displayLight,
-                      onChanged: (value) {
-                        setState(() => air.displayLight = value);
-                      },
-                    ),
-                    _FeatureSwitch(
-                      title: context.tr('Clean'),
-                      value: air.clean,
-                      onChanged: (value) => setState(() => air.clean = value),
-                    ),
+                    if (air.supportsHorizontalSwing)
+                      _FeatureSwitch(
+                        title: context.tr('Horizontal Swing'),
+                        value: air.horizontalSwing,
+                        onChanged: (value) {
+                          setState(() => air.horizontalSwing = value);
+                        },
+                      ),
+                    if (air.supportsEco)
+                      _FeatureSwitch(
+                        title: context.tr('Eco'),
+                        value: air.eco,
+                        onChanged: (value) => setState(() => air.eco = value),
+                      ),
+                    if (air.supportsTurbo)
+                      _FeatureSwitch(
+                        title: context.tr('Turbo'),
+                        value: air.turbo,
+                        onChanged: (value) => setState(() => air.turbo = value),
+                      ),
+                    if (air.supportsSleep)
+                      _FeatureSwitch(
+                        title: context.tr('Sleep'),
+                        value: air.sleep,
+                        onChanged: (value) => setState(() => air.sleep = value),
+                      ),
+                    if (air.supportsQuiet)
+                      _FeatureSwitch(
+                        title: context.tr('Quiet'),
+                        value: air.quiet,
+                        onChanged: (value) => setState(() => air.quiet = value),
+                      ),
+                    if (air.supportsDisplayLight)
+                      _FeatureSwitch(
+                        title: context.tr('Display Light'),
+                        value: air.displayLight,
+                        onChanged: (value) {
+                          setState(() => air.displayLight = value);
+                        },
+                      ),
+                    if (air.supportsClean)
+                      _FeatureSwitch(
+                        title: context.tr('Clean'),
+                        value: air.clean,
+                        onChanged: (value) => setState(() => air.clean = value),
+                      ),
                   ],
                 ),
               ),

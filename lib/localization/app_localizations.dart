@@ -236,6 +236,22 @@ class _AppLocalizationsDelegate
 }
 
 const _thaiTranslations = <String, String>{
+  // บอร์ดสายแอร์ / ยี่ห้อแอร์ (v3.16.0)
+  'Wired': 'สายแอร์',
+  'IR remote': 'รีโมต IR',
+  'Controlled through the air-conditioner cable in place of the wall remote':
+      'สั่งงานผ่านสายแอร์ แทนรีโมตติดผนัง',
+  'Controlled by infrared, like a handheld remote':
+      'สั่งงานด้วยอินฟราเรด เหมือนรีโมตแบบถือ',
+  'This unit is controlled through its cable, so only the functions of the Daikin wall remote are available.':
+      'เครื่องนี้สั่งผ่านสายแอร์ จึงใช้ได้เฉพาะฟังก์ชันที่รีโมตติดผนัง Daikin มี',
+  'Board type: wired controller (replaces the wall remote)':
+      'ชนิดบอร์ด: ควบคุมผ่านสายแอร์ (ใช้แทนรีโมตติดผนัง)',
+  'Board type: IR remote': 'ชนิดบอร์ด: รีโมต IR',
+  'Set by the board': 'บอร์ดกำหนดให้',
+  'Wired (replaces the wall remote)': 'สายแอร์ (ใช้แทนรีโมตติดผนัง)',
+  'This board plugs into the air-conditioner cable in place of the Daikin wall remote. Available: on/off, 16–30 °C, Cool / Dry / Fan, fan Low / Medium / High / Auto, swing on/off and Sleep.':
+      'บอร์ดนี้ต่อเข้ากับสายแอร์แทนรีโมตติดผนัง Daikin ใช้ได้: เปิด/ปิด, 16–30 °C, Cool / Dry / Fan, พัดลม Low / Medium / High / Auto, ส่าย เปิด/ปิด และ Sleep',
   // หน้าตั้งค่าการแจ้งเตือนแยกตามชนิด (v3.12.0)
   'Alerts by type': 'แจ้งเตือนแยกตามชนิด',
   // นำเข้าตารางเรียน: ช่วงวันที่ใช้ตาราง
@@ -1074,6 +1090,13 @@ const _thaiTranslations = <String, String>{
 };
 
 const _englishTranslations = <String, String>{
+  // Wired (DAIKIN_WIRED) air-conditioner validation
+  'แอร์แบบสายแอร์รองรับโหมด Cool, Dry และ Fan':
+      'Wired air conditioners support Cool, Dry and Fan modes only.',
+  'แอร์แบบสายแอร์ไม่มีพัดลมระดับ Turbo':
+      'Wired air conditioners have no Turbo fan speed.',
+  'แอร์แบบสายแอร์มีเฉพาะส่าย (Auto) หรือหยุด (Off)':
+      'Wired air conditioners only support swing (Auto) or stop (Off).',
   'ไม่พบ API ที่เรียกใช้งาน': 'The requested API was not found.',
   'เกิดข้อผิดพลาดภายในเซิร์ฟเวอร์': 'An internal server error occurred.',
   'ยังไม่ได้กำหนดเบอร์แอดมินในฐานข้อมูล':

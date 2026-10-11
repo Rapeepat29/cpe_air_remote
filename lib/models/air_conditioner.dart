@@ -36,6 +36,41 @@ extension SwingModeLabel on SwingMode {
   };
 }
 
+/// บอร์ดรุ่นสายแอร์ (rmutt_esp32_air_wired) ต่อสายแอร์แทนรีโมตติดผนัง Daikin
+const daikinWiredProtocol = 'DAIKIN_WIRED';
+
+/// ชื่อยี่ห้อที่คนอ่านเข้าใจ จากชื่อโปรโตคอลที่เก็บในฐานข้อมูล
+String airBrandOf(String protocol) {
+  final value = protocol.trim().toUpperCase();
+  if (value == daikinWiredProtocol || value.startsWith('DAIKIN')) {
+    return 'Daikin';
+  }
+  if (value == 'SAIJO_DENKI') return 'Saijo Denki';
+  if (value.startsWith('MITSUBISHI')) return 'Mitsubishi Electric';
+  if (value.startsWith('HAIER')) return 'Haier';
+  const names = {
+    'PANASONIC_AC': 'Panasonic',
+    'PANASONIC_AC32': 'Panasonic',
+    'GREE': 'Gree',
+    'MIDEA': 'Midea',
+    'COOLIX': 'Midea',
+    'LG': 'LG',
+    'LG2': 'LG',
+    'SAMSUNG_AC': 'Samsung',
+    'TOSHIBA_AC': 'Toshiba',
+    'HITACHI_AC': 'Hitachi',
+    'FUJITSU_AC': 'Fujitsu',
+    'KELVINATOR': 'Kelvinator',
+    'SHARP_AC': 'Sharp',
+    'ELECTRA_AC': 'Electra',
+  };
+  return names[value] ?? protocol;
+}
+
+/// `wired` สำหรับบอร์ดสายแอร์ นอกนั้น `ir`
+String airControlTypeOf(String protocol) =>
+    protocol.trim().toUpperCase() == daikinWiredProtocol ? 'wired' : 'ir';
+
 class AirConditioner {
   AirConditioner({
     required this.id,
@@ -198,13 +233,25 @@ class AirConditioner {
   bool get isProvisioned => provisionStatus == 'active';
   bool get canControl => isProvisioned && isOnline && deviceId != null;
   bool get isSaijoDenki => protocol == 'SAIJO_DENKI';
+
+  /// ควบคุมผ่านสายแอร์ (แทนรีโมตติดผนัง) ไม่ใช่ยิง IR
+  bool get isWired => airControlTypeOf(protocol) == 'wired';
+
+  /// ยี่ห้อแอร์ เช่น Daikin, Haier
+  String get brand => airBrandOf(protocol);
+
+  /// ข้อความสั้นบอกยี่ห้อ + วิธีควบคุม (ส่งผ่าน context.tr ก่อนแสดง)
+  String get controlTypeLabel => isWired ? 'Wired' : 'IR remote';
+
   int get minimumTemperature => isSaijoDenki ? 18 : 16;
   int get maximumTemperature => isSaijoDenki ? 29 : 30;
   List<AirMode> get supportedModes =>
-      isSaijoDenki
+      isSaijoDenki || isWired
           ? const [AirMode.cool, AirMode.dry, AirMode.fan]
           : AirMode.values;
-  List<FanSpeed> get supportedFanSpeeds => isSaijoDenki
+  List<FanSpeed> get supportedFanSpeeds => isWired
+      ? const [FanSpeed.auto, FanSpeed.low, FanSpeed.medium, FanSpeed.high]
+      : isSaijoDenki
       ? const [
           FanSpeed.auto,
           FanSpeed.low,
@@ -213,7 +260,9 @@ class AirConditioner {
           FanSpeed.turbo,
         ]
       : FanSpeed.values;
-  List<SwingMode> get supportedSwingModes => isSaijoDenki
+  List<SwingMode> get supportedSwingModes => isWired
+      ? const [SwingMode.auto, SwingMode.off]
+      : isSaijoDenki
       ? const [
           SwingMode.auto,
           SwingMode.top,
@@ -231,6 +280,16 @@ class AirConditioner {
         ];
   bool get supportsAdditionalFunctions => !isSaijoDenki;
 
+  // ฟังก์ชันเสริมทีละตัว รุ่นสายแอร์มีแค่ Sleep (ใช้ไม่ได้ในโหมด Dry)
+  bool get supportsHorizontalSwing => supportsAdditionalFunctions && !isWired;
+  bool get supportsEco => supportsAdditionalFunctions && !isWired;
+  bool get supportsTurbo => supportsAdditionalFunctions && !isWired;
+  bool get supportsSleep =>
+      supportsAdditionalFunctions && !(isWired && mode == AirMode.dry);
+  bool get supportsQuiet => supportsAdditionalFunctions && !isWired;
+  bool get supportsDisplayLight => supportsAdditionalFunctions && !isWired;
+  bool get supportsClean => supportsAdditionalFunctions && !isWired;
+
   String fanSpeedLabel(FanSpeed speed) {
     if (!isSaijoDenki) return speed.label;
     return switch (speed) {
@@ -246,6 +305,20 @@ class AirConditioner {
     temperature = temperature
         .clamp(minimumTemperature, maximumTemperature)
         .toInt();
+    if (isWired) {
+      if (!supportedModes.contains(mode)) mode = AirMode.cool;
+      if (fanSpeed == FanSpeed.turbo) fanSpeed = FanSpeed.high;
+      if (!supportedSwingModes.contains(verticalSwing)) {
+        verticalSwing = SwingMode.auto;
+      }
+      horizontalSwing = false;
+      eco = false;
+      turbo = false;
+      quiet = false;
+      clean = false;
+      if (mode == AirMode.dry) sleep = false;
+      return;
+    }
     if (!isSaijoDenki) return;
     if (!supportedModes.contains(mode)) mode = AirMode.cool;
     if (verticalSwing == SwingMode.off) verticalSwing = SwingMode.auto;

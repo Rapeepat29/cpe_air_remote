@@ -14,6 +14,7 @@ import { readActiveTermGate } from './academic-terms.js';
 import { readTodayBookings } from './room-bookings.js';
 import { withBookings } from '../utils/room-booking.js';
 import { normalizeOccupancyStatus } from '../utils/occupancy-sensor.js';
+import { protocolFromStatus } from '../utils/air-conditioner.js';
 import { hashSecret, safeHashEquals } from '../utils/security.js';
 import {
   recordEnergySample,
@@ -367,10 +368,26 @@ async function handleIncomingMessage(topic, payloadBuffer) {
     return;
   }
 
-  await runSerialForDevice(
-    deviceId,
-    () => handleAirStatus(deviceId, normalizePowerStatus(message)),
+  const statusProtocol = protocolFromStatus(message);
+  await runSerialForDevice(deviceId, async () => {
+    if (statusProtocol) await syncControlProtocol(deviceId, statusProtocol);
+    await handleAirStatus(deviceId, normalizePowerStatus(message));
+  });
+}
+
+// บอร์ดรุ่นสายแอร์ยืนยันชนิดตัวเองทุกครั้งที่ส่ง status
+// แก้เฉพาะแถวที่ยังไม่ตรง จึงไม่เขียนฐานข้อมูลซ้ำทุก 10 วินาที
+async function syncControlProtocol(deviceId, protocol) {
+  const result = await pool.query(
+    `UPDATE air_conditioners
+        SET protocol = ?
+      WHERE device_id = ?
+        AND protocol <> ?`,
+    [protocol, deviceId, protocol],
   );
+  if (Number(result?.affectedRows ?? 0) > 0) {
+    console.log(`[air] ${deviceId} เป็นบอร์ดสายแอร์ ปรับ protocol เป็น ${protocol}`);
+  }
 }
 
 async function handleAirStatus(deviceId, status) {

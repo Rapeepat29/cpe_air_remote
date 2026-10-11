@@ -2,6 +2,9 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
+  controlTypeOf,
+  protocolFromStatus,
+  publicAirConditioner,
   validateAirState,
   validateReservationInput,
 } from '../src/utils/air-conditioner.js';
@@ -161,4 +164,86 @@ test('validates the captured Saijo Denki capability range', () => {
     () => validateAirState({ ...base, verticalSwing: 'off' }, 'SAIJO_DENKI'),
     /Swing/,
   );
+});
+
+test('accepts the Daikin wired-panel board protocol', () => {
+  const result = validateReservationInput({
+    deviceId: 'ESP32-001122334455',
+    bleName: 'RMUTT-AC-001122334455',
+    roomNumber: '16101',
+    airNumber: 1,
+    name: 'Air 1',
+    protocol: 'daikin_wired',
+  });
+  assert.equal(result.protocol, 'DAIKIN_WIRED');
+});
+
+test('limits wired Daikin commands to what the wall-panel bus supports', () => {
+  const base = {
+    power: true,
+    temperature: 25,
+    mode: 'cool',
+    fanSpeed: 'high',
+    verticalSwing: 'auto',
+    horizontalSwing: true,
+    eco: true,
+    turbo: true,
+    sleep: true,
+    quiet: true,
+    displayLight: true,
+    clean: true,
+  };
+  const cool = validateAirState(base, 'DAIKIN_WIRED');
+  assert.equal(cool.sleep, true);
+  assert.equal(cool.horizontalSwing, false);
+  assert.equal(cool.eco, false);
+  assert.equal(cool.turbo, false);
+  assert.equal(cool.quiet, false);
+  assert.equal(cool.clean, false);
+  assert.equal(
+    validateAirState({ ...base, mode: 'dry' }, 'DAIKIN_WIRED').sleep,
+    false,
+  );
+  assert.equal(
+    validateAirState({ ...base, verticalSwing: 'off' }, 'DAIKIN_WIRED')
+      .verticalSwing,
+    'off',
+  );
+  assert.throws(
+    () => validateAirState({ ...base, mode: 'auto' }, 'DAIKIN_WIRED'),
+    /สายแอร์/,
+  );
+  assert.throws(
+    () => validateAirState({ ...base, mode: 'heat' }, 'DAIKIN_WIRED'),
+    /สายแอร์/,
+  );
+  assert.throws(
+    () => validateAirState({ ...base, fanSpeed: 'turbo' }, 'DAIKIN_WIRED'),
+    /Turbo/,
+  );
+  assert.throws(
+    () => validateAirState({ ...base, verticalSwing: 'middle' }, 'DAIKIN_WIRED'),
+    /สายแอร์/,
+  );
+  // IR Daikin is unaffected
+  assert.equal(validateAirState(base, 'DAIKIN').turbo, true);
+});
+
+test('reports the control type of each protocol', () => {
+  assert.equal(controlTypeOf('DAIKIN_WIRED'), 'wired');
+  assert.equal(controlTypeOf('daikin_wired'), 'wired');
+  assert.equal(controlTypeOf('DAIKIN'), 'ir');
+  assert.equal(controlTypeOf(null), 'ir');
+  assert.equal(
+    publicAirConditioner({ id: 1, protocol: 'DAIKIN_WIRED' }).controlType,
+    'wired',
+  );
+});
+
+test('detects a wired board from its MQTT status', () => {
+  assert.equal(protocolFromStatus({ controlMode: 'wired' }), 'DAIKIN_WIRED');
+  assert.equal(protocolFromStatus({ controlMode: ' Wired ' }), 'DAIKIN_WIRED');
+  assert.equal(protocolFromStatus({ controlMode: 'ir' }), null);
+  assert.equal(protocolFromStatus({ online: true }), null);
+  assert.equal(protocolFromStatus(null), null);
 });

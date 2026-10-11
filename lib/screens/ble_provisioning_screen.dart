@@ -4,6 +4,7 @@ import '../models/provisioning.dart';
 import '../services/air_conditioner_repository.dart';
 import '../services/ble_provisioning_service.dart';
 import '../theme/app_theme.dart';
+import '../widgets/air_control_badge.dart';
 
 class BleProvisioningScreen extends StatefulWidget {
   const BleProvisioningScreen({
@@ -182,10 +183,26 @@ class _BleProvisioningScreenState extends State<BleProvisioningScreen> {
                     ),
                     const SizedBox(width: 10),
                     Expanded(
-                      child: Text(
-                        '${_identity!.deviceId}\n'
-                        'Firmware ${_identity!.firmwareVersion}',
-                        style: const TextStyle(fontWeight: FontWeight.w700),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '${_identity!.deviceId}\n'
+                            'Firmware ${_identity!.firmwareVersion}',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            context.tr(
+                              _identity!.isWired
+                                  ? 'Board type: wired controller (replaces the wall remote)'
+                                  : 'Board type: IR remote',
+                            ),
+                            style: const TextStyle(fontSize: 13),
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -245,87 +262,91 @@ class _BleProvisioningScreenState extends State<BleProvisioningScreen> {
                 validator: _required,
               ),
               const SizedBox(height: 4),
-              DropdownButtonFormField<String>(
-                initialValue: _protocol,
-                decoration: InputDecoration(
-                  labelText: context.tr('Air Conditioner Brand / Protocol'),
+              if (_identity!.isWired)
+                _WiredBrandField(brand: _wiredBrand(_identity!))
+              else
+                DropdownButtonFormField<String>(
+                  key: ValueKey('protocol-${_identity!.deviceId}'),
+                  initialValue: _protocol,
+                  decoration: InputDecoration(
+                    labelText: context.tr('Air Conditioner Brand / Protocol'),
+                  ),
+                  items: const [
+                    DropdownMenuItem(
+                      value: 'SAIJO_DENKI',
+                      child: Text('Saijo Denki'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'DAIKIN',
+                      child: Text('Daikin'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'MITSUBISHI_AC',
+                      child: Text('Mitsubishi Electric'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'PANASONIC_AC',
+                      child: Text('Panasonic'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'GREE',
+                      child: Text('Gree'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'MIDEA',
+                      child: Text('Midea'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'LG',
+                      child: Text('LG'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'SAMSUNG_AC',
+                      child: Text('Samsung'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'TOSHIBA_AC',
+                      child: Text('Toshiba'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'HITACHI_AC',
+                      child: Text('Hitachi'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'FUJITSU_AC',
+                      child: Text('Fujitsu'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'KELVINATOR',
+                      child: Text('Kelvinator'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'SHARP_AC',
+                      child: Text('Sharp'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'ELECTRA_AC',
+                      child: Text('Electra'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'HAIER_AC160',
+                      child: Text('Haier 160-bit'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'HAIER_AC176',
+                      child: Text('Haier 176-bit'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'HAIER_AC_YRW02',
+                      child: Text('Haier YR-W02'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'HAIER_AC',
+                      child: Text('Haier legacy'),
+                    ),
+                  ],
+                  onChanged: (value) => setState(() => _protocol = value!),
                 ),
-                items: const [
-                  DropdownMenuItem(
-                    value: 'SAIJO_DENKI',
-                    child: Text('Saijo Denki'),
-                  ),
-                  DropdownMenuItem(
-                    value: 'DAIKIN',
-                    child: Text('Daikin'),
-                  ),
-                  DropdownMenuItem(
-                    value: 'MITSUBISHI_AC',
-                    child: Text('Mitsubishi Electric'),
-                  ),
-                  DropdownMenuItem(
-                    value: 'PANASONIC_AC',
-                    child: Text('Panasonic'),
-                  ),
-                  DropdownMenuItem(
-                    value: 'GREE',
-                    child: Text('Gree'),
-                  ),
-                  DropdownMenuItem(
-                    value: 'MIDEA',
-                    child: Text('Midea'),
-                  ),
-                  DropdownMenuItem(
-                    value: 'LG',
-                    child: Text('LG'),
-                  ),
-                  DropdownMenuItem(
-                    value: 'SAMSUNG_AC',
-                    child: Text('Samsung'),
-                  ),
-                  DropdownMenuItem(
-                    value: 'TOSHIBA_AC',
-                    child: Text('Toshiba'),
-                  ),
-                  DropdownMenuItem(
-                    value: 'HITACHI_AC',
-                    child: Text('Hitachi'),
-                  ),
-                  DropdownMenuItem(
-                    value: 'FUJITSU_AC',
-                    child: Text('Fujitsu'),
-                  ),
-                  DropdownMenuItem(
-                    value: 'KELVINATOR',
-                    child: Text('Kelvinator'),
-                  ),
-                  DropdownMenuItem(
-                    value: 'SHARP_AC',
-                    child: Text('Sharp'),
-                  ),
-                  DropdownMenuItem(
-                    value: 'ELECTRA_AC',
-                    child: Text('Electra'),
-                  ),
-                  DropdownMenuItem(
-                    value: 'HAIER_AC160',
-                    child: Text('Haier 160-bit'),
-                  ),
-                  DropdownMenuItem(
-                    value: 'HAIER_AC176',
-                    child: Text('Haier 176-bit'),
-                  ),
-                  DropdownMenuItem(
-                    value: 'HAIER_AC_YRW02',
-                    child: Text('Haier YR-W02'),
-                  ),
-                  DropdownMenuItem(
-                    value: 'HAIER_AC',
-                    child: Text('Haier legacy'),
-                  ),
-                ],
-                onChanged: (value) => setState(() => _protocol = value!),
-              ),
               const SizedBox(height: 20),
               _StepHeader(
                 number: 3,
@@ -513,6 +534,7 @@ class _BleProvisioningScreenState extends State<BleProvisioningScreen> {
       setState(() {
         _identity = identity;
         _applySavedBoardSettings(identity);
+        _protocolForBoard(identity);
       });
       WidgetsBinding.instance.addPostFrameCallback((_) {
         final detailsContext = _detailsKey.currentContext;
@@ -750,6 +772,22 @@ class _BleProvisioningScreenState extends State<BleProvisioningScreen> {
     _dailyOff = _parseTime(identity.dailyOff);
   }
 
+  /// บอร์ดสายแอร์ใช้ DAIKIN_WIRED เสมอ (ผู้ใช้ไม่ต้องเลือกยี่ห้อ)
+  /// บอร์ด IR ห้ามใช้ DAIKIN_WIRED (เช่น เปลี่ยนบอร์ดสายแอร์ออกแล้วใส่บอร์ด IR แทน)
+  void _protocolForBoard(BleDeviceIdentity identity) {
+    if (identity.isWired) {
+      _protocol = daikinWiredProtocol;
+    } else if (_protocol == daikinWiredProtocol) {
+      _protocol = 'DAIKIN';
+    }
+  }
+
+  String _wiredBrand(BleDeviceIdentity identity) {
+    return identity.brand.isNotEmpty
+        ? identity.brand
+        : airBrandOf(daikinWiredProtocol);
+  }
+
   bool _shouldKeepWifiPassword(BleDeviceIdentity identity) {
     return _wifiPassword.text.isEmpty &&
         identity.configured &&
@@ -898,4 +936,66 @@ class _BleErrorCard extends StatelessWidget {
 
 extension _FirstOrNull<T> on List<T> {
   T? get firstOrNull => isEmpty ? null : first;
+}
+
+/// ช่องยี่ห้อของบอร์ดสายแอร์: แสดงยี่ห้อกับชนิดบอร์ดแบบล็อกไว้ ไม่ให้เลือกยี่ห้อ IR
+class _WiredBrandField extends StatelessWidget {
+  const _WiredBrandField({required this.brand});
+
+  final String brand;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        InputDecorator(
+          decoration: InputDecoration(
+            labelText: context.tr('Air Conditioner Brand / Protocol'),
+            suffixIcon: Tooltip(
+              message: context.tr('Set by the board'),
+              child: const Icon(Icons.lock_outline_rounded),
+            ),
+          ),
+          child: Row(
+            children: [
+              const Icon(Icons.cable_rounded, size: 20, color: AppColors.blue),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  '$brand · ${context.tr('Wired (replaces the wall remote)')}',
+                  style: const TextStyle(fontWeight: FontWeight.w700),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: AppColors.blue.withValues(alpha: 0.10),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: AppColors.blue.withValues(alpha: 0.35)),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Icon(Icons.info_outline_rounded, color: AppColors.blue),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  context.tr(
+                    'This board plugs into the air-conditioner cable in place of the Daikin wall remote. Available: on/off, 16–30 °C, Cool / Dry / Fan, fan Low / Medium / High / Auto, swing on/off and Sleep.',
+                  ),
+                  style: TextStyle(fontSize: 13, color: colors.onSurface),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
 }

@@ -16,7 +16,10 @@ import {
   FAN_LABEL,
   MODE_LABEL,
   SWING_LABEL,
+  airBrand,
   clock,
+  controlTypeLabel,
+  isWiredProtocol,
   decimal,
   energy,
   floorLabel,
@@ -52,12 +55,29 @@ const EXTRA_TOGGLES = [
 
 /** ข้อจำกัดเฉพาะรุ่น ตรงกับที่ Backend ตรวจใน utils/air-conditioner.js */
 function limitsFor(protocol) {
+  if (isWiredProtocol(protocol)) {
+    // บอร์ดสายแอร์ ใช้ได้เท่าที่รีโมตติดผนัง Daikin มี
+    return {
+      minTemp: 16,
+      maxTemp: 30,
+      modes: ['cool', 'dry', 'fan'],
+      fans: ['auto', 'low', 'medium', 'high'],
+      swings: ['auto', 'off'],
+      extras: (mode) =>
+        mode === 'dry' ? [] : EXTRA_TOGGLES.filter((item) => item.key === 'sleep'),
+      note:
+        'ควบคุมผ่านสายแอร์แทนรีโมตติดผนัง Daikin · Cool / Dry / Fan · ' +
+        'ส่ายหรือหยุด · Sleep (ยกเว้นโหมด Dry)',
+    };
+  }
   if (String(protocol).toUpperCase() === 'SAIJO_DENKI') {
     return {
       minTemp: 18,
       maxTemp: 29,
       modes: ['cool', 'dry', 'fan'],
+      fans: FANS,
       swings: SWINGS.filter((value) => value !== 'off'),
+      extras: () => EXTRA_TOGGLES,
       note: 'Saijo Denki: 18–29°C · ไม่มีคำสั่งปิด Swing',
     };
   }
@@ -65,9 +85,29 @@ function limitsFor(protocol) {
     minTemp: 16,
     maxTemp: 30,
     modes: MODES,
+    fans: FANS,
     swings: SWINGS,
+    extras: () => EXTRA_TOGGLES,
     note: '',
   };
+}
+
+/** ปรับค่าที่ร่างไว้ให้อยู่ในสิ่งที่เครื่องนี้ทำได้ (ตรงกับที่ Backend ตรวจ) */
+function fitDraft(draft, limits) {
+  if (!limits.modes.includes(draft.mode)) draft.mode = limits.modes[0];
+  if (!limits.fans.includes(draft.fanSpeed)) {
+    draft.fanSpeed = limits.fans.includes('high') ? 'high' : limits.fans[0];
+  }
+  if (!limits.swings.includes(draft.verticalSwing)) {
+    draft.verticalSwing = limits.swings[0];
+  }
+  const allowed = new Set(limits.extras(draft.mode).map((item) => item.key));
+  for (const item of EXTRA_TOGGLES) {
+    // ไฟหน้าจอเปิดไว้เป็นค่าเริ่มต้น และ Backend ไม่ได้บังคับปิด จึงไม่แตะ
+    if (item.key !== 'displayLight' && !allowed.has(item.key)) {
+      draft[item.key] = false;
+    }
+  }
 }
 
 /**
@@ -507,6 +547,8 @@ function roomSummaryCard(room, sensor) {
 function acCard(unit, isAdmin, context) {
   const draft = draftFor(unit);
   const limits = limitsFor(unit.protocol);
+  const wired = isWiredProtocol(unit.protocol);
+  if (wired) fitDraft(draft, limits);
   const reading = liveReading(unit.deviceId) ?? unit;
   const active = unit.provisionStatus === 'active';
 
@@ -534,7 +576,9 @@ function acCard(unit, isAdmin, context) {
         }),
         el('div', {
           class: 'ac-sub',
-          text: `${unit.deviceId} · ${unit.protocol}`,
+          text: wired
+            ? `${unit.deviceId} · ${airBrand(unit.protocol)}`
+            : `${unit.deviceId} · ${airBrand(unit.protocol)} (${unit.protocol})`,
         }),
       ]),
       powerSwitch,
@@ -550,6 +594,13 @@ function acCard(unit, isAdmin, context) {
       el('span', {
         class: `status-chip ${unit.acRunning ? 'done' : 'off'}`,
         text: unit.acRunning ? 'แอร์ทำงานอยู่' : 'แอร์ไม่ทำงาน',
+      }),
+      el('span', {
+        class: `status-chip ${wired ? 'info' : 'off'}`,
+        title: wired
+          ? 'สั่งงานผ่านสายแอร์ แทนรีโมตติดผนัง'
+          : 'สั่งงานด้วยอินฟราเรด เหมือนรีโมตแบบถือ',
+        text: `${airBrand(unit.protocol)} · ${controlTypeLabel(unit.protocol)}`,
       }),
       !active
         ? el('span', {
@@ -619,10 +670,11 @@ function acCard(unit, isAdmin, context) {
   card.appendChild(
     chipGroup('โหมด', limits.modes, draft.mode, MODE_LABEL, (value) => {
       draft.mode = value;
+      if (wired) fitDraft(draft, limits);
     }),
   );
   card.appendChild(
-    chipGroup('พัดลม', FANS, draft.fanSpeed, FAN_LABEL, (value) => {
+    chipGroup('พัดลม', limits.fans, draft.fanSpeed, FAN_LABEL, (value) => {
       draft.fanSpeed = value;
     }),
   );
@@ -638,10 +690,14 @@ function acCard(unit, isAdmin, context) {
     ),
   );
 
+  const extras = limits.extras(draft.mode);
   card.appendChild(
     el('div', { class: 'chip-row' }, [
       el('div', { class: 'chip-label', text: 'ฟังก์ชันเสริม' }),
-      ...EXTRA_TOGGLES.map((item) =>
+      ...(extras.length
+        ? []
+        : [el('span', { class: 'dim', text: 'ไม่มีในโหมดนี้' })]),
+      ...extras.map((item) =>
         el('button', {
           class: `mode-chip${draft[item.key] ? ' sel' : ''}`,
           type: 'button',

@@ -4,6 +4,7 @@ import '../localization/localized_material.dart';
 
 import '../models/air_conditioner.dart';
 import '../theme/app_theme.dart';
+import 'air_control_badge.dart';
 import 'auto_off_countdown.dart' show formatCountdown;
 import 'full_remote_sheet.dart';
 
@@ -124,6 +125,11 @@ class _AirControlCardState extends State<AirControlCard> {
                       const SizedBox(width: 12),
                   ],
                 ),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: AirControlBadge(protocol: air.protocol),
+                ),
+                const SizedBox(height: 4),
                 Opacity(
                   opacity: on ? 1 : 0.55,
                   child: Row(
@@ -377,6 +383,8 @@ class _AirControlCardState extends State<AirControlCard> {
                   const SizedBox(width: 12),
               ],
             ),
+            AirControlBadge(protocol: air.protocol),
+            const SizedBox(height: 8),
             Padding(
               padding: const EdgeInsets.only(right: 12),
               child: Row(

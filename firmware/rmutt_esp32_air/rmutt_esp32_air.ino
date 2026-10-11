@@ -7,6 +7,7 @@
  * - Infrared: IRremoteESP8266 common A/C interface + custom Saijo Denki driver
  * - Power meter: PZEM-004T v3/v4 over HardwareSerial
  * - LEDs: measured operation, outside schedule, and Wi-Fi status
+ * - OLED 1.3" SH1106 I2C (GPIO21 SDA / GPIO22 SCL): status screen (oled_display.h)
  * - Persistent settings: ESP32 Preferences (NVS)
  * - Firmware update over Wi-Fi (HTTPS OTA) on command from the backend
  * - Offline history: 5-minute energy records kept in flash while offline,
@@ -34,6 +35,7 @@
 #include "letsencrypt_ca.h"
 #include "ota_update.h"
 #include "history_log.h"
+#include "oled_display.h"
 #include <esp_partition.h>
 #include <math.h>
 #include <time.h>
@@ -63,7 +65,7 @@ constexpr uint8_t AC_RUNNING_CONFIRM_SAMPLES = 3;
 constexpr uint8_t PZEM_FAILURE_LIMIT = 3;
 constexpr size_t MAX_CONFIG_BYTES = 4096;
 constexpr uint32_t NTP_SYNC_TIMEOUT_MS = 15000;
-constexpr char FIRMWARE_VERSION[] = "2.4.1";
+constexpr char FIRMWARE_VERSION[] = "2.5.0";
 constexpr char SAIJO_DENKI_PROTOCOL[] = "SAIJO_DENKI";
 // ข้อมูลย้อนหลังตอนเน็ตหลุด: ส่งทีละ 10 รายการ รอ Backend ตอบก่อนส่งชุดถัดไป
 constexpr uint8_t HISTORY_PARTITION_SUBTYPE = 0x40;
@@ -153,6 +155,8 @@ PZEM004Tv30 pzem(Serial2, PZEM_RX_PIN, PZEM_TX_PIN);
 DeviceConfig config;
 AirState airState;
 PowerMeasurements powerMeasurements;
+OledDisplay oledDisplay;
+String oledReason;   // เหตุผลที่เข้าโหมดตั้งค่า แสดงบนจอ
 
 // ตัวเก็บข้อมูลย้อนหลังบนพาร์ติชัน rmuttlog (ดู partitions.csv)
 struct PartitionFlash {
@@ -282,6 +286,7 @@ void processTimers();
 void processDailySchedule();
 void readPowerMeter();
 void updateStatusLeds();
+void refreshOled();
 bool isWithinConfiguredSchedule();
 bool isWithinAllowedSchedule();
 bool parseMinutesOfDay(const String &value, int &minutes);
@@ -427,6 +432,7 @@ void setup() {
   digitalWrite(RED_LED_PIN, LOW);
   digitalWrite(YELLOW_LED_PIN, LOW);
   delay(80);
+  oledDisplay.begin();
 
   config.deviceId = createDeviceId();
   config.bleName = "RMUTT-AC-" + config.deviceId.substring(6);
@@ -700,6 +706,7 @@ void startBleProvisioning() {
   identity["bleName"] = config.bleName;
   identity["firmwareVersion"] = FIRMWARE_VERSION;
   identity["configured"] = config.configured;
+  identity["controlType"] = "ir";  // แอปใช้แยกบอร์ด IR กับบอร์ดสายแอร์
   if (config.configured) {
     identity["roomNumber"] = config.roomNumber;
     identity["airNumber"] = config.airNumber;
@@ -802,6 +809,7 @@ void attemptWifiRecovery() {
 
 void enterBleRecovery(const String &reason, bool retryWifi) {
   Serial.printf("Mode: BLE recovery - %s\n", reason.c_str());
+  oledReason = reason.length() > 25 ? reason.substring(0, 25) : reason;
   bleBlocksNormalOperation = true;
   onlineSetupExpiresAt = 0;
   wifiRecoveryActive = retryWifi;
@@ -1433,6 +1441,7 @@ void publishStatus() {
 }
 
 void publishState(const String &commandId) {
+  oledDisplay.poke();   // ค่าที่สั่งเปลี่ยน วาดจอใหม่ทันที
   if (!mqttClient.connected()) return;
   DynamicJsonDocument document(768);
   if (!commandId.isEmpty()) document["commandId"] = commandId;
@@ -1630,6 +1639,7 @@ void readPowerMeter() {
   powerMeasurements.outsideSchedule =
       powerMeasurements.acRunning && !isWithinAllowedSchedule();
   accumulateHistorySample();
+  oledDisplay.pushPower(powerWatts);
   if (!previousAvailable ||
       previousRunning != powerMeasurements.acRunning ||
       previousOutsideSchedule != powerMeasurements.outsideSchedule) {
@@ -1666,6 +1676,7 @@ void updateStatusLeds() {
   digitalWrite(GREEN_LED_PIN, greenOn ? HIGH : LOW);
   digitalWrite(RED_LED_PIN, redOn ? HIGH : LOW);
   digitalWrite(YELLOW_LED_PIN, yellowLedState ? HIGH : LOW);
+  refreshOled();
 }
 
 bool isWithinConfiguredSchedule() {
@@ -1910,5 +1921,56 @@ void applyHistoryAck() {
   if (historyLog.pending() == 0) {
     Serial.println("Offline history: all records sent and erased");
     statusPublishRequested = true;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// จอ OLED 1.3" (SH1106 I2C, SDA GPIO21 / SCL GPIO22) — แบบ 1 "ตัวเลขใหญ่"
+// เปลี่ยนแบบได้ที่ OLED_LAYOUT ใน oled_display.h (1-5)
+// ---------------------------------------------------------------------------
+void refreshOled() {
+  if (!oledDisplay.due()) return;
+  static char clockText[6];
+  static char ipText[16];
+  struct tm timeInfo;
+  if (getLocalTime(&timeInfo, 0)) {
+    snprintf(clockText, sizeof(clockText), "%02d:%02d", timeInfo.tm_hour, timeInfo.tm_min);
+  } else {
+    clockText[0] = '\0';
+  }
+  snprintf(ipText, sizeof(ipText), "%s", WiFi.localIP().toString().c_str());
+
+  OledData d;
+  d.room = config.roomNumber.c_str();
+  d.airNo = config.airNumber;
+  d.power = airState.power;
+  d.setC = airState.temperature;
+  d.mode = airState.mode.c_str();
+  d.fan = airState.fanSpeed.c_str();
+  d.swing = airState.verticalSwing != "off";
+  d.sleep = airState.sleep;
+  d.pzemOk = powerMeasurements.available;
+  d.watts = powerMeasurements.available ? powerMeasurements.powerWatts : NAN;
+  d.kwh = powerMeasurements.available ? powerMeasurements.energyKwh : NAN;
+  d.volts = powerMeasurements.available ? powerMeasurements.voltage : NAN;
+  d.amps = powerMeasurements.available ? powerMeasurements.current : NAN;
+  d.pf = powerMeasurements.available ? powerMeasurements.powerFactor : NAN;
+  d.hz = powerMeasurements.available ? powerMeasurements.frequencyHz : NAN;
+  d.acRunning = powerMeasurements.acRunning;
+  d.outsideSchedule = powerMeasurements.outsideSchedule;
+  d.wifiOk = WiFi.status() == WL_CONNECTED;
+  d.mqttOk = mqttClient.connected();
+  d.rssi = d.wifiOk ? WiFi.RSSI() : -100;
+  d.ssid = config.wifiSsid.c_str();
+  d.ip = d.wifiOk ? ipText : "";
+  d.clock = clockText;
+  d.fw = FIRMWARE_VERSION;
+  d.deviceId = config.deviceId.c_str();
+  if (bleBlocksNormalOperation) {
+    oledDisplay.show(OledDisplay::SETUP, d, config.bleName.c_str(), oledReason.c_str());
+  } else if (wifiConnectionInProgress) {
+    oledDisplay.show(OledDisplay::CONNECTING, d, config.wifiSsid.c_str());
+  } else {
+    oledDisplay.show(OledDisplay::NORMAL, d);
   }
 }

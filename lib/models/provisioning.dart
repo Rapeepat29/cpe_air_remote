@@ -57,6 +57,8 @@ class BleDeviceIdentity {
     required this.hasMqttPassword,
     required this.dailyOn,
     required this.dailyOff,
+    this.controlType = 'ir',
+    this.brand = '',
   });
 
   factory BleDeviceIdentity.fromJson(Map<String, dynamic> json) {
@@ -78,6 +80,10 @@ class BleDeviceIdentity {
       hasMqttPassword: json['hasMqttPassword'] == true,
       dailyOn: json['dailyOn'] as String?,
       dailyOff: json['dailyOff'] as String?,
+      // บอร์ดรุ่นเก่าไม่ส่งสองช่องนี้ = บอร์ด IR
+      controlType:
+          (json['controlType'] as String? ?? 'ir').trim().toLowerCase(),
+      brand: json['brand'] as String? ?? '',
     );
   }
 
@@ -98,6 +104,14 @@ class BleDeviceIdentity {
   final bool hasMqttPassword;
   final String? dailyOn;
   final String? dailyOff;
+
+  /// `ir` = ยิงรีโมต IR, `wired` = ต่อสายแอร์แทนรีโมตติดผนัง
+  final String controlType;
+
+  /// ยี่ห้อแอร์ที่บอร์ดรุ่นสายแอร์รองรับ (ว่างสำหรับบอร์ด IR)
+  final String brand;
+
+  bool get isWired => controlType == 'wired';
 }
 
 class OccupancyProvisioningReservation {

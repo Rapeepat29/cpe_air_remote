@@ -343,3 +343,48 @@ export const SWING_LABEL = {
   bottom: 'ล่างสุด',
   auto: 'ส่ายอัตโนมัติ',
 };
+
+/** บอร์ดรุ่นสายแอร์ (ต่อสายแอร์แทนรีโมตติดผนัง Daikin) */
+export const WIRED_PROTOCOL = 'DAIKIN_WIRED';
+
+export const isWiredProtocol = (protocol) =>
+  String(protocol ?? '').trim().toUpperCase() === WIRED_PROTOCOL;
+
+const BRAND_BY_PROTOCOL = {
+  DAIKIN_WIRED: 'Daikin',
+  DAIKIN: 'Daikin',
+  SAIJO_DENKI: 'Saijo Denki',
+  MITSUBISHI_AC: 'Mitsubishi Electric',
+  PANASONIC_AC: 'Panasonic',
+  GREE: 'Gree',
+  MIDEA: 'Midea',
+  LG: 'LG',
+  SAMSUNG_AC: 'Samsung',
+  TOSHIBA_AC: 'Toshiba',
+  HITACHI_AC: 'Hitachi',
+  FUJITSU_AC: 'Fujitsu',
+  KELVINATOR: 'Kelvinator',
+  SHARP_AC: 'Sharp',
+  ELECTRA_AC: 'Electra',
+  HAIER_AC: 'Haier',
+  HAIER_AC160: 'Haier',
+  HAIER_AC176: 'Haier',
+  HAIER_AC_YRW02: 'Haier',
+};
+
+/** ยี่ห้อแอร์จากชื่อโปรโตคอล เช่น HAIER_AC160 → Haier */
+export function airBrand(protocol) {
+  const key = String(protocol ?? '').trim().toUpperCase();
+  return BRAND_BY_PROTOCOL[key] ?? (key || '—');
+}
+
+/** "สายแอร์" หรือ "รีโมต IR" */
+export function controlTypeLabel(protocol) {
+  return isWiredProtocol(protocol) ? 'สายแอร์' : 'รีโมต IR';
+}
+
+/** ข้อความสั้นสำหรับรายการ เช่น "Daikin · สายแอร์" หรือ "Haier · รีโมต IR (HAIER_AC160)" */
+export function airControlSummary(protocol) {
+  if (isWiredProtocol(protocol)) return `${airBrand(protocol)} · สายแอร์`;
+  return `${airBrand(protocol)} · รีโมต IR (${protocol})`;
+}
