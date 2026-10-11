@@ -44,13 +44,26 @@ functions remain disabled until complete valid captures exist.
 
 ## Pins
 
-- `GPIO17`: IR LED driver input
-- `GPIO16`: PZEM UART RX (connect to PZEM TX)
-- `GPIO18`: PZEM UART TX (connect to PZEM RX)
-- `GPIO25`: green status LED
-- `GPIO26`: red status LED
-- `GPIO27`: yellow Wi-Fi LED
-- `GPIO0`: BOOT/setup button
+| GPIO | `rmutt_esp32_air` (IR) | `rmutt_esp32_air_wired` (Daikin cable) |
+|---|---|---|
+| `GPIO17` | IR LED driver input | — (not used) |
+| `GPIO21` | OLED SDA (1.3" SH1106 I2C) | OLED SDA (1.3" SH1106 I2C) |
+| `GPIO22` | OLED SCL / SCK | OLED SCL / SCK |
+| `GPIO16` | PZEM UART RX (connect to PZEM TX) | PZEM UART RX (connect to PZEM TX) |
+| `GPIO18` | PZEM UART TX (connect to PZEM RX) | PZEM UART TX (connect to PZEM RX) |
+| `GPIO25` | green status LED | green status LED |
+| `GPIO26` | red status LED | red status LED |
+| `GPIO27` | yellow Wi-Fi LED | yellow Wi-Fi LED |
+| `GPIO0` | BOOT/setup button | BOOT/setup button |
+| `GPIO33` | — | A/C bus TX through a 1N4148 (stripe → GPIO33, other leg → command wire) |
+| `GPIO35` | — | A/C bus RX, status wire through a 100k/200k divider |
+| `GPIO34` | — | Bus echo, command wire through a 100k/200k divider (optional) |
+| `GPIO4` | — | DHT11 DATA (KY-015) |
+
+OLED power: VCC → 3V3, GND → GND. The display is optional; without it the
+firmware prints `OLED: not found on GPIO21/22 (display disabled)` and runs
+normally. For the wired board, also connect the A/C cable GND to ESP32 GND and
+leave the cable's +5 V unconnected (see `rmutt_esp32_air_wired/README_WIRED_TH.md`).
 
 Do not drive a high-power IR LED directly from GPIO17. Use a transistor driver
 and a current-limiting resistor, with common ground between the ESP32 and the
