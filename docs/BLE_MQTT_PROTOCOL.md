@@ -124,6 +124,28 @@ Topic: `rmutt/ac/<deviceId>/command`
 The device publishes the applied IR state to `/state`, availability and PZEM
 measurements to `/status`, and its one-time token to `/provision`.
 
+### Unprovision (device removed from the app)
+
+Sent by the backend to `<prefix>/<deviceId>/command` on both A/C and occupancy
+boards (A/C 2.5.1, wired 2.5.2-slm8, occupancy 1.3.2 and later). Never retained.
+
+```json
+{ "version": 1, "commandId": "UUID", "sentAt": "ISO-8601",
+  "action": "unprovision", "deviceId": "ESP32-AABBCCDDEEFF" }
+```
+
+The board ignores it unless `deviceId` is its own. Otherwise it publishes one
+non-retained acknowledgement to `/status`, clears its own retained `/status`
+(and `/state` on A/C boards), disconnects cleanly, erases its NVS settings
+(plus the offline-history partition on A/C boards) and restarts into BLE setup:
+
+```json
+{ "deviceId": "ESP32-AABBCCDDEEFF", "online": false, "unprovisioned": true }
+```
+
+The backend waits up to 4 s for this acknowledgement before it clears the
+retained topics and deletes the device's MQTT account.
+
 Firmware 2.0 status example:
 
 ```json

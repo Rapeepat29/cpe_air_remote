@@ -10,6 +10,7 @@ import {
   clearRetainedOccupancyTopics,
   publishEnterOccupancySetupMode,
   publishOtaCommand,
+  unprovisionDevice,
 } from '../services/mqtt.js';
 import { ApiError, asyncHandler } from '../utils/http.js';
 import { assertFirmwareFileExists } from './firmware.js';
@@ -292,15 +293,17 @@ occupancySensorsRouter.delete(
       [deviceId],
     );
     const deletedRows = Number(result.affectedRows ?? 0);
-    const retainedTopicsCleared =
-      await clearRetainedOccupancyTopics(deviceId);
+    // สั่งบอร์ดล้างค่าในตัวเองก่อนลบบัญชี MQTT (ลบบัญชีแล้วคำสั่งจะไปไม่ถึง)
+    const board = await unprovisionDevice('occupancy', deviceId);
+    const retainedTopicsCleared = await clearRetainedOccupancyTopics(deviceId);
     const mqttAccountRemoved = await removeDeviceAccount(deviceId);
 
     console.log(
       `[occupancy] ลบ ${deviceId} โดย ${request.authUser.username}: `
         + `deletedRows=${deletedRows} `
         + `retainedTopicsCleared=${retainedTopicsCleared} `
-        + `mqttAccountRemoved=${mqttAccountRemoved}`,
+        + `mqttAccountRemoved=${mqttAccountRemoved} `
+        + `boardCleared=${board.acknowledged}`,
     );
 
     // ลบซ้ำถือว่าสำเร็จ เพื่อไม่ให้แอปค้างกับแถวที่หายไปแล้ว
@@ -310,6 +313,9 @@ occupancySensorsRouter.delete(
       deletedRows,
       retainedTopicsCleared,
       mqttAccountRemoved,
+      // true = บอร์ดยืนยันว่าล้างค่าแล้ว, false = บอร์ดออฟไลน์หรือไม่ตอบ
+      // (ต้องล้างที่ตัวบอร์ดเอง: อัปโหลด firmware/reset หรือตั้งค่าใหม่ผ่านบลูทูธ)
+      boardCleared: board.acknowledged,
     });
   }),
 );
