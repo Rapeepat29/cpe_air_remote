@@ -119,10 +119,11 @@ services:
       MQTT_OCCUPANCY_TOPIC_PREFIX: rmutt/occupancy
       LEGACY_PHONE_PREFIX: ${LEGACY_PHONE_PREFIX:-0}
       # โฟลเดอร์เดียวกับที่ Caddy เสิร์ฟ /firmware/ ใช้แสดงรายการไฟล์ในเว็บ
+      # และรับไฟล์ที่อัปโหลดจากหน้าเฟิร์มแวร์ (ต้องเป็นของ uid 1000 = user node)
       FIRMWARE_DIR: /firmware
       TZ: Asia/Bangkok
     volumes:
-      - ./firmware:/firmware:ro
+      - ./firmware:/firmware
     healthcheck:
       test:
         - CMD

@@ -87,6 +87,8 @@ mkdir -p "$APP_DIR"/{db/data,mosquitto/{config,certs,data},caddy/{data,config},b
 chown -R "$OWNER":"$OWNER" "$APP_DIR"
 # ข้อมูลของ mosquitto ต้องเป็นของ uid 1883 ที่ใช้ในคอนเทนเนอร์
 chown -R 1883:1883 "$APP_DIR/mosquitto/data" "$APP_DIR/mosquitto/certs"
+# backend (user node uid 1000) รับไฟล์เฟิร์มแวร์ที่อัปโหลดจากเว็บ
+chown 1000:1000 "$APP_DIR/firmware"
 chmod 750 "$APP_DIR"
 chmod 700 "$APP_DIR/backups"
 

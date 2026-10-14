@@ -20,7 +20,12 @@ import {
 } from '../utils/air-conditioner.js';
 import { ApiError, asyncHandler } from '../utils/http.js';
 import { assertFirmwareFileExists } from './firmware.js';
-import { firmwareUrl, validateFirmwareFileName } from '../utils/firmware.js';
+import {
+  airFirmwareKind,
+  assertFirmwareKind,
+  firmwareUrl,
+  validateFirmwareFileName,
+} from '../utils/firmware.js';
 import { hashSecret } from '../utils/security.js';
 import {
   prepareDeviceCredentials,
@@ -367,7 +372,7 @@ airConditionersRouter.post(
     const fileName = validateFirmwareFileName(request.body?.file);
     await assertFirmwareFileExists(fileName);
     const rows = await pool.query(
-      `SELECT provision_status, is_online, mqtt_host
+      `SELECT provision_status, is_online, mqtt_host, protocol
          FROM air_conditioners
         WHERE device_id = ?
         LIMIT 1`,
@@ -375,6 +380,7 @@ airConditionersRouter.post(
     );
     const row = rows[0];
     if (!row) throw new ApiError(404, 'ไม่พบเครื่องปรับอากาศนี้');
+    assertFirmwareKind(fileName, airFirmwareKind(row.protocol));
     if (row.provision_status !== 'active') {
       throw new ApiError(409, 'บอร์ดยังตั้งค่าและยืนยันผ่าน MQTT ไม่สำเร็จ');
     }

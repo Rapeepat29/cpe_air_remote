@@ -13,7 +13,11 @@ import {
 } from '../services/mqtt.js';
 import { ApiError, asyncHandler } from '../utils/http.js';
 import { assertFirmwareFileExists } from './firmware.js';
-import { firmwareUrl, validateFirmwareFileName } from '../utils/firmware.js';
+import {
+  assertFirmwareKind,
+  firmwareUrl,
+  validateFirmwareFileName,
+} from '../utils/firmware.js';
 import { resolveMqttProvisioningSettings } from '../utils/mqtt-provisioning.js';
 import {
   publicOccupancySensor,
@@ -244,6 +248,7 @@ occupancySensorsRouter.post(
   asyncHandler(async (request, response) => {
     const deviceId = validateOccupancyDeviceId(request.params.deviceId);
     const fileName = validateFirmwareFileName(request.body?.file);
+    assertFirmwareKind(fileName, 'occupancy');
     await assertFirmwareFileExists(fileName);
     const rows = await pool.query(
       `SELECT provision_status, is_online, mqtt_host
