@@ -329,7 +329,7 @@ _roomRepository = widget.roomRepository ?? RoomService();
 | `file_selector`, `path_provider`, `share_plus` | เลือกไฟล์ Excel นำเข้า, บันทึก/แชร์ไฟล์ส่งออก |
 | `flutter_lints` (dev) | กฎตรวจรูปแบบโค้ด (`flutter analyze`) |
 
-`version: 3.12.0+29` = ชื่อรุ่น `3.12.0` + เลข build `29` (Android ใช้เลข build ตัดสินว่าอัปเดตทับได้ไหม ต้องเพิ่มทุกครั้งที่แจก)
+`version: 3.16.0+32` = ชื่อรุ่น `3.16.0` + เลข build `32` (Android ใช้เลข build ตัดสินว่าอัปเดตทับได้ไหม ต้องเพิ่มทุกครั้งที่แจก)
 
 ### การแปลภาษา
 `localization/localized_material.dart` สร้าง `Text` ของตัวเองมาแทน `Text` ของ Flutter
@@ -548,6 +548,19 @@ testWidgets('requires login before showing the energy dashboard', (tester) async
 | ล็อกอินได้แต่ข้อมูลเป็นของเซิร์ฟเวอร์จริง | ลืมใส่ `--dart-define` แอปเลยใช้ค่าเริ่มต้น |
 | หน้า Bluetooth ไม่เจอบอร์ด | บอร์ดไม่ได้อยู่ใน Setup Mode / เปิด Bluetooth ไม่ได้ / Android ไม่ได้ให้สิทธิ์ (ดูบท 11–12) |
 | `Gradle task assembleRelease failed` | ดูข้อความด้านบนให้ละเอียด, `flutter doctor --android-licenses`, ตรวจ `key.properties` |
+
+---
+
+## ฟีเจอร์ที่เพิ่มล่าสุด (9–14 ต.ค. 2569, แอป 3.16.0+32)
+
+| ฟีเจอร์ | ไฟล์หลัก |
+|---|---|
+| กราฟพลังงานเปลี่ยนเป็น **กราฟแท่ง** ปัดสเกลแกนให้สวย (1, 2, 2.5, 4, 5 × 10^n) | `lib/widgets/energy_usage_chart.dart` |
+| จัดการตารางเรียนจากมือถือ: จองห้อง, ปฏิทินภาคเรียน, นำเข้าแบบแทนที่ทั้งหมด, ส่งออก CSV | `lib/screens/booking_editor_screen.dart`, `term_calendar_screen.dart`, `schedule_management_screen.dart` |
+| ป้ายบอกชนิดการควบคุมแอร์ (IR / ต่อสาย Daikin) | `lib/widgets/air_control_badge.dart` |
+| ถือว่าแอร์ "เปิด" เมื่อสั่งเปิด **หรือ** PZEM วัดได้ว่ากำลังทำงาน | `isPoweredOn = isOn \|\| (pzemAvailable && isRunning)` |
+| ลบห้องแล้วสั่งล้างการตั้งค่าบอร์ด (unprovision) ให้ด้วย | รอการตอบกลับ `boardCleared` 4 วินาที |
+| GitHub Actions: `test.yml` (analyze + test), `build-android.yml`, `build-ios.yml` | `.github/workflows/` |
 
 ---
 
