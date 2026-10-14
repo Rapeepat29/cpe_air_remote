@@ -16,7 +16,8 @@ RMUTT Save Energy - อัปเดตแก้รหัส Wi-Fi ผิด
 2. แตก ZIP นี้ลงในโฟลเดอร์ cpe_air_remote
 3. เลือก Replace the files in the destination
 4. เปิด firmware/rmutt_esp32_air/rmutt_esp32_air.ino
-5. อัปโหลดเฟิร์มแวร์ใหม่โดยใช้ Partition Scheme: Huge APP
+5. อัปโหลดเฟิร์มแวร์ใหม่โดยใช้ Partition Scheme: No FS 4MB (2MB APP x2)
+   (เฟิร์มแวร์ปัจจุบันใช้ partitions.csv ในโฟลเดอร์สเก็ตช์ ไม่ใช่ Huge APP แล้ว)
 6. เปิด PowerShell ในโฟลเดอร์ cpe_air_remote แล้วรัน:
 
    flutter clean

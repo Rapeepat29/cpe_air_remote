@@ -32,8 +32,8 @@ src/
 
 พอแยกเป็น `decideAutoOff({device, occupancy, withinClass, now})` ที่รับ object
 เข้าไปเฉย ๆ การทดสอบกลายเป็นการเรียกฟังก์ชัน 10 ครั้งด้วยค่าต่างกัน
-ใช้เวลาเป็นมิลลิวินาที **เทสต์ทั้ง 95 เคสของโปรเจกต์รันจบใน ~30 วินาที
-โดยไม่ต้องมี MariaDB หรือ MQTT เลย**
+ใช้เวลาเป็นมิลลิวินาที **เทสต์ทั้ง 136 เคสของ Backend รันจบในไม่กี่วินาที
+โดยไม่ต้องมี MariaDB หรือ MQTT เลย** (นับ 14 ต.ค. 2569)
 
 ---
 
@@ -87,8 +87,10 @@ deviceUrl: process.env.MQTT_DEVICE_URL ?? process.env.MQTT_URL,
 
 - Backend อยู่ใน Docker เดียวกับ Broker ต่อผ่านชื่อ service
   `mqtt://mqtt:1883` ได้เลย ไม่ต้องออกอินเทอร์เน็ต
-- ESP32 อยู่ในอาคาร ต้องเข้ามาจากข้างนอกด้วย
-  `mqtts://rmutt-energy.duckdns.org:8883`
+- ESP32 อยู่ในอาคาร ต้องเข้ามาจากข้างนอกด้วย `mqtts://`
+  (อัปเดต 14 ต.ค. 2569) ตั้งแต่ 5 ต.ค. `deploy/docker-compose.yml` ตั้งค่าเริ่มต้นเป็น
+  `mqtts://rmutt-energy.tailb292b4.ts.net:8443` (Tailscale Funnel เข้าได้จากทุกเครือข่าย)
+  เดิมคือ `mqtts://rmutt-energy.duckdns.org:8883` ซึ่งยังใช้ได้ถ้าตั้ง `MQTT_DEVICE_URL` ใน `.env`
 
 ถ้ามีตัวแปรเดียว จะต้องเลือกอย่างใดอย่างหนึ่ง ซึ่งทำให้อีกฝั่งใช้ไม่ได้
 `?? MQTT_URL` ทำให้ตอนพัฒนาในเครื่องเดียวไม่ต้องตั้งสองค่า
@@ -155,7 +157,9 @@ settingsRouter.patch('/auto-off', requireAdmin, handler);  // เฉพาะเ
 |---|---|---|
 | `auth.js` | 12 KB | login, ลืมรหัสผ่าน 4 ขั้น, แก้โปรไฟล์ตัวเอง |
 | `rooms.js` | 7.5 KB | รายการห้อง + สถานะรวมของห้อง |
-| `schedules.js` | 11 KB | ตารางเรียน + นำเข้า Excel |
+| `schedules.js` | 11 KB | ตารางเรียน + นำเข้า Excel + ปฏิทินภาคเรียน (`/terms`) |
+| `bookings.js` | 5.2 KB | การใช้ห้องนอกตารางเรียน (อัปเดต 14 ต.ค. 2569) |
+| `firmware.js` | 7.2 KB | รายการ/อัปโหลด/ลบไฟล์เฟิร์มแวร์ `.bin` จากหน้าเว็บ (แอดมิน, อัปเดต 14 ต.ค. 2569) |
 | `air-conditioners.js` | 12 KB | จอง/ยืนยัน/สั่งงาน/นำออก แอร์ |
 | `occupancy-sensors.js` | 8 KB | เหมือนกันสำหรับเซ็นเซอร์ |
 | `energy.js` | 18 KB | ค่าไฟสด สรุป ประวัติ ส่งออก Excel |
@@ -202,6 +206,10 @@ throw new ApiError(400, 'ต้องส่ง enabled เป็น true หร�
 4. ส่ง `command` เมื่อแอปสั่งงาน
 5. ส่ง `schedule-status` แบบ retained บอกบอร์ดว่าตอนนี้มีคาบเรียนไหม
 6. ล้าง retained message ทั้งหมดเมื่อนำอุปกรณ์ออก
+7. (อัปเดต 14 ต.ค. 2569) `unprovisionDevice()` ส่งคำสั่งให้บอร์ดล้างค่าในตัวเองก่อนลบบัญชี MQTT
+   แล้วรอคำตอบไม่เกิน 4 วินาที (ดู `05-mqtt-ble.md`)
+8. บอร์ดสายแอร์ส่ง `controlMode: "wired"` ใน status ถ้าฐานข้อมูลยังเป็นยี่ห้อ IR
+   จะแก้ `protocol` เป็น `DAIKIN_WIRED` ให้เอง (`utils/air-conditioner.js`)
 
 **ลำดับที่สำคัญมากในข้อ 2**
 
@@ -335,8 +343,17 @@ ON DUPLICATE KEY UPDATE
 | `user.js` | 4.7 KB | `publicUser()` และตรวจข้อมูลโปรไฟล์ |
 | `room.js` | 4.4 KB | รวมสถานะของห้อง |
 | `schema-doctor.js` | 3 KB | เทียบโครงฐานข้อมูลกับ `schema.sql` |
-| `class-schedule.js` | 2.2 KB | ตอนนี้มีคาบเรียนไหม |
+| `class-schedule.js` | 2.2 KB | ตอนนี้มีคาบเรียนไหม + สถานะภาคเรียน (`termStatus`) |
 | `security.js` | 0.8 KB | OTP, HMAC, เทียบ hash แบบปลอดภัย |
+| `room-booking.js` | 7.8 KB | ตรวจการจองห้อง การทำซ้ำ `withBookings()` (อัปเดต 14 ต.ค. 2569) |
+| `firmware.js` | 5.9 KB | ชื่อไฟล์ → ชนิดบอร์ด (`occ` = เซ็นเซอร์, `wired`/`slm8` = สายแอร์, นอกนั้น = แอร์ IR) และรุ่น |
+| `unprovision.js` | 2.2 KB | คำสั่ง `unprovision` และตรวจคำตอบของบอร์ด |
+
+(ขนาดไฟล์ในตารางนี้เป็นค่าตอนเขียนครั้งแรก ไฟล์เดิมหลายไฟล์โตขึ้นแล้ว)
+
+บอร์ดสายแอร์ใช้ `protocol = 'DAIKIN_WIRED'` และ `utils/air-conditioner.js`
+ปฏิเสธคำสั่งที่แอร์รับทางสายไม่ได้ (โหมด Auto/Heat, พัดลม Turbo, Eco/Turbo/Quiet/Clean,
+ส่ายแนวนอน, Sleep ในโหมด Dry) API ส่ง `controlType: "wired" | "ir"` มากับแอร์ทุกเครื่อง
 
 ### `publicUser()` — ด่านกันข้อมูลรั่ว
 
@@ -397,7 +414,7 @@ password.length >= 8 && Buffer.byteLength(password, 'utf8') <= 72
 |---|---|
 | `init-db.js` | ติดตั้งใหม่ รัน `schema.sql` |
 | `seed-admin.js` | สร้างแอดมินคนแรก |
-| `migrate-*.js` (10 ตัว) | อัปเกรดฐานข้อมูลที่มีข้อมูลแล้ว |
+| `migrate-*.js` (12 ตัว) | อัปเกรดฐานข้อมูลที่มีข้อมูลแล้ว |
 | `doctor.js` | เทียบโครงจริงกับ `schema.sql` และเติมด้วย `--fix` |
 | `convert-schedule-file.js` | แปลงไฟล์ตารางเรียนนอกระบบ |
 
@@ -417,15 +434,19 @@ cd backend
 npm test          # node --test
 ```
 
-**14 ไฟล์ · 95 เคส** ครอบคลุม auth, room, schedule, import, mqtt, pzem,
+**21 ไฟล์ · 136 เคส** (นับ 14 ต.ค. 2569) ครอบคลุม auth, room, schedule, import, mqtt, pzem,
 occupancy, security, user-management, energy-history, xlsx-writer, auto-off,
-schema-doctor
+schema-doctor, room-booking, firmware, unprovision, air-conditioner (สายแอร์ Daikin),
+mqtt-accounts, offline-history
+
+GitHub Actions ยังไม่ได้รันเทสต์ Backend (`.github/workflows/test.yml` รันเฉพาะฝั่ง Flutter)
+ต้องรัน `npm test` เองก่อน push
 
 ### ทำไมใช้ `node --test` ไม่ใช่ Jest หรือ Mocha
 
 - มาพร้อม Node 20 ไม่ต้องติดตั้งอะไรเพิ่ม ลด dependency ลงหลายสิบตัว
 - รองรับ ESM ตั้งแต่แรก ไม่ต้องตั้ง babel หรือ transformer
-- เร็วพอ สำหรับ 95 เคสที่ไม่แตะฐานข้อมูล
+- เร็วพอ สำหรับ 136 เคสที่ไม่แตะฐานข้อมูล
 
 ### สิ่งที่เทสต์ชุดนี้จับได้จริงระหว่างพัฒนา
 

@@ -1,16 +1,17 @@
 # ESP32 firmware
 
-This folder contains two separate ESP32 firmwares. The A/C board controls one
+This folder contains three ESP32 firmwares: two A/C boards (IR and wired) and
+an occupancy board. An A/C board controls one
 air conditioner. The occupancy board monitors one room with an HLK-LD2410.
-Both use BLE for first setup/reconfiguration and Wi-Fi/MQTT afterward.
+All of them use BLE for first setup/reconfiguration and Wi-Fi/MQTT afterward.
 
 There are two A/C boards. They share the same BLE, MQTT, PZEM, LED, OTA and
 offline-history behaviour, so the app and Backend treat them alike:
 
 | Sketch | Talks to the A/C by | Brand in the app |
 |---|---|---|
-| `rmutt_esp32_air` (2.5.0) | IR, like a handheld remote | Chosen by the user (IRac protocol) |
-| `rmutt_esp32_air_wired` (2.5.1-slm8) | The Daikin wall-panel cable (SLM8), replacing the wall remote | Fixed by the board: **Daikin · Wired** (`DAIKIN_WIRED`) |
+| `rmutt_esp32_air` (2.5.1) | IR, like a handheld remote | Chosen by the user (IRac protocol) |
+| `rmutt_esp32_air_wired` (2.5.2-slm8) | The Daikin wall-panel cable (SLM8), replacing the wall remote | Fixed by the board: **Daikin · Wired** (`DAIKIN_WIRED`) |
 
 Both boards now drive a 1.3" SH1106 I2C OLED (SDA GPIO21, SCL GPIO22) and need
 the **U8g2** library. The wired board also needs **DHT sensor library**
@@ -23,7 +24,9 @@ the **U8g2** library. The wired board also needs **DHT sensor library**
 
 - ArduinoJson 6.x
 - PubSubClient
-- IRremoteESP8266 2.9.0
+- IRremoteESP8266 2.9.0 (IR board only)
+- U8g2 by olikraus (both A/C boards, OLED)
+- DHT sensor library by Adafruit (wired board only)
 - PZEM004Tv30 (Jakub Mandula)
 - ld2410 by Nick Reynolds 0.2.2 or later (occupancy board only)
 - ESP32 board package (Wi-Fi, BLE, Preferences are included)
@@ -135,6 +138,13 @@ For device `ESP32-AABBCCDDEEFF`:
 - Class schedule result: `rmutt/ac/ESP32-AABBCCDDEEFF/schedule-status`
 - Provisioning: `rmutt/ac/ESP32-AABBCCDDEEFF/provision`
 - Provisioning ACK: `rmutt/ac/ESP32-AABBCCDDEEFF/provision-ack`
+- Offline history: `rmutt/ac/ESP32-AABBCCDDEEFF/history` and `history-ack`
+
+Besides A/C state, `command` also carries `enter_setup`, `ota` and (from A/C
+2.5.1 / wired 2.5.2-slm8 / occupancy 1.3.2) `unprovision`. Deleting a board in
+the app sends `unprovision`: the board acknowledges on `status`, erases its NVS
+(and offline history) and restarts into BLE setup. See
+`docs/BLE_MQTT_PROTOCOL.md`.
 
 The Backend and every ESP32 must use the same broker and
 `MQTT_TOPIC_PREFIX=rmutt/ac`.
@@ -208,7 +218,7 @@ Occupancy MQTT topics for `OCC32-AABBCCDDEEFF` are:
 - Status/LWT: `rmutt/occupancy/OCC32-AABBCCDDEEFF/status`
 - Provisioning: `rmutt/occupancy/OCC32-AABBCCDDEEFF/provision`
 - Provisioning ACK: `rmutt/occupancy/OCC32-AABBCCDDEEFF/provision-ack`
-- Online setup command: `rmutt/occupancy/OCC32-AABBCCDDEEFF/command`
+- Command (`enter_setup`, `ota`, `unprovision`): `rmutt/occupancy/OCC32-AABBCCDDEEFF/command`
 
 The status is retained and is published whenever occupancy changes and at
 least every 10 seconds. The app shows **Sensor unavailable** instead of
@@ -221,11 +231,11 @@ Open the Serial Monitor at 115200 and press EN/RST. A healthy boot prints:
 ```text
 entry 0x400805b4
 RMUTT ESP32 LD2410 Occupancy Sensor
-Firmware: 1.1.1
+Firmware: 1.3.2
 Device ID: OCC32-XXXXXXXXXXXX
 LD2410 engineering mode ready
 Wi-Fi connected: 192.168.1.109
-Connecting MQTT: 192.168.1.153:1883 as rmutt_air
+Connecting MQTT: 192.168.1.153:1883 as OCC32-XXXXXXXXXXXX
 MQTT connected
 Subscribed: rmutt/occupancy/OCC32-XXXXXXXXXXXX/command
 ```
@@ -318,11 +328,11 @@ back restores normal operation.
 
 | sketch | question it answers |
 |---|---|
-| `ld2410_probe/ld2410_probe.ino` | Are `GPIO32`/`GPIO33` electrically sound, and does the module answer on either of them at 256000, 115200 or 57600 baud, in either wiring direction? |
+| `ld2410_probe/ld2410_probe.ino` (not included in this repository) | Are `GPIO32`/`GPIO33` electrically sound, and does the module answer on either of them at 256000, 115200 or 57600 baud, in either wiring direction? |
 | `ld2410_pinscan/ld2410_pinscan.ino` | Which ESP32 pin — out of all 18 that can be scanned — is the module's TX wire actually reaching? |
 
-Run `ld2410_probe` first. If it clears both pins and still finds no data, run
-`ld2410_pinscan`.
+Only `ld2410_pinscan` is in this repository. If you have `ld2410_probe`, run it
+first; if it clears both pins and still finds no data, run `ld2410_pinscan`.
 
 #### `ld2410_pinscan`
 

@@ -63,7 +63,7 @@ IR LED กำลังสูงกินกระแสเกินกว่า�
 
 ## ส่วนที่ 3 · สองบอร์ดในโปรเจกต์ และการต่อสาย
 
-### 3.1 บอร์ดแอร์ (`rmutt_esp32_air`, เฟิร์มแวร์ 2.4.0)
+### 3.1 บอร์ดแอร์ (`rmutt_esp32_air`, เฟิร์มแวร์ 2.5.1)
 
 | ขา ESP32 | ต่อกับ | หน้าที่ |
 |---|---|---|
@@ -111,7 +111,7 @@ IR LED กำลังสูงกินกระแสเกินกว่า�
 
 ```text
 RMUTT ESP32 Air Controller
-Firmware: 2.4.0
+Firmware: 2.5.1
 Device ID: ESP32-AABBCCDDEEFF
 IR output: GPIO17
 PZEM UART: RX GPIO16, TX GPIO18
@@ -386,8 +386,8 @@ Flash 4 MB ถูกแบ่งเป็นห้อง ๆ แบบนี้ 
 
 ขั้นตอน (จาก `deploy/DEPLOY.md`)
 1. Arduino IDE → **Sketch → Export Compiled Binary** → ได้ไฟล์ `*.ino.bin` ในโฟลเดอร์สเก็ตช์
-2. เปลี่ยนชื่อให้มีชนิดและรุ่น เช่น `rmutt_esp32_air-2.4.1.bin` (บอร์ดตรวจคนต้องมีคำว่า `occ`)
-3. อัปโหลดขึ้นเซิร์ฟเวอร์ `scp rmutt_esp32_air-2.4.1.bin <user>@<host>:/opt/rmutt/firmware/`
+2. เปลี่ยนชื่อให้มีชนิดและรุ่น เช่น `rmutt_esp32_air-2.5.1.bin` (บอร์ดตรวจคนต้องมีคำว่า `occ`)
+3. อัปโหลดขึ้นเซิร์ฟเวอร์ `scp rmutt_esp32_air-2.5.1.bin <user>@<host>:/opt/rmutt/firmware/`
 4. เว็บแอป → ห้องและอุปกรณ์ → กด **อัปเดตเฟิร์มแวร์**
 5. Backend ส่ง MQTT บอกที่อยู่ไฟล์ → บอร์ดดาวน์โหลดทาง HTTPS (ยอมรับเฉพาะ URL `https://<โดเมนเดียวกับ MQTT>/firmware/...` กันถูกหลอกให้โหลดไฟล์จากที่อื่น) → รีบูต
 
