@@ -1,0 +1,2077 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>4. เครือข่าย เซิร์ฟเวอร์ และ Tailscale — คู่มือศึกษา RMUTT Save Energy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Chakra+Petch:wght@600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+<script>try{var t=localStorage.getItem('guide.theme');if(t)document.documentElement.dataset.theme=t;var f=localStorage.getItem('guide.font');if(f)document.documentElement.dataset.font=f;}catch(e){}</script>
+</head>
+<body>
+<header class="topbar">
+  <button class="menu-btn" id="menuBtn" aria-label="เปิดเมนู">☰</button>
+  <a class="brand" href="../index.html"><span class="brand-mark">⚡</span><span>คู่มือศึกษา <b>RMUTT Save Energy</b></span></a>
+  <div class="top-actions">
+    <button id="fontBtn" title="ขนาดตัวอักษร">ก<small>±</small></button>
+    <button id="themeBtn" title="สลับโหมดสว่าง/มืด">☾</button>
+  </div>
+</header>
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <input class="nav-search" id="navSearch" type="search" placeholder="ค้นหาบทหรือหัวข้อ…">
+    <div id="searchResults" class="search-results"></div>
+    <nav class="nav" id="nav">
+<a class="nav-home" href="../index.html">หน้าแรก</a>
+<div class="nav-part">ภาพรวม</div><ul>
+<li><a href="01-concept.html"><span class="num">1</span>แนวคิดและหลักการคิดของโปรเจค</a></li>
+<li><a href="02-roadmap.html"><span class="num">2</span>เริ่มจากอะไร และต้องเรียนรู้อะไรบ้าง</a></li>
+<li><a href="03-architecture-flows.html"><span class="num">3</span>สถาปัตยกรรมและเส้นทางของข้อมูล</a></li>
+</ul>
+<div class="nav-part">โครงสร้างพื้นฐาน</div><ul>
+<li><a class="active" href="04-network-server.html"><span class="num">4</span>เครือข่าย เซิร์ฟเวอร์ และ Tailscale</a></li>
+<li><a href="05-database.html"><span class="num">5</span>ฐานข้อมูล MariaDB</a></li>
+</ul>
+<div class="nav-part">เซิร์ฟเวอร์</div><ul>
+<li><a href="06-backend-api.html"><span class="num">6</span>Backend ตอนที่ 1: โครงหลัก ระบบสมาชิก และ REST API</a></li>
+<li><a href="07-backend-services.html"><span class="num">7</span>Backend ตอนที่ 2: งานเบื้องหลังและตรรกะหลักของระบบ</a></li>
+<li><a href="08-protocols.html"><span class="num">8</span>โปรโตคอลสื่อสาร: MQTT และ Bluetooth Low Energy</a></li>
+</ul>
+<div class="nav-part">อุปกรณ์และหน้าจอ</div><ul>
+<li><a href="09-firmware.html"><span class="num">9</span>เฟิร์มแวร์ ESP32: บอร์ดแอร์ (IR และสายแอร์) และบอร์ดตรวจจับคน</a></li>
+<li><a href="10-flutter-architecture.html"><span class="num">10</span>แอป Flutter ตอนที่ 1: โครงสร้าง ข้อมูล และ State</a></li>
+<li><a href="11-flutter-screens.html"><span class="num">11</span>แอป Flutter ตอนที่ 2: หน้าจอหลักและวิดเจ็ต</a></li>
+<li><a href="12-flutter-admin-screens.html"><span class="num">12</span>แอป Flutter ตอนที่ 3: หน้าจอผู้ดูแลระบบและการตั้งค่า</a></li>
+<li><a href="13-webapp.html"><span class="num">13</span>เว็บแอป: HTML, CSS และ JavaScript ล้วน</a></li>
+</ul>
+<div class="nav-part">ใช้งานจริง</div><ul>
+<li><a href="14-deploy-scripts-testing.html"><span class="num">14</span>การติดตั้งระบบ สคริปต์อัตโนมัติ และการทดสอบ</a></li>
+<li><a href="15-security.html"><span class="num">15</span>ความปลอดภัยทั้งระบบ</a></li>
+<li><a href="16-presentation-qa.html"><span class="num">16</span>เตรียมนำเสนอและคำถามที่อาจารย์มักถาม</a></li>
+</ul>
+<div class="nav-part">ภาคผนวก</div><ul>
+<li><a href="17-glossary.html"><span class="num">17</span>อภิธานศัพท์</a></li>
+<li><a href="18-file-map.html"><span class="num">18</span>แผนที่ไฟล์ทั้งโปรเจค</a></li>
+</ul>
+<div class="nav-part">งานที่กำลังพัฒนา</div><ul>
+<li><a href="19-daikin-slm8.html"><span class="num">19</span>แอร์ Daikin ผ่านสาย SLM8: จากการแกะโปรโตคอลถึงบอร์ดสายแอร์</a></li>
+</ul>
+    </nav>
+  </aside>
+  <main class="content" id="content">
+<div class="chapter-head"><div class="kicker">บทที่ 4 · โครงสร้างพื้นฐาน</div><h1>เครือข่าย เซิร์ฟเวอร์ และ Tailscale</h1></div>
+<h2 id="ภาพรวม">ภาพรวม<a class="anchor" href="#ภาพรวม">#</a></h2>
+<p>บทนี้ตอบคำถามว่า "เซิร์ฟเวอร์ของโปรเจกต์อยู่ที่ไหน และคำขอจากแอป เว็บ และบอร์ด ESP32 เดินทางไปถึงมันได้อย่างไร" เริ่มจากความรู้เครือข่ายพื้นฐาน (IP, พอร์ต, DNS, TLS) แล้วไล่ไปจนถึงการตั้งค่าจริงในโฟลเดอร์ <code>deploy/</code> คือ <code>docker-compose.yml</code>, <code>Caddyfile</code>, Dockerfile ทั้งสองตัว, <code>tailscale-serve.json</code> และ <code>mosquitto/config/mosquitto.conf</code> รวมถึง Broker สำหรับพัฒนาในโฟลเดอร์ <code>mqtt/</code></p>
+<p>เซิร์ฟเวอร์จริงเป็นเครื่อง Ubuntu ที่อยู่<strong>ในเครือข่ายภายในของมหาวิทยาลัย</strong> ได้ IP ส่วนตัวแบบ <code>10.x.x.x</code> และ firewall ของมหาวิทยาลัยไม่ยอมให้อินเทอร์เน็ตต่อเข้ามา บนเครื่องรัน Docker 5 กล่อง (container) คือ <code>db</code> (MariaDB), <code>mqtt</code> (Mosquitto), <code>backend</code> (Node.js), <code>caddy</code> (เว็บเซิร์ฟเวอร์/reverse proxy) และ <code>tailscale</code> (ทางเข้าจากอินเทอร์เน็ต)</p>
+<p>ระบบจึงมีทางเข้า 4 ทาง ซึ่งเป็นแกนของบทนี้ (สองทางผ่าน Tailscale Funnel จากที่ไหนก็ได้ และสองทางตรงผ่านโดเมน DuckDNS ที่ใช้ได้เฉพาะในอาคาร)</p>
+<ol>
+<li><strong>เว็บและ API ในอาคาร ผ่านโดเมน DuckDNS พอร์ต 443</strong> <code>rmutt-energy.duckdns.org</code> → Caddy (เว็บ, API, ไฟล์เฟิร์มแวร์)</li>
+<li><strong>เว็บและ API จากที่ไหนก็ได้ ผ่าน Tailscale Funnel พอร์ต 443</strong> <code>rmutt-energy.tailb292b4.ts.net</code> → กล่อง tailscale (ถอด TLS) → Caddy พอร์ต 8080 แอปมือถือใช้ทางนี้เป็นค่าเริ่มต้น</li>
+<li><strong>บอร์ด ESP32 จากที่ไหนก็ได้ ผ่าน Tailscale Funnel พอร์ต 8443</strong> <code>rmutt-energy.tailb292b4.ts.net:8443</code> → กล่อง tailscale (ถอด TLS ด้วยใบรับรอง ts.net) → <code>mqtt:1883</code> ในเครือข่าย Docker → Mosquitto นี่คือ<strong>ค่าเริ่มต้นปัจจุบัน</strong>ที่ Backend ส่งให้บอร์ดตอน provisioning</li>
+<li><strong>บอร์ด ESP32 ในอาคาร ต่อตรง MQTTS พอร์ต 8883</strong> <code>rmutt-energy.duckdns.org:8883</code> → Mosquitto ยังใช้ได้เสมอ และจะถูกใช้จริงเมื่อตั้ง <code>MQTT_DEVICE_URL=mqtts://&lt;DOMAIN&gt;:8883</code> ใน <code>.env</code></li>
+</ol>
+<p>ที่ต้องมีทางที่ 3 เพราะโดเมน DuckDNS ชี้ไป IP ภายใน 10.x บอร์ดที่ต่อ Wi-Fi นอกมหาวิทยาลัยจึงหา Broker ไม่เจอ ส่วนชื่อ ts.net ชี้ไปที่ relay สาธารณะของ Tailscale ซึ่งเข้าได้จากทุกเครือข่ายที่มีอินเทอร์เน็ต</p>
+<p>ฐานข้อมูล (3306), Backend (3000) และ Caddy 8080 <strong>ไม่เปิดออกนอกเครื่องเลย</strong> ผู้ดูแลเข้าฐานข้อมูลได้ทางเดียวคืออุโมงค์ SSH ส่วน MQTT แบบไม่เข้ารหัส (1883) ไม่ได้ publish ออกนอกเครื่องเช่นกัน แต่กล่อง tailscale ส่งทราฟฟิกพอร์ต 8443 (ที่ถอด TLS แล้ว) มาที่พอร์ตนี้ภายในเครือข่าย Docker ดังนั้น Broker จึง<strong>เข้าถึงได้จากอินเทอร์เน็ตผ่าน Funnel</strong> โดยมี TLS และรหัสผ่านรายบอร์ดเป็นด่านป้องกัน (ดูหัวข้อ "ทำไมเปิดทางเข้าแค่สองจุด")</p>
+<div class="code-block"><div class="hl"><pre><span></span><code>          อินเทอร์เน็ต (มือถือ 4G, บ้าน, Wi-Fi นอกมหาวิทยาลัย)
+   แอป/เว็บ HTTPS :443                         บอร์ด ESP32 MQTTS :8443
+        │                                              │
+        └────────── rmutt-energy.tailb292b4.ts.net ────┘
+                                   │
+                       ┌───────────▼───────────┐
+                       │  Tailscale Funnel     │  (เซิร์ฟเวอร์ของบริษัท Tailscale)
+                       │  relay                │
+                       └───────────▲───────────┘
+                                   │ อุโมงค์ที่กล่อง tailscale "ต่อออกไป" เอง
+   ════════════ firewall มหาวิทยาลัย (ไม่ให้ต่อเข้า แต่ให้ต่อออก) ════════════
+                                   │
+ เครือข่ายภายในมหาวิทยาลัย 10.x     │
+                                   │
+  เบราว์เซอร์ในอาคาร        ┌───────┴──────────────── เซิร์ฟเวอร์ (IP 10.x) ─────────┐
+  rmutt-energy.duckdns.org │                                                    │
+  ──── HTTPS 443 ─────────▶│ :443 ┌────────┐ /api/* ┌─────────┐   ┌──────────┐  │
+                           │ :80  │ caddy  │───────▶│ backend │──▶│   db     │  │
+                           │      │        │◀───────│  :3000  │   │  :3306   │  │
+                           │      │ :8080  │ ◀──┐   └────┬────┘   └──────────┘  │
+                           │      └────────┘    │        │ mqtt://mqtt:1883     │
+                           │             ┌──────┴────┐ ┌─▼────────┐             │
+                           │             │ tailscale │ │  mqtt    │             │
+                           │             │ 8443→1883 ├▶│  :1883   │             │
+                           │             │ 443→8080  │ │          │             │
+                           │             └───────────┘ │          │             │
+  ESP32 ในอาคาร (ต่อตรง)     │ :8883                     │  :8883   │             │
+  ──── MQTTS 8883 ────────▶│──────────────────────────▶│          │             │
+                           │                           └──────────┘             │
+                           └────────────────────────────────────────────────────┘
+</code></pre></div>
+</div>
+
+<div class="callout note"><div class="callout-title">หมายเหตุ</div><p>เอกสารเก่าบางส่วน (<code>deploy/DEPLOY.md</code>, <code>deploy/SERVER_REQUIREMENTS.md</code>, <code>docs/learn/14-*.md</code>) ยังเขียนตามแผนเดิมที่ขอให้ฝ่ายไอทีเปิดพอร์ต 80/443 จากอินเทอร์เน็ต และขอใบรับรองแบบ HTTP-01 แต่โค้ดจริงตอนนี้ใช้ DuckDNS + DNS-01 + Tailscale Funnel บทนี้อธิบายตามโค้ดจริง</p></div>
+
+<h2 id="ความรู้ที่ต้องมีก่อนอ่านบทนี้">ความรู้ที่ต้องมีก่อนอ่านบทนี้<a class="anchor" href="#ความรู้ที่ต้องมีก่อนอ่านบทนี้">#</a></h2>
+<p>ส่วนนี้ยาวกว่าบทอื่น เพราะเรื่องเซิร์ฟเวอร์ต้องเข้าใจเครือข่ายก่อนถึงจะอธิบายได้ว่า "ทำไม" อ่านตามลำดับ</p>
+<h3 id="ip-address-lan-ip-ส่วนตัวกับ-ip-สาธารณะ">IP address, LAN, IP ส่วนตัวกับ IP สาธารณะ<a class="anchor" href="#ip-address-lan-ip-ส่วนตัวกับ-ip-สาธารณะ">#</a></h3>
+<ul>
+<li><strong>IP address</strong> คือที่อยู่ของเครื่องในเครือข่าย IPv4 เขียนเป็นเลข 4 ชุด เช่น <code>10.20.30.40</code></li>
+<li><strong>LAN</strong> (Local Area Network) คือเครือข่ายวงเดียวกัน เช่น Wi-Fi ในบ้าน หรือเครือข่ายทั้งมหาวิทยาลัย</li>
+<li><strong>IP ส่วนตัว (private IP)</strong> มี 3 ช่วงที่สงวนไว้ใช้ภายในเท่านั้น คือ <code>10.0.0.0/8</code> (10.x.x.x), <code>172.16.0.0/12</code> (172.16–172.31.x.x) และ <code>192.168.0.0/16</code> (192.168.x.x) เราเตอร์บนอินเทอร์เน็ตจะไม่ส่งแพ็กเก็ตไปหา IP ช่วงนี้ เพราะทุกองค์กรใช้ซ้ำกันได้ ใครอยู่นอกวงจึง "มองไม่เห็น" เครื่องที่มีแค่ IP ส่วนตัว</li>
+<li><strong>IP สาธารณะ (public IP)</strong> คือ IP ที่ไม่ซ้ำกันทั้งโลก เข้าถึงได้จากอินเทอร์เน็ต</li>
+<li><code>127.0.0.1</code> (localhost) คือ "เครื่องตัวเอง" ใช้ได้เฉพาะโปรแกรมในเครื่องนั้น</li>
+<li><code>100.64.0.0/10</code> (100.64–100.127.x.x) เป็นช่วงที่ Tailscale ใช้แจก IP ให้เครื่องใน tailnet (อธิบายในหัวข้อ Tailscale)</li>
+</ul>
+<p>ในโปรเจกต์นี้: เซิร์ฟเวอร์มี IP <code>10.x</code> (ส่วนตัว), กล่อง Docker แต่ละกล่องมี IP <code>172.x</code> ในเครือข่ายภายในของ Docker (ก็เป็น IP ส่วนตัวเหมือนกัน)</p>
+<h3 id="nat-router-และ-firewall">NAT, router และ firewall<a class="anchor" href="#nat-router-และ-firewall">#</a></h3>
+<ul>
+<li><strong>Router (เราเตอร์)</strong> ส่งต่อแพ็กเก็ตระหว่างเครือข่าย เช่น ระหว่าง LAN มหาวิทยาลัยกับอินเทอร์เน็ต</li>
+<li><strong>NAT</strong> (Network Address Translation) คือการที่เราเตอร์เปลี่ยน IP ต้นทางของเครื่องภายใน (10.x) เป็น IP สาธารณะของตัวเองตอนออกอินเทอร์เน็ต แล้วจำไว้ว่าการเชื่อมต่อไหนเป็นของใคร พอคำตอบกลับมาก็ส่งคืนถูกเครื่อง ผลคือ <strong>เครื่องข้างในต่อออกไปได้ แต่คนข้างนอกต่อเข้ามาหาเครื่องข้างในเองไม่ได้</strong> เพราะเราเตอร์ไม่รู้ว่าจะส่งให้ใคร ยกเว้นตั้ง <strong>port forwarding</strong> ไว้ (บอกว่า "ใครเข้ามาที่พอร์ต 443 ให้ส่งไปเครื่อง 10.20.30.40")</li>
+<li><strong>Firewall</strong> คือกฎว่าการเชื่อมต่อแบบไหนผ่านได้ ปกติองค์กรตั้งเป็น "ขาออกอนุญาต ขาเข้าปฏิเสธ" มหาวิทยาลัยก็เป็นแบบนี้</li>
+</ul>
+<p>นี่คือปัญหาหลักของโปรเจกต์: เซิร์ฟเวอร์ต่อออกอินเทอร์เน็ตได้ (โหลด Docker image, ส่งอีเมล, ขอใบรับรอง) แต่มือถือที่อยู่นอกมหาวิทยาลัยต่อเข้ามาไม่ได้</p>
+<h3 id="พอร์ต-และพอร์ตที่ใช้ในโปรเจกต์">พอร์ต และพอร์ตที่ใช้ในโปรเจกต์<a class="anchor" href="#พอร์ต-และพอร์ตที่ใช้ในโปรเจกต์">#</a></h3>
+<p>IP บอกว่า "เครื่องไหน" <strong>พอร์ต (port)</strong> บอกว่า "โปรแกรมไหนในเครื่องนั้น" เป็นเลข 0–65535 เขียนแบบ <code>host:port</code></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>พอร์ต</th>
+<th>โปรโตคอล</th>
+<th>ใครฟัง (listen)</th>
+<th>เปิดให้ใครเข้า</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>22</code></td>
+<td>SSH</td>
+<td>ระบบปฏิบัติการของเซิร์ฟเวอร์</td>
+<td>ผู้ดูแล จากเครือข่ายภายในมหาวิทยาลัย</td>
+</tr>
+<tr>
+<td><code>80</code></td>
+<td>HTTP</td>
+<td>Caddy</td>
+<td>เครือข่ายภายใน (ใช้ redirect ไป HTTPS)</td>
+</tr>
+<tr>
+<td><code>443</code></td>
+<td>HTTPS</td>
+<td>Caddy (บล็อกโดเมน DuckDNS)</td>
+<td>เครือข่ายภายใน</td>
+</tr>
+<tr>
+<td><code>8080</code></td>
+<td>HTTP</td>
+<td>Caddy (บล็อกสำหรับ Funnel)</td>
+<td>เฉพาะกล่อง tailscale ในเครือข่าย Docker</td>
+</tr>
+<tr>
+<td><code>3000</code></td>
+<td>HTTP</td>
+<td>Backend (Express)</td>
+<td>เฉพาะ Caddy ในเครือข่าย Docker</td>
+</tr>
+<tr>
+<td><code>1883</code></td>
+<td>MQTT ไม่เข้ารหัส</td>
+<td>Mosquitto</td>
+<td>Backend และกล่อง tailscale (ส่งต่อจาก Funnel 8443) ในเครือข่าย Docker เท่านั้น</td>
+</tr>
+<tr>
+<td><code>8883</code></td>
+<td>MQTT + TLS (MQTTS)</td>
+<td>Mosquitto</td>
+<td>บอร์ด ESP32 ในอาคารที่ต่อตรง (ทางเลือก ตั้งผ่าน <code>MQTT_DEVICE_URL</code>)</td>
+</tr>
+<tr>
+<td><code>443</code> (Funnel)</td>
+<td>HTTPS</td>
+<td>กล่อง tailscale (ถอด TLS แล้วส่งต่อไป <code>caddy:8080</code>)</td>
+<td>ทุกคนบนอินเทอร์เน็ต ผ่านชื่อ ts.net</td>
+</tr>
+<tr>
+<td><code>8443</code> (Funnel)</td>
+<td>MQTT + TLS ถอดที่กล่อง tailscale แล้วส่ง MQTT ดิบไป <code>mqtt:1883</code></td>
+<td>กล่อง tailscale</td>
+<td>บอร์ด ESP32 จากทุกเครือข่าย ผ่านชื่อ ts.net (ค่าเริ่มต้น)</td>
+</tr>
+<tr>
+<td><code>3306</code></td>
+<td>MariaDB</td>
+<td>MariaDB</td>
+<td><code>127.0.0.1</code> ของเซิร์ฟเวอร์เท่านั้น (ผ่านอุโมงค์ SSH)</td>
+</tr>
+<tr>
+<td><code>3307</code></td>
+<td>(อุโมงค์)</td>
+<td>ssh บนเครื่อง Windows ของผู้ดูแล</td>
+<td>HeidiSQL บนเครื่องนั้น</td>
+</tr>
+</tbody>
+</table></div>
+<p>สองพอร์ตสุดท้ายที่มีคำว่า Funnel ไม่ได้ publish บนเครื่อง เพราะกล่อง tailscale เป็นฝ่ายต่อออกไปหา relay ของ Tailscale เอง (ดูหัวข้อ Tailscale)</p>
+<p>ตอนพัฒนาบนเครื่องตัวเอง Broker ใน <code>mqtt/</code> เปิด <code>1883</code> ให้ ESP32 ใน Wi-Fi เดียวกันต่อตรง</p>
+<h3 id="tcp-และ-clientserver">TCP และ client/server<a class="anchor" href="#tcp-และ-clientserver">#</a></h3>
+<ul>
+<li><strong>TCP</strong> คือโปรโตคอลขนส่งที่รับประกันว่าข้อมูลถึงครบและเรียงลำดับ เริ่มด้วยการ "จับมือ" (handshake) 3 ขั้น HTTP, HTTPS, MQTT, SSH และ MariaDB ในโปรเจกต์นี้วิ่งบน TCP ทั้งหมด</li>
+<li><strong>Client/Server</strong>: ฝั่งที่เริ่มเชื่อมต่อคือ client ฝั่งที่รอรับคือ server สิ่งสำคัญที่ต้องจำคือ <strong>ใครเป็นคนเริ่มเชื่อมต่อ</strong> เพราะ firewall/NAT ตัดสินจากตรงนี้ ESP32 เป็น client ของ Mosquitto, แอปเป็น client ของ Caddy, และ (จุดที่ทำให้ Tailscale ใช้ได้) <strong>กล่อง tailscale เป็น client ที่ต่อออกไปหาเซิร์ฟเวอร์ของ Tailscale</strong></li>
+</ul>
+<h3 id="dns-และชื่อโดเมน">DNS และชื่อโดเมน<a class="anchor" href="#dns-และชื่อโดเมน">#</a></h3>
+<ul>
+<li><strong>DNS</strong> แปลงชื่อเป็น IP เหมือนสมุดโทรศัพท์ เช่น ถาม <code>rmutt-energy.duckdns.org</code> ได้คำตอบเป็น IP</li>
+<li><strong>Record</strong> ที่ต้องรู้: <code>A</code> (ชื่อ → IPv4) และ <code>TXT</code> (ชื่อ → ข้อความ ใช้พิสูจน์ความเป็นเจ้าของโดเมน)</li>
+<li><strong>Resolver</strong> คือเซิร์ฟเวอร์ที่เครื่องเราไปถาม (เช่น DNS ของมหาวิทยาลัย, <code>1.1.1.1</code> ของ Cloudflare, <code>8.8.8.8</code> ของ Google) resolver จะไปถาม <strong>authoritative server</strong> ของโดเมนนั้นอีกที (ของ <code>duckdns.org</code> คือเซิร์ฟเวอร์ของ DuckDNS)</li>
+<li><strong>DuckDNS</strong> เป็นบริการชื่อโดเมนย่อยฟรีแบบ <code>&lt;ชื่อ&gt;.duckdns.org</code> เราตั้งได้ว่าชื่อนี้ชี้ไป IP อะไร และมี API ให้เขียน TXT record ด้วย token</li>
+<li>DNS พอร์ตมาตรฐานคือ 53 (UDP/TCP) บางองค์กรบล็อกไม่ให้เครื่องภายในถาม DNS ภายนอกเอง</li>
+</ul>
+<h3 id="http-กับ-https-tls-ใบรับรอง-และ-ca">HTTP กับ HTTPS, TLS, ใบรับรอง และ CA<a class="anchor" href="#http-กับ-https-tls-ใบรับรอง-และ-ca">#</a></h3>
+<ul>
+<li><strong>HTTP</strong> ส่งข้อความเป็นตัวอักษรตรง ๆ ใครดักกลางทางก็อ่านรหัสผ่านได้</li>
+<li><strong>HTTPS</strong> = HTTP ที่วิ่งในช่อง <strong>TLS</strong> ซึ่งทำสองอย่าง: เข้ารหัส และ<strong>ยืนยันตัวตน</strong>ของเซิร์ฟเวอร์</li>
+<li>เซิร์ฟเวอร์ยืนยันตัวตนด้วย <strong>ใบรับรอง (certificate)</strong> ที่บอกว่า "กุญแจสาธารณะนี้เป็นของโดเมนนี้" ลงลายเซ็นโดย <strong>CA</strong> (Certificate Authority)</li>
+<li>Client เชื่อใบรับรองเพราะมี <strong>ใบรับรองราก (root CA)</strong> ของ CA นั้นเก็บไว้ล่วงหน้า (ในระบบปฏิบัติการ/เบราว์เซอร์ หรือในกรณี ESP32 คือฝังในเฟิร์มแวร์) แล้วไล่ตรวจลายเซ็นเป็นสาย (chain) จากใบของเซิร์ฟเวอร์ → ใบกลาง (intermediate) → ใบราก</li>
+<li>Client ยังตรวจด้วยว่า <strong>ชื่อในใบรับรองตรงกับชื่อที่ตั้งใจต่อ</strong> และ <strong>ใบยังไม่หมดอายุ</strong> (ต้องรู้เวลาปัจจุบัน — นี่คือเหตุผลที่ ESP32 ต้องซิงก์เวลา NTP ก่อนต่อ MQTTS)</li>
+<li><strong>SNI</strong> คือชื่อโดเมนที่ client บอกตอนเริ่ม TLS เซิร์ฟเวอร์ใช้เลือกใบรับรอง และ Funnel relay ใช้เลือกว่าจะส่งต่อไปเครื่องไหน</li>
+</ul>
+<h3 id="lets-encrypt-และการพิสูจน์โดเมน-http-01-กับ-dns-01">Let's Encrypt และการพิสูจน์โดเมน (HTTP-01 กับ DNS-01)<a class="anchor" href="#lets-encrypt-และการพิสูจน์โดเมน-http-01-กับ-dns-01">#</a></h3>
+<p><strong>Let's Encrypt</strong> เป็น CA ฟรีที่ออกใบรับรองอายุ 90 วันผ่านโปรโตคอลอัตโนมัติชื่อ <strong>ACME</strong> ก่อนออกใบ ต้องพิสูจน์ว่าเราคุมโดเมนจริง (เรียกว่า challenge) วิธีที่เกี่ยวข้องมี 2 แบบ</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th></th>
+<th>HTTP-01</th>
+<th>DNS-01</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>วิธีพิสูจน์</td>
+<td>วางไฟล์ไว้ที่ <code>http://&lt;โดเมน&gt;/.well-known/acme-challenge/&lt;token&gt;</code> แล้วให้ Let's Encrypt <strong>ต่อเข้ามา</strong>อ่านที่พอร์ต 80</td>
+<td>เขียน TXT record ชื่อ <code>_acme-challenge.&lt;โดเมน&gt;</code> แล้วให้ Let's Encrypt <strong>ถาม DNS</strong> สาธารณะ</td>
+</tr>
+<tr>
+<td>ต้องเปิดพอร์ตขาเข้าไหม</td>
+<td>ต้องเปิด 80 จากอินเทอร์เน็ต และโดเมนต้องชี้ IP ที่อินเทอร์เน็ตเข้าถึงได้</td>
+<td>ไม่ต้อง เซิร์ฟเวอร์แค่ต่อออกไปหา API ของผู้ให้บริการ DNS</td>
+</tr>
+<tr>
+<td>ต้องมีอะไรเพิ่ม</td>
+<td>ไม่มี</td>
+<td>API token ของผู้ให้บริการ DNS และ Caddy ต้องมีปลั๊กอินของผู้ให้บริการนั้น</td>
+</tr>
+</tbody>
+</table></div>
+<p>(ยังมี TLS-ALPN-01 ที่ตรวจผ่านพอร์ต 443 ซึ่งติดปัญหาเดียวกับ HTTP-01)</p>
+<h3 id="reverse-proxy">Reverse proxy<a class="anchor" href="#reverse-proxy">#</a></h3>
+<p><strong>Reverse proxy</strong> คือเซิร์ฟเวอร์ตัวหน้าที่รับคำขอทั้งหมดแทน แล้วส่งต่อให้โปรแกรมข้างหลัง ในโปรเจกต์คือ <strong>Caddy</strong> ทำหน้าที่ ถอด TLS (Backend ไม่ต้องรู้เรื่องใบรับรอง), ส่ง <code>/api/*</code> ไป Backend, เสิร์ฟไฟล์เว็บ, ใส่หัวความปลอดภัย พอผ่าน proxy แล้ว Backend จะเห็น IP ต้นทางเป็น IP ของ proxy proxy จึงแนบ IP จริงของผู้ใช้มาในหัว <strong><code>X-Forwarded-For</code></strong> (XFF) และ Backend ต้องรู้ว่า "เชื่อหัวนี้ได้กี่ชั้น" (เรื่อง <code>TRUST_PROXY</code>)</p>
+<h3 id="vpn-และ-overlay-network">VPN และ overlay network<a class="anchor" href="#vpn-และ-overlay-network">#</a></h3>
+<ul>
+<li><strong>VPN</strong> สร้าง "เครือข่ายเสมือน" ทับบนอินเทอร์เน็ต เครื่องที่อยู่คนละที่คุยกันเหมือนอยู่ LAN เดียว ข้อมูลระหว่างทางถูกเข้ารหัส</li>
+<li><strong>Overlay network / mesh VPN</strong> คือ VPN ที่ทุกเครื่องต่อกันตรง ๆ เป็นตาข่าย ไม่ต้องผ่านเซิร์ฟเวอร์กลางตัวเดียว <strong>Tailscale</strong> เป็นแบบนี้ สร้างบน <strong>WireGuard</strong> (โปรโตคอล VPN สมัยใหม่ที่เร็วและโค้ดน้อย)</li>
+</ul>
+<h3 id="ssh-และ-ssh-tunnel">SSH และ SSH tunnel<a class="anchor" href="#ssh-และ-ssh-tunnel">#</a></h3>
+<ul>
+<li><strong>SSH</strong> (พอร์ต 22) คือการเข้าไปสั่งงานเซิร์ฟเวอร์ผ่านช่องเข้ารหัส ยืนยันตัวด้วยรหัสผ่านหรือ <strong>SSH key</strong> (คู่กุญแจ: กุญแจลับอยู่ที่เครื่องเรา กุญแจสาธารณะอยู่ใน <code>~/.ssh/authorized_keys</code> บนเซิร์ฟเวอร์) <code>scp</code> คือคัดลอกไฟล์ผ่าน SSH</li>
+<li><strong>SSH tunnel (port forwarding)</strong> <code>ssh -L 3307:127.0.0.1:3306 user@server</code> แปลว่า "เปิดพอร์ต 3307 บนเครื่องฉัน อะไรที่เข้ามาให้ส่งผ่านช่อง SSH ไปออกที่เซิร์ฟเวอร์ แล้วต่อไป <code>127.0.0.1:3306</code> <em>ของเซิร์ฟเวอร์</em>" ทำให้เข้าถึงบริการที่ผูกไว้กับ localhost ของเซิร์ฟเวอร์ได้ โดยไม่ต้องเปิดบริการนั้นออกเครือข่าย</li>
+</ul>
+<h3 id="docker-แบบย่อ-ที่ต้องใช้ในบทนี้">Docker แบบย่อ (ที่ต้องใช้ในบทนี้)<a class="anchor" href="#docker-แบบย่อ-ที่ต้องใช้ในบทนี้">#</a></h3>
+<ul>
+<li><strong>Image</strong> = แม่แบบของโปรแกรมพร้อมทุกอย่างที่ต้องใช้ <strong>Container</strong> = image ที่กำลังรัน</li>
+<li><strong>Dockerfile</strong> = สูตรสร้าง image <strong>docker compose</strong> = ไฟล์ YAML บอกว่าจะรันกี่กล่อง ต่อกันอย่างไร</li>
+<li><strong>Port publishing</strong> <code>"443:443"</code> = เปิดพอร์ตของเครื่องจริงแล้วส่งเข้ากล่อง ถ้าไม่ publish กล่องอื่นในเครือข่าย Docker ยังเข้าได้ แต่นอกเครื่องเข้าไม่ได้</li>
+<li><strong>Volume / bind mount</strong> <code>./db/data:/var/lib/mysql</code> = ผูกโฟลเดอร์จริงเข้าไปในกล่อง ข้อมูลไม่หายเมื่อสร้างกล่องใหม่</li>
+<li><strong>Docker network</strong>: กล่องในไฟล์ compose เดียวกันอยู่เครือข่ายเดียวกันและเรียกกันด้วย<strong>ชื่อ service</strong> ได้ (<code>db</code>, <code>mqtt</code>, <code>backend</code>, <code>caddy</code>) เพราะ Docker มี DNS ภายใน</li>
+</ul>
+<h3 id="mqtt-แบบย่อ">MQTT แบบย่อ<a class="anchor" href="#mqtt-แบบย่อ">#</a></h3>
+<p>MQTT เป็นโปรโตคอลส่งข้อความแบบ publish/subscribe ผ่านตัวกลางชื่อ <strong>Broker</strong> (ที่นี่คือ Mosquitto) บอร์ดและ Backend เป็น client ทั้งคู่ ต่อเข้า Broker แล้วส่ง/รับข้อความตาม <strong>topic</strong> เช่น <code>rmutt/ac/...</code> และ <code>rmutt/occupancy/...</code> <code>mqtt://</code> คือพอร์ต 1883 ไม่เข้ารหัส <code>mqtts://</code> คือมี TLS (พอร์ตมาตรฐาน 8883 แต่ทาง Funnel ในโปรเจกต์นี้ใช้ 8443) (รายละเอียด topic อยู่ในบท MQTT)</p>
+<h2 id="สถานการณ์จริงของเซิร์ฟเวอร์">สถานการณ์จริงของเซิร์ฟเวอร์<a class="anchor" href="#สถานการณ์จริงของเซิร์ฟเวอร์">#</a></h2>
+<h3 id="เซิร์ฟเวอร์อยู่หลัง-firewall-มหาวิทยาลัย">เซิร์ฟเวอร์อยู่หลัง firewall มหาวิทยาลัย<a class="anchor" href="#เซิร์ฟเวอร์อยู่หลัง-firewall-มหาวิทยาลัย">#</a></h3>
+<div class="code-block"><div class="hl"><pre><span></span><code>  อินเทอร์เน็ต ──X──▶ firewall มหาวิทยาลัย ──▶ 10.x (เซิร์ฟเวอร์)     ขาเข้า: ถูกปิด
+  อินเทอร์เน็ต ◀───── firewall มหาวิทยาลัย ◀── 10.x (เซิร์ฟเวอร์)     ขาออก: ได้ (HTTPS 443 ฯลฯ)
+  เครื่องในอาคาร ──────────────────────────▶ 10.x (เซิร์ฟเวอร์)     ภายในวงเดียวกัน: ได้
+</code></pre></div>
+</div>
+
+<p>ผลที่ตามมา</p>
+<ul>
+<li>คนในอาคาร (เบราว์เซอร์ และบอร์ด ESP32 ที่ต่อตรง) ต่อเซิร์ฟเวอร์ได้ เพราะอยู่ในเครือข่ายเดียวกัน</li>
+<li>คนนอกมหาวิทยาลัย (เจ้าหน้าที่เปิดแอปจากบ้าน และบอร์ด ESP32 ที่ต่อ Wi-Fi ข้างนอก) ต่อไม่ได้ ถ้าไม่มีอะไรช่วย</li>
+<li>Let's Encrypt ก็ต่อเข้ามาตรวจ HTTP-01 ไม่ได้</li>
+</ul>
+<h3 id="duckdns-ชี้ไปที่-ip-ภายใน">DuckDNS ชี้ไปที่ IP ภายใน<a class="anchor" href="#duckdns-ชี้ไปที่-ip-ภายใน">#</a></h3>
+<p>โดเมน <code>rmutt-energy.duckdns.org</code> ถูกตั้งที่ DuckDNS ให้ชี้ไป <strong>IP ภายใน 10.x ของเซิร์ฟเวอร์</strong> (ดูคอมเมนต์ใน <code>lib/config/api_config.dart</code>: "rmutt-energy.duckdns.org ชี้ไป IP ภายในมหาวิทยาลัย ใช้ได้เฉพาะในตึก")</p>
+<ul>
+<li>ใครถาม DNS ก็ได้คำตอบเป็น 10.x เหมือนกันทั้งโลก</li>
+<li>เครื่องในอาคารเอา 10.x ไปต่อได้จริง</li>
+<li>เครื่องนอกมหาวิทยาลัยได้ 10.x ไปก็ต่อไม่ถึง (IP ส่วนตัวไม่ถูกส่งผ่านอินเทอร์เน็ต)</li>
+<li>บอร์ด ESP32 ที่ต่อ Wi-Fi นอกมหาวิทยาลัยเจอปัญหาเดียวกัน (เดิมบอร์ดต่อ <code>rmutt-energy.duckdns.org:8883</code> จึงต้องอยู่ในอาคาร) ค่าเริ่มต้นของบอร์ดจึงเปลี่ยนไปต่อผ่านชื่อ ts.net พอร์ต 8443 แทน (ดูหัวข้อ "ESP32 ต่อ MQTTS")</li>
+</ul>
+<p>ทำไมยังต้องมีชื่อโดเมน ทั้งที่ใช้ได้แค่ในตึก: เพราะ<strong>ใบรับรอง TLS ออกให้ชื่อโดเมน ไม่ใช่ให้ IP ส่วนตัว</strong> ถ้าไม่มีชื่อ ก็ไม่มี HTTPS ที่เบราว์เซอร์และ ESP32 เชื่อ และถ้า IP เครื่องเปลี่ยน แก้ที่ DuckDNS ที่เดียว บอร์ดทุกตัวไม่ต้องตั้งใหม่</p>
+<div class="callout warn"><div class="callout-title">ระวัง</div><p>เราเตอร์/DNS บางแห่งมี "DNS rebinding protection" ที่ทิ้งคำตอบ DNS สาธารณะซึ่งชี้ไป IP ส่วนตัว ถ้าเครื่องในอาคารบางเครื่องเปิดโดเมนไม่ได้ทั้งที่อยู่ในวงเดียวกัน ให้ลอง <code>nslookup rmutt-energy.duckdns.org</code> ดูก่อนว่าได้ IP กลับมาหรือไม่</p></div>
+
+<h3 id="ใบรับรองผ่าน-duckdns-ด้วย-dns-01">ใบรับรองผ่าน DuckDNS ด้วย DNS-01<a class="anchor" href="#ใบรับรองผ่าน-duckdns-ด้วย-dns-01">#</a></h3>
+<p>HTTP-01 ใช้ไม่ได้ เพราะ (1) โดเมนชี้ IP ส่วนตัว Let's Encrypt ซึ่งอยู่บนอินเทอร์เน็ตไม่มีทางต่อถึง และ (2) firewall ปิดขาเข้า Caddy ในโปรเจกต์นี้จึง build ใหม่ให้มีปลั๊กอิน <code>caddy-dns/duckdns</code> (ไฟล์ <code>caddy.Dockerfile</code>) แล้วสั่งใน <code>Caddyfile</code> ให้ใช้ DNS-01</p>
+<div class="code-block"><div class="hl"><pre><span></span><code> Caddy (ในเซิร์ฟเวอร์ 10.x)                 อินเทอร์เน็ต
+ ─────────────────────────                 ───────────
+ 1. ขอใบให้ rmutt-energy.duckdns.org  ───▶  Let's Encrypt (ACME API)
+                                      ◀───  "เขียน TXT นี้ที่ _acme-challenge.&lt;โดเมน&gt;"
+ 2. เรียก API DuckDNS ด้วย DUCKDNS_TOKEN ──▶  DuckDNS ตั้ง TXT record
+ 3. รอ 60 วินาที (propagation_delay)
+ 4. บอก Let's Encrypt ว่าพร้อม        ───▶  Let's Encrypt ถาม DNS ของ DuckDNS เอง
+                                             เจอ TXT ถูกต้อง → ออกใบ
+ 5. ดาวน์โหลดใบ เก็บที่ /data (= ./caddy/data)
+</code></pre></div>
+</div>
+
+<p>ทุกขั้นเป็นการเชื่อมต่อ<strong>ขาออก</strong>จากเซิร์ฟเวอร์ (HTTPS 443) ซึ่ง firewall อนุญาต จึงได้ใบรับรองจริงที่เชื่อถือได้ทั่วโลก แม้เครื่องจะไม่มีใครข้างนอกเข้าถึงได้เลย</p>
+<p>การตั้งค่าเพิ่ม 3 บรรทัดใน <code>tls { ... }</code> มีเหตุผลเฉพาะของเครือข่ายมหาวิทยาลัย (คอมเมนต์ใน <code>Caddyfile</code> บรรทัด 59–68)</p>
+<ul>
+<li><code>resolvers 1.1.1.1 8.8.8.8</code> — ก่อนเขียน TXT Caddy ต้องหาว่าชื่อ <code>_acme-challenge.rmutt-energy.duckdns.org</code> อยู่ใน zone ไหน DNS ของมหาวิทยาลัยตอบ <code>SERVFAIL</code> ตอนถามเรื่องนี้ จึงให้ไปถาม DNS สาธารณะแทน</li>
+<li><code>propagation_delay 60s</code> — หลังเขียน TXT ให้รอ 60 วินาทีให้ DuckDNS กระจายค่าก่อน</li>
+<li><code>propagation_timeout -1</code> — ปิดการที่ Caddy วนถาม DNS เองว่า TXT ขึ้นหรือยัง (ขั้นนี้ต้องคุย DNS ภายนอกซ้ำหลายรอบ และเครือข่ายมหาวิทยาลัยอาจบล็อกพอร์ต 53) รอครบเวลาแล้วให้ Let's Encrypt ตรวจเลย</li>
+</ul>
+<p>Caddy ต่ออายุใบให้อัตโนมัติก่อนหมดอายุ (ใบอายุ 90 วัน) ด้วยวิธีเดียวกัน</p>
+<h3 id="ใบรับรองใบเดียว-ใช้สองที่-caddy-กับ-mosquitto">ใบรับรองใบเดียว ใช้สองที่: Caddy กับ Mosquitto<a class="anchor" href="#ใบรับรองใบเดียว-ใช้สองที่-caddy-กับ-mosquitto">#</a></h3>
+<p>Mosquitto ไม่ขอใบรับรองเองได้ จึงใช้ใบเดียวกับ Caddy สคริปต์ <code>deploy/sync-mqtt-cert.sh</code> (cron ทุกวัน 03:10 ตั้งโดย <code>setup-vps.sh</code>) ก๊อป <code>caddy/data/caddy/certificates/.../&lt;โดเมน&gt;.crt</code> และ <code>.key</code> ไปเป็น <code>mosquitto/certs/fullchain.pem</code> และ <code>privkey.pem</code> ให้เจ้าของเป็น uid 1883 (user ของ mosquitto ในกล่อง) แล้วส่งสัญญาณ <code>docker kill -s HUP rmutt-mqtt</code> ให้ Mosquitto โหลดใบใหม่<strong>โดยบอร์ดที่ต่ออยู่ไม่หลุด</strong> ถ้าใบไม่เปลี่ยน (<code>cmp -s</code>) ก็ไม่ทำอะไร</p>
+<div class="callout why"><div class="callout-title">ทำไม</div><p>ถ้าไม่มี cron นี้ Caddy ต่ออายุใบของตัวเองได้ แต่ Mosquitto ยังถือใบเก่า พอครบ 90 วัน บอร์ด ESP32 ที่ต่อตรงพอร์ต 8883 ทุกตัวจะต่อ MQTTS ไม่ได้พร้อมกันทั้งอาคาร ระบบปิดแอร์อัตโนมัติหยุดทันที</p></div>
+
+<div class="callout note"><div class="callout-title">หมายเหตุ</div><p>ใบรับรองใบนี้ใช้เฉพาะทางที่บอร์ดต่อตรง 8883 เท่านั้น ทาง Funnel 8443 บอร์ดเห็นใบ ts.net ซึ่งกล่อง tailscale ถอด TLS ให้ Mosquitto ไม่เห็น TLS ชุดนั้นเลย (เห็นแค่ MQTT ดิบที่ listener 1883) บอร์ดที่ต่อทางนี้จึงไม่พึ่ง cron <code>sync-mqtt-cert.sh</code></p></div>
+
+<h3 id="esp32-ต่อ-mqtts-ผ่าน-funnel-8443-หรือ-8883-ตรง-และใบรับรองรากในเฟิร์มแวร์">ESP32 ต่อ MQTTS ผ่าน Funnel 8443 (หรือ 8883 ตรง) และใบรับรองรากในเฟิร์มแวร์<a class="anchor" href="#esp32-ต่อ-mqtts-ผ่าน-funnel-8443-หรือ-8883-ตรง-และใบรับรองรากในเฟิร์มแวร์">#</a></h3>
+<p>ตอนตั้งค่าบอร์ดผ่านบลูทูธ Backend คำนวณค่าที่จะส่งให้บอร์ดจาก <code>MQTT_DEVICE_URL</code> (<code>backend/src/utils/mqtt-provisioning.js</code> แยกเป็น <code>mqttHost</code>, <code>mqttPort</code>, <code>mqttTls</code> = true เมื่อ URL ขึ้นต้น <code>mqtts://</code> และถ้า URL ไม่ระบุพอร์ตจะใช้ 8883) ค่าเริ่มต้นใน <code>docker-compose.yml</code> ตอนนี้คือ <code>mqtts://rmutt-energy.tailb292b4.ts.net:8443</code> บอร์ดจึงรู้จักเซิร์ฟเวอร์ในชื่อ ts.net พอร์ต 8443 และจำค่านี้ไว้ในหน่วยความจำของบอร์ด</p>
+<p>ถ้าจะให้บอร์ดในมหาวิทยาลัยต่อตรง ให้ตั้ง <code>MQTT_DEVICE_URL=mqtts://&lt;DOMAIN&gt;:8883</code> ใน <code>.env</code> (compose เขียนเป็น <code>${MQTT_DEVICE_URL:-...}</code> คือใช้ค่าจาก <code>.env</code> ก่อน ถ้าว่างใช้ค่า Funnel) ค่านี้มีผลกับบอร์ดที่ตั้งค่าหลังจากนั้น บอร์ดที่ตั้งค่าไปแล้วยังจำค่าเดิมอยู่</p>
+<p>ฝั่งเฟิร์มแวร์ (<code>firmware/rmutt_esp32_air/rmutt_esp32_air.ino</code> ฟังก์ชัน <code>connectMqtt()</code> และ <code>ensureClockSynced()</code>)</p>
+<ol>
+<li>ซิงก์เวลา NTP (<code>pool.ntp.org</code>, <code>time.google.com</code>) ให้ได้ก่อน ถ้าเวลาไม่ตรงจะตรวจอายุใบรับรองไม่ผ่าน</li>
+<li><code>secureClient.setCACert(LETSENCRYPT_CA)</code> — ใช้ใบรากที่ฝังไว้ในไฟล์ <code>letsencrypt_ca.h</code></li>
+<li>ต่อ TLS ไปที่ host:port ที่ได้จาก provisioning (ค่าเริ่มต้น <code>rmutt-energy.tailb292b4.ts.net:8443</code>) ตรวจทั้งสายใบรับรองและชื่อโฮสต์</li>
+<li>ส่ง MQTT CONNECT ด้วย username/password ของบอร์ดตัวนั้น</li>
+</ol>
+<p>ไฟล์ <code>letsencrypt_ca.h</code> (เหมือนกันทั้งบอร์ดแอร์และบอร์ดเซ็นเซอร์) สร้างโดย <code>firmware/update-root-ca.ps1</code> ซึ่งดาวน์โหลดใบราก <strong>ISRG Root X1</strong> (สาย RSA หมดอายุ 2035-06-04) และ <strong>ISRG Root X2</strong> (สาย ECDSA หมดอายุ 2040-09-17) มาใส่ในตัวแปร <code>LETSENCRYPT_CA</code> ใส่ทั้งสองใบเพราะ Let's Encrypt อาจออกใบให้จากสายใดก็ได้ ถ้ามีใบเดียวแล้ววันหนึ่งได้ใบจากอีกสาย บอร์ดทุกตัวจะต่อไม่ได้จนกว่าจะแฟลชใหม่</p>
+<div class="callout why"><div class="callout-title">ทำไม</div><p>ใบรับรอง ts.net ที่กล่อง tailscale ใช้ถอด TLS ที่พอร์ต 8443 ออกโดย Let's Encrypt เหมือนกัน ใบรากชุดเดิมในเฟิร์มแวร์จึงตรวจผ่านโดยไม่ต้องแก้เฟิร์มแวร์หรือแฟลชบอร์ดใหม่ แค่เปลี่ยนค่า host/port ที่ Backend ส่งให้ตอน provisioning</p></div>
+
+<p>ใบรากชุดเดียวกันใช้ตอนอัปเดตเฟิร์มแวร์ผ่าน Wi-Fi (OTA) ด้วย: Backend สร้าง URL <code>https://&lt;mqtt_host ของบอร์ด&gt;/firmware/&lt;ไฟล์&gt;.bin</code> (<code>backend/src/utils/firmware.js</code> ฟังก์ชัน <code>firmwareUrl</code>) แล้วบอร์ดดาวน์โหลดด้วย <code>runHttpsOta(url, LETSENCRYPT_CA, ...)</code> เมื่อ host ของบอร์ดเป็นชื่อ ts.net (ค่าเริ่มต้น) คำขอ HTTPS พอร์ต 443 นี้จึงวิ่งผ่าน Funnel 443 → <code>caddy:8080</code> ซึ่งบล็อก <code>(app)</code> เสิร์ฟ <code>/firmware/*</code> ให้ ส่วนบอร์ดที่ต่อตรงจะดาวน์โหลดจาก Caddy พอร์ต 443 ของโดเมน DuckDNS ฟังก์ชัน <code>otaUrlAllowed</code> ในเฟิร์มแวร์บังคับให้ URL ใช้ host เดียวกับ MQTT host ของบอร์ด จึงไม่ต้องแก้อะไรเมื่อเปลี่ยนค่าเริ่มต้น</p>
+<div class="callout warn"><div class="callout-title">ระวัง</div><p>ถ้าวันหนึ่งเปลี่ยนไปใช้ใบรับรองของมหาวิทยาลัย (ไม่ใช่ Let's Encrypt) ต้องรัน <code>update-root-ca.ps1 -Urls &lt;url ใบรากของผู้ออก&gt;</code> แล้วแฟลชบอร์ดใหม่ทุกตัว ไม่งั้นบอร์ดต่อ MQTTS ไม่ได้ (เขียนไว้ใน <code>deploy/DEPLOY.md</code> หัวข้อ "ใช้ใบรับรองของมหาวิทยาลัย")</p></div>
+
+<div class="callout note"><div class="callout-title">หมายเหตุ</div><p>ค่าเริ่มต้น (Funnel) บอร์ดต้องออกอินเทอร์เน็ตไปยังชื่อ ts.net ได้ทั้งพอร์ต <strong>8443</strong> (MQTTS) และ <strong>443</strong> (ดาวน์โหลดเฟิร์มแวร์ OTA) ถ้า Wi-Fi ที่ติดตั้งมีนโยบายบล็อกพอร์ตขาออก ต้องขอเปิดทั้งสองพอร์ต ส่วนบอร์ดที่ต่อตรงต้องถึงเซิร์ฟเวอร์ได้ที่ <strong>8883</strong> และ <strong>443</strong> แต่หัวข้อ Wi-Fi ใน <code>SERVER_REQUIREMENTS.md</code> เขียนแค่ 8883 ถ้าฝ่ายไอทีทำ VLAN IoT แยก ต้องขอ 443 ไปที่เซิร์ฟเวอร์ด้วย</p></div>
+
+<h2 id="tailscale-ในเชิงลึก">Tailscale ในเชิงลึก<a class="anchor" href="#tailscale-ในเชิงลึก">#</a></h2>
+<h3 id="tailscale-คืออะไร">Tailscale คืออะไร<a class="anchor" href="#tailscale-คืออะไร">#</a></h3>
+<p><strong>Tailscale</strong> คือบริการ mesh VPN ที่สร้างบน <strong>WireGuard</strong> แนวคิดมีไม่กี่ข้อ</p>
+<ul>
+<li><strong>Tailnet</strong> = เครือข่ายส่วนตัวของบัญชีเรา ทุกเครื่องที่ล็อกอินบัญชีเดียวกันเป็นสมาชิก แต่ละเครื่องได้ IP ในช่วง <code>100.64.0.0/10</code> ที่ไม่ซ้ำกันใน tailnet</li>
+<li><strong>การต่อแบบ mesh</strong> เครื่องสองเครื่องใน tailnet พยายามต่อกันตรง ๆ (ผ่าน NAT traversal) ถ้าต่อตรงไม่ได้ก็ผ่าน relay ที่เรียกว่า <strong>DERP</strong> ของ Tailscale ข้อมูลถูกเข้ารหัสด้วย WireGuard ตลอดทาง แม้ผ่าน relay</li>
+<li><strong>Control plane</strong> (เซิร์ฟเวอร์ของ Tailscale) ทำแค่แจกกุญแจและบอกว่าใครอยู่ที่ไหน ไม่ได้แบกข้อมูลของเรา</li>
+<li><strong>MagicDNS</strong> ตั้งชื่อให้ทุกเครื่องอัตโนมัติ ชื่อเต็มคือ <code>&lt;ชื่อเครื่อง&gt;.&lt;ชื่อ tailnet&gt;.ts.net</code> ในโปรเจกต์นี้คือ <code>rmutt-energy.tailb292b4.ts.net</code> (<code>rmutt-energy</code> มาจาก <code>hostname</code>/<code>TS_HOSTNAME</code> ในไฟล์ compose, <code>tailb292b4</code> คือชื่อ tailnet ที่ Tailscale สุ่มให้)</li>
+<li><strong>HTTPS ของ ts.net</strong> Tailscale ออกใบรับรอง Let's Encrypt ให้ชื่อ <code>*.ts.net</code> ของเครื่องเราได้ ทำให้ไม่ต้องจัดการใบเอง (ใบนี้ใช้ถอด TLS ทั้งพอร์ต 443 ของเว็บและพอร์ต 8443 ของ MQTT และ Let's Encrypt เป็นผู้ออก จึงตรงกับใบรากที่ฝังในเฟิร์มแวร์)</li>
+</ul>
+<h3 id="serve-กับ-funnel-ต่างกันอย่างไร">Serve กับ Funnel ต่างกันอย่างไร<a class="anchor" href="#serve-กับ-funnel-ต่างกันอย่างไร">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th></th>
+<th>Tailscale <strong>Serve</strong></th>
+<th>Tailscale <strong>Funnel</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ใครเข้าได้</td>
+<td>เฉพาะเครื่องที่อยู่ใน tailnet (ต้องลงแอป Tailscale และล็อกอิน)</td>
+<td><strong>ใครก็ได้บนอินเทอร์เน็ต</strong> ไม่ต้องลงอะไร</td>
+</tr>
+<tr>
+<td>ใช้ทำอะไร</td>
+<td>แชร์บริการให้ทีมภายใน</td>
+<td>เปิดเว็บ/API (และพอร์ต TCP อย่าง MQTT) สู่สาธารณะ</td>
+</tr>
+<tr>
+<td>ชื่อที่ใช้</td>
+<td><code>&lt;เครื่อง&gt;.&lt;tailnet&gt;.ts.net</code></td>
+<td>ชื่อเดียวกัน</td>
+</tr>
+</tbody>
+</table></div>
+<p>Funnel คือ "Serve + เปิดให้คนนอก tailnet เข้าได้" ในโปรเจกต์ใช้ Funnel เพราะผู้ใช้คือเจ้าหน้าที่ที่เปิดแอปจากมือถือ ซึ่งไม่ได้อยู่ใน tailnet และเราไม่ต้องการให้ทุกคนลงแอป Tailscale และเพราะบอร์ด ESP32 ติดตั้ง Tailscale ไม่ได้ จึงต้องมีชื่อสาธารณะให้บอร์ดต่อ MQTT เข้ามา</p>
+<h3 id="funnel-ถึงเซิร์ฟเวอร์ได้อย่างไร-โดยไม่เปิดพอร์ตขาเข้า">Funnel ถึงเซิร์ฟเวอร์ได้อย่างไร โดยไม่เปิดพอร์ตขาเข้า<a class="anchor" href="#funnel-ถึงเซิร์ฟเวอร์ได้อย่างไร-โดยไม่เปิดพอร์ตขาเข้า">#</a></h3>
+<div class="code-block"><div class="hl"><pre><span></span><code> มือถือ/ESP32                 Funnel relay (ของ Tailscale)            กล่อง tailscale (ในเซิร์ฟเวอร์ 10.x)
+     │                                │                                          │
+     │                                │◀═══ (ก) กล่อง "ต่อออก" ไปหา Tailscale ═══│  ทำไว้ก่อนตั้งแต่เปิดกล่อง
+     │                                │      ค้างการเชื่อมต่อไว้ (outbound)       │  firewall เห็นเป็นขาออก จึงผ่าน
+     │── (ข) HTTPS ถึงชื่อ ts.net ──▶│                                          │
+     │   (DNS ของชื่อนี้ชี้ไปที่ relay) │── (ค) ส่งต่อผ่านการเชื่อมต่อที่ค้างไว้ ─▶│
+     │                                │      (relay ดู SNI เลือกเครื่อง          │
+     │                                │       ไม่ถอดรหัส TLS)                    │── (ง) ถอด TLS แล้วส่งต่อตามพอร์ต
+     │                                │                                          │     443  → HTTP ไป caddy:8080
+     │◀────────── คำตอบย้อนกลับทางเดิม ───────────────────────────────────────│     8443 → MQTT ดิบ ไป mqtt:1883
+</code></pre></div>
+</div>
+
+<p>สาระสำคัญคือ firewall ตัดสินจาก "ใครเป็นฝ่ายเริ่มต่อ" (ดูหัวข้อ TCP) กล่อง tailscale เป็นฝ่ายเริ่มต่อออกไปหา Tailscale เอง การเชื่อมต่อนั้นค้างไว้ คำขอของผู้ใช้จึงวิ่งย้อนเข้ามาในท่อเดิมได้ <strong>ไม่มีพอร์ตขาเข้าบนเซิร์ฟเวอร์เลย และฝ่ายไอทีไม่ต้องแก้ firewall</strong></p>
+<ul>
+<li>DNS ของ <code>rmutt-energy.tailb292b4.ts.net</code> ชี้ไปที่ IP สาธารณะของ Funnel relay (ไม่ใช่ 10.x) ผู้ใช้ทั่วโลกจึงถามแล้วต่อถึง</li>
+<li>relay อ่านแค่ SNI (ชื่อโดเมนตอนเริ่ม TLS) เพื่อรู้ว่าจะส่งให้เครื่องไหน ส่วนการถอดรหัส TLS ทำที่กล่อง tailscale ในเซิร์ฟเวอร์เรา (ใบรับรองของ <code>*.ts.net</code> อยู่ที่กล่องนั้น)</li>
+<li>Funnel เปิดสู่สาธารณะได้เฉพาะพอร์ตที่ Tailscale อนุญาตคือ <strong>443, 8443 และ 10000</strong> เราใช้ 443 สำหรับเว็บ/API และ 8443 สำหรับ MQTT ของบอร์ด ทั้งสองพอร์ตใช้ชื่อ ts.net เดียวกัน (ดูหัวข้อ "Funnel กับ TCP")</li>
+</ul>
+<h3 id="โหมด-userspace-ts_userspace">โหมด userspace (<code>TS_USERSPACE</code>)<a class="anchor" href="#โหมด-userspace-ts_userspace">#</a></h3>
+<p>ปกติ Tailscale สร้างการ์ดเครือข่ายเสมือน (<code>tun</code>) ในระบบปฏิบัติการ ต้องใช้อุปกรณ์ <code>/dev/net/tun</code> และสิทธิ์ <code>NET_ADMIN</code> ใน Docker ซึ่งเป็นสิทธิ์สูง <strong>โหมด userspace</strong> ให้ Tailscale จัดการแพ็กเก็ตเองในโปรแกรม ไม่แตะการตั้งค่าเครือข่ายของเครื่อง ผลคือไฟล์ compose ไม่ต้องมี <code>devices</code>, <code>cap_add</code> หรือ <code>network_mode: host</code> กล่องนี้เป็นกล่องธรรมดาที่แย่ที่สุดก็แค่ต่อออกอินเทอร์เน็ตและต่อ <code>caddy:8080</code> กับ <code>mqtt:1883</code> ในเครือข่าย Docker ข้อแลกเปลี่ยนคือประสิทธิภาพต่ำกว่าเล็กน้อย ซึ่งไม่มีผลกับเว็บขนาดนี้</p>
+<h3 id="ล็อกอินครั้งแรกและ-ts_authkey">ล็อกอินครั้งแรกและ <code>TS_AUTHKEY</code><a class="anchor" href="#ล็อกอินครั้งแรกและ-ts_authkey">#</a></h3>
+<p>กล่อง tailscale ต้องพิสูจน์ว่าเป็นของบัญชีเรา มี 2 วิธี</p>
+<ol>
+<li><strong>ไม่ตั้ง <code>TS_AUTHKEY</code></strong> (ค่าเริ่มต้นใน compose คือว่าง) ดู <code>docker compose logs tailscale</code> จะเจอลิงก์ล็อกอิน เปิดในเบราว์เซอร์แล้วอนุมัติ</li>
+<li><strong>ตั้ง <code>TS_AUTHKEY=tskey-auth-...</code></strong> ที่สร้างจากหน้าแอดมินของ Tailscale เครื่องเข้า tailnet เองโดยไม่ต้องกดอนุมัติ เหมาะกับการสร้างใหม่อัตโนมัติ</li>
+</ol>
+<p>หลังล็อกอินสำเร็จ ตัวตนของเครื่องถูกเก็บใน <code>TS_STATE_DIR=/var/lib/tailscale</code> ซึ่ง mount ไว้ที่ <code>./tailscale/state</code> บนเซิร์ฟเวอร์ ครั้งต่อไปที่สร้างกล่องใหม่จึงไม่ต้องล็อกอินอีก และ<strong>ชื่อ ts.net ไม่เปลี่ยน</strong> (ถ้าลบโฟลเดอร์นี้ จะได้เครื่องใหม่ และอาจได้ชื่อต่อท้ายเป็น <code>-1</code> ซึ่งทำให้แอปที่ฝังชื่อเดิมไว้ใช้ไม่ได้)</p>
+<div class="callout note"><div class="callout-title">หมายเหตุ</div><p>การเปิด Funnel ต้องทำที่ฝั่งบัญชี Tailscale ด้วย: เปิด MagicDNS และ HTTPS Certificates ในหน้าแอดมิน และให้ node มีสิทธิ์ Funnel (ในนโยบาย ACL ของ tailnet) ขั้นตอนนี้ทำในเว็บของ Tailscale ไม่มีในโค้ดของโปรเจกต์</p></div>
+
+<h3 id="tailscale-servejson-ทีละบรรทัด"><code>tailscale-serve.json</code> ทีละบรรทัด<a class="anchor" href="#tailscale-servejson-ทีละบรรทัด">#</a></h3>
+<p>ไฟล์นี้บอกว่า "กล่อง tailscale ต้องรับอะไรและส่งต่อไปไหน" mount เข้ากล่องเป็น <code>/config/serve.json</code> และอ้างโดย <code>TS_SERVE_CONFIG</code> ตอนนี้ไฟล์เปิด<strong>สองพอร์ต</strong>: 443 สำหรับเว็บ/API และ 8443 สำหรับ MQTT ของบอร์ด</p>
+<p><strong>ไฟล์ <code>deploy/tailscale-serve.json</code> บรรทัด 1–20</strong></p>
+<div class="code-block"><span class="code-lang">json</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">"TCP"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"443"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"HTTPS"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="p">},</span>
+<span class="w">    </span><span class="nt">"8443"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">"TCPForward"</span><span class="p">:</span><span class="w"> </span><span class="s2">"mqtt:1883"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"TerminateTLS"</span><span class="p">:</span><span class="w"> </span><span class="s2">"${TS_CERT_DOMAIN}"</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">"Web"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"${TS_CERT_DOMAIN}:443"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">"Handlers"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"/"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"Proxy"</span><span class="p">:</span><span class="w"> </span><span class="s2">"http://caddy:8080"</span><span class="w"> </span><span class="p">}</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">"AllowFunnel"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"${TS_CERT_DOMAIN}:443"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"${TS_CERT_DOMAIN}:8443"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></td></tr></table></div>
+</div>
+
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>บรรทัด</th>
+<th>โค้ด</th>
+<th>ความหมาย</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2–8</td>
+<td><code>"TCP": { ... }</code></td>
+<td>ตารางว่า "พอร์ตไหนของชื่อ ts.net ให้ทำอะไร" มีสองพอร์ต</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>"443": { "HTTPS": true }</code></td>
+<td>ให้ฟังพอร์ต 443 ของ tailnet และ<strong>ถอด TLS เอง</strong> (ใช้ใบรับรอง ts.net) แล้วให้กฎ HTTP ในส่วน <code>"Web"</code> ตัดสินว่าจะส่งต่อไปไหน</td>
+</tr>
+<tr>
+<td>4–7</td>
+<td><code>"8443": { ... }</code></td>
+<td>ฟังพอร์ต 8443 ซึ่งไม่ใช่ HTTP จึงไม่มีกฎในส่วน <code>"Web"</code> ใช้การส่งต่อระดับ TCP แทน</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>"TCPForward": "mqtt:1883"</code></td>
+<td>ส่งข้อมูลระดับ TCP (ไบต์ดิบ) ต่อไปที่ <code>mqtt:1883</code> ชื่อ <code>mqtt</code> ใช้ได้เพราะ DNS ภายใน Docker กล่อง tailscale ไม่ตีความโปรโตคอล MQTT เลย แค่ส่งไบต์ผ่าน</td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>"TerminateTLS": "${TS_CERT_DOMAIN}"</code></td>
+<td><strong>ถอด TLS ก่อนส่งต่อ</strong> ด้วยใบรับรอง ts.net ของชื่อนี้ ถ้าไม่มีบรรทัดนี้ <code>TCPForward</code> จะส่งไบต์ที่ยังเข้ารหัสอยู่ไปให้ listener 1883 ซึ่งไม่พูด TLS ทำให้ต่อไม่ติด</td>
+</tr>
+<tr>
+<td>9–15</td>
+<td><code>"Web": { ... }</code></td>
+<td>กฎระดับ HTTP ของแต่ละ "โฮสต์:พอร์ต" ใช้กับพอร์ต 443 เท่านั้น</td>
+</tr>
+<tr>
+<td>10</td>
+<td><code>"${TS_CERT_DOMAIN}:443"</code></td>
+<td><code>TS_CERT_DOMAIN</code> คือชื่อเต็ม <code>rmutt-energy.tailb292b4.ts.net</code> ที่กล่อง tailscale รู้เอง และเติมแทนให้ตอนโหลดไฟล์ จึงไม่ต้องฝังชื่อลงไฟล์ (บรรทัด 6, 17 และ 18 ใช้ตัวแปรเดียวกัน)</td>
+</tr>
+<tr>
+<td>11–13</td>
+<td><code>"Handlers": { "/": { "Proxy": "http://caddy:8080" } }</code></td>
+<td>ทุก path (เริ่มที่ <code>/</code>) ส่งต่อเป็น HTTP ไป <code>caddy:8080</code> ชื่อ <code>caddy</code> ใช้ได้เพราะ DNS ภายใน Docker</td>
+</tr>
+<tr>
+<td>16–19</td>
+<td><code>"AllowFunnel": { ... }</code></td>
+<td><strong>นี่คือส่วนที่เปิดสู่สาธารณะ</strong> ต้องประกาศทีละ "โฮสต์:พอร์ต" ถ้าลบทั้งส่วน จะเหลือแบบ Serve (เฉพาะใน tailnet)</td>
+</tr>
+<tr>
+<td>17</td>
+<td><code>"${TS_CERT_DOMAIN}:443": true</code></td>
+<td>เปิดเว็บ/API ให้อินเทอร์เน็ต</td>
+</tr>
+<tr>
+<td>18</td>
+<td><code>"${TS_CERT_DOMAIN}:8443": true</code></td>
+<td>เปิด MQTT ของบอร์ดให้อินเทอร์เน็ต ถ้าลบบรรทัดนี้ (เหลือแค่บรรทัด 17) เว็บยังใช้ได้ แต่บอร์ดที่ตั้งค่าให้ต่อ <code>ts.net:8443</code> จะต่อไม่ได้</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="funnel-กับ-tcp-https-handler-tcpforward-ดิบ-และ-terminatetls-ต่างกันอย่างไร">Funnel กับ TCP: HTTPS handler, TCPForward ดิบ และ TerminateTLS ต่างกันอย่างไร<a class="anchor" href="#funnel-กับ-tcp-https-handler-tcpforward-ดิบ-และ-terminatetls-ต่างกันอย่างไร">#</a></h3>
+<p>Funnel ไม่ได้ส่งต่อได้แค่เว็บ แต่ส่งต่อพอร์ต TCP ได้ด้วย โดยมีเงื่อนไขว่าต้องเป็นการเชื่อมต่อแบบ TLS (เพราะ relay ใช้ SNI เลือกเครื่อง) และเป็นพอร์ต 443, 8443 หรือ 10000 รูปแบบในไฟล์ <code>serve.json</code> ที่เกี่ยวข้องมี 3 แบบ</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>รูปแบบ</th>
+<th>ใครถอด TLS</th>
+<th>ปลายทางเห็นอะไร</th>
+<th>ในโปรเจกต์นี้</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>"HTTPS": true</code> + ส่วน <code>Web</code></td>
+<td>กล่อง tailscale</td>
+<td>HTTP ที่อ่าน path ได้ และมีหัว <code>X-Forwarded-For</code></td>
+<td>พอร์ต 443 → <code>caddy:8080</code></td>
+</tr>
+<tr>
+<td><code>"TCPForward"</code> อย่างเดียว (raw TCP)</td>
+<td>ไม่มีใครถอดที่กล่อง tailscale</td>
+<td>ไบต์ TLS เดิมจากไคลเอนต์ ปลายทางต้องถอดเองด้วยใบรับรองของตัวเอง</td>
+<td>ไม่ได้ใช้ (ถ้าส่งไป <code>mqtt:8883</code> Mosquitto จะแสดงใบ DuckDNS ซึ่งชื่อไม่ตรงกับ ts.net บอร์ดจึงปฏิเสธ)</td>
+</tr>
+<tr>
+<td><code>"TCPForward"</code> + <code>"TerminateTLS"</code></td>
+<td>กล่อง tailscale (ใบ ts.net)</td>
+<td>TCP ดิบที่ถอดแล้ว (ที่นี่คือ MQTT ธรรมดา)</td>
+<td>พอร์ต 8443 → <code>mqtt:1883</code></td>
+</tr>
+</tbody>
+</table></div>
+<div class="callout why"><div class="callout-title">ทำไม</div><p>เลือก <code>TerminateTLS</code> ที่กล่อง tailscale แทนการให้ Mosquitto ทำ TLS เองที่ 8883 เพราะ (1) บอร์ดตรวจ<strong>ชื่อโฮสต์</strong>ในใบรับรองให้ตรงกับชื่อที่ตั้งใจต่อ บอร์ดต่อชื่อ ts.net แต่ใบของ Mosquitto ออกให้ชื่อ DuckDNS จึงไม่ตรง (2) ใบ ts.net มี Let's Encrypt ออกให้และ tailscale จัดการเอง ไม่ต้องก๊อปใบด้วย cron (3) Mosquitto ไม่ต้องเปลี่ยนอะไรเลย (listener 1883 ที่ Backend ใช้อยู่แล้ว) ผลแลกเปลี่ยนคือช่วงสุดท้ายจากกล่อง tailscale ไป <code>mqtt:1883</code> เป็น MQTT ไม่เข้ารหัส แต่เป็นการวิ่งในเครือข่าย Docker ของเครื่องเดียวกัน</p></div>
+
+<p><strong>ทำไมเป็นพอร์ต 8443:</strong> Funnel เปิดสู่สาธารณะได้เฉพาะ 443, 8443 และ 10000 พอร์ต 443 ถูกเว็บใช้อยู่แล้ว (หนึ่งพอร์ตผูกกับกฎเดียว) และ 8883 ไม่อยู่ในรายการที่อนุญาต จึงเหลือ 8443 หรือ 10000 ซึ่งเลือก 8443 (commit ไม่ได้ระบุเหตุผลเพิ่มว่าทำไมไม่ใช้ 10000)</p>
+<h3 id="ทำไมเปิดทางเข้าแค่สองจุด-caddy8080-และ-mqtt1883">ทำไมเปิดทางเข้าแค่สองจุด: <code>caddy:8080</code> และ <code>mqtt:1883</code><a class="anchor" href="#ทำไมเปิดทางเข้าแค่สองจุด-caddy8080-และ-mqtt1883">#</a></h3>
+<p>Serve ส่งต่อได้ทุกที่อยู่ที่กล่อง tailscale มองเห็น ถ้าชี้ไป <code>backend:3000</code> หรือ <code>db:3306</code> ก็เปิดออกอินเทอร์เน็ตได้ทันที เราเลือกเปิดเพียงสองปลายทาง และเหตุผลของแต่ละข้อ</p>
+<ol>
+<li><strong>Caddy เป็นประตูเดียวของเว็บและ API</strong> ใส่หัวความปลอดภัย (CSP, HSTS), เลือกว่า <code>/api/*</code> ไป Backend ส่วนที่เหลือเป็นไฟล์เว็บ ถ้าข้ามไป Backend ตรง ๆ จะไม่มีกฎพวกนี้</li>
+<li><strong><code>/firmware/*</code> ก็ผ่าน Funnel 443 ได้ด้วย</strong> ไฟล์ <code>.bin</code> ถูกเสิร์ฟผ่านบล็อก <code>(app)</code> ที่ใช้ร่วมกัน จึงดาวน์โหลดผ่าน Funnel ได้เช่นกัน (เป็นไฟล์เฟิร์มแวร์ ไม่มีรหัสผ่านในนั้น และ Backend ยังกันการสั่งอัปเดตด้วยสิทธิ์ผู้ใช้) นี่คือสิ่งที่ทำให้ OTA ของบอร์ดที่ใช้ชื่อ ts.net ทำงานได้</li>
+<li><strong>พอร์ต 8080 แยกจาก 443</strong> ทำให้แยกได้ว่าคำขอมาจากทางไหน (ดู <code>trusted_proxies</code> ด้านล่าง) และไม่ต้องให้ Caddy ขอใบรับรองซ้ำสำหรับชื่อ ts.net (ใบจัดการโดยกล่อง tailscale แล้ว)</li>
+<li><strong>MQTT ผ่านพอร์ต 8443 แยกต่างหาก ไม่ผ่าน Caddy</strong> เพราะ Caddy พูดแต่ HTTP ส่ง MQTT ตรงไป Mosquitto ซึ่งยังบังคับ <code>allow_anonymous false</code> กับบัญชี Dynamic Security รายบอร์ด จึงเปิดพอร์ตนี้ให้อินเทอร์เน็ตได้โดยยังมีด่านล็อกอินและ ACL (บอร์ดเห็นเฉพาะ topic ของตัวเอง)</li>
+</ol>
+<p>สิ่งที่<strong>ไม่ถูกเปิด</strong>ออกอินเทอร์เน็ตคือ <code>backend:3000</code>, <code>db:3306</code> และ SSH</p>
+<div class="callout warn"><div class="callout-title">ระวัง</div><p>หลังเพิ่มพอร์ต 8443 Broker "เข้าถึงได้จากอินเทอร์เน็ต" เป็นครั้งแรก (เดิมต้องอยู่ในเครือข่ายมหาวิทยาลัย) ความปลอดภัยของ MQTT จึงพึ่ง 2 อย่าง: TLS ระหว่างบอร์ดกับกล่อง tailscale และ username/password รายบอร์ด (รหัสเป็นค่า HMAC จาก Device ID กับ secret ของเซิร์ฟเวอร์ เดาไม่ได้ง่าย) ที่ยังไม่มีคือการจำกัดอัตราการลองรหัสต่อ IP ที่ชั้น MQTT (Mosquitto เห็น IP ต้นทางเป็นกล่อง tailscale ทุกคำขอ) ถ้าไม่ต้องการเปิดแบบนี้ ตั้ง <code>MQTT_DEVICE_URL=mqtts://&lt;DOMAIN&gt;:8883</code> ใน <code>.env</code> เพื่อให้บอร์ดที่ตั้งค่าใหม่ต่อตรงในอาคาร และเอาส่วน <code>8443</code> ออกจาก <code>serve.json</code> (บรรทัด 4–7 และบรรทัด 18 พร้อมแก้เครื่องหมายจุลภาคให้ JSON ยังถูกต้อง)</p></div>
+
+<h3 id="ทำไมแอปมือถือใช้ที่อยู่-tsnet-เป็นค่าเริ่มต้น">ทำไมแอปมือถือใช้ที่อยู่ ts.net เป็นค่าเริ่มต้น<a class="anchor" href="#ทำไมแอปมือถือใช้ที่อยู่-tsnet-เป็นค่าเริ่มต้น">#</a></h3>
+<p>ใน <code>lib/config/api_config.dart</code> บรรทัด <code>defaultValue: 'https://rmutt-energy.tailb292b4.ts.net/api'</code> ค่านี้อ่านจาก <code>String.fromEnvironment('API_BASE_URL', ...)</code> คือตอน build สั่ง <code>--dart-define=API_BASE_URL=...</code> ทับได้</p>
+<ul>
+<li>ที่อยู่ <code>rmutt-energy.duckdns.org</code> ชี้ไป IP 10.x จึงใช้ได้เฉพาะในตึก แต่เจ้าหน้าที่เปิดแอปจากที่ไหนก็ได้</li>
+<li>ที่อยู่ ts.net ทำงานทั้งในและนอกมหาวิทยาลัย แอปจึงมีที่อยู่เดียวที่ใช้ได้ทุกที่ ไม่ต้องให้ผู้ใช้เลือก</li>
+<li><code>flutter run</code> เฉย ๆ ก็ต่อเซิร์ฟเวอร์จริงได้ ถ้าจะทดสอบกับ Backend ในเครื่องให้ override ตามคอมเมนต์ในไฟล์ (<code>http://10.0.2.2:3000/api</code> สำหรับ Android Emulator, <code>http://127.0.0.1:3000/api</code> สำหรับ Windows)</li>
+<li>เว็บแอปไม่ต้องฝังที่อยู่ใด ๆ: <code>webapp/assets/js/config.js</code> ตั้ง <code>API_BASE = '/api'</code> (path แบบสัมพัทธ์) เบราว์เซอร์จึงเรียกโดเมนที่เปิดหน้าเว็บอยู่เองไม่ว่าจะเป็น duckdns หรือ ts.net และไม่ติด CORS การรับ <code>?api=</code> ทำได้เฉพาะเมื่อเปิดจาก localhost (กันลิงก์หลอกให้ส่งรหัสผ่านไปเว็บอื่น)</li>
+</ul>
+<div class="callout warn"><div class="callout-title">ระวัง</div><p>ถ้าเปิดเว็บผ่านชื่อ ts.net แล้วกด POST (เช่นล็อกอิน) เบราว์เซอร์จะส่งหัว <code>Origin: https://rmutt-energy.tailb292b4.ts.net</code> ซึ่ง Backend ตรวจกับรายการใน <code>APP_ORIGIN</code> (<code>createCorsOptions</code> ใน <code>backend/src/app.js</code> บรรทัด 77–98) ใน compose บรรทัด 88 <code>APP_ORIGIN: https://${DOMAIN},${PUBLIC_URL:-}</code> ดังนั้นต้องตั้ง <code>PUBLIC_URL=https://rmutt-energy.tailb292b4.ts.net</code> ใน <code>.env</code> บนเซิร์ฟเวอร์ (ตัวแปรนี้ไม่อยู่ใน <code>.env.example</code>) แอปมือถือไม่ได้ส่ง <code>Origin</code> จึงไม่โดนตรวจ (เงื่อนไข <code>!origin</code> ผ่านเสมอ)</p></div>
+
+<h3 id="trust_proxy2-กับ-trusted_proxies-ของ-caddy"><code>TRUST_PROXY=2</code> กับ <code>trusted_proxies</code> ของ Caddy<a class="anchor" href="#trust_proxy2-กับ-trusted_proxies-ของ-caddy">#</a></h3>
+<p>ปัญหา: หน้า login มี rate limit ใน <code>backend/src/routes/auth.js</code> (<code>loginLimiter</code>: หน้าต่าง 15 นาที จำกัด 10 ครั้งต่อ IP) ตัวจำกัดนับตาม <code>req.ip</code> ซึ่ง Express คำนวณจากหัว <code>X-Forwarded-For</code> (XFF) ตามค่า <code>trust proxy</code> ถ้าไม่ตั้ง ทุกคำขอจะเห็น IP ของ proxy ตัวสุดท้าย แล้วคนเดียวพิมพ์รหัสผิด 10 ครั้งจะล็อกคนทั้งระบบ 15 นาที</p>
+<p>เส้นทางสองทางมีจำนวนชั้น proxy ต่างกัน</p>
+<div class="code-block"><div class="hl"><pre><span></span><code> ทางโดเมนหลัก   ผู้ใช้ 10.1.2.3 ─▶ Caddy ─▶ Backend
+                 Caddy ใส่ XFF: 10.1.2.3                       (1 ชั้น)
+ ทาง Funnel     ผู้ใช้ 171.5.6.7 ─▶ relay ─▶ tailscale ─▶ Caddy:8080 ─▶ Backend
+                 tailscale ใส่ XFF: 171.5.6.7                   Caddy ต่อท้าย IP ของ tailscale (172.x)
+                 XFF ที่ Backend ได้: "171.5.6.7, 172.18.0.5"    (2 ชั้น)
+</code></pre></div>
+</div>
+
+<ul>
+<li><strong>Express <code>trust proxy = 2</code></strong> แปลว่า "เชื่อ 2 hop ท้ายสุด" <code>req.ip</code> คือ IP ฝั่งซ้ายสุดที่อยู่ลึกกว่า 2 hop นับจากท้าย ได้ IP จริงของผู้ใช้ทั้งสองทาง (ทางโดเมนหลักมี XFF แค่ 1 ค่า จึงได้ค่านั้น) ตั้งใน <code>deploy/docker-compose.yml</code> บรรทัด 85 อ่านโดย <code>trustProxyFromEnv</code> ใน <code>backend/src/config.js</code> แล้วส่งให้ <code>app.set('trust proxy', ...)</code> ใน <code>backend/src/app.js</code> บรรทัด 33</li>
+<li><strong>Caddy <code>trusted_proxies static private_ranges</code></strong> (Caddyfile บรรทัด 4–6) บอก Caddy ว่า "คำขอที่มาจากช่วง IP ส่วนตัว เชื่อหัว XFF ที่แนบมาได้" ใช้เฉพาะ server <code>:8080</code> ซึ่งรับจากกล่อง tailscale (IP <code>172.x</code> ใน Docker) ถ้าไม่ตั้ง Caddy จะทิ้ง XFF ที่ได้มา แล้วเขียนใหม่เป็น IP ของ tailscale ทำให้ทุกคนเป็น IP เดียวกัน</li>
+<li><strong>ปลอม XFF ไม่ได้ในทางโดเมนหลัก</strong> เพราะ Caddy ไม่เชื่อ XFF จากผู้ใช้ทั่วไป (ไม่อยู่ใน trusted_proxies) จึงทิ้งแล้วใส่ค่าที่ตัวเองเห็น</li>
+</ul>
+<div class="callout warn"><div class="callout-title">ระวัง</div><p>ค่า <code>TRUST_PROXY</code> ต้องตรงกับจำนวนชั้นจริง ถ้ามากเกิน ผู้โจมตีใส่ XFF ปลอมเพื่อเปลี่ยน IP ตัวเองหนี rate limit ได้ ถ้าน้อยเกิน ทุกคนถูกนับเป็นคนเดียว <code>config.js</code> จึงแปลงค่า <code>true</code> เป็น 1 และปล่อยว่าง = <code>false</code> (ไม่เชื่อเลย เหมาะตอนรันตรงในเครื่อง) หมายเหตุ: คอมเมนต์ใน <code>config.js</code> บรรทัด 10 ยังเขียน "Caddy = 1" ซึ่งเก่ากว่าค่าจริงใน compose</p></div>
+
+<h3 id="ปิด-funnel-ทำอย่างไร">ปิด Funnel ทำอย่างไร<a class="anchor" href="#ปิด-funnel-ทำอย่างไร">#</a></h3>
+<ol>
+<li>ปิดทันที: <code>docker compose stop tailscale</code> ทางโดเมนหลัก (เว็บในอาคาร) และบอร์ดที่ต่อตรง 8883 ไม่กระทบ แต่แอปมือถือและบอร์ดที่ตั้งค่าให้ต่อ <code>ts.net:8443</code> จะต่อเซิร์ฟเวอร์ไม่ได้จนกว่าจะเปิดกลับ (Backend ที่ต่อ Broker ภายในไม่กระทบ)</li>
+<li>ปิดถาวร: ลบ service <code>tailscale</code> ออกจาก compose, ลบบล็อก <code>http://:8080</code> ออกจาก Caddyfile, ตั้ง <code>TRUST_PROXY: 1</code> กลับ (เพราะเหลือชั้นเดียว), ปล่อย <code>PUBLIC_URL</code> ว่าง และตั้ง <code>MQTT_DEVICE_URL=mqtts://&lt;DOMAIN&gt;:8883</code> ใน <code>.env</code> (ค่าเริ่มต้นชี้ ts.net:8443 ซึ่งจะใช้ไม่ได้อีก)</li>
+<li>ลบเครื่อง <code>rmutt-energy</code> ออกจากหน้าแอดมิน Tailscale เพื่อถอนชื่อ ts.net</li>
+<li>ต้อง build แอปมือถือใหม่ด้วย <code>--dart-define=API_BASE_URL=https://&lt;ที่อยู่ใหม่&gt;/api</code> เพราะค่าเริ่มต้นถูกฝังตอน build แอปรุ่นเก่าจะต่อไม่ได้ และบอร์ดที่เคยตั้งค่าให้ต่อ <code>ts.net:8443</code> ต้องตั้งค่าใหม่ (provisioning) ให้ชี้ไปที่อยู่ใหม่</li>
+</ol>
+<h3 id="เปรียบเทียบกับทางเลือกอื่นอย่างตรงไปตรงมา">เปรียบเทียบกับทางเลือกอื่นอย่างตรงไปตรงมา<a class="anchor" href="#เปรียบเทียบกับทางเลือกอื่นอย่างตรงไปตรงมา">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>ทางเลือก</th>
+<th>ได้อะไร</th>
+<th>ติดอะไร</th>
+<th>เหมาะกับสถานการณ์นี้ไหม</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ขอ IP สาธารณะ + เปิดพอร์ต (port forwarding) จากฝ่ายไอที</td>
+<td>ตรงที่สุด ไม่พึ่งใคร ใช้ HTTP-01 ได้</td>
+<td>ต้องขอฝ่ายไอที ใช้เวลา ต้องผ่านนโยบายความปลอดภัย เปิดเซิร์ฟเวอร์ให้โลกเห็น และเป็นสิ่งที่<strong>ขอไม่ได้</strong>ตอนนี้</td>
+<td>ดีที่สุดในระยะยาว แต่ทำไม่ได้ตอนนี้</td>
+</tr>
+<tr>
+<td>โดเมนของมหาวิทยาลัย (<code>*.rmutt.ac.th</code>)</td>
+<td>น่าเชื่อถือ ดูเป็นทางการ</td>
+<td>ต้องขอฝ่ายไอทีเช่นกัน และมักต้องมี IP ที่เข้าถึงได้</td>
+<td>ใช้ได้ถ้าไอทีให้ (Caddyfile เตรียมคอมเมนต์ไว้ให้ลบบล็อก <code>tls</code> ออก)</td>
+</tr>
+<tr>
+<td>Cloudflare Tunnel (<code>cloudflared</code>)</td>
+<td>ทำงานแบบเดียวกัน (ต่อออก) ฟรี ใช้โดเมนของเราเองได้ มี WAF/DDoS ป้องกันให้</td>
+<td>ต้องมีโดเมนที่ย้าย DNS ไป Cloudflare (ซื้อโดเมนประมาณปีละไม่กี่ร้อยบาท) ข้อมูลผ่านเครือข่ายของ Cloudflare</td>
+<td><strong>เป็นทางเลือกที่ดีมาก</strong> เลือก Tailscale เพราะไม่ต้องซื้อโดเมน</td>
+</tr>
+<tr>
+<td>ngrok</td>
+<td>ตั้งง่ายมาก</td>
+<td>แผนฟรีเปลี่ยนที่อยู่/มีข้อจำกัด ชื่อคงที่ต้องจ่าย</td>
+<td>เหมาะกับทดลองมากกว่าใช้จริง</td>
+</tr>
+<tr>
+<td>เช่า VPS สาธารณะ</td>
+<td>มี IP สาธารณะจริง ควบคุมเต็มที่</td>
+<td>ต้องจ่ายรายเดือน ต้องดูแลอีกเครื่อง ข้อมูลไปอยู่นอกมหาวิทยาลัย (ส่วนตัวของนักศึกษา) บอร์ดในตึกต้องต่อออกนอกตึกมาที่ VPS</td>
+<td>แพงและย้ายข้อมูลออกนอก</td>
+</tr>
+<tr>
+<td>ทำแค่ในตึก (ไม่มีทางเข้านอก)</td>
+<td>ปลอดภัยที่สุด ง่ายที่สุด</td>
+<td>เจ้าหน้าที่ดูจากบ้านไม่ได้</td>
+<td>ไม่ตอบโจทย์ "ดูได้ทุกที่"</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Funnel ถูกเลือกเพราะ</strong>: (1) ฟรี (2) ไม่ต้องแก้ firewall หรือขอไอที เพราะต่อออกอย่างเดียว (3) ได้ชื่อ HTTPS พร้อมใบรับรองจริงโดยไม่ต้องซื้อโดเมน (4) ติดตั้งเป็นกล่อง Docker เพิ่มกล่องเดียว และปิดได้ด้วยคำสั่งเดียว (5) ส่งต่อพอร์ต TCP ได้ด้วย (8443) จึงใช้กล่องเดียวกันเปิดทางให้ MQTT ของบอร์ดได้</p>
+<p><strong>ทางเลือกสำหรับบอร์ด ESP32 (MQTT)</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>ทางเลือก</th>
+<th>ข้อดี</th>
+<th>ข้อเสีย</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ต่อตรง <code>rmutt-energy.duckdns.org:8883</code> (ของเดิม ยังใช้ได้)</td>
+<td>ไม่พึ่งบุคคลที่สาม TLS ครบทางจากบอร์ดถึง Mosquitto</td>
+<td>ต้องอยู่ใน Wi-Fi ที่ถึง 10.x เท่านั้น บอร์ดนอกอาคารต่อไม่ได้</td>
+</tr>
+<tr>
+<td><strong>Funnel 8443 + <code>TerminateTLS</code> → <code>mqtt:1883</code> (ที่เลือก)</strong></td>
+<td>ต่อได้จากทุกเครือข่าย ไม่ต้องแก้ firewall ไม่ต้องแก้ Mosquitto ใช้ใบ ts.net ที่ตรงกับใบรากในเฟิร์มแวร์</td>
+<td>พึ่ง Tailscale, ช่วงสุดท้ายเป็น MQTT ดิบในเครือข่าย Docker, Broker เข้าถึงได้จากอินเทอร์เน็ต</td>
+</tr>
+<tr>
+<td>Funnel + <code>TCPForward</code> ดิบ → <code>mqtt:8883</code></td>
+<td>TLS ครบทางถึง Mosquitto</td>
+<td>ใบของ Mosquitto ออกให้ชื่อ DuckDNS ไม่ตรงชื่อ ts.net ที่บอร์ดต่อ บอร์ดจึงปฏิเสธ</td>
+</tr>
+<tr>
+<td>MQTT over WebSocket ผ่าน Caddy 443</td>
+<td>ใช้พอร์ต 443 ที่ผ่านเครือข่ายส่วนใหญ่</td>
+<td>ต้องแก้ทั้ง Mosquitto (listener WebSocket), Caddy และเฟิร์มแวร์ ยังไม่ได้ทำ</td>
+</tr>
+<tr>
+<td>Broker บนคลาวด์/VPS สาธารณะ</td>
+<td>ต่อได้จากทุกที่ ไม่พึ่งเครือข่ายมหาวิทยาลัย</td>
+<td>มีค่าใช้จ่าย และข้อมูลการใช้ไฟ/แอร์ออกนอกมหาวิทยาลัย</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>ข้อจำกัดที่ต้องบอกตรง ๆ</strong></p>
+<ul>
+<li><strong>พึ่งบริษัทภายนอก</strong> ถ้า Tailscale ล่มหรือเปลี่ยนเงื่อนไขแผนฟรี ทางเข้า ts.net หายทั้งสองพอร์ต คือแอปและเว็บนอกตึก <strong>และบอร์ดที่ตั้งค่าให้ต่อ <code>ts.net:8443</code></strong> (คำสั่งจาก Backend ถึงบอร์ดเหล่านั้นหยุดจนกว่าจะกลับมา) ส่วนเว็บในตึกทางโดเมนหลักและบอร์ดที่ต่อตรง 8883 ยังทำงาน</li>
+<li><strong>ข้อมูลผ่านเครือข่ายของ Tailscale</strong> แม้ relay ไม่ถอด TLS แต่ metadata (ใครต่อเมื่อไร รวมถึงการต่อ MQTT ของบอร์ด) ผ่านมือบริษัท</li>
+<li><strong>Funnel เปิดได้เฉพาะพอร์ต 443, 8443 และ 10000 และต้องเป็นการเชื่อมต่อ TLS</strong> MQTT ใช้พอร์ต 8443 ได้ด้วย <code>TCPForward</code> + <code>TerminateTLS</code> แต่ MariaDB หรือ SSH ไม่เหมาะและเราไม่ได้เปิด</li>
+<li><strong>ช่วงสุดท้ายเป็น MQTT ไม่เข้ารหัส</strong> จากกล่อง tailscale ไป <code>mqtt:1883</code> วิ่งในเครือข่าย Docker ของเครื่องเดียวกัน ใครควบคุมเครื่องหรือ Docker ได้ก็เห็นข้อความดิบได้ (แต่คนนั้นอ่านฐานข้อมูลได้อยู่แล้ว)</li>
+<li><strong>Broker เข้าถึงได้จากอินเทอร์เน็ต</strong> ป้องกันด้วย TLS และบัญชี Dynamic Security รายบอร์ด ยังไม่มี rate limit ต่อ IP ที่ชั้น MQTT (ดูบท 15)</li>
+<li><strong>บอร์ดต้องออกพอร์ต 8443 ได้ และมีเวลา NTP ถูกต้อง</strong> เพื่อตรวจใบ ts.net (ถ้า Wi-Fi ที่ติดตั้งบล็อกพอร์ตขาออกนี้ ให้ใช้ทางต่อตรง 8883 ถ้าอยู่ในอาคาร)</li>
+<li><strong>ชื่อ ts.net ฝังในแอปตอน build และอยู่ในค่า provisioning ของบอร์ด</strong> ถ้าชื่อเปลี่ยน ต้อง build แอปใหม่และตั้งค่าบอร์ดใหม่ทุกตัว</li>
+<li><strong>ความเร็ว</strong> มี relay เพิ่มหนึ่งทอด ช้ากว่าต่อตรง เล็กน้อย แต่พอสำหรับแอปที่ดึงข้อมูลทุก 10 วินาทีและข้อความ MQTT ขนาดเล็กของบอร์ด</li>
+</ul>
+<h2 id="duckdns-และ-lets-encrypt-แบบ-dns-01-สรุปรวม">DuckDNS และ Let's Encrypt แบบ DNS-01 (สรุปรวม)<a class="anchor" href="#duckdns-และ-lets-encrypt-แบบ-dns-01-สรุปรวม">#</a></h2>
+<p>หัวข้อ "สถานการณ์จริงของเซิร์ฟเวอร์" ด้านบนอธิบายขั้นตอนแล้ว ตรงนี้สรุปเหตุผลที่ต้องจำ</p>
+<ul>
+<li><strong>ทำไม HTTP-01 ทำไม่ได้</strong>: Let's Encrypt ต้องต่อเข้ามาที่พอร์ต 80 ของ IP ที่โดเมนชี้ แต่ DuckDNS ชี้ <code>10.x</code> (ส่วนตัว) จึงไม่มีทางต่อถึง และ firewall ปิดขาเข้าอยู่แล้ว</li>
+<li><strong>DNS-01 ทำได้</strong> เพราะเป็นขาออกล้วน: Caddy → Let's Encrypt (ขอใบ), Caddy → DuckDNS (เขียน TXT), Let's Encrypt → DNS ของ DuckDNS (ตรวจ TXT ซึ่งเป็นบริการสาธารณะอยู่แล้ว)</li>
+<li><strong>ปลั๊กอิน</strong>: Caddy มาตรฐานไม่มีตัวคุยกับ DuckDNS จึงต้อง build ใหม่ด้วย <code>xcaddy build --with github.com/caddy-dns/duckdns</code> (<code>caddy.Dockerfile</code>) แล้วตั้ง tag <code>rmutt-caddy:duckdns</code></li>
+<li><strong><code>DUCKDNS_TOKEN</code></strong> อยู่ใน <code>.env</code> ส่งเข้ากล่อง caddy เป็น environment แล้ว Caddyfile อ้างด้วย <code>{env.DUCKDNS_TOKEN}</code> (ถ้าไม่ตั้ง compose ใช้ค่าว่าง <code>${DUCKDNS_TOKEN:-}</code> และ Caddy ขอใบไม่สำเร็จ)</li>
+<li><strong><code>resolvers 1.1.1.1 8.8.8.8</code></strong>: DNS ของมหาวิทยาลัยตอบ SERVFAIL เมื่อ Caddy ถามหา zone ของ <code>_acme-challenge</code> จึงใช้ DNS สาธารณะ</li>
+<li><strong><code>propagation_delay 60s</code> + <code>propagation_timeout -1</code></strong>: รอ 60 วินาทีให้ค่า TXT กระจายแล้วให้ Let's Encrypt ตรวจเลย ไม่ให้ Caddy วนถาม DNS เอง (เพราะเครือข่ายมหาวิทยาลัยอาจบล็อกพอร์ต 53 ขาออก)</li>
+<li><strong>ผลกระทบข้างเคียง</strong>: ใบรับรอง DNS-01 ออกให้ชื่อ <code>rmutt-energy.duckdns.org</code> จริง เบราว์เซอร์และ ESP32 เชื่อได้ทั้งที่ชื่อชี้ IP ส่วนตัว</li>
+</ul>
+<h2 id="โครงสร้างโฟลเดอร์">โครงสร้างโฟลเดอร์<a class="anchor" href="#โครงสร้างโฟลเดอร์">#</a></h2>
+<div class="code-block"><div class="hl"><pre><span></span><code>deploy/
+├─ docker-compose.yml          กำหนด 5 กล่อง (db, mqtt, backend, caddy, tailscale)
+├─ Caddyfile                   กฎของ reverse proxy + ใบรับรอง DuckDNS
+├─ caddy.Dockerfile            สร้าง Caddy ที่มีปลั๊กอิน DuckDNS
+├─ backend.Dockerfile          สร้าง image ของ Backend (compose อ้าง build: ./backend)
+├─ tailscale-serve.json        กฎ Funnel: ts.net:443 → caddy:8080, ts.net:8443 → mqtt:1883
+├─ mosquitto/config/mosquitto.conf   Broker จริง (Dynamic Security + listener 1883 ภายใน + TLS 8883)
+├─ .env.example                ตัวอย่างค่าความลับของเซิร์ฟเวอร์ (init-env.sh สร้างจริง)
+├─ server.config.example.json  ตัวอย่างค่าที่อยู่เซิร์ฟเวอร์สำหรับสคริปต์บน Windows
+├─ SERVER_REQUIREMENTS.md      สเปกเครื่องและสิ่งที่ขอฝ่ายไอที
+├─ DEPLOY.md                   ขั้นตอน deploy (บางส่วนเก่า ดูหมายเหตุต้นบท)
+└─ (สคริปต์ .sh/.ps1 อื่น ๆ อยู่ในบท deploy/สคริปต์)
+
+mqtt/                          Broker สำหรับพัฒนาบนเครื่อง Windows
+├─ docker-compose.yml          service ชื่อ broker, พอร์ต 1883
+├─ config/mosquitto.conf       ใช้ password_file + acl_file
+├─ config/acl                  สิทธิ์ของ user rmutt_air
+├─ .env.example                ชื่อ/รหัสผ่านที่ setup_mqtt.ps1 สร้างให้
+└─ README.md                   วิธีใช้บน Windows
+</code></pre></div>
+</div>
+
+<h2 id="อธิบายทีละไฟล์">อธิบายทีละไฟล์<a class="anchor" href="#อธิบายทีละไฟล์">#</a></h2>
+<h3 id="deploydocker-composeyml"><code>deploy/docker-compose.yml</code><a class="anchor" href="#deploydocker-composeyml">#</a></h3>
+<p>ไฟล์ศูนย์กลางของ deploy ประกาศ 5 service, เครือข่ายเริ่มต้น (Docker สร้างให้โดยชื่อ <code>rmutt_default</code> จาก <code>name: rmutt</code>), และ anchor <code>x-logging</code> ที่ใช้ร่วมกัน ใครเรียกใช้: <code>docker compose up -d</code> บนเซิร์ฟเวอร์ (ผ่าน <code>update-server.ps1</code>/<code>update-remote.sh</code>) ค่า <code>${...}</code> อ่านจากไฟล์ <code>.env</code> ในโฟลเดอร์เดียวกัน</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>service</th>
+<th>image / build</th>
+<th>พอร์ตที่ publish</th>
+<th>เก็บข้อมูลที่</th>
+<th>หน้าที่</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>db</code></td>
+<td><code>mariadb:11</code></td>
+<td><code>127.0.0.1:3306</code> (เฉพาะเครื่องตัวเอง)</td>
+<td><code>./db/data</code></td>
+<td>ฐานข้อมูล</td>
+</tr>
+<tr>
+<td><code>mqtt</code></td>
+<td><code>eclipse-mosquitto:2.0</code></td>
+<td><code>8883</code></td>
+<td><code>./mosquitto/data</code>, certs, config</td>
+<td>Broker</td>
+</tr>
+<tr>
+<td><code>backend</code></td>
+<td>build <code>./backend</code></td>
+<td>ไม่มี (ภายในเท่านั้น <code>3000</code>)</td>
+<td>อ่าน <code>./firmware</code></td>
+<td>API และตัวรับ MQTT</td>
+</tr>
+<tr>
+<td><code>caddy</code></td>
+<td>build <code>caddy.Dockerfile</code></td>
+<td><code>80</code>, <code>443</code> (<code>8080</code> ไม่ publish)</td>
+<td><code>./caddy/data</code>, <code>./caddy/config</code></td>
+<td>เว็บ + proxy + ใบรับรอง</td>
+</tr>
+<tr>
+<td><code>tailscale</code></td>
+<td><code>tailscale/tailscale:stable</code></td>
+<td>ไม่มี</td>
+<td><code>./tailscale/state</code></td>
+<td>Funnel (443 → <code>caddy:8080</code>, 8443 → <code>mqtt:1883</code>)</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Published vs internal</strong>: พอร์ตที่เขียนใน <code>ports:</code> เปิดบนเครื่องจริง พอร์ตที่ไม่เขียนยังเข้าถึงได้จากกล่องอื่นในเครือข่ายเดียวกันด้วยชื่อ service (<code>db:3306</code>, <code>mqtt:1883</code>, <code>backend:3000</code>, <code>caddy:8080</code>) 1883, 3000 และ 8080 จึงไม่โผล่นอกเครื่อง (1883 มีกล่อง tailscale ส่งต่อมาจาก Funnel 8443 ภายในเครือข่าย Docker เท่านั้น)</p>
+<p><strong>DNS ภายใน Docker</strong>: Backend ต่อ <code>DB_HOST: db</code> และ <code>MQTT_URL: mqtt://mqtt:1883</code>, Caddy ส่งต่อ <code>backend:3000</code>, tailscale ส่งต่อ <code>caddy:8080</code> และ <code>mqtt:1883</code> ไม่มี IP ฝังในไฟล์ใดเลย กล่องเปลี่ยน IP เมื่อสร้างใหม่ได้โดยไม่เสียหาย</p>
+<p><strong>Healthcheck</strong>: Docker รันคำสั่งตรวจเป็นระยะและติดป้าย <code>healthy</code>/<code>unhealthy</code>
+- <code>db</code> ใช้ <code>healthcheck.sh --connect --innodb_initialized</code> ที่มากับ image
+- <code>mqtt</code> ใช้ <code>mosquitto_sub</code> ต่อ <code>127.0.0.1:1883</code> ด้วยบัญชี Backend อ่าน <code>$SYS/broker/version</code> หนึ่งข้อความ (<code>-C 1</code>) รอไม่เกิน 5 วินาที (<code>-W 5</code>) เขียน <code>$$</code> เพราะ compose ใช้ <code>$</code> แทนตัวแปร ต้องใช้ <code>$$</code> เพื่อให้ shell ในกล่องเห็น <code>$</code> จริง
+- <code>backend</code> ใช้ <code>node -e</code> เรียก <code>fetch('http://127.0.0.1:3000/api/health')</code> (image <code>node:22-alpine</code> ไม่มี <code>curl</code> จึงใช้ Node เอง)</p>
+<p><strong><code>depends_on</code></strong>: ควบคุมลำดับเริ่ม <code>backend</code> รอ <code>db</code> ถึงขั้น <code>service_healthy</code> (ไม่งั้นต่อ DB ไม่ติดตอนบูต) แต่รอ <code>mqtt</code> แค่ <code>service_started</code> ส่วน <code>caddy</code> รอ <code>backend</code> เริ่ม และ <code>tailscale</code> รอ <code>caddy</code> กับ <code>mqtt</code> (ให้ปลายทางทั้งสองขึ้นก่อนที่ Funnel จะเริ่มส่งต่อ) ข้อสังเกต: <code>depends_on</code> ไม่ใช่การรับประกันว่าพร้อมรับคำขอ</p>
+<p><strong><code>restart: unless-stopped</code></strong>: กล่องเด้งกลับเองเมื่อพังหรือเครื่องรีบูต แต่ถ้าเราสั่ง <code>docker compose stop</code> เองมันจะไม่ลุกขึ้นมาเอง (นี่คือเหตุผลที่ "ปิด Funnel" ด้วย <code>stop</code> ได้ผล)</p>
+<p><strong>Logging</strong>: anchor <code>x-logging</code> จำกัด log กล่องละ 10 MB × 5 ไฟล์ = 50 MB สูงสุดต่อกล่อง ค่าเริ่มต้นของ Docker ไม่จำกัด เครื่องที่รันยาวจะดิสก์เต็ม</p>
+<p><strong>Selective env vars</strong>: Backend ได้รับเฉพาะตัวแปรที่ใช้ ไม่ใช้ <code>env_file: .env</code> ทั้งไฟล์ เพราะ <code>.env</code> มีรหัส root ของ MariaDB, <code>DUCKDNS_TOKEN</code>, <code>TS_AUTHKEY</code> และรหัสแอดมินตัวแรก ถ้าส่งทั้งไฟล์ ใครที่รัน <code>docker inspect rmutt-backend</code> หรือเจาะ Backend ได้จะเห็นความลับที่ Backend ไม่เคยใช้ ผลเสียของวิธีนี้คือต้องมาเพิ่มตัวแปรในรายการเองเมื่อ Backend ต้องใช้ตัวใหม่</p>
+<h3 id="deploycaddyfile"><code>deploy/Caddyfile</code><a class="anchor" href="#deploycaddyfile">#</a></h3>
+<p>ตั้งค่า Caddy มี 4 ส่วน: บล็อกตั้งค่าทั่วไป (บรรทัด 1–7), snippet <code>(app)</code> ที่ใช้ร่วม (บรรทัด 10–56), บล็อกโดเมนหลัก <code>{$DOMAIN}</code> (บรรทัด 58–79), และบล็อก <code>http://:8080</code> สำหรับ Funnel (บรรทัด 83–85) ทำไมใช้ snippet: เว็บและ API เหมือนกันทั้งสองทางเข้า เขียนครั้งเดียวแล้ว <code>import app</code> สองที่ ไม่มีโอกาสที่สองทางจะต่างกัน</p>
+<h3 id="deploycaddydockerfile-และ-deploybackenddockerfile"><code>deploy/caddy.Dockerfile</code> และ <code>deploy/backend.Dockerfile</code><a class="anchor" href="#deploycaddydockerfile-และ-deploybackenddockerfile">#</a></h3>
+<p>สูตรสร้าง image Caddy (multi-stage build เอาเฉพาะไบนารี) และ image Backend (ติดตั้ง dependency แบบ production, ปรับสิทธิ์อ่านซอร์สให้ user <code>node</code>, รันด้วย user <code>node</code>) ดูในหัวข้อเจาะโค้ด <code>caddy.Dockerfile</code> อ้างจาก compose ผ่าน <code>build.dockerfile</code> ส่วน <code>backend.Dockerfile</code> compose ไม่ได้อ้างตรง ๆ (ใช้ <code>build: ./backend</code> ซึ่งมองหา <code>backend/Dockerfile</code>) แต่สคริปต์ <code>upload.ps1</code> และ <code>update-remote.sh</code> จะรัน <code>cp -f backend.Dockerfile backend/Dockerfile</code> บนเซิร์ฟเวอร์ให้ก่อน build ทุกครั้ง (ในซอร์สไม่มี <code>backend/Dockerfile</code> เก็บไว้) ถ้าลืมก๊อป <code>docker compose build</code> จะหา Dockerfile ไม่เจอ</p>
+<h3 id="deploytailscale-servejson"><code>deploy/tailscale-serve.json</code><a class="anchor" href="#deploytailscale-servejson">#</a></h3>
+<p>กฎ Funnel สองพอร์ต (443 → <code>caddy:8080</code> และ 8443 → <code>mqtt:1883</code>) อธิบายครบแล้วในหัวข้อ Tailscale mount เข้ากล่อง tailscale แบบอ่านอย่างเดียว (<code>:ro</code>) ไฟล์นี้ถูกอัปโหลดทับเป็นไฟล์ใหม่ทุกครั้งที่ deploy ซึ่ง container เดิมยังเห็นไฟล์เก่า <code>update-remote.sh</code> จึงสั่งสร้างกล่อง tailscale ใหม่ให้ (ดูบท 14)</p>
+<h3 id="deploymosquittoconfigmosquittoconf"><code>deploy/mosquitto/config/mosquitto.conf</code><a class="anchor" href="#deploymosquittoconfigmosquittoconf">#</a></h3>
+<p>คอนฟิก Broker จริง mount เข้ากล่อง mqtt ที่ <code>/mosquitto/config</code> (ดูเจาะโค้ด) ไฟล์ <code>init-env.sh</code> แก้บรรทัด <code>plugin</code> ให้ตรง path จริงของ image (บรรทัด 127 ของสคริปต์นั้น) ไฟล์นี้ไม่เปลี่ยนเมื่อเพิ่ม Funnel 8443 เพราะทางนั้นเข้า listener 1883 ที่มีอยู่แล้ว</p>
+<h3 id="deployenvexample-และ-deployserverconfigexamplejson"><code>deploy/.env.example</code> และ <code>deploy/server.config.example.json</code><a class="anchor" href="#deployenvexample-และ-deployserverconfigexamplejson">#</a></h3>
+<ul>
+<li><code>.env.example</code> คือรายการตัวแปรที่เซิร์ฟเวอร์ต้องมี ค่ารหัสเว้นว่างไว้เพราะ <code>init-env.sh</code> สุ่มให้ (ไม่พิมพ์เอง) ตัวแปรที่เกี่ยวกับบทนี้: <code>DOMAIN</code> (ใช้ใน Caddyfile <code>{$DOMAIN}</code>, ใน <code>APP_ORIGIN</code>, ใน <code>MQTT_DEVICE_URL</code>) และ <code>MQTT_USERNAME</code>/<code>MQTT_PASSWORD</code> (บัญชี Backend) ส่วน <code>DUCKDNS_TOKEN</code>, <code>TS_AUTHKEY</code>, <code>PUBLIC_URL</code> compose อ่านได้แต่<strong>ไม่มี</strong>ในไฟล์ตัวอย่าง ต้องเพิ่มเอง</li>
+<li><code>server.config.example.json</code> คัดลอกเป็น <code>server.config.json</code> (ไม่ถูก commit) เก็บ <code>host</code>, <code>user</code>, <code>port</code> (SSH), <code>domain</code> ที่สคริปต์ PowerShell ทุกตัว (<code>update-server.ps1</code>, <code>deploy-web.ps1</code>, <code>upload.ps1</code>, <code>db-tunnel.ps1</code>) อ่านผ่าน <code>deploy/ServerConfig.ps1</code> เพื่อไม่ต้องฝังที่อยู่เซิร์ฟเวอร์ในสคริปต์</li>
+</ul>
+<h3 id="deployserver_requirementsmd-และ-deploydeploymd"><code>deploy/SERVER_REQUIREMENTS.md</code> และ <code>deploy/DEPLOY.md</code><a class="anchor" href="#deployserver_requirementsmd-และ-deploydeploymd">#</a></h3>
+<p>เอกสารสำหรับคนและฝ่ายไอที: สเปกเครื่อง พอร์ตที่ขอ ลำดับติดตั้ง (<code>upload.ps1</code> → <code>setup-vps.sh</code> → <code>init-env.sh</code> → ขอใบรับรอง → <code>docker compose up -d --build</code> → <code>db:init</code> → <code>seed-admin.sh</code>) <strong>ทั้งสองไฟล์เขียนตามแผนเดิม</strong> (ขอเปิดพอร์ต 80/443, HTTP-01) ไม่กล่าวถึง DuckDNS-DNS-01 หรือ Tailscale ดูหมายเหตุต้นบท อ่านเป็นภาพรวมได้ แต่ต้องเชื่อโค้ดเมื่อขัดกัน</p>
+<h3 id="mqtt-broker-สำหรับพัฒนา"><code>mqtt/</code> (Broker สำหรับพัฒนา)<a class="anchor" href="#mqtt-broker-สำหรับพัฒนา">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>ไฟล์</th>
+<th>หน้าที่</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>docker-compose.yml</code></td>
+<td>รัน Mosquitto 1 กล่อง ชื่อ service <code>broker</code>, publish <code>1883:1883</code></td>
+</tr>
+<tr>
+<td><code>config/mosquitto.conf</code></td>
+<td><code>password_file</code> + <code>acl_file</code> (ไม่ใช้ Dynamic Security)</td>
+</tr>
+<tr>
+<td><code>config/acl</code></td>
+<td><code>user rmutt_air</code> อ่าน/เขียน <code>rmutt/ac/#</code> และ <code>rmutt/occupancy/#</code>, อ่าน <code>$SYS/#</code></td>
+</tr>
+<tr>
+<td><code>.env.example</code></td>
+<td><code>MQTT_USERNAME=rmutt_air</code>, <code>MQTT_PASSWORD</code> ที่สคริปต์สุ่ม</td>
+</tr>
+<tr>
+<td><code>README.md</code></td>
+<td>วิธีรัน <code>setup_mqtt.ps1</code>, <code>start_mqtt.ps1</code>, <code>test_mqtt.ps1</code>, <code>stop_mqtt.ps1</code> และเปิดไฟร์วอลล์ Windows</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="เจาะโค้ดทีละบรรทัด">เจาะโค้ดทีละบรรทัด<a class="anchor" href="#เจาะโค้ดทีละบรรทัด">#</a></h2>
+<h3 id="1-deploydocker-composeyml--หัวไฟล์และฐานข้อมูล">1) <code>deploy/docker-compose.yml</code> : หัวไฟล์และฐานข้อมูล<a class="anchor" href="#1-deploydocker-composeyml--หัวไฟล์และฐานข้อมูล">#</a></h3>
+<p><strong>ไฟล์ <code>deploy/docker-compose.yml</code> บรรทัด 1–37</strong></p>
+<div class="code-block"><span class="code-lang">yaml</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rmutt</span>
+
+<span class="c1"># จำกัดขนาด log ของทุก container ไม่ให้กินดิสก์จนเต็ม</span>
+<span class="c1"># ค่าเริ่มต้นของ Docker ไม่จำกัดเลย ระบบที่รันยาว ๆ จะเต็มดิสก์ในไม่กี่เดือน</span>
+<span class="nt">x-logging</span><span class="p">:</span><span class="w"> </span><span class="nl">&amp;default-logging</span>
+<span class="w">  </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">json-file</span>
+<span class="w">  </span><span class="nt">options</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">max-size</span><span class="p">:</span><span class="w"> </span><span class="s">"10m"</span>
+<span class="w">    </span><span class="nt">max-file</span><span class="p">:</span><span class="w"> </span><span class="s">"5"</span>
+
+<span class="nt">services</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">db</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mariadb:11</span>
+<span class="w">    </span><span class="nt">container_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rmutt-db</span>
+<span class="w">    </span><span class="nt">restart</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">unless-stopped</span>
+<span class="w">    </span><span class="nt">logging</span><span class="p">:</span><span class="w"> </span><span class="nv">*default-logging</span>
+<span class="w">    </span><span class="nt">environment</span><span class="p">:</span>
+<span class="w">      </span><span class="c1"># root ใช้เฉพาะงานดูแลระบบ (backup, db-view) Backend ไม่ใช้ root</span>
+<span class="w">      </span><span class="nt">MARIADB_ROOT_PASSWORD</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${DB_ROOT_PASSWORD}</span>
+<span class="w">      </span><span class="nt">MARIADB_DATABASE</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${DB_DATABASE}</span>
+<span class="w">      </span><span class="c1"># user ของแอป มีสิทธิ์เฉพาะฐานข้อมูล ${DB_DATABASE} เท่านั้น</span>
+<span class="w">      </span><span class="c1"># (สร้างให้อัตโนมัติตอนรันครั้งแรกที่โฟลเดอร์ db/data ยังว่าง)</span>
+<span class="w">      </span><span class="nt">MARIADB_USER</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${DB_USER}</span>
+<span class="w">      </span><span class="nt">MARIADB_PASSWORD</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${DB_PASSWORD}</span>
+<span class="w">      </span><span class="nt">TZ</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Asia/Bangkok</span>
+<span class="w">    </span><span class="c1"># เปิดพอร์ตเฉพาะ localhost ของเซิร์ฟเวอร์เท่านั้น เข้าจากเครือข่ายไม่ได้</span>
+<span class="w">    </span><span class="c1"># ใช้ต่อ DBeaver/HeidiSQL ผ่าน SSH tunnel</span>
+<span class="w">    </span><span class="nt">ports</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">"127.0.0.1:3306:3306"</span>
+<span class="w">    </span><span class="nt">volumes</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./db/data:/var/lib/mysql</span>
+<span class="w">    </span><span class="nt">healthcheck</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">test</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"CMD"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"healthcheck.sh"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"--connect"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"--innodb_initialized"</span><span class="p p-Indicator">]</span>
+<span class="w">      </span><span class="nt">interval</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10s</span>
+<span class="w">      </span><span class="nt">timeout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5s</span>
+<span class="w">      </span><span class="nt">retries</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">12</span>
+<span class="w">      </span><span class="nt">start_period</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">30s</span>
+</code></pre></div></td></tr></table></div>
+</div>
+
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>บรรทัด</th>
+<th>โค้ด</th>
+<th>ความหมาย</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>name: rmutt</code></td>
+<td>ชื่อโปรเจกต์ compose ใช้เป็นคำนำหน้าชื่อเครือข่าย/volume (เครือข่ายชื่อ <code>rmutt_default</code>)</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>x-logging: &amp;default-logging</code></td>
+<td><code>x-</code> นำหน้า = ส่วนขยายที่ compose ไม่ตีความ <code>&amp;ชื่อ</code> คือ YAML anchor (ตั้งชื่อก้อนข้อมูลไว้ใช้ซ้ำ)</td>
+</tr>
+<tr>
+<td>6–9</td>
+<td><code>driver: json-file</code> ...</td>
+<td>เก็บ log เป็นไฟล์ JSON ไฟล์ละไม่เกิน 10 MB หมุนทับเมื่อครบ 5 ไฟล์</td>
+</tr>
+<tr>
+<td>13</td>
+<td><code>image: mariadb:11</code></td>
+<td>ใช้ image สำเร็จรูป รุ่นหลัก 11 (ได้แพตช์ย่อยอัตโนมัติ)</td>
+</tr>
+<tr>
+<td>14</td>
+<td><code>container_name</code></td>
+<td>ตั้งชื่อกล่องตายตัว (สคริปต์อย่าง <code>docker kill -s HUP rmutt-mqtt</code> อ้างชื่อนี้)</td>
+</tr>
+<tr>
+<td>15</td>
+<td><code>restart: unless-stopped</code></td>
+<td>เด้งกลับเมื่อพัง/รีบูต ยกเว้นเราสั่งหยุดเอง</td>
+</tr>
+<tr>
+<td>16</td>
+<td><code>logging: *default-logging</code></td>
+<td><code>*ชื่อ</code> คือเรียก anchor มาใช้ ทุก service ใช้การตั้ง log เดียวกัน</td>
+</tr>
+<tr>
+<td>19</td>
+<td><code>${DB_ROOT_PASSWORD}</code></td>
+<td>ค่ามาจาก <code>.env</code> ตอนรัน compose (ไม่ได้ฝังรหัสในไฟล์)</td>
+</tr>
+<tr>
+<td>20–24</td>
+<td><code>MARIADB_DATABASE/USER/PASSWORD</code></td>
+<td>image อ่านตัวแปรชื่อพิเศษเหล่านี้ตอนเริ่มครั้งแรกที่ข้อมูลว่าง แล้วสร้างฐานข้อมูลและ user ของแอปให้ (สิทธิ์เฉพาะฐานเดียว)</td>
+</tr>
+<tr>
+<td>25</td>
+<td><code>TZ: Asia/Bangkok</code></td>
+<td>ตั้งเขตเวลาให้ตรงกับเวลาไทย ทุกกล่องใช้ค่าเดียวกัน</td>
+</tr>
+<tr>
+<td>29</td>
+<td><code>"127.0.0.1:3306:3306"</code></td>
+<td>รูปแบบ <code>ที่อยู่เครื่อง:พอร์ตเครื่อง:พอร์ตกล่อง</code> การระบุ <code>127.0.0.1</code> นำหน้าทำให้พอร์ตเปิดเฉพาะ loopback ของเซิร์ฟเวอร์ ถ้าเขียน <code>"3306:3306"</code> จะเปิดทุกการ์ดเครือข่าย (ใครในวง 10.x ต่อได้)</td>
+</tr>
+<tr>
+<td>31</td>
+<td><code>./db/data:/var/lib/mysql</code></td>
+<td>bind mount โฟลเดอร์ข้อมูลจริงอยู่นอกกล่อง สร้างกล่องใหม่/อัปเกรด image ข้อมูลไม่หาย</td>
+</tr>
+<tr>
+<td>33</td>
+<td><code>healthcheck.sh --connect --innodb_initialized</code></td>
+<td>สคริปต์ที่มากับ image ตรวจว่าต่อได้และ InnoDB พร้อม</td>
+</tr>
+<tr>
+<td>34–37</td>
+<td><code>interval/timeout/retries/start_period</code></td>
+<td>ตรวจทุก 10 วินาที ถ้าล้มติดกัน 12 ครั้งถือว่า unhealthy; <code>start_period: 30s</code> ช่วง 30 วินาทีแรกที่ล้มยังไม่นับ (ตอนสร้างฐานครั้งแรกใช้เวลา)</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="2-deploydocker-composeyml--mqtt-และ-backend">2) <code>deploy/docker-compose.yml</code> : mqtt และ backend<a class="anchor" href="#2-deploydocker-composeyml--mqtt-และ-backend">#</a></h3>
+<p><strong>ไฟล์ <code>deploy/docker-compose.yml</code> บรรทัด 39–65</strong></p>
+<div class="code-block"><span class="code-lang">yaml</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="w">  </span><span class="nt">mqtt</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">eclipse-mosquitto:2.0</span>
+<span class="w">    </span><span class="nt">container_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rmutt-mqtt</span>
+<span class="w">    </span><span class="nt">restart</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">unless-stopped</span>
+<span class="w">    </span><span class="nt">logging</span><span class="p">:</span><span class="w"> </span><span class="nv">*default-logging</span>
+<span class="w">    </span><span class="nt">ports</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">"8883:8883"</span>
+<span class="w">    </span><span class="nt">environment</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">MQTT_USERNAME</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${MQTT_USERNAME}</span>
+<span class="w">      </span><span class="nt">MQTT_PASSWORD</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${MQTT_PASSWORD}</span>
+<span class="w">      </span><span class="nt">TZ</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Asia/Bangkok</span>
+<span class="w">    </span><span class="nt">volumes</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./mosquitto/config:/mosquitto/config:ro</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./mosquitto/certs:/mosquitto/certs:ro</span>
+<span class="w">      </span><span class="c1"># dynamic-security.json (บัญชีของ Backend และของบอร์ดทุกตัว) อยู่ใน data</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./mosquitto/data:/mosquitto/data</span>
+<span class="w">    </span><span class="nt">healthcheck</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">test</span><span class="p">:</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CMD-SHELL</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">&gt;-</span>
+<span class="w">          </span><span class="no">mosquitto_sub -h 127.0.0.1 -p 1883</span>
+<span class="w">          </span><span class="no">-u "$${MQTT_USERNAME}" -P "$${MQTT_PASSWORD}"</span>
+<span class="w">          </span><span class="no">-t '$$SYS/broker/version' -C 1 -W 5</span>
+<span class="w">      </span><span class="nt">interval</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">30s</span>
+<span class="w">      </span><span class="nt">timeout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8s</span>
+<span class="w">      </span><span class="nt">retries</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5</span>
+<span class="w">      </span><span class="nt">start_period</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10s</span>
+</code></pre></div></td></tr></table></div>
+</div>
+
+<ul>
+<li><strong>บรรทัด 45:</strong> publish เฉพาะ <code>8883</code> (MQTTS สำหรับบอร์ดที่ต่อตรง) ไม่มี <code>1883</code> ในรายการ จึงเป็นพอร์ตภายในที่ Backend, healthcheck และกล่อง tailscale (ส่งต่อจาก Funnel 8443) ใช้ ส่วน 8443 ไม่อยู่ในรายการนี้เพราะเป็นพอร์ตของกล่อง tailscale ไม่ใช่ของ mqtt</li>
+<li><strong>บรรทัด 47–48:</strong> ส่งชื่อ/รหัสบัญชี Backend เข้ากล่องเพื่อให้ healthcheck ใช้ (ตัวแปรเหล่านี้ไม่ได้ถูก Mosquitto อ่านเอง)</li>
+<li><strong>บรรทัด 51–52:</strong> config และ certs เป็น <code>:ro</code> (อ่านอย่างเดียว) กล่องแก้ไฟล์ตั้งค่าไม่ได้ ใบรับรองปรับโดยสคริปต์ <code>sync-mqtt-cert.sh</code> บนเครื่องจริงเท่านั้น</li>
+<li><strong>บรรทัด 54:</strong> <code>data</code> เขียนได้ เพราะเก็บ <code>dynamic-security.json</code> (บัญชีทั้งหมด) และ persistence ของ MQTT (retained message)</li>
+<li><strong>บรรทัด 56–61:</strong> <code>CMD-SHELL</code> ให้ shell ในกล่องแปลงตัวแปร, <code>&gt;-</code> คือ YAML ต่อบรรทัดเป็นบรรทัดเดียว, <code>$${...}</code> กับ <code>$$SYS</code> คือ escape ของ compose (ถ้าเขียน <code>${MQTT_USERNAME}</code> compose จะแทนค่าตอนอ่านไฟล์ ซึ่งก็ได้ แต่ <code>$SYS</code> จะถูกมองเป็นตัวแปรว่าง จึงต้องใช้ <code>$$</code>)</li>
+<li><strong>บรรทัด 62–65:</strong> ตรวจทุก 30 วินาที ล้มติดกัน 5 ครั้งจึงถือว่า unhealthy</li>
+</ul>
+<p><strong>ไฟล์ <code>deploy/docker-compose.yml</code> บรรทัด 77–88 และ 106–117</strong></p>
+<div class="code-block"><span class="code-lang">yaml</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">77</span>
+<span class="normal">78</span>
+<span class="normal">79</span>
+<span class="normal">80</span>
+<span class="normal">81</span>
+<span class="normal">82</span>
+<span class="normal">83</span>
+<span class="normal">84</span>
+<span class="normal">85</span>
+<span class="normal">86</span>
+<span class="normal">87</span>
+<span class="normal">88</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="w">    </span><span class="nt">environment</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">NODE_ENV</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">production</span>
+<span class="w">      </span><span class="nt">PORT</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3000</span>
+<span class="w">      </span><span class="c1"># คำขอเข้ามาได้สองทาง: โดเมนหลัก (Caddy ชั้นเดียว) และ Tailscale Funnel</span>
+<span class="w">      </span><span class="c1"># (Tailscale -&gt; Caddy สองชั้น) ต้องเชื่อ X-Forwarded-For สองชั้น ไม่งั้นทุกคน</span>
+<span class="w">      </span><span class="c1"># ที่เข้าผ่าน Funnel (รวมแอปมือถือ) จะถูกนับเป็น IP เดียวกัน คนหนึ่งพิมพ์รหัสผิด</span>
+<span class="w">      </span><span class="c1"># 10 ครั้ง ทุกคนจะล็อกอินไม่ได้ 15 นาที</span>
+<span class="w">      </span><span class="c1"># ทางโดเมนหลักปลอมไม่ได้ เพราะ Caddy ทิ้ง X-Forwarded-For ที่ผู้ใช้ส่งมาเอง</span>
+<span class="w">      </span><span class="nt">TRUST_PROXY</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+<span class="w">      </span><span class="c1"># เว็บกับ API อยู่โดเมนเดียวกัน แอปมือถือไม่ถูกตรวจ CORS</span>
+<span class="w">      </span><span class="c1"># PUBLIC_URL = ที่อยู่สาธารณะจาก Tailscale Funnel (เว้นว่างได้)</span>
+<span class="w">      </span><span class="nt">APP_ORIGIN</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://${DOMAIN},${PUBLIC_URL:-}</span>
+</code></pre></div></td></tr></table></div>
+</div>
+
+<div class="code-block"><span class="code-lang">yaml</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="w">      </span><span class="nt">MQTT_URL</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mqtt://mqtt:1883</span>
+<span class="w">      </span><span class="nt">MQTT_USERNAME</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${MQTT_USERNAME}</span>
+<span class="w">      </span><span class="nt">MQTT_PASSWORD</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${MQTT_PASSWORD}</span>
+<span class="w">      </span><span class="c1"># ที่อยู่ที่ส่งให้ ESP32 ตอน provisioning (ต่างจากที่ Backend ใช้เอง)</span>
+<span class="w">      </span><span class="c1"># ค่าเริ่มต้นคือทาง Tailscale Funnel พอร์ต 8443 ซึ่งเข้าได้จากทุกเครือข่ายที่มีอินเทอร์เน็ต</span>
+<span class="w">      </span><span class="c1"># (โดเมน DuckDNS ชี้ไป IP ภายในมหาวิทยาลัย บอร์ดที่ต่อ Wi-Fi ข้างนอกจะหาไม่เจอ)</span>
+<span class="w">      </span><span class="c1"># ถ้าจะให้บอร์ดในมหาวิทยาลัยต่อตรง ตั้ง MQTT_DEVICE_URL=mqtts://&lt;DOMAIN&gt;:8883 ใน .env</span>
+<span class="w">      </span><span class="nt">MQTT_DEVICE_URL</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${MQTT_DEVICE_URL:-mqtts://rmutt-energy.tailb292b4.ts.net:8443}</span>
+<span class="w">      </span><span class="nt">MQTT_REQUIRED</span><span class="p">:</span><span class="w"> </span><span class="s">"true"</span>
+<span class="w">      </span><span class="c1"># บอร์ดแต่ละตัวมีบัญชี MQTT ของตัวเอง เห็นเฉพาะ topic ของตัวเอง</span>
+<span class="w">      </span><span class="nt">MQTT_DEVICE_AUTH</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dynsec</span>
+<span class="w">      </span><span class="nt">MQTT_DEVICE_SECRET</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${MQTT_DEVICE_SECRET}</span>
+</code></pre></div></td></tr></table></div>
+</div>
+
+<ul>
+<li><strong>บรรทัด 78:</strong> <code>NODE_ENV: production</code> ให้ไลบรารี (Express ฯลฯ) ทำงานโหมดจริง ปิดข้อความ error ละเอียด</li>
+<li><strong>บรรทัด 79:</strong> <code>PORT: 3000</code> ตรงกับ <code>reverse_proxy backend:3000</code> ใน Caddyfile</li>
+<li><strong>บรรทัด 85:</strong> <code>TRUST_PROXY: 2</code> ดูหัวข้อ Tailscale</li>
+<li><strong>บรรทัด 88:</strong> <code>${PUBLIC_URL:-}</code> ไวยากรณ์ <code>:-</code> = "ถ้าตัวแปรว่างหรือไม่มี ให้ใช้ค่าว่าง" (ไม่ให้ compose เตือนว่าตัวแปรหาย) ผลลัพธ์เป็นสตริงคั่นด้วยจุลภาค เช่น <code>https://rmutt-energy.duckdns.org,</code> ซึ่ง Backend แยกและตัดค่าว่างทิ้ง</li>
+<li><strong>บรรทัด 106:</strong> Backend ต่อ Broker ภายในด้วยพอร์ต 1883 ไม่เข้ารหัส เพราะอยู่ในเครือข่าย Docker ของเครื่องเดียวกัน ไม่ต้องเสียแรงเข้ารหัส</li>
+<li><strong>บรรทัด 109–113:</strong> ค่าที่<strong>ส่งให้บอร์ด</strong>ต่างจากที่ Backend ใช้เอง บอร์ดอยู่นอกกล่องจึงต้องใช้ชื่อภายนอกและ <code>mqtts</code> ค่าเริ่มต้นคือทาง Funnel <code>mqtts://rmutt-energy.tailb292b4.ts.net:8443</code> เพราะโดเมน DuckDNS ชี้ IP ภายใน (คอมเมนต์บรรทัด 110–111) ไวยากรณ์ <code>${MQTT_DEVICE_URL:-ค่า}</code> แปลว่าใช้ค่าที่ตั้งไว้ใน <code>.env</code> ก่อน ถ้าว่างหรือไม่มีให้ใช้ค่าหลัง <code>:-</code> จึงเปลี่ยนไปต่อตรงได้โดยตั้ง <code>MQTT_DEVICE_URL=mqtts://&lt;DOMAIN&gt;:8883</code> (คอมเมนต์บรรทัด 112) โดยไม่แก้ compose</li>
+<li><strong>บรรทัด 116:</strong> <code>MQTT_DEVICE_AUTH: dynsec</code> ใช้บัญชีรายบอร์ดผ่าน Dynamic Security (บทของ MQTT อธิบายต่อ)</li>
+</ul>
+<p><strong>ไฟล์ <code>deploy/docker-compose.yml</code> บรรทัด 125–143</strong></p>
+<div class="code-block"><span class="code-lang">yaml</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="w">    </span><span class="nt">volumes</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./firmware:/firmware</span>
+<span class="w">    </span><span class="nt">healthcheck</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">test</span><span class="p">:</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CMD</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">node</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">-e</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">&gt;-</span>
+<span class="w">          </span><span class="no">fetch('http://127.0.0.1:3000/api/health')</span>
+<span class="w">          </span><span class="no">.then(r=&gt;process.exit(r.ok?0:1)).catch(()=&gt;process.exit(1))</span>
+<span class="w">      </span><span class="nt">interval</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">30s</span>
+<span class="w">      </span><span class="nt">timeout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10s</span>
+<span class="w">      </span><span class="nt">retries</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
+<span class="w">      </span><span class="nt">start_period</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">20s</span>
+<span class="w">    </span><span class="nt">depends_on</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">db</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">condition</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">service_healthy</span>
+<span class="w">      </span><span class="nt">mqtt</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">condition</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">service_started</span>
+</code></pre></div></td></tr></table></div>
+</div>
+
+<ul>
+<li><strong>บรรทัด 126:</strong> Backend mount โฟลเดอร์เฟิร์มแวร์เพื่อแสดงรายการไฟล์ในหน้าเว็บ และ (เปลี่ยน 14 ต.ค. 2569) <strong>เขียนได้</strong> เพื่อรับไฟล์ที่แอดมินอัปโหลดจากหน้าเฟิร์มแวร์ของเว็บ (เดิมเป็น <code>:ro</code> อ่านอย่างเดียว ต้องอัปโหลดด้วย <code>scp</code>) โฟลเดอร์บนเครื่องจริงต้องเป็นของ uid 1000 (= user <code>node</code> ในกล่อง) ซึ่ง <code>setup-vps.sh</code> และ <code>update-remote.sh</code> ตั้งให้ (บท 14) Caddy ก็ mount โฟลเดอร์เดียวกันแบบอ่านอย่างเดียวเพื่อเสิร์ฟไฟล์ให้บอร์ดดาวน์โหลด</li>
+<li><strong>บรรทัด 129–134:</strong> <code>CMD</code> ต่างจาก <code>CMD-SHELL</code> คือรันคำสั่งตรง ๆ ไม่ผ่าน shell ที่นี่รัน <code>node -e "&lt;โค้ด&gt;"</code> โค้ดเรียก <code>fetch</code> (มีในตัว Node 18+) ไปที่ <code>/api/health</code> ถ้า <code>r.ok</code> (สถานะ 2xx) ออกด้วยรหัส 0 (สำเร็จ) ไม่งั้น 1 และ <code>.catch</code> กรณีต่อไม่ได้ก็ออก 1 <code>=&gt;</code> คือ arrow function</li>
+<li><strong>บรรทัด 139–143:</strong> รอ db healthy ก่อนเริ่ม</li>
+</ul>
+<h3 id="3-deploydocker-composeyml--caddy-และ-tailscale">3) <code>deploy/docker-compose.yml</code> : caddy และ tailscale<a class="anchor" href="#3-deploydocker-composeyml--caddy-และ-tailscale">#</a></h3>
+<p><strong>ไฟล์ <code>deploy/docker-compose.yml</code> บรรทัด 145–170 (caddy)</strong></p>
+<div class="code-block"><span class="code-lang">yaml</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="w">  </span><span class="nt">caddy</span><span class="p">:</span>
+<span class="w">    </span><span class="c1"># Caddy + ปลั๊กอิน DuckDNS (ดู caddy.Dockerfile)</span>
+<span class="w">    </span><span class="nt">build</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">context</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">.</span>
+<span class="w">      </span><span class="nt">dockerfile</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">caddy.Dockerfile</span>
+<span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rmutt-caddy:duckdns</span>
+<span class="w">    </span><span class="nt">container_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rmutt-caddy</span>
+<span class="w">    </span><span class="nt">restart</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">unless-stopped</span>
+<span class="w">    </span><span class="nt">logging</span><span class="p">:</span><span class="w"> </span><span class="nv">*default-logging</span>
+<span class="w">    </span><span class="nt">ports</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">"80:80"</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">"443:443"</span>
+<span class="w">    </span><span class="nt">environment</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">DOMAIN</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${DOMAIN}</span>
+<span class="w">      </span><span class="c1"># token จากหน้า duckdns.org ใช้เขียน TXT record ตอนขอใบรับรอง</span>
+<span class="w">      </span><span class="nt">DUCKDNS_TOKEN</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${DUCKDNS_TOKEN:-}</span>
+<span class="w">      </span><span class="nt">TZ</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Asia/Bangkok</span>
+<span class="w">    </span><span class="nt">volumes</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Caddyfile:/etc/caddy/Caddyfile:ro</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./www:/srv/www:ro</span>
+<span class="w">      </span><span class="c1"># ไฟล์ .bin สำหรับอัปเดตเฟิร์มแวร์ ESP32 ผ่าน Wi-Fi</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./firmware:/srv/firmware:ro</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./caddy/data:/data</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./caddy/config:/config</span>
+<span class="w">    </span><span class="nt">depends_on</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">backend</span>
+</code></pre></div></td></tr></table></div>
+</div>
+
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>บรรทัด</th>
+<th>โค้ด</th>
+<th>ความหมาย</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>147–149</td>
+<td><code>build: context: . dockerfile: caddy.Dockerfile</code></td>
+<td>สร้าง image จากโฟลเดอร์ <code>deploy/</code> ด้วยไฟล์ที่ระบุ</td>
+</tr>
+<tr>
+<td>150</td>
+<td><code>image: rmutt-caddy:duckdns</code></td>
+<td>ตั้งชื่อ image ที่ build ได้ (ไม่งั้นได้ชื่อสุ่มตามโปรเจกต์)</td>
+</tr>
+<tr>
+<td>154–156</td>
+<td><code>"80:80"</code>, <code>"443:443"</code></td>
+<td>เปิดสองพอร์ตให้ผู้ใช้ภายใน 80 ใช้ redirect ไป HTTPS <strong>ไม่มี 8080</strong> จึงเข้าได้เฉพาะจากกล่องในเครือข่าย Docker</td>
+</tr>
+<tr>
+<td>158–160</td>
+<td><code>DOMAIN</code>, <code>DUCKDNS_TOKEN</code></td>
+<td>เป็นตัวแปรที่ Caddyfile อ้างผ่าน <code>{$DOMAIN}</code> (ตอนอ่านไฟล์) และ <code>{env.DUCKDNS_TOKEN}</code> (ตอนรัน)</td>
+</tr>
+<tr>
+<td>163</td>
+<td><code>./Caddyfile:/etc/caddy/Caddyfile:ro</code></td>
+<td>mount ไฟล์กฎ เปลี่ยนกฎแล้ว <code>docker compose restart caddy</code> ไม่ต้อง build ใหม่</td>
+</tr>
+<tr>
+<td>164</td>
+<td><code>./www:/srv/www:ro</code></td>
+<td>โฟลเดอร์เว็บแอปที่ <code>deploy-web.ps1</code> อัปโหลดมา (<code>root * /srv/www</code>)</td>
+</tr>
+<tr>
+<td>166</td>
+<td><code>./firmware:/srv/firmware:ro</code></td>
+<td>ไฟล์ OTA สำหรับ <code>handle /firmware/*</code> (<code>root * /srv</code> + path <code>/firmware/x.bin</code> = <code>/srv/firmware/x.bin</code>)</td>
+</tr>
+<tr>
+<td>167–168</td>
+<td><code>/data</code>, <code>/config</code></td>
+<td><code>/data</code> เก็บใบรับรอง/บัญชี ACME และ access log ต้อง<strong>ไม่หาย</strong> ไม่งั้นขอใบใหม่ทุกครั้งที่สร้างกล่องจนชนข้อจำกัดอัตราของ Let's Encrypt <code>/config</code> เก็บ config ที่ Caddy ปรับอัตโนมัติ</td>
+</tr>
+<tr>
+<td>169–170</td>
+<td><code>depends_on: - backend</code></td>
+<td>รูปแบบสั้น (รอแค่เริ่ม ไม่รอ healthy)</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>ไฟล์ <code>deploy/docker-compose.yml</code> บรรทัด 172–198 (tailscale)</strong></p>
+<div class="code-block"><span class="code-lang">yaml</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="w">  </span><span class="c1"># ทางเข้าจากอินเทอร์เน็ต (Tailscale Funnel) สำหรับเว็บและแอปเท่านั้น</span>
+<span class="w">  </span><span class="c1"># - ต่อออกไปหา Tailscale เอง ไม่ต้องเปิดพอร์ตขาเข้าบน firewall ของมหาวิทยาลัย</span>
+<span class="w">  </span><span class="c1"># - โหมด userspace: ไม่ต้องใช้ /dev/net/tun หรือสิทธิ์ NET_ADMIN ไม่แตะเครือข่ายของเครื่อง</span>
+<span class="w">  </span><span class="c1"># - 443 ส่งต่อไปที่ caddy:8080 (เว็บ + /api)</span>
+<span class="w">  </span><span class="c1"># - 8443 ถอด TLS ด้วยใบรับรอง ts.net (Let's Encrypt) แล้วส่งต่อไปที่ mqtt:1883 ให้ ESP32</span>
+<span class="w">  </span><span class="c1">#   Broker ยังบังคับ username/password ของบอร์ดแต่ละตัว (allow_anonymous false)</span>
+<span class="w">  </span><span class="c1"># - ฐานข้อมูลและ SSH ไม่ถูกเปิดออก</span>
+<span class="w">  </span><span class="c1"># - ปิดได้ทันที: docker compose stop tailscale</span>
+<span class="w">  </span><span class="nt">tailscale</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">tailscale/tailscale:stable</span>
+<span class="w">    </span><span class="nt">container_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rmutt-tailscale</span>
+<span class="w">    </span><span class="nt">hostname</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rmutt-energy</span>
+<span class="w">    </span><span class="nt">restart</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">unless-stopped</span>
+<span class="w">    </span><span class="nt">logging</span><span class="p">:</span><span class="w"> </span><span class="nv">*default-logging</span>
+<span class="w">    </span><span class="nt">environment</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">TS_HOSTNAME</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rmutt-energy</span>
+<span class="w">      </span><span class="nt">TS_USERSPACE</span><span class="p">:</span><span class="w"> </span><span class="s">"true"</span>
+<span class="w">      </span><span class="nt">TS_STATE_DIR</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/var/lib/tailscale</span>
+<span class="w">      </span><span class="nt">TS_SERVE_CONFIG</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/config/serve.json</span>
+<span class="w">      </span><span class="c1"># เว้นว่างได้: ครั้งแรกให้ดูลิงก์ล็อกอินใน docker compose logs tailscale</span>
+<span class="w">      </span><span class="nt">TS_AUTHKEY</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${TS_AUTHKEY:-}</span>
+<span class="w">    </span><span class="nt">volumes</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./tailscale/state:/var/lib/tailscale</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./tailscale-serve.json:/config/serve.json:ro</span>
+<span class="w">    </span><span class="nt">depends_on</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">caddy</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mqtt</span>
+</code></pre></div></td></tr></table></div>
+</div>
+
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>บรรทัด</th>
+<th>โค้ด</th>
+<th>ความหมาย</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>172–179</td>
+<td>คอมเมนต์หัว service</td>
+<td>สรุปว่า Funnel เปิดอะไร: 443 → <code>caddy:8080</code> (เว็บและ <code>/api</code>), 8443 → ถอด TLS แล้วส่งไป <code>mqtt:1883</code> ให้ ESP32 โดย Broker ยังบังคับรหัสรายบอร์ด ส่วนฐานข้อมูลและ SSH ไม่ถูกเปิด และปิดได้ทันทีด้วย <code>stop</code></td>
+</tr>
+<tr>
+<td>181</td>
+<td><code>image: tailscale/tailscale:stable</code></td>
+<td>image ทางการ ตัวควบคุมในกล่อง (containerboot) อ่านตัวแปร <code>TS_*</code></td>
+</tr>
+<tr>
+<td>183</td>
+<td><code>hostname: rmutt-energy</code></td>
+<td>ชื่อของกล่องในเครือข่าย Docker (ส่วน <code>TS_HOSTNAME</code> คือชื่อใน tailnet ตั้งซ้ำเพื่อชัด)</td>
+</tr>
+<tr>
+<td>188</td>
+<td><code>TS_USERSPACE: "true"</code></td>
+<td>โหมด userspace (ใส่เครื่องหมายคำพูดเพราะ YAML ถ้าเขียน <code>true</code> เฉย ๆ จะเป็น boolean แต่ environment ต้องเป็นสตริง)</td>
+</tr>
+<tr>
+<td>189</td>
+<td><code>TS_STATE_DIR</code></td>
+<td>โฟลเดอร์เก็บตัวตนเครื่อง ผูกกับ volume บรรทัด 193</td>
+</tr>
+<tr>
+<td>190</td>
+<td><code>TS_SERVE_CONFIG</code></td>
+<td>path ของไฟล์ serve.json ในกล่อง (บรรทัด 194)</td>
+</tr>
+<tr>
+<td>192</td>
+<td><code>${TS_AUTHKEY:-}</code></td>
+<td>ว่างได้ ล็อกอินด้วยลิงก์ครั้งแรก</td>
+</tr>
+<tr>
+<td>195</td>
+<td><code>./tailscale-serve.json:/config/serve.json:ro</code></td>
+<td>mount ไฟล์กฎ Funnel แบบอ่านอย่างเดียว ถ้าแก้ไฟล์ต้องสร้างกล่องใหม่ (<code>up -d --force-recreate tailscale</code>) กล่องเดิมถึงจะเห็นของใหม่</td>
+</tr>
+<tr>
+<td>196–198</td>
+<td><code>depends_on: - caddy</code> และ <code>- mqtt</code></td>
+<td>ให้ปลายทางทั้งสองขึ้นก่อน Funnel เริ่มส่งต่อ: Caddy ที่ 8080 (พอร์ต 443) และ Mosquitto ที่ 1883 (พอร์ต 8443) รูปแบบสั้นรอแค่เริ่ม ไม่รอ healthy</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="4-deploycaddyfile">4) <code>deploy/Caddyfile</code><a class="anchor" href="#4-deploycaddyfile">#</a></h3>
+<p><strong>ไฟล์ <code>deploy/Caddyfile</code> บรรทัด 1–11</strong></p>
+<div class="code-block"><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span></pre></div></td><td class="code"><div><pre><span></span><code>{
+	# คำขอจาก Funnel ผ่าน container tailscale หนึ่งชั้น ให้เชื่อ X-Forwarded-For จากวงภายใน
+	# ไม่งั้น rate limit หน้า login จะนับคนนอกมหาวิทยาลัยทุกคนเป็น IP เดียวกัน
+	servers :8080 {
+		trusted_proxies static private_ranges
+	}
+}
+
+# เนื้อหาเว็บ/API ใช้ร่วมกันทั้งโดเมนหลักและทางเข้าจากอินเทอร์เน็ต (Tailscale Funnel)
+(app) {
+	encode gzip
+</code></pre></div></td></tr></table></div>
+</div>
+
+<ul>
+<li><strong>บรรทัด 1–7:</strong> บล็อกที่ไม่มีชื่อไซต์นำหน้าคือ <strong>global options</strong> ของ Caddy</li>
+<li><strong>บรรทัด 4–6:</strong> <code>servers :8080 { ... }</code> ตั้งค่าเฉพาะ listener พอร์ต 8080 <code>trusted_proxies static private_ranges</code> = เชื่อหัว forwarded จากไคลเอนต์ที่มี IP ในช่วงส่วนตัว (10/8, 172.16/12, 192.168/16 ฯลฯ) ซึ่งครอบคลุมกล่อง tailscale</li>
+<li><strong>บรรทัด 10:</strong> <code>(app) { ... }</code> วงเล็บรอบชื่อ = <strong>snippet</strong> (ชิ้นตั้งค่าที่นำกลับมาใช้ด้วย <code>import app</code>)</li>
+<li><strong>บรรทัด 11:</strong> <code>encode gzip</code> บีบอัดคำตอบ ลดข้อมูลบนมือถือ</li>
+</ul>
+<p><strong>ไฟล์ <code>deploy/Caddyfile</code> บรรทัด 20–56</strong></p>
+<div class="code-block"><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span></pre></div></td><td class="code"><div><pre><span></span><code>	header {
+		Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+		-Server
+	}
+
+	handle /api/* {
+		reverse_proxy backend:3000
+	}
+
+	# ไฟล์เฟิร์มแวร์สำหรับอัปเดต ESP32 ผ่าน Wi-Fi (OTA)
+	# วางไฟล์ .bin ไว้ที่ /opt/rmutt/firmware บนเซิร์ฟเวอร์
+	handle /firmware/* {
+		root * /srv
+		header Cache-Control "no-store"
+		file_server
+	}
+
+	handle {
+		root * /srv/www
+
+		@assets path /assets/*
+		header @assets Cache-Control "public, max-age=3600"
+
+		@html path / /index.html /status.html
+		header @html Cache-Control "no-cache"
+
+		file_server
+	}
+}
+</code></pre></div></td></tr></table></div>
+</div>
+
+<p>(ย่อคอมเมนต์ภาษาไทยบางบรรทัดออกเพื่อให้อ่านง่าย เลขบรรทัดอ้างอิงตามไฟล์จริง: <code>header</code> เริ่มบรรทัด 20, <code>handle /api/*</code> บรรทัด 29, <code>handle /firmware/*</code> บรรทัด 35, <code>handle</code> สุดท้ายบรรทัด 41, <code>@assets</code> บรรทัด 46, <code>@html</code> บรรทัด 51)</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>บรรทัด</th>
+<th>ความหมาย</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>21</td>
+<td><strong>CSP</strong> (Content-Security-Policy) บอกเบราว์เซอร์ว่าหน้าเว็บโหลดอะไรได้บ้าง: สคริปต์ได้เฉพาะไฟล์จากโดเมนเดียวกัน (<code>script-src 'self'</code>) ต่อ API ได้เฉพาะโดเมนเดียวกัน (<code>connect-src 'self'</code>) ห้ามฝังหน้านี้ใน iframe ของเว็บอื่น (<code>frame-ancestors 'none'</code>) เหตุผล: เว็บเก็บ token ใน <code>localStorage</code> ถ้ามีคนฝังสคริปต์ปลอมได้ก็ขโมย token ได้ CSP กันชั้นที่สอง</td>
+</tr>
+<tr>
+<td>22</td>
+<td><strong>HSTS</strong> บอกเบราว์เซอร์ให้ใช้ HTTPS กับโดเมนนี้ต่อไป 1 ปี (31536000 วินาที)</td>
+</tr>
+<tr>
+<td>23</td>
+<td><code>nosniff</code> ห้ามเบราว์เซอร์เดาประเภทไฟล์เอง กันไฟล์ที่ปลอมเป็นรูปแต่เป็นสคริปต์</td>
+</tr>
+<tr>
+<td>24</td>
+<td><code>Referrer-Policy</code> ลดข้อมูล URL ที่รั่วไปเว็บอื่น</td>
+</tr>
+<tr>
+<td>25</td>
+<td><code>Permissions-Policy</code> ปิดกล้อง ไมค์ ตำแหน่ง ที่เว็บนี้ไม่ใช้</td>
+</tr>
+<tr>
+<td>26</td>
+<td><code>-Server</code> เครื่องหมายลบ = ลบหัว <code>Server</code> ไม่บอกว่าใช้ Caddy</td>
+</tr>
+<tr>
+<td>29–31</td>
+<td>ทุก path ที่ขึ้นต้น <code>/api/</code> ส่งไป Backend ที่ <code>backend:3000</code> (ชื่อใน Docker DNS) <code>handle</code> เลือกบล็อกแรกที่ตรง และกฎ <code>handle</code> อื่นจะไม่ถูกลองต่อ</td>
+</tr>
+<tr>
+<td>35–39</td>
+<td><code>/firmware/*</code>: <code>root * /srv</code> (ทุก path) แล้ว <code>file_server</code> ส่งไฟล์ <code>/srv/firmware/&lt;ไฟล์&gt;.bin</code> และ <code>no-store</code> ห้ามแคชเพื่อให้บอร์ดได้ไฟล์รุ่นล่าสุดเสมอ</td>
+</tr>
+<tr>
+<td>41–55</td>
+<td><code>handle</code> ที่ไม่มี path = ที่เหลือทั้งหมด เสิร์ฟไฟล์จาก <code>/srv/www</code> (เว็บแอป)</td>
+</tr>
+<tr>
+<td>46–47</td>
+<td><code>@assets</code> คือ <strong>named matcher</strong> (ตัวจับคู่ที่ตั้งชื่อ) จับ path <code>/assets/*</code> แล้วตั้งแคช 1 ชั่วโมง</td>
+</tr>
+<tr>
+<td>51–52</td>
+<td><code>@html</code> จับหน้าเปลือก <code>/</code>, <code>/index.html</code>, <code>/status.html</code> แล้วตั้ง <code>no-cache</code> เพื่อให้เบราว์เซอร์ตรวจกับเซิร์ฟเวอร์ทุกครั้ง ไม่งั้นอัปเดตเว็บแล้วผู้ใช้ยังเห็นของเก่า</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>ไฟล์ <code>deploy/Caddyfile</code> บรรทัด 58–85</strong></p>
+<div class="code-block"><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span>
+<span class="normal">74</span>
+<span class="normal">75</span>
+<span class="normal">76</span>
+<span class="normal">77</span>
+<span class="normal">78</span></pre></div></td><td class="code"><div><pre><span></span><code>{$DOMAIN} {
+	tls {
+		dns duckdns {env.DUCKDNS_TOKEN}
+		resolvers 1.1.1.1 8.8.8.8
+		propagation_delay 60s
+		propagation_timeout -1
+	}
+
+	import app
+
+	log {
+		output file /data/access.log {
+			roll_size 10MiB
+			roll_keep 5
+		}
+	}
+}
+
+http://:8080 {
+	import app
+}
+</code></pre></div></td></tr></table></div>
+</div>
+
+<p>(ย่อคอมเมนต์ออก บรรทัดจริง: <code>{$DOMAIN} {</code> บรรทัด 58, <code>tls {</code> บรรทัด 63–69, <code>import app</code> บรรทัด 71, <code>log {</code> บรรทัด 73–78, <code>http://:8080 {</code> บรรทัด 83–85)</p>
+<ul>
+<li><strong>บรรทัด 58:</strong> <code>{$DOMAIN}</code> ตัวแปรสภาพแวดล้อมที่ Caddy แทนค่าตอน<strong>อ่านไฟล์</strong> (ต่างจาก <code>{env.X}</code> ที่แทนตอนรัน) ได้เป็น <code>rmutt-energy.duckdns.org</code> Caddy เห็นชื่อโดเมนจริงจึงขอใบรับรองเองอัตโนมัติ และเปิดพอร์ต 80 ไว้ redirect ไป HTTPS</li>
+<li><strong>บรรทัด 63–69:</strong> บล็อก <code>tls</code> บอกให้ใช้ DNS-01 ผ่านปลั๊กอิน <code>duckdns</code> (ดูหัวข้อ DuckDNS)</li>
+<li><strong>บรรทัด 71:</strong> <code>import app</code> ดึงชุดกฎร่วมมาวางตรงนี้</li>
+<li><strong>บรรทัด 73–78:</strong> บันทึก access log ลงไฟล์ <code>/data/access.log</code> (= <code>./caddy/data/access.log</code> บนเซิร์ฟเวอร์) หมุนที่ 10 MiB เก็บ 5 ไฟล์ บล็อกของ <code>:8080</code> ไม่มี log ของตัวเอง</li>
+<li><strong>บรรทัด 83:</strong> <code>http://:8080</code> ขึ้นต้น <code>http://</code> = <strong>ไม่ใช้ TLS</strong> และไม่มีชื่อโฮสต์ = รับทุกชื่อ ฟังพอร์ต 8080 การไม่ถอด TLS ที่นี่เพราะกล่อง tailscale ถอดให้แล้ว และ Caddy จะไม่พยายามขอใบรับรองหรือ redirect ไป HTTPS (ถ้าเขียนไม่มี <code>http://</code> Caddy จะพยายามเปิด HTTPS)</li>
+</ul>
+<h3 id="5-deploytailscale-servejson">5) <code>deploy/tailscale-serve.json</code><a class="anchor" href="#5-deploytailscale-servejson">#</a></h3>
+<p>อธิบายครบเป็นตารางแล้วในหัวข้อ "Tailscale ในเชิงลึก &gt; <code>tailscale-serve.json</code> ทีละบรรทัด"</p>
+<h3 id="6-deploymosquittoconfigmosquittoconf-broker-จริง">6) <code>deploy/mosquitto/config/mosquitto.conf</code> (Broker จริง)<a class="anchor" href="#6-deploymosquittoconfigmosquittoconf-broker-จริง">#</a></h3>
+<p><strong>ไฟล์ <code>deploy/mosquitto/config/mosquitto.conf</code> บรรทัด 11–38</strong></p>
+<div class="code-block"><span class="code-lang">ini</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c1"># Dynamic Security ต้องใช้กติกาเดียวกันทุก listener</span>
+<span class="na">per_listener_settings false</span>
+<span class="na">allow_anonymous false</span>
+
+<span class="na">plugin /usr/lib/mosquitto_dynamic_security.so</span>
+<span class="na">plugin_opt_config_file /mosquitto/data/dynamic-security.json</span>
+
+<span class="c1"># ภายใน docker network เท่านั้น (ไม่ publish port) ใช้โดย Backend</span>
+<span class="na">listener 1883 0.0.0.0</span>
+<span class="na">protocol mqtt</span>
+
+<span class="c1"># สำหรับ ESP32 ที่เข้ามาจากเครือข่าย ต้องเป็น TLS เสมอ</span>
+<span class="na">listener 8883 0.0.0.0</span>
+<span class="na">protocol mqtt</span>
+<span class="na">certfile /mosquitto/certs/fullchain.pem</span>
+<span class="na">keyfile /mosquitto/certs/privkey.pem</span>
+<span class="na">tls_version tlsv1.2</span>
+
+<span class="na">persistence true</span>
+<span class="na">persistence_location /mosquitto/data/</span>
+<span class="na">autosave_interval 60</span>
+
+<span class="na">log_dest stdout</span>
+<span class="na">log_type error</span>
+<span class="na">log_type warning</span>
+<span class="na">log_type notice</span>
+<span class="na">connection_messages true</span>
+</code></pre></div></td></tr></table></div>
+</div>
+
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>บรรทัด</th>
+<th>โค้ด</th>
+<th>ความหมาย</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>12</td>
+<td><code>per_listener_settings false</code></td>
+<td>ใช้การตั้งค่าความปลอดภัยชุดเดียวทั้ง Broker (ผู้ใช้และสิทธิ์ร่วมกันทุก listener) Dynamic Security กำหนดให้เป็นแบบนี้</td>
+</tr>
+<tr>
+<td>13</td>
+<td><code>allow_anonymous false</code></td>
+<td>ห้ามต่อโดยไม่ล็อกอิน</td>
+</tr>
+<tr>
+<td>15</td>
+<td><code>plugin ...mosquitto_dynamic_security.so</code></td>
+<td>โหลดปลั๊กอินจัดบัญชีขณะรัน (path ถูกเขียนทับโดย <code>init-env.sh</code> ให้ตรง image)</td>
+</tr>
+<tr>
+<td>16</td>
+<td><code>plugin_opt_config_file</code></td>
+<td>ไฟล์เก็บบัญชี/กลุ่ม/สิทธิ์ทั้งหมด ชี้ไปโฟลเดอร์ data ที่เขียนได้ Backend สั่งเพิ่ม/ลบบัญชีบอร์ดผ่าน MQTT และปลั๊กอินบันทึกลงไฟล์นี้</td>
+</tr>
+<tr>
+<td>19–20</td>
+<td><code>listener 1883 0.0.0.0</code> + <code>protocol mqtt</code></td>
+<td>ฟังทุกอินเทอร์เฟซ<strong>ในกล่อง</strong> พอร์ต 1883 ไม่เข้ารหัส ไม่ได้ publish ใน compose จึงเข้าถึงได้เฉพาะกล่องในเครือข่าย Docker (Backend และกล่อง tailscale ที่ส่งต่อพอร์ต 8443 มาที่นี่) <code>0.0.0.0</code> ต้องใช้เพราะ IP ของกล่องเปลี่ยนได้</td>
+</tr>
+<tr>
+<td>23–27</td>
+<td><code>listener 8883</code> + <code>certfile/keyfile/tls_version tlsv1.2</code></td>
+<td>listener ที่เข้ารหัส TLS สำหรับบอร์ดที่ต่อตรง (ไม่ใช่ทาง Funnel) ใช้ใบรับรองที่ <code>sync-mqtt-cert.sh</code> ก๊อปมา ขั้นต่ำ TLS 1.2 ไม่ยอมรับรุ่นเก่า</td>
+</tr>
+<tr>
+<td>29–31</td>
+<td><code>persistence true</code> ...</td>
+<td>บันทึกสถานะ (เช่น retained message, subscription ที่ค้าง) ลงดิสก์ทุก 60 วินาที รีสตาร์ท Broker แล้วสถานะล่าสุดของแต่ละบอร์ดไม่หาย</td>
+</tr>
+<tr>
+<td>34–38</td>
+<td><code>log_dest stdout</code> ...</td>
+<td>เขียน log ออกหน้าจอของกล่องอย่างเดียว ให้ Docker (<code>x-logging</code>) จัดการหมุนไฟล์ ไม่ต้องมีไฟล์ log ในกล่อง <code>connection_messages true</code> บันทึกการต่อ/หลุดของบอร์ด ใช้ดีบักได้</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Broker สำหรับพัฒนา (<code>mqtt/</code>) ต่างกันอย่างไร</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>หัวข้อ</th>
+<th>production (<code>deploy/mosquitto/...</code>)</th>
+<th>dev (<code>mqtt/config/...</code>)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ระบบบัญชี</td>
+<td>Dynamic Security (บัญชีเพิ่ม/ลบขณะรัน ทีละบอร์ด)</td>
+<td><code>password_file</code> + <code>acl_file</code> ไฟล์คงที่ มีผู้ใช้เดียว <code>rmutt_air</code> ใช้ร่วมทุกตัว</td>
+</tr>
+<tr>
+<td><code>per_listener_settings</code></td>
+<td><code>false</code></td>
+<td><code>true</code> (ตั้งสิทธิ์ต่อ listener)</td>
+</tr>
+<tr>
+<td>listener</td>
+<td>1883 (ภายใน) + 8883 (TLS)</td>
+<td>1883 อย่างเดียว ไม่เข้ารหัส</td>
+</tr>
+<tr>
+<td>publish พอร์ต</td>
+<td>เฉพาะ 8883</td>
+<td><code>1883:1883</code> เปิดให้ ESP32 ใน Wi-Fi เดียวกัน</td>
+</tr>
+<tr>
+<td>ใบรับรอง</td>
+<td>จาก Caddy/Let's Encrypt</td>
+<td>ไม่มี</td>
+</tr>
+<tr>
+<td>log</td>
+<td>stdout อย่างเดียว</td>
+<td>stdout + ไฟล์ <code>/mosquitto/log/mosquitto.log</code></td>
+</tr>
+<tr>
+<td>สิทธิ์</td>
+<td>แต่ละบอร์ดเห็นเฉพาะ topic ตัวเอง</td>
+<td><code>rmutt_air</code> อ่านเขียน <code>rmutt/ac/#</code> และ <code>rmutt/occupancy/#</code> ได้ทั้งหมด อ่าน <code>$SYS/#</code></td>
+</tr>
+<tr>
+<td>healthcheck</td>
+<td>ทุก 30 วินาที</td>
+<td>ทุก 10 วินาที (<code>start_period: 5s</code>)</td>
+</tr>
+</tbody>
+</table></div>
+<div class="callout note"><div class="callout-title">หมายเหตุ</div><p>บอร์ดที่ต่อผ่าน Funnel 8443 เข้ามาที่ listener 1883 ตัวเดียวกับที่ Backend ใช้ แต่ไม่ได้ข้ามการล็อกอิน เพราะ <code>allow_anonymous false</code> กับ <code>per_listener_settings false</code> (บรรทัด 12–13) ทำให้กติกาชุดเดียวใช้กับทุก listener ทุกการเชื่อมต่อต้องมี username/password ของบัญชี Dynamic Security และเห็นเฉพาะ topic ของตัวเอง</p></div>
+
+<p>เหตุผล: ตอนพัฒนาบนเครื่องตัวเอง ต้องการความง่าย (ไม่มีโดเมนจึงไม่มี TLS, ตั้งสคริปต์ครั้งเดียว) ส่วนของจริงต้องการความปลอดภัยรายอุปกรณ์ ถ้าบอร์ดตัวหนึ่งถูกเจาะ ก็สั่งแอร์ห้องอื่นไม่ได้ ไฟล์ ACL ที่ใช้ใน dev (<code>topic readwrite rmutt/ac/#</code>) ให้สิทธิ์กว้างเพราะมีผู้ใช้เดียว</p>
+<h3 id="7-deploycaddydockerfile-และ-deploybackenddockerfile">7) <code>deploy/caddy.Dockerfile</code> และ <code>deploy/backend.Dockerfile</code><a class="anchor" href="#7-deploycaddydockerfile-และ-deploybackenddockerfile">#</a></h3>
+<p><strong>ไฟล์ <code>deploy/caddy.Dockerfile</code> บรรทัด 6–10</strong></p>
+<div class="code-block"><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span></pre></div></td><td class="code"><div><pre><span></span><code>FROM caddy:2-builder AS builder
+RUN xcaddy build --with github.com/caddy-dns/duckdns
+
+FROM caddy:2
+COPY --from=builder /usr/bin/caddy /usr/bin/caddy
+</code></pre></div></td></tr></table></div>
+</div>
+
+<ul>
+<li><strong>บรรทัด 6:</strong> <code>FROM caddy:2-builder AS builder</code> เริ่มขั้นแรก ใช้ image ที่มีเครื่องมือ <code>xcaddy</code> และ Go ตั้งชื่อขั้นว่า <code>builder</code></li>
+<li><strong>บรรทัด 7:</strong> <code>xcaddy build --with &lt;module&gt;</code> คอมไพล์ Caddy ใหม่พร้อมปลั๊กอิน (Caddy ไม่โหลดปลั๊กอินตอนรัน ต้องคอมไพล์รวม)</li>
+<li><strong>บรรทัด 9:</strong> <code>FROM caddy:2</code> เริ่มขั้นที่สอง ใช้ image Caddy ตัวจริงที่เล็กกว่า (ไม่มี Go)</li>
+<li><strong>บรรทัด 10:</strong> <code>COPY --from=builder</code> เอาเฉพาะไฟล์ไบนารี <code>caddy</code> จากขั้นแรกมาทับของเดิม</li>
+</ul>
+<p>นี่คือ <strong>multi-stage build</strong>: image สุดท้ายไม่แบกเครื่องมือ build ขนาดหลายร้อย MB และไม่เสียความปลอดภัย</p>
+<p><strong>ไฟล์ <code>deploy/backend.Dockerfile</code> บรรทัด 1–24</strong></p>
+<div class="code-block"><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span></pre></div></td><td class="code"><div><pre><span></span><code>FROM node:22-alpine
+
+ENV NODE_ENV=production
+ENV TZ=Asia/Bangkok
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci --omit=dev
+
+COPY . .
+
+# ไฟล์ที่ scp ขึ้นมาจาก Windows อาจได้สิทธิ์ 700 (อ่านได้แค่เจ้าของ)
+# ถ้าไม่ปรับ user node จะเปิด /app/src ไม่ได้และขึ้น Cannot find module
+# ให้อ่านได้อย่างเดียว ไฟล์ยังเป็นของ root ทำให้แก้โค้ดใน container ไม่ได้
+# ปรับเฉพาะซอร์สของเรา ไม่แตะ node_modules (หลายพันไฟล์ ช้ามากและสิทธิ์ถูกอยู่แล้ว)
+RUN chmod -R a+rX src scripts database
+
+# รันด้วย user ธรรมดาที่ image เตรียมไว้ ไม่ใช่ root
+# ถ้าวันหนึ่ง Backend มีช่องโหว่ คนร้ายจะได้สิทธิ์แค่ user นี้ใน container
+USER node
+
+EXPOSE 3000
+CMD ["node", "src/server.js"]
+</code></pre></div></td></tr></table></div>
+</div>
+
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>บรรทัด</th>
+<th>ความหมาย</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>ฐานเป็น Node 22 บน Alpine Linux (ระบบขนาดเล็ก image เล็ก)</td>
+</tr>
+<tr>
+<td>3–4</td>
+<td>ตั้ง environment ถาวรใน image: โหมด production และเขตเวลาไทย</td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>WORKDIR /app</code> โฟลเดอร์ทำงานในกล่อง คำสั่งถัดไปรันที่นี่</td>
+</tr>
+<tr>
+<td>8–9</td>
+<td>คัดลอกเฉพาะ <code>package.json</code>/<code>package-lock.json</code> ก่อน แล้ว <code>npm ci --omit=dev</code> (ติดตั้งตาม lock เป๊ะ ข้าม devDependencies) <strong>ทำไมแยกเป็นสองขั้น</strong>: Docker แคชทีละคำสั่ง ถ้าเราแก้แค่โค้ด (ไม่แตะ package) ขั้นติดตั้ง dependency ไม่ต้องรันใหม่ build เร็วขึ้นมาก</td>
+</tr>
+<tr>
+<td>11</td>
+<td><code>COPY . .</code> คัดลอกโค้ดทั้งหมดที่เหลือ (<code>backend/.dockerignore</code> กัน <code>.env</code>, <code>node_modules</code>, <code>test</code> ไม่ให้ติดเข้า image) ไฟล์ที่คัดลอกเข้ามาเป็นของ root และเก็บสิทธิ์ตามไฟล์ต้นทาง</td>
+</tr>
+<tr>
+<td>13–17</td>
+<td><code>RUN chmod -R a+rX src scripts database</code> (คำสั่งอยู่บรรทัด 17 คอมเมนต์อธิบายบรรทัด 13–16) ไฟล์ที่ <code>scp</code> ขึ้นเซิร์ฟเวอร์จาก Windows อาจได้สิทธิ์ 700 (เจ้าของอ่านได้คนเดียว) และ <code>COPY . .</code> ก็เก็บสิทธิ์นั้นเข้า image ถ้าไม่แก้ user <code>node</code> จะเปิด <code>/app/src</code> ไม่ได้ และ Backend ขึ้น <code>Cannot find module</code> <code>a+rX</code> แปลว่า "ทุกคน (<code>a</code>) เพิ่มสิทธิ์อ่าน (<code>r</code>) และสิทธิ์เข้าโฟลเดอร์ (<code>X</code> ตัวใหญ่ = เติมสิทธิ์ execute เฉพาะโฟลเดอร์และไฟล์ที่เดิมมี execute อยู่แล้ว)" ไม่ให้สิทธิ์เขียน และไฟล์ยังเป็นของ root จึงแก้โค้ดใน container ไม่ได้ ทำเฉพาะ <code>src scripts database</code> ไม่แตะ <code>node_modules</code> เพราะมีหลายพันไฟล์ (ช้ามาก) และสิทธิ์ถูกอยู่แล้ว คำสั่งต้องอยู่<strong>ก่อน</strong> <code>USER node</code> เพราะการเปลี่ยนสิทธิ์ไฟล์ต้องรันเป็น root</td>
+</tr>
+<tr>
+<td>19–21</td>
+<td><code>USER node</code> (บรรทัด 21) เปลี่ยนไปเป็นผู้ใช้ที่ไม่มีสิทธิ์สูง ถ้า Backend ถูกเจาะ ผู้โจมตีไม่ได้เป็น root ในกล่อง</td>
+</tr>
+<tr>
+<td>23</td>
+<td><code>EXPOSE 3000</code> เป็นแค่เอกสารบอกว่ากล่องฟังพอร์ตนี้ ไม่ได้เปิดพอร์ตจริง (compose ไม่ publish)</td>
+</tr>
+<tr>
+<td>24</td>
+<td><code>CMD [...]</code> คำสั่งที่รันตอนเริ่มกล่อง รูปแบบ array ให้ Node เป็นโปรเซสหลัก (รับสัญญาณ <code>docker stop</code> ได้ตรง)</td>
+</tr>
+</tbody>
+</table></div>
+<div class="callout note"><div class="callout-title">หมายเหตุ</div><p>ใน compose service <code>backend</code> ใช้ <code>build: ./backend</code> แปลว่า Docker มองหา <code>backend/Dockerfile</code> ไม่ได้อ่าน <code>deploy/backend.Dockerfile</code> โดยตรง สคริปต์ <code>upload.ps1</code> / <code>update-remote.sh</code> ก๊อปไฟล์นี้ไปเป็น <code>backend/Dockerfile</code> บนเซิร์ฟเวอร์ให้ก่อน build และ <code>backend/.dockerignore</code> กันไฟล์ <code>.env</code>, <code>node_modules</code>, <code>test</code> ไม่ให้ติดเข้า image</p></div>
+
+<h2 id="เส้นทางของคำขอ-request-journeys">เส้นทางของคำขอ (Request journeys)<a class="anchor" href="#เส้นทางของคำขอ-request-journeys">#</a></h2>
+<h3 id="1-มือถือนอกมหาวิทยาลัย-ผ่าน-tsnet">1) มือถือนอกมหาวิทยาลัย ผ่าน ts.net<a class="anchor" href="#1-มือถือนอกมหาวิทยาลัย-ผ่าน-tsnet">#</a></h3>
+<div class="code-block"><div class="hl"><pre><span></span><code> แอป Flutter (4G)
+   │ 1. DNS: rmutt-energy.tailb292b4.ts.net → IP ของ Funnel relay
+   │ 2. HTTPS 443  POST /api/auth/login   (TLS ถึงกล่อง tailscale ของเรา)
+   ▼
+ Funnel relay ──(ท่อที่กล่อง tailscale ต่อออกไปค้างไว้)──▶ กล่อง tailscale
+   │ 3. กล่อง tailscale ถอด TLS ตาม serve.json (TCP 443 HTTPS)
+   │    ใส่ X-Forwarded-For: &lt;IP มือถือ&gt;
+   │ 4. Proxy → http://caddy:8080
+   ▼
+ Caddy (:8080)   trusted_proxies เชื่อ XFF จากวงส่วนตัว, ต่อท้าย IP ของ tailscale
+   │ 5. path /api/* → reverse_proxy backend:3000  (ใส่หัวความปลอดภัยก่อนตอบ)
+   ▼
+ Backend (:3000) trust proxy = 2 → req.ip = IP จริงของมือถือ → นับ rate limit รายคน
+   │ 6. query ที่ db:3306 (MariaDB) ตรวจรหัสผ่านแล้วออก JWT
+   ▼
+ คำตอบย้อนทางเดิมทั้งหมด (backend → caddy → tailscale → relay → มือถือ)
+</code></pre></div>
+</div>
+
+<h3 id="2-เบราว์เซอร์ในอาคาร-ผ่าน-duckdns">2) เบราว์เซอร์ในอาคาร ผ่าน DuckDNS<a class="anchor" href="#2-เบราว์เซอร์ในอาคาร-ผ่าน-duckdns">#</a></h3>
+<div class="code-block"><div class="hl"><pre><span></span><code> เบราว์เซอร์ในอาคาร (Wi-Fi/LAN มหาวิทยาลัย)
+   │ 1. DNS: rmutt-energy.duckdns.org → 10.x (IP ภายในของเซิร์ฟเวอร์)
+   │ 2. HTTPS 443 → เซิร์ฟเวอร์ 10.x (ไม่ผ่านอินเทอร์เน็ต อยู่ในวงเดียวกัน)
+   ▼
+ Caddy (:443) ถอด TLS ด้วยใบ Let's Encrypt ที่ขอด้วย DNS-01
+   │ 3. path /          → ไฟล์เว็บจาก /srv/www (index.html)
+   │    path /assets/*  → ไฟล์ CSS/JS (แคช 1 ชม.)
+   │    path /api/*     → reverse_proxy backend:3000   (XFF ชั้นเดียว)
+   ▼
+ Backend → db / mqtt (ภายในเครือข่าย Docker)
+</code></pre></div>
+</div>
+
+<p>เว็บเรียก <code>/api/...</code> แบบ path สัมพัทธ์ (<code>API_BASE = '/api'</code>) จึงกลับมาที่โดเมนเดิมเสมอ</p>
+<h3 id="3-esp32-ต่อ-mqtts-ผ่าน-funnel-8443-ค่าเริ่มต้น">3) ESP32 ต่อ MQTTS ผ่าน Funnel 8443 (ค่าเริ่มต้น)<a class="anchor" href="#3-esp32-ต่อ-mqtts-ผ่าน-funnel-8443-ค่าเริ่มต้น">#</a></h3>
+<div class="code-block"><div class="hl"><pre><span></span><code> ESP32 (Wi-Fi ที่ไหนก็ได้ ขอแค่ออกอินเทอร์เน็ตได้)
+   │ 1. ensureClockSynced(): NTP (pool.ntp.org / time.google.com) ให้ได้เวลาจริงก่อน
+   │ 2. DNS: rmutt-energy.tailb292b4.ts.net → IP ของ Funnel relay
+   │ 3. TCP 8443 → TLS handshake  (ตรวจสาย cert ด้วย LETSENCRYPT_CA ที่ฝังในเฟิร์มแวร์
+   │                               + ชื่อโฮสต์ ts.net + วันหมดอายุ)
+   ▼
+ Funnel relay ──(ท่อที่กล่อง tailscale ต่อออกไปค้างไว้)──▶ กล่อง tailscale
+   │ 4. กล่อง tailscale ถอด TLS ด้วยใบ ts.net ตาม serve.json (TerminateTLS ที่พอร์ต 8443)
+   │ 5. TCPForward → mqtt:1883 (MQTT ดิบ ภายในเครือข่าย Docker)
+   ▼
+ Mosquitto listener 1883  (ไม่ผ่าน Caddy)
+   │ 6. MQTT CONNECT: client id "rmutt-&lt;deviceId&gt;", username/password ของบอร์ดนั้น
+   │ 7. Dynamic Security ตรวจ → ไม่ผ่านถูกตัดการเชื่อมต่อ / ผ่านอนุญาตเฉพาะ topic ของบอร์ดตัวเอง
+   │ 8. publish สถานะ / subscribe คำสั่ง (rmutt/ac/...)
+   ▼
+ Backend (ต่อ mqtt://mqtt:1883 ภายใน) รับ-ส่งข้อความเดียวกันผ่าน Broker
+</code></pre></div>
+</div>
+
+<p>ทาง OTA ของบอร์ดที่ใช้ชื่อ ts.net ก็ผ่าน Funnel เช่นกันแต่เป็นพอร์ต 443: <code>https://rmutt-energy.tailb292b4.ts.net/firmware/&lt;ไฟล์&gt;.bin</code> → Funnel 443 → <code>caddy:8080</code> → <code>handle /firmware/*</code></p>
+<h3 id="4-esp32-ในอาคาร-ต่อ-mqtts-8883-ตรง-ทางเลือก-ตั้ง-mqtt_device_urlmqttsltdomaingt8883">4) ESP32 ในอาคาร ต่อ MQTTS 8883 ตรง (ทางเลือก ตั้ง <code>MQTT_DEVICE_URL=mqtts://&lt;DOMAIN&gt;:8883</code>)<a class="anchor" href="#4-esp32-ในอาคาร-ต่อ-mqtts-8883-ตรง-ทางเลือก-ตั้ง-mqtt_device_urlmqttsltdomaingt8883">#</a></h3>
+<div class="code-block"><div class="hl"><pre><span></span><code> ESP32 (Wi-Fi อาคาร)
+   │ 1. ensureClockSynced(): NTP ให้ได้เวลาจริงก่อน
+   │ 2. DNS: rmutt-energy.duckdns.org → 10.x
+   │ 3. TCP 8883 → TLS handshake  (ตรวจสาย cert ด้วย LETSENCRYPT_CA + ชื่อโฮสต์ + วันหมดอายุ)
+   ▼
+ Mosquitto listener 8883  (ใช้ fullchain.pem/privkey.pem ที่ sync-mqtt-cert.sh ก๊อปจาก Caddy)
+   │ 4. MQTT CONNECT ด้วย username/password ของบอร์ด → Dynamic Security ตรวจ
+   │ 5. publish สถานะ / subscribe คำสั่ง (rmutt/ac/...)
+   ▼
+ Backend (ต่อ mqtt://mqtt:1883 ภายใน)
+</code></pre></div>
+</div>
+
+<p>ทางนี้ไม่ผ่าน Caddy และไม่ผ่าน Funnel เลย บอร์ดนอกอาคารจึงต่อไม่ได้ ซึ่งเป็นเหตุผลที่ค่าเริ่มต้นเปลี่ยนไปใช้ Funnel 8443</p>
+<h3 id="5-ผู้ดูแลเข้า-mariadb-ผ่านอุโมงค์-ssh">5) ผู้ดูแลเข้า MariaDB ผ่านอุโมงค์ SSH<a class="anchor" href="#5-ผู้ดูแลเข้า-mariadb-ผ่านอุโมงค์-ssh">#</a></h3>
+<div class="code-block"><div class="hl"><pre><span></span><code> Windows ของผู้ดูแล (HeidiSQL)                       เซิร์ฟเวอร์ 10.x
+   │ db-tunnel.ps1:
+   │ 1. ssh อ่านรหัสผ่าน: grep DB_PASSWORD /opt/rmutt/.env  (คัดลอกลงคลิปบอร์ด)
+   │ 2. ssh -N -p &lt;port&gt; -L 3307:127.0.0.1:3306 &lt;user&gt;@&lt;host&gt;
+   │      เปิดพอร์ต 3307 บน Windows → ส่งผ่านช่อง SSH (พอร์ต 22, เข้ารหัส)
+   ▼
+ HeidiSQL → 127.0.0.1:3307 ═══ SSH ═══▶ sshd ──▶ 127.0.0.1:3306 (compose: "127.0.0.1:3306:3306")
+                                                        │
+                                                        ▼
+                                                    กล่อง db (MariaDB)
+</code></pre></div>
+</div>
+
+<ul>
+<li>ต้องใช้ผู้ใช้ SSH ที่เข้าเซิร์ฟเวอร์ได้ (ในเครือข่ายมหาวิทยาลัย) พอร์ต 3306 ไม่เปิดให้ใครอื่น</li>
+<li>สคริปต์ใช้บัญชี <code>DB_USER</code> ของแอป (สิทธิ์เฉพาะฐานเดียว) ถ้า <code>.env</code> รุ่นเก่าไม่มี จึงถอยไปใช้ <code>root</code></li>
+<li>ใน HeidiSQL ต้องปิดแท็บ SSH tunnel ของโปรแกรม เพราะอุโมงค์ถูกเปิดไว้แล้วโดยสคริปต์ (host เป็น <code>127.0.0.1</code> port <code>3307</code>)</li>
+<li>พอร์ต 3307 ใช้เพราะบนเครื่อง Windows อาจมี MariaDB/MySQL ของตัวเองครอง 3306 อยู่</li>
+</ul>
+<h2 id="หลักการเขียนโค้ดที่ใช้ในส่วนนี้">หลักการเขียนโค้ดที่ใช้ในส่วนนี้<a class="anchor" href="#หลักการเขียนโค้ดที่ใช้ในส่วนนี้">#</a></h2>
+<ul>
+<li><strong>Least exposure (เปิดให้น้อยที่สุด)</strong> <code>docker-compose.yml</code>: publish แค่ 80, 443, 8883, และ 3306 ที่ผูก <code>127.0.0.1</code> ส่วนที่เหลือคุยกันในเครือข่าย Docker ทางเข้า Funnel ก็เปิดแค่สองปลายทางคือ <code>caddy:8080</code> (พอร์ต 443) กับ <code>mqtt:1883</code> (พอร์ต 8443 ซึ่งยังต้องล็อกอินด้วยบัญชีรายบอร์ด) ถ้ามีช่องโหว่ใน Backend ผู้โจมตียังเข้าฐานข้อมูลตรง ๆ จากอินเทอร์เน็ตไม่ได้</li>
+<li><strong>Least privilege (สิทธิ์น้อยที่สุด)</strong> <code>backend.Dockerfile</code> ใช้ <code>USER node</code>; MariaDB แยก user ของแอปที่มีสิทธิ์เฉพาะฐานข้อมูล ไม่ใช้ root; กล่องที่ mount config ใช้ <code>:ro</code>; tailscale ใช้ userspace ไม่ขอ <code>NET_ADMIN</code>; บอร์ดแต่ละตัวมีบัญชี MQTT ของตัวเอง</li>
+<li><strong>Secrets แยกออกจากโค้ด</strong> รหัสผ่านทุกตัวอยู่ใน <code>.env</code> (ไม่ commit; <code>init-env.sh</code> สุ่มให้) compose อ้างด้วย <code>${...}</code>; ส่งเข้าแต่ละกล่องเฉพาะที่ใช้ ลดความเสียหายถ้ากล่องใดถูกเจาะ</li>
+<li><strong>Reverse proxy เป็นประตูเดียว</strong> (Caddy) เก็บ TLS, หัวความปลอดภัย, การแยก path ไว้ที่เดียว Backend ไม่ต้องรู้เรื่อง TLS และไม่ต้องเปิดตรงสู่ภายนอก</li>
+<li><strong>ถอด TLS ที่ขอบ (TLS termination)</strong> <code>deploy/tailscale-serve.json</code>: กล่อง tailscale ถอด TLS ทั้งพอร์ต 443 (ส่ง HTTP ไป Caddy) และพอร์ต 8443 (ส่ง MQTT ดิบไป Mosquitto 1883) ชั้นในจึงไม่ต้องดูแลใบรับรองของชื่อ ts.net เอง ข้อแลกเปลี่ยนคือช่วงสุดท้ายไม่เข้ารหัส ต้องจำกัดให้อยู่ในเครือข่าย Docker ภายในเครื่อง</li>
+<li><strong>DRY ด้วย snippet / anchor</strong> <code>(app)</code> ใน Caddyfile และ <code>&amp;default-logging</code> ใน compose เขียนครั้งเดียวใช้หลายที่ ลดโอกาสที่สองทางเข้าจะต่างกันโดยไม่ตั้งใจ</li>
+<li><strong>Defense in depth (ป้องกันหลายชั้น)</strong> CSP + HSTS + <code>nosniff</code> + CORS allow-list + rate limit + JWT ไม่พึ่งชั้นเดียว</li>
+<li><strong>Declarative infrastructure</strong> ระบบทั้งหมดอธิบายเป็นไฟล์ (compose, Caddyfile, serve.json) สร้างใหม่ได้ด้วย <code>docker compose up -d</code> สถานะที่ต้องเก็บมีแค่ volume (<code>db/data</code>, <code>caddy/data</code>, <code>mosquitto/data</code>, <code>tailscale/state</code>) ซึ่งเป็นสิ่งที่ต้องสำรอง</li>
+<li><strong>Healthcheck + depends_on condition</strong> ให้ลำดับเริ่มระบบรอจนบริการพร้อมจริง ไม่ใช่แค่เริ่มทำงาน</li>
+<li><strong>ไม่ผูกที่อยู่กับโค้ด</strong> ใช้ชื่อ service ภายใน Docker, <code>{$DOMAIN}</code> ใน Caddyfile, <code>/api</code> สัมพัทธ์ในเว็บ และ <code>--dart-define</code> ในแอป ย้ายโดเมนแล้วแก้ที่เดียว</li>
+<li><strong>Fail-safe default</strong> ถ้า <code>TRUST_PROXY</code> ว่าง = ไม่เชื่อ XFF เลย (<code>config.js</code>) ค่าเริ่มต้นเลือกด้านปลอดภัย</li>
+</ul>
+<h2 id="คำถามที่อาจารย์อาจถาม">คำถามที่อาจารย์อาจถาม<a class="anchor" href="#คำถามที่อาจารย์อาจถาม">#</a></h2>
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ทำไมต้องใช้ Tailscale ทำไมไม่ขอเปิดพอร์ตจากฝ่ายไอทีไปเลย</strong>
+เซิร์ฟเวอร์อยู่หลัง firewall ของมหาวิทยาลัยที่ไม่ให้ต่อขาเข้า และเราต้องการให้เจ้าหน้าที่เปิดแอปจากนอกมหาวิทยาลัยได้ รวมทั้งให้บอร์ด ESP32 ที่ต่อ Wi-Fi ข้างนอกต่อ MQTT เข้ามาได้ การขอเปิดพอร์ตเป็นทางที่ตรงที่สุดและดีในระยะยาว แต่ต้องผ่านขั้นตอนและนโยบายของไอที ซึ่งเราควบคุมไม่ได้ Tailscale Funnel ให้กล่อง Docker ต่อ "ออก" ไปหา Tailscale เอง ซึ่ง firewall อนุญาตอยู่แล้ว ผู้ใช้จึงเข้ามาทางท่อนั้นได้โดยไม่ต้องเปิดพอร์ตขาเข้า ได้ HTTPS ที่ถูกต้อง ฟรี และปิดได้ทันทีด้วย <code>docker compose stop tailscale</code> ถ้าภายหลังไอทีเปิดพอร์ตให้ ก็ถอด Funnel ออกแล้วใช้โดเมนของมหาวิทยาลัยได้</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>Funnel กับ Serve ต่างกันอย่างไร และ Funnel ปลอดภัยไหม</strong>
+Serve เปิดให้เฉพาะเครื่องใน tailnet ส่วน Funnel เปิดให้ทั้งอินเทอร์เน็ต เราเปิดสองทาง: เว็บและ API (พอร์ต 443 → <code>caddy:8080</code>) และ MQTT ของบอร์ด (พอร์ต 8443 → <code>mqtt:1883</code>) ฐานข้อมูลและ SSH ไม่ถูกเปิด ทางเว็บป้องกันที่ชั้นแอป: HTTPS, JWT, rate limit การล็อกอิน (10 ครั้ง/15 นาที), CSP, และ CORS ทาง MQTT ป้องกันด้วย TLS ที่พอร์ต 8443 และบัญชี Dynamic Security รายบอร์ด (<code>allow_anonymous false</code> บอร์ดเห็นเฉพาะ topic ของตัวเอง) ความเสี่ยงที่ยอมรับคือใครก็ลองเรียก API หรือลองต่อ MQTT ได้ จึงต้องพึ่งการยืนยันตัวตนและรหัสรายบอร์ดที่เดายาก ส่วน MQTT ยังไม่มี rate limit ต่อ IP ถ้าไม่อยากรับความเสี่ยงนี้ ตั้ง <code>MQTT_DEVICE_URL=mqtts://&lt;DOMAIN&gt;:8883</code> ให้บอร์ดต่อตรงในอาคารแทน</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>เซิร์ฟเวอร์ไม่มี IP สาธารณะ Funnel เข้ามาถึงได้อย่างไร</strong>
+กล่อง tailscale ในเซิร์ฟเวอร์สร้างการเชื่อมต่อขาออกไปหา Tailscale แล้วค้างไว้ DNS ของชื่อ ts.net ชี้ไป relay ของ Tailscale เมื่อผู้ใช้เข้ามา relay ส่งต่อผ่านการเชื่อมต่อที่ค้างไว้นั้น เรียกว่าเป็นการต่อ "ย้อนท่อ" firewall เห็นเป็นทราฟฟิกขาออกจึงไม่ปิดกั้น</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ทำไม <code>TRUST_PROXY</code> เป็น 2 ค่า 1 หรือ true ได้ไหม</strong>
+ได้ แต่จะผิด ทางโดเมนหลักผ่าน Caddy ชั้นเดียว ทาง Funnel ผ่านสองชั้น (tailscale แล้ว Caddy) ถ้าตั้ง 1 คำขอผ่าน Funnel จะได้ IP ของกล่อง tailscale เป็น <code>req.ip</code> ทุกคนถูกนับเป็นคนเดียว rate limit ล็อกอินจะทำให้ใครพิมพ์ผิด 10 ครั้งแล้วล็อกทั้งระบบ ถ้าตั้งมากกว่าจริง ผู้โจมตีปลอมหัว XFF เปลี่ยน IP หนี rate limit ได้ <code>true</code> จะถูก <code>config.js</code> แปลงเป็น 1 เพราะ express-rate-limit ไม่ยอมรับ true</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ทำไมต้องใช้ DuckDNS + DNS-01 ทำไมไม่ใช้ HTTP-01 ซึ่งง่ายกว่า</strong>
+HTTP-01 ให้ Let's Encrypt ต่อเข้าพอร์ต 80 ของเซิร์ฟเวอร์ แต่โดเมนของเราชี้ไป IP ภายใน 10.x และ firewall ปิดขาเข้า จึงต่อไม่ถึง DNS-01 พิสูจน์ด้วย TXT record ที่เขียนผ่าน API ของ DuckDNS เป็นการเชื่อมต่อขาออกทั้งหมด เราจึงได้ใบรับรองที่ถูกต้องโดยไม่เปิดพอร์ต ต้อง build Caddy ใหม่ให้มีปลั๊กอิน DuckDNS</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ทำไมโดเมนชี้ไป IP ภายใน แล้วยังต้องมีโดเมน</strong>
+ใบรับรอง TLS ออกให้ชื่อโดเมน ไม่ออกให้ IP ส่วนตัว บอร์ดและเบราว์เซอร์ตรวจว่าชื่อตรงกับใบ และถ้า IP เซิร์ฟเวอร์เปลี่ยน แก้ที่ DuckDNS ที่เดียว บอร์ดไม่ต้องตั้งใหม่ ชื่อนี้ใช้ได้เฉพาะในตึก ส่วนนอกตึกใช้ ts.net (แอป และบอร์ดตามค่าเริ่มต้นปัจจุบัน)</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ทำไม ESP32 ต่อ MQTT ผ่าน Funnel และทำไมเป็นพอร์ต 8443</strong>
+เดิมบอร์ดต่อ <code>rmutt-energy.duckdns.org:8883</code> แต่โดเมน DuckDNS ชี้ไป IP ภายใน 10.x บอร์ดที่ต่อ Wi-Fi นอกมหาวิทยาลัยจึงหา Broker ไม่เจอ ชื่อ ts.net ของ Funnel ชี้ไปที่ relay สาธารณะ เข้าได้จากทุกเครือข่าย และกล่อง tailscale เป็นฝ่ายต่อออกไปหา relay เอง จึงไม่ต้องขอเปิดพอร์ตขาเข้า Funnel รองรับพอร์ต TCP ได้ด้วย แต่เปิดสู่สาธารณะได้เฉพาะ 443, 8443 และ 10000 พอร์ต 443 เว็บใช้อยู่แล้ว และ 8883 ไม่อยู่ในรายการ จึงเลือก 8443 สำหรับ MQTT บอร์ดต่อ <code>rmutt-energy.tailb292b4.ts.net:8443</code> ได้จากทุกที่ ส่วนบอร์ดในอาคารยังต่อตรง 8883 ได้ถ้าตั้ง <code>MQTT_DEVICE_URL</code></p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ทำไมถอด TLS ที่กล่อง tailscale (<code>TerminateTLS</code>) ไม่ใช้ใบรับรองของ Mosquitto ที่ 8883</strong>
+บอร์ดตรวจว่าชื่อในใบรับรองตรงกับชื่อที่ต่อ ใบของ Mosquitto ออกให้ <code>rmutt-energy.duckdns.org</code> แต่บอร์ดต่อชื่อ ts.net ถ้าส่งต่อ TLS ดิบ (<code>TCPForward</code> อย่างเดียว) ไป 8883 บอร์ดจะเห็นใบผิดชื่อและปฏิเสธ จึงให้กล่อง tailscale ถอด TLS ด้วยใบ ts.net ของตัวเอง (ออกโดย Let's Encrypt จึงตรงกับใบรากที่ฝังในเฟิร์มแวร์ ไม่ต้องแฟลชใหม่) แล้วส่ง MQTT ดิบไป <code>mqtt:1883</code> ซึ่ง Backend ใช้อยู่แล้ว ไม่ต้องแก้ Mosquitto และไม่ต้องก๊อปใบด้วย cron ข้อแลกเปลี่ยนคือช่วงสุดท้ายไม่เข้ารหัส แต่วิ่งในเครือข่าย Docker ของเครื่องเดียว และบอร์ดยังต้องล็อกอินด้วยบัญชีรายตัว</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ใบรับรองหมดอายุจะเกิดอะไรขึ้น</strong>
+Caddy ต่ออายุเองด้วย DNS-01 ส่วน Mosquitto ใช้ใบเดียวกันแต่ต้องมีคนก๊อปให้ จึงมี cron <code>sync-mqtt-cert.sh</code> ทุกวัน 03:10 ที่ก๊อปเมื่อใบเปลี่ยนแล้วส่ง SIGHUP ให้ Mosquitto โหลดใหม่โดยไม่ตัดการเชื่อมต่อบอร์ด ถ้าไม่ทำ บอร์ดที่ต่อตรง 8883 ทุกตัวจะต่อ MQTTS ไม่ได้พร้อมกันเมื่อใบเก่าหมด (บอร์ดที่ต่อผ่าน Funnel 8443 ใช้ใบ ts.net ที่กล่อง tailscale จัดการเอง จึงไม่เกี่ยวกับ cron นี้) นอกจากนี้บอร์ดฝังใบรากของ Let's Encrypt (ISRG Root X1 และ X2) ซึ่งหมดอายุ 2035 และ 2040 จึงไม่ต้องแฟลชใหม่ตามรอบ 90 วัน</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ทำไมฐานข้อมูลเปิด <code>127.0.0.1:3306</code> ไม่ปิดไปเลย</strong>
+ผู้ดูแลต้องดูและแก้ข้อมูลด้วย HeidiSQL การเปิดเฉพาะ loopback ของเซิร์ฟเวอร์แล้วเข้าผ่านอุโมงค์ SSH ทำให้ต้องผ่านการยืนยันตัวตน SSH ก่อน และไม่มีใครในเครือข่าย 10.x ต่อ 3306 ตรง ๆ ได้ ปิดไปเลยก็ทำให้ดูแลยาก</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ทำไมไม่ส่ง <code>.env</code> ทั้งไฟล์ให้ Backend</strong>
+<code>.env</code> มีรหัส root ของฐานข้อมูล, token DuckDNS, authkey Tailscale และรหัสแอดมินตัวแรกซึ่ง Backend ไม่ได้ใช้ ถ้าส่งทั้งไฟล์ ใครที่เจาะ Backend ได้หรือรัน <code>docker inspect</code> จะเห็นความลับเหล่านั้น เราจึงใส่ทีละตัวใน <code>environment:</code> ของ service</p></div>
+
+<h2 id="สรุปและเช็กลิสต์ความเข้าใจ">สรุปและเช็กลิสต์ความเข้าใจ<a class="anchor" href="#สรุปและเช็กลิสต์ความเข้าใจ">#</a></h2>
+<p>ถ้าตอบข้อเหล่านี้ได้ แปลว่าเข้าใจบทนี้แล้ว</p>
+<ul>
+<li class="check"><input type="checkbox"> อธิบายได้ว่าทำไมเซิร์ฟเวอร์ต่อจากนอกมหาวิทยาลัยไม่ได้ (IP 10.x + NAT + firewall ขาเข้าปิด) และทำไมขาออกยังทำงาน</li>
+<li class="check"><input type="checkbox"> บอกทางเข้า 4 ทาง (duckdns → 443 ในอาคาร, ts.net Funnel 443 → <code>caddy:8080</code>, ts.net Funnel 8443 → <code>mqtt:1883</code> สำหรับ ESP32, duckdns:8883 ต่อตรงในอาคาร) และใครใช้แต่ละทาง</li>
+<li class="check"><input type="checkbox"> อธิบายได้ว่า Funnel ถึงเซิร์ฟเวอร์โดยไม่เปิดพอร์ตขาเข้าได้อย่างไร (การเชื่อมต่อขาออกที่ค้างไว้)</li>
+<li class="check"><input type="checkbox"> ต่างระหว่าง Tailscale Serve กับ Funnel, tailnet, MagicDNS, <code>*.ts.net</code> และ <code>TS_USERSPACE</code></li>
+<li class="check"><input type="checkbox"> อ่าน <code>tailscale-serve.json</code> ได้ทีละบรรทัด และบอกว่าบรรทัดไหนทำให้เปิดสู่สาธารณะ (บรรทัด 16–19)</li>
+<li class="check"><input type="checkbox"> อธิบายความต่างของ <code>HTTPS</code> + <code>Web</code>, <code>TCPForward</code> ดิบ และ <code>TCPForward</code> + <code>TerminateTLS</code> และเหตุที่ MQTT ใช้แบบสุดท้ายที่พอร์ต 8443</li>
+<li class="check"><input type="checkbox"> บอกได้ว่าทำไมเปิดแค่ <code>caddy:8080</code> กับ <code>mqtt:1883</code> และทำไมแอปใช้ที่อยู่ ts.net เป็นค่าเริ่มต้น</li>
+<li class="check"><input type="checkbox"> อธิบายความสัมพันธ์ <code>TRUST_PROXY=2</code> ↔ <code>trusted_proxies</code> ↔ rate limit ล็อกอิน และเหตุที่ตั้งผิดแล้วเสียหาย</li>
+<li class="check"><input type="checkbox"> เปรียบเทียบ Funnel กับ port forwarding, Cloudflare Tunnel, ngrok, VPS, โดเมนมหาวิทยาลัยได้ พร้อมข้อจำกัดของ Funnel (เปิดได้เฉพาะพอร์ต 443/8443/10000, ช่วงสุดท้ายถึง Mosquitto เป็น MQTT ดิบในเครือข่าย Docker, Broker เข้าถึงได้จากอินเทอร์เน็ต)</li>
+<li class="check"><input type="checkbox"> อธิบาย DNS-01 ทีละขั้น และ <code>resolvers</code>, <code>propagation_delay</code>, <code>propagation_timeout -1</code></li>
+<li class="check"><input type="checkbox"> อธิบายวิธีที่ใบรับรองของ Caddy ถึง Mosquitto และใบรากใน ESP32 (รวมถึงเหตุที่ใบ ts.net ใช้ใบรากเดิมได้)</li>
+<li class="check"><input type="checkbox"> ไล่ service ใน compose: image, พอร์ตที่ publish/ภายใน, volume, healthcheck, <code>depends_on</code>, logging</li>
+<li class="check"><input type="checkbox"> อธิบายความต่างของ Broker ใน <code>deploy/</code> กับ <code>mqtt/</code></li>
+<li class="check"><input type="checkbox"> อธิบาย multi-stage build ของ <code>caddy.Dockerfile</code> และเหตุที่ <code>backend.Dockerfile</code> แยก <code>npm ci</code> ออกจาก <code>COPY . .</code> กับเหตุที่ต้อง <code>chmod -R a+rX</code> ก่อน <code>USER node</code></li>
+<li class="check"><input type="checkbox"> วาดเส้นทางคำขอทั้ง 5 แบบ (รวม ESP32 ผ่าน Funnel 8443 และต่อตรง 8883)จากความจำได้</li>
+</ul><nav class="pager"><a class="prev" href="03-architecture-flows.html"><span>← บทก่อนหน้า</span>3. สถาปัตยกรรมและเส้นทางของข้อมูล</a><a class="next" href="05-database.html"><span>บทถัดไป →</span>5. ฐานข้อมูล MariaDB</a></nav>
+  </main>
+  <aside class="toc"><div class="toc-title">ในบทนี้</div><ul><li><a href="#ภาพรวม">ภาพรวม</a></li><li><a href="#ความรู้ที่ต้องมีก่อนอ่านบทนี้">ความรู้ที่ต้องมีก่อนอ่านบทนี้</a></li><li><a href="#สถานการณ์จริงของเซิร์ฟเวอร์">สถานการณ์จริงของเซิร์ฟเวอร์</a></li><li><a href="#tailscale-ในเชิงลึก">Tailscale ในเชิงลึก</a></li><li><a href="#duckdns-และ-lets-encrypt-แบบ-dns-01-สรุปรวม">DuckDNS และ Let&#x27;s Encrypt แบบ DNS-01 (สรุปรวม)</a></li><li><a href="#โครงสร้างโฟลเดอร์">โครงสร้างโฟลเดอร์</a></li><li><a href="#อธิบายทีละไฟล์">อธิบายทีละไฟล์</a></li><li><a href="#เจาะโค้ดทีละบรรทัด">เจาะโค้ดทีละบรรทัด</a></li><li><a href="#เส้นทางของคำขอ-request-journeys">เส้นทางของคำขอ (Request journeys)</a></li><li><a href="#หลักการเขียนโค้ดที่ใช้ในส่วนนี้">หลักการเขียนโค้ดที่ใช้ในส่วนนี้</a></li><li><a href="#คำถามที่อาจารย์อาจถาม">คำถามที่อาจารย์อาจถาม</a></li><li><a href="#สรุปและเช็กลิสต์ความเข้าใจ">สรุปและเช็กลิสต์ความเข้าใจ</a></li></ul></aside>
+</div>
+<button class="to-top" id="toTop" aria-label="กลับขึ้นด้านบน">↑</button>
+<script src="../assets/search.js"></script>
+<script src="../assets/app.js"></script>
+</body>
+</html>

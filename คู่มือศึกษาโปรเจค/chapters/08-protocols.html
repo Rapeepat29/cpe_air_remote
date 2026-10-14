@@ -1,0 +1,1780 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>8. โปรโตคอลสื่อสาร: MQTT และ Bluetooth Low Energy — คู่มือศึกษา RMUTT Save Energy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Chakra+Petch:wght@600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+<script>try{var t=localStorage.getItem('guide.theme');if(t)document.documentElement.dataset.theme=t;var f=localStorage.getItem('guide.font');if(f)document.documentElement.dataset.font=f;}catch(e){}</script>
+</head>
+<body>
+<header class="topbar">
+  <button class="menu-btn" id="menuBtn" aria-label="เปิดเมนู">☰</button>
+  <a class="brand" href="../index.html"><span class="brand-mark">⚡</span><span>คู่มือศึกษา <b>RMUTT Save Energy</b></span></a>
+  <div class="top-actions">
+    <button id="fontBtn" title="ขนาดตัวอักษร">ก<small>±</small></button>
+    <button id="themeBtn" title="สลับโหมดสว่าง/มืด">☾</button>
+  </div>
+</header>
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <input class="nav-search" id="navSearch" type="search" placeholder="ค้นหาบทหรือหัวข้อ…">
+    <div id="searchResults" class="search-results"></div>
+    <nav class="nav" id="nav">
+<a class="nav-home" href="../index.html">หน้าแรก</a>
+<div class="nav-part">ภาพรวม</div><ul>
+<li><a href="01-concept.html"><span class="num">1</span>แนวคิดและหลักการคิดของโปรเจค</a></li>
+<li><a href="02-roadmap.html"><span class="num">2</span>เริ่มจากอะไร และต้องเรียนรู้อะไรบ้าง</a></li>
+<li><a href="03-architecture-flows.html"><span class="num">3</span>สถาปัตยกรรมและเส้นทางของข้อมูล</a></li>
+</ul>
+<div class="nav-part">โครงสร้างพื้นฐาน</div><ul>
+<li><a href="04-network-server.html"><span class="num">4</span>เครือข่าย เซิร์ฟเวอร์ และ Tailscale</a></li>
+<li><a href="05-database.html"><span class="num">5</span>ฐานข้อมูล MariaDB</a></li>
+</ul>
+<div class="nav-part">เซิร์ฟเวอร์</div><ul>
+<li><a href="06-backend-api.html"><span class="num">6</span>Backend ตอนที่ 1: โครงหลัก ระบบสมาชิก และ REST API</a></li>
+<li><a href="07-backend-services.html"><span class="num">7</span>Backend ตอนที่ 2: งานเบื้องหลังและตรรกะหลักของระบบ</a></li>
+<li><a class="active" href="08-protocols.html"><span class="num">8</span>โปรโตคอลสื่อสาร: MQTT และ Bluetooth Low Energy</a></li>
+</ul>
+<div class="nav-part">อุปกรณ์และหน้าจอ</div><ul>
+<li><a href="09-firmware.html"><span class="num">9</span>เฟิร์มแวร์ ESP32: บอร์ดแอร์ (IR และสายแอร์) และบอร์ดตรวจจับคน</a></li>
+<li><a href="10-flutter-architecture.html"><span class="num">10</span>แอป Flutter ตอนที่ 1: โครงสร้าง ข้อมูล และ State</a></li>
+<li><a href="11-flutter-screens.html"><span class="num">11</span>แอป Flutter ตอนที่ 2: หน้าจอหลักและวิดเจ็ต</a></li>
+<li><a href="12-flutter-admin-screens.html"><span class="num">12</span>แอป Flutter ตอนที่ 3: หน้าจอผู้ดูแลระบบและการตั้งค่า</a></li>
+<li><a href="13-webapp.html"><span class="num">13</span>เว็บแอป: HTML, CSS และ JavaScript ล้วน</a></li>
+</ul>
+<div class="nav-part">ใช้งานจริง</div><ul>
+<li><a href="14-deploy-scripts-testing.html"><span class="num">14</span>การติดตั้งระบบ สคริปต์อัตโนมัติ และการทดสอบ</a></li>
+<li><a href="15-security.html"><span class="num">15</span>ความปลอดภัยทั้งระบบ</a></li>
+<li><a href="16-presentation-qa.html"><span class="num">16</span>เตรียมนำเสนอและคำถามที่อาจารย์มักถาม</a></li>
+</ul>
+<div class="nav-part">ภาคผนวก</div><ul>
+<li><a href="17-glossary.html"><span class="num">17</span>อภิธานศัพท์</a></li>
+<li><a href="18-file-map.html"><span class="num">18</span>แผนที่ไฟล์ทั้งโปรเจค</a></li>
+</ul>
+<div class="nav-part">งานที่กำลังพัฒนา</div><ul>
+<li><a href="19-daikin-slm8.html"><span class="num">19</span>แอร์ Daikin ผ่านสาย SLM8: จากการแกะโปรโตคอลถึงบอร์ดสายแอร์</a></li>
+</ul>
+    </nav>
+  </aside>
+  <main class="content" id="content">
+<div class="chapter-head"><div class="kicker">บทที่ 8 · เซิร์ฟเวอร์</div><h1>โปรโตคอลสื่อสาร: MQTT และ Bluetooth Low Energy</h1></div>
+<h2 id="ภาพรวม">ภาพรวม<a class="anchor" href="#ภาพรวม">#</a></h2>
+<p>บทนี้ไม่ได้อธิบายโปรแกรมตัวใดตัวหนึ่ง แต่อธิบาย <strong>"สัญญา" ที่ทุกส่วนของระบบต้องทำตรงกัน</strong> ได้แก่ ESP32 บอร์ดแอร์, ESP32 บอร์ดตรวจคน, Mosquitto Broker, Backend (Node.js) และแอป Flutter ถ้าฝ่ายใดฝ่ายหนึ่งสะกดชื่อ topic ผิดหนึ่งตัวอักษร หรือส่ง JSON ฟิลด์ชื่อไม่ตรง ระบบจะ "เงียบ" ไปเฉย ๆ โดยไม่มี error ให้เห็น จึงต้องรู้สัญญาเหล่านี้ให้ละเอียด</p>
+<p>ระบบใช้ <strong>สองโปรโตคอลที่มีหน้าที่คนละอย่าง</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>โปรโตคอล</th>
+<th>ใช้ตอนไหน</th>
+<th>ใครคุยกับใคร</th>
+<th>ระยะ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>BLE</strong> (Bluetooth Low Energy)</td>
+<td>ตั้งค่าบอร์ดครั้งแรก / เปลี่ยน Wi-Fi / กู้บอร์ดที่ Wi-Fi หลุด</td>
+<td>แอป Flutter ↔ ESP32 โดยตรง</td>
+<td>ไม่กี่เมตร</td>
+</tr>
+<tr>
+<td><strong>MQTT</strong></td>
+<td>ใช้งานปกติทุกวัน: สั่งแอร์ รับสถานะ รับค่าไฟ รับสถานะคนในห้อง</td>
+<td>ESP32 ↔ Broker ↔ Backend</td>
+<td>ผ่าน Wi-Fi/อินเทอร์เน็ต</td>
+</tr>
+</tbody>
+</table></div>
+<p>ทำไมต้องมีสองอย่าง: บอร์ดที่เพิ่งแฟลชยังไม่รู้ชื่อ Wi-Fi จึงเข้าอินเทอร์เน็ตไม่ได้ ช่องทางเดียวที่คุยได้คือ BLE (ใกล้ตัว ไม่ต้องมีเครือข่าย) พอบอร์ดได้ Wi-Fi และข้อมูล Broker แล้วก็เปลี่ยนไปใช้ MQTT ตลอด</p>
+<p>สิ่งสำคัญที่ต้องจำ: <strong>แอป Flutter ไม่เคยคุย MQTT เอง</strong> แอปคุยกับ Backend ด้วย HTTP เท่านั้น (ยกเว้นตอน BLE) แล้ว Backend เป็นฝ่ายแปลงเป็นข้อความ MQTT ถึงบอร์ด ฝั่งแอปของ BLE อธิบายรายบรรทัดไว้แล้วใน <strong>บท Flutter ตอนที่ 2</strong> (<code>11b-flutter-admin-screens.md</code>) บทนี้จะเน้น "สัญญา" และฝั่งบอร์ด/Backend แทน</p>
+<figure><img alt="ขั้นตอน provisioning" src="img/05-provisioning.svg" /></figure>
+<h2 id="ความรู้ที่ต้องมีก่อนอ่านบทนี้">ความรู้ที่ต้องมีก่อนอ่านบทนี้<a class="anchor" href="#ความรู้ที่ต้องมีก่อนอ่านบทนี้">#</a></h2>
+<h3 id="mqtt-ตั้งแต่ศูนย์">MQTT ตั้งแต่ศูนย์<a class="anchor" href="#mqtt-ตั้งแต่ศูนย์">#</a></h3>
+<p><strong>MQTT</strong> คือโปรโตคอลส่งข้อความแบบ publish/subscribe ที่เบามาก ออกแบบมาให้อุปกรณ์เล็ก ๆ (IoT) ใช้ รูปแบบคือ</p>
+<ul>
+<li><strong>Broker</strong> = ไปรษณีย์กลาง (ในโปรเจคนี้คือ Mosquitto) ไม่มีใครคุยกันตรง ๆ ทุกคนคุยผ่าน Broker</li>
+<li><strong>Client</strong> = ใครก็ตามที่ต่อเข้า Broker: ESP32 แต่ละตัว และ Backend ก็เป็น client เหมือนกัน</li>
+<li><strong>Publish</strong> = ส่งข้อความเข้า topic หนึ่ง <strong>Subscribe</strong> = บอกว่าอยากรับข้อความจาก topic นั้น Broker จะส่งต่อให้ทุกคนที่ subscribe</li>
+<li><strong>Topic</strong> = "ที่อยู่" ของข้อความ เป็นสตริงคั่นด้วย <code>/</code> เช่น <code>rmutt/ac/ESP32-AABBCCDDEEFF/command</code> ผู้ส่งไม่ต้องรู้ว่าใครรับ ผู้รับไม่ต้องรู้ว่าใครส่ง</li>
+</ul>
+<p><strong>Wildcard</strong> ใช้ตอน subscribe เท่านั้น
+- <code>+</code> แทนหนึ่งระดับ เช่น <code>rmutt/ac/+/status</code> = status ของทุกบอร์ด (Backend ใช้อันนี้)
+- <code>#</code> แทนทุกระดับที่เหลือ เช่น <code>rmutt/ac/#</code> = ทุก topic ใต้ <code>rmutt/ac/</code> (ใช้ใน ACL ของ Backend)</p>
+<p><strong>QoS</strong> (Quality of Service) = ระดับความมั่นใจว่าข้อความถึง
+- QoS 0 = ส่งครั้งเดียว ไม่สน (เร็วสุด อาจหาย)
+- QoS 1 = ส่งจนกว่าจะได้ใบตอบรับ (ถึงอย่างน้อยหนึ่งครั้ง อาจซ้ำ)
+- QoS 2 = ถึงพอดีหนึ่งครั้ง (ช้าสุด โปรเจคนี้ไม่ใช้)</p>
+<p>โปรเจคนี้: Backend ส่งและ subscribe ด้วย <strong>QoS 1</strong> ทั้งหมด ส่วนฝั่งบอร์ดใช้ไลบรารี <code>PubSubClient</code> ซึ่งฟังก์ชัน <code>publish()</code> <strong>ส่งได้แค่ QoS 0</strong> (ไม่มีพารามิเตอร์ QoS ให้เลือก) แต่ตอน <code>subscribe(..., 1)</code> ขอ QoS 1 และตอนตั้ง Last Will ระบุ QoS 1 ผลคือคำสั่งจาก Backend ถึงบอร์ดอย่างน้อยหนึ่งครั้ง (ข้อความที่บอร์ดส่งขึ้นไปบางข้อความอาจหายได้ แต่บอร์ดส่ง status ซ้ำทุก 10 วินาที จึงไม่เป็นปัญหา)</p>
+<p><strong>Retained message</strong> = Broker จำข้อความล่าสุดของ topic นั้นไว้ แล้วส่งให้ทุกคนที่ subscribe ทีหลังทันที เหมือนป้ายประกาศที่ติดผนัง ใช้กับ "สถานะล่าสุด" เพื่อให้ Backend ที่เพิ่งเปิดเห็นสถานะบอร์ดได้ทันทีโดยไม่ต้องรอ ล้างได้โดย publish ข้อความ <strong>ว่าง</strong> แบบ retained ไปที่ topic เดิม (โปรเจคนี้ทำในฟังก์ชัน <code>clearRetained</code>)</p>
+<p><strong>Last Will and Testament (LWT)</strong> = ตอนต่อ Broker บอร์ดฝากข้อความ "พินัยกรรม" ไว้ ถ้าบอร์ดหลุดแบบไม่บอกลา (ไฟดับ Wi-Fi หลุด) Broker จะ publish ข้อความนี้แทนให้ ทำให้ Backend รู้ทันทีว่าบอร์ด offline โดยบอร์ดไม่ต้องพูดอะไรเลย</p>
+<p><strong>Keep-alive</strong> = ช่วงเวลาที่ client ต้องส่งอะไรมาอย่างน้อยหนึ่งครั้ง (ไม่งั้นส่ง PINGREQ) ถ้า Broker ไม่ได้ยินเกิน ~1.5 เท่า จะถือว่าหลุดและปล่อย LWT โค้ดบอร์ดไม่ได้ตั้งค่าเอง ใช้ค่าเริ่มต้นของ PubSubClient (15 วินาที) ส่วนฝั่ง Backend ใช้ค่าเริ่มต้นของไลบรารี <code>mqtt</code> (60 วินาที)</p>
+<p><strong>Clean session</strong> = ต่อใหม่แล้วเริ่มสถานะ subscribe ใหม่หมด (Broker ไม่จำว่าเคย subscribe อะไร) Backend ตั้ง <code>clean: true</code> ชัดเจน (บรรทัด 90 ของ <code>services/mqtt.js</code>) ส่วน PubSubClient ตั้ง clean session ให้เองทุกครั้ง ผลคือทุกครั้งที่ต่อใหม่ ต้อง subscribe ใหม่ (โค้ดทั้งสองฝั่งทำตอน <code>connect</code>)</p>
+<p><strong>Client ID</strong> = ชื่อเฉพาะของ client บน Broker ถ้ามีสอง client ใช้ ID ซ้ำ Broker จะเตะตัวเก่าออก โปรเจคนี้: บอร์ดแอร์ <code>rmutt-ESP32-&lt;MAC&gt;</code>, บอร์ดตรวจคน <code>rmutt-occ-OCC32-&lt;MAC&gt;</code>, Backend <code>rmutt-api-&lt;pid&gt;</code></p>
+<p><strong>Authentication / TLS</strong>
+- <strong>Auth</strong> = ต้องมี username/password (<code>allow_anonymous false</code>) ไม่งั้นต่อไม่ได้
+- <strong>TLS</strong> = เข้ารหัสการเชื่อมต่อ พอร์ตมาตรฐานคือ <strong>8883</strong> (ส่วน 1883 คือไม่เข้ารหัส) แต่ในระบบจริงค่าเริ่มต้นที่บอร์ดใช้คือ <code>rmutt-energy.tailb292b4.ts.net</code> พอร์ต <strong>8443</strong> (ผ่าน Tailscale Funnel ซึ่งถอด TLS ที่กล่อง tailscale แล้วส่งต่อไป <code>mqtt:1883</code>) ส่วนพอร์ต 8883 ของ Mosquitto ยังใช้ได้เมื่อบอร์ดต่อตรงในอาคาร บอร์ดตรวจใบรับรองที่ปลายทางส่งมา (ใบ ts.net หรือใบ DuckDNS ก็ได้ ออกโดย Let's Encrypt ทั้งคู่) กับใบรากที่ฝังไว้ใน <code>letsencrypt_ca.h</code> (ISRG Root X1 และ X2) และต้อง sync เวลา NTP ก่อน เพราะตรวจวันหมดอายุของใบรับรองต้องรู้เวลาจริง (ฟังก์ชัน <code>ensureClockSynced()</code>)
+- <strong>Dynamic Security</strong> = ปลั๊กอินของ Mosquitto ที่สร้าง user/role/ACL ได้ตอนรัน ผ่านการ publish คำสั่ง JSON ไปที่ topic พิเศษ <code>$CONTROL/dynamic-security/v1</code> Backend ใช้อันนี้สร้างบัญชีให้บอร์ดแต่ละตัวอัตโนมัติ (อธิบายในหัวข้อ "บัญชี MQTT รายอุปกรณ์")</p>
+<p><strong>ทำไมใช้ MQTT ไม่ใช่ทางเลือกอื่น</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>ทางเลือก</th>
+<th>ปัญหาสำหรับงานนี้</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>HTTP polling (บอร์ดถามเซิร์ฟเวอร์ทุกไม่กี่วินาทีว่ามีคำสั่งไหม)</td>
+<td>เปลืองแบนด์วิดท์และไฟ คำสั่งช้า (ต้องรอรอบถามถัดไป) และเซิร์ฟเวอร์ต้องเปิดรับการเชื่อมต่อจากบอร์ดนับสิบตัว</td>
+</tr>
+<tr>
+<td>WebSocket</td>
+<td>คงการเชื่อมต่อค้างได้ แต่ต้องเขียนเองทั้งเรื่องห้อง/การกระจายข้อความ/การรู้ว่าใคร offline ไม่มี retained/LWT ให้</td>
+</tr>
+<tr>
+<td>MQTT</td>
+<td>การเชื่อมต่อค้างตลอด ส่งคำสั่งถึงบอร์ดทันที มี retained (สถานะล่าสุด) และ LWT (รู้ว่า offline) ในตัว header เล็ก ไลบรารีบนบอร์ดมีพร้อม และบอร์ดอยู่หลัง NAT ก็รับคำสั่งได้เพราะเป็นฝ่ายต่อออกไปเอง</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="ble-ตั้งแต่ศูนย์">BLE ตั้งแต่ศูนย์<a class="anchor" href="#ble-ตั้งแต่ศูนย์">#</a></h3>
+<p><strong>BLE</strong> (Bluetooth Low Energy) คือบลูทูธโหมดประหยัดพลังงาน ต่างจาก Bluetooth Classic (ที่ใช้กับหูฟัง สตรีมเสียง) ตรงที่ส่งข้อมูลก้อนเล็กและกินไฟน้อย เชื่อมต่อได้เร็ว เหมาะกับการตั้งค่าอุปกรณ์ ทั้งสองไม่ใช่ของที่คุยข้ามกันได้</p>
+<ul>
+<li><strong>Advertising / Scan</strong>: อุปกรณ์ที่รอให้คนมาต่อ (<strong>Peripheral</strong> = ESP32) ตะโกนประกาศตัวเป็นระยะ ๆ พร้อมชื่อ (เช่น <code>RMUTT-AC-AABBCCDDEEFF</code>) ส่วนอีกฝั่ง (<strong>Central</strong> = แอป) ทำ scan ฟังประกาศเหล่านั้น แล้วเลือกต่อ</li>
+<li><strong>GATT</strong> = โครงสร้างข้อมูลที่ Peripheral เปิดให้อ่าน/เขียน จัดเป็นชั้น: <strong>Service</strong> (กลุ่มของฟังก์ชัน) → <strong>Characteristic</strong> (ช่องข้อมูลหนึ่งช่อง เหมือน "ตัวแปร" ที่อ่านหรือเขียนได้)</li>
+<li><strong>UUID</strong> = รหัสยาว 128 บิตที่ระบุ Service/Characteristic เพื่อไม่ให้ชนกับของคนอื่น โปรเจคนี้สร้าง UUID ของตัวเอง</li>
+<li><strong>Property</strong> ของ characteristic: <strong>Read</strong> (แอปอ่านค่า), <strong>Write</strong> (แอปเขียนค่า), <strong>Notify</strong> (บอร์ดผลักค่าใหม่มาให้แอปเองเมื่อมีการเปลี่ยน โดยแอปต้อง "สมัครรับ" ก่อน)</li>
+<li><strong>MTU และการหั่นแพ็กเก็ต</strong>: BLE ส่งได้ทีละไม่กี่สิบถึงสองสามร้อยไบต์ต่อ packet (ค่าเริ่มต้น MTU 23 ไบต์ ใช้งานได้จริง 20 ไบต์ ต่อรองให้ใหญ่ขึ้นได้แต่ขึ้นกับอุปกรณ์) JSON ตั้งค่าของเราเกิน จึงต้อง <strong>หั่นเป็นชิ้น</strong> ใส่หมายเลขลำดับ แล้วให้บอร์ดประกอบกลับ (โปรเจคนี้ใช้ชิ้นละ 150 ไบต์ข้อมูล ดูหัวข้อ "รูปแพ็กเก็ตตั้งค่า")</li>
+</ul>
+<h2 id="ตัวตนอุปกรณ์-device-identity">ตัวตนอุปกรณ์ (Device Identity)<a class="anchor" href="#ตัวตนอุปกรณ์-device-identity">#</a></h2>
+<p>ทุกบอร์ดมีเลข MAC ฝังมาจากโรงงานใน eFuse ของชิป เฟิร์มแวร์เอามาทำเป็น Device ID ด้วยฟังก์ชัน <code>createDeviceId()</code>:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>บอร์ด</th>
+<th>Device ID</th>
+<th>ชื่อ BLE</th>
+<th>Client ID บน MQTT</th>
+<th>Topic prefix (ค่าเริ่มต้น)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>คุมแอร์</td>
+<td><code>ESP32-&lt;MAC 12 หลัก hex ตัวพิมพ์ใหญ่&gt;</code> เช่น <code>ESP32-AABBCCDDEEFF</code></td>
+<td><code>RMUTT-AC-AABBCCDDEEFF</code></td>
+<td><code>rmutt-ESP32-AABBCCDDEEFF</code></td>
+<td><code>rmutt/ac</code></td>
+</tr>
+<tr>
+<td>ตรวจคน</td>
+<td><code>OCC32-&lt;MAC 12 หลัก&gt;</code> เช่น <code>OCC32-AABBCCDDEEFF</code></td>
+<td><code>RMUTT-OCC-AABBCCDDEEFF</code></td>
+<td><code>rmutt-occ-OCC32-AABBCCDDEEFF</code></td>
+<td><code>rmutt/occupancy</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>ในโค้ดบอร์ด <code>snprintf(buffer, ..., "ESP32-%04X%08X", chipId &gt;&gt; 32, chipId)</code> ดึง 16 บิตบน + 32 บิตล่างของ MAC 48 บิต เป็น hex 4 + 8 = 12 หลัก ชื่อ BLE ตัด <code>ESP32-</code>/<code>OCC32-</code> ออกด้วย <code>substring(6)</code> แล้วต่อท้าย <code>RMUTT-AC-</code>/<code>RMUTT-OCC-</code></p>
+<ul>
+<li>ตรวจรูปแบบที่ Backend ด้วย regex <code>^ESP32-[0-9A-F]{12}$</code> และ <code>^OCC32-[0-9A-F]{12}$</code> (ใน <code>handleIncomingMessage</code> และ <code>DEVICE_KINDS</code>)</li>
+<li>แอปใช้คำนำหน้าชื่อ BLE แยกชนิด: สแกนหา <code>RMUTT-AC-</code> (ค่าเริ่มต้นของ <code>scan()</code>) หรือ <code>RMUTT-OCC-</code></li>
+<li>ฐานข้อมูล: หนึ่งแถวของแอร์ = หนึ่ง <code>(roomNumber, airNumber)</code> เซ็นเซอร์ตรวจคนหนึ่งตัวต่อหนึ่งห้อง</li>
+<li>MAC ไม่ใช่ความลับ (พิมพ์บนบอร์ดและประกาศผ่าน BLE) จึงต้องมี token พิสูจน์ตัวตนตอน provisioning (ดูหัวข้อ provisioning)</li>
+<li><strong>บอร์ดสายแอร์ Daikin</strong> (<code>firmware/rmutt_esp32_air_wired/</code>, เพิ่ม 11 ต.ค. 2569) ใช้รูปแบบเดียวกับบอร์ดแอร์ IR ทุกอย่าง (<code>ESP32-&lt;MAC&gt;</code>, <code>RMUTT-AC-…</code>, <code>rmutt-ESP32-…</code>, prefix <code>rmutt/ac</code>) เพราะในมุม MQTT มันคือ "บอร์ดคุมแอร์" เหมือนกัน ต่างแค่วิธีสั่งแอร์ (ต่อสายแทนรีโมตติดผนัง แทนการยิง IR) ระบบแยกสองรุ่นด้วยฟิลด์ <code>controlType</code> ใน Identity ของ BLE และ <code>controlMode</code> ใน <code>status</code> (ดูด้านล่าง) ไม่ได้แยกด้วยชื่อ จึงไม่ต้องแก้ ACL, regex หรือ topic เลย</li>
+</ul>
+<h2 id="ตาราง-topic-ทั้งหมด">ตาราง Topic ทั้งหมด<a class="anchor" href="#ตาราง-topic-ทั้งหมด">#</a></h2>
+<p>ทุก topic อยู่ในรูป <code>&lt;prefix&gt;/&lt;deviceId&gt;/&lt;suffix&gt;</code> ค่าด้านล่างดึงจากโค้ดจริง: <code>services/mqtt.js</code> (ฝั่ง Backend), <code>rmutt_esp32_air.ino</code> และ <code>rmutt_esp32_occupancy.ino</code> (ฝั่งบอร์ด), <code>utils/mqtt-accounts.js</code> (ACL)</p>
+<h3 id="บอร์ดแอร์-rmuttacesp32-ltmacgt">บอร์ดแอร์ <code>rmutt/ac/ESP32-&lt;MAC&gt;/…</code><a class="anchor" href="#บอร์ดแอร์-rmuttacesp32-ltmacgt">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>suffix</th>
+<th>ทิศทาง</th>
+<th>Retained</th>
+<th>QoS</th>
+<th>ใครส่ง / ใครรับ</th>
+<th>เนื้อหาหลัก</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>command</code></td>
+<td>Backend → บอร์ด</td>
+<td>ไม่</td>
+<td>1</td>
+<td>Backend <code>publishAirCommand</code> / บอร์ด <code>mqttCallback</code></td>
+<td><code>state</code> (สั่งแอร์) หรือ <code>action</code> = <code>enter_setup</code>, <code>ota</code>, <code>unprovision</code> (เพิ่ม 13 ต.ค. 2569)</td>
+</tr>
+<tr>
+<td><code>state</code></td>
+<td>บอร์ด → Backend</td>
+<td><strong>ใช่</strong></td>
+<td>0</td>
+<td>บอร์ด <code>publishState</code> / Backend อัปเดต <code>state_json</code></td>
+<td>สถานะ IR ที่ใช้อยู่ + <code>commandId</code> ที่ตอบรับ</td>
+</tr>
+<tr>
+<td><code>status</code></td>
+<td>บอร์ด → Backend</td>
+<td><strong>ใช่</strong> (ยกเว้นคำตอบ unprovision)</td>
+<td>0 (LWT = 1)</td>
+<td>บอร์ด <code>publishStatus</code> ทุก 10 วินาที / Backend <code>handleAirStatus</code></td>
+<td>online, PZEM, ค่าไฟ, เวอร์ชัน, <code>historyPending</code> บอร์ดสายแอร์มี <code>controlMode</code> ฯลฯ เพิ่ม และคำตอบ <code>{"unprovisioned":true}</code> (ไม่ retained)</td>
+</tr>
+<tr>
+<td><code>provision</code></td>
+<td>บอร์ด → Backend</td>
+<td><strong>ใช่</strong></td>
+<td>0</td>
+<td>บอร์ด <code>publishProvisioningToken</code> ทุก 10 วินาที จนได้ ack</td>
+<td><code>token</code>, <code>deviceId</code>, <code>roomNumber</code>, <code>airNumber</code></td>
+</tr>
+<tr>
+<td><code>provision-ack</code></td>
+<td>Backend → บอร์ด</td>
+<td><strong>ใช่</strong></td>
+<td>1</td>
+<td>Backend <code>activateProvisioning</code></td>
+<td><code>activated</code>, <code>token</code> เดิม</td>
+</tr>
+<tr>
+<td><code>schedule-status</code></td>
+<td>Backend → บอร์ด</td>
+<td><strong>ใช่</strong></td>
+<td>1</td>
+<td>Backend <code>publishScheduleEvaluation</code></td>
+<td>อยู่ในคาบเรียนหรือไม่</td>
+</tr>
+<tr>
+<td><code>history</code></td>
+<td>บอร์ด → Backend</td>
+<td>ไม่</td>
+<td>0</td>
+<td>บอร์ด <code>processHistoryUpload</code> / Backend <code>handleAirHistory</code></td>
+<td>ข้อมูลไฟย้อนหลังตอนเน็ตหลุด (ชุดละ 10 รายการ)</td>
+</tr>
+<tr>
+<td><code>history-ack</code></td>
+<td>Backend → บอร์ด</td>
+<td>ไม่</td>
+<td>1</td>
+<td>Backend <code>handleAirHistory</code></td>
+<td><code>upTo</code>, <code>stored</code>, <code>skipped</code></td>
+</tr>
+</tbody>
+</table></div>
+<div class="callout note"><div class="callout-title">หมายเหตุ</div><p><code>docs/BLE_MQTT_PROTOCOL.md</code> (ปรับ 14 ต.ค. 2569) อธิบาย <code>history</code> และ <code>history-ack</code> แล้ว (เพิ่มในเฟิร์มแวร์ 2.4.0: ส่งค่าที่เก็บไว้ตอนเน็ตหลุดครั้งละ 10 รายการ แล้วลบเมื่อ Backend ตอบ) ส่วน "retained/QoS" ของ <code>state</code> และ <code>status</code> เอกสารไม่ได้ระบุ ค่าในตารางนี้อ่านจากโค้ดจริง (<code>mqttClient.publish(topic, payload, true)</code> = retained) เอกสารเพิ่มฟิลด์ <code>controlType</code> ของ Identity และฟิลด์ <code>status</code> ของบอร์ดสายแอร์ (11 ต.ค. 2569) และหัวข้อ "Unprovision" (13 ต.ค. 2569) แล้ว (ตรงกับที่อธิบายในบทนี้)</p></div>
+
+<p><strong>ตัวอย่าง <code>command</code> (สั่งแอร์)</strong> — Backend สร้างใน <code>publishAirCommand</code></p>
+<div class="code-block"><span class="code-lang">json</span><div class="hl"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">"version"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"commandId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"3f2b8c1e-0a52-4d6e-9a47-7c2d1b9e5f10"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"sentAt"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-08-19T09:30:00.000Z"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"state"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"power"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="nt">"temperature"</span><span class="p">:</span><span class="w"> </span><span class="mi">25</span><span class="p">,</span><span class="w"> </span><span class="nt">"mode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"cool"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"fanSpeed"</span><span class="p">:</span><span class="w"> </span><span class="s2">"auto"</span><span class="p">,</span><span class="w"> </span><span class="nt">"verticalSwing"</span><span class="p">:</span><span class="w"> </span><span class="s2">"auto"</span><span class="p">,</span><span class="w"> </span><span class="nt">"horizontalSwing"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"eco"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="nt">"turbo"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="nt">"sleep"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="nt">"quiet"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"displayLight"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="nt">"clean"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"timerOnMinutes"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="nt">"timerOffMinutes"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+
+<p><code>commandId</code> เป็น UUID สุ่มจาก <code>crypto.randomUUID()</code> ใช้ให้ตามได้ว่าคำสั่งไหนถูกทำแล้ว (บอร์ดส่งกลับใน <code>state</code>) <code>sentAt</code> เป็น ISO-8601</p>
+<p><strong>คำสั่งแบบ action</strong> (ไม่มี <code>state</code>): <code>{"version":1,"commandId":"…","sentAt":"…","action":"enter_setup"}</code> และ <code>{"version":1,…,"action":"ota","url":"https://&lt;host&gt;/firmware/&lt;ไฟล์&gt;.bin"}</code></p>
+<p><strong>คำสั่ง <code>unprovision</code></strong> (เพิ่ม 13 ต.ค. 2569) Backend สร้างด้วย <code>buildUnprovisionCommand</code> ใน <code>utils/unprovision.js</code> ตอนแอดมินลบอุปกรณ์ ใช้กับทั้งบอร์ดแอร์ (IR 2.5.1, สายแอร์ 2.5.2-slm8) และบอร์ดตรวจคน (1.3.2) ขึ้นไป</p>
+<div class="code-block"><span class="code-lang">json</span><div class="hl"><pre><span></span><code><span class="p">{</span><span class="w"> </span><span class="nt">"version"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="nt">"commandId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"UUID"</span><span class="p">,</span><span class="w"> </span><span class="nt">"sentAt"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-10-13T12:00:00.000Z"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"action"</span><span class="p">:</span><span class="w"> </span><span class="s2">"unprovision"</span><span class="p">,</span><span class="w"> </span><span class="nt">"deviceId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ESP32-AABBCCDDEEFF"</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+</div>
+
+<p>ต่างจาก action อื่นตรงที่ <strong>ใส่ <code>deviceId</code> ซ้ำในเนื้อข้อความ</strong> บอร์ดเทียบกับรหัสตัวเองก่อนทำ ไม่ตรงก็ทิ้ง (กันข้อความหลงผิด topic เพราะผลของคำสั่งนี้ย้อนกลับไม่ได้) บอร์ดตอบทาง <code>status</code> <strong>แบบไม่ retained</strong>:</p>
+<div class="code-block"><span class="code-lang">json</span><div class="hl"><pre><span></span><code><span class="p">{</span><span class="w"> </span><span class="nt">"deviceId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ESP32-AABBCCDDEEFF"</span><span class="p">,</span><span class="w"> </span><span class="nt">"online"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="nt">"unprovisioned"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+</div>
+
+<p>ลำดับเต็มและกรณีบอร์ดออฟไลน์ อธิบายในหัวข้อ "ลบอุปกรณ์ในแอป → ล้างค่าในบอร์ด (unprovision)" ด้านล่าง</p>
+<p><strong>ตัวอย่าง <code>state</code></strong> — บอร์ดตอบหลังทำคำสั่ง (<code>publishState(commandId)</code>)</p>
+<div class="code-block"><span class="code-lang">json</span><div class="hl"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">"commandId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"3f2b8c1e-0a52-4d6e-9a47-7c2d1b9e5f10"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"state"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"power"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="nt">"temperature"</span><span class="p">:</span><span class="w"> </span><span class="mi">25</span><span class="p">,</span><span class="w"> </span><span class="nt">"mode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"cool"</span><span class="p">,</span><span class="w"> </span><span class="nt">"fanSpeed"</span><span class="p">:</span><span class="w"> </span><span class="s2">"auto"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"verticalSwing"</span><span class="p">:</span><span class="w"> </span><span class="s2">"auto"</span><span class="p">,</span><span class="w"> </span><span class="nt">"horizontalSwing"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="nt">"eco"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"turbo"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="nt">"sleep"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="nt">"quiet"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="nt">"displayLight"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"clean"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="nt">"timerOnMinutes"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="nt">"timerOffMinutes"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+
+<p>Backend เก็บเฉพาะ <code>message.state ?? message</code> ลงคอลัมน์ <code>air_conditioners.state_json</code> พร้อมตั้ง <code>is_online = 1</code> และ <code>last_seen_at</code></p>
+<p><strong>ตัวอย่าง <code>status</code></strong> (ฟิลด์ตามฟังก์ชัน <code>publishStatus</code> ในเฟิร์มแวร์ 2.4.1)</p>
+<div class="code-block"><span class="code-lang">json</span><div class="hl"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">"online"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"deviceId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ESP32-AABBCCDDEEFF"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"firmwareVersion"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2.4.1"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"roomNumber"</span><span class="p">:</span><span class="w"> </span><span class="s2">"16101"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"airNumber"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"ip"</span><span class="p">:</span><span class="w"> </span><span class="s2">"192.168.1.50"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"rssi"</span><span class="p">:</span><span class="w"> </span><span class="mi">-58</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"pzemAvailable"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"acRunning"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"outsideSchedule"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"scheduleConfigured"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"classScheduleConfigured"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"historyPending"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"voltage"</span><span class="p">:</span><span class="w"> </span><span class="mf">229.8</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"current"</span><span class="p">:</span><span class="w"> </span><span class="mf">2.145</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"powerWatts"</span><span class="p">:</span><span class="w"> </span><span class="mf">465.2</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"energyKwh"</span><span class="p">:</span><span class="w"> </span><span class="mf">12.345</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"frequencyHz"</span><span class="p">:</span><span class="w"> </span><span class="mf">50.0</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"powerFactor"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.94</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+
+<p><strong>ฟิลด์เพิ่มของบอร์ดสายแอร์</strong> (<code>rmutt_esp32_air_wired</code>, เพิ่ม 11 ต.ค. 2569) บอร์ดส่งทุกฟิลด์ข้างบนเหมือนเดิม แล้วต่อท้ายด้วย</p>
+<div class="code-block"><span class="code-lang">json</span><div class="hl"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">"controlMode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"wired"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"airBrand"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Daikin"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"busOk"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"compressorRunning"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"unitRoomTemperature"</span><span class="p">:</span><span class="w"> </span><span class="mi">27</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"roomTemperature"</span><span class="p">:</span><span class="w"> </span><span class="mf">27.4</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+
+<p><code>controlMode</code> บอกว่าบอร์ดคุมแอร์ทางสาย <code>busOk</code> = คุยกับแอร์ทางสายได้ไหม <code>compressorRunning</code> = คอมเพรสเซอร์ทำงานอยู่ไหม (อ่านจากแอร์ ไม่ใช่เดาจากไฟ) <code>unitRoomTemperature</code> = อุณหภูมิห้องที่แอร์วัดเอง (มีเฉพาะตอน <code>busOk</code>) <code>roomTemperature</code> = เซนเซอร์ของบอร์ด (<code>null</code> ถ้าอ่านไม่ได้) บอร์ด IR เดิมไม่ส่งฟิลด์เหล่านี้ และ Backend/แอปรุ่นเก่าที่ไม่รู้จักก็แค่ไม่อ่าน (เพิ่มฟิลด์ได้โดยไม่ทำให้ใครพัง)</p>
+<p>Backend ใช้ <code>controlMode</code> ทำสองอย่าง (ฟังก์ชัน <code>protocolFromStatus</code> ใน <code>utils/air-conditioner.js</code> และ <code>syncControlProtocol</code> ใน <code>services/mqtt.js</code>):
+1. <strong>แก้ protocol ในฐานข้อมูลให้เอง</strong> ถ้า <code>controlMode</code> เป็น <code>wired</code> แต่แถวยังเป็นยี่ห้อ IR (เช่น จองจากแอปรุ่นเก่าที่ยังไม่รู้จักบอร์ดสายแอร์) Backend <code>UPDATE ... SET protocol = 'DAIKIN_WIRED' WHERE ... AND protocol &lt;&gt; ?</code> ใส่เงื่อนไข <code>&lt;&gt;</code> จึงเขียนฐานข้อมูลเฉพาะครั้งที่ค่ายังไม่ตรง ไม่ใช่ทุก 10 วินาที
+2. <strong>คำสั่งที่ส่งไปบอร์ด <code>DAIKIN_WIRED</code> ถูกจำกัด</strong> ตาม <code>validateAirState(body, protocol)</code> รับเฉพาะโหมด Cool/Dry/Fan, พัดลม Auto/Low/Medium/High (ไม่มี Turbo), สวิงแนวตั้ง Auto/Off และ Sleep (ยกเว้นโหมด Dry) ส่วน Eco, Turbo, Quiet, Clean และสวิงแนวนอนถูกบังคับเป็น <code>false</code> เพราะรีโมตติดผนังของ Daikin ไม่มีฟังก์ชันเหล่านี้ ถ้าส่งไปบอร์ดก็ทำไม่ได้แต่แอปจะแสดงว่าเปิดอยู่ ซึ่งหลอกผู้ใช้</p>
+<p>และ REST API คืน <code>controlType: "wired" | "ir"</code> ในข้อมูลแอร์ทุกเครื่อง (<code>controlTypeOf(protocol)</code> ใน <code>publicAirConditioner</code>) แอปจึงไม่ต้องรู้ชื่อโปรโตคอลเอง แค่ดูฟิลด์นี้เพื่อซ่อนปุ่มที่ใช้ไม่ได้ (รายละเอียดฝั่ง Backend อยู่ในบท Backend ตอนที่ 2)</p>
+<p>ถ้า PZEM อ่านไม่ได้ ฟิลด์ voltage…powerFactor จะเป็น <code>null</code> (ไม่ใช่ 0 เพื่อไม่ให้แอปเข้าใจผิดว่าแอร์ไม่กินไฟ) ถ้ามี <code>otaError</code> จะมีฟิลด์นั้นเพิ่ม Backend ผ่าน <code>normalizePowerStatus</code> ซึ่งบังคับกติกา เช่น ถ้า <code>pzemAvailable</code> ไม่ใช่ <code>true</code> พอร์ตค่าไฟทั้งหมดจะถูกตั้งเป็น <code>null</code> และ <code>acRunning</code> เป็น <code>false</code></p>
+<p><strong>LWT ของบอร์ดแอร์</strong> (ที่ Broker ปล่อยแทนเมื่อบอร์ดหลุด): topic <code>…/status</code>, QoS 1, retained</p>
+<div class="code-block"><span class="code-lang">json</span><div class="hl"><pre><span></span><code><span class="p">{</span><span class="w"> </span><span class="nt">"online"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="nt">"deviceId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ESP32-AABBCCDDEEFF"</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+</div>
+
+<p><strong>ตัวอย่าง <code>provision</code></strong> และ <strong><code>provision-ack</code></strong></p>
+<div class="code-block"><span class="code-lang">json</span><div class="hl"><pre><span></span><code><span class="p">{</span><span class="w"> </span><span class="nt">"token"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&lt;24 ไบต์ base64url&gt;"</span><span class="p">,</span><span class="w"> </span><span class="nt">"deviceId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ESP32-AABBCCDDEEFF"</span><span class="p">,</span><span class="w"> </span><span class="nt">"roomNumber"</span><span class="p">:</span><span class="w"> </span><span class="s2">"16101"</span><span class="p">,</span><span class="w"> </span><span class="nt">"airNumber"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+</div>
+
+<div class="code-block"><span class="code-lang">json</span><div class="hl"><pre><span></span><code><span class="p">{</span><span class="w"> </span><span class="nt">"version"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="nt">"activated"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="nt">"deviceId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ESP32-AABBCCDDEEFF"</span><span class="p">,</span><span class="w"> </span><span class="nt">"token"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&lt;token เดิม&gt;"</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+</div>
+
+<p><strong><code>schedule-status</code></strong> (Backend ส่งทุกครั้งที่ได้รับ status ที่ <code>online</code>)</p>
+<div class="code-block"><span class="code-lang">json</span><div class="hl"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">"version"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"classScheduleConfigured"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"withinClassSchedule"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"evaluatedAt"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-08-19T12:00:00.000Z"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"timezone"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Asia/Bangkok"</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+
+<p>บอร์ดเอาไปคำนวณ <code>outsideSchedule</code> (แอร์ทำงานนอกคาบเรียน) และขึ้นไฟ LED เหลือง/แดง</p>
+<p><strong><code>history</code></strong> — บอร์ดส่งเป็น array ของตัวเลข 15 ช่อง ต่อ 1 รายการ (ช่วงละ 5 นาที) เรียงตามลำดับ: <code>ts, energyKwh, voltageAvg×10, voltageMin×10, voltageMax×10, currentAvg×1000, currentMax×1000, powerAvg×10, powerMin×10, powerMax×10, powerFactor×100, frequencyOffset×10, runtimeSeconds, samples, flags</code> ใช้ array แทน object เพื่อประหยัดขนาดข้อความ</p>
+<div class="code-block"><span class="code-lang">json</span><div class="hl"><pre><span></span><code><span class="p">{</span><span class="w"> </span><span class="nt">"v"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="nt">"deviceId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ESP32-AABBCCDDEEFF"</span><span class="p">,</span><span class="w"> </span><span class="nt">"records"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="p">[</span><span class="mi">1755590400</span><span class="p">,</span><span class="w"> </span><span class="mf">12.3</span><span class="p">,</span><span class="w"> </span><span class="mi">2298</span><span class="p">,</span><span class="w"> </span><span class="mi">2290</span><span class="p">,</span><span class="w"> </span><span class="mi">2310</span><span class="p">,</span><span class="w"> </span><span class="mi">2145</span><span class="p">,</span><span class="w"> </span><span class="mi">2200</span><span class="p">,</span><span class="w"> </span><span class="mi">4650</span><span class="p">,</span><span class="w"> </span><span class="mi">4400</span><span class="p">,</span><span class="w"> </span><span class="mi">4900</span><span class="p">,</span><span class="w"> </span><span class="mi">94</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span><span class="w"> </span><span class="mi">300</span><span class="p">,</span><span class="w"> </span><span class="mi">150</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+</div>
+
+<p>(ค่าในตัวอย่างเป็นตัวเลขสมมติเพื่อให้เห็นรูปร่าง) และ <code>history-ack</code></p>
+<div class="code-block"><span class="code-lang">json</span><div class="hl"><pre><span></span><code><span class="p">{</span><span class="w"> </span><span class="nt">"version"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="nt">"upTo"</span><span class="p">:</span><span class="w"> </span><span class="mi">1755590400</span><span class="p">,</span><span class="w"> </span><span class="nt">"stored"</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="nt">"skipped"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+</div>
+
+<h3 id="บอร์ดตรวจคน-rmuttoccupancyocc32-ltmacgt">บอร์ดตรวจคน <code>rmutt/occupancy/OCC32-&lt;MAC&gt;/…</code><a class="anchor" href="#บอร์ดตรวจคน-rmuttoccupancyocc32-ltmacgt">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>suffix</th>
+<th>ทิศทาง</th>
+<th>Retained</th>
+<th>QoS</th>
+<th>เนื้อหา</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>status</code></td>
+<td>บอร์ด → Backend</td>
+<td><strong>ใช่</strong> (LWT ก็ retained, QoS 1)</td>
+<td>0 (LWT = 1)</td>
+<td>online, radarAvailable, occupied</td>
+</tr>
+<tr>
+<td><code>provision</code></td>
+<td>บอร์ด → Backend</td>
+<td><strong>ใช่</strong></td>
+<td>0</td>
+<td><code>token</code>, <code>deviceId</code>, <code>roomNumber</code></td>
+</tr>
+<tr>
+<td><code>provision-ack</code></td>
+<td>Backend → บอร์ด</td>
+<td><strong>ใช่</strong></td>
+<td>1</td>
+<td><code>activated</code>, <code>token</code></td>
+</tr>
+<tr>
+<td><code>command</code></td>
+<td>Backend → บอร์ด</td>
+<td>ไม่</td>
+<td>1</td>
+<td><code>action</code> = <code>enter_setup</code>, <code>ota</code> หรือ <code>unprovision</code> (เพิ่ม 13 ต.ค. 2569)</td>
+</tr>
+</tbody>
+</table></div>
+<p>บอร์ดตรวจคน <strong>ไม่มี</strong> <code>state</code>, <code>history</code>, <code>schedule-status</code> เพราะไม่ควบคุมอะไรและไม่ต้องรู้ตารางเรียน</p>
+<div class="code-block"><span class="code-lang">json</span><div class="hl"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">"online"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"deviceId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"OCC32-AABBCCDDEEFF"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"firmwareVersion"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1.3.1"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"roomNumber"</span><span class="p">:</span><span class="w"> </span><span class="s2">"16203"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"radarAvailable"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"occupied"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"staticThreshold"</span><span class="p">:</span><span class="w"> </span><span class="mi">25</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+
+<p>LWT ของบอร์ดตรวจคน: <code>{"online":false,"deviceId":"OCC32-…","radarAvailable":false,"occupied":false}</code> — สังเกตว่ามี <code>radarAvailable:false</code> ด้วย เพราะถ้าแค่ <code>occupied:false</code> ผู้ใช้จะเข้าใจว่า "ห้องว่าง" ทั้งที่จริงคือ "ไม่รู้" กฎคือ <strong>ถ้า <code>online</code> หรือ <code>radarAvailable</code> เป็น false ให้ถือว่า "ไม่มีข้อมูล" ไม่ใช่ "ว่าง"</strong> (ระบบปิดแอร์อัตโนมัติก็ใช้กฎนี้: <code>sensorUsable</code>)</p>
+<p>บอร์ดตรวจคนส่ง status ทุก 10 วินาที (<code>STATUS_INTERVAL_MS</code>) และทันทีเมื่อ <code>occupied</code> หรือ <code>radarAvailable</code> เปลี่ยน (<code>statusPublishRequested = true</code>) การตัดสิน <code>occupied</code>: อ่านพลังงาน stationary ของ LD2410 โหมด Engineering เกต 0–8 ถ้าเกตใดเกิน <code>STATIC_ENERGY_THRESHOLD = 25</code> = มีคน และไม่ส่งตำแหน่ง/พลังงานดิบขึ้นเน็ตเลย (เพื่อความเป็นส่วนตัว)</p>
+<h3 id="topic-พิเศษของ-dynamic-security">Topic พิเศษของ Dynamic Security<a class="anchor" href="#topic-พิเศษของ-dynamic-security">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Topic</th>
+<th>ใครส่ง</th>
+<th>ใช้ทำอะไร</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>$CONTROL/dynamic-security/v1</code></td>
+<td>Backend</td>
+<td>ส่งคำสั่ง <code>{"commands":[…]}</code> สร้าง/แก้/ลบ role, client</td>
+</tr>
+<tr>
+<td><code>$CONTROL/dynamic-security/v1/response</code></td>
+<td>Broker</td>
+<td>คำตอบ จับคู่กับคำสั่งด้วย <code>correlationData</code> = <code>&lt;batch&gt;:&lt;index&gt;</code></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="บัญชี-mqtt-รายอุปกรณ์-dynamic-security">บัญชี MQTT รายอุปกรณ์ (Dynamic Security)<a class="anchor" href="#บัญชี-mqtt-รายอุปกรณ์-dynamic-security">#</a></h2>
+<p><strong>ปัญหาเดิม</strong>: ถ้าทุกบอร์ดใช้ username/password เดียวกันที่อ่านเขียน <code>rmutt/#</code> ได้ ใครถอดบอร์ดตัวหนึ่งออกจากฝ้า อ่านรหัสใน flash ได้ ก็สั่งแอร์ทั้งอาคารได้</p>
+<p><strong>วิธีแก้</strong> (เปิดด้วย <code>MQTT_DEVICE_AUTH=dynsec</code>, ไฟล์ <code>utils/mqtt-accounts.js</code> + <code>services/mqtt-accounts.js</code>):
+- บอร์ดแต่ละตัวมี <strong>username = Device ID</strong>, <strong>client ID</strong> ตายตัว, และ <strong>role</strong> ของตัวเอง
+- รหัสผ่าน = <code>HMAC-SHA256(MQTT_DEVICE_SECRET, "mqtt-device:&lt;DEVICE_ID&gt;")</code> เป็น base64url ตัดเหลือ 32 ตัว (ฟังก์ชัน <code>deriveDevicePassword</code>) คำนวณซ้ำได้เสมอ จึงไม่ต้องเก็บรหัสในฐานข้อมูล และตั้งค่าบอร์ดซ้ำกี่ครั้งก็ได้รหัสเดิม
+- ACL ของบอร์ดแอร์ (<code>DEVICE_KINDS.air</code>): <strong>publish</strong> ได้เฉพาะ <code>state, status, provision, provision-ack, history</code> และ <strong>subscribe</strong> ได้เฉพาะ <code>command, provision-ack, schedule-status, history-ack</code> ของ <strong>ตัวเองเท่านั้น</strong>
+- ACL ของบอร์ดตรวจคน: publish <code>status, provision, provision-ack</code> / subscribe <code>command, provision-ack</code>
+- Backend ใช้ role <code>rmutt-backend</code> ที่ publish/subscribe <code>rmutt/ac/#</code> และ <code>rmutt/occupancy/#</code> ได้ (<code>backendAcls</code>)
+- <code>reconcileAccounts()</code> รันทุกครั้งที่ Backend ต่อ Broker ได้ (ผ่าน <code>onMqttConnected</code>): ให้สิทธิ์ Backend แล้วสร้างบัญชีให้ทุกบอร์ดที่ยังไม่ <code>removed</code> ถ้าไฟล์ <code>dynamic-security.json</code> หายหรือย้ายเซิร์ฟเวอร์ บอร์ดเดิมจะกลับมาต่อได้เอง
+- ตอนจองช่อง (<code>prepareDeviceCredentials</code>) ใช้ <code>repair: true</code> เพื่อให้รหัส/client ID ตรงกับที่จะส่งให้บอร์ด (บอร์ดที่ออนไลน์อยู่จะถูกเตะหนึ่งครั้งแล้วต่อกลับเองใน 3 วินาที)
+- ตอนลบอุปกรณ์: <code>removeDeviceCommands</code> ลบ client และ role</p>
+<p>โหมด <code>shared</code> (ค่าเริ่มต้นของ config ถ้าไม่ตั้ง) = ทุกบอร์ดใช้บัญชีเดียวกับ Backend ใช้ตอนพัฒนาเท่านั้น (config.js จะพิมพ์คำเตือน)</p>
+<h2 id="ble-gatt-ของโปรเจค">BLE GATT ของโปรเจค<a class="anchor" href="#ble-gatt-ของโปรเจค">#</a></h2>
+<p>บอร์ดทั้งสองชนิดใช้ GATT เหมือนกันทุกตัวอักษร ประกาศเป็นค่าคงที่ในเฟิร์มแวร์ (<code>SERVICE_UUID</code> ฯลฯ) และในแอป (<code>BleProvisioningService</code>)</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>ชื่อ</th>
+<th>UUID</th>
+<th>Property</th>
+<th>ใช้ทำอะไร</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Service</td>
+<td><code>7b570001-a243-4e5b-8f13-179af81b2457</code></td>
+<td>Primary service</td>
+<td>ครอบทุก characteristic ด้านล่าง</td>
+</tr>
+<tr>
+<td>Config</td>
+<td><code>7b570002-a243-4e5b-8f13-179af81b2457</code></td>
+<td><strong>Write</strong></td>
+<td>แอปเขียนค่าตั้งค่า (หั่นเป็น packet)</td>
+</tr>
+<tr>
+<td>Status/ACK</td>
+<td><code>7b570003-a243-4e5b-8f13-179af81b2457</code></td>
+<td><strong>Read, Notify</strong></td>
+<td>บอร์ดแจ้งผล <code>{ok, code, message}</code></td>
+</tr>
+<tr>
+<td>Identity</td>
+<td><code>7b570004-a243-4e5b-8f13-179af81b2457</code></td>
+<td><strong>Read</strong></td>
+<td>ตัวตนบอร์ด (สั้น)</td>
+</tr>
+<tr>
+<td>Nearby Wi-Fi</td>
+<td><code>7b570005-a243-4e5b-8f13-179af81b2457</code></td>
+<td><strong>Read</strong></td>
+<td>อ่านแล้วบอร์ดสแกน Wi-Fi รอบตัวเอง</td>
+</tr>
+<tr>
+<td>Saved settings</td>
+<td><code>7b570006-a243-4e5b-8f13-179af81b2457</code></td>
+<td><strong>Read</strong></td>
+<td>ค่าที่บันทึกไว้ (เฟิร์มแวร์ 1.6+)</td>
+</tr>
+</tbody>
+</table></div>
+<p>Status characteristic มี descriptor <code>BLE2902</code> (CCCD) ซึ่งเป็นตัวที่ทำให้แอป "สมัครรับ" Notify ได้</p>
+<p><strong>Identity</strong> (เล็กโดยตั้งใจ ขนาด document 256 ไบต์):</p>
+<div class="code-block"><span class="code-lang">json</span><div class="hl"><pre><span></span><code><span class="p">{</span><span class="w"> </span><span class="nt">"deviceId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ESP32-AABBCCDDEEFF"</span><span class="p">,</span><span class="w"> </span><span class="nt">"bleName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"RMUTT-AC-AABBCCDDEEFF"</span><span class="p">,</span><span class="w"> </span><span class="nt">"firmwareVersion"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2.4.1"</span><span class="p">,</span><span class="w"> </span><span class="nt">"configured"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+</div>
+
+<p>ตั้งแต่เฟิร์มแวร์ 2.5.0 (เพิ่ม 11 ต.ค. 2569) Identity มี <code>"controlType"</code> เพิ่ม: บอร์ด IR ส่ง <code>"ir"</code> บอร์ดสายแอร์ส่ง <code>"wired"</code> พร้อม <code>"brand": "Daikin"</code> บอร์ดรุ่นเก่าที่ไม่ส่งฟิลด์นี้ แอปถือว่าเป็น <code>"ir"</code> ถ้าเป็น <code>wired</code> แอปล็อกช่องยี่ห้อเป็น <em>Daikin · สายแอร์</em> และจองแอร์ด้วย protocol <code>DAIKIN_WIRED</code> แทนการให้เลือกโปรโตคอล IR (ฝั่งบอร์ดสายแอร์เองก็บันทึก <code>DAIKIN_WIRED</code> เสมอไม่ว่าแอปส่งโปรโตคอลอะไรมา กันแอปรุ่นเก่าส่งชื่อ IR) ทำไมใส่ใน Identity: แอปอ่าน Identity เป็นอย่างแรกหลังต่อ BLE จึงรู้ชนิดบอร์ดก่อนแสดงฟอร์ม และ Identity ต้องเล็ก (256 ไบต์) จึงเพิ่มแค่สองฟิลด์สั้น ๆ</p>
+<p>ถ้าตั้งค่าแล้ว (<code>configured: true</code>) จะมี <code>roomNumber</code> และ <code>airNumber</code> เพิ่ม บอร์ดตรวจคนมี <code>"deviceType": "occupancy"</code> ด้วย (แอปใช้ตรวจว่าชื่อ BLE กับ Device ID ตรงกัน กัน spoof)</p>
+<p><strong>Saved settings</strong> (อ่านเฉพาะถ้า <code>configured</code>): <code>roomNumber, airNumber, name, airProtocol, wifiSsid, hasWifiPassword, mqttHost, mqttPort, mqttUsername, hasMqttPassword, dailyOn, dailyOff</code> — <strong>ไม่มีรหัสผ่านจริง</strong> ส่งแค่ธง <code>hasWifiPassword</code>/<code>hasMqttPassword</code> ให้แอปรู้ว่ามีรหัสเก่าอยู่ (ใช้ร่วมกับ <code>keepPassword</code> ตอนบันทึกใหม่ ดูบท Flutter ตอนที่ 2)</p>
+<p><strong>Nearby Wi-Fi</strong>: การ <strong>อ่าน</strong> characteristic นี้ทำให้ <code>onRead</code> ของ <code>WifiScanCallbacks</code> สั่ง <code>WiFi.scanNetworks()</code> ที่ตำแหน่งติดตั้งจริง ได้สูงสุด 8 SSID ไม่ซ้ำ เรียงแรงสุดก่อน (ตัดทิ้งถ้า JSON เกิน 480 ไบต์) รูปแบบกะทัดรัดเป็น <code>[SSID, RSSI, isSecure]</code>:</p>
+<div class="code-block"><span class="code-lang">json</span><div class="hl"><pre><span></span><code><span class="p">{</span><span class="w"> </span><span class="nt">"ok"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="nt">"networks"</span><span class="p">:</span><span class="w"> </span><span class="p">[[</span><span class="s2">"RMUTT-WiFi"</span><span class="p">,</span><span class="w"> </span><span class="mi">-42</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">],</span><span class="w"> </span><span class="p">[</span><span class="s2">"Guest"</span><span class="p">,</span><span class="w"> </span><span class="mi">-68</span><span class="p">,</span><span class="w"> </span><span class="kc">false</span><span class="p">]]</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+</div>
+
+<p>ทำไมให้บอร์ดสแกนแทนแอป: Wi-Fi ที่คอมของแอดมินเห็นไม่ใช่ Wi-Fi ที่บอร์ดบนฝ้าเห็น และบอร์ดรองรับเฉพาะ 2.4 GHz เลือกจากรายการที่บอร์ดเห็นจริงจึงตรงที่สุด</p>
+<h3 id="รูปแพ็กเก็ตตั้งค่า-config">รูปแพ็กเก็ตตั้งค่า (Config)<a class="anchor" href="#รูปแพ็กเก็ตตั้งค่า-config">#</a></h3>
+<p>JSON ตั้งค่าถูกแปลงเป็น UTF-8 แล้วหั่นชิ้นละ <strong>150 ไบต์</strong> (<code>dataBytesPerPacket = 150</code> ในแอป) ใส่หัว 6 ไบต์:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>ไบต์</th>
+<th>ค่า</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>เวอร์ชันโปรโตคอล = <code>1</code></td>
+</tr>
+<tr>
+<td>1</td>
+<td>ชนิดข้อความ = <code>1</code> (config)</td>
+</tr>
+<tr>
+<td>2–3</td>
+<td>ลำดับ packet เริ่มจาก 0 (big-endian: ไบต์สูงก่อน)</td>
+</tr>
+<tr>
+<td>4–5</td>
+<td>จำนวน packet ทั้งหมด (big-endian)</td>
+</tr>
+<tr>
+<td>6…</td>
+<td>ไบต์ของ JSON</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>JSON ตั้งค่าของบอร์ดแอร์</strong> (<code>toBleJson</code> ใน <code>lib/models/provisioning.dart</code>):</p>
+<div class="code-block"><span class="code-lang">json</span><div class="hl"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">"version"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"deviceId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ESP32-AABBCCDDEEFF"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"token"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&lt;provisioning token&gt;"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"roomNumber"</span><span class="p">:</span><span class="w"> </span><span class="s2">"16101"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"airNumber"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"แอร์ 1"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"airProtocol"</span><span class="p">:</span><span class="w"> </span><span class="s2">"DAIKIN"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"wifi"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"ssid"</span><span class="p">:</span><span class="w"> </span><span class="s2">"RMUTT-WiFi"</span><span class="p">,</span><span class="w"> </span><span class="nt">"password"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&lt;รหัส Wi-Fi&gt;"</span><span class="p">,</span><span class="w"> </span><span class="nt">"keepPassword"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w"> </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">"mqtt"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"host"</span><span class="p">:</span><span class="w"> </span><span class="s2">"rmutt-energy.tailb292b4.ts.net"</span><span class="p">,</span><span class="w"> </span><span class="nt">"port"</span><span class="p">:</span><span class="w"> </span><span class="mi">8443</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"username"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ESP32-AABBCCDDEEFF"</span><span class="p">,</span><span class="w"> </span><span class="nt">"password"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&lt;รหัสที่ Backend ออกให้&gt;"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"keepPassword"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="nt">"topic"</span><span class="p">:</span><span class="w"> </span><span class="s2">"rmutt/ac/ESP32-AABBCCDDEEFF"</span><span class="p">,</span><span class="w"> </span><span class="nt">"tls"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">"schedule"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"dailyOn"</span><span class="p">:</span><span class="w"> </span><span class="s2">"07:00"</span><span class="p">,</span><span class="w"> </span><span class="nt">"dailyOff"</span><span class="p">:</span><span class="w"> </span><span class="s2">"18:00"</span><span class="p">,</span><span class="w"> </span><span class="nt">"timezone"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Asia/Bangkok"</span><span class="w"> </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+
+<p>บอร์ดตรวจคนส่ง JSON คล้ายกัน แต่มี <code>"deviceType":"occupancy"</code>, ไม่มี <code>airNumber/name/airProtocol/schedule</code> และมี <code>staticThreshold</code></p>
+<p><strong>ผลตอบกลับทาง Notify</strong> (<code>notifyBle</code>): <code>{"ok":bool,"code":"…","message":"…"}</code> โค้ดที่เป็นไปได้ในเฟิร์มแวร์แอร์:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>code</th>
+<th>ความหมาย</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>invalid_packet</code></td>
+<td>สั้นกว่า 6 ไบต์ หรือ <code>total</code> เป็น 0 / &gt; 32 / <code>sequence &gt;= total</code></td>
+</tr>
+<tr>
+<td><code>unsupported_version</code></td>
+<td>ไบต์ 0 หรือ 1 ไม่ใช่ 1</td>
+</tr>
+<tr>
+<td><code>sequence_error</code></td>
+<td>packet มาไม่เรียง หรือ <code>total</code> เปลี่ยนกลางทาง</td>
+</tr>
+<tr>
+<td><code>config_too_large</code></td>
+<td>รวมเกิน <code>MAX_CONFIG_BYTES</code> (แอร์ 4096, ตรวจคน 3072)</td>
+</tr>
+<tr>
+<td><code>invalid_json</code></td>
+<td>แปลง JSON ไม่ได้</td>
+</tr>
+<tr>
+<td><code>invalid_config</code></td>
+<td>ฟิลด์ไม่ครบ/ไม่ถูก (Device ID ไม่ตรงบอร์ด, ห้องผิดรูปแบบ, <code>airNumber</code> ไม่อยู่ใน 1–6, รหัส Wi-Fi สั้นกว่า 8, โปรโตคอลไม่รองรับ ฯลฯ)</td>
+</tr>
+<tr>
+<td><code>wifi_only_mode</code></td>
+<td>อยู่ในโหมดกู้ Wi-Fi แต่พยายามเปลี่ยนห้อง/เซิร์ฟเวอร์</td>
+</tr>
+<tr>
+<td><code>wifi_connection_failed</code></td>
+<td>ทดสอบ Wi-Fi ใหม่ไม่ผ่าน (ค่าเดิมใน NVS ยังอยู่)</td>
+</tr>
+<tr>
+<td><code>config_saved</code></td>
+<td>สำเร็จ บอร์ดรีสตาร์ตใน 1.5 วินาที</td>
+</tr>
+</tbody>
+</table></div>
+<p><code>airProtocol</code> ต้องเป็นชื่อ decode type ตัวพิมพ์ใหญ่ที่ <code>IRac</code> รองรับ (เช่น <code>DAIKIN</code>, <code>MITSUBISHI_AC</code>, <code>GREE</code>, <code>HAIER_AC160</code>, …) หรือค่าพิเศษ <code>SAIJO_DENKI</code> ที่ใช้ไดรเวอร์ 72 บิตของโปรเจคเอง (รองรับ Cool/Dry/Fan, 18–29 °C ตามโค้ดตรวจใน <code>processMqttCommand</code>)</p>
+<h3 id="ข้อจำกัดและเรื่องเฉพาะของ-windows">ข้อจำกัดและเรื่องเฉพาะของ Windows<a class="anchor" href="#ข้อจำกัดและเรื่องเฉพาะของ-windows">#</a></h3>
+<p>แอป Windows ใช้ <code>flutter_blue_plus_winrt</code> (ล็อกเวอร์ชัน 0.0.20) ซึ่งสร้างปัญหาเฉพาะตัว ที่ไล่แก้ตาม README สามฉบับ และมีผลต่อการออกแบบ <strong>ทั้งฝั่งบอร์ดและฝั่งแอป</strong>:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>อาการ</th>
+<th>สาเหตุ</th>
+<th>วิธีแก้ในโค้ด</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>อ่าน Identity ครั้งแรกหมดเวลา (~15 วินาที)</td>
+<td>Windows WinRT อ่านค่า GATT ก้อนใหญ่ที่ MTU เริ่มต้นไม่ทัน</td>
+<td>เฟิร์มแวร์ 1.6 ทำ Identity ให้สั้น (256 ไบต์) แล้วแยกค่าตั้งเดิมไป characteristic <code>…0006</code> ส่วนแอปอ่าน <code>settings</code> แยก และถ้าอ่านไม่ได้ก็ไปต่อได้</td>
+</tr>
+<tr>
+<td>เชื่อมได้แต่ค้นหา Service ไม่จบ</td>
+<td>แอปใช้ <code>autoConnect</code> แล้วเรียก <code>discoverServices</code> ทันที ขณะที่ WinRT ค้นหา GATT ภายใน <code>connect()</code> อยู่แล้ว เกิดซ้อนกัน</td>
+<td>เชื่อมแบบปกติ รอ <code>connect</code> เสร็จ (timeout 45 วินาที) หน่วง 1.2 วินาที แล้วค้นหา Service ซ้ำได้สูงสุด 3 ครั้ง <strong>บนการเชื่อมเดิม</strong></td>
+</tr>
+<tr>
+<td>scan ด้วย <code>withServices</code> ไม่เจอบอร์ดที่กู้แล้ว</td>
+<td>บางไดรเวอร์ไม่จับคู่เมื่อชื่ออยู่ใน scan response แต่ UUID อยู่ใน advertisement หลัก</td>
+<td>แอป scan โดยไม่กรอง Service กรองด้วยคำนำหน้าชื่อ แล้วค่อยยืนยัน identity</td>
+</tr>
+<tr>
+<td>ต่อใหม่หลังล้มเหลวแล้วบอร์ดเงียบ</td>
+<td>callback <code>onDisconnect</code> ของ BLE รันบน task ของ BLE ไม่เสถียรที่จะสั่งโฆษณาใหม่ตรงนั้น</td>
+<td>เฟิร์มแวร์ตั้งธง <code>bleReadvertisePending</code> แล้วให้ <code>loop()</code> เริ่ม advertising ใหม่หลังหน่วง 600 ms (<code>BLE_READVERTISE_DELAY_MS</code>)</td>
+</tr>
+</tbody>
+</table></div>
+<p>รายละเอียดฝั่งแอป (<code>_connect</code>, <code>provision</code>) อยู่ใน <strong>บท Flutter ตอนที่ 2</strong> บทนี้ไม่ซ้ำ</p>
+<h2 id="ลำดับ-provisioning-ทั้งหมด">ลำดับ Provisioning ทั้งหมด<a class="anchor" href="#ลำดับ-provisioning-ทั้งหมด">#</a></h2>
+<p><strong>Provisioning</strong> = กระบวนการลงทะเบียนบอร์ดใหม่เข้าระบบ: บอก Wi-Fi, บอก Broker, บอกว่าบอร์ดนี้อยู่ห้องไหน แล้วให้ระบบยืนยันว่าบอร์ดตัวนี้จริง</p>
+<p>ขั้นตอน (ฝั่งแอร์ ส่วนตรวจคนเหมือนกันแต่เรียก <code>/api/occupancy-sensors/reservations</code>):</p>
+<ol>
+<li>แอดมินเปิดหน้าตั้งค่าในแอป แอป scan BLE เลือกบอร์ด <code>RMUTT-AC-…</code> แล้ว <strong>อ่าน Identity</strong> เพื่อยืนยัน Device ID ตรงกับชื่อ BLE</li>
+<li>แอปกด <strong>สแกน Wi-Fi</strong> (อ่าน characteristic <code>…0005</code>) แล้วแอดมินเลือก SSID พิมพ์รหัส เลือกห้อง/หมายเลขแอร์/โปรโตคอล</li>
+<li>แอปเรียก <strong><code>POST /api/air-conditioners/reservations</code></strong> (เฉพาะ admin) Backend: ตรวจว่าห้องมีอยู่, ลบแถว <code>reserved</code> ที่หมดอายุ, ตรวจ Device ID/ตำแหน่งซ้ำ (ซ้ำตอบ <strong>409</strong> ก่อนเขียน BLE), สร้าง token สุ่ม 24 ไบต์, เก็บ <strong>เฉพาะ hash</strong> ของ token (<code>hashSecret(token, otpPepper)</code>) พร้อมหมดอายุ <strong>15 นาที</strong>, เตรียมบัญชี MQTT ของบอร์ด, แทรกแถว <code>provision_status = 'reserved'</code> แล้วตอบ <code>provisioningToken</code>, <code>mqttHost</code>, <code>mqttPort</code>, <code>mqttUsername</code>, <code>mqttPassword</code>, <code>mqttTls</code>, <code>mqttTopic</code></li>
+<li>แอป <strong>เขียน Config</strong> ผ่าน BLE (หั่น packet) พร้อม token และค่า MQTT</li>
+<li>บอร์ดประกอบ JSON → ตรวจความถูกต้อง → <strong>ทดสอบต่อ Wi-Fi จริง</strong> ด้วยรหัสที่ได้ (15 วินาที) → ถ้าผ่าน บันทึกลง <strong>NVS</strong> (หน่วยความจำถาวรที่ไม่หายเมื่อไฟดับ) → แจ้ง <code>config_saved</code> ทาง Notify → รีสตาร์ต</li>
+<li>บอร์ดบูตใหม่ ต่อ Wi-Fi ต่อ MQTT (TLS ถ้า <code>tls</code> เช่นพอร์ต 8443 ผ่าน Funnel หรือ 8883 ต่อตรง) แล้ว publish <code>…/provision</code> (retained) ที่มี token ซ้ำทุก 10 วินาทีจนกว่าจะได้ ack</li>
+<li>Backend subscribe <code>rmutt/ac/+/provision</code> ได้ข้อความ → ดึง hash จากแถว (ต้องเป็น <code>reserved</code>/<code>active</code>, ยังไม่หมดอายุ) → hash token ที่ได้เทียบด้วย <code>safeHashEquals</code> (เทียบแบบ constant-time กัน timing attack) → ถ้าตรง ตั้ง <code>provision_status = 'active'</code></li>
+<li>Backend publish <code>…/provision-ack</code> (retained, QoS 1) ที่มี token เดิม, ล้าง <code>provisioning_token_hash</code> ในฐานข้อมูล, และ <strong>ล้าง retained ของ <code>/provision</code></strong> ด้วยข้อความว่าง</li>
+<li>บอร์ดได้ ack → เช็คว่า <code>activated == true</code> และ token ตรงกับของตัวเอง → <strong>ลบ token ออกจาก NVS</strong> แล้ว publish ข้อความว่างล้าง retained ของ <code>/provision-ack</code> เอง</li>
+</ol>
+<div class="code-block"><div class="hl"><pre><span></span><code>แอป Flutter          Backend (HTTP)          Broker (MQTT)          ESP32
+    |  scan BLE ---------------------------------------------------&gt; | (advertising)
+    |  &lt;--------------- อ่าน Identity (BLE) ------------------------ |
+    |  POST /reservations -&gt;|                                          |
+    |                       |-- สร้างบัญชี MQTT (dynsec) -&gt;|           |
+    |                       |-- INSERT status=reserved, token hash     |
+    |  &lt;- token + ค่า MQTT -|                                          |
+    |  เขียน Config เป็น packet ผ่าน BLE ----------------------------&gt; |
+    |                                                  ทดสอบ Wi-Fi, บันทึก NVS
+    |  &lt;---------------- Notify {ok:true,config_saved} --------------- |
+    |                                                  รีสตาร์ต, ต่อ Wi-Fi + MQTT
+    |                       |&lt;------ /provision {token} (retained) ----|
+    |                       | hash(token) เทียบกับที่เก็บไว้            |
+    |                       | status = 'active'                        |
+    |                       |-- /provision-ack {token} retained ------&gt;|
+    |                       |-- /provision "" (ล้าง retained)          |
+    |                       |                                  ลบ token จาก NVS
+</code></pre></div>
+</div>
+
+<div class="callout why"><div class="callout-title">ทำไม</div><p><strong>ทำไมต้องมี token</strong>: Device ID มาจาก MAC ซึ่งไม่ใช่ความลับ ถ้าไม่มี token ใครก็ต่อ MQTT แล้วอ้างเป็นบอร์ดนั้นเพื่อทำให้ระบบเปลี่ยนเป็น active ได้ token ส่งมาทาง BLE เท่านั้น ซึ่งต้องอยู่ใกล้บอร์ดจริง และ Backend เก็บแค่ hash (ถ้าฐานข้อมูลรั่วก็เอา token ไปใช้ไม่ได้) <strong>ทำไมต้อง <code>reserved</code> ก่อน <code>active</code></strong>: ขั้น 4–6 ใช้เวลาเป็นนาที ถ้าไม่จองตำแหน่งไว้ก่อน คนที่สองจองห้อง+แอร์เบอร์เดียวกันซ้ำได้ ค่า UNIQUE ของ (ห้อง, เบอร์แอร์) ทำงานตั้งแต่ขั้น 3</p></div>
+
+<p><strong>ตั้งค่าบอร์ดเดิมซ้ำ</strong>: ถ้า Device ID เดิมอยู่ที่ห้อง+เบอร์เดิม (สถานะ <code>active</code>) Backend อัปเดตแถวเดิม ออก token ใหม่ และตอบ 200 (ไม่ใช่ 201) ถ้าเป็น Device ID อื่นหรือช่องมีคนใช้แล้ว ตอบ 409 ก่อนเริ่มเขียน BLE</p>
+<h2 id="การไหลของคำสั่งและข้อมูลเซนเซอร์">การไหลของคำสั่งและข้อมูลเซนเซอร์<a class="anchor" href="#การไหลของคำสั่งและข้อมูลเซนเซอร์">#</a></h2>
+<h3 id="คำสั่ง-เปิดแอร์-25c">คำสั่ง "เปิดแอร์ 25°C"<a class="anchor" href="#คำสั่ง-เปิดแอร์-25c">#</a></h3>
+<ol>
+<li>ผู้ใช้กดปุ่มในแอป → <code>AirConditionerService.sendCommand</code> ยิง <code>POST /api/air-conditioners/&lt;deviceId&gt;/command</code> พร้อม JSON ของสถานะ (<code>toCommandJson</code>)</li>
+<li>Backend (route ใน <code>routes/air-conditioners.js</code>): ตรวจว่ามีแถวนี้และ <code>provision_status = 'active'</code> (ไม่งั้น 409) → <code>validateAirState(body, protocol)</code> ตรวจค่า (ช่วงอุณหภูมิ, โหมด ฯลฯ ตามยี่ห้อ) → เรียก <code>publishAirCommand(deviceId, state)</code></li>
+<li><code>publishAirCommand</code> สร้าง <code>commandId</code> (UUID) + <code>sentAt</code> แล้ว publish ไป <code>rmutt/ac/&lt;deviceId&gt;/command</code> QoS 1 ไม่ retained (คำสั่งเก่าต้องไม่ถูกส่งซ้ำตอนบอร์ดเพิ่งต่อกลับ ไม่งั้นแอร์จะเปิดเองหลังไฟดับ!) Backend ตอบ HTTP <strong>202 Accepted</strong> <code>{accepted, commandId, state}</code> (ย้ำว่า "รับเรื่องแล้ว" ไม่ใช่ "แอร์เปิดแล้ว") ถ้า Broker ไม่ต่อ ตอบ 503</li>
+<li>Broker ส่งต่อให้บอร์ดที่ subscribe <code>/command</code> → <code>mqttCallback</code> <strong>ไม่ประมวลผลในนั้น</strong> แค่คัดลอกข้อความเก็บใน <code>pendingMqttCommand</code> แล้วตั้งธง <code>mqttCommandReady</code> (ดูหัวข้อเจาะโค้ด)</li>
+<li><code>loop()</code> เห็นธง → <code>processMqttCommand()</code> แปลง JSON, ตรวจช่วงอุณหภูมิ (16–30 หรือ Saijo 18–29), ตรวจค่าของ Saijo, อัปเดต <code>airState</code>, <code>saveAirState()</code> ลง NVS, <code>sendCurrentIrState()</code> ส่งสัญญาณ <strong>IR</strong> ออก LED ไปที่แอร์จริง</li>
+<li>บอร์ด <code>publishState(commandId)</code> สะท้อนสถานะจริงกลับไปที่ <code>…/state</code> (retained) พร้อม <code>commandId</code></li>
+<li>Backend ได้ <code>state</code> → อัปเดต <code>state_json</code>; แอปที่ดึงข้อมูลห้องทุก 10 วินาทีเห็นสถานะใหม่</li>
+</ol>
+<div class="callout note"><div class="callout-title">หมายเหตุ</div><p>ไม่มีการ "รอ" ผลแบบ request/response ระหว่าง HTTP กับบอร์ด: HTTP ตอบทันทีที่ publish แล้ว ผลจริงเห็นทาง <code>state</code>/<code>status</code> ทีหลัง การออกแบบแบบ asynchronous นี้ทำให้ Backend ไม่ค้างถ้าบอร์ด offline และแสดงสถานะจริงจากบอร์ดไม่ใช่ที่เดา</p></div>
+
+<h3 id="เซนเซอร์ตรวจคน--ปิดแอร์อัตโนมัติ">เซนเซอร์ตรวจคน → ปิดแอร์อัตโนมัติ<a class="anchor" href="#เซนเซอร์ตรวจคน--ปิดแอร์อัตโนมัติ">#</a></h3>
+<ol>
+<li>LD2410 ส่งข้อมูลทาง UART ให้ ESP32 ตรวจคน (บอร์ด <code>OCC32-…</code>) ทุก 250 ms (<code>PRESENCE_READ_INTERVAL_MS</code>) บอร์ดตัดสิน <code>occupied</code> จากพลังงาน stationary เกต 0–8 &gt; 25</li>
+<li>บอร์ด publish <code>rmutt/occupancy/OCC32-…/status</code> (retained) ทุก 10 วินาทีและทันทีที่เปลี่ยน</li>
+<li>Backend <code>handleOccupancyMessage</code> บันทึก <code>is_online</code>, <code>radar_available</code>, <code>is_occupied</code> ลง <code>occupancy_sensors</code> แล้ว <code>notify(occupancyStatusListeners, …)</code> พร้อมเลขห้อง</li>
+<li><code>services/auto-off.js</code> (สมัครเป็น listener ไว้ผ่าน <code>onOccupancyStatus</code>/<code>onAirStatus</code> และมี timer ทุก 10 วินาที) ประเมินแอร์ในห้องนั้น ผ่านฟังก์ชันตัดสิน <code>decideAutoOff</code> (ไฟล์ <code>utils/auto-off.js</code>): แอร์กินไฟอยู่ + ห้องว่าง → เริ่มนับถอยหลัง 300 วินาที (900 วินาทีถ้ามีคาบเรียน) → ครบเวลายังว่างก็ <code>publishAirCommand</code> สั่งปิด → ถ้ายังกินไฟ ยิงซ้ำทุก 20 วินาที สูงสุด 5 ครั้ง แล้วแจ้งเตือน</li>
+<li>ถ้าเซนเซอร์ไม่ online/radar ไม่พร้อม หรือ PZEM อ่านไม่ได้ → <strong>ไม่ปิดเด็ดขาด</strong> (ไม่รู้ว่ามีคนไหม / ตรวจไม่ได้ว่าแอร์หยุดจริงไหม)</li>
+</ol>
+<p>ทำไม logic นี้อยู่ที่ Backend ไม่ใช่บอร์ด: บอร์ดแอร์กับบอร์ดตรวจคนเป็นคนละตัว คุยกันเองไม่ได้ (ACL ก็ไม่เปิดให้) Backend เป็นที่เดียวที่เห็นทั้งสองฝั่งและรู้ตารางเรียน (รายละเอียดอยู่ในบทเรื่องปิดแอร์อัตโนมัติ)</p>
+<h2 id="กรณีพิเศษ">กรณีพิเศษ<a class="anchor" href="#กรณีพิเศษ">#</a></h2>
+<h3 id="wi-fi-หลุด-ble-recovery-กู้-wi-fi">Wi-Fi หลุด: BLE Recovery (กู้ Wi-Fi)<a class="anchor" href="#wi-fi-หลุด-ble-recovery-กู้-wi-fi">#</a></h3>
+<p>เงื่อนไข 5 ทางที่บอร์ดเปิด BLE: ไม่เคยตั้งค่า, กด BOOT (GPIO0) ค้างตอน RESET, ต่อ Wi-Fi ที่เก็บไว้ไม่ได้ตอนบูต (รอ 20 วินาที), Wi-Fi หลุดระหว่างใช้งาน, และคำสั่ง MQTT <code>enter_setup</code></p>
+<p><strong>ถ้า Wi-Fi เป็นสาเหตุ</strong> (<code>enterBleRecovery(reason, retryWifi = true)</code> และบอร์ด <code>config.configured</code>) บอร์ดเข้า <strong>โหมดกู้ Wi-Fi</strong> (<code>bleWifiOnlyMode = true</code>):
+- หยุดงานปกติ (<code>bleBlocksNormalOperation</code>), ตัด MQTT, เปิด BLE
+- <strong>ลองต่อ Wi-Fi เดิมซ้ำเองเบื้องหลังทุก 30 วินาที</strong> (<code>WIFI_RECOVERY_RETRY_MS</code>) ครั้งละไม่เกิน 8 วินาที (<code>WIFI_RECOVERY_ATTEMPT_MS</code>) ถ้าเราเตอร์กลับมา บอร์ดปิด BLE ต่อ MQTT ทำงานต่อเอง ไม่ลองถ้ามีแอปเชื่อม BLE อยู่
+- <strong>ยอมให้เปลี่ยนได้เฉพาะ Wi-Fi</strong> ฟังก์ชัน <code>keepsServerAssignment()</code> เทียบว่า ห้อง เบอร์แอร์ MQTT host/port/tls/username/password/topic ต้อง <strong>เท่าเดิมทุกตัว</strong> ไม่งั้นตอบ <code>wifi_only_mode</code></p>
+<div class="callout why"><div class="callout-title">ทำไม</div><p>ตอน Wi-Fi หลุด ใครอยู่ใกล้บอร์ดก็ต่อ BLE ได้ (BLE ไม่มีรหัสผ่านในโปรเจคนี้) ถ้าเปลี่ยนห้องหรือ MQTT server ได้ คนแปลกหน้าจะชี้บอร์ดไปหา MQTT ของตัวเองแล้วสั่งแอร์ห้องนั้น จึงล็อกไว้ ต้องการเปลี่ยนห้องหรือเซิร์ฟเวอร์ ต้องกด BOOT + RESET ที่ตัวบอร์ด (ต้องเข้าถึงตัวเครื่องจริง) ซึ่งเป็น "หลักฐานการอยู่ตรงนั้น" ในอีกรูปแบบ</p></div>
+
+<p>ส่วนกรณีที่แอดมินสั่ง <code>enter_setup</code> ผ่านแอป (<code>POST /api/air-conditioners/:deviceId/setup-mode</code>, admin เท่านั้น, ตอบ 202): <code>enterBleReconfiguration</code> เปิด BLE <strong>5 นาที</strong> (<code>ONLINE_SETUP_WINDOW_MS</code>) โดยบอร์ดยังออนไลน์อยู่ และ <strong>แก้ได้ทุกช่อง</strong> (<code>bleWifiOnlyMode = false</code>) เพราะคำสั่งมาจากแอดมินผ่าน Backend ที่ยืนยันตัวตนแล้ว ค่าเดิมยังใช้งานจนกว่าจะกดบันทึกสำเร็จ ถ้าทดสอบ Wi-Fi ใหม่ไม่ผ่านจะกู้ Wi-Fi/MQTT เดิมคืน</p>
+<p><strong>MQTT หลุด</strong> (Wi-Fi ปกติ) ไม่เปิด BLE แต่ <code>loop()</code> ลองต่อใหม่ทุก 3 วินาที ไปเรื่อย ๆ</p>
+<h3 id="ล้างเครื่อง-factory-reset-vs-ตั้งค่าใหม่">ล้างเครื่อง (Factory reset) vs. ตั้งค่าใหม่<a class="anchor" href="#ล้างเครื่อง-factory-reset-vs-ตั้งค่าใหม่">#</a></h3>
+<ul>
+<li><strong>BOOT + RESET</strong>: ไม่ลบอะไร แค่บังคับเข้าโหมด BLE ให้ตั้งค่าใหม่ได้ทุกช่อง</li>
+<li><strong>ล้าง NVS จริง</strong>: แฟลชสเก็ตช์ <code>firmware/reset/reset.ino</code> (เรียก <code>nvs_flash_erase()</code> ลบทุกค่าที่บันทึก, <code>WiFi.disconnect(true, true)</code>, แล้ว <code>nvs_flash_init()</code>) จากนั้นแฟลชเฟิร์มแวร์จริงกลับ บอร์ดจะ "ยังไม่ตั้งค่า" และเปิด BLE เอง</li>
+<li><strong>ลบอุปกรณ์ออกจากระบบ</strong>: <code>DELETE /api/air-conditioners/:deviceId</code> ลบแถวใน DB → <strong>สั่งบอร์ดล้างค่าตัวเอง (<code>unprovision</code>) แล้วรอคำตอบ ≤ 4 วินาที</strong> (เพิ่ม 13 ต.ค. 2569) → <strong>ล้าง retained</strong> ทั้ง 6 topic (<code>AIR_RETAINED_SUFFIXES</code> ใน <code>utils/mqtt-topics.js</code>) → ลบบัญชี MQTT ของบอร์ด ถ้าบอร์ดออนไลน์ ผลจะเหมือนแฟลช <code>reset.ino</code> แต่ทำจากแอปได้เลย (หัวข้อถัดไป)</li>
+</ul>
+<h3 id="ลบอุปกรณ์ในแอป--ล้างค่าในบอร์ด-unprovision-เพิ่ม-13-ตค-2569">ลบอุปกรณ์ในแอป → ล้างค่าในบอร์ด (unprovision) (เพิ่ม 13 ต.ค. 2569)<a class="anchor" href="#ลบอุปกรณ์ในแอป--ล้างค่าในบอร์ด-unprovision-เพิ่ม-13-ตค-2569">#</a></h3>
+<p><strong>ปัญหาเดิม:</strong> ก่อนหน้านี้การลบอุปกรณ์ทำแค่ฝั่งเซิร์ฟเวอร์ (ลบแถว ล้าง retained ลบบัญชี MQTT) ตัวบอร์ดยังเก็บรหัส Wi-Fi, ที่อยู่ Broker, username/password MQTT และเลขห้องไว้ใน NVS ครบ และยังพยายามต่อ Broker ทุก 3 วินาทีไปเรื่อย ๆ ผลเสีย: (1) บอร์ดที่ถอดไปทิ้งหรือย้ายไปที่อื่นยังพกรหัส Wi-Fi ของคณะไปด้วย (2) ในโหมด <code>shared</code> ที่ทุกบอร์ดใช้บัญชีเดียวกัน การลบบัญชีรายบอร์ดไม่มีผล บอร์ดที่ถูกลบยังต่อและส่งข้อมูลได้ (3) จะเอาบอร์ดไปใช้ห้องอื่นต้องไปกด BOOT + RESET หรือแฟลช <code>reset.ino</code> ที่ตัวบอร์ด</p>
+<p><strong>ลำดับทั้งหมด</strong> (แอร์และเซ็นเซอร์เหมือนกัน ต่างแค่ prefix ของ topic):</p>
+<div class="code-block"><div class="hl"><pre><span></span><code>แอป/เว็บ (แอดมิน)      Backend                        Broker                  บอร์ด
+DELETE /api/...  ───► 1. DELETE แถวในฐานข้อมูล
+                       2. publish command ─────────► &lt;prefix&gt;/&lt;id&gt;/command ─► ตรวจ deviceId ตรงกับตัวเอง
+                          {"action":"unprovision",     (QoS 1, ไม่ retained)    ├ publish status {"unprovisioned":true} (ไม่ retained)
+                           "deviceId":"&lt;id&gt;"}                                    ├ publish ข้อความว่าง retained ที่ status (+ state ของแอร์)
+                          รอคำตอบ ≤ 4 วินาที ◄──────── &lt;prefix&gt;/&lt;id&gt;/status ◄──┤ disconnect แบบปกติ (ไม่เกิด Last Will)
+                       3. ล้าง retained ทุก topic ──► ข้อความว่าง retained       ├ preferences.clear() ล้าง NVS
+                       4. ลบบัญชี MQTT (dynsec) ────► บอร์ดต่อกลับไม่ได้อีก      ├ (แอร์) ลบพาร์ติชันประวัติ rmuttlog
+◄── 200 {..., boardCleared: true/false}                                          └ ESP.restart() → โหมดตั้งค่า BLE
+</code></pre></div>
+</div>
+
+<p><strong>ทำไมลำดับต้องเป็นแบบนี้</strong>
+- <strong>ส่งคำสั่งก่อนลบบัญชี MQTT:</strong> ลบบัญชีแล้ว Broker ตัดบอร์ดออกทันที (Dynamic Security เตะ client ที่ถูกลบ) และบอร์ดต่อกลับไม่ได้อีก คำสั่งจะไปไม่ถึงตลอดไป
+- <strong>รอคำตอบก่อนล้าง retained:</strong> บอร์ดล้าง retained ของตัวเองแล้ว Backend ล้างซ้ำอีกรอบ (รวม <code>command</code>, <code>provision</code>, <code>provision-ack</code>, <code>schedule-status</code> ที่บอร์ดล้างเองไม่ได้เพราะ ACL ไม่ให้ publish) ล้างซ้ำไม่เสียหายเพราะข้อความว่างคือ "ไม่มี retained" เหมือนเดิม
+- <strong>ลบแถวในฐานข้อมูลก่อนสุด:</strong> การลบในระบบต้องสำเร็จเสมอแม้บอร์ดไม่ตอบ <code>unprovisionDevice</code> จึงไม่โยน error คืนแค่ <code>{sent, acknowledged}</code>
+- <strong>บอร์ดตัดการเชื่อมต่อแบบปกติ (<code>disconnect()</code>):</strong> ถ้าแค่รีบูต Broker จะเห็นว่าหลุดแบบไม่บอกลาแล้วปล่อย Last Will <code>{"online":false}</code> แบบ retained ทับข้อความว่างที่เพิ่งล้าง ทำให้มี retained ค้างอีก</p>
+<p><strong>การจัดการ retained ในขั้นนี้</strong>
+- คำสั่ง <code>unprovision</code> <strong>ไม่ retained</strong> โดยตั้งใจ ถ้า retained แล้วบอร์ดออฟไลน์ตอนลบ คำสั่งจะค้างบน Broker วันหลังถ้าเพิ่มบอร์ดตัวเดิมกลับเข้าระบบ (Device ID เดิมเพราะมาจาก MAC) บอร์ดจะได้คำสั่งค้างทันทีที่ subscribe แล้วล้างตัวเองทิ้งอีกรอบ (ขั้น 3 ของ Backend ก็ล้าง <code>command</code> อยู่แล้วเพื่อกันกรณีนี้)
+- คำตอบ <code>{"unprovisioned":true}</code> ไม่ retained เพราะเป็นเหตุการณ์ครั้งเดียว ถ้า retained จะค้างเป็น "status ล่าสุด" ของรหัสบอร์ดนี้
+- Backend แยกคำตอบออกจาก status ปกติด้วย <code>isUnprovisionAck(message, deviceId)</code>: ต้องมี <code>unprovisioned === true</code> (boolean จริง สตริง <code>"true"</code> ไม่นับ) และ <code>deviceId</code> ตรงกับ topic ถ้าใช่ <code>consumeUnprovisionAck</code> ปลุกตัวที่รออยู่แล้ว <code>return</code> ไม่ส่งต่อให้ <code>handleAirStatus</code> (ไม่บันทึกเป็นสถานะ)
+- ข้อความว่างที่บอร์ดล้าง retained ไหลมาถึง Backend ด้วย แต่ <code>JSON.parse('')</code> ล้มเหลวจึงถูกทิ้งเงียบ ๆ (defensive parsing)</p>
+<p><strong>กรณีขอบ (edge cases)</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>สถานการณ์</th>
+<th>เกิดอะไรขึ้น</th>
+<th>ผลต่อผู้ใช้</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>บอร์ดออนไลน์ เฟิร์มแวร์ใหม่</td>
+<td>ล้างค่า ตอบภายในไม่ถึงวินาที</td>
+<td><code>boardCleared: true</code> บอร์ดกลับเป็นสภาพใหม่ รอตั้งค่าผ่าน BLE</td>
+</tr>
+<tr>
+<td>บอร์ดออฟไลน์ตอนกดลบ</td>
+<td>คำสั่งไม่ retained จึงไม่ค้าง Backend รอครบ 4 วินาที (<code>UNPROVISION_ACK_TIMEOUT_MS</code>) แล้วลบต่อ</td>
+<td><code>boardCleared: false</code> บอร์ดยังเก็บค่าเดิม แต่บัญชี MQTT ถูกลบ (โหมด dynsec) จึงต่อ Broker ไม่ได้อีก ต้องล้างที่ตัวบอร์ดเอง: แฟลช <code>reset.ino</code>, BOOT + RESET แล้วตั้งค่าใหม่ หรือแฟลชเฟิร์มแวร์ใหม่</td>
+</tr>
+<tr>
+<td>บอร์ดเฟิร์มแวร์เก่า (ก่อน IR 2.5.1 / สายแอร์ 2.5.2-slm8 / เซ็นเซอร์ 1.3.2)</td>
+<td>ไม่รู้จัก action นี้ (บอร์ดแอร์รุ่นเก่าตกไปตรวจ <code>state</code> ไม่พบ พิมพ์ <code>MQTT command rejected: state is missing</code> แล้วทิ้ง) ไม่ตอบ</td>
+<td>เหมือนบอร์ดออฟไลน์: รอ 4 วินาที <code>boardCleared: false</code></td>
+</tr>
+<tr>
+<td>Backend ไม่ได้ต่อ Broker</td>
+<td><code>unprovisionDevice</code> คืน <code>{sent:false}</code> ทันที ไม่รอ</td>
+<td>ลบในฐานข้อมูลสำเร็จ <code>boardCleared: false</code></td>
+</tr>
+<tr>
+<td><code>deviceId</code> ในข้อความไม่ตรงกับบอร์ด</td>
+<td>บอร์ดพิมพ์ <code>Unprovision ignored</code> แล้วไม่ทำอะไร</td>
+<td>ไม่มีบอร์ดผิดตัวถูกล้าง</td>
+</tr>
+<tr>
+<td>กดลบเครื่องเดิมซ้ำระหว่างยังรอ</td>
+<td>ตัวรอเก่าถูกปิดด้วย <code>false</code> ก่อนตั้งตัวใหม่ (<code>unprovisionWaiters.get(deviceId)?.(false)</code>)</td>
+<td>ไม่มี Promise ค้าง</td>
+</tr>
+</tbody>
+</table></div>
+<div class="callout warn"><div class="callout-title">ระวัง</div><p>โหมด <code>shared</code> (บัญชี MQTT เดียวทุกบอร์ด ใช้ตอนพัฒนา) ไม่มีบัญชีรายบอร์ดให้ลบ ถ้าบอร์ดออฟไลน์ตอนลบแล้วกลับมาทีหลัง มันจะต่อ Broker และส่ง <code>status</code> ได้ตามเดิม (Backend ไม่บันทึกเพราะไม่มีแถวของบอร์ดนี้ <code>UPDATE</code> จึงไม่โดนแถวไหน) นี่เป็นอีกเหตุผลที่ระบบจริงต้องใช้ <code>MQTT_DEVICE_AUTH=dynsec</code></p></div>
+
+<div class="callout note"><div class="callout-title">หมายเหตุ</div><p>หลังล้าง Device ID <strong>ไม่เปลี่ยน</strong> เพราะสร้างจาก MAC ใน eFuse ไม่ได้เก็บใน NVS เอาบอร์ดไปตั้งค่าใหม่ก็ได้รหัสเดิม และบอร์ดแอร์ IR ไม่สั่งแอร์เพิ่ม (แอร์ค้างสถานะล่าสุด) ส่วนบอร์ดสายแอร์ล้างสถานะแอร์ที่จำไว้ด้วย หลังรีบูตจึงส่งเฟรม "ปิด" ทางสาย (ตามคอมเมนต์ใน <code>rmutt_esp32_air_wired.ino</code>)</p></div>
+
+<h3 id="ข้อมูลย้อนหลังตอนเน็ตหลุด-offline-history-พร้อม-ack">ข้อมูลย้อนหลังตอนเน็ตหลุด (offline history) พร้อม ack<a class="anchor" href="#ข้อมูลย้อนหลังตอนเน็ตหลุด-offline-history-พร้อม-ack">#</a></h3>
+<p>ถ้าบอร์ดต่อ MQTT ไม่ได้ ค่าไฟยังถูกวัด สรุปทุก 5 นาที (<code>HISTORY_INTERVAL_SECONDS = 300</code>) เขียนลง flash (partition <code>rmuttlog</code> 64 KB เป็น ring buffer 2,048 รายการ ≈ 7 วัน) เมื่อกลับมาออนไลน์:
+1. รอแบบสุ่ม 5–45 วินาที (<code>HISTORY_START_DELAY_*</code>) กันบอร์ดทั้งตึกส่งพร้อมกันหลัง Wi-Fi กลับมา
+2. ส่ง <code>…/history</code> ชุดละ 10 รายการ (<code>HISTORY_BATCH_SIZE</code>) แล้ว <strong>หยุดรอ ack</strong> (<code>historyAwaitingAck</code>)
+3. Backend <code>recordHistoryBatch</code> บันทึก แล้วตอบ <code>…/history-ack</code> <code>{upTo, stored, skipped}</code>
+4. บอร์ดได้ ack → <code>applyHistoryAck()</code> ลบรายการถึง <code>upTo</code> ออกจาก flash แล้วส่งชุดถัดไปหลังเว้น 1 วินาที
+5. ถ้า 20 วินาทีไม่มี ack (<code>HISTORY_ACK_TIMEOUT_MS</code>) ส่งชุดเดิมซ้ำ (หลัง 5 วินาที) Backend ข้ามรายการที่เคยบันทึกแล้ว จึงไม่นับซ้ำ</p>
+<p>ระหว่างยังส่งไม่ครบ ฟิลด์ <code>historyPending</code> ใน <code>status</code> &gt; 0 และ Backend <strong>ไม่บันทึกค่าสดลงประวัติ</strong> (<code>status.historyPending === 0</code> ใน <code>handleAirStatus</code>) ไม่งั้นพลังงานช่วงนั้นจะถูกนับสองรอบ (ครั้งหนึ่งจากค่าสด อีกครั้งจากข้อมูลย้อนหลัง) นี่คือเหตุผลของ ack: ลบจาก flash เฉพาะเมื่อ Backend ยืนยันว่าเก็บแล้ว จึงไม่มีข้อมูลหายแม้ไฟดับกลางทาง</p>
+<h3 id="ota-อัปเดตเฟิร์มแวร์ผ่าน-wi-fi">OTA (อัปเดตเฟิร์มแวร์ผ่าน Wi-Fi)<a class="anchor" href="#ota-อัปเดตเฟิร์มแวร์ผ่าน-wi-fi">#</a></h3>
+<ol>
+<li>แอดมินเลือกไฟล์ <code>.bin</code> บนเซิร์ฟเวอร์ (ตั้งแต่ 14 ต.ค. 2569 อัปโหลดจากหน้า <strong>เฟิร์มแวร์</strong> ในเว็บได้ด้วย <code>POST /api/firmware</code> ไม่ต้อง <code>scp</code>) → <code>POST /api/air-conditioners/:deviceId/ota</code> (หรือ <code>/api/occupancy-sensors/:deviceId/ota</code>) ตรวจว่า <strong>ชนิดไฟล์ตรงกับชนิดบอร์ด</strong> (<code>assertFirmwareKind</code>: ชื่อมี <code>occ</code> = เซ็นเซอร์, มี <code>wired</code>/<code>slm8</code> = สายแอร์ ใช้กับแอร์ที่ protocol <code>DAIKIN_WIRED</code>, นอกนั้น = แอร์ IR ผิดตอบ 400) ตรวจว่าบอร์ด <code>active</code> และ <strong>online</strong> → Backend สร้าง URL <code>https://&lt;mqtt_host&gt;/firmware/&lt;ชื่อไฟล์&gt;</code> (<code>firmwareUrl</code>) → <code>publishOtaCommand</code> ส่ง <code>{"action":"ota","url":…}</code> ไป <code>/command</code> → ตอบ 202</li>
+<li>บอร์ดเช็ก <code>otaUrlAllowed(url, config.mqttHost)</code>: ต้องขึ้นต้น <code>https://&lt;MQTT host เดิมของบอร์ด&gt;/firmware/</code>, ลงท้าย <code>.bin</code>, ยาวไม่เกิน 300, ไม่มี <code>..</code>, ตัวอักษรชื่อไฟล์จำกัด ไม่ผ่านจะตั้ง <code>otaError = "url_rejected"</code> ใน status</li>
+<li><code>performOtaUpdate()</code> sync เวลา, <strong>ตัด MQTT ก่อน</strong> (หน่วยความจำไม่พอเปิด TLS สองชุดพร้อมกัน), ดาวน์โหลดผ่าน HTTPS ตรวจใบรับรองกับใบราก, สำเร็จ → รีสตาร์ต ล้มเหลว → ใช้เฟิร์มแวร์เดิมต่อ รายงาน <code>otaError</code> และ <code>firmwareVersion</code> ใน <code>status</code> ซึ่ง Backend เก็บผ่าน <code>recordFirmwareStatus</code></li>
+</ol>
+<div class="callout why"><div class="callout-title">ทำไม</div><p>ป้องกันเฟิร์มแวร์ปลอม 3 ชั้น: (1) คำสั่งมาจาก topic <code>command</code> ที่มีแต่ Backend ส่งได้ตาม ACL (2) URL ชี้ได้เฉพาะเซิร์ฟเวอร์เดียวกับ MQTT ของบอร์ดเอง (3) ตรวจใบรับรอง HTTPS</p>
+<p>ทำไมต้องตรวจชนิดไฟล์ (เพิ่ม 14 ต.ค. 2569): โปรโตคอล OTA ไม่มีฟิลด์ "ชนิดบอร์ด" บอร์ดรับไฟล์ <code>.bin</code> อะไรก็ได้ที่ URL ผ่านเงื่อนไข ถ้าสั่งไฟล์ของบอร์ด IR ให้บอร์ดสายแอร์ (ชิปเดียวกัน ESP32) มันจะติดตั้งได้สำเร็จแล้วรีบูตเป็นโปรแกรมผิดชนิด ขาที่ต่อก็ผิด จึงต้องกันไว้ที่ Backend ซึ่งรู้ทั้งชื่อไฟล์และ protocol ของบอร์ด</p></div>
+
+<h2 id="broker-แบบพัฒนา-เทียบกับแบบใช้งานจริง">Broker แบบพัฒนา เทียบกับแบบใช้งานจริง<a class="anchor" href="#broker-แบบพัฒนา-เทียบกับแบบใช้งานจริง">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>หัวข้อ</th>
+<th>พัฒนา (<code>mqtt/</code>)</th>
+<th>ใช้งานจริง (<code>deploy/</code>)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ไฟล์ตั้งค่า</td>
+<td><code>mqtt/config/mosquitto.conf</code></td>
+<td><code>deploy/mosquitto/config/mosquitto.conf</code></td>
+</tr>
+<tr>
+<td>ผู้ใช้</td>
+<td>บัญชีเดียว <code>rmutt_air</code> ใช้ร่วมทุกบอร์ดและ Backend (<code>MQTT_DEVICE_AUTH=shared</code>)</td>
+<td>Backend หนึ่งบัญชี + บอร์ดละบัญชี (Dynamic Security, <code>MQTT_DEVICE_AUTH=dynsec</code>)</td>
+</tr>
+<tr>
+<td>สิทธิ์</td>
+<td>ไฟล์ <code>acl</code>: <code>topic readwrite rmutt/ac/#</code>, <code>rmutt/occupancy/#</code>, <code>read $SYS/#</code></td>
+<td>role/ACL รายอุปกรณ์สร้างโดย Backend</td>
+</tr>
+<tr>
+<td>รหัสผ่าน</td>
+<td>สุ่มโดย <code>setup_mqtt.ps1</code> ไฟล์ <code>passwords</code> (hash ด้วย <code>mosquitto_passwd</code>)</td>
+<td><code>deploy/init-env.sh</code> สร้าง <code>MQTT_PASSWORD</code>, <code>MQTT_DEVICE_SECRET</code> และ <code>mosquitto_ctrl dynsec init</code></td>
+</tr>
+<tr>
+<td>พอร์ต</td>
+<td>1883 ไม่เข้ารหัส เปิดให้ LAN</td>
+<td>1883 ภายใน Docker network เท่านั้น (Backend ใช้ <code>mqtt://mqtt:1883</code>) และเป็นปลายทางที่กล่อง tailscale ส่งต่อมาจาก Funnel <strong>8443</strong> (ค่าเริ่มต้นที่ส่งให้บอร์ด: <code>MQTT_DEVICE_URL=mqtts://rmutt-energy.tailb292b4.ts.net:8443</code>) ส่วน <strong>8883 TLS</strong> ยังเปิดไว้สำหรับบอร์ดที่ต่อตรงในอาคาร (ตั้ง <code>MQTT_DEVICE_URL=mqtts://&lt;โดเมน&gt;:8883</code> ใน <code>.env</code>)</td>
+</tr>
+<tr>
+<td>ใบรับรอง</td>
+<td>ไม่มี</td>
+<td>ทาง 8883: <code>fullchain.pem</code>/<code>privkey.pem</code> copy จาก Caddy โดย <code>sync-mqtt-cert.sh</code> (cron รายวัน), <code>tls_version tlsv1.2</code> ทาง Funnel 8443: ใบ ts.net ที่กล่อง tailscale ใช้ถอด TLS (Mosquitto ไม่เห็น)</td>
+</tr>
+<tr>
+<td><code>per_listener_settings</code></td>
+<td><code>true</code></td>
+<td><code>false</code> (Dynamic Security ต้องใช้กติกาเดียวทุก listener)</td>
+</tr>
+<tr>
+<td>ฝั่งบอร์ด</td>
+<td><code>tls=false</code> ต่อ IP ของ LAN</td>
+<td><code>tls=true</code> ตรวจใบรับรองกับ ISRG Root X1/X2 (ใบ ts.net และใบ DuckDNS ออกโดย Let's Encrypt จึงตรวจผ่านด้วยใบรากชุดเดียวกัน)</td>
+</tr>
+</tbody>
+</table></div>
+<p>ทำไมแยก: ตอนพัฒนาอยากได้ตัวที่ตั้งง่ายใน 1 คำสั่ง บนเครื่องตัวเอง ส่วนของจริงเปิดสู่อินเทอร์เน็ต (ผ่าน Funnel 8443) ต้องเข้ารหัสและแยกสิทธิ์ ไม่งั้นบอร์ดตัวเดียวที่ถูกถอดไปอ่าน flash ก็ควบคุมทั้งอาคารได้</p>
+<div class="callout warn"><div class="callout-title">ระวัง</div><p>บอร์ดคุยกับ Broker ที่ <code>127.0.0.1</code> ไม่ได้ เพราะ 127.0.0.1 บนบอร์ดคือตัวบอร์ดเอง (README_MQTT_HOST_EDIT) <code>MQTT_URL</code> ใน <code>backend/.env</code> ต้องใช้ LAN IP ของคอม ถ้าไม่งั้น <code>resolveMqttProvisioningSettings</code> จะส่ง host ที่บอร์ดต่อไม่ได้ให้ ฟังก์ชันนี้ใช้ <code>MQTT_DEVICE_URL</code> ก่อน (ถ้าตั้ง) แล้วค่อยถอยไปใช้ <code>MQTT_URL</code> เพราะ Backend ในของจริงต่อ <code>mqtt://mqtt:1883</code> ภายใน Docker แต่บอร์ดต้องต่อ <code>mqtts://</code> ที่เข้าถึงจากภายนอก (ค่าเริ่มต้น <code>mqtts://rmutt-energy.tailb292b4.ts.net:8443</code>)</p></div>
+
+<h3 id="setup_mqttps1-ทีละส่วน-ไฟล์-mqttsetup_mqttps1"><code>setup_mqtt.ps1</code> ทีละส่วน (ไฟล์ <code>mqtt/setup_mqtt.ps1</code>)<a class="anchor" href="#setup_mqttps1-ทีละส่วน-ไฟล์-mqttsetup_mqttps1">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>บรรทัด</th>
+<th>โค้ด</th>
+<th>ความหมาย</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2–10</td>
+<td><code>param(... $Username='rmutt_air', $Port=1883, $BrokerHost='')</code></td>
+<td>พารามิเตอร์ ตรวจรูปแบบชื่อผู้ใช้ด้วย <code>ValidatePattern</code> และพอร์ตด้วย <code>ValidateRange</code></td>
+</tr>
+<tr>
+<td>12–13</td>
+<td><code>$ErrorActionPreference='Stop'</code> / <code>Set-StrictMode -Version Latest</code></td>
+<td>หยุดทันทีเมื่อผิดพลาด ไม่ให้สคริปต์เดินต่อทั้งที่พังครึ่งทาง</td>
+</tr>
+<tr>
+<td>32–45</td>
+<td><code>Get-LanIPv4</code></td>
+<td>หา IPv4 ของการ์ดเครือข่ายที่ <code>Up</code> และมี default gateway ตัด <code>127.*</code> กับ <code>169.254.*</code> (IP ที่ระบบตั้งเองเมื่อไม่มี DHCP)</td>
+</tr>
+<tr>
+<td>47–61</td>
+<td><code>New-RandomPassword</code></td>
+<td>สุ่ม 24 ไบต์ด้วย <code>RandomNumberGenerator</code> (ใช้ตัวสุ่มเข้ารหัสลับ ไม่ใช่ <code>Get-Random</code>) แปลง Base64 แล้วแทน <code>+</code>→<code>A</code>, <code>/</code>→<code>B</code> ตัด <code>=</code> เพื่อไม่ให้มีตัวอักษรที่ทำให้ <code>.env</code>/URL มีปัญหา</td>
+</tr>
+<tr>
+<td>102–114</td>
+<td>หา <code>$BrokerHost</code> + ปฏิเสธ <code>localhost</code>, <code>0.0.0.0</code>, <code>127.*</code></td>
+<td>กันความผิดพลาดที่กล่าวข้างต้น (บอร์ดต่อ 127.0.0.1 ไม่ได้)</td>
+</tr>
+<tr>
+<td>122–136</td>
+<td>เขียน <code>passwords</code> แล้ว <code>docker run eclipse-mosquitto:2.0 mosquitto_passwd -U</code></td>
+<td>ใส่ <code>user:password</code> แบบ plain ไว้ก่อน แล้วให้ <code>mosquitto_passwd -U</code> แปลงเป็น hash ในไฟล์เดิม (ไฟล์ไม่เก็บรหัสจริง) ถ้าพังลบไฟล์ทิ้ง</td>
+</tr>
+<tr>
+<td>138–143</td>
+<td>เขียน <code>acl</code></td>
+<td><code>user rmutt_air</code> + <code>topic readwrite rmutt/ac/#</code> + <code>rmutt/occupancy/#</code> + <code>topic read $SYS/#</code> สิทธิ์อ่านเขียนเฉพาะสอง prefix ของโปรเจค (บอร์ดตรวจคนต้องมี prefix ที่สอง ถ้าตกไป Broker จะ "ปฏิเสธเงียบ ๆ" ข้อความหาย ทั้งที่ต่อติดและรหัสถูก)</td>
+</tr>
+<tr>
+<td>145–149</td>
+<td>เขียน <code>mqtt/.env</code></td>
+<td><code>MQTT_USERNAME</code>, <code>MQTT_PASSWORD</code> ให้ docker compose ใช้ (healthcheck)</td>
+</tr>
+<tr>
+<td>151–161</td>
+<td><code>Set-DotEnvValue</code> ใส่ <code>backend/.env</code></td>
+<td>ตั้ง <code>MQTT_REQUIRED=true</code>, <code>MQTT_URL=mqtt://&lt;IP&gt;:&lt;Port&gt;</code>, username/password, และ prefix ทั้งสอง <strong>โดยไม่ลบค่าอื่น</strong> (อัปเดตเฉพาะบรรทัดชื่อนั้น ไม่เจอก็เติมท้าย)</td>
+</tr>
+<tr>
+<td>163–172</td>
+<td><code>docker compose --env-file .env up -d</code> แล้วเรียก <code>test_mqtt.ps1</code></td>
+<td>เปิด container แล้วทดสอบทันที</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="test_mqttps1-ทีละส่วน-ไฟล์-mqtttest_mqttps1"><code>test_mqtt.ps1</code> ทีละส่วน (ไฟล์ <code>mqtt/test_mqtt.ps1</code>)<a class="anchor" href="#test_mqttps1-ทีละส่วน-ไฟล์-mqtttest_mqttps1">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>บรรทัด</th>
+<th>ความหมาย</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>4–20</td>
+<td>อ่าน <code>mqtt/.env</code> เป็นคู่ชื่อ=ค่า ตรวจว่ามี username/password ไม่งั้น throw</td>
+</tr>
+<tr>
+<td>22–23</td>
+<td><code>$topic = "rmutt/ac/diagnostic-$PID"</code>: topic ทดสอบใต้ prefix ที่ ACL อนุญาต ต่อท้ายด้วย PID ของ PowerShell กันชนกัน</td>
+</tr>
+<tr>
+<td>24–40</td>
+<td>วนรอสูงสุด 35 วินาที จน <code>docker inspect</code> รายงาน health = <code>healthy</code> ไม่ทัน → พิมพ์ log 60 บรรทัดท้ายแล้ว throw</td>
+</tr>
+<tr>
+<td>42–47</td>
+<td><code>mosquitto_pub ... -q 1 -r -t $topic -m $payload</code>: ส่ง QoS 1 แบบ <strong>retained</strong> (<code>-r</code>)</td>
+</tr>
+<tr>
+<td>49–55</td>
+<td><code>mosquitto_sub ... -q 1 -C 1 -W 8</code>: รับ 1 ข้อความ (<code>-C 1</code>) รอไม่เกิน 8 วินาที (<code>-W 8</code>) แล้วเทียบกับ payload ที่ส่ง เพราะส่งแบบ retained การ subscribe ทีหลังก็ยังได้รับ จึงทดสอบทั้ง publish และ subscribe ได้ในคำสั่งเรียงกัน</td>
+</tr>
+<tr>
+<td>57–62</td>
+<td><code>mosquitto_pub ... -r -n -t $topic</code>: <code>-n</code> = payload ว่าง + <code>-r</code> = ล้าง retained ไม่ทิ้งขยะบน Broker</td>
+</tr>
+</tbody>
+</table></div>
+<p><code>start_mqtt.ps1</code> ตรวจว่ามี <code>.env</code> กับ <code>config/passwords</code> แล้ว <code>docker compose up -d</code> + <code>ps</code>; <code>stop_mqtt.ps1</code> ตรวจ <code>.env</code> แล้ว <code>docker compose down</code> (ข้อมูล retained อยู่ใน <code>data/</code> จึงไม่หาย)</p>
+<h2 id="เจาะโค้ดทีละบรรทัด">เจาะโค้ดทีละบรรทัด<a class="anchor" href="#เจาะโค้ดทีละบรรทัด">#</a></h2>
+<h3 id="1-backendsrcutilsmqtt-topicsjs--รายการ-topic-ที่ต้องล้าง">1) <code>backend/src/utils/mqtt-topics.js</code> — รายการ topic ที่ต้องล้าง<a class="anchor" href="#1-backendsrcutilsmqtt-topicsjs--รายการ-topic-ที่ต้องล้าง">#</a></h3>
+<p><strong>ไฟล์ <code>backend/src/utils/mqtt-topics.js</code> บรรทัด 1–26</strong></p>
+<div class="code-block"><span class="code-lang">js</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c1">// Topic ที่ Backend/ESP32 ส่งแบบ retain ไว้บน Broker</span>
+<span class="c1">// ต้องล้างทั้งหมดเมื่อนำอุปกรณ์ออกจากระบบ ไม่งั้นข้อความเก่าจะค้างอยู่บน</span>
+<span class="c1">// Broker และย้อนกลับมาเมื่อเพิ่มอุปกรณ์รหัสเดิมอีกครั้ง</span>
+
+<span class="k">export</span><span class="w"> </span><span class="kd">const</span><span class="w"> </span><span class="nx">AIR_RETAINED_SUFFIXES</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">Object</span><span class="p">.</span><span class="nx">freeze</span><span class="p">([</span>
+<span class="w">  </span><span class="s1">'command'</span><span class="p">,</span>
+<span class="w">  </span><span class="s1">'state'</span><span class="p">,</span>
+<span class="w">  </span><span class="s1">'status'</span><span class="p">,</span>
+<span class="w">  </span><span class="s1">'provision'</span><span class="p">,</span>
+<span class="w">  </span><span class="s1">'provision-ack'</span><span class="p">,</span>
+<span class="w">  </span><span class="s1">'schedule-status'</span><span class="p">,</span>
+<span class="p">]);</span>
+
+<span class="k">export</span><span class="w"> </span><span class="kd">const</span><span class="w"> </span><span class="nx">OCCUPANCY_RETAINED_SUFFIXES</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">Object</span><span class="p">.</span><span class="nx">freeze</span><span class="p">([</span>
+<span class="w">  </span><span class="s1">'command'</span><span class="p">,</span>
+<span class="w">  </span><span class="s1">'status'</span><span class="p">,</span>
+<span class="w">  </span><span class="s1">'provision'</span><span class="p">,</span>
+<span class="w">  </span><span class="s1">'provision-ack'</span><span class="p">,</span>
+<span class="p">]);</span>
+
+<span class="k">export</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="nx">retainedTopics</span><span class="p">(</span><span class="nx">prefix</span><span class="p">,</span><span class="w"> </span><span class="nx">deviceId</span><span class="p">,</span><span class="w"> </span><span class="nx">suffixes</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">base</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">String</span><span class="p">(</span><span class="nx">prefix</span><span class="w"> </span><span class="o">??</span><span class="w"> </span><span class="s1">''</span><span class="p">).</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/\/+$/</span><span class="p">,</span><span class="w"> </span><span class="s1">''</span><span class="p">);</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">device</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">String</span><span class="p">(</span><span class="nx">deviceId</span><span class="w"> </span><span class="o">??</span><span class="w"> </span><span class="s1">''</span><span class="p">).</span><span class="nx">trim</span><span class="p">();</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">base</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">!</span><span class="nx">device</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="p">[];</span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="nx">suffixes</span><span class="p">.</span><span class="nx">map</span><span class="p">((</span><span class="nx">suffix</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="sb">`</span><span class="si">${</span><span class="nx">base</span><span class="si">}</span><span class="sb">/</span><span class="si">${</span><span class="nx">device</span><span class="si">}</span><span class="sb">/</span><span class="si">${</span><span class="nx">suffix</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></td></tr></table></div>
+</div>
+
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>บรรทัด</th>
+<th>ความหมาย</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>5</td>
+<td><code>export const</code> = ให้ไฟล์อื่น import ไปใช้ได้ <code>Object.freeze</code> ทำให้ array แก้ไขต่อไม่ได้ กันโค้ดอื่นแอบ <code>push</code> เพิ่มจนรายการเพี้ยน</td>
+</tr>
+<tr>
+<td>6–11</td>
+<td>suffix ของ topic ที่อาจมี retained ค้างอยู่ของบอร์ดแอร์ สังเกตว่ามี <code>command</code> แม้ปกติ Backend ส่งไม่ retained (กันกรณีเวอร์ชันเก่าเคยส่ง retained) แต่ไม่มี <code>history</code>, <code>history-ack</code> เพราะส่งแบบไม่ retained เสมอ</td>
+</tr>
+<tr>
+<td>20</td>
+<td>ประกาศฟังก์ชัน รับ prefix (เช่น <code>rmutt/ac</code>), Device ID และรายการ suffix</td>
+</tr>
+<tr>
+<td>21</td>
+<td><code>String(prefix ?? '')</code> — <code>??</code> คืนค่าขวาถ้าซ้ายเป็น <code>null/undefined</code> แล้วแปลงเป็นสตริงเสมอ; <code>.replace(/\/+$/, '')</code> ตัด <code>/</code> ท้ายสุดทุกตัวออก (regex: <code>\/+</code> = สแลชหนึ่งตัวขึ้นไป, <code>$</code> = ท้ายข้อความ) กัน <code>rmutt/ac//ESP32…</code></td>
+</tr>
+<tr>
+<td>22</td>
+<td><code>.trim()</code> ตัดช่องว่างหัวท้าย</td>
+</tr>
+<tr>
+<td>23</td>
+<td>ถ้าไม่มี prefix หรือ device ให้คืน array ว่าง ไม่สร้าง topic เพี้ยน เช่น <code>rmutt/ac//command</code> ซึ่งอาจไปล้าง topic ผิดที่</td>
+</tr>
+<tr>
+<td>24</td>
+<td><code>map</code> สร้าง topic เต็มทีละ suffix ด้วย template literal <code>`${base}/${device}/${suffix}`</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>ฟังก์ชัน <code>clearRetained</code> ใน <code>services/mqtt.js</code> เอา array นี้ไป publish <strong>ข้อความว่าง + <code>retain: true</code></strong> ทีละ topic ซึ่งตามกติกา MQTT คือคำสั่ง "ลบ retained ของ topic นี้" ทำไมต้องล้าง: ถ้าไม่ล้าง <code>status</code>/<code>provision</code> เก่าจะค้างบน Broker แล้วย้อนกลับมาหลอกระบบ เมื่อเพิ่มบอร์ดรหัสเดิมกลับเข้ามาใหม่</p>
+<h3 id="2-เฟิร์มแวร์-ต่อ-mqtt-พร้อม-lwt--connectmqtt">2) เฟิร์มแวร์: ต่อ MQTT พร้อม LWT — <code>connectMqtt()</code><a class="anchor" href="#2-เฟิร์มแวร์-ต่อ-mqtt-พร้อม-lwt--connectmqtt">#</a></h3>
+<p><strong>ไฟล์ <code>firmware/rmutt_esp32_air/rmutt_esp32_air.ino</code> บรรทัด 1064–1098</strong></p>
+<div class="code-block"><span class="code-lang">cpp</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1064</span>
+<span class="normal">1065</span>
+<span class="normal">1066</span>
+<span class="normal">1067</span>
+<span class="normal">1068</span>
+<span class="normal">1069</span>
+<span class="normal">1070</span>
+<span class="normal">1071</span>
+<span class="normal">1072</span>
+<span class="normal">1073</span>
+<span class="normal">1074</span>
+<span class="normal">1075</span>
+<span class="normal">1076</span>
+<span class="normal">1077</span>
+<span class="normal">1078</span>
+<span class="normal">1079</span>
+<span class="normal">1080</span>
+<span class="normal">1081</span>
+<span class="normal">1082</span>
+<span class="normal">1083</span>
+<span class="normal">1084</span>
+<span class="normal">1085</span>
+<span class="normal">1086</span>
+<span class="normal">1087</span>
+<span class="normal">1088</span>
+<span class="normal">1089</span>
+<span class="normal">1090</span>
+<span class="normal">1091</span>
+<span class="normal">1092</span>
+<span class="normal">1093</span>
+<span class="normal">1094</span>
+<span class="normal">1095</span>
+<span class="normal">1096</span>
+<span class="normal">1097</span>
+<span class="normal">1098</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">statusTopic</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">config</span><span class="p">.</span><span class="n">mqttTopic</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">"/status"</span><span class="p">;</span>
+<span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">clientId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"rmutt-"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">config</span><span class="p">.</span><span class="n">deviceId</span><span class="p">;</span>
+<span class="w">  </span><span class="n">DynamicJsonDocument</span><span class="w"> </span><span class="nf">offline</span><span class="p">(</span><span class="mi">96</span><span class="p">);</span>
+<span class="w">  </span><span class="n">offline</span><span class="p">[</span><span class="s">"online"</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span>
+<span class="w">  </span><span class="n">offline</span><span class="p">[</span><span class="s">"deviceId"</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">config</span><span class="p">.</span><span class="n">deviceId</span><span class="p">;</span>
+<span class="w">  </span><span class="n">String</span><span class="w"> </span><span class="n">willPayload</span><span class="p">;</span>
+<span class="w">  </span><span class="n">serializeJson</span><span class="p">(</span><span class="n">offline</span><span class="p">,</span><span class="w"> </span><span class="n">willPayload</span><span class="p">);</span>
+
+<span class="w">  </span><span class="kt">bool</span><span class="w"> </span><span class="n">connected</span><span class="p">;</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">config</span><span class="p">.</span><span class="n">mqttUsername</span><span class="p">.</span><span class="n">isEmpty</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">connected</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mqttClient</span><span class="p">.</span><span class="n">connect</span><span class="p">(</span>
+<span class="w">        </span><span class="n">clientId</span><span class="p">.</span><span class="n">c_str</span><span class="p">(),</span>
+<span class="w">        </span><span class="n">statusTopic</span><span class="p">.</span><span class="n">c_str</span><span class="p">(),</span>
+<span class="w">        </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">        </span><span class="nb">true</span><span class="p">,</span>
+<span class="w">        </span><span class="n">willPayload</span><span class="p">.</span><span class="n">c_str</span><span class="p">());</span>
+<span class="w">  </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">connected</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mqttClient</span><span class="p">.</span><span class="n">connect</span><span class="p">(</span>
+<span class="w">        </span><span class="n">clientId</span><span class="p">.</span><span class="n">c_str</span><span class="p">(),</span>
+<span class="w">        </span><span class="n">config</span><span class="p">.</span><span class="n">mqttUsername</span><span class="p">.</span><span class="n">c_str</span><span class="p">(),</span>
+<span class="w">        </span><span class="n">config</span><span class="p">.</span><span class="n">mqttPassword</span><span class="p">.</span><span class="n">c_str</span><span class="p">(),</span>
+<span class="w">        </span><span class="n">statusTopic</span><span class="p">.</span><span class="n">c_str</span><span class="p">(),</span>
+<span class="w">        </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">        </span><span class="nb">true</span><span class="p">,</span>
+<span class="w">        </span><span class="n">willPayload</span><span class="p">.</span><span class="n">c_str</span><span class="p">());</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">connected</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">Serial</span><span class="p">.</span><span class="n">printf</span><span class="p">(</span><span class="s">"MQTT connection failed, state: %d</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span><span class="w"> </span><span class="n">mqttClient</span><span class="p">.</span><span class="n">state</span><span class="p">());</span>
+<span class="w">    </span><span class="k">return</span><span class="p">;</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="n">mqttClient</span><span class="p">.</span><span class="n">subscribe</span><span class="p">((</span><span class="n">config</span><span class="p">.</span><span class="n">mqttTopic</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">"/command"</span><span class="p">).</span><span class="n">c_str</span><span class="p">(),</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+<span class="w">  </span><span class="n">mqttClient</span><span class="p">.</span><span class="n">subscribe</span><span class="p">((</span><span class="n">config</span><span class="p">.</span><span class="n">mqttTopic</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">"/provision-ack"</span><span class="p">).</span><span class="n">c_str</span><span class="p">(),</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+<span class="w">  </span><span class="n">mqttClient</span><span class="p">.</span><span class="n">subscribe</span><span class="p">((</span><span class="n">config</span><span class="p">.</span><span class="n">mqttTopic</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">"/schedule-status"</span><span class="p">).</span><span class="n">c_str</span><span class="p">(),</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+<span class="w">  </span><span class="n">mqttClient</span><span class="p">.</span><span class="n">subscribe</span><span class="p">((</span><span class="n">config</span><span class="p">.</span><span class="n">mqttTopic</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">"/history-ack"</span><span class="p">).</span><span class="n">c_str</span><span class="p">(),</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+</code></pre></div></td></tr></table></div>
+</div>
+
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>บรรทัด</th>
+<th>ความหมาย</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1064</td>
+<td><code>config.mqttTopic</code> คือ <code>rmutt/ac/ESP32-&lt;MAC&gt;</code> (ได้จาก Backend ผ่าน BLE) ต่อ <code>/status</code> = topic ที่จะฝากพินัยกรรม <code>const String</code> = ตัวแปรสตริงของ Arduino ที่แก้ไม่ได้</td>
+</tr>
+<tr>
+<td>1065</td>
+<td>client ID <code>rmutt-ESP32-&lt;MAC&gt;</code> ต้องตรงกับที่ Backend ลงทะเบียนในบัญชี Dynamic Security (<code>clientIdPrefix: 'rmutt-'</code>) ไม่ตรง Broker ปฏิเสธ</td>
+</tr>
+<tr>
+<td>1066–1070</td>
+<td>สร้าง JSON พินัยกรรม <code>{"online":false,"deviceId":…}</code> ด้วย ArduinoJson (<code>DynamicJsonDocument</code> ขนาด 96 ไบต์ในหน่วยความจำ heap) แล้ว <code>serializeJson</code> ลงสตริง</td>
+</tr>
+<tr>
+<td>1073–1079</td>
+<td>กรณีไม่มี username (โหมด Broker ไม่ต้อง auth) เรียก <code>connect(clientId, willTopic, willQoS, willRetain, willMessage)</code> อาร์กิวเมนต์ที่ 3 = <code>1</code> = <strong>Will QoS 1</strong> และที่ 4 = <code>true</code> = <strong>Will retained</strong></td>
+</tr>
+<tr>
+<td>1080–1089</td>
+<td>กรณีมี username: เพิ่มอาร์กิวเมนต์ username/password เข้าไปก่อน (ลำดับพารามิเตอร์ของ <code>PubSubClient::connect</code>) Dynamic Security ใช้ username = Device ID</td>
+</tr>
+<tr>
+<td>1090–1093</td>
+<td>ต่อไม่ติด → พิมพ์ <code>state</code> (รหัสข้อผิดพลาดของ PubSubClient เช่น 5 = ไม่ได้รับอนุญาต) แล้ว <code>return</code> โดย <code>loop()</code> จะลองใหม่ทุก 3 วินาที</td>
+</tr>
+<tr>
+<td>1095–1098</td>
+<td>subscribe 4 topic ด้วย QoS 1 ทุกครั้งที่ต่อติด (เพราะ clean session) ตรงกับ ACL <code>subscribe</code> ของบอร์ดแอร์พอดี ถ้า subscribe topic ที่ไม่มีสิทธิ์ Broker จะเงียบ</td>
+</tr>
+</tbody>
+</table></div>
+<p>หลังบรรทัด 1098 โค้ดตั้งหน่วงสุ่มก่อนส่งประวัติ แล้วเรียก <code>publishStatus()</code>, <code>publishState()</code> และ <code>publishProvisioningToken()</code> ทันที ทำไม publish <code>status</code> ทันทีที่ต่อติด: เพื่อ <strong>ทับพินัยกรรมเก่า</strong> (retained <code>online:false</code>) ที่ Broker ปล่อยไว้ตอนหลุดครั้งก่อน ให้กลับเป็น <code>online:true</code></p>
+<div class="callout why"><div class="callout-title">ทำไม</div><p><strong>ทำไม LWT ต้อง retained</strong>: ถ้า Backend รีสตาร์ตระหว่างที่บอร์ดหลุด แล้ว LWT ไม่ retained Backend จะไม่เคยรู้ว่าบอร์ด offline เพราะข้อความหลุดไปตอนมันไม่ได้ฟัง retained ทำให้ Backend ได้ "สถานะล่าสุดจริง" ทันทีที่ subscribe</p></div>
+
+<h3 id="3-เฟิร์มแวร์-callback-ตอนรับ-mqtt--mqttcallback">3) เฟิร์มแวร์: callback ตอนรับ MQTT — <code>mqttCallback()</code><a class="anchor" href="#3-เฟิร์มแวร์-callback-ตอนรับ-mqtt--mqttcallback">#</a></h3>
+<p><strong>ไฟล์ <code>firmware/rmutt_esp32_air/rmutt_esp32_air.ino</code> บรรทัด 1114–1116 และ 1143–1165</strong></p>
+<div class="code-block"><span class="code-lang">cpp</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1114</span>
+<span class="normal">1115</span>
+<span class="normal">1116</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">mqttCallback</span><span class="p">(</span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">topic</span><span class="p">,</span><span class="w"> </span><span class="kt">byte</span><span class="w"> </span><span class="o">*</span><span class="n">payload</span><span class="p">,</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">length</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">length</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">length</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">2048</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="p">;</span>
+<span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">incomingTopic</span><span class="p">(</span><span class="n">topic</span><span class="p">);</span>
+</code></pre></div></td></tr></table></div>
+</div>
+
+<div class="code-block"><span class="code-lang">cpp</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1143</span>
+<span class="normal">1144</span>
+<span class="normal">1145</span>
+<span class="normal">1146</span>
+<span class="normal">1147</span>
+<span class="normal">1148</span>
+<span class="normal">1149</span>
+<span class="normal">1150</span>
+<span class="normal">1151</span>
+<span class="normal">1152</span>
+<span class="normal">1153</span>
+<span class="normal">1154</span>
+<span class="normal">1155</span>
+<span class="normal">1156</span>
+<span class="normal">1157</span>
+<span class="normal">1158</span>
+<span class="normal">1159</span>
+<span class="normal">1160</span>
+<span class="normal">1161</span>
+<span class="normal">1162</span>
+<span class="normal">1163</span>
+<span class="normal">1164</span>
+<span class="normal">1165</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">incomingTopic</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">config</span><span class="p">.</span><span class="n">mqttTopic</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">"/provision-ack"</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">DynamicJsonDocument</span><span class="w"> </span><span class="nf">acknowledgement</span><span class="p">(</span><span class="mi">512</span><span class="p">);</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">deserializeJson</span><span class="p">(</span><span class="n">acknowledgement</span><span class="p">,</span><span class="w"> </span><span class="n">payload</span><span class="p">,</span><span class="w"> </span><span class="n">length</span><span class="p">))</span><span class="w"> </span><span class="k">return</span><span class="p">;</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">acknowledgedToken</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">acknowledgement</span><span class="p">[</span><span class="s">"token"</span><span class="p">]</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="s">""</span><span class="p">;</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">acknowledgement</span><span class="p">[</span><span class="s">"activated"</span><span class="p">]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">true</span><span class="w"> </span><span class="o">&amp;&amp;</span>
+<span class="w">        </span><span class="o">!</span><span class="n">config</span><span class="p">.</span><span class="n">provisioningToken</span><span class="p">.</span><span class="n">isEmpty</span><span class="p">()</span><span class="w"> </span><span class="o">&amp;&amp;</span>
+<span class="w">        </span><span class="n">acknowledgedToken</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">config</span><span class="p">.</span><span class="n">provisioningToken</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">preferences</span><span class="p">.</span><span class="n">begin</span><span class="p">(</span><span class="s">"rmutt-air"</span><span class="p">,</span><span class="w"> </span><span class="nb">false</span><span class="p">);</span>
+<span class="w">      </span><span class="n">preferences</span><span class="p">.</span><span class="n">remove</span><span class="p">(</span><span class="s">"prov_token"</span><span class="p">);</span>
+<span class="w">      </span><span class="n">preferences</span><span class="p">.</span><span class="n">end</span><span class="p">();</span>
+<span class="w">      </span><span class="n">config</span><span class="p">.</span><span class="n">provisioningToken</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">""</span><span class="p">;</span>
+<span class="w">      </span><span class="n">provisionAckClearReady</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="k">return</span><span class="p">;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">incomingTopic</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">config</span><span class="p">.</span><span class="n">mqttTopic</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">"/command"</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="p">;</span>
+<span class="w">  </span><span class="n">pendingMqttCommand</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">""</span><span class="p">;</span>
+<span class="w">  </span><span class="n">pendingMqttCommand</span><span class="p">.</span><span class="n">reserve</span><span class="p">(</span><span class="n">length</span><span class="p">);</span>
+<span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">index</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">index</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">length</span><span class="p">;</span><span class="w"> </span><span class="n">index</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">pendingMqttCommand</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="k">static_cast</span><span class="o">&lt;</span><span class="kt">char</span><span class="o">&gt;</span><span class="p">(</span><span class="n">payload</span><span class="p">[</span><span class="n">index</span><span class="p">]);</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="w">  </span><span class="n">mqttCommandReady</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></td></tr></table></div>
+</div>
+
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>บรรทัด</th>
+<th>ความหมาย</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1114</td>
+<td>ลายเซ็น callback ที่ PubSubClient บังคับ: <code>char *topic</code> (ชื่อ topic), <code>byte *payload</code> (ไบต์ดิบ ไม่มี <code>\0</code> ปิดท้าย), <code>length</code> (จำนวนไบต์) <code>*</code> คือ pointer = ที่อยู่ของหน่วยความจำที่เก็บข้อมูล</td>
+</tr>
+<tr>
+<td>1115</td>
+<td>ทิ้งข้อความว่าง (เช่นข้อความล้าง retained) หรือใหญ่เกิน 2048 ไบต์ (ขนาด buffer ที่ตั้ง <code>setBufferSize(2048)</code> ใน <code>setup</code>)</td>
+</tr>
+<tr>
+<td>1116</td>
+<td>แปลง topic เป็น <code>String</code> เพื่อเทียบด้วย <code>==</code></td>
+</tr>
+<tr>
+<td>1143</td>
+<td>แยกตามชนิด topic: นี่คือ ack ของ provisioning</td>
+</tr>
+<tr>
+<td>1145</td>
+<td><code>deserializeJson(doc, payload, length)</code> คืนค่า error (ไม่ใช่ศูนย์ = true) ถ้า JSON เสีย → <code>return</code> ทิ้ง ต้องส่ง <code>length</code> เพราะ payload ไม่มี <code>\0</code></td>
+</tr>
+<tr>
+<td>1146</td>
+<td><code>acknowledgement["token"] | ""</code> — ใน ArduinoJson <code>|</code> ใช้ให้ค่าเริ่มต้นถ้าไม่มีฟิลด์ (ต่างจาก <code>||</code> ของภาษาอื่น)</td>
+</tr>
+<tr>
+<td>1147–1149</td>
+<td>เงื่อนไข 3 ข้อพร้อมกัน: ack บอกว่า <code>activated == true</code>, บอร์ดยังมี token เก็บอยู่ และ token ใน ack <strong>ตรงกับของตัวเอง</strong> (กันใครส่ง ack ปลอม/ของบอร์ดอื่นมา)</td>
+</tr>
+<tr>
+<td>1150–1152</td>
+<td>ลบ key <code>prov_token</code> ออกจาก NVS (namespace <code>rmutt-air</code>) ผ่าน <code>Preferences</code> ลบแล้ว token ที่เคยส่งผ่านอากาศไม่มีเหลือที่บอร์ด</td>
+</tr>
+<tr>
+<td>1153–1154</td>
+<td>ล้าง token ในหน่วยความจำ และตั้งธง <code>provisionAckClearReady</code> ให้ <code>loop()</code> ไป publish ข้อความว่างล้าง retained ของ <code>/provision-ack</code></td>
+</tr>
+<tr>
+<td>1158</td>
+<td>ถ้าไม่ใช่ <code>/command</code> ทิ้ง (เช่น <code>schedule-status</code>, <code>history-ack</code> ถูกจัดการก่อนหน้านี้แล้ว)</td>
+</tr>
+<tr>
+<td>1159–1164</td>
+<td><strong>คัดลอกคำสั่งไปเก็บ</strong> แล้วตั้งธง <code>mqttCommandReady</code> ไม่ได้ประมวลผลทันที</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>ทำไมไม่ทำงานใน callback</strong>: callback ถูกเรียกขณะ <code>mqttClient.loop()</code> ทำงานอยู่ ถ้าทำงานหนัก (ส่งสัญญาณ IR ซึ่งใช้เวลา, เขียน NVS, parse JSON ใหญ่, publish ตอบกลับซึ่งเรียก PubSubClient ซ้ำซ้อนกลางการประมวลผล) อาจทำให้เชื่อมต่อค้างหรือหลุด keep-alive และ buffer ชนกัน จึงใช้แพทเทิร์น "callback แค่ฝากของ แล้วให้ <code>loop()</code> เป็นคนทำ" (<code>if (mqttCommandReady) processMqttCommand();</code> ใน <code>loop</code>) เช่นเดียวกับ OTA (<code>otaRequested</code>) และการลบ flash ของ history</p>
+<h3 id="4-เฟิร์มแวร์-ตัวรับคำสั่งเขียน-ble--configcallbacksonwrite">4) เฟิร์มแวร์: ตัวรับคำสั่งเขียน BLE — <code>ConfigCallbacks::onWrite</code><a class="anchor" href="#4-เฟิร์มแวร์-ตัวรับคำสั่งเขียน-ble--configcallbacksonwrite">#</a></h3>
+<p><strong>ไฟล์ <code>firmware/rmutt_esp32_air/rmutt_esp32_air.ino</code> บรรทัด 315–338</strong></p>
+<div class="code-block"><span class="code-lang">cpp</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">315</span>
+<span class="normal">316</span>
+<span class="normal">317</span>
+<span class="normal">318</span>
+<span class="normal">319</span>
+<span class="normal">320</span>
+<span class="normal">321</span>
+<span class="normal">322</span>
+<span class="normal">323</span>
+<span class="normal">324</span>
+<span class="normal">325</span>
+<span class="normal">326</span>
+<span class="normal">327</span>
+<span class="normal">328</span>
+<span class="normal">329</span>
+<span class="normal">330</span>
+<span class="normal">331</span>
+<span class="normal">332</span>
+<span class="normal">333</span>
+<span class="normal">334</span>
+<span class="normal">335</span>
+<span class="normal">336</span>
+<span class="normal">337</span>
+<span class="normal">338</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="nf">onWrite</span><span class="p">(</span><span class="n">BLECharacteristic</span><span class="w"> </span><span class="o">*</span><span class="n">characteristic</span><span class="p">)</span><span class="w"> </span><span class="k">override</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">raw</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">characteristic</span><span class="o">-&gt;</span><span class="n">getValue</span><span class="p">();</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">size_t</span><span class="w"> </span><span class="n">length</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raw</span><span class="p">.</span><span class="n">length</span><span class="p">();</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">length</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">6</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">notifyBle</span><span class="p">(</span><span class="nb">false</span><span class="p">,</span><span class="w"> </span><span class="s">"invalid_packet"</span><span class="p">,</span><span class="w"> </span><span class="s">"BLE packet is too short"</span><span class="p">);</span>
+<span class="w">      </span><span class="k">return</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="c1">// ESP32 Arduino Core 3.x returns Arduino String here.</span>
+<span class="w">    </span><span class="c1">// String has c_str(), but does not provide data() on every core version.</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">uint8_t</span><span class="w"> </span><span class="o">*</span><span class="n">data</span><span class="w"> </span><span class="o">=</span>
+<span class="w">        </span><span class="k">reinterpret_cast</span><span class="o">&lt;</span><span class="k">const</span><span class="w"> </span><span class="kt">uint8_t</span><span class="w"> </span><span class="o">*&gt;</span><span class="p">(</span><span class="n">raw</span><span class="p">.</span><span class="n">c_str</span><span class="p">());</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">notifyBle</span><span class="p">(</span><span class="nb">false</span><span class="p">,</span><span class="w"> </span><span class="s">"unsupported_version"</span><span class="p">,</span><span class="w"> </span><span class="s">"Unsupported BLE protocol"</span><span class="p">);</span>
+<span class="w">      </span><span class="k">return</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">uint16_t</span><span class="w"> </span><span class="n">sequence</span><span class="w"> </span><span class="o">=</span>
+<span class="w">        </span><span class="p">(</span><span class="k">static_cast</span><span class="o">&lt;</span><span class="kt">uint16_t</span><span class="o">&gt;</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">8</span><span class="p">)</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">data</span><span class="p">[</span><span class="mi">3</span><span class="p">];</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">uint16_t</span><span class="w"> </span><span class="n">total</span><span class="w"> </span><span class="o">=</span>
+<span class="w">        </span><span class="p">(</span><span class="k">static_cast</span><span class="o">&lt;</span><span class="kt">uint16_t</span><span class="o">&gt;</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">8</span><span class="p">)</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">data</span><span class="p">[</span><span class="mi">5</span><span class="p">];</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">total</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">total</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">32</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">sequence</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="n">total</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">notifyBle</span><span class="p">(</span><span class="nb">false</span><span class="p">,</span><span class="w"> </span><span class="s">"invalid_packet"</span><span class="p">,</span><span class="w"> </span><span class="s">"Invalid BLE sequence"</span><span class="p">);</span>
+<span class="w">      </span><span class="k">return</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+</code></pre></div></td></tr></table></div>
+</div>
+
+<p><strong>บรรทัด 339–368 (ประกอบข้อมูล)</strong></p>
+<div class="code-block"><span class="code-lang">cpp</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">339</span>
+<span class="normal">340</span>
+<span class="normal">341</span>
+<span class="normal">342</span>
+<span class="normal">343</span>
+<span class="normal">344</span>
+<span class="normal">345</span>
+<span class="normal">346</span>
+<span class="normal">347</span>
+<span class="normal">348</span>
+<span class="normal">349</span>
+<span class="normal">350</span>
+<span class="normal">351</span>
+<span class="normal">352</span>
+<span class="normal">353</span>
+<span class="normal">354</span>
+<span class="normal">355</span>
+<span class="normal">356</span>
+<span class="normal">357</span>
+<span class="normal">358</span>
+<span class="normal">359</span>
+<span class="normal">360</span>
+<span class="normal">361</span>
+<span class="normal">362</span>
+<span class="normal">363</span>
+<span class="normal">364</span>
+<span class="normal">365</span>
+<span class="normal">366</span>
+<span class="normal">367</span>
+<span class="normal">368</span>
+<span class="normal">369</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">sequence</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">receivedConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">""</span><span class="p">;</span>
+<span class="w">      </span><span class="n">expectedSequence</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">      </span><span class="n">expectedTotal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">total</span><span class="p">;</span>
+<span class="w">      </span><span class="n">receivedConfig</span><span class="p">.</span><span class="n">reserve</span><span class="p">(</span><span class="n">MAX_CONFIG_BYTES</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">sequence</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">expectedSequence</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">total</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">expectedTotal</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">receivedConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">""</span><span class="p">;</span>
+<span class="w">      </span><span class="n">expectedSequence</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">      </span><span class="n">expectedTotal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">      </span><span class="n">notifyBle</span><span class="p">(</span><span class="nb">false</span><span class="p">,</span><span class="w"> </span><span class="s">"sequence_error"</span><span class="p">,</span><span class="w"> </span><span class="s">"BLE packets arrived out of order"</span><span class="p">);</span>
+<span class="w">      </span><span class="k">return</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">receivedConfig</span><span class="p">.</span><span class="n">length</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">length</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">6</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">MAX_CONFIG_BYTES</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">receivedConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">""</span><span class="p">;</span>
+<span class="w">      </span><span class="n">notifyBle</span><span class="p">(</span><span class="nb">false</span><span class="p">,</span><span class="w"> </span><span class="s">"config_too_large"</span><span class="p">,</span><span class="w"> </span><span class="s">"Configuration is too large"</span><span class="p">);</span>
+<span class="w">      </span><span class="k">return</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">size_t</span><span class="w"> </span><span class="n">index</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">6</span><span class="p">;</span><span class="w"> </span><span class="n">index</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">length</span><span class="p">;</span><span class="w"> </span><span class="n">index</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">receivedConfig</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="k">static_cast</span><span class="o">&lt;</span><span class="kt">char</span><span class="o">&gt;</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">index</span><span class="p">]);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="n">expectedSequence</span><span class="o">++</span><span class="p">;</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">expectedSequence</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">expectedTotal</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">pendingConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">receivedConfig</span><span class="p">;</span>
+<span class="w">      </span><span class="n">configReady</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="w">      </span><span class="n">receivedConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">""</span><span class="p">;</span>
+<span class="w">      </span><span class="n">expectedSequence</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">      </span><span class="n">expectedTotal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+</code></pre></div></td></tr></table></div>
+</div>
+
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>บรรทัด</th>
+<th>ความหมาย</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>315</td>
+<td><code>onWrite</code> = callback ที่ไลบรารี BLE เรียกทุกครั้งที่แอปเขียน characteristic <code>…0002</code> <code>override</code> = บอกว่าเป็นการเขียนทับเมธอดของคลาสแม่ <code>BLECharacteristicCallbacks</code></td>
+</tr>
+<tr>
+<td>316–317</td>
+<td><code>auto</code> ให้คอมไพเลอร์เดาชนิด <code>getValue()</code> ได้ข้อมูลที่แอปเพิ่งเขียน</td>
+</tr>
+<tr>
+<td>318–321</td>
+<td>หัว packet 6 ไบต์ ถ้าสั้นกว่านั้นผิดแน่ แจ้ง error ทาง Notify</td>
+</tr>
+<tr>
+<td>324–325</td>
+<td><code>reinterpret_cast&lt;const uint8_t*&gt;</code> = ตีความตัวอักษรของสตริงเป็น "อาร์เรย์ไบต์ไม่มีเครื่องหมาย" เพื่ออ่านค่า 0–255 ได้ตรง ๆ</td>
+</tr>
+<tr>
+<td>326</td>
+<td>ตรวจ <code>data[0]</code> (เวอร์ชัน) และ <code>data[1]</code> (ชนิดข้อความ) ต้องเป็น 1 ทั้งคู่ — ถ้าปรับโปรโตคอลในอนาคต บอร์ดเก่าจะปฏิเสธชัดเจน</td>
+</tr>
+<tr>
+<td>331–332</td>
+<td>ประกอบเลข 16 บิตแบบ <strong>big-endian</strong>: ไบต์ <code>data[2]</code> เป็นครึ่งบน เลื่อนซ้าย 8 บิต (<code>&lt;&lt; 8</code>) แล้ว <code>|</code> ไบต์ล่าง <code>data[3]</code> ตัวอย่าง <code>0x01 0x2C</code> → 256 + 44 = 300 <code>static_cast&lt;uint16_t&gt;</code> กันไม่ให้ไบต์ถูกเลื่อนบิตจนล้นก่อนแปลง</td>
+</tr>
+<tr>
+<td>333–334</td>
+<td><code>total</code> จากไบต์ 4–5 ด้วยวิธีเดียวกัน</td>
+</tr>
+<tr>
+<td>335</td>
+<td>กันข้อมูลเพี้ยน: <code>total</code> ต้อง 1–32 และ <code>sequence</code> ต้องน้อยกว่า <code>total</code> (จำกัด 32 packet = 32×150 ≈ 4.8 KB เกิน <code>MAX_CONFIG_BYTES</code> พอดี เป็นแนวกันชั้นแรก)</td>
+</tr>
+<tr>
+<td>339–344</td>
+<td>packet แรก (<code>sequence == 0</code>) → เริ่มประกอบใหม่: ล้างบัฟเฟอร์ จำจำนวน packet ทั้งหมด จองหน่วยความจำ 4096 ไบต์ล่วงหน้า (<code>reserve</code>) ลดการจัดสรรใหม่ซ้ำ ๆ ที่ทำให้หน่วยความจำแตกเป็นชิ้น</td>
+</tr>
+<tr>
+<td>345–351</td>
+<td>ถ้า packet ที่มาไม่ใช่ลำดับที่รอ หรือ <code>total</code> เปลี่ยน → ทิ้งทั้งหมดแล้วให้แอปเริ่มใหม่ (ใช้ write-with-response ของแอปจึงปกติมาเรียง แต่ป้องกันไว้)</td>
+</tr>
+<tr>
+<td>352–356</td>
+<td>กันบัฟเฟอร์ล้น: ขนาดสะสม + ขนาดชิ้นนี้ (ตัดหัว 6 ไบต์) ต้องไม่เกิน 4096</td>
+</tr>
+<tr>
+<td>358–360</td>
+<td>วนต่อไบต์ข้อมูล (ตั้งแต่ index 6) ลงสตริงทีละตัว</td>
+</tr>
+<tr>
+<td>361–368</td>
+<td>นับ packet ที่ได้รับ ถ้าครบ → ย้ายไป <code>pendingConfig</code>, ตั้งธง <code>configReady</code>, ล้างตัวแปรประกอบ — แล้วจบ <strong>ไม่ประมวลผลที่นี่</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>ทำไมใช้ธง <code>configReady</code> แล้วให้ <code>loop()</code> เรียก <code>processPendingConfig()</code></strong>: การประมวลผลต้องทดสอบ Wi-Fi (นานถึง 15 วินาที), เขียน NVS, ซึ่งทำใน callback ของ BLE ไม่ได้ (callback รันบน task ของ BLE stack การบล็อกนานทำให้การเชื่อมต่อหลุด/หมดเวลา) แพทเทิร์นเดียวกับ MQTT ข้างบน และผลลัพธ์ส่งกลับทาง Notify (<code>notifyBle</code>) ซึ่งแอปรอได้สูงสุด 40 วินาที</p>
+<h3 id="5-เฟิร์มแวร์-ล้างค่าเมื่อถูกลบออกจากแอป--unprovisionandrestart-เพิ่ม-13-ตค-2569">5) เฟิร์มแวร์: ล้างค่าเมื่อถูกลบออกจากแอป — <code>unprovisionAndRestart()</code> (เพิ่ม 13 ต.ค. 2569)<a class="anchor" href="#5-เฟิร์มแวร์-ล้างค่าเมื่อถูกลบออกจากแอป--unprovisionandrestart-เพิ่ม-13-ตค-2569">#</a></h3>
+<p><strong>ไฟล์ <code>firmware/rmutt_esp32_air/rmutt_esp32_air.ino</code> บรรทัด 1229–1239</strong> (กิ่ง <code>unprovision</code> ใน <code>processMqttCommand</code>)</p>
+<div class="code-block"><span class="code-lang">cpp</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1229</span>
+<span class="normal">1230</span>
+<span class="normal">1231</span>
+<span class="normal">1232</span>
+<span class="normal">1233</span>
+<span class="normal">1234</span>
+<span class="normal">1235</span>
+<span class="normal">1236</span>
+<span class="normal">1237</span>
+<span class="normal">1238</span>
+<span class="normal">1239</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">action</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s">"unprovision"</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// Backend ส่งมาเมื่อแอดมินกดลบอุปกรณ์ในแอป</span>
+<span class="w">    </span><span class="c1">// ตรวจ deviceId ซ้ำอีกชั้น กันข้อความหลงมาผิด topic</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">target</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">document</span><span class="p">[</span><span class="s">"deviceId"</span><span class="p">]</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="s">""</span><span class="p">;</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">target</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">config</span><span class="p">.</span><span class="n">deviceId</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">Serial</span><span class="p">.</span><span class="n">printf</span><span class="p">(</span><span class="s">"Unprovision ignored: deviceId '%s' is not this board</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span><span class="w"> </span><span class="n">target</span><span class="p">.</span><span class="n">c_str</span><span class="p">());</span>
+<span class="w">      </span><span class="k">return</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="n">unprovisionAndRestart</span><span class="p">(</span><span class="s">"removed from the app"</span><span class="p">);</span>
+<span class="w">    </span><span class="k">return</span><span class="p">;</span>
+<span class="w">  </span><span class="p">}</span>
+</code></pre></div></td></tr></table></div>
+</div>
+
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>บรรทัด</th>
+<th>ความหมาย</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1229</td>
+<td><code>action</code> อ่านมาก่อนหน้านี้ด้วย <code>document["action"] | ""</code> (ไม่มีฟิลด์ได้สตริงว่าง) โค้ดนี้อยู่ใน <code>processMqttCommand()</code> ที่ <code>loop()</code> เรียก ไม่ใช่ใน callback จึง publish/disconnect ได้อย่างปลอดภัย</td>
+</tr>
+<tr>
+<td>1232</td>
+<td>ดึง <code>deviceId</code> ที่ Backend ใส่มาในข้อความ ถ้าไม่มีได้ <code>""</code></td>
+</tr>
+<tr>
+<td>1233–1236</td>
+<td>ไม่ตรงกับรหัสของตัวเอง → พิมพ์ลง Serial แล้ว <code>return</code> <strong>ไม่ล้าง</strong> ปกติ topic ก็บอกอยู่แล้วว่าเป็นของบอร์ดไหน แต่คำสั่งนี้ทำลายค่าทั้งหมดและย้อนกลับไม่ได้ จึงตรวจซ้ำอีกชั้น (defense in depth)</td>
+</tr>
+<tr>
+<td>1237</td>
+<td>ผ่านแล้วเรียกฟังก์ชันล้างค่า ซึ่งจบด้วย <code>ESP.restart()</code> (ไม่กลับมาที่บรรทัด 1238 จริง ๆ แต่เขียน <code>return</code> ไว้ให้อ่านง่ายและปลอดภัยถ้าแก้ฟังก์ชันภายหลัง)</td>
+</tr>
+</tbody>
+</table></div>
+<p>บอร์ดตรวจคน (<code>rmutt_esp32_occupancy.ino</code>) ต่างนิดเดียว: ตรวจ <code>deviceId</code> ใน <code>mqttCallback</code> แล้ว<strong>ตั้งธง</strong> <code>unprovisionRequested = true</code> ให้ <code>loop()</code> เรียก <code>unprovisionAndRestart</code> ภายหลัง เพราะบอร์ดนั้นประมวลผลคำสั่งใน callback โดยตรง และการ publish + disconnect ภายใน callback ของ PubSubClient เสี่ยงทำให้ไลบรารีพัง (แพทเทิร์นเดียวกับ <code>otaRequested</code>)</p>
+<p><strong>ไฟล์ <code>firmware/rmutt_esp32_air/rmutt_esp32_air.ino</code> บรรทัด 1174–1208</strong></p>
+<div class="code-block"><span class="code-lang">cpp</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1174</span>
+<span class="normal">1175</span>
+<span class="normal">1176</span>
+<span class="normal">1177</span>
+<span class="normal">1178</span>
+<span class="normal">1179</span>
+<span class="normal">1180</span>
+<span class="normal">1181</span>
+<span class="normal">1182</span>
+<span class="normal">1183</span>
+<span class="normal">1184</span>
+<span class="normal">1185</span>
+<span class="normal">1186</span>
+<span class="normal">1187</span>
+<span class="normal">1188</span>
+<span class="normal">1189</span>
+<span class="normal">1190</span>
+<span class="normal">1191</span>
+<span class="normal">1192</span>
+<span class="normal">1193</span>
+<span class="normal">1194</span>
+<span class="normal">1195</span>
+<span class="normal">1196</span>
+<span class="normal">1197</span>
+<span class="normal">1198</span>
+<span class="normal">1199</span>
+<span class="normal">1200</span>
+<span class="normal">1201</span>
+<span class="normal">1202</span>
+<span class="normal">1203</span>
+<span class="normal">1204</span>
+<span class="normal">1205</span>
+<span class="normal">1206</span>
+<span class="normal">1207</span>
+<span class="normal">1208</span>
+<span class="normal">1209</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">unprovisionAndRestart</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="o">&amp;</span><span class="n">reason</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">Serial</span><span class="p">.</span><span class="n">printf</span><span class="p">(</span><span class="s">"Unprovision: %s - clearing all saved settings</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span><span class="w"> </span><span class="n">reason</span><span class="p">.</span><span class="n">c_str</span><span class="p">());</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">mqttClient</span><span class="p">.</span><span class="n">connected</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// ตอบ Backend ว่าล้างค่าแล้ว (Backend รอคำตอบนี้ก่อนลบบัญชี MQTT ของบอร์ด)</span>
+<span class="w">    </span><span class="n">DynamicJsonDocument</span><span class="w"> </span><span class="n">ack</span><span class="p">(</span><span class="mi">128</span><span class="p">);</span>
+<span class="w">    </span><span class="n">ack</span><span class="p">[</span><span class="s">"deviceId"</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">config</span><span class="p">.</span><span class="n">deviceId</span><span class="p">;</span>
+<span class="w">    </span><span class="n">ack</span><span class="p">[</span><span class="s">"online"</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span>
+<span class="w">    </span><span class="n">ack</span><span class="p">[</span><span class="s">"unprovisioned"</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">ackPayload</span><span class="p">;</span>
+<span class="w">    </span><span class="n">serializeJson</span><span class="p">(</span><span class="n">ack</span><span class="p">,</span><span class="w"> </span><span class="n">ackPayload</span><span class="p">);</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">statusTopic</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">config</span><span class="p">.</span><span class="n">mqttTopic</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">"/status"</span><span class="p">;</span>
+<span class="w">    </span><span class="n">mqttClient</span><span class="p">.</span><span class="n">publish</span><span class="p">(</span><span class="n">statusTopic</span><span class="p">.</span><span class="n">c_str</span><span class="p">(),</span><span class="w"> </span><span class="n">ackPayload</span><span class="p">.</span><span class="n">c_str</span><span class="p">(),</span><span class="w"> </span><span class="nb">false</span><span class="p">);</span>
+<span class="w">    </span><span class="c1">// ล้าง retained ของตัวเอง แล้วตัดการเชื่อมต่อแบบปกติ</span>
+<span class="w">    </span><span class="c1">// (ตัดแบบปกติ Broker จะไม่ส่ง Last Will "online:false" กลับมาค้างเป็น retained)</span>
+<span class="w">    </span><span class="n">mqttClient</span><span class="p">.</span><span class="n">publish</span><span class="p">(</span><span class="n">statusTopic</span><span class="p">.</span><span class="n">c_str</span><span class="p">(),</span><span class="w"> </span><span class="s">""</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">);</span>
+<span class="w">    </span><span class="n">mqttClient</span><span class="p">.</span><span class="n">publish</span><span class="p">((</span><span class="n">config</span><span class="p">.</span><span class="n">mqttTopic</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">"/state"</span><span class="p">).</span><span class="n">c_str</span><span class="p">(),</span><span class="w"> </span><span class="s">""</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">);</span>
+<span class="w">    </span><span class="n">mqttClient</span><span class="p">.</span><span class="n">loop</span><span class="p">();</span>
+<span class="w">    </span><span class="n">delay</span><span class="p">(</span><span class="mi">300</span><span class="p">);</span>
+<span class="w">    </span><span class="n">mqttClient</span><span class="p">.</span><span class="n">disconnect</span><span class="p">();</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="n">preferences</span><span class="p">.</span><span class="n">begin</span><span class="p">(</span><span class="s">"rmutt-air"</span><span class="p">,</span><span class="w"> </span><span class="nb">false</span><span class="p">);</span>
+<span class="w">  </span><span class="n">preferences</span><span class="p">.</span><span class="n">clear</span><span class="p">();</span>
+<span class="w">  </span><span class="n">preferences</span><span class="p">.</span><span class="n">end</span><span class="p">();</span>
+<span class="w">  </span><span class="n">preferences</span><span class="p">.</span><span class="n">begin</span><span class="p">(</span><span class="s">"rmutt-state"</span><span class="p">,</span><span class="w"> </span><span class="nb">false</span><span class="p">);</span>
+<span class="w">  </span><span class="n">preferences</span><span class="p">.</span><span class="n">clear</span><span class="p">();</span><span class="w">   </span><span class="c1">// สถานะแอร์ + hist_ack</span>
+<span class="w">  </span><span class="n">preferences</span><span class="p">.</span><span class="n">end</span><span class="p">();</span>
+
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">historyFlash</span><span class="p">.</span><span class="n">partition</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="nb">nullptr</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">esp_partition_erase_range</span><span class="p">(</span><span class="n">historyFlash</span><span class="p">.</span><span class="n">partition</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">historyFlash</span><span class="p">.</span><span class="n">partition</span><span class="o">-&gt;</span><span class="n">size</span><span class="p">);</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="n">Serial</span><span class="p">.</span><span class="n">println</span><span class="p">(</span><span class="s">"Unprovision: done, restarting into BLE setup mode"</span><span class="p">);</span>
+<span class="w">  </span><span class="n">delay</span><span class="p">(</span><span class="mi">300</span><span class="p">);</span>
+<span class="w">  </span><span class="n">ESP</span><span class="p">.</span><span class="n">restart</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div></td></tr></table></div>
+</div>
+
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>บรรทัด</th>
+<th>ความหมาย</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1174</td>
+<td><code>const String &amp;reason</code> = รับสตริงแบบอ้างอิง (reference <code>&amp;</code>) ไม่คัดลอก และ <code>const</code> = ห้ามแก้ ใช้แค่พิมพ์ลง Serial</td>
+</tr>
+<tr>
+<td>1176</td>
+<td>ส่งคำตอบได้เฉพาะตอนยังต่อ MQTT อยู่ (ปกติต่ออยู่เพราะเพิ่งได้คำสั่งมา) ถ้าไม่ต่อก็ข้ามไปล้าง NVS เลย ไม่ค้างรอ</td>
+</tr>
+<tr>
+<td>1178–1183</td>
+<td>สร้าง JSON คำตอบ <code>{"deviceId":…,"online":false,"unprovisioned":true}</code> ขนาด 128 ไบต์ ใส่ <code>online:false</code> ด้วยเพื่อให้ Backend รุ่นเก่าที่ไม่รู้จัก <code>unprovisioned</code> อย่างน้อยเข้าใจว่าบอร์ดออฟไลน์</td>
+</tr>
+<tr>
+<td>1185</td>
+<td>publish คำตอบที่ <code>…/status</code> อาร์กิวเมนต์สุดท้าย <code>false</code> = <strong>ไม่ retained</strong> (เหตุการณ์ครั้งเดียว) ใช้ topic <code>status</code> เพราะ ACL ของบอร์ดอนุญาตให้ publish อยู่แล้ว ไม่ต้องเพิ่ม topic ใหม่</td>
+</tr>
+<tr>
+<td>1188–1189</td>
+<td>publish ข้อความว่าง <code>""</code> แบบ retained (<code>true</code>) ที่ <code>status</code> และ <code>state</code> = ลบ retained ของตัวเองบน Broker บอร์ดตรวจคนล้างแค่ <code>status</code> เพราะไม่มี <code>state</code></td>
+</tr>
+<tr>
+<td>1190–1191</td>
+<td><code>mqttClient.loop()</code> + หน่วง 300 ms ให้ PubSubClient ส่งข้อความในบัฟเฟอร์ออกไปจริงก่อนตัด</td>
+</tr>
+<tr>
+<td>1192</td>
+<td><code>disconnect()</code> ส่งแพ็กเก็ต DISCONNECT ตามมาตรฐาน Broker จึงรู้ว่า "ลาอย่างปกติ" และ <strong>ทิ้ง Last Will</strong> ไม่ปล่อย <code>online:false</code> แบบ retained กลับมาทับ</td>
+</tr>
+<tr>
+<td>1195–1197</td>
+<td>เปิด namespace <code>rmutt-air</code> ของ NVS แบบเขียนได้ (<code>false</code> = ไม่ใช่ read-only) แล้ว <code>clear()</code> ลบทุก key: Wi-Fi SSID/รหัส, MQTT host/port/username/password, ห้อง, เบอร์แอร์, token, ตารางเปิดปิด</td>
+</tr>
+<tr>
+<td>1198–1200</td>
+<td>ล้าง namespace <code>rmutt-state</code> (สถานะแอร์ล่าสุดและตัวชี้ <code>hist_ack</code> ของประวัติ)</td>
+</tr>
+<tr>
+<td>1202–1204</td>
+<td>ลบพาร์ติชันประวัติ <code>rmuttlog</code> ทั้งก้อนด้วย <code>esp_partition_erase_range</code> (flash ต้อง erase เป็นบล็อก) ไม่ให้ข้อมูลไฟของห้องเก่าถูกส่งขึ้นไปในนามห้องใหม่หลังตั้งค่าใหม่ ตรวจ <code>nullptr</code> ก่อนเพราะถ้าแฟลชด้วย partition table ที่ไม่มี <code>rmuttlog</code> ตัวชี้จะว่าง</td>
+</tr>
+<tr>
+<td>1206–1208</td>
+<td>หน่วงให้ Serial พิมพ์ทัน แล้ว <code>ESP.restart()</code> บูตใหม่ บอร์ดพบว่า <code>configured</code> เป็น false (ถูกล้าง) จึงเปิด BLE รอตั้งค่าเหมือนบอร์ดใหม่</td>
+</tr>
+</tbody>
+</table></div>
+<div class="callout why"><div class="callout-title">ทำไม</div><p>ทำไมไม่ใช้ <code>nvs_flash_erase()</code> แบบ <code>reset.ino</code> ที่ล้างทั้งชิป: <code>preferences.clear()</code> ล้างเฉพาะ namespace ของโปรแกรมเรา ไม่ไปยุ่งกับข้อมูลระบบอื่นใน NVS (เช่นค่าคาลิเบรตของ Wi-Fi/PHY ที่ไลบรารีเก็บ) และทำได้ขณะโปรแกรมรันอยู่ ไม่ต้อง deinit NVS ก่อน ผลที่ต้องการ (ลืม Wi-Fi/MQTT/ห้อง) ได้ครบเหมือนกัน</p></div>
+
+<h2 id="หลักการเขียนโค้ดที่ใช้ในส่วนนี้">หลักการเขียนโค้ดที่ใช้ในส่วนนี้<a class="anchor" href="#หลักการเขียนโค้ดที่ใช้ในส่วนนี้">#</a></h2>
+<ul>
+<li><strong>สัญญาร่วม (shared contract) เขียนซ้ำในหลายที่โดยต้องตรงกัน</strong>: UUID ซ้ำใน <code>.ino</code> สองไฟล์และ <code>ble_provisioning_service.dart</code>; ชื่อ topic ใน <code>.ino</code>, <code>services/mqtt.js</code>, <code>utils/mqtt-accounts.js</code> (ACL) ไม่มี codegen ดังนั้นไฟล์ <code>docs/BLE_MQTT_PROTOCOL.md</code> เป็นศูนย์กลางอ้างอิงและเวลาเพิ่ม topic ต้องแก้ครบทั้งสามที่ (รวม ACL ไม่งั้นถูกปฏิเสธเงียบ)</li>
+<li><strong>Callback ฝากของ แล้ว loop ทำงาน</strong> (<code>mqttCallback</code>, <code>ConfigCallbacks</code>, <code>WifiScanCallbacks</code> เป็นข้อยกเว้นเพราะเบา) เหตุผลคือกันบล็อก stack ของไลบรารี</li>
+<li><strong>Retained = "สถานะล่าสุด", ไม่ retained = "คำสั่งครั้งเดียว"</strong>: <code>state</code>/<code>status</code>/<code>provision</code>/<code>schedule-status</code> retained เพราะผู้มาทีหลังต้องเห็นค่าล่าสุด; <code>command</code>/<code>history</code> ไม่ retained เพราะการเล่นซ้ำจะเป็นอันตราย (เปิดแอร์ซ้ำ นับพลังงานซ้ำ)</li>
+<li><strong>สั่งก่อนเพิกถอน (notify before revoke)</strong> (<code>unprovision</code>, เพิ่ม 13 ต.ค. 2569): ส่งคำสั่งล้างค่าและรอคำตอบ (มี timeout 4 วินาที) ก่อนลบบัญชี MQTT เพราะหลังเพิกถอนสิทธิ์แล้วจะคุยกับบอร์ดไม่ได้อีก และ timeout ทำให้การลบไม่ค้างเมื่อบอร์ดออฟไลน์ คำสั่งทำลายข้อมูลแบบนี้ไม่ retained และใส่ <code>deviceId</code> ซ้ำในเนื้อข้อความให้บอร์ดตรวจ</li>
+<li><strong>เพิ่มฟิลด์ได้โดยไม่ทำให้ใครพัง (backward-compatible fields)</strong>: <code>controlType</code> ใน Identity, <code>controlMode</code>/<code>busOk</code> ฯลฯ ใน <code>status</code> ฝ่ายที่ไม่รู้จักแค่ไม่อ่าน ฝ่ายที่รู้จักใช้ค่าเริ่มต้นเมื่อไม่มีฟิลด์ (ไม่มี <code>controlType</code> = <code>ir</code>)</li>
+<li><strong>Ack-then-delete</strong> (<code>history-ack</code>, <code>provision-ack</code>): ผู้ส่งเก็บข้อมูลจนกว่าผู้รับยืนยัน ทำให้ไม่มีข้อมูลหาย และส่งซ้ำได้โดยผู้รับต้องทน duplicate (idempotent) Backend ข้ามรายการที่เคยบันทึก</li>
+<li><strong>Least privilege (สิทธิ์น้อยที่สุด)</strong>: ACL รายอุปกรณ์ (<code>deviceAcls</code>) ให้เห็นเฉพาะ topic ตัวเอง</li>
+<li><strong>Pure function แยกจากการทำงานจริง</strong>: <code>utils/mqtt-accounts.js</code>, <code>utils/mqtt-topics.js</code>, <code>utils/mqtt-provisioning.js</code> คำนวณล้วน ๆ (ทดสอบง่าย) ส่วน <code>services/mqtt*.js</code> เป็นตัวคุยกับ Broker จริง</li>
+<li><strong>Observer / listener</strong> (<code>onAirStatus</code>, <code>onOccupancyStatus</code>, <code>onMqttConnected</code> ใน <code>services/mqtt.js</code>): ให้ <code>auto-off.js</code> และ <code>mqtt-accounts.js</code> สมัครรับเหตุการณ์ได้ โดย <code>mqtt.js</code> ไม่ต้อง import ไฟล์เหล่านั้น หลีกเลี่ยง import วน (circular dependency) และ <code>notify()</code> จับ error ของ listener แต่ละตัวไม่ให้ล้มทั้งระบบ</li>
+<li><strong>Defense in depth</strong>: OTA มีสามชั้น, provisioning ใช้ token + hash + หมดอายุ 15 นาที + constant-time compare, โหมดกู้ Wi-Fi ล็อกค่า server</li>
+<li><strong>Serial per device</strong> (<code>runSerialForDevice</code>): ข้อความ <code>status</code>/<code>history</code> ของบอร์ดเดียวกันถูกประมวลผลทีละอัน กัน race condition ตอนอ่านค่าเดิมแล้วเขียนทับ</li>
+<li><strong>Defensive parsing</strong>: ข้อความที่ JSON เสียถูกทิ้งเงียบ ๆ (<code>catch { return; }</code>) เพราะ MQTT ไม่มีใครรอตอบ error และไม่ควรให้ข้อความขยะทำให้ Backend ล้ม</li>
+</ul>
+<h2 id="คำถามที่อาจารย์อาจถาม">คำถามที่อาจารย์อาจถาม<a class="anchor" href="#คำถามที่อาจารย์อาจถาม">#</a></h2>
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ทำไมใช้ MQTT ไม่ใช้ HTTP polling หรือ WebSocket?</strong>
+MQTT คงการเชื่อมต่อค้าง ส่งคำสั่งถึงบอร์ดได้ทันทีโดยบอร์ดไม่ต้องถามซ้ำ ๆ ประหยัดทั้งแบนด์วิดท์และไฟ มี retained (เก็บสถานะล่าสุด) และ Last Will (รู้ว่าบอร์ดหลุด) ให้ในตัว ซึ่ง HTTP polling กับ WebSocket ต้องเขียนเองทั้งหมด และบอร์ดอยู่หลัง NAT ก็ใช้ได้เพราะเป็นฝ่ายต่อออกไปหา Broker</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>แอปสั่งแอร์ผ่าน MQTT โดยตรงไหม?</strong>
+ไม่ แอปยิง HTTP ไปที่ Backend (<code>POST /api/air-conditioners/:id/command</code>) Backend ตรวจสิทธิ์ ตรวจค่า แล้วค่อย publish ไป <code>rmutt/ac/&lt;deviceId&gt;/command</code> เหตุผล: (1) ไม่ต้องแจกรหัส MQTT ให้ทุกเครื่องผู้ใช้ (2) Backend ตรวจสิทธิ์/ความถูกต้องได้ที่จุดเดียว (3) บันทึกประวัติและทำปิดแอร์อัตโนมัติได้</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>Retained message คืออะไร และโปรเจคใช้กับอะไร?</strong>
+Broker จำข้อความสุดท้ายของ topic ไว้ส่งให้คนที่ subscribe ทีหลัง ใช้กับ <code>status</code>, <code>state</code>, <code>provision</code>, <code>provision-ack</code>, <code>schedule-status</code> เพื่อให้ Backend/บอร์ดที่เพิ่งเริ่มทำงานเห็นสถานะล่าสุดทันที ส่วน <code>command</code> ไม่ retained เพราะถ้า retained บอร์ดที่ต่อกลับหลังไฟดับจะได้รับคำสั่ง "เปิดแอร์" เก่าซ้ำ</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>Last Will ใช้ทำอะไร?</strong>
+ตอนต่อ Broker บอร์ดฝากข้อความ <code>{"online":false,…}</code> ไว้ที่ topic <code>status</code> (QoS 1, retained) ถ้าบอร์ดหลุดแบบไม่ปกติ Broker ปล่อยข้อความนี้แทน Backend จึงรู้ว่า offline ทันทีโดยไม่ต้องรอหมดเวลา ตอนกลับมาออนไลน์บอร์ดส่ง <code>online:true</code> ทับ</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ทำไมต้องมี BLE ทั้งที่มี Wi-Fi และ MQTT?</strong>
+บอร์ดใหม่ไม่รู้ SSID/รหัสผ่านและไม่รู้ที่อยู่ Broker จึงเข้าเครือข่ายไม่ได้ BLE เป็นช่องทางระยะใกล้ที่ไม่ต้องมีเครือข่าย ใช้ส่งค่าตั้งต้นครั้งแรก และกู้บอร์ดเมื่อ Wi-Fi หลุด ช่องทางนี้ต้องอยู่ใกล้ตัวบอร์ดจริงซึ่งเป็นการป้องกันอีกชั้น</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>Provisioning token มีไว้ทำไม ในเมื่อมี Device ID แล้ว?</strong>
+Device ID มาจาก MAC ซึ่งไม่ใช่ความลับ (ประกาศผ่าน BLE) ถ้าไม่มี token ใครก็อ้างเป็นบอร์ดนั้นได้ token สุ่ม 24 ไบต์ส่งทาง BLE เท่านั้น (ต้องอยู่ใกล้) Backend เก็บแค่ hash หมดอายุใน 15 นาที เทียบแบบ constant-time เมื่อบอร์ดส่งกลับมาทาง MQTT และใช้ได้แค่ครั้งเดียว (เคลียร์ทั้งสองฝั่งหลัง ack)</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ข้อความ BLE ใหญ่เกิน MTU ทำอย่างไร?</strong>
+หั่น JSON เป็นชิ้นละ 150 ไบต์ ใส่หัว 6 ไบต์ (เวอร์ชัน, ชนิด, ลำดับ 2 ไบต์, จำนวนทั้งหมด 2 ไบต์) บอร์ดตรวจลำดับ รวมเป็นสตริง เมื่อครบจึงประมวลผล ผิดลำดับ/ใหญ่เกิน/เวอร์ชันไม่ตรงจะตอบ error ทาง Notify แอปรอผลสุดท้ายสูงสุด 40 วินาที เพราะบอร์ดต้องทดสอบ Wi-Fi ก่อนบันทึก</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถ้าใส่รหัส Wi-Fi ผิดแล้วบันทึกเกิดอะไร?</strong>
+บอร์ดทดสอบต่อ Wi-Fi ด้วยค่าใหม่ก่อน (15 วินาที) ถ้าไม่ผ่านจะไม่เขียนทับ NVS ตอบ <code>wifi_connection_failed</code> แอปอยู่หน้าเดิมให้แก้แล้วกดบันทึกใหม่ได้ ไม่ต้องล้าง flash และถ้าเป็นการตั้งค่าซ้ำบนบอร์ดที่ออนไลน์อยู่ บอร์ดกู้ Wi-Fi/MQTT เดิมกลับมา</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถ้าบอร์ดหลุดเน็ตหลายชั่วโมง ข้อมูลค่าไฟหายไหม?</strong>
+ไม่หาย บอร์ดสรุปทุก 5 นาทีเก็บลง flash (ราว 7 วัน) พอกลับมาก็ส่ง <code>history</code> ทีละ 10 รายการ รอ <code>history-ack</code> จาก Backend แล้วจึงลบจาก flash ถ้าไม่ได้รับ ack จะส่งซ้ำ และ Backend ข้ามรายการที่เคยบันทึก (ไม่นับซ้ำ) ระหว่างนั้น Backend ไม่บันทึกค่าสดลงประวัติเพื่อไม่ให้นับซ้ำ</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ปลอดภัยแค่ไหนถ้ามีคนขโมยบอร์ดหนึ่งตัวไปอ่านรหัสใน flash?</strong>
+ใช้โหมด Dynamic Security: แต่ละบอร์ดมี username/รหัสของตัวเอง (HMAC จาก Device ID กับ secret ของเซิร์ฟเวอร์) และ ACL อนุญาตเฉพาะ topic ของตัวเอง จึงสั่งแอร์ห้องอื่นไม่ได้ ถอดอุปกรณ์ออกจากระบบแล้วบัญชีถูกลบ นอกจากนี้การเชื่อมต่อจริงใช้ TLS (ค่าเริ่มต้นผ่าน Funnel พอร์ต 8443 หรือ 8883 เมื่อต่อตรง) ตรวจใบรับรองกับใบราก และ Broker ที่เข้าถึงจากอินเทอร์เน็ตได้ก็ยังบังคับบัญชีรายบอร์ด</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ลบแอร์ในแอปแล้ว บอร์ดยังจำรหัส Wi-Fi อยู่ไหม?</strong>
+ถ้าบอร์ดออนไลน์ตอนลบ ไม่จำครับ (ตั้งแต่ 13 ต.ค. 2569) Backend ส่ง <code>{"action":"unprovision","deviceId":…}</code> ไปที่ <code>command</code> ก่อนลบบัญชี MQTT บอร์ดตรวจว่า <code>deviceId</code> เป็นของตัวเอง ตอบ <code>{"unprovisioned":true}</code> ทาง <code>status</code> ล้าง retained ของตัวเอง ตัดการเชื่อมต่อแบบปกติ แล้ว <code>preferences.clear()</code> ลบ Wi-Fi, MQTT, ห้องใน NVS และรีบูตเข้าโหมดตั้งค่า BLE API ตอบ <code>boardCleared: true</code> ถ้าบอร์ดออฟไลน์ คำสั่งไปไม่ถึง (ไม่ได้ส่งแบบ retained) API ตอบ <code>boardCleared: false</code> บอร์ดยังเก็บค่าเดิมแต่ต่อ Broker ไม่ได้แล้วเพราะบัญชีถูกลบ ต้องไปล้างที่ตัวบอร์ด</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ทำไมคำสั่ง unprovision ไม่ส่งแบบ retained จะได้ถึงบอร์ดที่ออฟไลน์ตอนกลับมา?</strong>
+เพราะ Device ID มาจาก MAC ไม่เปลี่ยน ถ้าคำสั่งค้างบน Broker แล้ววันหลังเราเพิ่มบอร์ดตัวเดิมกลับเข้าระบบ บอร์ดจะได้คำสั่งค้างทันทีที่ subscribe แล้วล้างตัวเองทิ้งอีกรอบ อีกอย่างบัญชี MQTT ของบอร์ดถูกลบไปแล้ว บอร์ดที่กลับมาก็ต่อ Broker ไม่ได้อยู่ดี คำสั่ง retained จึงไม่มีประโยชน์และมีโทษ</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>บอร์ดสายแอร์กับบอร์ด IR แยกกันอย่างไรในโปรโตคอล?</strong>
+ใช้ Device ID, ชื่อ BLE, topic และ ACL ชุดเดียวกัน แยกด้วยฟิลด์ข้อมูล: Identity BLE มี <code>controlType: "wired"</code> และ <code>brand: "Daikin"</code> (บอร์ด IR ส่ง <code>"ir"</code>) และ <code>status</code> มี <code>controlMode: "wired"</code> ถ้าฐานข้อมูลยังเก็บยี่ห้อ IR Backend แก้เป็น <code>DAIKIN_WIRED</code> ให้เอง และ REST API ส่ง <code>controlType</code> ให้แอปรู้ว่าต้องซ่อนปุ่มที่รีโมตติดผนังไม่มี (Eco, Turbo, Quiet, Clean, สวิงแนวนอน)</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถ้าแอดมินสั่งไฟล์เฟิร์มแวร์ของบอร์ด IR ให้บอร์ดสายแอร์ จะเกิดอะไร?</strong>
+Backend ปฏิเสธตั้งแต่ต้น (400) ด้วย <code>assertFirmwareKind</code> ซึ่งดูชนิดจากชื่อไฟล์ (<code>wired</code>/<code>slm8</code> = สายแอร์, <code>occ</code> = เซ็นเซอร์) เทียบกับ protocol ของบอร์ด เพราะตัวบอร์ดเองตรวจแค่ URL ไม่รู้ว่าไฟล์เป็นของรุ่นไหน ถ้าปล่อยผ่าน บอร์ดจะติดตั้งได้ (ชิปเดียวกัน) แล้วรีบูตเป็นโปรแกรมผิดชนิด</p></div>
+
+<h2 id="สรุปและเช็กลิสต์ความเข้าใจ">สรุปและเช็กลิสต์ความเข้าใจ<a class="anchor" href="#สรุปและเช็กลิสต์ความเข้าใจ">#</a></h2>
+<p>ถ้าตอบข้อเหล่านี้ได้ แปลว่าเข้าใจบทนี้แล้ว</p>
+<ul>
+<li class="check"><input type="checkbox"> อธิบายได้ว่า Broker, client, topic, publish/subscribe, wildcard <code>+</code>/<code>#</code> คืออะไร และใครเป็น client บ้างในระบบ (บอร์ดแอร์ บอร์ดตรวจคน Backend — แอปไม่ใช่)</li>
+<li class="check"><input type="checkbox"> บอกได้ว่า QoS 0/1 ต่างกันอย่างไร และโปรเจคใช้อะไรที่ไหน (Backend ใช้ 1, <code>PubSubClient.publish</code> ของบอร์ดเป็น 0, LWT/subscribe เป็น 1)</li>
+<li class="check"><input type="checkbox"> บอกได้ว่าอะไร retained อะไรไม่ retained พร้อมเหตุผล (<code>command</code>/<code>history</code> ไม่, <code>state</code>/<code>status</code>/<code>provision</code>/<code>provision-ack</code>/<code>schedule-status</code> ใช่)</li>
+<li class="check"><input type="checkbox"> เขียน topic ของบอร์ดแอร์และบอร์ดตรวจคนได้ครบ พร้อมทิศทาง และรู้ว่า <code>history</code>/<code>history-ack</code> เป็นของแอร์เท่านั้น</li>
+<li class="check"><input type="checkbox"> อธิบายรูปแบบ Device ID (<code>ESP32-</code>/<code>OCC32-</code> + MAC 12 หลัก), ชื่อ BLE (<code>RMUTT-AC-</code>/<code>RMUTT-OCC-</code>), client ID</li>
+<li class="check"><input type="checkbox"> อธิบาย LWT ว่าทำงานอย่างไรและทำไม payload ของบอร์ดตรวจคนมี <code>radarAvailable:false</code></li>
+<li class="check"><input type="checkbox"> บอก UUID ทั้ง 6 ตัว (<code>7b57000N-a243-4e5b-8f13-179af81b2457</code>, N = 1–6) และ property ของแต่ละตัวได้</li>
+<li class="check"><input type="checkbox"> อธิบายหัว packet 6 ไบต์, ทำไมต้องหั่นชิ้น, รหัสผลลัพธ์ที่บอร์ดแจ้งกลับ</li>
+<li class="check"><input type="checkbox"> เล่าลำดับ provisioning 9 ขั้นได้ พร้อมเหตุผลของ token, hash, <code>reserved</code>→<code>active</code>, หมดอายุ 15 นาที</li>
+<li class="check"><input type="checkbox"> เล่าเส้นทาง "เปิดแอร์ 25°C" ตั้งแต่แอปถึง IR และ echo <code>state</code> พร้อมอธิบายว่าทำไม HTTP ตอบ 202</li>
+<li class="check"><input type="checkbox"> อธิบายเส้นทาง LD2410 → <code>status</code> → Backend → <code>auto-off</code> → <code>command</code> ปิดแอร์</li>
+<li class="check"><input type="checkbox"> แยกให้ได้ระหว่างโหมดกู้ Wi-Fi (เปลี่ยนได้เฉพาะ Wi-Fi) กับ <code>enter_setup</code> (เปลี่ยนได้ทุกช่อง 5 นาที) กับ BOOT+RESET กับ <code>reset.ino</code></li>
+<li class="check"><input type="checkbox"> อธิบาย offline history + ack และ OTA (3 ชั้นป้องกัน)</li>
+<li class="check"><input type="checkbox"> เปรียบเทียบ Broker แบบพัฒนา (บัญชีเดียว 1883) กับแบบใช้งานจริง (Dynamic Security รายอุปกรณ์ + TLS ผ่าน Funnel 8443 หรือ 8883 ตรง)</li>
+<li class="check"><input type="checkbox"> อธิบายเหตุผลที่ <code>mqttCallback</code> และ <code>ConfigCallbacks::onWrite</code> ไม่ประมวลผลหนัก ๆ เองทันที</li>
+<li class="check"><input type="checkbox"> เล่าลำดับ unprovision ได้ครบ (ลบแถว → ส่ง <code>unprovision</code> → รอคำตอบ ≤ 4 วินาที → ล้าง retained → ลบบัญชี MQTT) และบอกได้ว่าทำไมต้องส่งก่อนลบบัญชี (เพิ่ม 13 ต.ค. 2569)</li>
+<li class="check"><input type="checkbox"> บอกได้ว่าบอร์ดทำอะไรบ้างเมื่อได้ <code>unprovision</code> (ตรวจ <code>deviceId</code>, ตอบไม่ retained, ล้าง retained ตัวเอง, disconnect ปกติเพื่อไม่เกิด Last Will, ล้าง NVS, รีบูต) และผลเมื่อบอร์ดออฟไลน์ (<code>boardCleared: false</code>)</li>
+<li class="check"><input type="checkbox"> บอกฟิลด์ที่แยกบอร์ดสายแอร์ (<code>controlType</code> ใน Identity, <code>controlMode</code> ใน status, <code>controlType</code> ใน REST) และกติกาคำสั่งของ <code>DAIKIN_WIRED</code> ได้</li>
+<li class="check"><input type="checkbox"> อธิบายว่าทำไม OTA ต้องตรวจชนิดไฟล์ตรงชนิดบอร์ดที่ Backend</li>
+</ul><nav class="pager"><a class="prev" href="07-backend-services.html"><span>← บทก่อนหน้า</span>7. Backend ตอนที่ 2: งานเบื้องหลังและตรรกะหลักของระบบ</a><a class="next" href="09-firmware.html"><span>บทถัดไป →</span>9. เฟิร์มแวร์ ESP32: บอร์ดแอร์ (IR และสายแอร์) และบอร์ดตรวจจับคน</a></nav>
+  </main>
+  <aside class="toc"><div class="toc-title">ในบทนี้</div><ul><li><a href="#ภาพรวม">ภาพรวม</a></li><li><a href="#ความรู้ที่ต้องมีก่อนอ่านบทนี้">ความรู้ที่ต้องมีก่อนอ่านบทนี้</a></li><li><a href="#ตัวตนอุปกรณ์-device-identity">ตัวตนอุปกรณ์ (Device Identity)</a></li><li><a href="#ตาราง-topic-ทั้งหมด">ตาราง Topic ทั้งหมด</a></li><li><a href="#บัญชี-mqtt-รายอุปกรณ์-dynamic-security">บัญชี MQTT รายอุปกรณ์ (Dynamic Security)</a></li><li><a href="#ble-gatt-ของโปรเจค">BLE GATT ของโปรเจค</a></li><li><a href="#ลำดับ-provisioning-ทั้งหมด">ลำดับ Provisioning ทั้งหมด</a></li><li><a href="#การไหลของคำสั่งและข้อมูลเซนเซอร์">การไหลของคำสั่งและข้อมูลเซนเซอร์</a></li><li><a href="#กรณีพิเศษ">กรณีพิเศษ</a></li><li><a href="#broker-แบบพัฒนา-เทียบกับแบบใช้งานจริง">Broker แบบพัฒนา เทียบกับแบบใช้งานจริง</a></li><li><a href="#เจาะโค้ดทีละบรรทัด">เจาะโค้ดทีละบรรทัด</a></li><li><a href="#หลักการเขียนโค้ดที่ใช้ในส่วนนี้">หลักการเขียนโค้ดที่ใช้ในส่วนนี้</a></li><li><a href="#คำถามที่อาจารย์อาจถาม">คำถามที่อาจารย์อาจถาม</a></li><li><a href="#สรุปและเช็กลิสต์ความเข้าใจ">สรุปและเช็กลิสต์ความเข้าใจ</a></li></ul></aside>
+</div>
+<button class="to-top" id="toTop" aria-label="กลับขึ้นด้านบน">↑</button>
+<script src="../assets/search.js"></script>
+<script src="../assets/app.js"></script>
+</body>
+</html>

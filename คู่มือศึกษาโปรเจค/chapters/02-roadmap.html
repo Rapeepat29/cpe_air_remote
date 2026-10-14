@@ -1,0 +1,744 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>2. เริ่มจากอะไร และต้องเรียนรู้อะไรบ้าง — คู่มือศึกษา RMUTT Save Energy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Chakra+Petch:wght@600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+<script>try{var t=localStorage.getItem('guide.theme');if(t)document.documentElement.dataset.theme=t;var f=localStorage.getItem('guide.font');if(f)document.documentElement.dataset.font=f;}catch(e){}</script>
+</head>
+<body>
+<header class="topbar">
+  <button class="menu-btn" id="menuBtn" aria-label="เปิดเมนู">☰</button>
+  <a class="brand" href="../index.html"><span class="brand-mark">⚡</span><span>คู่มือศึกษา <b>RMUTT Save Energy</b></span></a>
+  <div class="top-actions">
+    <button id="fontBtn" title="ขนาดตัวอักษร">ก<small>±</small></button>
+    <button id="themeBtn" title="สลับโหมดสว่าง/มืด">☾</button>
+  </div>
+</header>
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <input class="nav-search" id="navSearch" type="search" placeholder="ค้นหาบทหรือหัวข้อ…">
+    <div id="searchResults" class="search-results"></div>
+    <nav class="nav" id="nav">
+<a class="nav-home" href="../index.html">หน้าแรก</a>
+<div class="nav-part">ภาพรวม</div><ul>
+<li><a href="01-concept.html"><span class="num">1</span>แนวคิดและหลักการคิดของโปรเจค</a></li>
+<li><a class="active" href="02-roadmap.html"><span class="num">2</span>เริ่มจากอะไร และต้องเรียนรู้อะไรบ้าง</a></li>
+<li><a href="03-architecture-flows.html"><span class="num">3</span>สถาปัตยกรรมและเส้นทางของข้อมูล</a></li>
+</ul>
+<div class="nav-part">โครงสร้างพื้นฐาน</div><ul>
+<li><a href="04-network-server.html"><span class="num">4</span>เครือข่าย เซิร์ฟเวอร์ และ Tailscale</a></li>
+<li><a href="05-database.html"><span class="num">5</span>ฐานข้อมูล MariaDB</a></li>
+</ul>
+<div class="nav-part">เซิร์ฟเวอร์</div><ul>
+<li><a href="06-backend-api.html"><span class="num">6</span>Backend ตอนที่ 1: โครงหลัก ระบบสมาชิก และ REST API</a></li>
+<li><a href="07-backend-services.html"><span class="num">7</span>Backend ตอนที่ 2: งานเบื้องหลังและตรรกะหลักของระบบ</a></li>
+<li><a href="08-protocols.html"><span class="num">8</span>โปรโตคอลสื่อสาร: MQTT และ Bluetooth Low Energy</a></li>
+</ul>
+<div class="nav-part">อุปกรณ์และหน้าจอ</div><ul>
+<li><a href="09-firmware.html"><span class="num">9</span>เฟิร์มแวร์ ESP32: บอร์ดแอร์ (IR และสายแอร์) และบอร์ดตรวจจับคน</a></li>
+<li><a href="10-flutter-architecture.html"><span class="num">10</span>แอป Flutter ตอนที่ 1: โครงสร้าง ข้อมูล และ State</a></li>
+<li><a href="11-flutter-screens.html"><span class="num">11</span>แอป Flutter ตอนที่ 2: หน้าจอหลักและวิดเจ็ต</a></li>
+<li><a href="12-flutter-admin-screens.html"><span class="num">12</span>แอป Flutter ตอนที่ 3: หน้าจอผู้ดูแลระบบและการตั้งค่า</a></li>
+<li><a href="13-webapp.html"><span class="num">13</span>เว็บแอป: HTML, CSS และ JavaScript ล้วน</a></li>
+</ul>
+<div class="nav-part">ใช้งานจริง</div><ul>
+<li><a href="14-deploy-scripts-testing.html"><span class="num">14</span>การติดตั้งระบบ สคริปต์อัตโนมัติ และการทดสอบ</a></li>
+<li><a href="15-security.html"><span class="num">15</span>ความปลอดภัยทั้งระบบ</a></li>
+<li><a href="16-presentation-qa.html"><span class="num">16</span>เตรียมนำเสนอและคำถามที่อาจารย์มักถาม</a></li>
+</ul>
+<div class="nav-part">ภาคผนวก</div><ul>
+<li><a href="17-glossary.html"><span class="num">17</span>อภิธานศัพท์</a></li>
+<li><a href="18-file-map.html"><span class="num">18</span>แผนที่ไฟล์ทั้งโปรเจค</a></li>
+</ul>
+<div class="nav-part">งานที่กำลังพัฒนา</div><ul>
+<li><a href="19-daikin-slm8.html"><span class="num">19</span>แอร์ Daikin ผ่านสาย SLM8: จากการแกะโปรโตคอลถึงบอร์ดสายแอร์</a></li>
+</ul>
+    </nav>
+  </aside>
+  <main class="content" id="content">
+<div class="chapter-head"><div class="kicker">บทที่ 2 · ภาพรวม</div><h1>เริ่มจากอะไร และต้องเรียนรู้อะไรบ้าง</h1></div>
+<h2 id="ภาพรวม">ภาพรวม<a class="anchor" href="#ภาพรวม">#</a></h2>
+<p>โปรเจคนี้มีโค้ดราว 61,000 บรรทัด ใน 6 ภาษา/เทคโนโลยี (Dart, JavaScript, C++, SQL, PowerShell/Bash, HTML/CSS) ถ้าเปิดไฟล์แรกที่เจอแล้วอ่านไปเรื่อย ๆ จะหลงแน่นอน
+บทนี้บอก <strong>ลำดับ</strong> ว่าควรเริ่มตรงไหน ต่อด้วยอะไร และต้องมีความรู้พื้นฐานอะไรก่อนเข้าแต่ละส่วน</p>
+<p>หลักคิดคือ <strong>อ่านจากภาพใหญ่ลงไปรายละเอียด และตามเส้นทางของข้อมูล</strong> ไม่ใช่อ่านตามโฟลเดอร์</p>
+<div class="code-block"><div class="hl"><pre><span></span><code>ภาพรวม (บท 1–3) → โครงสร้างพื้นฐาน (เครือข่าย, ฐานข้อมูล) → สมองกลาง (Backend)
+   → ภาษาที่ใช้คุยกัน (MQTT/BLE) → ปลายทาง (ESP32, แอป, เว็บ) → การติดตั้งจริง/ความปลอดภัย
+</code></pre></div>
+</div>
+
+<h2 id="ขั้นที่-0-เตรียมตัว-ครึ่งวัน">ขั้นที่ 0: เตรียมตัว (ครึ่งวัน)<a class="anchor" href="#ขั้นที่-0-เตรียมตัว-ครึ่งวัน">#</a></h2>
+<ol>
+<li>เปิดโฟลเดอร์โปรเจคใน <strong>VS Code</strong> (ติดตั้งส่วนเสริม Dart, Flutter, ESLint, Thai language pack ถ้าต้องการ)</li>
+<li>อ่านไฟล์ <code>START_HERE.md</code> ที่รากโปรเจค มันสั้นและบอกว่าระบบมีอะไรบ้าง</li>
+<li>ดูโครงโฟลเดอร์ระดับบนให้จำได้</li>
+</ol>
+<div class="code-block"><div class="hl"><pre><span></span><code>cpe_air_remote/
+├── lib/          แอป Flutter (Dart)              → บท 10–12
+├── test/         เทสต์ของแอป Flutter
+├── backend/      เซิร์ฟเวอร์ Node.js + SQL        → บท 5–7
+├── webapp/       เว็บแอป HTML/CSS/JS              → บท 13
+├── firmware/     โค้ด ESP32 (Arduino C++)         → บท 9
+├── mqtt/         Broker สำหรับพัฒนาบนเครื่องตัวเอง → บท 8
+├── deploy/       ไฟล์ขึ้นเซิร์ฟเวอร์จริง (Docker)   → บท 4, 14
+├── docs/         เอกสารเดิมของโปรเจค (docs/learn, docs/study)
+├── คู่มือศึกษาโปรเจค/  คู่มือนี้ (เปิด index.html)
+└── *.ps1         สคริปต์ PowerShell ช่วยรัน/สร้างแอป → บท 14
+</code></pre></div>
+</div>
+
+<h2 id="ลำดับการอ่านคู่มือนี้">ลำดับการอ่านคู่มือนี้<a class="anchor" href="#ลำดับการอ่านคู่มือนี้">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>ลำดับ</th>
+<th>บท</th>
+<th>เป้าหมาย</th>
+<th>เวลาโดยประมาณ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>แนวคิดและหลักการคิด</td>
+<td>ตอบได้ว่าทำไมต้องมีระบบนี้ และทำไมออกแบบแบบนี้</td>
+<td>1 ชม.</td>
+</tr>
+<tr>
+<td>2</td>
+<td>เริ่มจากอะไร (บทนี้)</td>
+<td>รู้ว่าต้องเรียนอะไร</td>
+<td>30 นาที</td>
+</tr>
+<tr>
+<td>3</td>
+<td>สถาปัตยกรรมและเส้นทางข้อมูล</td>
+<td>เห็นภาพการไหลของข้อมูลครบวง</td>
+<td>2 ชม.</td>
+</tr>
+<tr>
+<td>4</td>
+<td>เครือข่าย เซิร์ฟเวอร์ และ Tailscale</td>
+<td>เข้าใจว่าเซิร์ฟเวอร์อยู่ที่ไหน คนเข้ามาทางไหน</td>
+<td>4 ชม.</td>
+</tr>
+<tr>
+<td>5</td>
+<td>ฐานข้อมูล</td>
+<td>รู้ว่าข้อมูลเก็บอะไรไว้ที่ไหน</td>
+<td>4 ชม.</td>
+</tr>
+<tr>
+<td>6–7</td>
+<td>Backend ตอนที่ 1–2</td>
+<td>เข้าใจ API, ระบบสมาชิก, ตรรกะปิดแอร์, การเก็บค่าไฟ</td>
+<td>1–2 วัน</td>
+</tr>
+<tr>
+<td>8</td>
+<td>MQTT และ BLE</td>
+<td>เข้าใจ "ภาษา" ที่บอร์ดกับเซิร์ฟเวอร์ใช้คุยกัน</td>
+<td>4 ชม.</td>
+</tr>
+<tr>
+<td>9</td>
+<td>เฟิร์มแวร์ ESP32</td>
+<td>เข้าใจฝั่งฮาร์ดแวร์</td>
+<td>1 วัน</td>
+</tr>
+<tr>
+<td>10–12</td>
+<td>แอป Flutter ตอนที่ 1–3</td>
+<td>เข้าใจแอปมือถือ</td>
+<td>1–2 วัน</td>
+</tr>
+<tr>
+<td>13</td>
+<td>เว็บแอป</td>
+<td>เข้าใจหน้าเว็บ</td>
+<td>ครึ่งวัน</td>
+</tr>
+<tr>
+<td>14</td>
+<td>การติดตั้งและการทดสอบ</td>
+<td>รู้ว่าเอาขึ้นเซิร์ฟเวอร์และทดสอบยังไง</td>
+<td>ครึ่งวัน</td>
+</tr>
+<tr>
+<td>15</td>
+<td>ความปลอดภัย</td>
+<td>ตอบคำถามเรื่องความปลอดภัยได้</td>
+<td>2 ชม.</td>
+</tr>
+<tr>
+<td>16</td>
+<td>เตรียมนำเสนอและคำถามอาจารย์</td>
+<td>ซ้อมตอบ</td>
+<td>2 ชม.</td>
+</tr>
+</tbody>
+</table></div>
+<div class="callout tip"><div class="callout-title">เคล็ดลับ</div><p>ถ้าเวลาน้อย (เช่นต้องนำเสนอพรุ่งนี้) ให้อ่านแค่ <strong>บท 1 → 3 → 4 (ส่วน Tailscale) → 7 (ส่วนปิดแอร์อัตโนมัติ) → 16</strong> ก่อน แล้วค่อยกลับมาอ่านส่วนที่เหลือ</p></div>
+
+<h2 id="วิธีอ่านโค้ดให้ไม่หลง">วิธีอ่านโค้ดให้ไม่หลง<a class="anchor" href="#วิธีอ่านโค้ดให้ไม่หลง">#</a></h2>
+<ol>
+<li><strong>ตามเส้นทางข้อมูลหนึ่งเส้นให้จบก่อน</strong> เช่น "กดเปิดแอร์ในแอป" ไล่จาก <code>lib/widgets/air_control_card.dart</code> → <code>lib/services/air_conditioner_service.dart</code> → <code>backend/src/routes/air-conditioners.js</code> → <code>backend/src/services/mqtt.js</code> → <code>firmware/rmutt_esp32_air/rmutt_esp32_air.ino</code> (บท 3 มีเส้นทางให้แล้ว)</li>
+<li><strong>อ่านจุดเริ่มต้นของแต่ละโปรแกรมก่อน</strong>: <code>lib/main.dart</code>, <code>backend/src/server.js</code>, <code>webapp/assets/js/main.js</code>, ฟังก์ชัน <code>setup()</code> / <code>loop()</code> ในไฟล์ <code>.ino</code></li>
+<li><strong>อ่านเทสต์ประกอบ</strong> เทสต์บอกว่าฟังก์ชันควรทำอะไรกับข้อมูลแบบไหน เช่น <code>backend/test/auto-off.test.js</code></li>
+<li><strong>รันจริงแล้วลองแก้ทีละนิด</strong> เช่น เปลี่ยนข้อความในหน้าจอ แล้วดูว่าเปลี่ยนตรงไหน</li>
+<li><strong>ใช้ค้นหาทั้งโปรเจค</strong> (Ctrl+Shift+F ใน VS Code) หาชื่อฟังก์ชันหรือชื่อ topic เพื่อดูว่าใครเรียกใช้</li>
+</ol>
+<h2 id="ความรู้ที่ต้องศึกษา-แยกตามหมวด">ความรู้ที่ต้องศึกษา (แยกตามหมวด)<a class="anchor" href="#ความรู้ที่ต้องศึกษา-แยกตามหมวด">#</a></h2>
+<p>ระดับความสำคัญ: <strong>★★★ ต้องรู้ก่อนนำเสนอ</strong> · <strong>★★ ควรรู้</strong> · <strong>★ รู้ไว้ช่วยตอบคำถามเชิงลึก</strong></p>
+<h3 id="พื้นฐานคอมพิวเตอร์และการเขียนโปรแกรม">พื้นฐานคอมพิวเตอร์และการเขียนโปรแกรม<a class="anchor" href="#พื้นฐานคอมพิวเตอร์และการเขียนโปรแกรม">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>หัวข้อ</th>
+<th>ระดับ</th>
+<th>ใช้ตรงไหน</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ตัวแปร, ฟังก์ชัน, if/loop, object/class</td>
+<td>★★★</td>
+<td>ทุกส่วน</td>
+</tr>
+<tr>
+<td>JSON (รูปแบบข้อมูลแบบ <code>{ "key": value }</code>)</td>
+<td>★★★</td>
+<td>API, MQTT, BLE ทั้งหมดส่งข้อมูลเป็น JSON</td>
+</tr>
+<tr>
+<td>การทำงานแบบ asynchronous (<code>async</code>/<code>await</code>, Promise/Future)</td>
+<td>★★★</td>
+<td>Backend, แอป, เว็บ</td>
+</tr>
+<tr>
+<td>Command line / Terminal / PowerShell</td>
+<td>★★</td>
+<td>รันสคริปต์ทุกตัว</td>
+</tr>
+<tr>
+<td>Git และ <code>.gitignore</code></td>
+<td>★★</td>
+<td>เก็บโค้ด ไม่ให้ secret หลุด</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="เครือข่าย-บท-4">เครือข่าย (บท 4)<a class="anchor" href="#เครือข่าย-บท-4">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>หัวข้อ</th>
+<th>ระดับ</th>
+<th>ใช้ตรงไหน</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>IP address, IP ส่วนตัว/สาธารณะ, LAN, NAT</td>
+<td>★★★</td>
+<td>เหตุผลที่ต้องใช้ Tailscale</td>
+</tr>
+<tr>
+<td>Port และพอร์ตที่โปรเจคใช้ (22, 80, 443, 1883, 8443, 8883, 3000, 3306, 8080)</td>
+<td>★★★</td>
+<td>docker-compose, firewall</td>
+</tr>
+<tr>
+<td>DNS และโดเมน</td>
+<td>★★★</td>
+<td>DuckDNS, ts.net</td>
+</tr>
+<tr>
+<td>HTTP vs HTTPS, TLS, ใบรับรอง (certificate), CA, Let's Encrypt</td>
+<td>★★★</td>
+<td>Caddy, MQTTS, ESP32</td>
+</tr>
+<tr>
+<td>Reverse proxy</td>
+<td>★★</td>
+<td>Caddy ส่ง <code>/api</code> ไป Backend</td>
+</tr>
+<tr>
+<td>VPN / Tailscale / Funnel</td>
+<td>★★★</td>
+<td>ทางเข้าจากอินเทอร์เน็ต</td>
+</tr>
+<tr>
+<td>Firewall, SSH, SSH tunnel</td>
+<td>★★</td>
+<td>ดูแลเซิร์ฟเวอร์, เปิดดูฐานข้อมูล</td>
+</tr>
+<tr>
+<td>DNS-01 vs HTTP-01 challenge</td>
+<td>★</td>
+<td>ขอใบรับรองตอนเซิร์ฟเวอร์อยู่หลัง firewall</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="เซิร์ฟเวอร์และการ-deploy-บท-4-14">เซิร์ฟเวอร์และการ deploy (บท 4, 14)<a class="anchor" href="#เซิร์ฟเวอร์และการ-deploy-บท-4-14">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>หัวข้อ</th>
+<th>ระดับ</th>
+<th>ใช้ตรงไหน</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Docker: image, container, volume, network</td>
+<td>★★★</td>
+<td><code>deploy/docker-compose.yml</code></td>
+</tr>
+<tr>
+<td>docker compose (<code>up</code>, <code>ps</code>, <code>logs</code>, <code>exec</code>)</td>
+<td>★★</td>
+<td>ดูแลระบบ</td>
+</tr>
+<tr>
+<td>Linux/Ubuntu พื้นฐาน, sudo, cron</td>
+<td>★★</td>
+<td><code>setup-vps.sh</code>, สำรองข้อมูลรายวัน</td>
+</tr>
+<tr>
+<td>Environment variables และไฟล์ <code>.env</code></td>
+<td>★★★</td>
+<td>ค่าตั้งและ secret ทั้งหมด</td>
+</tr>
+<tr>
+<td>Healthcheck และ monitoring</td>
+<td>★</td>
+<td><code>/api/health</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="ฐานข้อมูล-บท-5">ฐานข้อมูล (บท 5)<a class="anchor" href="#ฐานข้อมูล-บท-5">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>หัวข้อ</th>
+<th>ระดับ</th>
+<th>ใช้ตรงไหน</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ตาราง แถว คอลัมน์ ชนิดข้อมูล</td>
+<td>★★★</td>
+<td><code>backend/database/schema.sql</code></td>
+</tr>
+<tr>
+<td>PRIMARY KEY, FOREIGN KEY, UNIQUE, INDEX</td>
+<td>★★★</td>
+<td>ทุกตาราง</td>
+</tr>
+<tr>
+<td>SQL: SELECT / INSERT / UPDATE / DELETE / JOIN / GROUP BY</td>
+<td>★★★</td>
+<td>routes และ services ของ Backend</td>
+</tr>
+<tr>
+<td>Transaction และการล็อกแถว</td>
+<td>★★</td>
+<td>จัดการผู้ใช้, บันทึกค่าไฟ</td>
+</tr>
+<tr>
+<td>SQL injection และ parameterized query</td>
+<td>★★★</td>
+<td><code>db.js</code> และทุก query</td>
+</tr>
+<tr>
+<td>Migration</td>
+<td>★★</td>
+<td><code>backend/scripts/migrate-*.js</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="backend-บท-67">Backend (บท 6–7)<a class="anchor" href="#backend-บท-67">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>หัวข้อ</th>
+<th>ระดับ</th>
+<th>ใช้ตรงไหน</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Node.js, npm, <code>package.json</code></td>
+<td>★★★</td>
+<td><code>backend/</code></td>
+</tr>
+<tr>
+<td>ES Modules (<code>import</code> / <code>export</code>)</td>
+<td>★★</td>
+<td>ทุกไฟล์</td>
+</tr>
+<tr>
+<td>HTTP method, status code, REST API</td>
+<td>★★★</td>
+<td><code>backend/src/routes/</code></td>
+</tr>
+<tr>
+<td>Express: router, middleware, error handler</td>
+<td>★★★</td>
+<td><code>app.js</code>, <code>middleware/</code></td>
+</tr>
+<tr>
+<td>JWT (token เข้าสู่ระบบ)</td>
+<td>★★★</td>
+<td><code>middleware/authenticate.js</code>, <code>routes/auth.js</code></td>
+</tr>
+<tr>
+<td>Hash รหัสผ่าน (bcrypt), OTP, pepper</td>
+<td>★★</td>
+<td>ระบบลืมรหัสผ่าน</td>
+</tr>
+<tr>
+<td>Rate limiting, CORS, security headers</td>
+<td>★★</td>
+<td><code>app.js</code>, <code>routes/auth.js</code></td>
+</tr>
+<tr>
+<td>Timer/งานเบื้องหลัง (<code>setInterval</code>)</td>
+<td>★★</td>
+<td><code>services/auto-off.js</code></td>
+</tr>
+<tr>
+<td>State machine และ pure function</td>
+<td>★★★</td>
+<td>ตรรกะปิดแอร์ <code>utils/auto-off.js</code></td>
+</tr>
+<tr>
+<td>Unit test (<code>node --test</code>)</td>
+<td>★★</td>
+<td><code>backend/test/</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="mqtt-และ-bluetooth-บท-8">MQTT และ Bluetooth (บท 8)<a class="anchor" href="#mqtt-และ-bluetooth-บท-8">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>หัวข้อ</th>
+<th>ระดับ</th>
+<th>ใช้ตรงไหน</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Publish/Subscribe, Broker, Topic, wildcard <code>+</code> <code>#</code></td>
+<td>★★★</td>
+<td>การคุยระหว่าง Backend กับบอร์ด</td>
+</tr>
+<tr>
+<td>QoS, retained message, Last Will</td>
+<td>★★★</td>
+<td>สถานะออนไลน์/ออฟไลน์ของบอร์ด</td>
+</tr>
+<tr>
+<td>Mosquitto + Dynamic Security (บัญชีและสิทธิ์รายบอร์ด)</td>
+<td>★★</td>
+<td><code>mosquitto.conf</code>, <code>services/mqtt-accounts.js</code></td>
+</tr>
+<tr>
+<td>BLE: advertising, GATT, service, characteristic, UUID</td>
+<td>★★★</td>
+<td>การตั้งค่าบอร์ดครั้งแรก</td>
+</tr>
+<tr>
+<td>MTU และการแบ่งข้อมูลเป็นชิ้น (chunk)</td>
+<td>★</td>
+<td>ส่งค่าตั้งยาว ๆ ผ่าน BLE</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="ฮาร์ดแวร์และเฟิร์มแวร์-บท-9">ฮาร์ดแวร์และเฟิร์มแวร์ (บท 9)<a class="anchor" href="#ฮาร์ดแวร์และเฟิร์มแวร์-บท-9">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>หัวข้อ</th>
+<th>ระดับ</th>
+<th>ใช้ตรงไหน</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ESP32 คืออะไร (Wi-Fi + BLE + หลาย UART)</td>
+<td>★★★</td>
+<td>ทั้งสองบอร์ด</td>
+</tr>
+<tr>
+<td>Arduino: <code>setup()</code>, <code>loop()</code>, <code>millis()</code> แทน <code>delay()</code></td>
+<td>★★★</td>
+<td>ไฟล์ <code>.ino</code></td>
+</tr>
+<tr>
+<td>GPIO, UART/Serial</td>
+<td>★★</td>
+<td>ต่อ PZEM, LD2410</td>
+</tr>
+<tr>
+<td>รีโมตอินฟราเรด (IR 38 kHz)</td>
+<td>★★</td>
+<td>ยิงคำสั่งแอร์, <code>SaijoDenkiAC.cpp</code></td>
+</tr>
+<tr>
+<td>PZEM-004T วัดแรงดัน/กระแส/กำลัง/พลังงาน</td>
+<td>★★★</td>
+<td>วัดค่าไฟ</td>
+</tr>
+<tr>
+<td>HLK-LD2410 เรดาร์ mmWave ตรวจคน</td>
+<td>★★★</td>
+<td>บอร์ดตรวจจับคน</td>
+</tr>
+<tr>
+<td>Hysteresis / debounce</td>
+<td>★★</td>
+<td>ตัดสินว่าแอร์ทำงานจริงไหม</td>
+</tr>
+<tr>
+<td>NVS, partition table, OTA</td>
+<td>★★</td>
+<td>จำค่าตั้ง, อัปเดตเฟิร์มแวร์ผ่าน Wi-Fi</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="แอปมือถือ-บท-1012">แอปมือถือ (บท 10–12)<a class="anchor" href="#แอปมือถือ-บท-1012">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>หัวข้อ</th>
+<th>ระดับ</th>
+<th>ใช้ตรงไหน</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ภาษา Dart: class, null safety (<code>?</code>, <code>!</code>, <code>??</code>), <code>final</code>/<code>const</code></td>
+<td>★★★</td>
+<td><code>lib/</code> ทั้งหมด</td>
+</tr>
+<tr>
+<td>Flutter: Widget, StatelessWidget/StatefulWidget, <code>build()</code></td>
+<td>★★★</td>
+<td><code>lib/screens/</code>, <code>lib/widgets/</code></td>
+</tr>
+<tr>
+<td>State management ด้วย <code>ChangeNotifier</code></td>
+<td>★★★</td>
+<td><code>lib/controllers/</code></td>
+</tr>
+<tr>
+<td>เรียก HTTP และแปลง JSON เป็น object (<code>fromJson</code>)</td>
+<td>★★★</td>
+<td><code>lib/services/</code>, <code>lib/models/</code></td>
+</tr>
+<tr>
+<td>Repository pattern</td>
+<td>★★</td>
+<td><code>*_repository.dart</code></td>
+</tr>
+<tr>
+<td><code>flutter_blue_plus</code> และสิทธิ์ Android</td>
+<td>★★</td>
+<td>หน้าตั้งค่าบอร์ด</td>
+</tr>
+<tr>
+<td><code>--dart-define</code></td>
+<td>★</td>
+<td>สลับเซิร์ฟเวอร์ตอน build</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="เว็บ-บท-13">เว็บ (บท 13)<a class="anchor" href="#เว็บ-บท-13">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>หัวข้อ</th>
+<th>ระดับ</th>
+<th>ใช้ตรงไหน</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>HTML, CSS (flex/grid, ตัวแปร CSS), JavaScript DOM</td>
+<td>★★★</td>
+<td><code>webapp/</code></td>
+</tr>
+<tr>
+<td><code>fetch</code>, <code>localStorage</code>, ES modules ในเบราว์เซอร์</td>
+<td>★★</td>
+<td><code>api.js</code>, <code>config.js</code></td>
+</tr>
+<tr>
+<td>Single Page App และการสลับหน้าด้วย hash</td>
+<td>★★</td>
+<td><code>app.js</code></td>
+</tr>
+<tr>
+<td>XSS และ Content-Security-Policy</td>
+<td>★★</td>
+<td><code>dom.js</code>, <code>Caddyfile</code></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="แหล่งเรียนรู้แนะนำ-เอกสารทางการ">แหล่งเรียนรู้แนะนำ (เอกสารทางการ)<a class="anchor" href="#แหล่งเรียนรู้แนะนำ-เอกสารทางการ">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>เรื่อง</th>
+<th>แหล่ง</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>HTML/CSS/JavaScript</td>
+<td>developer.mozilla.org (MDN)</td>
+</tr>
+<tr>
+<td>Node.js / Express</td>
+<td>nodejs.org/docs, expressjs.com</td>
+</tr>
+<tr>
+<td>MariaDB / SQL</td>
+<td>mariadb.com/kb</td>
+</tr>
+<tr>
+<td>Dart / Flutter</td>
+<td>dart.dev, docs.flutter.dev</td>
+</tr>
+<tr>
+<td>MQTT / Mosquitto</td>
+<td>mqtt.org, mosquitto.org/documentation</td>
+</tr>
+<tr>
+<td>ESP32 / Arduino</td>
+<td>docs.espressif.com, docs.arduino.cc</td>
+</tr>
+<tr>
+<td>Docker</td>
+<td>docs.docker.com</td>
+</tr>
+<tr>
+<td>Caddy</td>
+<td>caddyserver.com/docs</td>
+</tr>
+<tr>
+<td>Tailscale (Funnel, Serve)</td>
+<td>tailscale.com/kb</td>
+</tr>
+<tr>
+<td>Let's Encrypt</td>
+<td>letsencrypt.org/docs</td>
+</tr>
+</tbody>
+</table></div>
+<p>เอกสารเดิมในโปรเจค <code>docs/learn/</code> (18 บท) สอนพื้นฐานแต่ละเทคโนโลยีไว้แล้ว ใช้เสริมคู่มือนี้ได้ ส่วน <code>docs/study/</code> (9 บท) เป็นบันทึกสั้นแยกตามส่วน ทั้งสองชุดปรับเลขรุ่น บอร์ดสายแอร์ Daikin จอ OLED และหน้าเฟิร์มแวร์บนเว็บแล้ว (14 ต.ค. 2569) แต่บางหัวข้อยังเขียนตามแผนเดิม (เช่นการเปิดพอร์ต 80/443 ใน <code>docs/learn/14</code>) ถ้าขัดกันให้เชื่อโค้ดและคู่มือนี้</p>
+<h2 id="แบบฝึกหัดลงมือทำ-แนะนำมาก">แบบฝึกหัดลงมือทำ (แนะนำมาก)<a class="anchor" href="#แบบฝึกหัดลงมือทำ-แนะนำมาก">#</a></h2>
+<p>การได้รันระบบจริงช่วยให้เข้าใจเร็วกว่าอ่านอย่างเดียวหลายเท่า</p>
+<ol>
+<li><strong>รันระบบบนเครื่องตัวเอง</strong> ด้วย <code>run_all.ps1</code> (ต้องมี Docker Desktop, Node.js, Flutter) แล้วเปิด <code>http://127.0.0.1:3000/api/health</code> ดูผล</li>
+<li><strong>ลองเรียก API</strong> ล็อกอินด้วย <code>curl</code> หรือ Postman ที่ <code>POST /api/auth/login</code> ได้ token แล้วใช้เรียก <code>GET /api/rooms</code></li>
+<li><strong>ดูข้อความ MQTT สด ๆ</strong> ใช้ <code>mosquitto_sub -t 'rmutt/#' -v</code> (ผ่าน <code>mqtt/test_mqtt.ps1</code> หรือ <code>docker exec</code>) แล้วกดคำสั่งในแอป ดูว่ามีข้อความอะไรวิ่ง</li>
+<li><strong>เปิดฐานข้อมูล</strong> ด้วย HeidiSQL/DBeaver แล้วลองรัน SQL ตัวอย่างในบทฐานข้อมูล</li>
+<li><strong>รันเทสต์</strong> <code>cd backend; npm test</code> และ <code>flutter test</code> อ่านชื่อเทสต์ที่ผ่าน</li>
+<li><strong>แก้ค่าเล็ก ๆ</strong> เช่นเวลานับถอยหลังใน <code>backend/src/utils/auto-off.js</code> แล้วดูว่าเทสต์ไหนพัง (เข้าใจว่าเทสต์ปกป้องอะไร) แล้วแก้กลับ</li>
+<li><strong>วาดแผนภาพเอง</strong> บนกระดาษ: ระบบทั้งหมด + เส้นทางคำสั่ง "เปิดแอร์" ถ้าวาดได้โดยไม่ดู แปลว่าเข้าใจจริง</li>
+</ol>
+<h2 id="แผนเรียน-2-สัปดาห์-ตัวอย่าง">แผนเรียน 2 สัปดาห์ (ตัวอย่าง)<a class="anchor" href="#แผนเรียน-2-สัปดาห์-ตัวอย่าง">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>วัน</th>
+<th>เรียนอะไร</th>
+<th>ผลลัพธ์ที่ควรได้</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>บท 1–3 + รัน <code>run_all.ps1</code></td>
+<td>เล่าโปรเจคได้ 2 นาที, ระบบรันบนเครื่อง</td>
+</tr>
+<tr>
+<td>2</td>
+<td>บท 4 เครือข่าย + Tailscale</td>
+<td>อธิบายทางเข้า 3 ทางของเซิร์ฟเวอร์ได้</td>
+</tr>
+<tr>
+<td>3</td>
+<td>บท 5 ฐานข้อมูล</td>
+<td>วาดความสัมพันธ์ตารางได้ รัน SQL ได้</td>
+</tr>
+<tr>
+<td>4–5</td>
+<td>บท 6 Backend ตอนที่ 1</td>
+<td>อธิบายการล็อกอินและ JWT ได้ ลองเรียก API ได้</td>
+</tr>
+<tr>
+<td>6</td>
+<td>บท 7 Backend ตอนที่ 2</td>
+<td>อธิบาย auto-off และถังค่าไฟรายชั่วโมงได้</td>
+</tr>
+<tr>
+<td>7</td>
+<td>บท 8 MQTT/BLE + แบบฝึกหัด mosquitto_sub</td>
+<td>บอก topic หลักได้ เล่าขั้นตอน provisioning ได้</td>
+</tr>
+<tr>
+<td>8</td>
+<td>บท 9 เฟิร์มแวร์</td>
+<td>อธิบาย <code>loop()</code> และเกณฑ์แอร์ทำงานได้</td>
+</tr>
+<tr>
+<td>9–10</td>
+<td>บท 10–12 Flutter</td>
+<td>อธิบายชั้น model/service/controller/screen ได้</td>
+</tr>
+<tr>
+<td>11</td>
+<td>บท 13 เว็บแอป</td>
+<td>อธิบายว่าเว็บเรียก API อย่างไร</td>
+</tr>
+<tr>
+<td>12</td>
+<td>บท 14–15</td>
+<td>อธิบายการ deploy และความปลอดภัยได้</td>
+</tr>
+<tr>
+<td>13</td>
+<td>บท 16 ซ้อมตอบคำถาม</td>
+<td>ตอบคำถามท้ายบทได้ทุกข้อ</td>
+</tr>
+<tr>
+<td>14</td>
+<td>ทบทวน + ซ้อมนำเสนอจริง</td>
+<td>พร้อมนำเสนอ</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="สรุปและเช็กลิสต์ความเข้าใจ">สรุปและเช็กลิสต์ความเข้าใจ<a class="anchor" href="#สรุปและเช็กลิสต์ความเข้าใจ">#</a></h2>
+<ul>
+<li class="check"><input type="checkbox"> รู้ว่าแต่ละโฟลเดอร์ระดับบนคือส่วนไหนของระบบ</li>
+<li class="check"><input type="checkbox"> รู้ลำดับการอ่าน และรู้ว่าถ้าเวลาน้อยควรอ่านบทไหนก่อน</li>
+<li class="check"><input type="checkbox"> รู้ว่าแต่ละส่วนต้องมีความรู้พื้นฐานอะไร และตัวเองยังขาดอะไร</li>
+<li class="check"><input type="checkbox"> รันระบบบนเครื่องตัวเองได้อย่างน้อยหนึ่งครั้ง</li>
+</ul><nav class="pager"><a class="prev" href="01-concept.html"><span>← บทก่อนหน้า</span>1. แนวคิดและหลักการคิดของโปรเจค</a><a class="next" href="03-architecture-flows.html"><span>บทถัดไป →</span>3. สถาปัตยกรรมและเส้นทางของข้อมูล</a></nav>
+  </main>
+  <aside class="toc"><div class="toc-title">ในบทนี้</div><ul><li><a href="#ภาพรวม">ภาพรวม</a></li><li><a href="#ขั้นที่-0-เตรียมตัว-ครึ่งวัน">ขั้นที่ 0: เตรียมตัว (ครึ่งวัน)</a></li><li><a href="#ลำดับการอ่านคู่มือนี้">ลำดับการอ่านคู่มือนี้</a></li><li><a href="#วิธีอ่านโค้ดให้ไม่หลง">วิธีอ่านโค้ดให้ไม่หลง</a></li><li><a href="#ความรู้ที่ต้องศึกษา-แยกตามหมวด">ความรู้ที่ต้องศึกษา (แยกตามหมวด)</a></li><li><a href="#แหล่งเรียนรู้แนะนำ-เอกสารทางการ">แหล่งเรียนรู้แนะนำ (เอกสารทางการ)</a></li><li><a href="#แบบฝึกหัดลงมือทำ-แนะนำมาก">แบบฝึกหัดลงมือทำ (แนะนำมาก)</a></li><li><a href="#แผนเรียน-2-สัปดาห์-ตัวอย่าง">แผนเรียน 2 สัปดาห์ (ตัวอย่าง)</a></li><li><a href="#สรุปและเช็กลิสต์ความเข้าใจ">สรุปและเช็กลิสต์ความเข้าใจ</a></li></ul></aside>
+</div>
+<button class="to-top" id="toTop" aria-label="กลับขึ้นด้านบน">↑</button>
+<script src="../assets/search.js"></script>
+<script src="../assets/app.js"></script>
+</body>
+</html>

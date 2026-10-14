@@ -1,0 +1,1435 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>15. ความปลอดภัยทั้งระบบ — คู่มือศึกษา RMUTT Save Energy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Chakra+Petch:wght@600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+<script>try{var t=localStorage.getItem('guide.theme');if(t)document.documentElement.dataset.theme=t;var f=localStorage.getItem('guide.font');if(f)document.documentElement.dataset.font=f;}catch(e){}</script>
+</head>
+<body>
+<header class="topbar">
+  <button class="menu-btn" id="menuBtn" aria-label="เปิดเมนู">☰</button>
+  <a class="brand" href="../index.html"><span class="brand-mark">⚡</span><span>คู่มือศึกษา <b>RMUTT Save Energy</b></span></a>
+  <div class="top-actions">
+    <button id="fontBtn" title="ขนาดตัวอักษร">ก<small>±</small></button>
+    <button id="themeBtn" title="สลับโหมดสว่าง/มืด">☾</button>
+  </div>
+</header>
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <input class="nav-search" id="navSearch" type="search" placeholder="ค้นหาบทหรือหัวข้อ…">
+    <div id="searchResults" class="search-results"></div>
+    <nav class="nav" id="nav">
+<a class="nav-home" href="../index.html">หน้าแรก</a>
+<div class="nav-part">ภาพรวม</div><ul>
+<li><a href="01-concept.html"><span class="num">1</span>แนวคิดและหลักการคิดของโปรเจค</a></li>
+<li><a href="02-roadmap.html"><span class="num">2</span>เริ่มจากอะไร และต้องเรียนรู้อะไรบ้าง</a></li>
+<li><a href="03-architecture-flows.html"><span class="num">3</span>สถาปัตยกรรมและเส้นทางของข้อมูล</a></li>
+</ul>
+<div class="nav-part">โครงสร้างพื้นฐาน</div><ul>
+<li><a href="04-network-server.html"><span class="num">4</span>เครือข่าย เซิร์ฟเวอร์ และ Tailscale</a></li>
+<li><a href="05-database.html"><span class="num">5</span>ฐานข้อมูล MariaDB</a></li>
+</ul>
+<div class="nav-part">เซิร์ฟเวอร์</div><ul>
+<li><a href="06-backend-api.html"><span class="num">6</span>Backend ตอนที่ 1: โครงหลัก ระบบสมาชิก และ REST API</a></li>
+<li><a href="07-backend-services.html"><span class="num">7</span>Backend ตอนที่ 2: งานเบื้องหลังและตรรกะหลักของระบบ</a></li>
+<li><a href="08-protocols.html"><span class="num">8</span>โปรโตคอลสื่อสาร: MQTT และ Bluetooth Low Energy</a></li>
+</ul>
+<div class="nav-part">อุปกรณ์และหน้าจอ</div><ul>
+<li><a href="09-firmware.html"><span class="num">9</span>เฟิร์มแวร์ ESP32: บอร์ดแอร์ (IR และสายแอร์) และบอร์ดตรวจจับคน</a></li>
+<li><a href="10-flutter-architecture.html"><span class="num">10</span>แอป Flutter ตอนที่ 1: โครงสร้าง ข้อมูล และ State</a></li>
+<li><a href="11-flutter-screens.html"><span class="num">11</span>แอป Flutter ตอนที่ 2: หน้าจอหลักและวิดเจ็ต</a></li>
+<li><a href="12-flutter-admin-screens.html"><span class="num">12</span>แอป Flutter ตอนที่ 3: หน้าจอผู้ดูแลระบบและการตั้งค่า</a></li>
+<li><a href="13-webapp.html"><span class="num">13</span>เว็บแอป: HTML, CSS และ JavaScript ล้วน</a></li>
+</ul>
+<div class="nav-part">ใช้งานจริง</div><ul>
+<li><a href="14-deploy-scripts-testing.html"><span class="num">14</span>การติดตั้งระบบ สคริปต์อัตโนมัติ และการทดสอบ</a></li>
+<li><a class="active" href="15-security.html"><span class="num">15</span>ความปลอดภัยทั้งระบบ</a></li>
+<li><a href="16-presentation-qa.html"><span class="num">16</span>เตรียมนำเสนอและคำถามที่อาจารย์มักถาม</a></li>
+</ul>
+<div class="nav-part">ภาคผนวก</div><ul>
+<li><a href="17-glossary.html"><span class="num">17</span>อภิธานศัพท์</a></li>
+<li><a href="18-file-map.html"><span class="num">18</span>แผนที่ไฟล์ทั้งโปรเจค</a></li>
+</ul>
+<div class="nav-part">งานที่กำลังพัฒนา</div><ul>
+<li><a href="19-daikin-slm8.html"><span class="num">19</span>แอร์ Daikin ผ่านสาย SLM8: จากการแกะโปรโตคอลถึงบอร์ดสายแอร์</a></li>
+</ul>
+    </nav>
+  </aside>
+  <main class="content" id="content">
+<div class="chapter-head"><div class="kicker">บทที่ 15 · ใช้งานจริง</div><h1>ความปลอดภัยทั้งระบบ</h1></div>
+<h2 id="ภาพรวม">ภาพรวม<a class="anchor" href="#ภาพรวม">#</a></h2>
+<p>บทนี้ไม่ได้อธิบายไฟล์ใดไฟล์หนึ่ง แต่ตัดขวางทั้งระบบเพื่อตอบคำถามที่อาจารย์ถามได้แน่นอนว่า <strong>"ระบบนี้ปลอดภัยแค่ไหน และคุณป้องกันอะไรไว้บ้าง"</strong> วิธีคิดของบทนี้คือเดินไปทีละชั้น (layer) ของระบบ แต่ละชั้นตอบสี่ข้อเหมือนกันหมด</p>
+<ol>
+<li><strong>ภัยคุกคาม (threat):</strong> อะไรอาจผิดพลาดหรือใครอาจทำอะไรได้</li>
+<li><strong>วิธีป้องกันในโปรเจค:</strong> ไฟล์ไหน บรรทัดไหน ตั้งค่าอะไร</li>
+<li><strong>ทำไมทำแบบนี้:</strong> ทางเลือกอื่นคืออะไร และเสียอะไรถ้าไม่ทำ</li>
+<li><strong>จุดอ่อนที่ยังเหลือ:</strong> ยังไม่ปลอดภัยตรงไหน และควรปรับปรุงอย่างไร</li>
+</ol>
+<p>ระบบนี้มีลักษณะที่ทำให้ความปลอดภัยสำคัญเป็นพิเศษ เพราะมัน <strong>สั่งงานอุปกรณ์ไฟฟ้าจริง</strong> (เปิด/ปิดแอร์ทั้งอาคาร) ไม่ใช่แค่แสดงข้อมูล ถ้าคนร้ายยึดระบบได้ ผลคือแอร์ถูกเปิดทิ้งทั้งคืน หรือถูกปิดกลางคาบเรียน และเซิร์ฟเวอร์ก็ต่ออินเทอร์เน็ตจริงผ่าน Tailscale Funnel จึงเป็นเป้าสแกนของคนทั่วโลกตั้งแต่วันแรก</p>
+<p>ภาพคร่าว ๆ ของ "เส้นแบ่งความเชื่อถือ" (trust boundary) ที่บทนี้ใช้เป็นแกน</p>
+<div class="code-block"><div class="hl"><pre><span></span><code>อินเทอร์เน็ต ─┬─ HTTPS 443 (โดเมน DuckDNS) ──────────┐
+              ├─ HTTPS 443 (Tailscale Funnel) ───────┤→ Caddy ─── /api/* → Backend ─→ MariaDB (127.0.0.1 เท่านั้น)
+              ├─ MQTTS 8443 (Funnel, บอร์ด ESP32) ─→ tailscale ถอด TLS ─→ :1883 ─┐
+              └─ MQTTS 8883 (บอร์ดในอาคาร ต่อตรง) ───────────────────────────────→ Mosquitto ←─ Backend ต่อ mqtt://mqtt:1883 ภายใน docker
+มือถือ/เว็บ ──(JWT)──→ API        ESP32 ──(บัญชี MQTT ต่อบอร์ด)──→ Broker      BLE ←→ แอปตอนตั้งค่า
+</code></pre></div>
+</div>
+
+<h2 id="ความรู้ที่ต้องมีก่อนอ่านบทนี้">ความรู้ที่ต้องมีก่อนอ่านบทนี้<a class="anchor" href="#ความรู้ที่ต้องมีก่อนอ่านบทนี้">#</a></h2>
+<p><strong>CIA triad</strong> คือสามเป้าหมายของความปลอดภัย <strong>C</strong>onfidentiality (ความลับ: คนที่ไม่มีสิทธิ์ต้องอ่านไม่ได้ เช่น รหัสผ่าน), <strong>I</strong>ntegrity (ความถูกต้อง: ข้อมูลและคำสั่งต้องไม่ถูกแก้โดยไม่ได้รับอนุญาต เช่น คำสั่งเปิดแอร์ ไฟล์เฟิร์มแวร์), <strong>A</strong>vailability (ความพร้อมใช้: ระบบต้องใช้งานได้ ไม่ถูกทำให้ล่ม เช่น rate limit กันคนล็อกอินรัว ๆ ทำให้ทุกคนเข้าไม่ได้) ทุกมาตรการในบทนี้ปกป้องอย่างน้อยหนึ่งในสามข้อนี้</p>
+<p><strong>Authentication vs Authorization</strong> <em>Authentication (ยืนยันตัวตน)</em> คือ "คุณคือใคร" ในระบบนี้ทำด้วย username+password แล้วได้ JWT ส่วน <em>Authorization (กำหนดสิทธิ์)</em> คือ "คุณทำอะไรได้" ในระบบนี้คือ role <code>admin</code> กับ <code>staff</code> (ตรวจด้วย <code>requireAdmin</code>) สองเรื่องนี้แยกกัน คนที่ล็อกอินสำเร็จ (authenticated) ยังไม่ได้แปลว่ามีสิทธิ์ทุกอย่าง (authorized)</p>
+<p><strong>Hashing vs Encryption</strong> <em>Hash</em> เป็นทางเดียว แปลงข้อมูลเป็นลายนิ้วมือแล้วย้อนกลับไม่ได้ ใช้เก็บรหัสผ่านเพราะเซิร์ฟเวอร์ไม่จำเป็นต้องรู้รหัสจริง แค่เทียบ hash กัน <em>Encryption</em> เป็นสองทาง ถอดรหัสกลับได้ถ้ามีกุญแจ ใช้ตอนต้องอ่านข้อมูลเดิมกลับมา เช่น TLS ที่เข้ารหัสข้อมูลระหว่างทาง ห้ามเก็บรหัสผ่านด้วย encryption เพราะถ้ากุญแจหลุด รหัสผ่านทุกตัวหลุดหมด</p>
+<p><strong>Salt vs Pepper</strong> <em>Salt</em> คือค่าสุ่มที่ผสมกับรหัสผ่านก่อน hash และ <strong>เก็บคู่กับ hash ในฐานข้อมูล</strong> ทำให้รหัสเหมือนกันได้ hash ไม่เหมือนกัน และกัน rainbow table (ตาราง hash สำเร็จรูป) bcrypt ฝัง salt ไว้ในสตริงผลลัพธ์เองอยู่แล้ว <em>Pepper</em> คือความลับที่ผสมเพิ่มแต่ <strong>เก็บแยกจากฐานข้อมูล</strong> (ในไฟล์ <code>.env</code>) ถ้าคนร้ายขโมยฐานข้อมูลไปได้อย่างเดียว ก็ยังเดาค่าที่ hash ไม่ได้เพราะไม่มี pepper</p>
+<p><strong>HMAC</strong> คือ hash ที่ต้องมีกุญแจลับ <code>HMAC(กุญแจ, ข้อความ)</code> ใครไม่มีกุญแจคำนวณผลซ้ำไม่ได้ ระบบนี้ใช้ HMAC ในสามที่ คือ hash ของ OTP, hash ของ token และรหัสผ่าน MQTT ของบอร์ด</p>
+<p><strong>MITM (Man-in-the-Middle)</strong> คนที่ดักอยู่กลางทางระหว่างสองฝ่าย แอบอ่านหรือแก้ข้อมูล (เช่น คนที่นั่งใน Wi-Fi เดียวกัน) แก้ด้วย <strong>TLS</strong> ซึ่งเข้ารหัสและพิสูจน์ตัวตนเซิร์ฟเวอร์ด้วยใบรับรอง (certificate) ที่ออกโดย CA ที่ไว้ใจได้</p>
+<p><strong>XSS (Cross-Site Scripting)</strong> คนร้ายแทรก JavaScript เข้าไปในหน้าเว็บ (เช่น ผ่านชื่อวิชาที่มีแท็ก <code>&lt;script&gt;</code>) แล้วสคริปต์นั้นรันในเบราว์เซอร์ของเหยื่อ ขโมย token ได้ กันด้วยการไม่เอาข้อมูลดิบไปใส่เป็น HTML และใช้ CSP</p>
+<p><strong>SQL Injection</strong> คนร้ายพิมพ์ SQL ปนมาในช่องกรอก (เช่น <code>' OR 1=1 --</code>) ให้ฐานข้อมูลรันคำสั่งที่ไม่ได้ตั้งใจ กันด้วย <strong>parameterized query</strong> (ใส่ <code>?</code> แล้วส่งค่าแยก ฐานข้อมูลถือว่าเป็นข้อมูลเสมอ ไม่ใช่คำสั่ง)</p>
+<p><strong>Brute force</strong> เดารหัสผ่านหรือ OTP ซ้ำ ๆ จนถูก กันด้วย rate limit (จำกัดจำนวนครั้ง) และ hash ที่ช้าโดยตั้งใจ (bcrypt)</p>
+<p><strong>Timing attack</strong> วัดเวลาตอบเพื่อเดาข้อมูล เช่น ถ้า "ไม่มี username นี้" ตอบเร็วกว่า "มี username แต่รหัสผิด" คนร้ายก็รู้ว่าชื่อไหนมีจริง แก้ด้วยการทำงานให้เวลาใกล้เคียงกันทุกกรณี</p>
+<p><strong>Least privilege (สิทธิ์น้อยที่สุดที่ทำงานได้)</strong> ให้ทุกส่วนมีสิทธิ์เท่าที่จำเป็นเท่านั้น เช่น บอร์ดแต่ละตัวส่งได้แค่ topic ของตัวเอง Backend ใช้ user ฐานข้อมูลที่ไม่ใช่ root</p>
+<p><strong>Defense in depth (ป้องกันหลายชั้น)</strong> ไม่พึ่งด่านเดียว สมมติว่าด่านใดด่านหนึ่งพังได้ แล้วมีอีกด่านรองรับ เช่น กัน XSS สองชั้น (ไม่ใช้ <code>innerHTML</code> กับข้อมูลผู้ใช้ <strong>และ</strong> มี CSP)</p>
+<p><strong>Secret (ความลับ) คืออะไร</strong> ค่าที่ถ้าหลุดแล้วระบบเสียหาย เช่น <code>JWT_SECRET</code>, รหัสฐานข้อมูล, token ของ DuckDNS ต้องไม่อยู่ใน git ไม่ฝังในโค้ด และสุ่มให้ยาวพอ</p>
+<h2 id="ชั้นที่-1-การเปิดพอร์ตและเครือข่าย-network-exposure">ชั้นที่ 1: การเปิดพอร์ตและเครือข่าย (network exposure)<a class="anchor" href="#ชั้นที่-1-การเปิดพอร์ตและเครือข่าย-network-exposure">#</a></h2>
+<p><strong>ภัยคุกคาม:</strong> ถ้าฐานข้อมูล, Broker หรือ SSH เปิดสู่อินเทอร์เน็ต คนทั่วโลกจะสแกนเจอและลองเดารหัสภายในไม่กี่นาที พื้นที่โจมตี (attack surface) ยิ่งกว้างยิ่งเสี่ยง</p>
+<p><strong>วิธีป้องกัน:</strong> เปิดเท่าที่จำเป็นและผูกทุกอย่างที่ไม่ต้องเปิดไว้กับ localhost หรือเครือข่ายภายใน docker</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>ส่วน</th>
+<th>เปิดอย่างไร</th>
+<th>ไฟล์</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MariaDB 3306</td>
+<td>ผูก <code>127.0.0.1</code> เท่านั้น เข้าได้จากตัวเซิร์ฟเวอร์เอง ไม่ใช่จากเครือข่าย</td>
+<td><code>deploy/docker-compose.yml</code> บรรทัด 29</td>
+</tr>
+<tr>
+<td>Mosquitto 8883</td>
+<td>เปิดสู่ภายนอก (TLS) ให้บอร์ดที่ต่อตรงในอาคาร (ทางเลือก)</td>
+<td><code>deploy/docker-compose.yml</code> บรรทัด 45</td>
+</tr>
+<tr>
+<td>Mosquitto 1883</td>
+<td><strong>ไม่ publish</strong> เป็นพอร์ตของ container ใช้ในเครือข่าย docker เท่านั้น (Backend ต่อ <code>mqtt://mqtt:1883</code> และกล่อง tailscale ส่งต่อพอร์ต 8443 จาก Funnel มาที่นี่)</td>
+<td><code>docker-compose.yml</code> (ไม่มีบรรทัด ports ของ 1883)</td>
+</tr>
+<tr>
+<td>Backend 3000</td>
+<td><strong>ไม่ publish</strong> ถึงได้ผ่าน Caddy (<code>/api/*</code>) เท่านั้น</td>
+<td><code>docker-compose.yml</code> (มีแค่ <code>EXPOSE</code> ใน Dockerfile)</td>
+</tr>
+<tr>
+<td>Caddy 80/443</td>
+<td>เปิดสู่ภายนอก (ทางโดเมนหลัก)</td>
+<td><code>docker-compose.yml</code> บรรทัด 155–156</td>
+</tr>
+<tr>
+<td>Tailscale Funnel</td>
+<td>ส่งต่อ 443 ไป <code>caddy:8080</code> (เว็บ/API) และ 8443 (ถอด TLS ที่กล่อง tailscale) ไป <code>mqtt:1883</code> (MQTT ของบอร์ด) เท่านั้น</td>
+<td><code>deploy/tailscale-serve.json</code> บรรทัด 3–7, 16–19</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>ไฟล์ <code>deploy/docker-compose.yml</code> บรรทัด 26–29</strong></p>
+<div class="code-block"><span class="code-lang">yaml</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="w">    </span><span class="c1"># เปิดพอร์ตเฉพาะ localhost ของเซิร์ฟเวอร์เท่านั้น เข้าจากเครือข่ายไม่ได้</span>
+<span class="w">    </span><span class="c1"># ใช้ต่อ DBeaver/HeidiSQL ผ่าน SSH tunnel</span>
+<span class="w">    </span><span class="nt">ports</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">"127.0.0.1:3306:3306"</span>
+</code></pre></div></td></tr></table></div>
+</div>
+
+<p>คำอธิบาย: <code>"127.0.0.1:3306:3306"</code> อ่านว่า <code>&lt;IP ที่ผูก&gt;:&lt;พอร์ตบนเครื่อง&gt;:&lt;พอร์ตใน container&gt;</code> ถ้าเขียนแค่ <code>"3306:3306"</code> Docker จะผูก <code>0.0.0.0</code> คือทุกการ์ดเครือข่าย เปิดให้คนทั้งโลกเห็น การใส่ <code>127.0.0.1</code> ทำให้ต่อได้เฉพาะจากเครื่องเซิร์ฟเวอร์เอง ถ้าผู้พัฒนาอยากดูข้อมูลด้วย DBeaver จากเครื่องตัวเอง ใช้ <strong>SSH tunnel</strong> (<code>db-tunnel.ps1</code>) คือเปิดท่อเข้ารหัสผ่าน SSH ที่ลงท้ายที่ <code>127.0.0.1:3306</code> ของเซิร์ฟเวอร์ ไม่ต้องเปิดพอร์ตฐานข้อมูลสู่อินเทอร์เน็ตเลย <code>db-tunnel.ps1</code> ใช้บัญชี <code>DB_USER</code> ของแอป (สิทธิ์เฉพาะฐานข้อมูลนี้) ไม่ใช้ root</p>
+<div class="callout why"><div class="callout-title">ทำไม</div><p><strong>ทำไม Funnel ส่งต่อแค่สองปลายทาง คือ <code>caddy:8080</code> (พอร์ต 443) และ <code>mqtt:1883</code> (พอร์ต 8443)</strong> เซิร์ฟเวอร์อยู่ในเครือข่ายมหาวิทยาลัย (IP 10.x) ที่เปิดพอร์ตขาเข้าไม่ได้ Funnel ให้ container <code>tailscale</code> <strong>ต่อออก</strong> ไปหา Tailscale เอง (outbound) แล้วเปิดทางสาธารณะให้ที่ <code>https://&lt;ชื่อ&gt;.ts.net</code> จึงไม่ต้องเจาะ firewall ขาเข้า และ <code>deploy/tailscale-serve.json</code> กำหนดปลายทางไว้สองจุดเท่านั้น: <code>"Proxy": "http://caddy:8080"</code> (พอร์ต 443 เว็บ/API) กับ <code>"TCPForward": "mqtt:1883"</code> พร้อม <code>"TerminateTLS"</code> (พอร์ต 8443 MQTT ของบอร์ด ทำให้บอร์ดที่ต่อ Wi-Fi นอกมหาวิทยาลัยเข้าถึง Broker ได้) ฐานข้อมูลและ SSH จึงไม่ถูกเปิดผ่านทางนี้ (ดูคอมเมนต์ใน <code>docker-compose.yml</code> บรรทัด 172–179) และยัง <strong>ปิดได้ทันที</strong> ด้วย <code>docker compose stop tailscale</code> ถ้าเกิดเหตุ นอกจากนี้ container รันโหมด <code>TS_USERSPACE: "true"</code> ไม่ต้องการ <code>NET_ADMIN</code> หรือ <code>/dev/net/tun</code> ไม่แตะเครือข่ายของเครื่อง</p></div>
+
+<div class="callout warn"><div class="callout-title">ระวัง</div><p>พอร์ต 8443 ทำให้ Mosquitto <strong>เข้าถึงได้จากอินเทอร์เน็ต</strong> เป็นครั้งแรก (เดิมต่อได้เฉพาะในเครือข่ายมหาวิทยาลัย) ด่านป้องกันมี 3 ชั้น: (1) TLS ระหว่างบอร์ดกับกล่อง tailscale (2) <code>allow_anonymous false</code> + Dynamic Security ต้องมี username/password ของบอร์ด (3) ACL รายบอร์ดจำกัด topic แต่ยังไม่มีการจำกัดอัตราการเชื่อมต่อหรือแบน IP ที่ชั้น MQTT และ Mosquitto เห็นต้นทางทุกคำขอเป็นกล่อง tailscale ช่วงสุดท้ายจากกล่อง tailscale ไป <code>mqtt:1883</code> เป็น MQTT ดิบ แต่อยู่ในเครือข่าย docker ของเครื่องเดียว ถ้าบอร์ดทุกตัวอยู่ในอาคาร ให้ตั้ง <code>MQTT_DEVICE_URL=mqtts://&lt;DOMAIN&gt;:8883</code> ใน <code>.env</code> แล้วเอาพอร์ต 8443 ออกจาก <code>serve.json</code> เพื่อลดพื้นผิวโจมตี</p></div>
+
+<p><strong>Firewall (<code>deploy/setup-vps.sh</code> บรรทัด 69–81):</strong> เมื่อรันด้วย <code>--firewall</code> สคริปต์ตั้ง <code>ufw default deny incoming</code> แล้วอนุญาตเฉพาะ 22 (SSH), 80, 443 และ 8883 (พอร์ต 443/8443 ของ Funnel ไม่ต้องเปิดใน ufw เพราะเป็นทางที่กล่อง tailscale ต่อออกไปเอง) ส่วนที่ไม่ได้ใช้ <code>--firewall</code> เป็นกรณีที่ฝ่ายไอทีมหาวิทยาลัยดูแล firewall อยู่แล้ว สคริปต์ติดตั้ง <code>fail2ban</code> (แบน IP ที่เดารหัส SSH ซ้ำ ๆ) ให้ด้วยแต่ <strong>ไม่ได้ตั้งค่าเฉพาะ</strong> ใช้ค่าเริ่มต้นของแพ็กเกจ</p>
+<div class="callout note"><div class="callout-title">หมายเหตุ</div><p>หลักการ "ปฏิเสธทุกอย่างเป็นค่าเริ่มต้น แล้วเปิดเท่าที่จำเป็น" (default deny) คือหัวใจของ firewall ที่ดี และข้อควรรู้: Docker เขียนกฎ iptables เองข้าม <code>ufw</code> ได้ ดังนั้น <strong>การผูก <code>127.0.0.1</code> ในไฟล์ compose คือด่านจริงของฐานข้อมูล</strong> ห้ามพึ่งแค่ ufw</p></div>
+
+<p><strong>จุดอ่อนที่เหลือ:</strong> ไม่มีการตั้งค่า SSH ให้เข้มงวด (เช่นปิดล็อกอินด้วยรหัสผ่านให้ใช้ key อย่างเดียว) สคริปต์ <code>db-tunnel.ps1</code> เองยังบอกให้ "พิมพ์รหัส SSH" แปลว่าใช้รหัสผ่านล็อกอินอยู่ และคอมเมนต์ใน <code>setup-vps.sh</code> บรรทัด 75 เขียนว่าเปิดพอร์ต 80 เพื่อ "Lets Encrypt" ซึ่งไม่จริงแล้ว เพราะใช้ DNS-01 (ดูหัวข้อ TLS) พอร์ต 80 จึงใช้แค่ redirect เป็น HTTPS</p>
+<h2 id="ชั้นที่-2-tls-ทุกเส้นทาง">ชั้นที่ 2: TLS ทุกเส้นทาง<a class="anchor" href="#ชั้นที่-2-tls-ทุกเส้นทาง">#</a></h2>
+<p><strong>ภัยคุกคาม:</strong> ถ้าข้อมูลวิ่งเป็นข้อความธรรมดา คนที่อยู่ในเครือข่ายเดียวกันหรือผู้ให้บริการอินเทอร์เน็ตอ่านรหัสผ่าน, JWT และคำสั่งแอร์ได้ (MITM) หรือแก้คำสั่งกลางทางได้</p>
+<p><strong>วิธีป้องกัน:</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>เส้นทาง</th>
+<th>ใช้ TLS อย่างไร</th>
+<th>ที่ตั้งค่า</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>เว็บ/มือถือ → Caddy (โดเมนหลัก)</td>
+<td>HTTPS ใบรับรอง Let's Encrypt ที่ Caddy ขอและต่ออายุให้เอง</td>
+<td><code>deploy/Caddyfile</code> บรรทัด 58–79</td>
+</tr>
+<tr>
+<td>เว็บ/มือถือ → Funnel</td>
+<td>HTTPS ใบรับรองของ Tailscale (<code>*.ts.net</code>) ถอด TLS ที่ container tailscale แล้วส่ง HTTP ต่อใน docker network</td>
+<td><code>tailscale-serve.json</code>, <code>Caddyfile</code> บรรทัด 82–85</td>
+</tr>
+<tr>
+<td>ESP32 → Funnel 8443 → Mosquitto (ค่าเริ่มต้น)</td>
+<td>MQTTS: บอร์ดต่อชื่อ ts.net พอร์ต 8443 ตรวจใบ ts.net (Let's Encrypt) กับ root CA ในเฟิร์มแวร์ กล่อง tailscale ถอด TLS (<code>TerminateTLS</code>) แล้วส่ง MQTT ดิบต่อไป <code>mqtt:1883</code> ในเครือข่าย docker</td>
+<td><code>tailscale-serve.json</code> บรรทัด 4–7, <code>docker-compose.yml</code> บรรทัด 113</td>
+</tr>
+<tr>
+<td>ESP32 → Mosquitto (ต่อตรง)</td>
+<td>MQTTS พอร์ต 8883, <code>tls_version tlsv1.2</code> ขึ้นไป (ใช้เมื่อตั้ง <code>MQTT_DEVICE_URL</code> เป็นพอร์ต 8883)</td>
+<td><code>deploy/mosquitto/config/mosquitto.conf</code> บรรทัด 23–27</td>
+</tr>
+<tr>
+<td>ESP32 → ดาวน์โหลดเฟิร์มแวร์</td>
+<td>HTTPS ตรวจใบรับรองกับ root CA ในเฟิร์มแวร์</td>
+<td><code>firmware/*/ota_update.h</code>, <code>letsencrypt_ca.h</code></td>
+</tr>
+<tr>
+<td>Backend → Mosquitto</td>
+<td><code>mqtt://mqtt:1883</code> แบบไม่เข้ารหัส <strong>แต่</strong> อยู่ในเครือข่าย docker ภายในเครื่องเดียว (ช่วงสุดท้ายจากกล่อง tailscale ของทาง Funnel 8443 ก็เป็น MQTT ดิบแบบเดียวกัน)</td>
+<td><code>docker-compose.yml</code> บรรทัด 106</td>
+</tr>
+<tr>
+<td>Backend → MariaDB</td>
+<td>ภายใน docker network เช่นกัน</td>
+<td><code>docker-compose.yml</code> บรรทัด 89</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>ใบรับรองด้วย DuckDNS แบบ DNS-01:</strong> ปกติ Let's Encrypt พิสูจน์ว่าคุณเป็นเจ้าของโดเมนด้วยการเข้ามาที่พอร์ต 80 ของเซิร์ฟเวอร์ (HTTP-01) แต่เซิร์ฟเวอร์นี้อยู่หลังเครือข่ายมหาวิทยาลัย Let's Encrypt เข้ามาไม่ได้ จึงใช้ <strong>DNS-01</strong> คือ Caddy เขียน TXT record ชื่อ <code>_acme-challenge</code> ผ่าน API ของ DuckDNS (ใช้ <code>DUCKDNS_TOKEN</code>) แล้ว Let's Encrypt ตรวจจาก DNS แทน</p>
+<p><strong>ไฟล์ <code>deploy/Caddyfile</code> บรรทัด 63–69</strong></p>
+<div class="code-block"><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span></pre></div></td><td class="code"><div><pre><span></span><code>	tls {
+		dns duckdns {env.DUCKDNS_TOKEN}
+		# DNS ของมหาวิทยาลัยตอบ SERVFAIL ตอนหา zone ของ _acme-challenge จึงถาม DNS สาธารณะแทน
+		resolvers 1.1.1.1 8.8.8.8
+		propagation_delay 60s
+		propagation_timeout -1
+	}
+</code></pre></div></td></tr></table></div>
+</div>
+
+<ul>
+<li><code>dns duckdns {env.DUCKDNS_TOKEN}</code>: ใช้ปลั๊กอิน DuckDNS (ติดตั้งใน image ด้วย <code>xcaddy</code> ใน <code>deploy/caddy.Dockerfile</code>) อ่าน token จากตัวแปรสภาพแวดล้อมของ container ไม่ฝังในไฟล์</li>
+<li><code>resolvers 1.1.1.1 8.8.8.8</code>: ถาม DNS สาธารณะเพราะ DNS ในมหาวิทยาลัยตอบผิด</li>
+<li><code>propagation_delay 60s</code> + <code>propagation_timeout -1</code>: รอ 60 วินาทีให้ DNS กระจายแล้วให้ Let's Encrypt ตรวจเลย ไม่ให้เซิร์ฟเวอร์ตรวจ DNS เอง (เครือข่ายอาจบล็อกพอร์ต 53)</li>
+</ul>
+<p>ข้อดีเพิ่มเติมของ DNS-01: ไม่ต้องเปิดพอร์ต 80 ให้ Let's Encrypt และ token DuckDNS <strong>ใช้ได้แค่แก้ DNS ของโดเมนตัวเอง</strong> ไม่ใช่สิทธิ์เข้าเซิร์ฟเวอร์</p>
+<p><strong>ใบรับรองสำหรับ Mosquitto:</strong> Mosquitto ไม่ขอใบเอง <code>deploy/sync-mqtt-cert.sh</code> (cron รันทุกวัน) คัดลอกใบที่ Caddy ขอได้ไปที่ <code>mosquitto/certs/</code> แล้ว reload เฉพาะเมื่อใบเปลี่ยนจริง เพื่อให้ MQTTS ใช้ใบเดียวกับเว็บ</p>
+<p><strong>Root CA ในเฟิร์มแวร์:</strong> ESP32 ไม่มีที่เก็บ CA ของระบบแบบคอมพิวเตอร์ ต้องฝังใบรากไว้ในโค้ด ไฟล์ <code>firmware/rmutt_esp32_air/letsencrypt_ca.h</code> (สร้างด้วย <code>firmware/update-root-ca.ps1</code>) ฝัง <strong>ISRG Root X1</strong> (RSA, หมดอายุ 2035) และ <strong>Root X2</strong> (ECDSA, หมดอายุ 2040) ไว้ทั้งคู่ เพราะ Let's Encrypt อาจออกใบจากสายใดสายหนึ่ง ถ้าฝังไว้ใบเดียวแล้ววันหนึ่งสลับสาย บอร์ดทุกตัวจะต่อไม่ได้พร้อมกันจนกว่าจะแฟลชใหม่ ในโค้ดบอร์ดเรียก <code>secureClient.setCACert(LETSENCRYPT_CA)</code> (<code>rmutt_esp32_air.ino</code> บรรทัด 1057) แปลว่า <strong>ตรวจใบรับรองจริง</strong> ไม่ได้ปิดการตรวจ (ไม่มี <code>setInsecure()</code> ในโค้ด) และเพราะใบรับรองมีวันหมดอายุ บอร์ดต้อง <strong>ซิงก์เวลา NTP ให้ได้ก่อน</strong> (<code>ensureClockSynced()</code>) ถึงจะตรวจได้ ถ้าเวลาผิด TLS จะล้มเหลวและบอร์ดไม่ต่อ (ล้มแบบปลอดภัย) ใบ ts.net ที่กล่อง tailscale ใช้ถอด TLS ที่พอร์ต 8443 ออกโดย Let's Encrypt เช่นกัน จึงตรวจผ่านด้วยใบรากชุดเดียวกันโดยไม่ต้องแก้เฟิร์มแวร์</p>
+<p><strong>HSTS:</strong> <code>Strict-Transport-Security "max-age=31536000"</code> (Caddyfile บรรทัด 22) สั่งเบราว์เซอร์จำว่าโดเมนนี้ต้องใช้ HTTPS เท่านั้นเป็นเวลา 1 ปี ป้องกันการถูกลดระดับเป็น HTTP (SSL stripping)</p>
+<p><strong>จุดอ่อนที่เหลือ:</strong> ไม่มี certificate pinning ในแอปมือถือ (แอปเชื่อ CA ของระบบปฏิบัติการ) ถ้า CA ใด ๆ ถูกหลอกให้ออกใบปลอมก็ดักได้ในทางทฤษฎี, HSTS ไม่มี <code>includeSubDomains</code>/<code>preload</code>, และ MQTT ภายใน docker เป็นข้อความธรรมดา (ยอมรับได้เพราะอยู่เครื่องเดียวกัน แต่ถ้าย้าย Backend ไปคนละเครื่องต้องเปลี่ยนเป็น TLS)</p>
+<h2 id="ชั้นที่-3-เว็บ-webapp">ชั้นที่ 3: เว็บ (webapp)<a class="anchor" href="#ชั้นที่-3-เว็บ-webapp">#</a></h2>
+<p><strong>ภัยคุกคาม:</strong> (1) XSS แทรกสคริปต์แล้วขโมย token (2) clickjacking (ฝังเว็บเราใน iframe ของเว็บร้ายแล้วหลอกให้กดปุ่ม) (3) ถูกหลอกให้เว็บส่งรหัสผ่านไปยัง API ปลอม (4) เบราว์เซอร์เดาประเภทไฟล์ผิด</p>
+<p><strong>วิธีป้องกัน: security headers ใน Caddy</strong> ทั้งโดเมนหลักและ Funnel ใช้บล็อก <code>(app)</code> ร่วมกัน (<code>deploy/Caddyfile</code> บรรทัด 10–27) จึงได้หัวเดียวกันทั้งสองทาง</p>
+<p><strong>ไฟล์ <code>deploy/Caddyfile</code> บรรทัด 20–27</strong></p>
+<div class="code-block"><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span></pre></div></td><td class="code"><div><pre><span></span><code>	header {
+		Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+		-Server
+	}
+</code></pre></div></td></tr></table></div>
+</div>
+
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>หัว / คำสั่ง</th>
+<th>ความหมาย</th>
+<th>กันอะไร</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>script-src 'self'</code></td>
+<td>รันสคริปต์ได้เฉพาะไฟล์ <code>.js</code> จากโดเมนเราเท่านั้น ห้าม inline <code>&lt;script&gt;</code> และ <code>eval</code></td>
+<td>XSS (แม้มีคนแทรก <code>&lt;script&gt;</code> ก็ไม่รัน)</td>
+</tr>
+<tr>
+<td><code>connect-src 'self'</code></td>
+<td><code>fetch</code>/XHR ไปได้เฉพาะโดเมนเรา</td>
+<td>สคริปต์แปลกปลอมส่ง token ออกไปเว็บอื่นไม่ได้</td>
+</tr>
+<tr>
+<td><code>frame-ancestors 'none'</code></td>
+<td>ห้ามใครฝังหน้าเราใน iframe</td>
+<td>clickjacking</td>
+</tr>
+<tr>
+<td><code>object-src 'none'</code>, <code>base-uri 'self'</code>, <code>form-action 'self'</code></td>
+<td>ปิด plugin, ห้ามเปลี่ยน base URL, ห้ามฟอร์มส่งออกนอกโดเมน</td>
+<td>การแทรก <code>&lt;base&gt;</code>/ฟอร์มปลอม</td>
+</tr>
+<tr>
+<td><code>style-src ... 'unsafe-inline'</code></td>
+<td>ยอม inline style เพราะหน้าเว็บใช้ <code>style=""</code> ในบางจุด</td>
+<td>(ผ่อนปรนโดยรู้ตัว ความเสี่ยงต่ำ ดูคอมเมนต์ในไฟล์)</td>
+</tr>
+<tr>
+<td><code>X-Content-Type-Options: nosniff</code></td>
+<td>เบราว์เซอร์ห้ามเดาประเภทไฟล์เอง</td>
+<td>ไฟล์ที่ถูกตีความเป็นสคริปต์</td>
+</tr>
+<tr>
+<td><code>Referrer-Policy</code></td>
+<td>ไม่ส่ง URL เต็มไปเว็บอื่นตอนกดลิงก์ออก</td>
+<td>URL รั่ว</td>
+</tr>
+<tr>
+<td><code>Permissions-Policy</code></td>
+<td>ปิดกล้อง ไมค์ ตำแหน่ง</td>
+<td>เว็บ/สคริปต์ขอสิทธิ์ที่ไม่จำเป็น</td>
+</tr>
+<tr>
+<td><code>-Server</code></td>
+<td>ลบหัว <code>Server: Caddy</code> ออก</td>
+<td>บอกรุ่นซอฟต์แวร์ให้คนสแกน</td>
+</tr>
+</tbody>
+</table></div>
+<p>ฝั่ง API ก็มีหัวของตัวเองด้วย <code>app.use(helmet())</code> และ <code>app.disable('x-powered-by')</code> (<code>backend/src/app.js</code> บรรทัด 28, 34) helmet ใส่หัวความปลอดภัยพื้นฐานชุดหนึ่งให้ทุก response ของ Express ซ้อนกับของ Caddy อีกชั้น</p>
+<p><strong>การหลีกเลี่ยง XSS ในโค้ด DOM:</strong> <code>webapp/assets/js/dom.js</code> เป็นตัวช่วยสร้าง element (<code>el()</code>) ที่ <strong>ใส่ข้อความด้วย <code>textContent</code> หรือ <code>createTextNode</code> เสมอ</strong> ไม่เอาข้อความไปต่อสตริง HTML ดังนั้นชื่อวิชา ชื่ออาจารย์ หรือชื่อห้องที่มีอักขระ <code>&lt;</code> <code>&gt;</code> จึงแสดงเป็นตัวหนังสือธรรมดา ไม่ถูกตีความเป็นแท็ก คำสั่ง <code>innerHTML</code> ถูกใช้เฉพาะกับไอคอน SVG ที่ระบบเขียนเอง (เช่น <code>icons.menu(18)</code>) ไม่ใช่ข้อมูลจากผู้ใช้ ตรวจได้ด้วยการค้นหา <code>html:</code> และ <code>innerHTML</code> ใน <code>webapp/assets/js</code> จะพบว่าทุกจุดรับค่าจากฟังก์ชันไอคอนหรือสตริง SVG ที่เขียนตายตัว</p>
+<div class="callout why"><div class="callout-title">ทำไม</div><p><strong>ทำไมทำสองชั้น (XSS defense in depth)</strong> ชั้นแรก (ไม่ใช้ <code>innerHTML</code> กับข้อมูลผู้ใช้) กันที่ต้นเหตุ ชั้นที่สอง (CSP) กันตอนชั้นแรกพลาด เช่นวันหนึ่งนักพัฒนาลืมแล้วใช้ <code>innerHTML</code> กับชื่อวิชา CSP ยังไม่ยอมรัน inline script และไม่ยอมให้ส่งข้อมูลออกนอกโดเมน เหตุผลที่ต้องกังวลเป็นพิเศษ คือเว็บเก็บ token ไว้ใน <code>localStorage</code> ซึ่ง JavaScript ทุกตัวในหน้าอ่านได้</p></div>
+
+<p><strong><code>?api=</code> ใช้ได้เฉพาะ localhost:</strong> <code>webapp/assets/js/config.js</code> ตอนพัฒนาให้เปิด <code>http://127.0.0.1:5500/?api=http://127.0.0.1:3000/api</code> เพื่อชี้ไป Backend บนเครื่องตัวเองได้ แต่ถ้าโค้ดรับพารามิเตอร์นี้บนโดเมนจริง คนร้ายก็ส่งลิงก์ <code>https://ระบบจริง/?api=https://เว็บร้าย</code> แล้วเบราว์เซอร์เหยื่อจะจำค่านั้นใน <code>localStorage</code> และส่ง username/password ไปเว็บร้ายทุกครั้งที่ล็อกอิน (phishing ที่มาจากโดเมนจริง)</p>
+<p><strong>ไฟล์ <code>webapp/assets/js/config.js</code> บรรทัด 40–46</strong></p>
+<div class="code-block"><span class="code-lang">js</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kd">function</span><span class="w"> </span><span class="nx">resolveApiBase</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">isLocalPage</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="c1">// ล้างค่าที่อาจถูกฝังไว้จากลิงก์แปลก ๆ ก่อนหน้านี้ แล้วใช้ API ของโดเมนนี้เสมอ</span>
+<span class="w">      </span><span class="nb">window</span><span class="p">.</span><span class="nx">localStorage</span><span class="p">.</span><span class="nx">removeItem</span><span class="p">(</span><span class="nx">STORAGE_API</span><span class="p">);</span>
+<span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="s1">'/api'</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+</code></pre></div></td></tr></table></div>
+</div>
+
+<ul>
+<li><code>isLocalPage()</code> (บรรทัด 20–22) ตรวจว่า <code>window.location.hostname</code> อยู่ในชุด <code>localhost</code>, <code>127.0.0.1</code>, <code>[::1]</code>, <code>::1</code> หรือไม่</li>
+<li>ถ้า <strong>ไม่ใช่</strong> หน้าบนเครื่องตัวเอง: <strong>ลบ</strong> ค่า <code>rmutt.apiBase</code> เก่าที่อาจถูกฝังไว้ แล้วคืน <code>'/api'</code> (path บนโดเมนเดียวกัน) ทันที ไม่อ่าน query string เลย</li>
+<li><code>normalizeApiBase</code> (บรรทัด 25–38) รับเฉพาะ path ที่ขึ้นต้นด้วย <code>/</code> (แต่ไม่ใช่ <code>//</code> ซึ่งเป็น protocol-relative URL ไปโดเมนอื่น) หรือ URL แบบ <code>http:</code>/<code>https:</code> เท่านั้น ปฏิเสธ <code>javascript:</code> และอื่น ๆ</li>
+</ul>
+<p><strong>Token ใน localStorage (trade-off):</strong> <code>webapp/assets/js/api.js</code> เก็บ JWT ใน <code>localStorage</code> (คีย์ <code>rmutt.token</code>) และแนบด้วยหัว <code>Authorization: Bearer ...</code> เหตุผลที่ไม่ใช้ cookie (อธิบายใน <code>auth.js</code> หัวไฟล์): Backend ตรวจสิทธิ์จากหัว Authorization อย่างเดียว ถ้าใช้ cookie ต้องคิดเรื่อง <strong>CSRF</strong> (เว็บร้ายหลอกเบราว์เซอร์ให้ส่ง cookie ของเราไปยิง API) เพิ่มโดยไม่ได้ประโยชน์</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th></th>
+<th>localStorage + Bearer (ที่ใช้)</th>
+<th>cookie <code>HttpOnly</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>อ่านด้วย JS (ขโมยตอนมี XSS)</td>
+<td><strong>อ่านได้</strong> (จุดอ่อน)</td>
+<td>อ่านไม่ได้</td>
+</tr>
+<tr>
+<td>CSRF</td>
+<td>ไม่เกิด เพราะเบราว์เซอร์ไม่แนบ header เอง</td>
+<td>เกิดได้ ต้องมี CSRF token / SameSite</td>
+</tr>
+<tr>
+<td>ใช้กับแอปมือถือเดียวกัน</td>
+<td>ใช้ได้เหมือนกัน</td>
+<td>ยุ่งกว่า</td>
+</tr>
+</tbody>
+</table></div>
+<p>ระบบจึงเลือกรับความเสี่ยง XSS แล้ว <strong>ลดด้วย CSP + ไม่ใช้ innerHTML</strong> แทน และอายุ token สั้น (8 ชั่วโมง) ส่วนแอปมือถือเก็บ token ด้วย <code>flutter_secure_storage</code> (<code>lib/services/auth_service.dart</code> บรรทัด 5, 32) ซึ่งใช้ที่เก็บที่ระบบปฏิบัติการปกป้อง (Android Keystore) ปลอดภัยกว่า localStorage</p>
+<p>อีกเรื่องที่ทำไว้ดี: ตอนแรกแอปจำรหัสผ่านไว้ใน secure storage ปัจจุบัน <code>loadRememberedLogin()</code> (บรรทัด 47–54) <strong>ลบรหัสผ่านที่รุ่นเก่าเคยเก็บทิ้งทุกครั้ง</strong> และจำแค่ username ส่วนการอยู่ในระบบต่อใช้ token ที่หมดอายุเองและเพิกถอนได้จากเซิร์ฟเวอร์</p>
+<p><strong>จุดอ่อนที่เหลือ:</strong> CSP ยอม <code>'unsafe-inline'</code> ใน style, โหลดฟอนต์จาก Google Fonts (มีคำขอไปบุคคลที่สาม), และ token ใน <code>localStorage</code> ยังเสี่ยงถ้ามีช่องโหว่ XSS สักจุดที่หลุดทั้งสองชั้น</p>
+<h2 id="ชั้นที่-4-api-backend">ชั้นที่ 4: API (Backend)<a class="anchor" href="#ชั้นที่-4-api-backend">#</a></h2>
+<h3 id="41-jwt-และการยืนยันตัวตน">4.1 JWT และการยืนยันตัวตน<a class="anchor" href="#41-jwt-และการยืนยันตัวตน">#</a></h3>
+<p><strong>ภัยคุกคาม:</strong> ปลอม token, ใช้ token เก่าหลังเปลี่ยนรหัสผ่านหรือโดนปิดบัญชี, แก้ role ใน token ให้เป็น admin</p>
+<p><strong>ตอนออก token</strong> (<code>backend/src/routes/auth.js</code> บรรทัด 89–102)</p>
+<div class="code-block"><span class="code-lang">js</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 89</span>
+<span class="normal"> 90</span>
+<span class="normal"> 91</span>
+<span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">jwt</span><span class="p">.</span><span class="nx">sign</span><span class="p">(</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nx">role</span><span class="o">:</span><span class="w"> </span><span class="nx">user</span><span class="p">.</span><span class="nx">role</span><span class="p">,</span>
+<span class="w">        </span><span class="nx">ver</span><span class="o">:</span><span class="w"> </span><span class="nb">Number</span><span class="p">(</span><span class="nx">user</span><span class="p">.</span><span class="nx">token_version</span><span class="p">),</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="nx">config</span><span class="p">.</span><span class="nx">jwtSecret</span><span class="p">,</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nx">algorithm</span><span class="o">:</span><span class="w"> </span><span class="s1">'HS256'</span><span class="p">,</span>
+<span class="w">        </span><span class="nx">subject</span><span class="o">:</span><span class="w"> </span><span class="nx">user</span><span class="p">.</span><span class="nx">username</span><span class="p">,</span>
+<span class="w">        </span><span class="nx">expiresIn</span><span class="o">:</span><span class="w"> </span><span class="nx">config</span><span class="p">.</span><span class="nx">jwtExpiresIn</span><span class="p">,</span>
+<span class="w">        </span><span class="nx">issuer</span><span class="o">:</span><span class="w"> </span><span class="s1">'rmutt-save-energy-api'</span><span class="p">,</span>
+<span class="w">        </span><span class="nx">audience</span><span class="o">:</span><span class="w"> </span><span class="s1">'rmutt-save-energy-app'</span><span class="p">,</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">    </span><span class="p">);</span>
+</code></pre></div></td></tr></table></div>
+</div>
+
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Claim</th>
+<th>ค่า</th>
+<th>หน้าที่</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>sub</code></td>
+<td>username</td>
+<td>ตัวตนเจ้าของ token</td>
+</tr>
+<tr>
+<td><code>exp</code></td>
+<td><code>JWT_EXPIRES_IN</code> (ค่าเริ่มต้น <code>8h</code>, <code>config.js</code> บรรทัด 43)</td>
+<td>หมดอายุเอง ลดความเสียหายถ้า token หลุด</td>
+</tr>
+<tr>
+<td><code>iss</code> / <code>aud</code></td>
+<td><code>rmutt-save-energy-api</code> / <code>rmutt-save-energy-app</code></td>
+<td>กัน token ของระบบอื่นที่ใช้ secret เดียวกันมาใช้ที่นี่</td>
+</tr>
+<tr>
+<td><code>role</code></td>
+<td>admin/staff</td>
+<td>ใส่ไว้เพื่อให้ฝั่ง client อ่านเร็ว ๆ แต่ <strong>Backend ไม่เชื่อค่านี้</strong></td>
+</tr>
+<tr>
+<td><code>ver</code></td>
+<td><code>token_version</code> ในตาราง <code>users</code></td>
+<td>ใช้เพิกถอน token (อธิบายด้านล่าง)</td>
+</tr>
+<tr>
+<td><code>algorithm: 'HS256'</code></td>
+<td>HMAC-SHA256 ใช้กุญแจลับตัวเดียวทั้งเซ็นและตรวจ</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>ตอนตรวจ token ทุกคำขอ</strong> (<code>backend/src/middleware/authenticate.js</code> บรรทัด 16–38)</p>
+<div class="code-block"><span class="code-lang">js</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="w">  </span><span class="kd">let</span><span class="w"> </span><span class="nx">payload</span><span class="p">;</span>
+<span class="w">  </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">payload</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">jwt</span><span class="p">.</span><span class="nx">verify</span><span class="p">(</span><span class="nx">token</span><span class="p">,</span><span class="w"> </span><span class="nx">config</span><span class="p">.</span><span class="nx">jwtSecret</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nx">algorithms</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s1">'HS256'</span><span class="p">],</span>
+<span class="w">      </span><span class="nx">issuer</span><span class="o">:</span><span class="w"> </span><span class="s1">'rmutt-save-energy-api'</span><span class="p">,</span>
+<span class="w">      </span><span class="nx">audience</span><span class="o">:</span><span class="w"> </span><span class="s1">'rmutt-save-energy-app'</span><span class="p">,</span>
+<span class="w">    </span><span class="p">});</span>
+<span class="w">  </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">throw</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">ApiError</span><span class="p">(</span><span class="mf">401</span><span class="p">,</span><span class="w"> </span><span class="s1">'รหัสเข้าสู่ระบบหมดอายุหรือไม่ถูกต้อง'</span><span class="p">);</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">rows</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">pool</span><span class="p">.</span><span class="nx">query</span><span class="p">(</span>
+<span class="w">    </span><span class="sb">`SELECT username, first_name, last_name, email, phone, role,</span>
+<span class="sb">            token_version</span>
+<span class="sb">       FROM users</span>
+<span class="sb">      WHERE username = ? AND is_active = 1</span>
+<span class="sb">      LIMIT 1`</span><span class="p">,</span>
+<span class="w">    </span><span class="p">[</span><span class="nx">payload</span><span class="p">.</span><span class="nx">sub</span><span class="p">],</span>
+<span class="w">  </span><span class="p">);</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">rows</span><span class="p">[</span><span class="mf">0</span><span class="p">];</span>
+
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">user</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">Number</span><span class="p">(</span><span class="nx">user</span><span class="p">.</span><span class="nx">token_version</span><span class="p">)</span><span class="w"> </span><span class="o">!==</span><span class="w"> </span><span class="nb">Number</span><span class="p">(</span><span class="nx">payload</span><span class="p">.</span><span class="nx">ver</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">throw</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">ApiError</span><span class="p">(</span><span class="mf">401</span><span class="p">,</span><span class="w"> </span><span class="s1">'กรุณาเข้าสู่ระบบใหม่'</span><span class="p">);</span>
+<span class="w">  </span><span class="p">}</span>
+</code></pre></div></td></tr></table></div>
+</div>
+
+<ul>
+<li><code>algorithms: ['HS256']</code> <strong>ระบุอัลกอริทึมที่ยอมรับเอง</strong> ไม่ให้ไลบรารีเชื่อ header <code>alg</code> ในตัว token ปิดช่องโจมตีแบบ <code>alg: none</code> (token ไม่เซ็น) และการสลับอัลกอริทึม</li>
+<li><code>jwt.verify</code> ตรวจลายเซ็น วันหมดอายุ <code>exp</code> <code>iss</code> และ <code>aud</code> ให้ในคำสั่งเดียว ล้มเหลวอย่างไรก็ตอบ 401 ข้อความกลาง ๆ ไม่บอกว่าผิดเพราะอะไร</li>
+<li><strong>อ่าน user จากฐานข้อมูลทุกคำขอ</strong> (<code>WHERE username = ? AND is_active = 1</code>) แล้วใช้ <code>role</code> จากแถวในฐานข้อมูล (ผ่าน <code>request.authUser = publicUser(user)</code> บรรทัด 41) <strong>ไม่ใช้ <code>role</code> ใน token</strong> ดังนั้นถ้าคนร้ายได้ token ของ staff ไป ก็แก้เป็น admin เองไม่ได้ (ลายเซ็นไม่ผ่าน) และถ้า admin ลดสิทธิ์ใครก็มีผลทันที</li>
+<li>เทียบ <code>token_version</code> ในฐานข้อมูลกับ <code>ver</code> ใน token ถ้าไม่เท่ากัน = token ถูกเพิกถอนแล้ว <code>token_version</code> ถูกบวกเพิ่ม (<code>token_version + 1</code>) ใน 4 กรณี คือ เปลี่ยนรหัสผ่านเอง (<code>auth.js</code> บรรทัด 229–236), รีเซ็ตรหัสผ่านด้วย OTP (บรรทัด 405–412), admin เปลี่ยน role/สถานะผู้ใช้ (<code>routes/users.js</code> บรรทัด 122–128) และรัน <code>seed-admin</code></li>
+</ul>
+<div class="callout why"><div class="callout-title">ทำไม</div><p><strong>ทำไมยอมเสียค่า query ฐานข้อมูลทุกคำขอ</strong> JWT ปกติเป็น stateless (ไม่ต้องถามฐานข้อมูล) เร็วแต่ <strong>เพิกถอนไม่ได้จนกว่าจะหมดอายุ</strong> ถ้าบัญชีถูกปิดหรือรหัสผ่านถูกขโมยแล้วเปลี่ยน token เก่ายังใช้ได้อีกเป็นชั่วโมง ที่นี่ผู้ใช้หลักหลายสิบคน ภาระ query เล็กน้อยเทียบกับ "ปิดบัญชีแล้วมีผลทันที" คุ้มกว่า เป็นการแลกความเร็วกับความปลอดภัย</p></div>
+
+<p><strong>Authorization:</strong> <code>requireAdmin</code> (<code>backend/src/middleware/require-admin.js</code> บรรทัด 3–12) ตรวจ <code>request.authUser?.role !== 'admin'</code> แล้วตอบ 403 ใช้ต่อท้าย <code>authenticate</code> เสมอ (ลำดับ: ยืนยันตัวตนก่อน แล้วค่อยตรวจสิทธิ์) บาง router ใช้ทั้งไฟล์ เช่น <code>usersRouter.use(requireAdmin)</code> และ <code>firmwareRouter.use(authenticate, requireAdmin)</code> บาง router ใส่เป็นรายเส้นทาง เช่น <code>POST /api/air-conditioners/reservations</code>, <code>/:deviceId/setup-mode</code>, <code>/:deviceId/ota</code></p>
+<h3 id="42-rate-limit-จำกัดจำนวนครั้ง">4.2 Rate limit (จำกัดจำนวนครั้ง)<a class="anchor" href="#42-rate-limit-จำกัดจำนวนครั้ง">#</a></h3>
+<p>ทั้งหมดอยู่ใน <code>backend/src/routes/auth.js</code> (ไม่มี rate limit ที่เส้นทางอื่น) ใช้ไลบรารี <code>express-rate-limit</code></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>ตัวจำกัด</th>
+<th>ใช้กับ</th>
+<th>จำนวน</th>
+<th>ช่วงเวลา</th>
+<th>หมายเหตุ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>loginLimiter</code> (บรรทัด 27–33)</td>
+<td><code>POST /login</code></td>
+<td>10 ครั้ง</td>
+<td>15 นาที</td>
+<td>นับต่อ IP ทุกคำขอ</td>
+</tr>
+<tr>
+<td><code>passwordConfirmLimiter</code> (บรรทัด 37–44)</td>
+<td><code>PATCH /me</code>, <code>POST /me/password</code></td>
+<td>10 ครั้ง</td>
+<td>15 นาที</td>
+<td><code>skipSuccessfulRequests: true</code> นับเฉพาะครั้งที่ <strong>ผิด</strong></td>
+</tr>
+<tr>
+<td><code>resetLimiter</code> (บรรทัด 46–52)</td>
+<td><code>POST /forgot-password</code>, <code>/verify-otp</code>, <code>/reset-password</code></td>
+<td>8 ครั้ง</td>
+<td>1 ชั่วโมง</td>
+<td>ตัวนับ <strong>ร่วมกัน</strong> ทั้งสามเส้นทาง เพราะใช้ตัวจำกัดตัวเดียวกัน</td>
+</tr>
+</tbody>
+</table></div>
+<p>เมื่อเกิน ตอบ 429 พร้อมข้อความไทย และ <code>standardHeaders: 'draft-7'</code> ส่งหัว <code>RateLimit-*</code> ให้ client รู้โควตา</p>
+<p><strong>TRUST_PROXY=2 และเหตุผล:</strong> Rate limit ต้องรู้ "IP จริงของผู้ใช้" แต่เมื่อมี reverse proxy คั่น Backend จะเห็นแค่ IP ของ proxy ต้องอ่านจากหัว <code>X-Forwarded-For</code> (XFF) ซึ่ง <strong>ปลอมได้ถ้าเชื่อมั่ว</strong> ๆ</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>เส้นทาง</th>
+<th>ลำดับ</th>
+<th>จำนวนชั้นที่ Backend ต้องเชื่อ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>โดเมนหลัก</td>
+<td>ผู้ใช้ → Caddy → Backend</td>
+<td>1</td>
+</tr>
+<tr>
+<td>Funnel</td>
+<td>ผู้ใช้ → Tailscale → Caddy (<code>:8080</code>) → Backend</td>
+<td>2</td>
+</tr>
+</tbody>
+</table></div>
+<p>ใช้เส้นทางเดียวกันทั้งสองทาง จึงตั้งเป็น <strong>2</strong> (<code>docker-compose.yml</code> บรรทัด 85) ถ้าตั้งเป็น 1 ทุกคนที่เข้าผ่าน Funnel (รวมแอปมือถือทั้งหมด) จะถูกนับเป็น IP เดียวกัน ใครพิมพ์รหัสผิด 10 ครั้ง ทุกคนล็อกอินไม่ได้ 15 นาที (ตัวอย่าง "ทำให้ระบบใช้ไม่ได้" ที่เป็นปัญหา Availability) ส่วนการปลอม XFF: ทางโดเมนหลัก Caddy ทิ้ง XFF ที่ผู้ใช้ส่งมาเองและเขียนใหม่ ส่วนที่ <code>:8080</code> มี <code>trusted_proxies static private_ranges</code> (<code>Caddyfile</code> บรรทัด 3–7) แปลว่าเชื่อ XFF เฉพาะจากต้นทางที่อยู่ในวงเครือข่ายส่วนตัว (container tailscale)</p>
+<p><strong>ไฟล์ <code>backend/src/config.js</code> บรรทัด 12–19</strong></p>
+<div class="code-block"><span class="code-lang">js</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kd">function</span><span class="w"> </span><span class="nx">trustProxyFromEnv</span><span class="p">(</span><span class="nx">name</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">raw</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">[</span><span class="nx">name</span><span class="p">]</span><span class="w"> </span><span class="o">??</span><span class="w"> </span><span class="s1">''</span><span class="p">).</span><span class="nx">trim</span><span class="p">();</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">raw</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">''</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nx">raw</span><span class="p">.</span><span class="nx">toLowerCase</span><span class="p">()</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">'false'</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="sr">/^\d+$/</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">raw</span><span class="p">))</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="nb">Number</span><span class="p">.</span><span class="nb">parseInt</span><span class="p">(</span><span class="nx">raw</span><span class="p">,</span><span class="w"> </span><span class="mf">10</span><span class="p">);</span>
+<span class="w">  </span><span class="c1">// ค่า true จะทำให้ใครก็ปลอม IP ได้ และ express-rate-limit จะปฏิเสธ</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">raw</span><span class="p">.</span><span class="nx">toLowerCase</span><span class="p">()</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">'true'</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="mf">1</span><span class="p">;</span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="nx">raw</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></td></tr></table></div>
+</div>
+
+<p>ค่าว่าง = <code>false</code> (ไม่เชื่อ XFF เลย เหมาะกับรันตรงบนเครื่อง) ตัวเลข = เชื่อกี่ชั้น และถ้าใส่ <code>true</code> จะถูกแปลงเป็น 1 แทน เพราะ <code>true</code> แปลว่าเชื่อ <strong>ทุกชั้นรวมที่ผู้ใช้ส่งมาเอง</strong> อันตราย</p>
+<h3 id="43-การตรวจข้อมูลขาเข้า-sql-และการตอบ-error">4.3 การตรวจข้อมูลขาเข้า, SQL, และการตอบ error<a class="anchor" href="#43-การตรวจข้อมูลขาเข้า-sql-และการตอบ-error">#</a></h3>
+<ul>
+<li><strong>Parameterized SQL ทั้งระบบ</strong> ทุก query ใช้ <code>?</code> และส่งค่าเป็นอาร์เรย์ เช่น <code>WHERE username = ? ... [payload.sub]</code> ส่วนที่มีการต่อสตริง SQL (<code>${...}</code>) ตรวจแล้วเป็นส่วนที่โค้ดกำหนดเอง ไม่ใช่ข้อมูลผู้ใช้ เช่น รายการคอลัมน์ที่ <code>PATCH /air-conditioners/:deviceId</code> ประกอบจาก <code>fields.push('auto_off_attempts = 0')</code> (ข้อความคงที่ทั้งหมด) และ <code>keyExpression</code> ใน <code>routes/energy.js</code> ที่เลือกจากสองสตริงคงที่ ตามค่า <code>granularity</code> ที่ผ่านการตรวจแล้ว</li>
+<li><strong>Validate ก่อนใช้:</strong> <code>validateDeviceId</code> ใช้ regex <code>^ESP32-[0-9A-F]{12}$</code> (<code>utils/air-conditioner.js</code> บรรทัด 4, 137–143) ชื่อห้องใช้ <code>^[A-Z0-9][A-Z0-9_-]{1,19}$</code> เวลาใช้ <code>^(?:[01]\d|2[0-3]):[0-5]\d$</code> โหมดแอร์/ความเร็วพัดลม/โปรโตคอลตรวจกับ <code>Set</code> ของค่าที่ยอมรับ (<code>modes</code>, <code>fanSpeeds</code>, <code>protocols</code>) แปลว่าสิ่งที่ไม่อยู่ในรายการถูกปฏิเสธ (allowlist ปลอดภัยกว่า blocklist) อีกที่คือ <code>cleanString(value, maxLength)</code> ใน <code>auth.js</code> บรรทัด 423–426 ตัดความยาวและรับเฉพาะ string</li>
+<li><strong>จำกัดขนาด:</strong> <code>express.json({ limit: '256kb' })</code> (<code>app.js</code> บรรทัด 36) กันคนส่ง JSON ก้อนยักษ์ให้หน่วยความจำเต็ม เกินแล้วตอบ 413 และรหัสผ่านที่ login ยาวเกิน 256 ตัวถูกปฏิเสธ (<code>auth.js</code> บรรทัด 63)</li>
+<li><strong>Error ไม่รั่วข้อมูลภายใน:</strong> <code>errorHandler</code> (<code>utils/http.js</code> บรรทัด 19–40) แยกสามแบบ คือ <code>ApiError</code> (ข้อความที่เราตั้งใจให้ผู้ใช้เห็น) 413 และอย่างอื่นทั้งหมด (เช่น ฐานข้อมูลล่ม โค้ดมีบั๊ก) ตอบแค่ <code>เกิดข้อผิดพลาดภายในเซิร์ฟเวอร์</code> พร้อม status 500 โดย <code>console.error(error)</code> ลง log ฝั่งเซิร์ฟเวอร์เท่านั้น ไม่ส่ง stack trace หรือข้อความ SQL ให้ client</li>
+<li><strong>ข้อความ login กลาง ๆ:</strong> ทั้งกรณีไม่มี username และรหัสผิดตอบ <code>Username หรือ Password ไม่ถูกต้อง</code> เหมือนกัน (บรรทัด 81) และหน้า forgot-password ตอบข้อความเดียวกันไม่ว่าบัญชีมีหรือไม่ (บรรทัด 300–304) เพื่อไม่ให้คนร้ายใช้เป็นเครื่องเดาว่า username ไหนมีในระบบ (user enumeration)</li>
+</ul>
+<p><strong><code>/api/health</code> ซ่อนรายละเอียดบน production</strong> (<code>app.js</code> บรรทัด 38–59): เส้นทางนี้ไม่ต้องล็อกอิน (Docker healthcheck และเครื่องมือเรียกใช้) จึงต้องไม่บอกข้อมูลที่ช่วยโจมตี ถ้า <code>config.env === 'production'</code> ตอบแค่ <code>connected</code>, <code>deviceAuth</code>, <code>topicPrefix</code> ไม่บอกที่อยู่ Broker หรือข้อความ error ภายใน (ตอนพัฒนาบนเครื่องได้รายละเอียดเต็มให้ <code>check_system.ps1</code> ใช้ตรวจ)</p>
+<p><strong>CORS:</strong> <code>createCorsOptions()</code> (<code>app.js</code> บรรทัด 77–98) บนเซิร์ฟเวอร์จริง <code>APP_ORIGIN</code> เป็นรายการที่อนุญาต (<code>https://${DOMAIN},${PUBLIC_URL:-}</code> ใน compose บรรทัด 88) ถ้า <code>Origin</code> ไม่อยู่ในรายการ → error ส่วนคำขอที่ไม่มี <code>Origin</code> (แอปมือถือ, curl) ผ่านได้ เพราะ CORS เป็นกลไกของ <strong>เบราว์เซอร์</strong> ไม่ใช่การยืนยันตัวตน ค่าเริ่มต้นในโค้ดเป็น <code>*</code> (สะดวกตอนพัฒนา) เปลี่ยนเป็นรายการจริงโดย <code>docker-compose.yml</code></p>
+<p><strong>ตรวจ secret ตอนเริ่มเซิร์ฟเวอร์:</strong> <code>assertServerConfig()</code> (<code>config.js</code> บรรทัด 74–126) เรียกใน <code>server.js</code> บรรทัด 11 ก่อนเริ่มรับคำขอ ถ้า <code>JWT_SECRET</code>/<code>OTP_PEPPER</code> สั้นกว่า 32 ตัวหรือมีคำว่า <code>replace|change|example</code> (ค่าตัวอย่างจาก <code>.env.example</code> ที่ลืมเปลี่ยน) เซิร์ฟเวอร์ <strong>ไม่ยอมเริ่ม</strong> (fail closed)</p>
+<p><strong>ไฟล์ <code>backend/src/config.js</code> บรรทัด 137–139</strong></p>
+<div class="code-block"><span class="code-lang">js</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kd">function</span><span class="w"> </span><span class="nx">unsafeSecret</span><span class="p">(</span><span class="nx">value</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="nx">value</span><span class="p">.</span><span class="nx">length</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mf">32</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="sr">/replace|change|example/i</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">value</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></td></tr></table></div>
+</div>
+
+<h2 id="ชั้นที่-5-รหัสผ่านและ-otp">ชั้นที่ 5: รหัสผ่านและ OTP<a class="anchor" href="#ชั้นที่-5-รหัสผ่านและ-otp">#</a></h2>
+<h3 id="51-รหัสผ่าน-bcryptjs-cost-12--dummy-hash">5.1 รหัสผ่าน: bcryptjs cost 12 + dummy hash<a class="anchor" href="#51-รหัสผ่าน-bcryptjs-cost-12--dummy-hash">#</a></h3>
+<p><strong>ภัยคุกคาม:</strong> ฐานข้อมูลรั่ว → ถ้าเก็บรหัสผ่านจริงหรือ hash เร็ว ๆ (MD5/SHA) คนร้ายเดาได้เป็นพันล้านครั้งต่อวินาทีด้วย GPU</p>
+<p><strong>วิธีป้องกัน:</strong> ใช้ <code>bcryptjs</code> ด้วย cost 12 (<code>bcrypt.hash(newPassword, 12)</code> ใน <code>auth.js</code> บรรทัด 235, 379 และ <code>scripts/seed-admin.js</code>) bcrypt ช้าโดยตั้งใจ (cost 12 = ทำซ้ำ 2^12 รอบ ใช้เวลาระดับหลักร้อยมิลลิวินาทีต่อครั้ง) ทำให้การเดารหัสแพงมาก และมี salt สุ่มฝังในผลลัพธ์ (<code>$2b$12$&lt;salt&gt;&lt;hash&gt;</code>) อยู่แล้ว ข้อจำกัดคือ bcrypt อ่านรหัสแค่ <strong>72 ไบต์แรก</strong> <code>isValidNewPassword</code> (<code>utils/security.js</code> บรรทัด 23–29) จึงบังคับ 8 ตัวขึ้นไป และไม่เกิน 72 ไบต์ (ตัวอักษรไทยกินตัวละ 3 ไบต์ ดูเทสต์ใน <code>test/security.test.js</code>) ไม่งั้นส่วนที่เกินจะถูกทิ้งเงียบ ๆ</p>
+<p><strong>Dummy hash กัน timing attack</strong> (<code>auth.js</code> บรรทัด 24–25, 76–82)</p>
+<div class="code-block"><span class="code-lang">js</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">76</span>
+<span class="normal">77</span>
+<span class="normal">78</span>
+<span class="normal">79</span>
+<span class="normal">80</span>
+<span class="normal">81</span>
+<span class="normal">82</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">isCorrect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">user</span>
+<span class="w">      </span><span class="o">?</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">bcrypt</span><span class="p">.</span><span class="nx">compare</span><span class="p">(</span><span class="nx">password</span><span class="p">,</span><span class="w"> </span><span class="nx">user</span><span class="p">.</span><span class="nx">password_hash</span><span class="p">)</span>
+<span class="w">      </span><span class="o">:</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">bcrypt</span><span class="p">.</span><span class="nx">compare</span><span class="p">(</span><span class="nx">password</span><span class="p">,</span><span class="w"> </span><span class="nx">dummyPasswordHash</span><span class="p">);</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">user</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">!</span><span class="nx">isCorrect</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="k">throw</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">ApiError</span><span class="p">(</span><span class="mf">401</span><span class="p">,</span><span class="w"> </span><span class="s1">'Username หรือ Password ไม่ถูกต้อง'</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+</code></pre></div></td></tr></table></div>
+</div>
+
+<p>ปัญหา: <code>bcrypt.compare</code> ใช้เวลานาน (หลักร้อย ms) ถ้าไม่มี user แล้วข้ามไปตอบทันที จะเร็วกว่ากรณีมี user อย่างเห็นได้ชัด คนร้ายจับเวลาแล้วรู้ว่า username ไหนมีจริง วิธีแก้คือ <strong>ถ้าไม่พบ user ก็ยังเปรียบเทียบกับ hash ปลอม</strong> (<code>dummyPasswordHash</code> ซึ่งเป็น bcrypt cost 12 ที่ไม่ตรงรหัสผ่านใดเลย) เพื่อให้ใช้เวลาใกล้เคียงกัน ผลลัพธ์ที่ได้ไม่ถูกใช้ (ผ่านเงื่อนไข <code>!user</code> อยู่แล้ว) แค่ "เผาเวลา" เท่ากัน</p>
+<p><strong>ปกป้องการแก้ข้อมูลสำคัญ:</strong> <code>PATCH /me</code> ถ้า <strong>เปลี่ยนอีเมล</strong> ต้องส่ง <code>currentPassword</code> ถูกต้อง (บรรทัด 135–156) เพราะ OTP ลืมรหัสผ่านถูกส่งไปที่อีเมลนั้น ถ้าไม่บังคับ คนที่ได้เครื่องที่ลืมล็อกเอาท์จะเปลี่ยนอีเมลเป็นของตัวเองแล้วกด "ลืมรหัสผ่าน" ยึดบัญชีถาวรได้ และ <code>/me/password</code> ต้องใช้รหัสเดิม รหัสใหม่ต้องไม่ซ้ำเดิม และทั้งสองใช้ <code>passwordConfirmLimiter</code> นับเฉพาะครั้งที่ผิด</p>
+<p><strong>ผู้ดูแลคนสุดท้าย:</strong> <code>assertAnotherActiveAdminExists</code> (<code>routes/users.js</code> บรรทัด 174–189) ไม่ยอมให้ลบ/ปิด/ลดสิทธิ์ admin คนสุดท้าย (409) กันระบบไม่มีใครดูแล (Availability) และใช้ <code>SELECT ... FOR UPDATE</code> ใน transaction กัน race condition สองคนลบกันพร้อมกัน</p>
+<h3 id="52-otp-ลืมรหัสผ่าน-hmac--pepper-หมดอายุ-จำกัดครั้ง-reset-token">5.2 OTP ลืมรหัสผ่าน: HMAC + pepper, หมดอายุ, จำกัดครั้ง, reset token<a class="anchor" href="#52-otp-ลืมรหัสผ่าน-hmac--pepper-หมดอายุ-จำกัดครั้ง-reset-token">#</a></h3>
+<p>โฟลว์ 3 ขั้น: <code>forgot-password</code> (สร้าง OTP ส่งอีเมล) → <code>verify-otp</code> (ตรวจ OTP ได้ reset token) → <code>reset-password</code> (ตั้งรหัสใหม่)</p>
+<p><strong>ไฟล์ <code>backend/src/utils/security.js</code> บรรทัด 5–21</strong></p>
+<div class="code-block"><span class="code-lang">js</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">export</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="nx">createOtp</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="nx">crypto</span><span class="p">.</span><span class="nx">randomInt</span><span class="p">(</span><span class="mf">100000</span><span class="p">,</span><span class="w"> </span><span class="mf">1000000</span><span class="p">).</span><span class="nx">toString</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="k">export</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="nx">createResetToken</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="nx">crypto</span><span class="p">.</span><span class="nx">randomBytes</span><span class="p">(</span><span class="mf">32</span><span class="p">).</span><span class="nx">toString</span><span class="p">(</span><span class="s1">'hex'</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">export</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="nx">hashSecret</span><span class="p">(</span><span class="nx">value</span><span class="p">,</span><span class="w"> </span><span class="nx">pepper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">config</span><span class="p">.</span><span class="nx">otpPepper</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="nx">crypto</span><span class="p">.</span><span class="nx">createHmac</span><span class="p">(</span><span class="s1">'sha256'</span><span class="p">,</span><span class="w"> </span><span class="nx">pepper</span><span class="p">).</span><span class="nx">update</span><span class="p">(</span><span class="nx">value</span><span class="p">).</span><span class="nx">digest</span><span class="p">(</span><span class="s1">'hex'</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">export</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="nx">safeHashEquals</span><span class="p">(</span><span class="nx">leftHash</span><span class="p">,</span><span class="w"> </span><span class="nx">rightHash</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">left</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">Buffer</span><span class="p">.</span><span class="kr">from</span><span class="p">(</span><span class="nx">leftHash</span><span class="p">,</span><span class="w"> </span><span class="s1">'hex'</span><span class="p">);</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">right</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">Buffer</span><span class="p">.</span><span class="kr">from</span><span class="p">(</span><span class="nx">rightHash</span><span class="p">,</span><span class="w"> </span><span class="s1">'hex'</span><span class="p">);</span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="nx">left</span><span class="p">.</span><span class="nx">length</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="nx">right</span><span class="p">.</span><span class="nx">length</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nx">crypto</span><span class="p">.</span><span class="nx">timingSafeEqual</span><span class="p">(</span><span class="nx">left</span><span class="p">,</span><span class="w"> </span><span class="nx">right</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></td></tr></table></div>
+</div>
+
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>ฟังก์ชัน</th>
+<th>ทำอะไร</th>
+<th>ทำไม</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>createOtp</code></td>
+<td>เลข 6 หลัก <code>100000–999999</code> ด้วย <code>crypto.randomInt</code></td>
+<td>ใช้ตัวสุ่มระดับความปลอดภัย (CSPRNG) ไม่ใช่ <code>Math.random()</code> ซึ่งเดาได้</td>
+</tr>
+<tr>
+<td><code>createResetToken</code></td>
+<td>สุ่ม 32 ไบต์ = 64 ตัว hex (256 บิต)</td>
+<td>เดาไม่ได้ในทางปฏิบัติ</td>
+</tr>
+<tr>
+<td><code>hashSecret</code></td>
+<td><strong>HMAC-SHA256</strong> โดยใช้ <code>OTP_PEPPER</code> เป็นกุญแจ</td>
+<td>ดูด้านล่าง</td>
+</tr>
+<tr>
+<td><code>safeHashEquals</code></td>
+<td>เทียบแบบ <code>timingSafeEqual</code></td>
+<td>เทียบแบบ <code>===</code> จะหยุดทันทีที่พบไบต์ต่าง เวลาตอบจึงบอกใบ้ว่าตรงไปกี่ไบต์ ส่วนนี้ใช้เวลาเท่ากันเสมอ</td>
+</tr>
+</tbody>
+</table></div>
+<div class="callout why"><div class="callout-title">ทำไม</div><p><strong>ทำไม OTP ใช้ HMAC+pepper ไม่ใช้ bcrypt</strong> OTP มีแค่ 10^6 แบบ (หนึ่งล้าน) ต่อให้ใช้ SHA-256 ธรรมดา คนที่ขโมยตาราง <code>password_reset_otps</code> ไปคำนวณครบล้านแบบได้ในเสี้ยววินาที แต่ HMAC ต้องใช้ <code>OTP_PEPPER</code> ซึ่งอยู่ใน <code>.env</code> ไม่ได้อยู่ในฐานข้อมูล ขโมยฐานข้อมูลอย่างเดียวจึงถอด OTP ไม่ได้ ส่วนรหัสผ่านใช้ bcrypt เพราะอยู่ถาวรและต้องทนการเดาออฟไลน์ ส่วน OTP อายุสั้นและมีจำกัดครั้ง ใช้ HMAC พอและเร็วกว่า</p></div>
+
+<p><strong>ขั้นตอนกำกับความปลอดภัย:</strong></p>
+<ol>
+<li><code>forgot-password</code>: สร้าง OTP, <strong>ทำเครื่องหมาย OTP เก่าของบัญชีเดียวกันว่าใช้แล้ว</strong> (<code>SET used_at = NOW() WHERE username = ? AND used_at IS NULL</code>, บรรทัด 269–274) ให้มี OTP ที่ใช้ได้ครั้งละอันเดียว เก็บเฉพาะ <strong>hash</strong> (<code>otp_hash</code>) ไม่เก็บ OTP จริง <code>expires_at</code> = ตอนนี้ + <code>OTP_EXPIRES_MINUTES</code> (ค่าเริ่มต้น 10 นาที) ส่งอีเมล ถ้าส่งไม่สำเร็จจะลบแถวนั้นทิ้ง</li>
+<li><code>verify-otp</code> (บรรทัด 308–360): ตรวจรูปแบบ <code>requestId</code> (UUID) และ OTP (<code>/^\d{6}$/</code>) ปฏิเสธถ้าไม่มีแถว/ใช้แล้ว/<code>attempts &gt;= 5</code>/หมดอายุ ด้วยข้อความเดียวกัน (<code>OTP ไม่ถูกต้องหรือหมดอายุแล้ว</code>) ถ้า OTP ผิดจะ <code>attempts + 1</code> และถูกได้แค่ <strong>5 ครั้งต่อคำขอหนึ่ง</strong> ถ้าถูกจะออก reset token (ส่งกลับให้ผู้ใช้ <strong>เก็บเฉพาะ hash</strong> ลง <code>reset_token_hash</code>)</li>
+<li><code>reset-password</code> (บรรทัด 362–421): ตรวจ reset token (64 hex), hash แล้วหาแถว (<code>FOR UPDATE</code> ล็อกแถวใน transaction), ต้อง <code>verified_at</code> มีค่า, ยังไม่ <code>used_at</code>, ยังไม่หมดอายุ แล้วจึงเปลี่ยนรหัสผ่าน <strong>บวก <code>token_version</code></strong> (ทุกอุปกรณ์ที่ล็อกอินค้างต้องเข้าใหม่) และตั้ง <code>used_at</code> (ใช้ซ้ำไม่ได้)</li>
+</ol>
+<p>คำนวณความเสี่ยงการเดา: ต่อ OTP หนึ่งอัน เดาได้ 5 ครั้งจาก 1,000,000 → โอกาส 0.0005% และการขอ OTP ใหม่ต้องผ่าน <code>resetLimiter</code> (8 ครั้ง/ชม. รวมทุกเส้นทาง) จึงเดาต่อเนื่องไม่ได้</p>
+<p><strong>จุดอ่อนที่เหลือ:</strong> หน้า <code>forgot-password</code> ตอบเหมือนกันทุกกรณีก็จริง แต่ถ้ามีบัญชี โค้ดต้องเขียนฐานข้อมูลและ <strong>รอส่งอีเมล (SMTP) จนเสร็จ</strong> ก่อนตอบ (บรรทัด 261–298) ส่วนไม่มีบัญชีตอบทันที จึงมี timing channel ให้ใช้เดาได้ว่า username/อีเมลมีหรือไม่ ปรับปรุงได้โดยส่งอีเมลแบบ background (ไม่ <code>await</code>) หรือหน่วงเวลาให้เท่ากัน</p>
+<h2 id="ชั้นที่-6-mqtt">ชั้นที่ 6: MQTT<a class="anchor" href="#ชั้นที่-6-mqtt">#</a></h2>
+<p><strong>ภัยคุกคาม:</strong> ใครต่อ Broker ได้ก็อาจ (1) สั่งแอร์ทุกห้องผ่าน topic <code>.../command</code> (2) ส่งข้อมูลค่าไฟปลอม (3) แอบอ่านสถานะ ถ้ารหัสผ่านร่วมกันทุกบอร์ด <strong>แค่ถอดบอร์ดเดียวออกมาอ่านรหัสใน flash ก็สั่งแอร์ได้ทั้งอาคาร</strong> (ตามที่คอมเมนต์ใน <code>utils/mqtt-accounts.js</code> บรรทัด 3–5 เล่าไว้ว่าเป็นดีไซน์เก่าที่ถูกเปลี่ยน)</p>
+<p><strong>วิธีป้องกัน:</strong></p>
+<p><strong>(ก) ไม่ยอมให้ anonymous:</strong> <code>deploy/mosquitto/config/mosquitto.conf</code> บรรทัด 12–13</p>
+<div class="code-block"><span class="code-lang">ini</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">12</span>
+<span class="normal">13</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="na">per_listener_settings false</span>
+<span class="na">allow_anonymous false</span>
+</code></pre></div></td></tr></table></div>
+</div>
+
+<p><code>allow_anonymous false</code> = ทุกคนต้องมี username/password และ <code>per_listener_settings false</code> ทำให้กติกาเดียวกันมีผลกับทุก listener (1883 และ 8883) ไม่มีช่องทางหลบ (รวมถึงทาง Funnel 8443 ซึ่งเข้ามาที่ listener 1883)</p>
+<p><strong>(ข) Dynamic Security: บัญชีและ ACL ต่อบอร์ด</strong> Mosquitto Dynamic Security plugin (บรรทัด 15–16 ของ conf) เก็บบัญชี/role/ACL ในไฟล์ <code>mosquitto/data/dynamic-security.json</code> และให้ Backend สร้างบัญชีผ่าน topic <code>$CONTROL/dynamic-security/v1</code> ได้ขณะรัน (ไม่ต้อง restart Broker) บอร์ดแต่ละตัวได้ username = Device ID (เช่น <code>ESP32-AABBCCDDEEFF</code>) และ role ของตัวเอง</p>
+<p><strong>ไฟล์ <code>backend/src/utils/mqtt-accounts.js</code> บรรทัด 20–33 และ 70–86</strong></p>
+<div class="code-block"><span class="code-lang">js</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">export</span><span class="w"> </span><span class="kd">const</span><span class="w"> </span><span class="nx">DEVICE_KINDS</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">air</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">pattern</span><span class="o">:</span><span class="w"> </span><span class="sr">/^ESP32-[0-9A-F]{12}$/</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">clientIdPrefix</span><span class="o">:</span><span class="w"> </span><span class="s1">'rmutt-'</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">publish</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s1">'state'</span><span class="p">,</span><span class="w"> </span><span class="s1">'status'</span><span class="p">,</span><span class="w"> </span><span class="s1">'provision'</span><span class="p">,</span><span class="w"> </span><span class="s1">'provision-ack'</span><span class="p">,</span><span class="w"> </span><span class="s1">'history'</span><span class="p">],</span>
+<span class="w">    </span><span class="nx">subscribe</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s1">'command'</span><span class="p">,</span><span class="w"> </span><span class="s1">'provision-ack'</span><span class="p">,</span><span class="w"> </span><span class="s1">'schedule-status'</span><span class="p">,</span><span class="w"> </span><span class="s1">'history-ack'</span><span class="p">],</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nx">occupancy</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">pattern</span><span class="o">:</span><span class="w"> </span><span class="sr">/^OCC32-[0-9A-F]{12}$/</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">clientIdPrefix</span><span class="o">:</span><span class="w"> </span><span class="s1">'rmutt-occ-'</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">publish</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s1">'status'</span><span class="p">,</span><span class="w"> </span><span class="s1">'provision'</span><span class="p">,</span><span class="w"> </span><span class="s1">'provision-ack'</span><span class="p">],</span>
+<span class="w">    </span><span class="nx">subscribe</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s1">'command'</span><span class="p">,</span><span class="w"> </span><span class="s1">'provision-ack'</span><span class="p">],</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="p">};</span>
+</code></pre></div></td></tr></table></div>
+</div>
+
+<div class="code-block"><span class="code-lang">js</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span>
+<span class="normal">74</span>
+<span class="normal">75</span>
+<span class="normal">76</span>
+<span class="normal">77</span>
+<span class="normal">78</span>
+<span class="normal">79</span>
+<span class="normal">80</span>
+<span class="normal">81</span>
+<span class="normal">82</span>
+<span class="normal">83</span>
+<span class="normal">84</span>
+<span class="normal">85</span>
+<span class="normal">86</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">export</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="nx">deviceAcls</span><span class="p">({</span><span class="w"> </span><span class="nx">kind</span><span class="p">,</span><span class="w"> </span><span class="nx">topicPrefix</span><span class="p">,</span><span class="w"> </span><span class="nx">deviceId</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">spec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">DEVICE_KINDS</span><span class="p">[</span><span class="nx">kind</span><span class="p">];</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">spec</span><span class="p">)</span><span class="w"> </span><span class="k">throw</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="ne">Error</span><span class="p">(</span><span class="sb">`Unknown device kind: </span><span class="si">${</span><span class="nx">kind</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">base</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sb">`</span><span class="si">${</span><span class="nb">String</span><span class="p">(</span><span class="nx">topicPrefix</span><span class="p">).</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/\/+$/</span><span class="p">,</span><span class="w"> </span><span class="s1">''</span><span class="p">)</span><span class="si">}</span><span class="sb">/</span><span class="si">${</span><span class="nx">deviceId</span><span class="si">}</span><span class="sb">`</span><span class="p">;</span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">...</span><span class="nx">spec</span><span class="p">.</span><span class="nx">publish</span><span class="p">.</span><span class="nx">map</span><span class="p">((</span><span class="nx">suffix</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">({</span>
+<span class="w">      </span><span class="nx">acltype</span><span class="o">:</span><span class="w"> </span><span class="s1">'publishClientSend'</span><span class="p">,</span>
+<span class="w">      </span><span class="nx">topic</span><span class="o">:</span><span class="w"> </span><span class="sb">`</span><span class="si">${</span><span class="nx">base</span><span class="si">}</span><span class="sb">/</span><span class="si">${</span><span class="nx">suffix</span><span class="si">}</span><span class="sb">`</span><span class="p">,</span>
+<span class="w">      </span><span class="nx">allow</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">    </span><span class="p">})),</span>
+<span class="w">    </span><span class="p">...</span><span class="nx">spec</span><span class="p">.</span><span class="nx">subscribe</span><span class="p">.</span><span class="nx">map</span><span class="p">((</span><span class="nx">suffix</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">({</span>
+<span class="w">      </span><span class="nx">acltype</span><span class="o">:</span><span class="w"> </span><span class="s1">'subscribeLiteral'</span><span class="p">,</span>
+<span class="w">      </span><span class="nx">topic</span><span class="o">:</span><span class="w"> </span><span class="sb">`</span><span class="si">${</span><span class="nx">base</span><span class="si">}</span><span class="sb">/</span><span class="si">${</span><span class="nx">suffix</span><span class="si">}</span><span class="sb">`</span><span class="p">,</span>
+<span class="w">      </span><span class="nx">allow</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">    </span><span class="p">})),</span>
+<span class="w">  </span><span class="p">];</span>
+<span class="p">}</span>
+</code></pre></div></td></tr></table></div>
+</div>
+
+<ul>
+<li>บอร์ดแอร์ <strong>publish ได้</strong> เฉพาะ <code>rmutt/ac/&lt;DeviceID&gt;/{state,status,provision,provision-ack,history}</code> และ <strong>subscribe ได้</strong> เฉพาะ <code>.../{command,provision-ack,schedule-status,history-ack}</code> ของตัวเอง</li>
+<li><code>subscribeLiteral</code> = ต้องตรงชื่อเป๊ะ ไม่ใช้ wildcard (<code>#</code>, <code>+</code>) จึงเอา topic ของห้องอื่นมาแอบฟังไม่ได้</li>
+<li>ไม่มี ACL ให้ publish ที่ <code>.../command</code> เลย แปลว่า <strong>บอร์ดสั่งแอร์ห้องอื่นไม่ได้</strong> (หรือแม้แต่สั่งตัวเอง) คำสั่งส่งได้เฉพาะ Backend ซึ่งเป็นด่านที่ตรวจ JWT/role ก่อน ส่วน topic อื่นทั้งหมดถูกปฏิเสธเป็นค่าเริ่มต้นของ Dynamic Security (default deny)</li>
+<li>Backend มี role <code>rmutt-backend</code> (<code>backendAcls</code>, บรรทัด 88–98) ได้ publish/subscribe <code>rmutt/ac/#</code> และ <code>rmutt/occupancy/#</code></li>
+</ul>
+<p><strong>(ค) รหัสผ่าน = HMAC ของ Device ID</strong> (<code>utils/mqtt-accounts.js</code> บรรทัด 44–51)</p>
+<div class="code-block"><span class="code-lang">js</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">export</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="nx">deriveDevicePassword</span><span class="p">(</span><span class="nx">secret</span><span class="p">,</span><span class="w"> </span><span class="nx">deviceId</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">secret</span><span class="p">)</span><span class="w"> </span><span class="k">throw</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="ne">Error</span><span class="p">(</span><span class="s1">'MQTT_DEVICE_SECRET is required'</span><span class="p">);</span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="nx">crypto</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">createHmac</span><span class="p">(</span><span class="s1">'sha256'</span><span class="p">,</span><span class="w"> </span><span class="nx">secret</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">update</span><span class="p">(</span><span class="sb">`mqtt-device:</span><span class="si">${</span><span class="nb">String</span><span class="p">(</span><span class="nx">deviceId</span><span class="p">).</span><span class="nx">trim</span><span class="p">().</span><span class="nx">toUpperCase</span><span class="p">()</span><span class="si">}</span><span class="sb">`</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">digest</span><span class="p">(</span><span class="s1">'base64url'</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span><span class="w"> </span><span class="mf">32</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></td></tr></table></div>
+</div>
+
+<p>รหัสผ่านของบอร์ดแต่ละตัวคือ <code>HMAC-SHA256(MQTT_DEVICE_SECRET, "mqtt-device:&lt;DeviceID&gt;")</code> ตัดเหลือ 32 ตัวอักษร base64url ข้อดี: (1) <strong>ไม่ต้องเก็บรหัสในฐานข้อมูล</strong> คำนวณซ้ำได้เสมอ (2) ตั้งค่าบอร์ดซ้ำกี่ครั้งก็ได้รหัสเดิม บอร์ดที่ออนไลน์อยู่จึงไม่หลุด (3) บอร์ดแต่ละตัวรหัสต่างกัน (4) ถ้าบอร์ดหนึ่งถูกเจาะ ได้แค่รหัสของบอร์ดนั้น คำนวณของตัวอื่นไม่ได้เพราะไม่มี <code>MQTT_DEVICE_SECRET</code> ข้อเสียที่ต้องรู้: ถ้า <code>MQTT_DEVICE_SECRET</code> หลุด ปลอมรหัสของทุกบอร์ดได้ และถ้าเปลี่ยน secret ต้องตั้งค่ารหัสใหม่ให้ทุกบอร์ด</p>
+<p><strong>(ง) วงจรชีวิตของบัญชีบอร์ด</strong> (<code>backend/src/services/mqtt-accounts.js</code>): <code>prepareDeviceCredentials</code> สร้างบัญชีบน Broker ตอนจองช่อง (<code>POST /air-conditioners/reservations</code>) <strong>ก่อน</strong> เขียนฐานข้อมูล (ถ้า Broker ไม่พร้อมจะไม่ทิ้งแถวจองค้าง) <code>removeDeviceAccount</code> ลบบัญชีตอนถอดอุปกรณ์ และ <code>reconcileAccounts</code> ทุกครั้งที่ Backend ต่อ Broker ได้ จะสร้างบัญชีของบอร์ดทุกตัวในฐานข้อมูลคืนให้ (ถ้าไฟล์ <code>dynamic-security.json</code> หายหรือย้ายเซิร์ฟเวอร์ ไม่ต้องตั้งค่าบอร์ดใหม่)</p>
+<p><strong>(จ) บัญชีของ Backend:</strong> สร้างโดย <code>init-env.sh</code> (<code>mosquitto_ctrl dynsec init ... "$MQTT_USERNAME" "$MQTT_PASSWORD"</code>) ชื่อ <code>rmutt_backend</code> รหัสสุ่ม 32 ตัว ไฟล์ <code>dynamic-security.json</code> ตั้ง <code>chmod 600</code> และ <code>chown</code> เป็น uid 1883 (ผู้ใช้ของ mosquitto ใน container)</p>
+<p><strong>จุดอ่อนที่เหลือ (MQTT):</strong>
+- ค่าเริ่มต้นในโค้ด <code>normalizeDeviceAuthMode</code> คือ <code>shared</code> (ทุกบอร์ดใช้บัญชีเดียวกับ Backend) ถ้าลืมตั้ง <code>MQTT_DEVICE_AUTH=dynsec</code> ระบบถอยไปโหมดที่อ่อนกว่า <strong>เงียบ ๆ</strong> (มีแค่ <code>console.warn</code> ตอน production ใน <code>config.js</code> บรรทัด 116–120) ที่ปลอดภัยกว่า (fail closed) คือบังคับ <code>dynsec</code> เมื่อ <code>NODE_ENV=production</code>
+- บัญชีที่ Backend ใช้ถูกสร้างด้วย <code>dynsec init</code> ซึ่งเป็นผู้ดูแล Dynamic Security ไปในตัว ถ้า Backend ถูกเจาะ ก็คุม Broker ได้ทั้งหมด (ยอมรับได้เพราะ Backend คือผู้ควบคุมระบบอยู่แล้ว แต่ควรแยกบัญชีผู้ดูแลออกจากบัญชีที่ใช้ publish ทุกวัน)
+- Container <code>mqtt</code> ได้ <code>MQTT_USERNAME</code>/<code>MQTT_PASSWORD</code> ของ Backend เป็น env เพื่อใช้ใน healthcheck (<code>docker-compose.yml</code> บรรทัด 47–48) ซึ่งเกินความจำเป็นเล็กน้อย
+- <strong>Broker เข้าถึงได้จากอินเทอร์เน็ตผ่าน Funnel 8443:</strong> ค่าเริ่มต้นใหม่ของ <code>MQTT_DEVICE_URL</code> ทำให้ใครก็ต่อ <code>ts.net:8443</code> ได้ ด่านที่มี: TLS, <code>allow_anonymous false</code>, บัญชี dynsec รายบอร์ดที่รหัสเป็น HMAC (เดาในทางปฏิบัติไม่ได้), ACL รายบอร์ด ส่วนที่ไม่มี: rate limit/lockout ต่อ IP ที่ Mosquitto (เห็นต้นทางเป็นกล่อง tailscale ทุกคำขอ) จึงยังถูกยิงการเชื่อมต่อถี่ ๆ เพื่อกินทรัพยากรหรือทำ log รกได้ และช่วงจากกล่อง tailscale ไป <code>mqtt:1883</code> เป็น MQTT ดิบ (ในเครื่องเดียวกัน) ทางลดความเสี่ยง: ตั้ง <code>MQTT_DEVICE_URL=mqtts://&lt;DOMAIN&gt;:8883</code> เมื่อบอร์ดทั้งหมดอยู่ในอาคาร แล้วถอดพอร์ต 8443 ออกจาก <code>serve.json</code></p>
+<h2 id="ชั้นที่-7-อุปกรณ์-esp32-และ-ble">ชั้นที่ 7: อุปกรณ์ ESP32 และ BLE<a class="anchor" href="#ชั้นที่-7-อุปกรณ์-esp32-และ-ble">#</a></h2>
+<h3 id="71-provisioning-token-ผูกบอร์ดกับห้อง">7.1 Provisioning token (ผูกบอร์ดกับห้อง)<a class="anchor" href="#71-provisioning-token-ผูกบอร์ดกับห้อง">#</a></h3>
+<p><strong>ภัยคุกคาม:</strong> ใครสักคนส่งข้อความ "ฉันคือบอร์ดห้อง 503" เพื่อให้ระบบรับบอร์ดปลอมเข้ามาในห้องนั้น</p>
+<p><strong>วิธีป้องกัน:</strong> ตอน admin จองช่อง (<code>POST /api/air-conditioners/reservations</code>, <code>requireAdmin</code>) Backend สร้าง token แบบสุ่ม แล้วเก็บ <strong>เฉพาะ hash</strong> หมดอายุใน 15 นาที (<code>routes/air-conditioners.js</code> บรรทัด 145–147, 173, 204)</p>
+<div class="code-block"><span class="code-lang">js</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">crypto</span><span class="p">.</span><span class="nx">randomBytes</span><span class="p">(</span><span class="mf">24</span><span class="p">).</span><span class="nx">toString</span><span class="p">(</span><span class="s1">'base64url'</span><span class="p">);</span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">mqttTopic</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sb">`</span><span class="si">${</span><span class="nx">config</span><span class="p">.</span><span class="nx">mqtt</span><span class="p">.</span><span class="nx">topicPrefix</span><span class="si">}</span><span class="sb">/</span><span class="si">${</span><span class="nx">input</span><span class="p">.</span><span class="nx">deviceId</span><span class="si">}</span><span class="sb">`</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">tokenHash</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">hashSecret</span><span class="p">(</span><span class="nx">token</span><span class="p">,</span><span class="w"> </span><span class="nx">config</span><span class="p">.</span><span class="nx">otpPepper</span><span class="p">);</span>
+</code></pre></div></td></tr></table></div>
+</div>
+
+<p>token ยาว 24 ไบต์ (192 บิต) ส่งให้แอปมือถือหนึ่งครั้งในผลของคำขอ (<code>expiresInSeconds: 900</code>) แอปส่งต่อให้บอร์ดทาง BLE บอร์ดส่ง token มาทาง MQTT (<code>.../provision</code>) และ Backend ตรวจใน <code>activateProvisioning</code> (<code>services/mqtt.js</code> บรรทัด 738–788)</p>
+<ul>
+<li>ค้นแถวที่ <code>provision_status IN ('reserved','active')</code> และ <code>provisioning_expires_at &gt; CURRENT_TIMESTAMP</code> เท่านั้น (หมดอายุแล้วไม่ผ่านแม้ token ถูก)</li>
+<li>hash ที่บอร์ดส่งมาด้วย <code>hashSecret(token, config.otpPepper)</code> แล้วเทียบด้วย <code>safeHashEquals</code> (เวลาคงที่)</li>
+<li>สำเร็จแล้วเปลี่ยนเป็น <code>active</code> และ <strong>ตั้ง <code>provisioning_token_hash = NULL</code></strong> ใช้ซ้ำไม่ได้ (one-time token)</li>
+</ul>
+<h3 id="72-โหมดตั้งค่า-ble-กู้-wi-fi-เปลี่ยนได้แค่-wi-fi">7.2 โหมดตั้งค่า BLE: กู้ Wi-Fi เปลี่ยนได้แค่ Wi-Fi<a class="anchor" href="#72-โหมดตั้งค่า-ble-กู้-wi-fi-เปลี่ยนได้แค่-wi-fi">#</a></h3>
+<p><strong>ภัยคุกคาม:</strong> บอร์ดที่ตั้งค่าแล้วเมื่อ Wi-Fi หลุดจะเปิด BLE รอให้แก้ ใครยืนอยู่ใกล้ก็เชื่อมต่อ BLE ได้ ถ้ายอมให้แก้ได้ทุกช่อง คนแปลกหน้าจะชี้บอร์ดไปหา MQTT Broker ของตัวเองแล้วสั่งแอร์ห้องนั้นได้</p>
+<p><strong>ไฟล์ <code>firmware/rmutt_esp32_air/rmutt_esp32_air.ino</code> บรรทัด 811–850</strong></p>
+<div class="code-block"><span class="code-lang">cpp</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">811</span>
+<span class="normal">812</span>
+<span class="normal">813</span>
+<span class="normal">814</span>
+<span class="normal">815</span>
+<span class="normal">816</span>
+<span class="normal">817</span>
+<span class="normal">818</span>
+<span class="normal">819</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">enterBleRecovery</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="o">&amp;</span><span class="n">reason</span><span class="p">,</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="n">retryWifi</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">Serial</span><span class="p">.</span><span class="n">printf</span><span class="p">(</span><span class="s">"Mode: BLE recovery - %s</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span><span class="w"> </span><span class="n">reason</span><span class="p">.</span><span class="n">c_str</span><span class="p">());</span>
+<span class="w">  </span><span class="n">oledReason</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">reason</span><span class="p">.</span><span class="n">length</span><span class="p">()</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">25</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="n">reason</span><span class="p">.</span><span class="n">substring</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">25</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">reason</span><span class="p">;</span>
+<span class="w">  </span><span class="n">bleBlocksNormalOperation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="w">  </span><span class="n">onlineSetupExpiresAt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">  </span><span class="n">wifiRecoveryActive</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">retryWifi</span><span class="p">;</span>
+<span class="w">  </span><span class="c1">// บอร์ดที่ตั้งค่าแล้วแต่ Wi-Fi หลุด: ใครอยู่ใกล้ก็ต่อ BLE ได้ จึงล็อกห้องและเซิร์ฟเวอร์ไว้</span>
+<span class="w">  </span><span class="c1">// ส่วนกรณียังไม่เคยตั้งค่า หรือกด BOOT ค้าง (ต้องเข้าถึงตัวบอร์ด) แก้ได้ทุกช่อง</span>
+<span class="w">  </span><span class="n">bleWifiOnlyMode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">retryWifi</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">config</span><span class="p">.</span><span class="n">configured</span><span class="p">;</span>
+</code></pre></div></td></tr></table></div>
+</div>
+
+<div class="code-block"><span class="code-lang">cpp</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">841</span>
+<span class="normal">842</span>
+<span class="normal">843</span>
+<span class="normal">844</span>
+<span class="normal">845</span>
+<span class="normal">846</span>
+<span class="normal">847</span>
+<span class="normal">848</span>
+<span class="normal">849</span>
+<span class="normal">850</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kt">bool</span><span class="w"> </span><span class="nf">keepsServerAssignment</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">DeviceConfig</span><span class="w"> </span><span class="o">&amp;</span><span class="n">incoming</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">incoming</span><span class="p">.</span><span class="n">roomNumber</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">config</span><span class="p">.</span><span class="n">roomNumber</span><span class="w"> </span><span class="o">&amp;&amp;</span>
+<span class="w">         </span><span class="n">incoming</span><span class="p">.</span><span class="n">airNumber</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">config</span><span class="p">.</span><span class="n">airNumber</span><span class="w"> </span><span class="o">&amp;&amp;</span>
+<span class="w">         </span><span class="n">incoming</span><span class="p">.</span><span class="n">mqttHost</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">config</span><span class="p">.</span><span class="n">mqttHost</span><span class="w"> </span><span class="o">&amp;&amp;</span>
+<span class="w">         </span><span class="n">incoming</span><span class="p">.</span><span class="n">mqttPort</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">config</span><span class="p">.</span><span class="n">mqttPort</span><span class="w"> </span><span class="o">&amp;&amp;</span>
+<span class="w">         </span><span class="n">incoming</span><span class="p">.</span><span class="n">mqttTls</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">config</span><span class="p">.</span><span class="n">mqttTls</span><span class="w"> </span><span class="o">&amp;&amp;</span>
+<span class="w">         </span><span class="n">incoming</span><span class="p">.</span><span class="n">mqttUsername</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">config</span><span class="p">.</span><span class="n">mqttUsername</span><span class="w"> </span><span class="o">&amp;&amp;</span>
+<span class="w">         </span><span class="n">incoming</span><span class="p">.</span><span class="n">mqttPassword</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">config</span><span class="p">.</span><span class="n">mqttPassword</span><span class="w"> </span><span class="o">&amp;&amp;</span>
+<span class="w">         </span><span class="n">incoming</span><span class="p">.</span><span class="n">mqttTopic</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">config</span><span class="p">.</span><span class="n">mqttTopic</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></td></tr></table></div>
+</div>
+
+<ul>
+<li><code>bleWifiOnlyMode = retryWifi &amp;&amp; config.configured</code> เปิดเมื่อ "บอร์ดตั้งค่าแล้ว และเข้าโหมดกู้เพราะ Wi-Fi หลุด"</li>
+<li>ใน <code>processPendingConfig</code> (บรรทัด 914) ถ้า <code>bleWifiOnlyMode &amp;&amp; !keepsServerAssignment(incoming)</code> → ปฏิเสธด้วยรหัส <code>wifi_only_mode</code> (ห้อง, เลขแอร์, host/port/TLS/user/password/topic ของ MQTT ต้องตรงของเดิมทั้งหมด) เปลี่ยนได้เฉพาะ SSID/รหัส Wi-Fi</li>
+<li>กรณีที่ <strong>ต้อง</strong> เข้าถึงตัวบอร์ดจริง (ยังไม่เคยตั้งค่า หรือกดปุ่ม BOOT ค้างตอนรีเซ็ต GPIO0) ถือว่าเจ้าของอยู่หน้าเครื่อง ให้แก้ได้ทุกช่อง</li>
+</ul>
+<h3 id="73-โหมดตั้งค่าออนไลน์-เฉพาะแอดมิน-และจำกัด-5-นาที">7.3 โหมดตั้งค่าออนไลน์: เฉพาะแอดมิน และจำกัด 5 นาที<a class="anchor" href="#73-โหมดตั้งค่าออนไลน์-เฉพาะแอดมิน-และจำกัด-5-นาที">#</a></h3>
+<p>คำสั่ง <code>enter_setup</code> ส่งได้ทาง <code>POST /api/air-conditioners/:deviceId/setup-mode</code> ซึ่งเป็น <code>requireAdmin</code> เท่านั้น Backend ส่งทาง MQTT ซึ่งมีแต่ Backend เท่านั้นที่ publish topic <code>command</code> ได้ บอร์ดเปิด BLE ตามคำสั่งแล้วตั้ง <code>onlineSetupExpiresAt = millis() + ONLINE_SETUP_WINDOW_MS</code> โดย <code>ONLINE_SETUP_WINDOW_MS = 5UL * 60UL * 1000UL</code> (บรรทัด 57) คือ <strong>5 นาที</strong> แล้วปิด BLE เอง และขณะนั้นค่าเดิม (Wi-Fi/MQTT) ยังใช้งานต่อได้จนกว่าจะกดบันทึก</p>
+<h3 id="74-ota-ผ่าน-https-แต่ไม่มี-signature">7.4 OTA ผ่าน HTTPS แต่ไม่มี signature<a class="anchor" href="#74-ota-ผ่าน-https-แต่ไม่มี-signature">#</a></h3>
+<p><strong>ไฟล์ <code>firmware/rmutt_esp32_air/ota_update.h</code> บรรทัด 26–39</strong></p>
+<div class="code-block"><span class="code-lang">cpp</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kr">inline</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="nf">otaUrlAllowed</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="o">&amp;</span><span class="n">url</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="o">&amp;</span><span class="n">host</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">host</span><span class="p">.</span><span class="n">isEmpty</span><span class="p">()</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">url</span><span class="p">.</span><span class="n">length</span><span class="p">()</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">OTA_MAX_URL_LENGTH</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span>
+<span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">prefix</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"https://"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">host</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">"/firmware/"</span><span class="p">;</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">url</span><span class="p">.</span><span class="n">startsWith</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">!</span><span class="n">url</span><span class="p">.</span><span class="n">endsWith</span><span class="p">(</span><span class="s">".bin"</span><span class="p">))</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">url</span><span class="p">.</span><span class="n">indexOf</span><span class="p">(</span><span class="s">".."</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span>
+<span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">size_t</span><span class="w"> </span><span class="n">index</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">prefix</span><span class="p">.</span><span class="n">length</span><span class="p">();</span><span class="w"> </span><span class="n">index</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">url</span><span class="p">.</span><span class="n">length</span><span class="p">();</span><span class="w"> </span><span class="n">index</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">url</span><span class="p">.</span><span class="n">charAt</span><span class="p">(</span><span class="n">index</span><span class="p">);</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="n">ok</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">c</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="sc">'A'</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="sc">'Z'</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="p">(</span><span class="n">c</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="sc">'a'</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="sc">'z'</span><span class="p">)</span><span class="w"> </span><span class="o">||</span>
+<span class="w">                    </span><span class="p">(</span><span class="n">c</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="sc">'0'</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="sc">'9'</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="sc">'.'</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="sc">'_'</span><span class="w"> </span><span class="o">||</span>
+<span class="w">                    </span><span class="n">c</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="sc">'-'</span><span class="p">;</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">ok</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></td></tr></table></div>
+</div>
+
+<p>ป้องกันสามชั้น (ตามคอมเมนต์หัวไฟล์): (1) คำสั่งมาจาก topic <code>command</code> ที่มีแต่ Backend ส่งได้ (2) URL ต้องขึ้นต้น <code>https://&lt;MQTT host ของบอร์ดเอง&gt;/firmware/</code> ลงท้าย <code>.bin</code> ห้ามมี <code>..</code> และอักขระต้องเป็นตัวอักษร/ตัวเลข/<code>. _ -</code> เท่านั้น ชี้ไปเซิร์ฟเวอร์อื่นหรือเดินออกนอกโฟลเดอร์ไม่ได้ (3) ตรวจใบรับรอง HTTPS กับ root CA ที่ฝังไว้ (<code>client.setCACert(caCert)</code> ใน <code>runHttpsOta</code>) และไม่ตามการ redirect (<code>HTTPC_DISABLE_FOLLOW_REDIRECTS</code>) ฝั่ง Backend <code>POST /:deviceId/ota</code> เป็น <code>requireAdmin</code> ตรวจชื่อไฟล์ด้วย <code>validateFirmwareFileName</code> ตรวจว่ามีไฟล์จริง ตรวจว่าชนิดไฟล์ตรงกับชนิดบอร์ดด้วย <code>assertFirmwareKind</code> (เพิ่ม 14 ต.ค. 2569: บอร์ดสายแอร์ <code>DAIKIN_WIRED</code> รับเฉพาะไฟล์ <code>wired</code>/<code>slm8</code> บอร์ด IR รับเฉพาะไฟล์ IR เซ็นเซอร์รับเฉพาะไฟล์ <code>occ</code>) และบันทึก log <code>[ota] &lt;บอร์ด&gt; &lt;- &lt;url&gt; โดย &lt;ผู้สั่ง&gt;</code> ไว้ตรวจสอบย้อนหลัง</p>
+<p><strong>จุดอ่อนที่เหลือ:</strong> ความแท้ของไฟล์พึ่ง "ใครวางไฟล์ในโฟลเดอร์ <code>/opt/rmutt/firmware</code> บนเซิร์ฟเวอร์ได้" เท่านั้น (ตั้งแต่ 14 ต.ค. 2569 มีสองทาง คือ SSH/<code>scp</code> และบัญชีแอดมินในเว็บผ่าน <code>POST /api/firmware</code> ดูหัวข้อ 7.5) ไม่มี <strong>การเซ็นเฟิร์มแวร์ (code signing)</strong> ไม่มี <strong>secure boot / flash encryption</strong> และไม่มี <strong>rollback</strong> (ค้นหา <code>esp_ota_mark_app_valid</code>, <code>rollback</code> ในโฟลเดอร์ <code>firmware/</code> ไม่พบ) ถ้าเฟิร์มแวร์เสียแต่ดาวน์โหลดครบ บอร์ดจะสลับไปใช้และอาจบูตไม่ขึ้น ถ้าเซิร์ฟเวอร์ถูกเจาะ คนร้ายวาง <code>.bin</code> อันตรายแล้วสั่งอัปเดตได้ ปรับปรุงได้ด้วยการเซ็นไฟล์ (เช่น ESP-IDF signed OTA ด้วยคีย์ที่เก็บนอกเซิร์ฟเวอร์), เปิด <code>CONFIG_APP_ROLLBACK_ENABLE</code> และเรียก <code>esp_ota_mark_app_valid_cancel_rollback()</code> หลังบูตสำเร็จ</p>
+<p>อีกประเด็น: เส้นทาง <code>/firmware/*</code> ใน Caddy (บรรทัด 35–39) <strong>เปิดสาธารณะ ไม่ต้องล็อกอิน</strong> (ทั้งทางโดเมนหลักและทาง Funnel 443 เพราะใช้บล็อก <code>(app)</code> ร่วมกัน และเป็นทางที่บอร์ดซึ่งใช้ชื่อ ts.net ดาวน์โหลด OTA) เพราะบอร์ดไม่มี JWT (จำเป็นต้องเป็นแบบนี้ถ้าไม่เพิ่มกลไกยืนยันตัวบอร์ด) ใครรู้ชื่อไฟล์ดาวน์โหลดเฟิร์มแวร์ไปศึกษาได้ ข้อมูลลับต้องไม่ฝังในไฟล์ <code>.bin</code> (ระบบนี้เก็บ Wi-Fi/รหัส MQTT ใน NVS ไม่ใช่ในโค้ด จึงไม่รั่วทางนี้)</p>
+<p><strong>จุดอ่อนที่เหลือของ BLE (ตรวจจากโค้ด):</strong> ใน <code>startBleProvisioning()</code> (บรรทัด 666–740) characteristic สำหรับเขียนค่าตั้ง (<code>CONFIG_UUID</code>) เป็นแค่ <code>PROPERTY_WRITE</code> ไม่มีการตั้ง pairing/bonding/encryption ใด ๆ (ไม่พบ <code>setSecurityCallbacks</code>, <code>setEncryptionLevel</code> ในโค้ด) ผลคือ (1) ระหว่างหน้าต่างตั้งค่า 5 นาทีของโหมดออนไลน์ ใครอยู่ในระยะ BLE ก็เชื่อมต่อได้ และเนื่องจาก <code>bleWifiOnlyMode = false</code> ในโหมดนี้ จึงเขียนได้ทุกช่อง (บอร์ดตรวจแค่ว่า <code>deviceId</code> ตรงและ token ไม่ว่าง ส่วนความถูกต้องของ token ตรวจที่ Backend ภายหลัง) (2) ข้อมูลที่แอปส่งผ่าน BLE ตอนตั้งค่า (รหัส Wi-Fi และรหัส MQTT ของบอร์ด) วิ่งบนลิงก์ที่ไม่ได้เข้ารหัสในชั้นแอป ถูกดักได้ถ้ามีคนอยู่ใกล้ตอนตั้งค่า ข้อมูลที่อ่านออกจากบอร์ดผ่าน BLE ไม่รวมรหัส (มีแค่ <code>hasWifiPassword</code>/<code>hasMqttPassword</code> เป็น true/false) แต่เปิดเผย SSID, MQTT host/username และ Device ID</p>
+<h3 id="75-อัปโหลดเฟิร์มแวร์จากเว็บ-ด่านตรวจก่อนเขียนลงดิสก์-เพิ่ม-14-ตค-2569">7.5 อัปโหลดเฟิร์มแวร์จากเว็บ: ด่านตรวจก่อนเขียนลงดิสก์ (เพิ่ม 14 ต.ค. 2569)<a class="anchor" href="#75-อัปโหลดเฟิร์มแวร์จากเว็บ-ด่านตรวจก่อนเขียนลงดิสก์-เพิ่ม-14-ตค-2569">#</a></h3>
+<p><strong>ภัยคุกคาม:</strong> เส้น <code>POST /api/firmware</code> ให้ผู้ใช้ส่งไฟล์มาเขียนลงดิสก์ของเซิร์ฟเวอร์ ซึ่งเป็นช่องทางคลาสสิกของการโจมตี เช่น ตั้งชื่อไฟล์เป็น <code>../../app/src/server.js</code> เพื่อเขียนทับโค้ด (path traversal), ส่งไฟล์ใหญ่มากให้ดิสก์เต็ม, หรือวางไฟล์ที่ไม่ใช่เฟิร์มแวร์ให้บอร์ดดาวน์โหลด และอีกภัยที่ไม่ได้ตั้งใจ คือแอดมินลากไฟล์ผิดชนิดแล้วสั่งบอร์ด ทำให้บอร์ดรีบูตเข้าโปรแกรมของบอร์ดอีกชนิดแล้วใช้งานไม่ได้ (Availability)</p>
+<p><strong>วิธีป้องกัน (ตรวจตามลำดับในโค้ด):</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>ด่าน</th>
+<th>ตรวจอะไร</th>
+<th>ผิดแล้ว</th>
+<th>ไฟล์</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. สิทธิ์</td>
+<td><code>firmwareRouter.use(authenticate, requireAdmin)</code> คลุมทั้ง router รวมเส้นอัปโหลดและลบ</td>
+<td>401 / 403</td>
+<td><code>routes/firmware.js</code> บรรทัด 23</td>
+</tr>
+<tr>
+<td>2. ขนาดก่อนอ่าน</td>
+<td><code>express.raw({ limit: FIRMWARE_MAX_BYTES + 1024 })</code> Express หยุดอ่าน body ที่ใหญ่เกิน ไม่โหลดเข้าหน่วยความจำทั้งก้อน</td>
+<td>413</td>
+<td><code>routes/firmware.js</code> บรรทัด 47</td>
+</tr>
+<tr>
+<td>3. ชื่อไฟล์</td>
+<td><code>validateFirmwareFileName</code>: regex <code>^[A-Za-z0-9][A-Za-z0-9._-]{0,118}\.bin$</code> (ไม่มี <code>/</code> ขึ้นต้นด้วยจุดไม่ได้ ลงท้าย <code>.bin</code>) และห้ามมี <code>..</code> ชื่อที่ถอด percent-encoding ไม่ได้กลายเป็น <code>''</code> ซึ่งไม่ผ่าน</td>
+<td>400</td>
+<td><code>utils/firmware.js</code> บรรทัด 5–16, <code>routes/firmware.js</code> บรรทัด 130–136</td>
+</tr>
+<tr>
+<td>4. ชนิดตรงแท็บ</td>
+<td><code>?kind=</code> ต้องเท่ากับ <code>firmwareKindOf(ชื่อ)</code> (<code>occ</code> / <code>wired</code>,<code>slm8</code> / ที่เหลือ = <code>air</code>)</td>
+<td>400</td>
+<td><code>routes/firmware.js</code> บรรทัด 58–67</td>
+</tr>
+<tr>
+<td>5. เนื้อไฟล์</td>
+<td><code>validateFirmwareImage</code>: ไม่ว่าง, ไม่เกิน <code>0x1F0000</code> ไบต์ (ขนาดช่องโปรแกรมใน <code>partitions.csv</code>), ยาว ≥ 256 ไบต์ และไบต์แรกเป็น magic byte <code>0xE9</code> ของ ESP image</td>
+<td>400 / 413</td>
+<td><code>utils/firmware.js</code> บรรทัด 100–124</td>
+</tr>
+<tr>
+<td>6. ไม่ทับโดยไม่ตั้งใจ</td>
+<td>มีไฟล์ชื่อเดิมแล้วต้องส่ง <code>?replace=1</code></td>
+<td>409</td>
+<td><code>routes/firmware.js</code> บรรทัด 71–76</td>
+</tr>
+<tr>
+<td>7. เขียนแบบ atomic</td>
+<td>เขียน <code>&lt;ชื่อ&gt;.&lt;pid&gt;.part</code> แล้ว <code>rename</code> บอร์ดที่ดาวน์โหลดอยู่ไม่เจอไฟล์ครึ่ง ๆ ล้มกลางทางลบไฟล์ชั่วคราวทิ้ง</td>
+<td>500 (ข้อความบอกให้ตรวจสิทธิ์/<code>:ro</code>)</td>
+<td><code>routes/firmware.js</code> บรรทัด 81–95</td>
+</tr>
+<tr>
+<td>8. ร่องรอย</td>
+<td>log <code>[firmware] อัปโหลด &lt;ชื่อ&gt; (&lt;ขนาด&gt; bytes) โดย &lt;ผู้ใช้&gt;</code> และ <code>[firmware] ลบ ... โดย ...</code></td>
+<td>-</td>
+<td><code>routes/firmware.js</code> บรรทัด 97–100, 125</td>
+</tr>
+<tr>
+<td>9. ตอนสั่งบอร์ด</td>
+<td><code>assertFirmwareKind(ไฟล์, ชนิดบอร์ด)</code> ใน route OTA ของแอร์และเซ็นเซอร์</td>
+<td>400</td>
+<td><code>routes/air-conditioners.js</code> บรรทัด 384, <code>routes/occupancy-sensors.js</code> บรรทัด 252</td>
+</tr>
+</tbody>
+</table></div>
+<div class="callout why"><div class="callout-title">ทำไม</div><p>ทำไมด่านชื่อไฟล์คือด่านที่สำคัญที่สุด: <code>path.join(config.firmwareDir, fileName)</code> จะยอมต่อ <code>..</code> ให้ออกนอกโฟลเดอร์ได้ ถ้าชื่อไม่ถูกตรวจ แต่ regex ห้ามทั้ง <code>/</code> และ <code>..</code> ไว้แล้ว ชื่อที่ผ่านจึงเป็นได้แค่ไฟล์ในโฟลเดอร์ firmware เท่านั้น และเพราะใช้ allowlist (บอกว่าอักขระไหน "ใช้ได้") แทน blocklist (ไล่ห้ามอักขระอันตราย) จึงไม่ต้องตามทันทุกเทคนิค เช่น <code>%2e%2e</code> หรือ backslash</p></div>
+
+<div class="callout note"><div class="callout-title">หมายเหตุ</div><p>การเช็กไบต์ <code>0xE9</code> และขนาดเป็น <strong>การตรวจรูปแบบ ไม่ใช่การยืนยันความแท้</strong> ไฟล์อันตรายที่คอมไพล์เป็นโปรแกรม ESP32 ก็ขึ้นต้นด้วย <code>0xE9</code> เหมือนกัน ด่านเหล่านี้จึงกัน "ความผิดพลาด" และไฟล์มั่ว ๆ ได้ แต่ไม่ได้แทน code signing (จุดอ่อนข้อ 1 ยังอยู่) ไฟล์ที่อัปโหลดไม่ถูกรันบนเซิร์ฟเวอร์ แค่ถูก Caddy เสิร์ฟให้บอร์ดดาวน์โหลด</p></div>
+
+<p><strong>ความเสี่ยงใหม่ที่มากับฟีเจอร์นี้ (บอกตรง ๆ):</strong></p>
+<ul>
+<li><strong>บัญชีแอดมินเว็บกลายเป็นกุญแจของเฟิร์มแวร์</strong> เดิมต้องมี SSH เข้าเซิร์ฟเวอร์ถึงจะวางไฟล์ได้ ตอนนี้แค่รหัสแอดมินในเว็บก็อัปโหลดไฟล์แล้วสั่ง OTA ทุกบอร์ดได้ ความแข็งแรงของรหัสแอดมินและ rate limit ล็อกอินจึงสำคัญขึ้น</li>
+<li><strong>Backend เขียนโฟลเดอร์ firmware ได้แล้ว</strong> <code>docker-compose.yml</code> เปลี่ยน mount ของ Backend จาก <code>./firmware:/firmware:ro</code> เป็น <code>./firmware:/firmware</code> (บรรทัด 126) และโฟลเดอร์บนเครื่องต้องเป็นของ uid 1000 ถ้า Backend ถูกยึด คนร้ายเปลี่ยนไฟล์ <code>.bin</code> ได้ (เดิมทำไม่ได้) ส่วน Caddy ยัง mount แบบ <code>:ro</code> เหมือนเดิม (บรรทัด 166)</li>
+<li><strong>ไม่มีโควตาจำนวนไฟล์</strong> แอดมินอัปโหลดได้เรื่อย ๆ ไฟล์ละไม่เกิน 1,984 KB ดิสก์เต็มได้ถ้าตั้งใจ (ต้องเป็นแอดมินจึงความเสี่ยงต่ำ) ลบไฟล์เก่าได้ด้วย <code>DELETE /api/firmware/:fileName</code></li>
+</ul>
+<h3 id="76-ล้างค่าในบอร์ดเมื่อลบอุปกรณ์-unprovision-เพิ่ม-13-ตค-2569">7.6 ล้างค่าในบอร์ดเมื่อลบอุปกรณ์ (unprovision, เพิ่ม 13 ต.ค. 2569)<a class="anchor" href="#76-ล้างค่าในบอร์ดเมื่อลบอุปกรณ์-unprovision-เพิ่ม-13-ตค-2569">#</a></h3>
+<p><strong>ภัยคุกคาม:</strong> ก่อนหน้านี้ ลบอุปกรณ์ในแอปลบแค่แถวในฐานข้อมูล บัญชี MQTT และ retained message ตัวบอร์ดยังจำ SSID/รหัส Wi-Fi, ที่อยู่ Broker, username/รหัส MQTT ของตัวเอง และห้องไว้ใน NVS ถ้าบอร์ดถูกถอดไปใช้ที่อื่น ทิ้ง หรือหาย ใครได้ไปก็อ่าน flash เอารหัส Wi-Fi ของอาคารได้ (Confidentiality) นี่คือปัญหา <strong>data hygiene</strong> (การไม่ทิ้งข้อมูลลับค้างไว้ในอุปกรณ์ที่เลิกใช้)</p>
+<p><strong>วิธีป้องกัน:</strong> route ลบ (<code>DELETE /api/air-conditioners/:deviceId</code> และ <code>/api/occupancy-sensors/:deviceId</code>, <code>requireAdmin</code>) เรียก <code>unprovisionDevice</code> ส่ง <code>{"action":"unprovision","deviceId":...}</code> ไปที่ topic <code>command</code> ของบอร์ด บอร์ดที่ได้รับ:</p>
+<ol>
+<li>ตรวจ <code>deviceId</code> ในคำสั่งว่าตรงกับตัวเอง ไม่ตรงไม่ทำ (กันข้อความหลงผิด topic)</li>
+<li>ตอบ <code>{"unprovisioned":true,"online":false,"deviceId":...}</code> ทาง <code>status</code> แล้วล้าง retained <code>status</code>/<code>state</code> ของตัวเอง และตัดการเชื่อมต่อแบบปกติ (ไม่เกิด Last Will)</li>
+<li><code>preferences.clear()</code> ล้าง NVS ทั้ง namespace ของการตั้งค่า (Wi-Fi, MQTT, ห้อง) และสถานะแอร์ แล้วรีบูตเข้าโหมดตั้งค่าบลูทูธเหมือนบอร์ดใหม่ (<code>unprovisionAndRestart</code> ใน <code>firmware/rmutt_esp32_air/rmutt_esp32_air.ino</code> บรรทัด 1174 เป็นต้นไป บอร์ดสายแอร์และเซ็นเซอร์มีฟังก์ชันชื่อเดียวกัน)</li>
+</ol>
+<p>Backend รอคำตอบไม่เกิน 4 วินาที แล้วค่อยล้าง retained และ <strong>ลบบัญชี MQTT เป็นขั้นสุดท้าย</strong> (ถ้าลบบัญชีก่อน Broker จะตัดบอร์ดทันทีและคำสั่งล้างค่าไปไม่ถึง) ผลถูกส่งกลับในฟิลด์ <code>boardCleared</code> และ log <code>boardCleared=true/false</code></p>
+<div class="callout why"><div class="callout-title">ทำไม</div><p>ทำไมคำสั่งต้องมีทั้ง ACL และ <code>deviceId</code> ในตัว: คำสั่งนี้ทำลายการตั้งค่า (destructive) ถ้าส่งผิดบอร์ดคือห้องนั้นใช้งานไม่ได้จนกว่าจะมีคนไปตั้งค่าใหม่ ACL ของ Broker ทำให้มีแต่ Backend ที่ publish <code>command</code> ได้ และบอร์ดเห็นเฉพาะ topic ตัวเอง การใส่ <code>deviceId</code> ซ้ำในเนื้อข้อความเป็นชั้นที่สอง (defense in depth) และไม่ส่งแบบ retain เพราะคำสั่งค้างบน Broker จะล้างบอร์ดรหัสเดิมที่ถูกเพิ่มกลับมาภายหลัง</p></div>
+
+<p><strong>จุดอ่อนที่เหลือ:</strong></p>
+<ul>
+<li><strong>บอร์ดที่ออฟไลน์ตอนกดลบ ไม่ถูกล้าง</strong> (<code>boardCleared: false</code>) รหัส Wi-Fi ยังอยู่ใน flash ผู้ดูแลต้องล้างที่ตัวบอร์ดเอง (ตั้งค่าใหม่ผ่านบลูทูธหรือแฟลชใหม่) ส่วนบัญชี MQTT ถูกลบแล้ว บอร์ดจึงต่อ Broker ไม่ได้อีก (รหัส MQTT ที่ค้างในบอร์ดไร้ประโยชน์)</li>
+<li><strong>NVS ไม่ได้เข้ารหัส</strong> (ไม่มี flash encryption ดูจุดอ่อนข้อ 1) ระหว่างที่บอร์ดยังใช้งาน ใครถอดบอร์ดไปอ่าน flash ได้ก็ได้รหัส Wi-Fi และรหัส MQTT ของบอร์ดตัวนั้น unprovision ช่วยเฉพาะตอนเลิกใช้</li>
+<li><code>preferences.clear()</code> ลบค่าในระดับ NVS ไม่ได้รับประกันว่าเขียนทับข้อมูลเก่าใน flash ทุกไบต์ (เป็นพฤติกรรมของ NVS ทั่วไป ผู้ที่ถอด flash ไปวิเคราะห์ระดับต่ำอาจกู้บางส่วนได้) ถ้าต้องการลบแน่นอนให้แฟลชลบทั้งชิป (<code>erase_flash</code>) ก่อนทิ้งบอร์ด</li>
+</ul>
+<h2 id="ชั้นที่-8-การจัดการความลับ-secrets-management">ชั้นที่ 8: การจัดการความลับ (secrets management)<a class="anchor" href="#ชั้นที่-8-การจัดการความลับ-secrets-management">#</a></h2>
+<p><strong>ภัยคุกคาม:</strong> รหัสผ่านฝังในโค้ดแล้วขึ้น git, ใช้ค่าตัวอย่างจริงบนเซิร์ฟเวอร์, secret หลุดผ่าน <code>docker inspect</code>, รหัสแอดมินค้างอยู่ในไฟล์</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>มาตรการ</th>
+<th>รายละเอียด</th>
+<th>ไฟล์</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>สุ่มความลับอัตโนมัติ</td>
+<td><code>secret()</code> ใช้ <code>openssl rand -base64 64</code> กรองเหลือ <code>A-Za-z0-9</code> แล้วตัดเป็น 32–48 ตัว: <code>DB_ROOT_PASSWORD</code>, <code>DB_PASSWORD</code> (40), <code>JWT_SECRET</code>, <code>OTP_PEPPER</code>, <code>MQTT_DEVICE_SECRET</code> (48), <code>MQTT_PASSWORD</code> (32) แต่ละตัวสุ่มแยกกัน (ไม่ซ้ำกัน)</td>
+<td><code>deploy/init-env.sh</code> บรรทัด 24, 68–74</td>
+</tr>
+<tr>
+<td>สิทธิ์ไฟล์</td>
+<td><code>.env</code> เป็น <code>chmod 600</code> (อ่านได้เฉพาะเจ้าของ) สำรอง <code>.env.bak-*</code> ก็ <code>600</code> และ <code>dynamic-security.json</code> เป็น <code>600</code></td>
+<td><code>init-env.sh</code> บรรทัด 13, 114, 141</td>
+</tr>
+<tr>
+<td>Backend รับเฉพาะ env ที่ใช้</td>
+<td>ใน compose ระบุตัวแปรทีละตัวใน <code>environment:</code> ไม่ใช้ <code>env_file: .env</code> ทั้งไฟล์ เพราะ <code>.env</code> มีรหัส root ของ MariaDB, token DuckDNS/Tailscale และรหัสแอดมินแรก ซึ่งถ้าส่งเข้า container จะเห็นได้ด้วย <code>docker inspect</code></td>
+<td><code>docker-compose.yml</code> บรรทัด 72–76 (คอมเมนต์)</td>
+</tr>
+<tr>
+<td>รหัสแอดมินไม่ค้าง</td>
+<td><code>seed-admin.sh</code> ส่งรหัสผ่านเข้า Backend ทาง <strong>stdin</strong> ครั้งเดียว (<code>--password-stdin</code>) แล้ว <code>sed</code> ล้าง <code>SEED_ADMIN_PASSWORD=</code> ออกจาก <code>.env</code></td>
+<td><code>deploy/seed-admin.sh</code> บรรทัด 56–58, <code>backend/scripts/seed-admin.js</code></td>
+</tr>
+<tr>
+<td>ไม่ขึ้น git</td>
+<td><code>.gitignore</code>: <code>.env</code>, <code>deploy/.env*</code>, <code>deploy/server.config.json</code>, <code>mqtt/config/passwords</code>, <code>*.jks</code>, <code>*.keystore</code>, <code>android/key.properties</code></td>
+<td><code>.gitignore</code>, <code>backend/.gitignore</code></td>
+</tr>
+<tr>
+<td>บล็อก secret อ่อน</td>
+<td><code>unsafeSecret</code> + <code>assertServerConfig</code> ไม่ยอมเริ่มถ้า secret สั้นหรือยังเป็นค่าตัวอย่าง</td>
+<td><code>backend/src/config.js</code></td>
+</tr>
+<tr>
+<td>คีย์เซ็น APK</td>
+<td><code>android/app/build.gradle.kts</code> อ่านจาก <code>android/key.properties</code> (สร้างด้วย <code>create-keystore.ps1</code>) ถ้าไม่มีจะเตือนและเซ็นด้วย debug key</td>
+<td><code>android/app/build.gradle.kts</code> บรรทัด 10–22</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>ไฟล์ <code>deploy/docker-compose.yml</code> บรรทัด 72–77 (คอมเมนต์ที่อธิบายเหตุผล)</strong></p>
+<div class="code-block"><span class="code-lang">yaml</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">72</span>
+<span class="normal">73</span>
+<span class="normal">74</span>
+<span class="normal">75</span>
+<span class="normal">76</span>
+<span class="normal">77</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="w">    </span><span class="c1"># ส่งเข้า Backend เฉพาะค่าที่ Backend ใช้จริง ไม่ใช้ `env_file: .env` ทั้งไฟล์</span>
+<span class="w">    </span><span class="c1"># เพราะ .env มีรหัส root ของ MariaDB, token DuckDNS/Tailscale และรหัสแอดมินตัวแรก</span>
+<span class="w">    </span><span class="c1"># ถ้าส่งไปทั้งไฟล์ ค่าพวกนั้นจะอยู่ใน container และเห็นได้จาก `docker inspect`</span>
+<span class="w">    </span><span class="c1"># (ค่าใน ${...} ยังอ่านจาก .env ไฟล์เดิม ไม่ต้องแก้ .env บนเซิร์ฟเวอร์)</span>
+<span class="w">    </span><span class="c1"># เพิ่มตัวแปรใหม่ให้ Backend เมื่อไร ต้องมาเพิ่มในรายการนี้ด้วย</span>
+<span class="w">    </span><span class="nt">environment</span><span class="p">:</span>
+</code></pre></div></td></tr></table></div>
+</div>
+
+<p>นี่คือ least privilege ระดับ secret: ถ้า Backend ถูกเจาะ คนร้ายไม่ได้รหัส root ของฐานข้อมูล, token DuckDNS หรือ Tailscale ไปด้วย (ได้เฉพาะที่ Backend ใช้จริง)</p>
+<p><strong>ไฟล์ <code>deploy/seed-admin.sh</code> บรรทัด 56–58</strong></p>
+<div class="code-block"><span class="code-lang">bash</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">56</span>
+<span class="normal">57</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">if</span><span class="w"> </span>grep<span class="w"> </span>-qE<span class="w"> </span><span class="s1">'^SEED_ADMIN_PASSWORD=.+'</span><span class="w"> </span>.env<span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">  </span>sed<span class="w"> </span>-i<span class="w"> </span><span class="s1">'s/^SEED_ADMIN_PASSWORD=.*/SEED_ADMIN_PASSWORD=/'</span><span class="w"> </span>.env
+</code></pre></div></td></tr></table></div>
+</div>
+
+<p><code>init-env.sh</code> ถามรหัสแอดมินแรกแล้วเขียนลง <code>.env</code> ชั่วคราว (บรรทัด 103) จากนั้น <code>seed-admin.sh</code> ใช้แล้วล้างทิ้ง รหัสแอดมินจึงไม่อยู่เป็นข้อความธรรมดาบนดิสก์ถาวร (ในฐานข้อมูลเป็น bcrypt hash)</p>
+<p><strong>จุดอ่อนที่เหลือ:</strong> <code>.env</code> ยังเก็บความลับทั้งหมดเป็นข้อความธรรมดาบนดิสก์ (อ่านได้ด้วย root และเจ้าของ <code>SUDO_USER</code>) ถ้าเซิร์ฟเวอร์ถูกยึดก็ได้ครบ ทางที่ดีกว่าคือใช้ Docker secrets/ตัวจัดการความลับ และ <code>JWT_SECRET</code> ไม่มีกลไกหมุนเวียน (rotation) ที่ไม่ทำให้ทุกคนหลุด (<code>token_version</code> ใช้เพิกถอนรายบัญชีเท่านั้น) และ <code>backend/.env.example</code> มีค่าตัวอย่างที่ปลอดภัยสำหรับพัฒนาแต่ใช้ <code>DB_USER=root</code>, <code>APP_ORIGIN=*</code> ต้องไม่ใช้บนเซิร์ฟเวอร์จริง</p>
+<h2 id="ชั้นที่-9-คอนเทนเนอร์">ชั้นที่ 9: คอนเทนเนอร์<a class="anchor" href="#ชั้นที่-9-คอนเทนเนอร์">#</a></h2>
+<p><strong>ไฟล์ <code>deploy/backend.Dockerfile</code> บรรทัด 19–21</strong></p>
+<div class="code-block"><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span></pre></div></td><td class="code"><div><pre><span></span><code># รันด้วย user ธรรมดาที่ image เตรียมไว้ ไม่ใช่ root
+# ถ้าวันหนึ่ง Backend มีช่องโหว่ คนร้ายจะได้สิทธิ์แค่ user นี้ใน container
+USER node
+</code></pre></div></td></tr></table></div>
+</div>
+
+<ul>
+<li><strong>Backend รันเป็น user <code>node</code></strong> (ไม่ใช่ root) <code>npm ci --omit=dev</code> ติดตั้งเฉพาะแพ็กเกจที่ใช้จริงบน production ลดพื้นผิวโจมตี</li>
+<li><strong>ไฟล์ซอร์สอ่านได้อย่างเดียวสำหรับ user <code>node</code>:</strong> <code>RUN chmod -R a+rX src scripts database</code> (<code>backend.Dockerfile</code> บรรทัด 17 ก่อน <code>USER node</code>) แก้ปัญหาไฟล์ที่ <code>scp</code> จาก Windows ได้สิทธิ์ 700 จน user <code>node</code> เปิด <code>/app/src</code> ไม่ได้ (<code>Cannot find module</code>) <code>a+rX</code> ให้ทุกคน<strong>อ่าน</strong>และเข้าโฟลเดอร์ได้ แต่ไม่ให้<strong>เขียน</strong> และไฟล์ยังเป็นของ root จึงเป็น least privilege (โปรเซสที่ถูกยึดแก้ซอร์สใน container ไม่ได้) ไม่แตะ <code>node_modules</code> เพราะมีหลายพันไฟล์และสิทธิ์ถูกอยู่แล้ว</li>
+<li><strong>mount แบบอ่านอย่างเดียว (<code>:ro</code>)</strong>: Mosquitto config และ certs (<code>docker-compose.yml</code> บรรทัด 51–52), <code>Caddyfile</code>, <code>www</code>, <code>firmware</code> ใน Caddy (บรรทัด 163–166), และ <code>tailscale-serve.json</code> (บรรทัด 195) แปลว่าต่อให้ process ในนั้นถูกยึด ก็แก้ไฟล์ต้นฉบับ (เว็บ, config) ไม่ได้ ที่เขียนได้มี <code>db/data</code>, <code>mosquitto/data</code>, <code>caddy/data</code>, <code>tailscale/state</code> ที่จำเป็นต้องเขียน และ <strong>โฟลเดอร์ firmware ใน Backend</strong> (บรรทัด 126) ซึ่งเดิมเป็น <code>:ro</code> แต่ตั้งแต่ 14 ต.ค. 2569 ต้องเขียนได้เพื่อรับไฟล์ที่อัปโหลดจากเว็บ (เป็นการแลกความสะดวกกับสิทธิ์ที่เพิ่มขึ้น ดูหัวข้อ 7.5) ส่วนโฟลเดอร์ firmware ฝั่ง Caddy ยังอ่านอย่างเดียว</li>
+<li><strong>จำกัดขนาด log</strong> ทุก container (<code>x-logging</code> บรรทัด 3–9: <code>max-size: "10m"</code>, <code>max-file: "5"</code> = ไม่เกิน 50 MB ต่อ container) ป้องกันดิสก์เต็มจน <strong>ระบบล่ม (Availability)</strong> เพราะค่าเริ่มต้นของ Docker ไม่จำกัด Caddy ก็หมุน access log ของตัวเอง (<code>roll_size 10MiB</code>, <code>roll_keep 5</code>)</li>
+<li><code>restart: unless-stopped</code> และ <code>healthcheck</code> ของ db/mqtt/backend ให้ระบบฟื้นเองเมื่อล้ม และ <code>depends_on: condition: service_healthy</code> ให้ Backend รอฐานข้อมูลพร้อมก่อน</li>
+<li><strong>ผู้ใช้ฐานข้อมูลแยกสิทธิ์:</strong> Backend ใช้ <code>DB_USER</code> (<code>rmutt_app</code>) ที่มีสิทธิ์เฉพาะฐานข้อมูล <code>${DB_DATABASE}</code> (MariaDB สร้างให้อัตโนมัติจาก <code>MARIADB_USER</code>) ส่วน root ใช้เฉพาะงานดูแลระบบ (backup, db-view)</li>
+</ul>
+<p><strong>จุดอ่อนที่เหลือ:</strong> ตรวจ <code>docker-compose.yml</code> แล้ว <strong>ไม่มี</strong> <code>read_only: true</code> (ระบบไฟล์ของ container ยังเขียนได้), <code>cap_drop: [ALL]</code>, หรือ <code>security_opt: [no-new-privileges:true]</code> และ container อื่น (db, mqtt, caddy) ไม่ได้ตั้ง <code>user:</code> เอง (พึ่ง image ที่ลดสิทธิ์ภายในเอง) สามารถเพิ่ม hardening เหล่านี้ให้ Backend ได้โดยแทบไม่เสียค่าใช้จ่าย</p>
+<h2 id="ชั้นที่-10-การสำรองข้อมูล-backup">ชั้นที่ 10: การสำรองข้อมูล (backup)<a class="anchor" href="#ชั้นที่-10-การสำรองข้อมูล-backup">#</a></h2>
+<p><strong>ภัยคุกคาม:</strong> ดิสก์เสีย ลบข้อมูลผิด หรือถูก ransomware สูญเสียประวัติค่าไฟทั้งหมด (Availability และ Integrity)</p>
+<p><strong>ไฟล์ <code>deploy/backup-db.sh</code></strong> cron รันทุกวัน <strong>02:30</strong> (ตั้งโดย <code>setup-vps.sh</code> บรรทัด 104) ทำสิ่งต่อไปนี้</p>
+<ul>
+<li><code>mariadb-dump --single-transaction --routines --triggers --events</code> ผ่าน <code>docker compose exec</code> แล้ว <code>gzip -9</code> — <code>--single-transaction</code> อ่านข้อมูลชุดเดียวกันทั้งไฟล์โดยไม่ล็อกตาราง ระบบบันทึกค่าไฟต่อได้ระหว่างสำรอง</li>
+<li>เขียนลงไฟล์ <code>.partial</code> ก่อน แล้ว <strong>ตรวจว่าสมบูรณ์</strong> (<code>gzip -t</code> และบรรทัดสุดท้ายมี <code>Dump completed</code>) จึง <code>mv</code> เป็นชื่อจริง ไฟล์ที่ dump ไม่ครบจะไม่ถูกนับเป็น backup (กันเข้าใจผิดว่ามี backup ทั้งที่ใช้กู้ไม่ได้)</li>
+<li>สิทธิ์: โฟลเดอร์ <code>backups</code> เป็น <code>700</code> ไฟล์ <code>600</code> (<code>chmod 700 backups</code>, <code>chmod 600 "$FILE"</code>)</li>
+<li>เก็บย้อนหลัง <code>BACKUP_KEEP_DAYS</code> (ค่าเริ่มต้น 14 วัน, <code>find ... -mtime +N -delete</code>)</li>
+<li>ถ้าตั้ง <code>BACKUP_REMOTE</code> จะ <code>rsync</code> ไปเครื่องอื่นผ่าน SSH key เพื่อไม่ให้ backup อยู่ที่เดียวกับข้อมูลจริง</li>
+</ul>
+<p><strong>จุดอ่อนที่เหลือ:</strong> ไฟล์ backup <strong>ไม่ได้เข้ารหัส</strong> (มี hash รหัสผ่านและข้อมูลทั้งหมด) และ <code>BACKUP_REMOTE</code> ว่างโดยค่าเริ่มต้น ซึ่งแปลว่า backup อยู่ดิสก์เดียวกับข้อมูล (ดิสก์พังก็หายทั้งคู่) ไม่ได้สำรอง <code>.env</code>, <code>mosquitto/data/dynamic-security.json</code> และใบรับรอง (ส่วนบัญชีบอร์ดสร้างคืนได้จาก <code>reconcileAccounts</code> แต่ <code>.env</code> หายคือ secret หายหมด) และไม่มีการทดสอบกู้คืนอัตโนมัติ</p>
+<h2 id="ตารางสรุปตามชั้น">ตารางสรุปตามชั้น<a class="anchor" href="#ตารางสรุปตามชั้น">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>ชั้น</th>
+<th>ภัยคุกคาม</th>
+<th>วิธีป้องกันในโปรเจค</th>
+<th>ไฟล์</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>เครือข่าย</td>
+<td>สแกนพอร์ตเจอ DB/SSH/Broker</td>
+<td>DB ผูก <code>127.0.0.1</code>, Backend/1883 ไม่ publish, Funnel ส่งเข้า <code>caddy:8080</code> (443) กับ <code>mqtt:1883</code> (8443) เท่านั้น, ufw default deny, SSH tunnel</td>
+<td><code>docker-compose.yml</code>, <code>tailscale-serve.json</code>, <code>setup-vps.sh</code>, <code>db-tunnel.ps1</code></td>
+</tr>
+<tr>
+<td>TLS</td>
+<td>ดักอ่าน/แก้ข้อมูล (MITM)</td>
+<td>Let's Encrypt (DNS-01 DuckDNS), HSTS, MQTTS (Funnel 8443 ใบ ts.net / ต่อตรง 8883 TLS1.2+), root CA ในเฟิร์มแวร์ (X1+X2), OTA ผ่าน HTTPS</td>
+<td><code>Caddyfile</code>, <code>mosquitto.conf</code>, <code>letsencrypt_ca.h</code>, <code>ota_update.h</code></td>
+</tr>
+<tr>
+<td>เว็บ</td>
+<td>XSS, clickjacking, API ปลอม</td>
+<td>CSP <code>script-src 'self'</code>, <code>frame-ancestors 'none'</code>, nosniff, <code>textContent</code> ใน <code>dom.js</code>, <code>?api=</code> เฉพาะ localhost</td>
+<td><code>Caddyfile</code>, <code>dom.js</code>, <code>config.js</code></td>
+</tr>
+<tr>
+<td>API: ตัวตน</td>
+<td>ปลอม/ใช้ token ซ้ำ</td>
+<td>JWT HS256 (pin อัลกอริทึม, iss/aud, 8 ชม.), <code>token_version</code>, อ่าน role จาก DB ทุกคำขอ</td>
+<td><code>authenticate.js</code>, <code>auth.js</code></td>
+</tr>
+<tr>
+<td>API: สิทธิ์</td>
+<td>staff ทำงานของ admin</td>
+<td><code>requireAdmin</code> (403), กัน admin คนสุดท้าย</td>
+<td><code>require-admin.js</code>, <code>users.js</code></td>
+</tr>
+<tr>
+<td>API: การจำกัด</td>
+<td>เดารหัส, ล็อกอินรัว</td>
+<td>login 10/15 นาที, ยืนยันรหัสผิด 10/15 นาที, reset 8/ชม., <code>TRUST_PROXY=2</code></td>
+<td><code>auth.js</code>, <code>docker-compose.yml</code>, <code>config.js</code></td>
+</tr>
+<tr>
+<td>API: ข้อมูล</td>
+<td>SQL injection, ข้อมูลรั่ว</td>
+<td>parameterized <code>?</code>, regex/allowlist, <code>limit: 256kb</code>, error กลาง ๆ, <code>/api/health</code> ย่อบน production</td>
+<td><code>app.js</code>, <code>http.js</code>, <code>air-conditioner.js</code></td>
+</tr>
+<tr>
+<td>รหัสผ่าน/OTP</td>
+<td>ฐานข้อมูลรั่ว, เดา OTP, timing</td>
+<td>bcryptjs cost 12, dummy hash, OTP HMAC+pepper, หมดอายุ 10 นาที, 5 ครั้ง/OTP, reset token hash ใช้ครั้งเดียว</td>
+<td><code>security.js</code>, <code>auth.js</code></td>
+</tr>
+<tr>
+<td>MQTT</td>
+<td>สั่งแอร์ผิดห้อง, ฟังข้ามห้อง</td>
+<td><code>allow_anonymous false</code>, Dynamic Security บัญชี+ACL ต่อบอร์ด, รหัส = HMAC(Device ID), role ของ Backend</td>
+<td><code>mosquitto.conf</code>, <code>mqtt-accounts.js</code> (utils/services)</td>
+</tr>
+<tr>
+<td>อุปกรณ์/BLE</td>
+<td>บอร์ดปลอม, ชี้บอร์ดไป Broker อื่น, ความลับค้างในบอร์ดที่เลิกใช้</td>
+<td>provisioning token สุ่ม hash หมดอายุ 15 นาที ใช้ครั้งเดียว, กู้ Wi-Fi แก้ได้แค่ Wi-Fi, setup admin-only 5 นาที, OTA จำกัด URL + ตรวจ CA + ไฟล์ตรงชนิดบอร์ด, unprovision ล้าง NVS ตอนลบอุปกรณ์</td>
+<td><code>air-conditioners.js</code>, <code>occupancy-sensors.js</code>, <code>mqtt.js</code>, <code>unprovision.js</code>, <code>rmutt_esp32_air.ino</code>, <code>ota_update.h</code></td>
+</tr>
+<tr>
+<td>อัปโหลดเฟิร์มแวร์</td>
+<td>path traversal, ไฟล์ผิดชนิด/ไม่ใช่เฟิร์มแวร์, ไฟล์ใหญ่</td>
+<td>admin-only, regex ชื่อไฟล์ + ห้าม <code>..</code>, <code>?kind</code> ต้องตรง, magic byte <code>0xE9</code>, ≤ <code>0x1F0000</code>, <code>?replace=1</code>, เขียน <code>.part</code> + rename, log ผู้อัปโหลด</td>
+<td><code>routes/firmware.js</code>, <code>utils/firmware.js</code></td>
+</tr>
+<tr>
+<td>ความลับ</td>
+<td>secret หลุด/ฝังโค้ด</td>
+<td><code>init-env.sh</code> สุ่ม, <code>.env</code> 600, env เฉพาะที่ใช้, seed-admin ล้างรหัส, <code>.gitignore</code>, keystore แยก</td>
+<td><code>init-env.sh</code>, <code>docker-compose.yml</code>, <code>seed-admin.sh</code>, <code>.gitignore</code></td>
+</tr>
+<tr>
+<td>คอนเทนเนอร์</td>
+<td>ถูกยึด container, ดิสก์เต็ม</td>
+<td><code>USER node</code> + <code>chmod -R a+rX</code> (อ่านอย่างเดียว), mount <code>:ro</code> (ยกเว้น firmware ของ Backend ตั้งแต่ 14 ต.ค. 2569), จำกัด log 10MB×5, healthcheck</td>
+<td><code>backend.Dockerfile</code>, <code>docker-compose.yml</code></td>
+</tr>
+<tr>
+<td>สำรองข้อมูล</td>
+<td>ข้อมูลหาย</td>
+<td>cron 02:30, ตรวจไฟล์ครบ, 600/700, เก็บ 14 วัน, rsync ออกนอก</td>
+<td><code>backup-db.sh</code>, <code>setup-vps.sh</code></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="จุดอ่อนที่ยังเหลือและข้อเสนอปรับปรุง">จุดอ่อนที่ยังเหลือและข้อเสนอปรับปรุง<a class="anchor" href="#จุดอ่อนที่ยังเหลือและข้อเสนอปรับปรุง">#</a></h2>
+<p>รายการนี้ตรวจกับโค้ดจริงแล้ว ใช้ตอบอาจารย์ได้อย่างตรงไปตรงมา การยอมรับข้อจำกัดอย่างมีเหตุผลดีกว่าอ้างว่า "ปลอดภัย 100%"</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>จุดอ่อน</th>
+<th>หลักฐานในโค้ด</th>
+<th>ผลกระทบ</th>
+<th>ข้อเสนอ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>OTA ไม่มี code signing / secure boot / rollback</td>
+<td>ไม่พบใน <code>firmware/</code>; ไฟล์ <code>.bin</code> เสิร์ฟสาธารณะที่ <code>/firmware/*</code> (<code>Caddyfile</code> 35–39); ตั้งแต่ 14 ต.ค. 2569 แอดมินอัปโหลดไฟล์ผ่านเว็บได้ (<code>POST /api/firmware</code> ตรวจแค่รูปแบบ <code>0xE9</code>/ขนาด ไม่ตรวจความแท้)</td>
+<td>ผู้ที่วางไฟล์บนเซิร์ฟเวอร์ได้ (SSH หรือบัญชีแอดมินเว็บ) ควบคุมบอร์ดทุกตัวได้; ไฟล์เสียแต่ครบ = บอร์ดบูตไม่ขึ้น</td>
+<td>เซ็นเฟิร์มแวร์, เปิด app rollback, flash encryption</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>staff สั่งแอร์ได้ทุกเครื่อง</strong></td>
+<td><code>POST /:deviceId/command</code> (<code>air-conditioners.js</code> บรรทัด 238–239) ไม่มี <code>requireAdmin</code> มีแค่ <code>authenticate</code> ที่ระดับ router (บรรทัด 39) และ role ในระบบมีแค่ <code>admin</code>/<code>staff</code> (<code>schema.sql</code> บรรทัด 8)</td>
+<td>บัญชี staff ที่ถูกขโมยสั่งปิด/เปิดแอร์ทั้งอาคารได้ (อาจตั้งใจเพราะผู้ใช้หลักคือเจ้าหน้าที่ แต่ควรเป็นการตัดสินใจที่จดไว้)</td>
+<td>แยกสิทธิ์รายห้อง/ชั้น หรือ role <code>operator</code>; จำกัดอัตราคำสั่งต่อผู้ใช้</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>PUBLIC_URL</code> ไม่ถูกตั้งโดย <code>init-env.sh</code> และไม่อยู่ใน <code>.env</code> ตัวอย่าง/<code>DEPLOY.md</code></td>
+<td><code>grep PUBLIC_URL</code> พบเฉพาะ <code>docker-compose.yml</code> บรรทัด 88 (<code>${PUBLIC_URL:-}</code>) ค่าที่ได้คือ <code>https://&lt;โดเมน&gt;,</code></td>
+<td><strong>เว็บ</strong> ที่เปิดผ่าน <code>https://...ts.net</code> จะส่ง <code>Origin</code> ที่ไม่อยู่ในรายการ CORS ในคำขอ POST (เช่น login) → Backend ตอบ 500 (ข้อสรุปจากการอ่านโค้ด <code>createCorsOptions</code> + <code>errorHandler</code> ควรทดสอบจริงก่อนอ้าง) ส่วนแอปมือถือไม่ถูกกระทบเพราะไม่ส่ง <code>Origin</code></td>
+<td>ให้ <code>init-env.sh</code> ถามและเขียน <code>PUBLIC_URL</code>, อธิบายใน <code>DEPLOY.md</code></td>
+</tr>
+<tr>
+<td>4</td>
+<td>ไม่มี handler 401 ระดับแอป (Flutter)</td>
+<td>แต่ละ service โยน <code>ApiException('Please sign in again.', statusCode: 401)</code> (เช่น <code>energy_service.dart</code> บรรทัด 147) แต่ controller แปลงเป็นข้อความผิดพลาดธรรมดา ไม่พบการเด้งออกอัตโนมัติ (เว็บมี <code>api.js</code> บรรทัด 128 ที่จัดการ 401 ที่เดียว)</td>
+<td>token หมดอายุ/ถูกเพิกถอนแล้วผู้ใช้เห็นข้อความ error ทุกหน้าจนกว่าจะออกจากระบบเอง</td>
+<td>ทำ HTTP interceptor กลางที่ล้าง token แล้วกลับหน้า login</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>AlertNotifier</code> ไม่ได้ต่อสาย</td>
+<td><code>main.dart</code> บรรทัด 34 <code>runApp(const CpeAirRemoteApp())</code> ไม่ส่ง <code>alertNotifier</code> เข้าไป (บรรทัด 49, 175 รับเป็น nullable) ตัวที่มีคือ <code>NoopAlertNotifier</code></td>
+<td>การแจ้งเตือนผิดปกติ (เช่น แอร์เปิดเกินเวลา) ไม่ถึงผู้ดูแลแบบ push จึงเป็นเรื่อง Availability/การตอบสนองต่อเหตุ</td>
+<td>ต่อ notifier จริง (local notification/FCM)</td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>db-view.sh</code> ใช้ root และรัน SQL อะไรก็ได้</td>
+<td><code>db-view.sh</code> บรรทัด 322, 327–330: อ่าน <code>DB_ROOT_PASSWORD</code> และคำสั่ง <code>sql</code> รันข้อความใดก็ได้ ทั้งที่หัวไฟล์ระบุว่า "อ่านอย่างเดียว"</td>
+<td>ไม่ใช่ read-only จริง ใช้สิทธิ์เกินจำเป็น</td>
+<td>ใช้ user ฐานข้อมูลแบบ <code>SELECT</code> อย่างเดียว</td>
+</tr>
+<tr>
+<td>7</td>
+<td>บัญชีเริ่มต้น MQTT ถอยเป็น <code>shared</code> เงียบ ๆ</td>
+<td><code>normalizeDeviceAuthMode</code> (<code>utils/mqtt-accounts.js</code> บรรทัด 35–38) คืน <code>shared</code> ถ้าไม่ได้ตั้งค่า; <code>config.js</code> มีแค่ warn บรรทัด 116–120</td>
+<td>ลืมตั้ง env = ทุกบอร์ดใช้รหัสเดียว</td>
+<td>บังคับ <code>dynsec</code> เมื่อ <code>NODE_ENV=production</code></td>
+</tr>
+<tr>
+<td>8</td>
+<td>BLE ไม่มี pairing/encryption</td>
+<td>ดูหัวข้อ 7</td>
+<td>ดักรหัสตอนตั้งค่า, แย่งตั้งค่าใน 5 นาที</td>
+<td>ใช้ LE Secure Connections + passkey หรือเข้ารหัสข้อมูลระดับแอปด้วยคีย์ที่แลกกับ Backend</td>
+</tr>
+<tr>
+<td>9</td>
+<td>rate limit เฉพาะ <code>auth.js</code>, ตัวนับอยู่ในหน่วยความจำ</td>
+<td>ค้น <code>rateLimit(</code> พบเฉพาะ <code>auth.js</code>; ไม่ได้กำหนด <code>store</code></td>
+<td>API อื่นถูกยิงถี่ได้ (มี JWT เท่านั้น); MQTT ผ่าน Funnel 8443 ก็ไม่มี rate limit ต่อ IP (ดูข้อ 15); รีสตาร์ท Backend ล้างตัวนับ; ไม่มี lockout ต่อบัญชี (นับต่อ IP)</td>
+<td>rate limit ทั้ง <code>/api</code>, เก็บตัวนับใน Redis/DB</td>
+</tr>
+<tr>
+<td>10</td>
+<td><code>GET /api/public/admin-contact</code> เปิดไม่ต้องล็อกอิน</td>
+<td><code>routes/public.js</code> ตอบชื่อและเบอร์ของแอดมิน</td>
+<td>เป็นข้อมูลที่ตั้งใจเปิดให้หน้า login (ติดต่อแอดมิน) แต่คนนอกเก็บเบอร์ไปได้ และถ้าไม่มีชื่อจะแสดง username ของ admin (บรรทัด 34)</td>
+<td>ยอมรับได้ถ้าตั้งใจ ควรไม่คืน username</td>
+</tr>
+<tr>
+<td>11</td>
+<td>JWT เพิกถอนรายตัวไม่ได้ / ไม่มี logout ฝั่งเซิร์ฟเวอร์ / อายุ 8 ชม. ไม่มี refresh</td>
+<td>ไม่มี endpoint logout ใน <code>auth.js</code>; เพิกถอนได้เฉพาะด้วยการบวก <code>token_version</code> ทั้งบัญชี</td>
+<td>token ที่หลุดใช้ได้จนกว่าจะเปลี่ยนรหัส/โดนปิดบัญชี</td>
+<td>access token สั้น + refresh token ที่เพิกถอนได้</td>
+</tr>
+<tr>
+<td>12</td>
+<td>timing/enumeration ที่ <code>forgot-password</code></td>
+<td><code>auth.js</code> บรรทัด 261–298 รอส่งอีเมลเฉพาะกรณีมีบัญชี</td>
+<td>เดาได้ว่าบัญชีมีหรือไม่จากเวลาตอบ</td>
+<td>ส่งอีเมลเบื้องหลัง</td>
+</tr>
+<tr>
+<td>13</td>
+<td>ใช้ <code>OTP_PEPPER</code> ตัวเดียวกับ token ผูกบอร์ดด้วย</td>
+<td><code>air-conditioners.js</code> บรรทัด 147, <code>mqtt.js</code> ใช้ <code>config.otpPepper</code></td>
+<td>ใช้กุญแจเดียวหลายหน้าที่ ถ้ารั่วกระทบทั้งคู่</td>
+<td>แยกกุญแจต่อหน้าที่</td>
+</tr>
+<tr>
+<td>14</td>
+<td>ฮาร์เดนนิงของ SSH/ฐานข้อมูลสำรอง/เครื่องมือ</td>
+<td><code>db-tunnel.ps1</code> ถามรหัสผ่าน SSH; backup ไม่เข้ารหัส และ <code>BACKUP_REMOTE</code> ว่าง; ไม่มี <code>cap_drop</code>/<code>read_only</code></td>
+<td>ดูหัวข้อชั้น 1, 9, 10</td>
+<td>ใช้ SSH key อย่างเดียว, เข้ารหัส backup (เช่น <code>age</code>/<code>gpg</code>)</td>
+</tr>
+<tr>
+<td>15</td>
+<td>Broker เข้าถึงได้จากอินเทอร์เน็ตผ่าน Funnel 8443 และไม่มี rate limit/ตัวแบน IP ที่ชั้น MQTT</td>
+<td><code>tailscale-serve.json</code> บรรทัด 4–7 และ 18 เปิดพอร์ต 8443 → <code>mqtt:1883</code>; <code>mosquitto.conf</code> ไม่มีการตั้งค่าจำกัดการเชื่อมต่อหรือการล็อกอินผิด และ Mosquitto เห็นต้นทางเป็นกล่อง tailscale</td>
+<td>ยิงการเชื่อมต่อใส่ Broker เพื่อกินทรัพยากรหรือทำ log รกได้ (รหัสบอร์ดเป็น HMAC เดาในทางปฏิบัติไม่ได้ แต่ถ้า <code>MQTT_DEVICE_SECRET</code> หรือบัญชีหลุดก็ต่อจากนอกอาคารได้ทันที) ช่วงสุดท้ายถึง Mosquitto เป็น MQTT ดิบในเครือข่าย docker</td>
+<td>ใช้ 8883 ต่อตรงและถอด 8443 เมื่อบอร์ดอยู่ในอาคารหมด, เฝ้าดู log (<code>connection_messages true</code>), เพิ่มตัวนับ/แบน IP หน้า Broker</td>
+</tr>
+<tr>
+<td>16</td>
+<td>Backend เขียนโฟลเดอร์ firmware ได้ (เพิ่ม 14 ต.ค. 2569)</td>
+<td><code>docker-compose.yml</code> บรรทัด 126 ไม่มี <code>:ro</code> แล้ว; <code>setup-vps.sh</code>/<code>update-remote.sh</code> ตั้งเจ้าของเป็น uid 1000</td>
+<td>Backend ที่ถูกยึดเปลี่ยนไฟล์ <code>.bin</code> ที่บอร์ดจะดาวน์โหลดได้</td>
+<td>เซ็นเฟิร์มแวร์ (ข้อ 1) หรือแยกบริการรับไฟล์ที่มีสิทธิ์เขียนเฉพาะโฟลเดอร์นี้</td>
+</tr>
+<tr>
+<td>17</td>
+<td>บอร์ดออฟไลน์ตอนลบ ยังเก็บรหัส Wi-Fi ใน NVS (เพิ่ม 13 ต.ค. 2569)</td>
+<td><code>unprovisionDevice</code> ไม่ส่งแบบ retain และรอแค่ 4 วินาที; คำตอบ <code>boardCleared: false</code></td>
+<td>รหัส Wi-Fi ของอาคารค้างในบอร์ดที่ถูกถอดไป</td>
+<td>แจ้งเตือนในแอปเมื่อ <code>boardCleared</code> เป็น false, ขั้นตอนเก็บคืนบอร์ด + <code>erase_flash</code>, flash encryption</td>
+</tr>
+</tbody>
+</table></div>
+<div class="callout warn"><div class="callout-title">ระวัง</div><p>ข้อ 2 และ 3 ควรทดสอบกับระบบจริงก่อนไปบอกอาจารย์ว่าเป็นข้อเท็จจริง (ข้อ 2 ยืนยันได้จากโค้ดตรง ๆ ว่าเส้นทางไม่ตรวจ role ส่วนข้อ 3 เป็นผลจากการวิเคราะห์ลำดับ CORS ของ Express ไม่ได้รันจริง)</p></div>
+
+<h2 id="คำถามที่อาจารย์อาจถาม">คำถามที่อาจารย์อาจถาม<a class="anchor" href="#คำถามที่อาจารย์อาจถาม">#</a></h2>
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>1. ระบบนี้ป้องกันการเดารหัสผ่านอย่างไร</strong>
+สามชั้น (1) rate limit การล็อกอิน 10 ครั้งต่อ 15 นาทีต่อ IP (<code>loginLimiter</code> ใน <code>auth.js</code>) (2) เก็บรหัสผ่านด้วย bcrypt cost 12 ซึ่งช้าโดยตั้งใจ ถ้าฐานข้อมูลรั่วก็เดาออฟไลน์ได้ช้ามาก (3) ข้อความ error กลาง ๆ และใช้ dummy hash ให้เวลาตอบใกล้เคียงกัน คนร้ายจึงเดา username ไม่ได้ ตั้ง <code>TRUST_PROXY=2</code> ให้ IP ที่นับเป็นของผู้ใช้จริง ไม่ใช่ของ proxy</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>2. ทำไมใช้ JWT แล้วยังต้อง query ฐานข้อมูลทุกคำขอ ไม่ขัดกับแนวคิด stateless หรือ</strong>
+ขัดบางส่วนโดยตั้งใจ JWT ล้วน ๆ เพิกถอนไม่ได้จนหมดอายุ ระบบนี้ต้องการให้ปิดบัญชี เปลี่ยนรหัสผ่าน หรือลดสิทธิ์แล้วมีผลทันที จึงตรวจ <code>is_active</code>, <code>role</code> และ <code>token_version</code> จากฐานข้อมูลใน <code>authenticate.js</code> ทุกครั้ง แลกกับ query เล็ก ๆ หนึ่งครั้งต่อคำขอ ซึ่งรับได้เพราะผู้ใช้หลักหลายสิบคน และ role จึงมาจากฐานข้อมูลไม่ใช่จาก token</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>3. ฐานข้อมูลเปิดสู่อินเทอร์เน็ตหรือไม่ ถ้าอยากดูข้อมูลทำอย่างไร</strong>
+ไม่เปิด พอร์ต 3306 ผูกที่ <code>127.0.0.1</code> ของเซิร์ฟเวอร์เท่านั้น (<code>docker-compose.yml</code> บรรทัด 29) ถ้าต้องการดูข้อมูลจากเครื่องตัวเองใช้ SSH tunnel (<code>db-tunnel.ps1</code>) ซึ่งเข้ารหัสทั้งเส้นทางและใช้บัญชีฐานข้อมูลของแอป (ไม่ใช่ root) ข้อควรระวังคือ Docker ข้าม ufw ได้ จึงต้องพึ่งการผูก localhost ในไฟล์ compose ไม่ใช่แค่ firewall</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>4. ถ้าบอร์ด ESP32 ตัวหนึ่งถูกขโมยไปอ่านรหัสใน flash จะเกิดอะไรขึ้น</strong>
+ได้แค่รหัสผ่านและ Wi-Fi ของบอร์ดนั้น เพราะแต่ละบอร์ดมีบัญชี MQTT ของตัวเอง (username = Device ID, รหัส = HMAC ของ Device ID ด้วย <code>MQTT_DEVICE_SECRET</code>) และ ACL อนุญาตให้ publish/subscribe เฉพาะ topic ของตัวเอง ไม่มีสิทธิ์ publish ที่ topic <code>command</code> ใด ๆ จึงสั่งแอร์ห้องอื่นไม่ได้ ผู้ดูแลถอดบอร์ดออกจากระบบเพื่อลบบัญชีนั้นได้ (<code>removeDeviceAccount</code>) ข้อจำกัด: flash ของ ESP32 ไม่ได้เข้ารหัส (ไม่ได้เปิด flash encryption) ดังนั้นคนที่ถือบอร์ดอ่านรหัส Wi-Fi ของอาคารออกมาได้</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>5. XSS คืออะไร ระบบกันอย่างไร และทำไมต้องกังวลเรื่อง token ใน localStorage</strong>
+XSS คือการแทรกสคริปต์เข้าหน้าเว็บ กัน 2 ชั้น: โค้ด DOM ใช้ <code>textContent</code>/<code>createTextNode</code> เสมอ (<code>dom.js</code>) ไม่เอาข้อมูลผู้ใช้ไปต่อ HTML และ CSP <code>script-src 'self'</code> + <code>connect-src 'self'</code> ทำให้สคริปต์แปลกปลอมรันไม่ได้และส่งข้อมูลออกนอกโดเมนไม่ได้ ที่ต้องกังวลเพราะ <code>localStorage</code> ถูก JavaScript อ่านได้ ถ้าหลุดสองชั้นก็ขโมย token ได้ จึงลดความเสียหายด้วยอายุ token 8 ชั่วโมงและการเพิกถอนด้วย <code>token_version</code> เหตุผลที่ไม่ใช้ cookie คือจะเกิดความเสี่ยง CSRF เพิ่ม</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>6. ทำไม OTP ถึงใช้ HMAC ไม่ใช่ bcrypt เหมือนรหัสผ่าน</strong>
+OTP มีเพียง 1,000,000 แบบ ถ้า hash ธรรมดา คนที่ได้ตารางไปคำนวณครบทุกแบบได้ทันที HMAC ต้องใช้ pepper ที่เก็บแยกใน <code>.env</code> ไม่อยู่ในฐานข้อมูล ขโมยฐานข้อมูลอย่างเดียวจึงถอดไม่ได้ และ OTP อายุแค่ 10 นาที เดาได้ 5 ครั้งต่ออัน การใช้ bcrypt ที่ช้าจึงไม่คุ้ม ส่วนรหัสผ่านอยู่ถาวรและเดาออฟไลน์ได้นาน ต้องใช้ bcrypt</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>7. TLS ของ Caddy ได้ใบรับรองมาอย่างไรทั้งที่เซิร์ฟเวอร์อยู่หลังเครือข่ายมหาวิทยาลัย</strong>
+ใช้ DNS-01 challenge ผ่านปลั๊กอิน DuckDNS ใน Caddy: Caddy เขียน TXT record <code>_acme-challenge</code> ผ่าน API ด้วย <code>DUCKDNS_TOKEN</code> แล้ว Let's Encrypt ตรวจจาก DNS ไม่ต้องเข้ามาที่พอร์ต 80 ของเซิร์ฟเวอร์ ใบนี้ถูกคัดลอกให้ Mosquitto ใช้กับ MQTTS ด้วย (<code>sync-mqtt-cert.sh</code>) ส่วนบอร์ดตรวจใบด้วย root CA ของ Let's Encrypt ที่ฝังในเฟิร์มแวร์ ทั้ง X1 (RSA) และ X2 (ECDSA)</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>8. มี rate limit ตรงไหนบ้าง และตัวเลขเท่าไร</strong>
+ทั้งหมดใน <code>auth.js</code>: login 10 ครั้ง/15 นาที, เปลี่ยนรหัสผ่านหรืออีเมลยืนยันรหัสผิด 10 ครั้ง/15 นาที (นับเฉพาะครั้งที่ผิด), ลืมรหัสผ่าน/ตรวจ OTP/ตั้งรหัสใหม่ รวมกัน 8 ครั้ง/ชั่วโมง นอกจากนี้ OTP แต่ละอันผิดได้ 5 ครั้ง จุดที่ควรปรับปรุงคือยังไม่มี rate limit ที่ API อื่น และตัวนับอยู่ในหน่วยความจำ ส่วนทาง MQTT (Funnel 8443) ไม่มี rate limit ต่อ IP ป้องกันด้วยบัญชีรายบอร์ดเท่านั้น</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>9. OTA อัปเดตเฟิร์มแวร์ปลอดภัยแค่ไหน มีจุดอ่อนอะไร</strong>
+ป้องกันสามชั้น: คำสั่งส่งได้เฉพาะ Backend (ACL) และเฉพาะ admin เรียก (และตั้งแต่ 14 ต.ค. 2569 Backend ไม่ยอมสั่งไฟล์ที่ชนิดไม่ตรงกับบอร์ด), บอร์ดยอมรับเฉพาะ URL <code>https://&lt;host ของ Broker ตัวเอง&gt;/firmware/&lt;ชื่อไฟล์ .bin&gt;</code> ที่ผ่านการตรวจอักขระ, และตรวจใบรับรอง HTTPS กับ root CA จุดอ่อนที่ต้องยอมรับคือไม่มีการเซ็นเฟิร์มแวร์ ไม่มี secure boot และไม่มี rollback ดังนั้นความถูกต้องของไฟล์ขึ้นกับว่าเซิร์ฟเวอร์ไม่ถูกเจาะ ถ้าจะปรับปรุงให้เซ็นไฟล์ด้วยคีย์ที่เก็บนอกเซิร์ฟเวอร์และเปิด rollback</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>10. ถ้ามีคนส่งลิงก์ <code>?api=https://เว็บร้าย</code> มาให้ผู้ใช้จะเกิดอะไร</strong>
+ไม่เกิดผล <code>config.js</code> ของเว็บรับพารามิเตอร์ <code>?api=</code> เฉพาะตอนเปิดจาก <code>localhost</code>/<code>127.0.0.1</code> เท่านั้น บนโดเมนจริงจะลบค่าที่อาจฝังไว้ใน <code>localStorage</code> ทิ้งแล้วใช้ <code>/api</code> ของโดเมนตัวเองเสมอ ไม่เช่นนั้นผู้ใช้จะส่ง username/password ไปเว็บของคนร้ายทุกครั้งที่ล็อกอิน (ลิงก์ฟิชชิงที่มาจากโดเมนจริง)</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>11. ถ้าให้บอกจุดอ่อนที่ยังเหลือของระบบ 3 ข้อ คืออะไร</strong>
+(1) OTA ไม่มีการเซ็นเฟิร์มแวร์/rollback (2) บัญชี staff สั่งแอร์ได้ทุกเครื่อง เพราะเส้นทาง command ไม่ได้จำกัดสิทธิ์รายห้อง (3) BLE ตอนตั้งค่าไม่มี pairing/เข้ารหัส และ rate limit มีเฉพาะส่วน auth ผมเลือกยอมรับบางข้อโดยมีเหตุผล เช่นเปิด <code>/firmware/*</code> สาธารณะเพราะบอร์ดไม่มี JWT และเสนอแนวแก้ทุกข้อไว้ในบท</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>12. เปิด MQTT ให้ ESP32 ผ่าน Funnel แล้ว Broker ไม่เสี่ยงหรือ</strong>
+เสี่ยงขึ้นกว่าเดิมจริง เพราะเดิม Broker ต่อได้เฉพาะในเครือข่ายมหาวิทยาลัย ตอนนี้ใครก็ต่อ <code>ts.net:8443</code> ได้ เราจึงพึ่ง 3 ชั้น: TLS ถอดที่กล่อง tailscale, ไม่ยอม anonymous และบัญชี Dynamic Security รายบอร์ดที่รหัสเป็น HMAC เดาไม่ได้, ACL ให้บอร์ดเห็นเฉพาะ topic ตัวเอง สิ่งที่ยังขาดคือ rate limit ต่อ IP ที่ชั้น MQTT และช่วงจาก tailscale ไป Mosquitto เป็น MQTT ดิบในเครื่องเดียวกัน ถ้าบอร์ดทั้งหมดอยู่ในอาคาร สามารถตั้ง <code>MQTT_DEVICE_URL=mqtts://&lt;DOMAIN&gt;:8883</code> แล้วถอดพอร์ต 8443 ออกจาก <code>serve.json</code> ได้</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>13. ให้แอดมินอัปโหลดเฟิร์มแวร์จากเว็บได้ ตรวจอะไรบ้าง และเพิ่มความเสี่ยงอะไร</strong>
+ตรวจตามลำดับ: ต้องเป็นแอดมิน, Express ไม่อ่าน body เกิน <code>0x1F0000 + 1024</code> ไบต์, ชื่อไฟล์ผ่าน allowlist regex ลงท้าย <code>.bin</code> ไม่มี <code>/</code> หรือ <code>..</code> (กัน path traversal), ชนิดจากชื่อต้องตรงแท็บ, ไบต์แรกต้องเป็น <code>0xE9</code> และไม่เกินช่องโปรแกรม, ไม่ทับไฟล์เดิมถ้าไม่ยืนยัน แล้วเขียนผ่านไฟล์ <code>.part</code> + rename และ log ว่าใครอัปโหลด ความเสี่ยงที่เพิ่มคือรหัสแอดมินเว็บอย่างเดียวก็วางเฟิร์มแวร์ให้ทุกบอร์ดได้ และ Backend ต้องเขียนโฟลเดอร์ firmware ได้ (เลิก <code>:ro</code>) การตรวจ <code>0xE9</code> เป็นแค่ตรวจรูปแบบ ไม่ใช่ลายเซ็น ทางแก้จริงคือ code signing</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>14. ลบอุปกรณ์แล้ว รหัส Wi-Fi ที่อยู่ในบอร์ดยังอยู่ไหม</strong>
+ถ้าบอร์ดออนไลน์ตอนลบ ไม่อยู่ครับ Backend ส่งคำสั่ง <code>unprovision</code> (มี <code>deviceId</code> ให้บอร์ดตรวจซ้ำ) บอร์ดตอบกลับแล้วล้าง NVS ทั้ง Wi-Fi, MQTT, ห้อง แล้วรีบูตเป็นบอร์ดเปล่า Backend รอคำตอบ 4 วินาทีก่อนลบบัญชี MQTT เพราะถ้าลบบัญชีก่อนคำสั่งจะไปไม่ถึง ถ้าบอร์ดออฟไลน์ แอปได้ <code>boardCleared: false</code> ต้องไปล้างที่ตัวบอร์ด แต่บอร์ดนั้นต่อ Broker ไม่ได้แล้วเพราะบัญชีถูกลบ</p></div>
+
+<h2 id="สรุปและเช็กลิสต์ความเข้าใจ">สรุปและเช็กลิสต์ความเข้าใจ<a class="anchor" href="#สรุปและเช็กลิสต์ความเข้าใจ">#</a></h2>
+<p>ภาพรวมที่ต้องจำ: ระบบใช้ <strong>หลายชั้นป้องกัน (defense in depth)</strong> และ <strong>สิทธิ์น้อยที่สุด (least privilege)</strong> ตั้งแต่เครือข่าย (เปิดพอร์ตน้อย, DB ผูก localhost) ผ่าน TLS ทุกเส้นทาง, เว็บ (CSP, ไม่ใช้ <code>innerHTML</code> กับข้อมูลผู้ใช้), API (JWT ตรวจกับฐานข้อมูลทุกครั้ง, rate limit, parameterized SQL), รหัสผ่าน (bcrypt, dummy hash, OTP HMAC+pepper), MQTT (บัญชีและ ACL ต่อบอร์ด), อุปกรณ์ (token ผูกบอร์ดใช้ครั้งเดียว, กู้ Wi-Fi แก้ได้แค่ Wi-Fi), การจัดการความลับ (สุ่ม, ส่งเฉพาะที่จำเป็น), คอนเทนเนอร์ (ไม่ใช้ root, <code>:ro</code>, จำกัด log) และ backup พร้อมกับยอมรับจุดอ่อนที่เหลืออย่างตรงไปตรงมา</p>
+<p>ถ้าตอบข้อเหล่านี้ได้ แปลว่าเข้าใจบทนี้แล้ว</p>
+<ul>
+<li class="check"><input type="checkbox"> อธิบาย CIA, authentication vs authorization, hash vs encryption, salt vs pepper ได้ด้วยภาษาตัวเอง</li>
+<li class="check"><input type="checkbox"> บอกได้ว่าพอร์ตไหนเปิดสู่อินเทอร์เน็ต พอร์ตไหนไม่เปิด และ Funnel ส่งต่อไปที่ไหนบ้าง (443 → <code>caddy:8080</code>, 8443 → <code>mqtt:1883</code>) พร้อมความเสี่ยงของการเปิด 8443</li>
+<li class="check"><input type="checkbox"> อธิบายได้ว่า DNS-01 ต่างจาก HTTP-01 อย่างไร และทำไมโปรเจคนี้ต้องใช้ DNS-01</li>
+<li class="check"><input type="checkbox"> ระบุได้ว่ามี root CA อะไรในเฟิร์มแวร์ และบอร์ดต้องซิงก์เวลา NTP ก่อนต่อ TLS เพราะอะไร</li>
+<li class="check"><input type="checkbox"> ยกตัวอย่าง security header อย่างน้อย 4 ตัวใน Caddyfile และบอกว่ากันอะไร</li>
+<li class="check"><input type="checkbox"> อธิบาย XSS สองชั้นที่ใช้ และ trade-off ของ token ใน <code>localStorage</code> เทียบกับ cookie</li>
+<li class="check"><input type="checkbox"> อธิบายได้ว่าทำไม <code>?api=</code> ต้องจำกัดเฉพาะ localhost</li>
+<li class="check"><input type="checkbox"> เล่า claim ใน JWT, สิ่งที่ <code>jwt.verify</code> ตรวจ, ทำไมต้อง <code>algorithms: ['HS256']</code> และ <code>token_version</code> ทำอะไร</li>
+<li class="check"><input type="checkbox"> บอกตัวเลข rate limit ทั้งสามตัว (10/15 นาที, 10/15 นาที นับเฉพาะผิด, 8/ชม.) และอธิบายว่าทำไม <code>TRUST_PROXY=2</code></li>
+<li class="check"><input type="checkbox"> อธิบายว่า dummy hash กัน timing attack อย่างไร</li>
+<li class="check"><input type="checkbox"> บอกได้ว่าทำไม OTP ใช้ HMAC+pepper, หมดอายุกี่นาที, ผิดได้กี่ครั้ง และ reset token ถูกเก็บอย่างไร</li>
+<li class="check"><input type="checkbox"> อธิบายได้ว่า ACL ของบอร์ดหนึ่งตัวอนุญาตอะไร และรหัสผ่าน MQTT ของบอร์ดมาจากไหน</li>
+<li class="check"><input type="checkbox"> เล่าวงจร provisioning token (15 นาที, hash, ใช้ครั้งเดียว) และโหมดกู้ Wi-Fi/โหมดตั้งค่าออนไลน์ 5 นาที</li>
+<li class="check"><input type="checkbox"> อธิบายว่า Backend รับ env อย่างไรและทำไมไม่ใช้ <code>env_file</code> ทั้งไฟล์</li>
+<li class="check"><input type="checkbox"> ชี้ได้ว่า container ไหนมีมาตรการอะไร (<code>USER node</code>, <code>:ro</code>, log limit) และยังขาดอะไร</li>
+<li class="check"><input type="checkbox"> ระบุจุดอ่อนที่เหลืออย่างน้อย 5 ข้อพร้อมข้อเสนอแก้ และแยกได้ว่าข้อไหนยืนยันจากโค้ด ข้อไหนเป็นข้อสรุปที่ต้องทดสอบก่อน</li>
+<li class="check"><input type="checkbox"> ไล่ด่านตรวจของ <code>POST /api/firmware</code> ได้ครบ และแยกได้ว่าด่านไหนตรวจรูปแบบ ด่านไหนตรวจสิทธิ์ และทำไมยังไม่ใช่การยืนยันความแท้ (เพิ่ม 14 ต.ค. 2569)</li>
+<li class="check"><input type="checkbox"> อธิบาย unprovision ในมุม data hygiene: ล้างอะไร ลำดับก่อนลบบัญชี MQTT และข้อจำกัดเมื่อบอร์ดออฟไลน์ (เพิ่ม 13 ต.ค. 2569)</li>
+</ul><nav class="pager"><a class="prev" href="14-deploy-scripts-testing.html"><span>← บทก่อนหน้า</span>14. การติดตั้งระบบ สคริปต์อัตโนมัติ และการทดสอบ</a><a class="next" href="16-presentation-qa.html"><span>บทถัดไป →</span>16. เตรียมนำเสนอและคำถามที่อาจารย์มักถาม</a></nav>
+  </main>
+  <aside class="toc"><div class="toc-title">ในบทนี้</div><ul><li><a href="#ภาพรวม">ภาพรวม</a></li><li><a href="#ความรู้ที่ต้องมีก่อนอ่านบทนี้">ความรู้ที่ต้องมีก่อนอ่านบทนี้</a></li><li><a href="#ชั้นที่-1-การเปิดพอร์ตและเครือข่าย-network-exposure">ชั้นที่ 1: การเปิดพอร์ตและเครือข่าย (network exposure)</a></li><li><a href="#ชั้นที่-2-tls-ทุกเส้นทาง">ชั้นที่ 2: TLS ทุกเส้นทาง</a></li><li><a href="#ชั้นที่-3-เว็บ-webapp">ชั้นที่ 3: เว็บ (webapp)</a></li><li><a href="#ชั้นที่-4-api-backend">ชั้นที่ 4: API (Backend)</a></li><li><a href="#ชั้นที่-5-รหัสผ่านและ-otp">ชั้นที่ 5: รหัสผ่านและ OTP</a></li><li><a href="#ชั้นที่-6-mqtt">ชั้นที่ 6: MQTT</a></li><li><a href="#ชั้นที่-7-อุปกรณ์-esp32-และ-ble">ชั้นที่ 7: อุปกรณ์ ESP32 และ BLE</a></li><li><a href="#ชั้นที่-8-การจัดการความลับ-secrets-management">ชั้นที่ 8: การจัดการความลับ (secrets management)</a></li><li><a href="#ชั้นที่-9-คอนเทนเนอร์">ชั้นที่ 9: คอนเทนเนอร์</a></li><li><a href="#ชั้นที่-10-การสำรองข้อมูล-backup">ชั้นที่ 10: การสำรองข้อมูล (backup)</a></li><li><a href="#ตารางสรุปตามชั้น">ตารางสรุปตามชั้น</a></li><li><a href="#จุดอ่อนที่ยังเหลือและข้อเสนอปรับปรุง">จุดอ่อนที่ยังเหลือและข้อเสนอปรับปรุง</a></li><li><a href="#คำถามที่อาจารย์อาจถาม">คำถามที่อาจารย์อาจถาม</a></li><li><a href="#สรุปและเช็กลิสต์ความเข้าใจ">สรุปและเช็กลิสต์ความเข้าใจ</a></li></ul></aside>
+</div>
+<button class="to-top" id="toTop" aria-label="กลับขึ้นด้านบน">↑</button>
+<script src="../assets/search.js"></script>
+<script src="../assets/app.js"></script>
+</body>
+</html>

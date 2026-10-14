@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1140" height="800" viewBox="0 0 1140 800" font-family="Sarabun, Tahoma, 'Leelawadee UI', sans-serif">
+  <defs>
+    <marker id="e1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#0D7A4B"/>
+    </marker>
+    <marker id="e2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#DC4C5C"/>
+    </marker>
+  </defs>
+  <rect width="1140" height="800" fill="#FFFFFF"/>
+
+  <text x="36" y="42" font-size="21" font-weight="700" fill="#17241D">เส้นทางข้อมูลค่าไฟ · จาก PZEM ถึงไฟล์ Excel</text>
+  <text x="36" y="66" font-size="12.5" fill="#66766E">จุดสีแดงคือจุดที่พลาดแล้วตัวเลขผิดโดยไม่มีใครสังเกต</text>
+
+  <!-- 1 PZEM -->
+  <rect x="40" y="96" width="250" height="104" rx="10" fill="#EAF1F9" stroke="#4678B8" stroke-width="2"/>
+  <text x="165" y="122" font-size="14" font-weight="700" fill="#4678B8" text-anchor="middle">PZEM-004T v3.0</text>
+  <text x="165" y="144" font-size="11" fill="#17241D" text-anchor="middle">อ่านทุก 2 วินาที ได้ 6 ค่า</text>
+  <text x="165" y="163" font-size="10.5" fill="#66766E" text-anchor="middle">V · A · W · kWh สะสม · Hz · PF</text>
+  <text x="165" y="184" font-size="10.5" fill="#66766E" text-anchor="middle">ทุกคอลัมน์ในรายงานคิดต่อจาก 6 ค่านี้</text>
+
+  <path d="M290,148 L360,148" stroke="#0D7A4B" stroke-width="2.5" marker-end="url(#e1)"/>
+
+  <!-- 2 ESP32 -->
+  <rect x="364" y="96" width="250" height="104" rx="10" fill="#FFFFFF" stroke="#17241D" stroke-width="2"/>
+  <text x="489" y="122" font-size="14" font-weight="700" fill="#17241D" text-anchor="middle">ESP32 แอร์</text>
+  <text x="489" y="144" font-size="11" fill="#17241D" text-anchor="middle">ตัดสิน acRunning ด้วย hysteresis</text>
+  <text x="489" y="163" font-size="10.5" fill="#66766E" text-anchor="middle">ขึ้น: ≥30 W ×3 · ลง: ≤10 W ×3</text>
+  <text x="489" y="184" font-size="10.5" fill="#66766E" text-anchor="middle">ส่งข้อสรุป ไม่ส่งค่าดิบทุกครั้ง</text>
+
+  <path d="M614,148 L684,148" stroke="#0D7A4B" stroke-width="2.5" marker-end="url(#e1)"/>
+  <text x="618" y="140" font-size="10.5" fill="#0D7A4B">MQTT /status</text>
+
+  <!-- 3 mqtt.js -->
+  <rect x="688" y="96" width="410" height="150" rx="10" fill="#FCE8EB" stroke="#DC4C5C" stroke-width="2.5"/>
+  <text x="893" y="122" font-size="14" font-weight="700" fill="#DC4C5C" text-anchor="middle">services/mqtt.js · ลำดับห้ามสลับ</text>
+  <text x="704" y="148" font-size="11.5" fill="#17241D">1. อ่านค่าเดิมจาก air_conditioners</text>
+  <text x="704" y="170" font-size="11.5" fill="#17241D">2. เขียนค่าใหม่ทับ</text>
+  <text x="704" y="192" font-size="11.5" fill="#17241D">3. recordEnergySample({ previous, status })</text>
+  <text x="704" y="216" font-size="10.5" fill="#DC4C5C">ถ้าทับก่อน จะไม่เหลือค่าเดิมให้หาผลต่าง</text>
+  <text x="704" y="234" font-size="10.5" fill="#DC4C5C">consumption_kwh จะกลายเป็นเลขสะสมทั้งหมด</text>
+
+  <path d="M893,246 L893,286" stroke="#0D7A4B" stroke-width="2.5" marker-end="url(#e1)"/>
+
+  <!-- 4 delta -->
+  <rect x="620" y="288" width="478" height="150" rx="10" fill="#FFF0DC" stroke="#C97A1B" stroke-width="2"/>
+  <text x="859" y="314" font-size="14" font-weight="700" fill="#C97A1B" text-anchor="middle">buildSampleDelta() · กันข้อมูลเพี้ยน</text>
+  <text x="636" y="340" font-size="11.5" fill="#17241D">energyDelta() — เลขลดลง (บอร์ดรีเซ็ต) → นับเป็น 0</text>
+  <text x="636" y="360" font-size="11.5" fill="#17241D">              — กระโดดเกิน 50 kWh (อ่านผิด) → นับเป็น 0</text>
+  <text x="636" y="384" font-size="11.5" fill="#17241D">elapsedSeconds() — เพดาน 300 วินาที</text>
+  <text x="636" y="404" font-size="10.5" fill="#66766E">บอร์ดหายไป 3 ชั่วโมงแล้วกลับมา นับแค่ 5 นาที</text>
+  <text x="636" y="422" font-size="10.5" fill="#66766E">เพราะไม่รู้ว่าระหว่างนั้นแอร์ทำงานอยู่หรือเปล่า</text>
+
+  <path d="M616,364 L560,364" stroke="#0D7A4B" stroke-width="2.5" marker-end="url(#e1)"/>
+
+  <!-- 5 table -->
+  <rect x="40" y="288" width="516" height="196" rx="10" fill="#E3F3E9" stroke="#0D7A4B" stroke-width="2.5"/>
+  <text x="298" y="314" font-size="14" font-weight="700" fill="#0D7A4B" text-anchor="middle">energy_hourly · INSERT ... ON DUPLICATE KEY UPDATE</text>
+  <text x="56" y="340" font-size="11.5" fill="#17241D">PK (device_id, bucket_start) ทำให้ UPSERT ได้ในคำสั่งเดียว</text>
+  <text x="56" y="360" font-size="10.5" fill="#66766E">ถ้า SELECT ก่อนแล้วค่อยตัดสินใจ จะเกิด race condition</text>
+  <text x="56" y="384" font-size="11.5" font-weight="700" fill="#0D7A4B">เก็บผลรวม + ตัวนับ ไม่เก็บค่าเฉลี่ย</text>
+  <text x="56" y="404" font-size="11" fill="#17241D">เพราะค่าเฉลี่ยบวกกันไม่ได้</text>
+  <text x="56" y="422" font-size="10.5" fill="#66766E">220V จาก 100 ครั้ง + 230V จาก 10 ครั้ง ≠ 225</text>
+  <text x="56" y="438" font-size="10.5" fill="#66766E">= (220×100 + 230×10) / 110 = 220.9</text>
+  <text x="56" y="462" font-size="11" fill="#17241D">40 เครื่อง: 1,728,000 แถว/วัน → 960 แถว/วัน</text>
+
+  <path d="M298,484 L298,524" stroke="#0D7A4B" stroke-width="2.5" marker-end="url(#e1)"/>
+
+  <!-- 6 sql -->
+  <rect x="40" y="526" width="516" height="176" rx="10" fill="#FFFFFF" stroke="#DC4C5C" stroke-width="2.5"/>
+  <text x="298" y="552" font-size="14" font-weight="700" fill="#DC4C5C" text-anchor="middle">SQL สองชั้น · ห้ามรวมทีเดียว</text>
+  <text x="56" y="578" font-size="11.5" fill="#17241D">ชั้นใน  GROUP BY device_id, bucket_start</text>
+  <text x="56" y="598" font-size="11.5" fill="#17241D">ชั้นนอก GROUP BY ตามขอบเขตที่ผู้ใช้เลือก</text>
+  <text x="56" y="622" font-size="10.5" fill="#66766E">รวมทีเดียว = เครื่องที่เพิ่งติดตั้ง (100 ครั้ง) มีน้ำหนัก</text>
+  <text x="56" y="638" font-size="10.5" fill="#66766E">เท่ากับเครื่องที่ส่งมา 1,800 ครั้ง</text>
+  <text x="56" y="662" font-size="11" fill="#0D7A4B">SUM: kWh, W, A  (เป็นปริมาณ บวกกันได้)</text>
+  <text x="56" y="682" font-size="11" fill="#C97A1B">AVG: V, PF, Hz  (เป็นสภาพของระบบไฟ)</text>
+
+  <path d="M560,614 L620,614" stroke="#0D7A4B" stroke-width="2.5" marker-end="url(#e1)"/>
+
+  <!-- 7 xlsx -->
+  <rect x="624" y="460" width="474" height="242" rx="10" fill="#FFFFFF" stroke="#0D7A4B" stroke-width="2"/>
+  <text x="861" y="486" font-size="14" font-weight="700" fill="#0D7A4B" text-anchor="middle">routes/energy.js → xlsx-writer.js</text>
+  <text x="640" y="512" font-size="11.5" fill="#17241D">METRIC_CATALOG 16 ค่า · detailOnly ซ่อนค่าที่ไม่มีความหมาย</text>
+  <text x="640" y="532" font-size="10.5" fill="#66766E">แรงดันต่ำสุดของทั้งอาคาร = ของเครื่องไหนก็ไม่รู้</text>
+  <text x="640" y="558" font-size="11.5" fill="#17241D">เขียน .xlsx เองด้วย fflate</text>
+  <text x="640" y="576" font-size="10.5" fill="#66766E">.xlsx คือ zip ที่ข้างในเป็น XML หลายไฟล์ (OOXML)</text>
+  <text x="640" y="592" font-size="10.5" fill="#66766E">ใช้ inlineStr ไม่ใช้ sharedStrings ลดไฟล์ที่ต้องถูกต้อง</text>
+  <text x="640" y="616" font-size="11.5" fill="#17241D">DATE_FORMAT ส่งเวลาเป็นข้อความ</text>
+  <text x="640" y="634" font-size="10.5" fill="#DC4C5C">ถ้าให้ไดรเวอร์แปลงเป็น Date ชั่วโมงจะเลื่อนตาม TZ</text>
+  <text x="640" y="658" font-size="11.5" fill="#17241D">ชื่อไฟล์ไทย: filename*=UTF-8&apos;&apos; percent-encoded</text>
+  <text x="640" y="676" font-size="10.5" fill="#66766E">HTTP header รับเฉพาะ latin-1 ใส่ไทยตรง ๆ จะ ERR_INVALID_CHAR</text>
+  <text x="640" y="694" font-size="10.5" fill="#66766E">Android ไม่มีกล่องเลือกที่บันทึก จึงใช้เมนูแชร์แทน</text>
+
+  <!-- bucket note -->
+  <rect x="40" y="724" width="1058" height="56" rx="10" fill="#F5F8F6" stroke="#D7E2DB" stroke-width="1.5"/>
+  <text x="56" y="748" font-size="12.5" font-weight="700" fill="#17241D">การตัดถังใช้เวลาไทย ไม่ใช่ UTC</text>
+  <text x="56" y="768" font-size="11" fill="#66766E">เซิร์ฟเวอร์ตั้งเป็น UTC ถ้าตัดตาม UTC ชั่วโมง 09:00 ในรายงานจะเป็น 16:00 น. เวลาไทย — และดูเผิน ๆ เหมือนถูก จนกว่าจะมีคนเทียบกับเวลาจริง</text>
+</svg>

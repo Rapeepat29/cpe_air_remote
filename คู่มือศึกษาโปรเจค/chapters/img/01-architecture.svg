@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="830" viewBox="0 0 1120 830" font-family="Sarabun, Tahoma, 'Leelawadee UI', sans-serif">
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#66766E"/>
+    </marker>
+    <marker id="arg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#0D7A4B"/>
+    </marker>
+    <marker id="arb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4678B8"/>
+    </marker>
+  </defs>
+
+  <rect width="1120" height="830" fill="#FFFFFF"/>
+
+  <text x="40" y="46" font-size="22" font-weight="700" fill="#17241D">สถาปัตยกรรมระบบ RMUTT Save Energy</text>
+  <text x="40" y="70" font-size="13" fill="#66766E">เส้นทึบ = ใช้งานตลอดเวลา · เส้นประ = ใช้ครั้งเดียวตอนติดตั้ง</text>
+
+  <!-- App -->
+  <rect x="430" y="100" width="260" height="82" rx="12" fill="#E3F3E9" stroke="#0D7A4B" stroke-width="2"/>
+  <text x="560" y="130" font-size="16" font-weight="700" fill="#0D7A4B" text-anchor="middle">แอป Flutter</text>
+  <text x="560" y="152" font-size="12" fill="#17241D" text-anchor="middle">Android · Windows</text>
+  <text x="560" y="170" font-size="11" fill="#66766E" text-anchor="middle">ดูสถานะ สั่งงาน ตั้งค่า</text>
+
+  <!-- Backend -->
+  <rect x="400" y="262" width="320" height="112" rx="12" fill="#0D7A4B" stroke="#075D39" stroke-width="2"/>
+  <text x="560" y="292" font-size="16" font-weight="700" fill="#FFFFFF" text-anchor="middle">Node.js Backend (Express 5)</text>
+  <text x="560" y="315" font-size="11.5" fill="#CDF1D2" text-anchor="middle">REST API + JWT · ตัวคุมจังหวะปิดแอร์อัตโนมัติ</text>
+  <text x="560" y="334" font-size="11.5" fill="#CDF1D2" text-anchor="middle">บันทึกค่าไฟรายชั่วโมง · สร้างใบแจ้งเตือน</text>
+  <text x="560" y="357" font-size="11" fill="#9FD9B4" text-anchor="middle">ที่เดียวที่เห็นทั้งค่าไฟ คนในห้อง และตารางเรียน</text>
+
+  <!-- MariaDB -->
+  <rect x="800" y="252" width="270" height="58" rx="10" fill="#EAF1F9" stroke="#4678B8" stroke-width="2"/>
+  <text x="935" y="277" font-size="14" font-weight="700" fill="#4678B8" text-anchor="middle">MariaDB 11</text>
+  <text x="935" y="296" font-size="11" fill="#17241D" text-anchor="middle">8 ตาราง · InnoDB · utf8mb4</text>
+
+  <!-- SMTP -->
+  <rect x="800" y="326" width="270" height="48" rx="10" fill="#FFF0DC" stroke="#C97A1B" stroke-width="2"/>
+  <text x="935" y="348" font-size="13" font-weight="700" fill="#C97A1B" text-anchor="middle">SMTP</text>
+  <text x="935" y="365" font-size="11" fill="#17241D" text-anchor="middle">ส่ง OTP กู้รหัสผ่าน</text>
+
+  <!-- Broker -->
+  <rect x="410" y="452" width="300" height="76" rx="12" fill="#ECF3EF" stroke="#0D7A4B" stroke-width="2"/>
+  <text x="560" y="480" font-size="15" font-weight="700" fill="#0D7A4B" text-anchor="middle">Mosquitto MQTT Broker</text>
+  <text x="560" y="500" font-size="11" fill="#17241D" text-anchor="middle">MQTTS 8883 · Retained · Last Will</text>
+  <text x="560" y="518" font-size="11" fill="#66766E" text-anchor="middle">ACL: rmutt/ac/# และ rmutt/occupancy/#</text>
+
+  <!-- ESP32 air -->
+  <rect x="120" y="606" width="300" height="104" rx="12" fill="#FFFFFF" stroke="#17241D" stroke-width="2"/>
+  <text x="270" y="633" font-size="14.5" font-weight="700" fill="#17241D" text-anchor="middle">ESP32 แอร์</text>
+  <text x="270" y="653" font-size="11" fill="#66766E" text-anchor="middle">ESP32-&lt;MAC 12 หลัก&gt;</text>
+  <text x="270" y="675" font-size="11" fill="#17241D" text-anchor="middle">1 ตัวต่อแอร์ 1 เครื่อง</text>
+  <text x="270" y="694" font-size="11" fill="#17241D" text-anchor="middle">ตัดสินเองว่าแอร์ทำงานจริงไหม</text>
+
+  <!-- ESP32 room -->
+  <rect x="700" y="606" width="300" height="104" rx="12" fill="#FFFFFF" stroke="#17241D" stroke-width="2"/>
+  <text x="850" y="633" font-size="14.5" font-weight="700" fill="#17241D" text-anchor="middle">ESP32 ห้อง</text>
+  <text x="850" y="653" font-size="11" fill="#66766E" text-anchor="middle">OCC32-&lt;MAC 12 หลัก&gt;</text>
+  <text x="850" y="675" font-size="11" fill="#17241D" text-anchor="middle">1 ตัวต่อห้อง 1 ห้อง</text>
+  <text x="850" y="694" font-size="11" fill="#17241D" text-anchor="middle">ตัดสินเองว่ามีคนไหม</text>
+
+  <!-- peripherals -->
+  <rect x="40" y="754" width="200" height="50" rx="10" fill="#FCE8EB" stroke="#DC4C5C" stroke-width="2"/>
+  <text x="140" y="775" font-size="12.5" font-weight="700" fill="#DC4C5C" text-anchor="middle">เครื่องปรับอากาศ</text>
+  <text x="140" y="793" font-size="10.5" fill="#17241D" text-anchor="middle">รับสัญญาณ IR อย่างเดียว</text>
+
+  <rect x="268" y="754" width="200" height="50" rx="10" fill="#EAF1F9" stroke="#4678B8" stroke-width="2"/>
+  <text x="368" y="775" font-size="12.5" font-weight="700" fill="#4678B8" text-anchor="middle">PZEM-004T v3.0</text>
+  <text x="368" y="793" font-size="10.5" fill="#17241D" text-anchor="middle">วัดไฟ 6 ค่าที่สายเมน</text>
+
+  <rect x="750" y="754" width="200" height="50" rx="10" fill="#FFF0DC" stroke="#C97A1B" stroke-width="2"/>
+  <text x="850" y="775" font-size="12.5" font-weight="700" fill="#C97A1B" text-anchor="middle">HLK-LD2410</text>
+  <text x="850" y="793" font-size="10.5" fill="#17241D" text-anchor="middle">เรดาร์ 24 GHz ตรวจคน</text>
+
+  <!-- arrows: app -> backend -->
+  <path d="M560,182 L560,258" stroke="#0D7A4B" stroke-width="2.5" fill="none" marker-end="url(#arg)"/>
+  <rect x="566" y="204" width="140" height="20" rx="4" fill="#FFFFFF"/>
+  <text x="572" y="219" font-size="11.5" font-weight="600" fill="#0D7A4B">HTTPS + JWT</text>
+
+  <!-- backend <-> mariadb -->
+  <path d="M724,296 L796,290" stroke="#4678B8" stroke-width="2.5" fill="none" marker-end="url(#arb)" marker-start="url(#arb)"/>
+  <!-- backend -> smtp -->
+  <path d="M724,348 L796,350" stroke="#66766E" stroke-width="2" fill="none" marker-end="url(#ar)"/>
+
+  <!-- backend <-> broker -->
+  <path d="M560,378 L560,448" stroke="#0D7A4B" stroke-width="2.5" fill="none" marker-end="url(#arg)" marker-start="url(#arg)"/>
+  <rect x="566" y="400" width="70" height="20" rx="4" fill="#FFFFFF"/>
+  <text x="572" y="415" font-size="11.5" font-weight="600" fill="#0D7A4B">MQTTS</text>
+
+  <!-- broker <-> esp32 air -->
+  <path d="M440,530 L300,602" stroke="#0D7A4B" stroke-width="2.5" fill="none" marker-end="url(#arg)" marker-start="url(#arg)"/>
+  <!-- broker <-> esp32 room -->
+  <path d="M680,530 L820,602" stroke="#0D7A4B" stroke-width="2.5" fill="none" marker-end="url(#arg)" marker-start="url(#arg)"/>
+
+  <!-- BLE dashed app -> boards -->
+  <path d="M430,150 C180,190 96,330 150,602" stroke="#C97A1B" stroke-width="2.5" fill="none" stroke-dasharray="8 6" marker-end="url(#ar)"/>
+  <text x="62" y="330" font-size="12" font-weight="700" fill="#C97A1B">BLE</text>
+  <text x="30" y="350" font-size="10.5" fill="#C97A1B">ตั้งค่าครั้งแรก</text>
+
+  <path d="M690,150 C950,190 1046,330 976,602" stroke="#C97A1B" stroke-width="2.5" fill="none" stroke-dasharray="8 6" marker-end="url(#ar)"/>
+  <text x="1042" y="330" font-size="12" font-weight="700" fill="#C97A1B">BLE</text>
+  <text x="1016" y="350" font-size="10.5" fill="#C97A1B">ตั้งค่าครั้งแรก</text>
+
+  <!-- esp32 air -> AC (IR) -->
+  <path d="M200,714 L150,750" stroke="#DC4C5C" stroke-width="2.5" fill="none" marker-end="url(#ar)"/>
+  <text x="104" y="736" font-size="11" font-weight="700" fill="#DC4C5C">IR</text>
+  <!-- PZEM -> esp32 air -->
+  <path d="M368,750 L330,714" stroke="#4678B8" stroke-width="2.5" fill="none" marker-end="url(#arb)"/>
+  <text x="378" y="734" font-size="11" font-weight="700" fill="#4678B8">UART</text>
+  <!-- LD2410 -> esp32 room -->
+  <path d="M850,750 L850,714" stroke="#C97A1B" stroke-width="2.5" fill="none" marker-end="url(#ar)"/>
+  <text x="860" y="736" font-size="11" font-weight="700" fill="#C97A1B">UART 256000</text>
+
+  <!-- note -->
+  <rect x="40" y="410" width="330" height="118" rx="10" fill="#F5F8F6" stroke="#D7E2DB" stroke-width="1.5"/>
+  <text x="56" y="434" font-size="12.5" font-weight="700" fill="#17241D">ทำไมตรรกะอยู่ที่ Backend</text>
+  <text x="56" y="456" font-size="11" fill="#66766E">ESP32 แอร์ รู้แค่ว่าแอร์กินไฟไหม</text>
+  <text x="56" y="474" font-size="11" fill="#66766E">ESP32 ห้อง รู้แค่ว่ามีคนไหม</text>
+  <text x="56" y="492" font-size="11" fill="#66766E">สองบอร์ดคุยกันเองไม่ได้</text>
+  <text x="56" y="512" font-size="11" fill="#17241D">Backend เห็นทั้งสองฝั่ง จึงเป็นคนตัดสิน</text>
+</svg>
