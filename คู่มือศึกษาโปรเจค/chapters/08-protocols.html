@@ -483,7 +483,7 @@
 - ACL ของบอร์ดแอร์ (<code>DEVICE_KINDS.air</code>): <strong>publish</strong> ได้เฉพาะ <code>state, status, provision, provision-ack, history</code> และ <strong>subscribe</strong> ได้เฉพาะ <code>command, provision-ack, schedule-status, history-ack</code> ของ <strong>ตัวเองเท่านั้น</strong>
 - ACL ของบอร์ดตรวจคน: publish <code>status, provision, provision-ack</code> / subscribe <code>command, provision-ack</code>
 - Backend ใช้ role <code>rmutt-backend</code> ที่ publish/subscribe <code>rmutt/ac/#</code> และ <code>rmutt/occupancy/#</code> ได้ (<code>backendAcls</code>)
-- <code>reconcileAccounts()</code> รันทุกครั้งที่ Backend ต่อ Broker ได้ (ผ่าน <code>onMqttConnected</code>): ให้สิทธิ์ Backend แล้วสร้างบัญชีให้ทุกบอร์ดที่ยังไม่ <code>removed</code> ถ้าไฟล์ <code>dynamic-security.json</code> หายหรือย้ายเซิร์ฟเวอร์ บอร์ดเดิมจะกลับมาต่อได้เอง
+- <code>reconcileAccounts()</code> รันทุกครั้งที่ Backend ต่อ Broker ได้ (ผ่าน <code>onMqttConnected</code>): ให้สิทธิ์ Backend แล้วสร้างบัญชีให้ทุกบอร์ดที่อยู่ในฐานข้อมูล (บอร์ดที่ถูกถอดถูกลบแถวไปแล้ว) ถ้าไฟล์ <code>dynamic-security.json</code> หายหรือย้ายเซิร์ฟเวอร์ บอร์ดเดิมจะกลับมาต่อได้เอง
 - ตอนจองช่อง (<code>prepareDeviceCredentials</code>) ใช้ <code>repair: true</code> เพื่อให้รหัส/client ID ตรงกับที่จะส่งให้บอร์ด (บอร์ดที่ออนไลน์อยู่จะถูกเตะหนึ่งครั้งแล้วต่อกลับเองใน 3 วินาที)
 - ตอนลบอุปกรณ์: <code>removeDeviceCommands</code> ลบ client และ role</p>
 <p>โหมด <code>shared</code> (ค่าเริ่มต้นของ config ถ้าไม่ตั้ง) = ทุกบอร์ดใช้บัญชีเดียวกับ Backend ใช้ตอนพัฒนาเท่านั้น (config.js จะพิมพ์คำเตือน)</p>

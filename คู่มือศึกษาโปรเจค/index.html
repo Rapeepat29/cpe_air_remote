@@ -78,7 +78,17 @@
   </div>
 </section>
 
-<div class="callout note"><div class="callout-title">อัปเดตล่าสุด · 14 ต.ค. 2569 (บทใหม่ 20)</div>
+<div class="callout note"><div class="callout-title">อัปเดตล่าสุด · 15 ต.ค. 2569 (ลบส่วนที่ไม่ใช้ออกจากฐานข้อมูล)</div>
+<p>หลังเขียนบท 20 ได้ลบสองส่วนที่โค้ดไม่ใช้แล้วออกจากฐานข้อมูลจริง (GitHub PR #8) และปรับคู่มือตาม:</p>
+<ul>
+<li><b>ลบคอลัมน์ <code>rooms.is_active</code></b> ไม่มีโค้ดไหนตั้งเป็น FALSE (ลบห้อง = <code>DELETE</code> จริง) เอาเงื่อนไขออกจาก query ทุกจุด index เปลี่ยนเป็น <code>idx_rooms_floor_order</code> (บท 5, 6, 20)</li>
+<li><b>ลบค่า <code>removed</code> ของ <code>provision_status</code></b> ถอดอุปกรณ์ = ลบแถว + <code>unprovision</code> ตอนนี้ ENUM เหลือ <code>reserved</code>/<code>active</code> ลบห้องไม่ต้องล้างแถว removed ก่อนแล้ว (บท 5, 6, 7, 8, 20)</li>
+<li><b>สคริปต์ใหม่ <code>migrate-drop-unused.js</code></b> (<code>npm run db:migrate:cleanup</code>, มี <code>--dry-run</code>) รันซ้ำได้ <code>update-remote.sh</code> เรียกให้เองหลัง Backend รุ่นใหม่ขึ้น (บท 5, 14, 18)</li>
+<li><b>วิธีอัปเดตเซิร์ฟเวอร์อย่างปลอดภัย</b>: สำรองด้วย <code>backup-db.sh</code> ก่อนเสมอ, วิธีเช็กทรัพยากรเซิร์ฟเวอร์ (RAM/ดิสก์/CPU/<code>docker stats</code>) และแก้ error "running scripts is disabled" ของ PowerShell (บท 14)</li>
+<li>แอปและบอร์ดไม่ต้อง build/แฟลชใหม่ เพราะ API ส่งข้อมูลรูปแบบเดิม · เทสต์ Backend 136 ผ่านทั้งหมด</li>
+</ul></div>
+
+<div class="callout note"><div class="callout-title">อัปเดตก่อนหน้า · 14 ต.ค. 2569 (บทใหม่ 20)</div>
 <ul>
 <li><b>บทใหม่ 20: เจาะลึกการออกแบบฐานข้อมูล</b> (ทำไม จำเป็นไหม ทำแบบอื่นได้ไหม) ทุกตารางทุกคอลัมน์ว่าทำไมออกแบบแบบนี้ จำเป็นแค่ไหน (ขาดไม่ได้ / ควรมี / ไว้ดู / เหลือจากรุ่นเก่า) ตรวจจากโค้ดจริงว่าคอลัมน์ไหนถูกอ่านไปตัดสินอะไร และทางเลือกอื่นพร้อมเหตุผลที่ไม่เลือก</li>
 <li>พบคอลัมน์ที่ไม่ได้ใช้แล้ว เช่น <code>rooms.is_active</code> และสถานะ <code>removed</code> ของอุปกรณ์ อธิบายไว้ในบทพร้อมวิธีตอบอาจารย์</li>

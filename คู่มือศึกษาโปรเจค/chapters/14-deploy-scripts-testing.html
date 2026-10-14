@@ -1338,6 +1338,8 @@ docker<span class="w"> </span>compose<span class="w"> </span>restart<span class=
 </div>
 
 <p>รัน migration 6 ตัวตามลำดับ (<code>energy-history-v370</code>, <code>auto-off-v380</code>, <code>system-settings-v3100</code>, <code>firmware-v3140</code>, <code>offline-history-v3150</code>, <code>drop-unused</code>) แล้ว <code>doctor.js --fix</code> (เทียบกับ <code>database/schema.sql</code> และเติมตาราง/คอลัมน์ที่ขาด) <strong>หัวใจคือ idempotent</strong> ทุกสคริปต์ตรวจก่อนว่ามีอยู่แล้วหรือยัง จึงรันซ้ำทุกครั้งได้ ไม่ต้องจำว่ารอบนี้ต้องรันตัวไหน <code>-T</code> จำเป็นเพราะ SSH แบบสั่งคำสั่งเดียวไม่มี terminal บรรทัด 95 ก๊อปใบรับรองเผื่อต่ออายุระหว่างนั้น (ล้มเหลวได้เพราะไม่ใช่ root จึงแค่เตือน) บรรทัด 98 รีสตาร์ทให้ Backend รู้จักตารางใหม่</p>
+<div class="callout warn"><div class="callout-title">ระวัง</div><p><strong>สำรองฐานข้อมูลเองก่อนอัปเดตทุกครั้ง</strong> <code>update-remote.sh</code> ไม่ได้สำรองให้ก่อน migrate ส่วน backup อัตโนมัติรันแค่ตอนตี 2:30 ปกติ migration ทุกตัวแค่ "เพิ่ม" ตาราง/คอลัมน์ ถ้าพลาดก็ไม่เสียข้อมูล แต่ <code>migrate-drop-unused.js</code> (14 ต.ค. 2569) <strong>ลบ</strong> คอลัมน์และแถวจริง จึงควร ssh เข้าเครื่องแล้วรัน <code>cd /opt/rmutt &amp;&amp; bash backup-db.sh</code> ก่อน แล้วตรวจว่าไฟล์ครบด้วย <code>zcat backups/&lt;ไฟล์ล่าสุด&gt;.sql.gz | grep -c "CREATE TABLE"</code> (ควรได้อย่างน้อย 11 ตามจำนวนตารางใน <code>schema.sql</code>) ถ้ามีปัญหาหลังอัปเดต กู้คืนได้ตามหัวข้อ "สำรองข้อมูล" ด้านล่าง</p></div>
+
 <p><strong>บรรทัด 111–123 (ขั้น 5: โหลด Caddy ใหม่ และสร้างกล่อง tailscale ใหม่) ของ <code>deploy/update-remote.sh</code></strong></p>
 <div class="code-block"><span class="code-lang">bash</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">111</span>
 <span class="normal">112</span>
@@ -1945,6 +1947,18 @@ chmod<span class="w"> </span><span class="m">600</span><span class="w"> </span><
 </ul>
 <h3 id="ตรวจสุขภาพ-apihealth">ตรวจสุขภาพ (<code>/api/health</code>)<a class="anchor" href="#ตรวจสุขภาพ-apihealth">#</a></h3>
 <p><code>curl -s https://&lt;โดเมน&gt;/api/health</code> ต้องเห็น <code>"status":"ok"</code>, <code>"connected":true</code> (Backend ต่อ broker อยู่) และ <code>"deviceAuth":"dynsec"</code> (โหมดบัญชีแยกต่อบอร์ด) endpoint นี้ (นิยามใน <code>backend/src/app.js</code>) ไม่ต้องล็อกอิน และรัน <code>SELECT 1</code> ถาม DB ด้วย จึงยืนยันได้ทั้ง API และฐานข้อมูล บนเซิร์ฟเวอร์จริง (<code>config.env === 'production'</code>) จะไม่บอกที่อยู่ broker หรือข้อความ error ภายในให้คนนอกเห็น (ตอน dev ได้รายละเอียดครบ ซึ่ง <code>check_system.ps1</code>/<code>diagnose.ps1</code> ใช้) docker compose ก็ใช้ URL นี้เป็น healthcheck ของ backend เอง DEPLOY.md แนะนำให้ตั้ง UptimeRobot (หรือระบบ monitor ของมหาวิทยาลัย) เรียกทุก 5 นาที และแจ้งเตือนเมื่อไม่ได้ <code>"connected":true</code></p>
+<h3 id="เช็กทรัพยากรเซิร์ฟเวอร์">เช็กทรัพยากรเซิร์ฟเวอร์<a class="anchor" href="#เช็กทรัพยากรเซิร์ฟเวอร์">#</a></h3>
+<p>ssh เข้าเครื่องแล้วใช้คำสั่งพื้นฐานของ Linux ไม่ต้องติดตั้งอะไรเพิ่ม</p>
+<div class="code-block"><span class="code-lang">bash</span><div class="hl"><pre><span></span><code>free<span class="w"> </span>-h<span class="w">                  </span><span class="c1"># RAM: ดูช่อง available (ที่ยังใช้ได้จริง รวม cache ที่คืนได้)</span>
+df<span class="w"> </span>-h<span class="w"> </span>/<span class="w">                  </span><span class="c1"># ดิสก์: ดู Use% ถ้าเกิน ~85% ควรเคลียร์</span>
+uptime<span class="w">                   </span><span class="c1"># load average 1/5/15 นาที เทียบกับจำนวน core</span>
+nproc<span class="w">                    </span><span class="c1"># จำนวน CPU core</span>
+docker<span class="w"> </span>stats<span class="w"> </span>--no-stream<span class="w"> </span><span class="c1"># CPU/RAM ของแต่ละกล่อง (db มักใช้ RAM มากสุด)</span>
+docker<span class="w"> </span>system<span class="w"> </span>df<span class="w">         </span><span class="c1"># พื้นที่ที่ image/volume/cache ของ Docker ใช้</span>
+</code></pre></div>
+</div>
+
+<p><strong>อ่านค่าอย่างไร:</strong> load average ต่ำกว่าจำนวน core = CPU ว่าง, <code>available</code> ของ RAM สำคัญกว่า <code>free</code> (Linux เอา RAM ว่างไปทำ cache แล้วคืนให้เมื่อโปรแกรมต้องการ), Swap ที่แทบไม่ถูกใช้แปลว่า RAM ไม่ตึง ตัวอย่างจากเครื่องจริง 14 ต.ค. 2569: RAM 3.8 GiB ใช้ 870 MiB (available 3.0 GiB), ดิสก์ 30 GB ใช้ 40%, 2 core load 0.58 แปลว่ายังเหลือมาก ถ้าดิสก์ใกล้เต็ม ลบได้อย่างปลอดภัยด้วย <code>docker image prune -f</code> และ <code>docker builder prune -f</code> แต่ <strong>ห้าม</strong> <code>docker volume prune</code> เพราะฐานข้อมูลอยู่ใน volume</p>
 <h3 id="ดู-log-และสถานะ">ดู log และสถานะ<a class="anchor" href="#ดู-log-และสถานะ">#</a></h3>
 <div class="code-block"><span class="code-lang">bash</span><div class="hl"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>/opt/rmutt
 docker<span class="w"> </span>compose<span class="w"> </span>ps<span class="w">                      </span><span class="c1"># สถานะ/health ของทุก service</span>
@@ -2016,6 +2030,11 @@ tail<span class="w"> </span>/var/log/rmutt-cert.log<span class="w">           </
 <td>อัปโหลดเฟิร์มแวร์จากเว็บแล้วขึ้น "Backend เขียนโฟลเดอร์ firmware ไม่ได้" (เพิ่ม 14 ต.ค. 2569)</td>
 <td>โฟลเดอร์ <code>/opt/rmutt/firmware</code> ไม่ใช่ของ uid 1000 หรือ <code>docker-compose.yml</code> บนเครื่องยังเป็น <code>:ro</code></td>
 <td><code>sudo chown 1000:1000 /opt/rmutt/firmware</code> แล้วอัปเดตด้วย <code>update-server.ps1</code> (สคริปต์แก้สิทธิ์ให้เองถ้าทำได้)</td>
+</tr>
+<tr>
+<td><code>update-server.ps1</code> / <code>npm</code> ขึ้น <code>cannot be loaded because running scripts is disabled on this system</code> (เพิ่ม 15 ต.ค. 2569)</td>
+<td>Windows ตั้ง Execution Policy ไม่ให้รันสคริปต์ <code>.ps1</code> (ค่าเริ่มต้น) หรือเคยตั้งแบบ <code>-Scope Process</code> ซึ่งหายเมื่อปิดหน้าต่าง</td>
+<td>ตั้งครั้งเดียวต่อบัญชี: <code>Set-ExecutionPolicy -Scope CurrentUser RemoteSigned</code> หรือเฉพาะครั้งนั้น: <code>powershell -ExecutionPolicy Bypass -File .\update-server.ps1</code></td>
 </tr>
 <tr>
 <td>พิมพ์ <code>.\deploy\update-server.ps1</code> แล้วเปิด Notepad</td>
