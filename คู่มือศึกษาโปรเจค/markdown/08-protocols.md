@@ -296,7 +296,7 @@ LWT ของบอร์ดตรวจคน: `{"online":false,"deviceId":"OCC
 - ACL ของบอร์ดแอร์ (`DEVICE_KINDS.air`): **publish** ได้เฉพาะ `state, status, provision, provision-ack, history` และ **subscribe** ได้เฉพาะ `command, provision-ack, schedule-status, history-ack` ของ **ตัวเองเท่านั้น**
 - ACL ของบอร์ดตรวจคน: publish `status, provision, provision-ack` / subscribe `command, provision-ack`
 - Backend ใช้ role `rmutt-backend` ที่ publish/subscribe `rmutt/ac/#` และ `rmutt/occupancy/#` ได้ (`backendAcls`)
-- `reconcileAccounts()` รันทุกครั้งที่ Backend ต่อ Broker ได้ (ผ่าน `onMqttConnected`): ให้สิทธิ์ Backend แล้วสร้างบัญชีให้ทุกบอร์ดที่ยังไม่ `removed` ถ้าไฟล์ `dynamic-security.json` หายหรือย้ายเซิร์ฟเวอร์ บอร์ดเดิมจะกลับมาต่อได้เอง
+- `reconcileAccounts()` รันทุกครั้งที่ Backend ต่อ Broker ได้ (ผ่าน `onMqttConnected`): ให้สิทธิ์ Backend แล้วสร้างบัญชีให้ทุกบอร์ดที่อยู่ในฐานข้อมูล (บอร์ดที่ถูกถอดถูกลบแถวไปแล้ว) ถ้าไฟล์ `dynamic-security.json` หายหรือย้ายเซิร์ฟเวอร์ บอร์ดเดิมจะกลับมาต่อได้เอง
 - ตอนจองช่อง (`prepareDeviceCredentials`) ใช้ `repair: true` เพื่อให้รหัส/client ID ตรงกับที่จะส่งให้บอร์ด (บอร์ดที่ออนไลน์อยู่จะถูกเตะหนึ่งครั้งแล้วต่อกลับเองใน 3 วินาที)
 - ตอนลบอุปกรณ์: `removeDeviceCommands` ลบ client และ role
 

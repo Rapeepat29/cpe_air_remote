@@ -823,6 +823,9 @@ docker compose restart backend || fail 'รีสตาร์ทไม่สำ�
 
 รัน migration 6 ตัวตามลำดับ (`energy-history-v370`, `auto-off-v380`, `system-settings-v3100`, `firmware-v3140`, `offline-history-v3150`, `drop-unused`) แล้ว `doctor.js --fix` (เทียบกับ `database/schema.sql` และเติมตาราง/คอลัมน์ที่ขาด) **หัวใจคือ idempotent** ทุกสคริปต์ตรวจก่อนว่ามีอยู่แล้วหรือยัง จึงรันซ้ำทุกครั้งได้ ไม่ต้องจำว่ารอบนี้ต้องรันตัวไหน `-T` จำเป็นเพราะ SSH แบบสั่งคำสั่งเดียวไม่มี terminal บรรทัด 95 ก๊อปใบรับรองเผื่อต่ออายุระหว่างนั้น (ล้มเหลวได้เพราะไม่ใช่ root จึงแค่เตือน) บรรทัด 98 รีสตาร์ทให้ Backend รู้จักตารางใหม่
 
+> [!WARN]
+> **สำรองฐานข้อมูลเองก่อนอัปเดตทุกครั้ง** `update-remote.sh` ไม่ได้สำรองให้ก่อน migrate ส่วน backup อัตโนมัติรันแค่ตอนตี 2:30 ปกติ migration ทุกตัวแค่ "เพิ่ม" ตาราง/คอลัมน์ ถ้าพลาดก็ไม่เสียข้อมูล แต่ `migrate-drop-unused.js` (14 ต.ค. 2569) **ลบ** คอลัมน์และแถวจริง จึงควร ssh เข้าเครื่องแล้วรัน `cd /opt/rmutt && bash backup-db.sh` ก่อน แล้วตรวจว่าไฟล์ครบด้วย `zcat backups/<ไฟล์ล่าสุด>.sql.gz | grep -c "CREATE TABLE"` (ควรได้อย่างน้อย 11 ตามจำนวนตารางใน `schema.sql`) ถ้ามีปัญหาหลังอัปเดต กู้คืนได้ตามหัวข้อ "สำรองข้อมูล" ด้านล่าง
+
 **บรรทัด 111–123 (ขั้น 5: โหลด Caddy ใหม่ และสร้างกล่อง tailscale ใหม่) ของ `deploy/update-remote.sh`**
 
 ```bash:111
@@ -1199,6 +1202,21 @@ $encoding = New-Object System.Text.UTF8Encoding($false)
 
 `curl -s https://<โดเมน>/api/health` ต้องเห็น `"status":"ok"`, `"connected":true` (Backend ต่อ broker อยู่) และ `"deviceAuth":"dynsec"` (โหมดบัญชีแยกต่อบอร์ด) endpoint นี้ (นิยามใน `backend/src/app.js`) ไม่ต้องล็อกอิน และรัน `SELECT 1` ถาม DB ด้วย จึงยืนยันได้ทั้ง API และฐานข้อมูล บนเซิร์ฟเวอร์จริง (`config.env === 'production'`) จะไม่บอกที่อยู่ broker หรือข้อความ error ภายในให้คนนอกเห็น (ตอน dev ได้รายละเอียดครบ ซึ่ง `check_system.ps1`/`diagnose.ps1` ใช้) docker compose ก็ใช้ URL นี้เป็น healthcheck ของ backend เอง DEPLOY.md แนะนำให้ตั้ง UptimeRobot (หรือระบบ monitor ของมหาวิทยาลัย) เรียกทุก 5 นาที และแจ้งเตือนเมื่อไม่ได้ `"connected":true`
 
+### เช็กทรัพยากรเซิร์ฟเวอร์
+
+ssh เข้าเครื่องแล้วใช้คำสั่งพื้นฐานของ Linux ไม่ต้องติดตั้งอะไรเพิ่ม
+
+```bash
+free -h                  # RAM: ดูช่อง available (ที่ยังใช้ได้จริง รวม cache ที่คืนได้)
+df -h /                  # ดิสก์: ดู Use% ถ้าเกิน ~85% ควรเคลียร์
+uptime                   # load average 1/5/15 นาที เทียบกับจำนวน core
+nproc                    # จำนวน CPU core
+docker stats --no-stream # CPU/RAM ของแต่ละกล่อง (db มักใช้ RAM มากสุด)
+docker system df         # พื้นที่ที่ image/volume/cache ของ Docker ใช้
+```
+
+**อ่านค่าอย่างไร:** load average ต่ำกว่าจำนวน core = CPU ว่าง, `available` ของ RAM สำคัญกว่า `free` (Linux เอา RAM ว่างไปทำ cache แล้วคืนให้เมื่อโปรแกรมต้องการ), Swap ที่แทบไม่ถูกใช้แปลว่า RAM ไม่ตึง ตัวอย่างจากเครื่องจริง 14 ต.ค. 2569: RAM 3.8 GiB ใช้ 870 MiB (available 3.0 GiB), ดิสก์ 30 GB ใช้ 40%, 2 core load 0.58 แปลว่ายังเหลือมาก ถ้าดิสก์ใกล้เต็ม ลบได้อย่างปลอดภัยด้วย `docker image prune -f` และ `docker builder prune -f` แต่ **ห้าม** `docker volume prune` เพราะฐานข้อมูลอยู่ใน volume
+
 ### ดู log และสถานะ
 
 ```bash
@@ -1226,6 +1244,7 @@ tail /var/log/rmutt-cert.log           # ผลก๊อปใบรับรอ
 | `init-env.sh` ใหม่แล้ว Backend ต่อ DB ไม่ได้ | รหัส DB ใหม่ใช้กับฐานข้อมูลที่สร้างไปแล้วไม่ได้ (MariaDB ตั้ง user ครั้งเดียว) | คืน `.env` จากไฟล์ `.env.bak-*` หรือแก้ `.env` เอง |
 | `docker: permission denied` | ผู้ใช้ยังไม่อยู่กลุ่ม docker (หรือยังไม่ล็อกอินใหม่) | ออกจาก SSH แล้วเข้าใหม่ |
 | อัปโหลดเฟิร์มแวร์จากเว็บแล้วขึ้น "Backend เขียนโฟลเดอร์ firmware ไม่ได้" (เพิ่ม 14 ต.ค. 2569) | โฟลเดอร์ `/opt/rmutt/firmware` ไม่ใช่ของ uid 1000 หรือ `docker-compose.yml` บนเครื่องยังเป็น `:ro` | `sudo chown 1000:1000 /opt/rmutt/firmware` แล้วอัปเดตด้วย `update-server.ps1` (สคริปต์แก้สิทธิ์ให้เองถ้าทำได้) |
+| `update-server.ps1` / `npm` ขึ้น `cannot be loaded because running scripts is disabled on this system` (เพิ่ม 15 ต.ค. 2569) | Windows ตั้ง Execution Policy ไม่ให้รันสคริปต์ `.ps1` (ค่าเริ่มต้น) หรือเคยตั้งแบบ `-Scope Process` ซึ่งหายเมื่อปิดหน้าต่าง | ตั้งครั้งเดียวต่อบัญชี: `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` หรือเฉพาะครั้งนั้น: `powershell -ExecutionPolicy Bypass -File .\update-server.ps1` |
 | พิมพ์ `.\deploy\update-server.ps1` แล้วเปิด Notepad | รันใน Command Prompt ไม่ใช่ PowerShell | `powershell -ExecutionPolicy Bypass -File .\deploy\update-server.ps1` หรือเปิด PowerShell |
 | API ตอบ 404 ที่เส้นทางใหม่ | ยังไม่ได้อัปเดตโค้ดบนเซิร์ฟเวอร์ | `.\deploy\update-server.ps1` (ตรวจ 401/404 ท้ายสคริปต์) |
 | local: ESP32 ไม่ขึ้นในแอป | IP เครื่องเปลี่ยน / Firewall ปิดพอร์ต 1883 / ACL ขาด | `.\diagnose.ps1` แล้วอ่านทีละขั้น, `.\run_all.ps1` ซ่อม `MQTT_URL` และ ACL |

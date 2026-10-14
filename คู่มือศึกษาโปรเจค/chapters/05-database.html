@@ -843,7 +843,7 @@ JWT ที่ออกให้ตอนล็อกอินบรรจุ <co
 
 <p><strong>ใครอ่าน/เขียน:</strong> <code>routes/rooms.js</code> (CRUD ห้อง ลบห้องใน transaction พร้อม <code>FOR UPDATE</code>), <code>routes/schedules.js</code> (นำเข้าตารางเรียนแล้วสร้างห้องที่ยังไม่มีด้วย <code>ON DUPLICATE KEY UPDATE</code>), และถูก JOIN ใน <code>routes/air-conditioners.js</code>, <code>routes/occupancy-sensors.js</code>, <code>routes/bookings.js</code>, <code>routes/energy.js</code></p>
 <div class="callout tip"><div class="callout-title">เคล็ดลับ</div><p><strong>ทำไมลบห้องแล้วได้ข้อความภาษาไทยแทน error ของ FK</strong>
-<code>routes/rooms.js</code> ไม่ปล่อยให้ชน <code>ON DELETE RESTRICT</code> เอง แต่ภายใน transaction จะลบอุปกรณ์ที่สถานะ <code>removed</code> ทิ้งก่อน แล้วนับแอร์/ตารางเรียน/เซ็นเซอร์ที่ยังผูกอยู่ ถ้ายังมีจะตอบ 409 พร้อมบอกจำนวน FK จึงเป็น "ด่านสุดท้าย" กันพลาด ส่วนโค้ดเป็นด่านแรกที่สื่อสารกับผู้ใช้</p></div>
+<code>routes/rooms.js</code> ไม่ปล่อยให้ชน <code>ON DELETE RESTRICT</code> เอง แต่ภายใน transaction จะนับแอร์/ตารางเรียน/เซ็นเซอร์ที่ยังผูกอยู่ก่อน ถ้ายังมีจะตอบ 409 พร้อมบอกจำนวน FK จึงเป็น "ด่านสุดท้าย" กันพลาด ส่วนโค้ดเป็นด่านแรกที่สื่อสารกับผู้ใช้</p></div>
 
 <h3 id="ตาราง-class_schedules--ตารางเรียน">ตาราง class_schedules — ตารางเรียน<a class="anchor" href="#ตาราง-class_schedules--ตารางเรียน">#</a></h3>
 <p>ไฟล์: <code>backend/database/schema.sql</code></p>
