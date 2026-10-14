@@ -58,6 +58,9 @@
 <div class="nav-part">งานที่กำลังพัฒนา</div><ul>
 <li><a href="chapters/19-daikin-slm8.html"><span class="num">19</span>แอร์ Daikin ผ่านสาย SLM8: จากการแกะโปรโตคอลถึงบอร์ดสายแอร์</a></li>
 </ul>
+<div class="nav-part">เจาะลึก</div><ul>
+<li><a href="chapters/20-database-design.html"><span class="num">20</span>เจาะลึกการออกแบบฐานข้อมูล</a></li>
+</ul>
     </nav>
   </aside>
   <main class="content" id="content">
@@ -68,14 +71,20 @@
   คู่มือนี้อธิบายตั้งแต่แนวคิด เครือข่าย เซิร์ฟเวอร์ ฐานข้อมูล Backend โปรโตคอล เฟิร์มแวร์ แอปมือถือ เว็บแอป จนถึงการติดตั้งจริงและความปลอดภัย
   ทุกไฟล์ในโปรเจคมีคำอธิบาย และโค้ดสำคัญถูกเจาะอธิบายทีละบรรทัด</p>
   <div class="hero-stats">
-    <div><b>19</b><span>บทเรียน</span></div>
+    <div><b>20</b><span>บทเรียน</span></div>
     <div><b>~61,000</b><span>บรรทัดโค้ดที่อธิบาย</span></div>
     <div><b>348</b><span>ไฟล์ในแผนที่ไฟล์</span></div>
     <div><b>6</b><span>เทคโนโลยีหลัก</span></div>
   </div>
 </section>
 
-<div class="callout note"><div class="callout-title">อัปเดตล่าสุด · 14 ต.ค. 2569 รอบค่ำ (ขึ้น GitHub + ตรวจกับโค้ด main ล่าสุด)</div>
+<div class="callout note"><div class="callout-title">อัปเดตล่าสุด · 14 ต.ค. 2569 (บทใหม่ 20)</div>
+<ul>
+<li><b>บทใหม่ 20: เจาะลึกการออกแบบฐานข้อมูล</b> (ทำไม จำเป็นไหม ทำแบบอื่นได้ไหม) ทุกตารางทุกคอลัมน์ว่าทำไมออกแบบแบบนี้ จำเป็นแค่ไหน (ขาดไม่ได้ / ควรมี / ไว้ดู / เหลือจากรุ่นเก่า) ตรวจจากโค้ดจริงว่าคอลัมน์ไหนถูกอ่านไปตัดสินอะไร และทางเลือกอื่นพร้อมเหตุผลที่ไม่เลือก</li>
+<li>พบคอลัมน์ที่ไม่ได้ใช้แล้ว เช่น <code>rooms.is_active</code> และสถานะ <code>removed</code> ของอุปกรณ์ อธิบายไว้ในบทพร้อมวิธีตอบอาจารย์</li>
+</ul></div>
+
+<div class="callout note"><div class="callout-title">อัปเดตก่อนหน้า · 14 ต.ค. 2569 รอบค่ำ (ขึ้น GitHub + ตรวจกับโค้ด main ล่าสุด)</div>
 <p>คู่มือนี้อยู่บน GitHub แล้วที่โฟลเดอร์ <code>คู่มือศึกษาโปรเจค/</code> ของ repo ตรวจซ้ำกับโค้ดล่าสุดแล้วแก้ตามนี้:</p>
 <ul>
 <li><b>เวอร์ชันแอป</b> เป็น <code>3.16.0+32</code> (เดิมในคู่มือเขียน 3.13.1+31) ใน <code>pubspec.yaml</code> และ APK ที่ build บน GitHub (บท 10, 14, 18)</li>
@@ -161,6 +170,9 @@
 </div>
 <h2 class="part-title">งานที่กำลังพัฒนา</h2><div class="cards">
 <a class="card" href="chapters/19-daikin-slm8.html"><div class="card-num">19</div><div class="card-title">แอร์ Daikin ผ่านสาย SLM8: จากการแกะโปรโตคอลถึงบอร์ดสายแอร์</div><div class="card-sub">ภาพรวม · ความรู้ที่ต้องมีก่อนอ่านบทนี้ · อุปกรณ์และเครื่องมือ · ขั้นที่ 1: ค้นคว้าก่อนลงมือ</div></a>
+</div>
+<h2 class="part-title">เจาะลึก</h2><div class="cards">
+<a class="card" href="chapters/20-database-design.html"><div class="card-num">20</div><div class="card-title">เจาะลึกการออกแบบฐานข้อมูล</div><div class="card-sub">วิธีอ่านบทนี้ · หลักคิดที่ใช้ทั้งฐานข้อมูล · ตาราง users — บัญชีผู้ใช้ · ตาราง password_reset_otps — OTP ลืมรหัสผ่าน</div></a>
 </div>
 
 <h2 class="part-title">วิธีใช้คู่มือนี้</h2>

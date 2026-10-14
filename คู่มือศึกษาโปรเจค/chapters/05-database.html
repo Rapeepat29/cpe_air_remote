@@ -58,6 +58,9 @@
 <div class="nav-part">งานที่กำลังพัฒนา</div><ul>
 <li><a href="19-daikin-slm8.html"><span class="num">19</span>แอร์ Daikin ผ่านสาย SLM8: จากการแกะโปรโตคอลถึงบอร์ดสายแอร์</a></li>
 </ul>
+<div class="nav-part">เจาะลึก</div><ul>
+<li><a href="20-database-design.html"><span class="num">20</span>เจาะลึกการออกแบบฐานข้อมูล</a></li>
+</ul>
     </nav>
   </aside>
   <main class="content" id="content">
@@ -522,6 +525,8 @@ Transaction คือกลุ่มคำสั่งที่ต้อง "ส
 
 <h2 id="ตารางทีละตาราง">ตารางทีละตาราง<a class="anchor" href="#ตารางทีละตาราง">#</a></h2>
 <p>ในหัวข้อนี้ เลขบรรทัดอ้างอิงตามแต่ละ code block (เริ่มนับ 1 ใหม่ทุกบล็อก)</p>
+<div class="callout tip"><div class="callout-title">เคล็ดลับ</div><p>หัวข้อนี้บอกว่าแต่ละคอลัมน์ "คืออะไร" ถ้าอยากรู้ว่า <strong>ทำไมออกแบบแบบนี้ คอลัมน์ไหนจำเป็นจริง คอลัมน์ไหนเหลือจากรุ่นเก่า และทำแบบอื่นได้ไหม</strong> อ่านต่อที่บท 20 <a href="20-database-design.html">เจาะลึกการออกแบบฐานข้อมูล</a></p></div>
+
 <h3 id="ตาราง-users--บัญชีผู้ใช้">ตาราง users — บัญชีผู้ใช้<a class="anchor" href="#ตาราง-users--บัญชีผู้ใช้">#</a></h3>
 <p>ไฟล์: <code>backend/database/schema.sql</code></p>
 <div class="code-block"><span class="code-lang">sql</span><div class="hl"><pre><span></span><code><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="k">IF</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">EXISTS</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="p">(</span>

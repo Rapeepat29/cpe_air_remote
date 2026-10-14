@@ -1,0 +1,1336 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>20. เจาะลึกการออกแบบฐานข้อมูล — คู่มือศึกษา RMUTT Save Energy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Chakra+Petch:wght@600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+<script>try{var t=localStorage.getItem('guide.theme');if(t)document.documentElement.dataset.theme=t;var f=localStorage.getItem('guide.font');if(f)document.documentElement.dataset.font=f;}catch(e){}</script>
+</head>
+<body>
+<header class="topbar">
+  <button class="menu-btn" id="menuBtn" aria-label="เปิดเมนู">☰</button>
+  <a class="brand" href="../index.html"><span class="brand-mark">⚡</span><span>คู่มือศึกษา <b>RMUTT Save Energy</b></span></a>
+  <div class="top-actions">
+    <button id="fontBtn" title="ขนาดตัวอักษร">ก<small>±</small></button>
+    <button id="themeBtn" title="สลับโหมดสว่าง/มืด">☾</button>
+  </div>
+</header>
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <input class="nav-search" id="navSearch" type="search" placeholder="ค้นหาบทหรือหัวข้อ…">
+    <div id="searchResults" class="search-results"></div>
+    <nav class="nav" id="nav">
+<a class="nav-home" href="../index.html">หน้าแรก</a>
+<div class="nav-part">ภาพรวม</div><ul>
+<li><a href="01-concept.html"><span class="num">1</span>แนวคิดและหลักการคิดของโปรเจค</a></li>
+<li><a href="02-roadmap.html"><span class="num">2</span>เริ่มจากอะไร และต้องเรียนรู้อะไรบ้าง</a></li>
+<li><a href="03-architecture-flows.html"><span class="num">3</span>สถาปัตยกรรมและเส้นทางของข้อมูล</a></li>
+</ul>
+<div class="nav-part">โครงสร้างพื้นฐาน</div><ul>
+<li><a href="04-network-server.html"><span class="num">4</span>เครือข่าย เซิร์ฟเวอร์ และ Tailscale</a></li>
+<li><a href="05-database.html"><span class="num">5</span>ฐานข้อมูล MariaDB</a></li>
+</ul>
+<div class="nav-part">เซิร์ฟเวอร์</div><ul>
+<li><a href="06-backend-api.html"><span class="num">6</span>Backend ตอนที่ 1: โครงหลัก ระบบสมาชิก และ REST API</a></li>
+<li><a href="07-backend-services.html"><span class="num">7</span>Backend ตอนที่ 2: งานเบื้องหลังและตรรกะหลักของระบบ</a></li>
+<li><a href="08-protocols.html"><span class="num">8</span>โปรโตคอลสื่อสาร: MQTT และ Bluetooth Low Energy</a></li>
+</ul>
+<div class="nav-part">อุปกรณ์และหน้าจอ</div><ul>
+<li><a href="09-firmware.html"><span class="num">9</span>เฟิร์มแวร์ ESP32: บอร์ดแอร์ (IR และสายแอร์) และบอร์ดตรวจจับคน</a></li>
+<li><a href="10-flutter-architecture.html"><span class="num">10</span>แอป Flutter ตอนที่ 1: โครงสร้าง ข้อมูล และ State</a></li>
+<li><a href="11-flutter-screens.html"><span class="num">11</span>แอป Flutter ตอนที่ 2: หน้าจอหลักและวิดเจ็ต</a></li>
+<li><a href="12-flutter-admin-screens.html"><span class="num">12</span>แอป Flutter ตอนที่ 3: หน้าจอผู้ดูแลระบบและการตั้งค่า</a></li>
+<li><a href="13-webapp.html"><span class="num">13</span>เว็บแอป: HTML, CSS และ JavaScript ล้วน</a></li>
+</ul>
+<div class="nav-part">ใช้งานจริง</div><ul>
+<li><a href="14-deploy-scripts-testing.html"><span class="num">14</span>การติดตั้งระบบ สคริปต์อัตโนมัติ และการทดสอบ</a></li>
+<li><a href="15-security.html"><span class="num">15</span>ความปลอดภัยทั้งระบบ</a></li>
+<li><a href="16-presentation-qa.html"><span class="num">16</span>เตรียมนำเสนอและคำถามที่อาจารย์มักถาม</a></li>
+</ul>
+<div class="nav-part">ภาคผนวก</div><ul>
+<li><a href="17-glossary.html"><span class="num">17</span>อภิธานศัพท์</a></li>
+<li><a href="18-file-map.html"><span class="num">18</span>แผนที่ไฟล์ทั้งโปรเจค</a></li>
+</ul>
+<div class="nav-part">งานที่กำลังพัฒนา</div><ul>
+<li><a href="19-daikin-slm8.html"><span class="num">19</span>แอร์ Daikin ผ่านสาย SLM8: จากการแกะโปรโตคอลถึงบอร์ดสายแอร์</a></li>
+</ul>
+<div class="nav-part">เจาะลึก</div><ul>
+<li><a class="active" href="20-database-design.html"><span class="num">20</span>เจาะลึกการออกแบบฐานข้อมูล</a></li>
+</ul>
+    </nav>
+  </aside>
+  <main class="content" id="content">
+<div class="chapter-head"><div class="kicker">บทที่ 20 · เจาะลึก</div><h1>เจาะลึกการออกแบบฐานข้อมูล</h1></div>
+<p>บท 5 อธิบายแล้วว่าแต่ละตารางและคอลัมน์ "คืออะไร" บทนี้ตอบอีกสามคำถามที่อาจารย์ชอบถามต่อ: <strong>ทำไมแยกเป็นตารางนี้</strong>, <strong>คอลัมน์นี้จำเป็นจริงไหม (ถ้าลบทิ้งจะเกิดอะไร)</strong> และ <strong>ทำแบบอื่นได้ไหม ทำไมไม่เลือกแบบนั้น</strong> ทุกข้อในบทนี้ตรวจจากโค้ดจริงในโปรเจกต์ (<code>backend/src/</code>) ว่าคอลัมน์ไหนถูกอ่านไปตัดสินอะไร คอลัมน์ไหนแค่เขียนเก็บไว้ และคอลัมน์ไหนเหลือจากรุ่นเก่า (ตรวจกับโค้ด main วันที่ 14 ต.ค. 2569)</p>
+<h2 id="วิธีอ่านบทนี้">วิธีอ่านบทนี้<a class="anchor" href="#วิธีอ่านบทนี้">#</a></h2>
+<p>ทุกตารางมีตารางสรุปคอลัมน์ ช่อง "จำเป็นแค่ไหน" ใช้ 4 ระดับนี้</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>ระดับ</th>
+<th>ความหมาย</th>
+<th>ถ้าลบทิ้ง</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>🔴 <strong>ขาดไม่ได้</strong></td>
+<td>โค้ดอ่านค่านี้ไปตัดสินอะไรสักอย่าง</td>
+<td>ระบบพัง หรือทำงานผิด (เช่น ปิดแอร์ผิด นับค่าไฟผิด)</td>
+</tr>
+<tr>
+<td>🟠 <strong>ควรมี</strong></td>
+<td>ระบบยังทำงานได้ แต่เสียฟีเจอร์หรือความปลอดภัย</td>
+<td>ฟีเจอร์หนึ่งหายไป หรือช่องโหว่เพิ่มขึ้น</td>
+</tr>
+<tr>
+<td>🟢 <strong>ไว้ดู</strong></td>
+<td>โค้ดเขียนค่าไว้หรือแสดงบนหน้าจอ แต่ไม่มีตรรกะไหนใช้ตัดสิน</td>
+<td>ระบบทำงานเหมือนเดิม แค่ข้อมูลให้คนดูหายไป</td>
+</tr>
+<tr>
+<td>⚪ <strong>เหลือจากรุ่นเก่า</strong></td>
+<td>ยังอยู่ใน schema แต่โค้ดปัจจุบันไม่ได้ใช้แล้วจริง ๆ</td>
+<td>ไม่มีผลอะไร (ต้องแก้ query ที่ยังอ้างถึงเท่านั้น)</td>
+</tr>
+</tbody>
+</table></div>
+<div class="callout note"><div class="callout-title">หมายเหตุ</div><p>"ไว้ดู" ไม่ได้แปลว่าไม่มีประโยชน์ คอลัมน์อย่าง <code>created_by</code> คือหลักฐานว่าใครทำอะไร ซึ่งสำคัญมากเวลามีปัญหา แต่ถ้าถามว่า "ระบบต้องใช้ไหม" คำตอบคือไม่ต้อง</p></div>
+
+<h2 id="หลักคิดที่ใช้ทั้งฐานข้อมูล">หลักคิดที่ใช้ทั้งฐานข้อมูล<a class="anchor" href="#หลักคิดที่ใช้ทั้งฐานข้อมูล">#</a></h2>
+<p>ก่อนดูทีละตาราง มี 10 การตัดสินใจที่ใช้ซ้ำทั่วทั้ง schema เข้าใจตรงนี้แล้วจะตอบคำถามส่วนใหญ่ได้เอง</p>
+<h3 id="1-คีย์หลัก-ใช้-ชื่อจริง-หรือ-เลขสุ่ม">1. คีย์หลัก: ใช้ "ชื่อจริง" หรือ "เลขสุ่ม"<a class="anchor" href="#1-คีย์หลัก-ใช้-ชื่อจริง-หรือ-เลขสุ่ม">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>ตาราง</th>
+<th>คีย์หลัก</th>
+<th>ชนิด</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>users</code></td>
+<td><code>username</code></td>
+<td>คีย์ธรรมชาติ (natural key)</td>
+</tr>
+<tr>
+<td><code>rooms</code></td>
+<td><code>room_number</code> เช่น <code>16302</code></td>
+<td>คีย์ธรรมชาติ</td>
+</tr>
+<tr>
+<td><code>air_conditioners</code>, <code>occupancy_sensors</code></td>
+<td><code>device_id</code> เช่น <code>ESP32-AABBCCDDEEFF</code> (มาจาก MAC ของบอร์ด)</td>
+<td>คีย์ธรรมชาติ</td>
+</tr>
+<tr>
+<td><code>academic_terms</code></td>
+<td><code>semester</code> เช่น <code>1/2569</code></td>
+<td>คีย์ธรรมชาติ</td>
+</tr>
+<tr>
+<td><code>system_settings</code></td>
+<td><code>setting_key</code></td>
+<td>คีย์ธรรมชาติ</td>
+</tr>
+<tr>
+<td><code>energy_hourly</code></td>
+<td><code>(device_id, bucket_start)</code></td>
+<td>คีย์ผสม (composite)</td>
+</tr>
+<tr>
+<td><code>class_schedules</code>, <code>room_bookings</code>, <code>system_alerts</code>, <code>password_reset_otps</code></td>
+<td><code>id</code> UUID</td>
+<td>คีย์สุ่ม (surrogate)</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>กฎที่ใช้:</strong> ถ้าสิ่งนั้นมี "ชื่อที่ไม่ซ้ำและไม่ค่อยเปลี่ยน" อยู่แล้วในโลกจริง (เลขห้อง ชื่อผู้ใช้ MAC ของบอร์ด) ใช้ชื่อนั้นเป็นคีย์เลย ถ้าไม่มี (คาบเรียนหนึ่งคาบ การแจ้งเตือนหนึ่งใบ) ค่อยสร้าง UUID</p>
+<p><strong>ข้อดีของคีย์ธรรมชาติ</strong>
+- เปิดดูข้อมูลแล้วอ่านรู้เรื่องทันที <code>room_number = '16302'</code> ดีกว่า <code>room_id = 17</code>
+- บอร์ด ESP32 รู้ <code>device_id</code> ของตัวเองตั้งแต่ผลิต (จาก MAC) จึงส่งข้อความ MQTT มาพร้อมคีย์ได้เลย ไม่ต้องถามฐานข้อมูลก่อนว่าตัวเองเป็นเลขอะไร
+- <code>created_by = 'admin01'</code> อ่านออกโดยไม่ต้อง JOIN</p>
+<p><strong>ข้อเสีย:</strong> เปลี่ยนชื่อยาก ถ้าวันหนึ่งต้องเปลี่ยนเลขห้อง ตารางลูกต้องตามแก้ ระบบนี้กันไว้สองชั้น: แอปไม่มีปุ่มเปลี่ยนเลขห้องหรือชื่อผู้ใช้เลย (<code>PUT /api/rooms/:roomNumber</code> แก้ได้แค่ชั้น ลำดับ ประเภท) และ FK ไปที่ <code>rooms</code> ตั้ง <code>ON UPDATE CASCADE</code> ไว้ ถ้าแอดมินจำเป็นต้องแก้เลขห้องด้วย SQL เอง ตารางลูกจะตามไปเอง</p>
+<p><strong>ทำแบบอื่นได้ไหม:</strong> ใช้ <code>id INT AUTO_INCREMENT</code> ทุกตารางก็ได้ (เป็นแบบที่ framework อย่าง Laravel/Django ทำ) เปลี่ยนชื่อได้ง่ายกว่า แต่ต้อง JOIN ทุกครั้งที่อยากเห็นชื่อ และบอร์ดต้องจำเลข id ที่ฐานข้อมูลแจก ซึ่งยุ่งกว่าใช้ MAC ที่บอร์ดมีอยู่แล้ว เรื่องนี้ไม่มีถูกผิด เป็นการแลกเปลี่ยน โปรเจกต์นี้เคยใช้ id แบบตัวเลขกับ <code>users</code> มาก่อน แล้วย้ายมาใช้ <code>username</code> เป็นคีย์ (ดู <code>backend/scripts/migrate-user-primary-key.js</code>)</p>
+<div class="callout why"><div class="callout-title">ทำไม</div><p><strong>ทำไม UUID ไม่ใช้เลขรันนิ่ง 1, 2, 3</strong>
+UUID สร้างได้ในโค้ด (<code>crypto.randomUUID()</code>) ก่อนบันทึก จึงรู้ id ทันทีโดยไม่ต้องรอฐานข้อมูลตอบ และเดาไม่ได้ ใครเห็น <code>/api/alerts/7/acknowledge</code> จะเดาว่ามีใบที่ 8 ได้ แต่ UUID เดาไม่ได้ ข้อเสียคือเปลืองที่ (CHAR(36) = 36 ไบต์ต่อค่า เทียบกับ INT 4 ไบต์) แต่ตารางที่ใช้ UUID ในระบบนี้มีแถวน้อย (หลักร้อยถึงหลักพัน) จึงไม่เป็นปัญหา ถ้าอยากประหยัดเก็บเป็น <code>BINARY(16)</code> ได้ แต่อ่านด้วยตาไม่ออก</p></div>
+
+<h3 id="2-แยก-สถานะล่าสุด-ออกจาก-ประวัติ">2. แยก "สถานะล่าสุด" ออกจาก "ประวัติ"<a class="anchor" href="#2-แยก-สถานะล่าสุด-ออกจาก-ประวัติ">#</a></h3>
+<ul>
+<li><code>air_conditioners</code> เก็บค่าไฟ <strong>ล่าสุดค่าเดียว</strong> ของแต่ละเครื่อง (เขียนทับทุก 10 วินาที)</li>
+<li><code>energy_hourly</code> เก็บ <strong>ประวัติ</strong> แบบสรุปรายชั่วโมง</li>
+</ul>
+<p>หน้าจอส่วนใหญ่อยากรู้แค่ "ตอนนี้" อ่านจาก <code>air_conditioners</code> แถวเดียวต่อเครื่อง เร็วมาก รายงานย้อนหลังค่อยไปอ่าน <code>energy_hourly</code></p>
+<p><strong>ทำแบบอื่นได้ไหม:</strong> เก็บทุกข้อความที่บอร์ดส่งมาเป็นแถวใหม่ แล้วหา "ค่าล่าสุด" ด้วย <code>ORDER BY time DESC LIMIT 1</code> ได้ แต่บอร์ดส่งสถานะทุก 10 วินาที (<code>STATUS_INTERVAL_MS = 10000</code> ในเฟิร์มแวร์) คิดเป็นแอร์ 45 เครื่อง:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>แบบ</th>
+<th>แถวต่อวัน</th>
+<th>แถวต่อปี</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>เก็บทุกข้อความ</td>
+<td>45 × 8,640 = <strong>388,800</strong></td>
+<td>ราว <strong>142 ล้าน</strong></td>
+</tr>
+<tr>
+<td>ถังรายชั่วโมง (แบบที่ใช้)</td>
+<td>45 × 24 = <strong>1,080</strong></td>
+<td>ราว <strong>394,200</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>ต่างกันราว 360 เท่า บนเซิร์ฟเวอร์เล็กของมหาวิทยาลัยแบบแรกจะทำให้รายงานช้าลงเรื่อย ๆ ถ้าต้องการข้อมูลละเอียดระดับวินาทีจริง ควรใช้ฐานข้อมูลสำหรับ time-series โดยเฉพาะ เช่น InfluxDB หรือ TimescaleDB ซึ่งเพิ่มอีกระบบให้ดูแล รายงานค่าไฟของโปรเจกต์นี้ละเอียดแค่รายชั่วโมงก็พอ</p>
+<h3 id="3-เก็บ-ผลรวม--จำนวน-ไม่เก็บ-ค่าเฉลี่ย">3. เก็บ "ผลรวม + จำนวน" ไม่เก็บ "ค่าเฉลี่ย"<a class="anchor" href="#3-เก็บ-ผลรวม--จำนวน-ไม่เก็บ-ค่าเฉลี่ย">#</a></h3>
+<p><code>energy_hourly</code> เก็บ <code>voltage_sum</code> กับ <code>pzem_samples</code> แล้วค่อยหาร ไม่เก็บ <code>voltage_avg</code> ตรง ๆ เพราะ <strong>ค่าเฉลี่ยรวมกันไม่ได้</strong> แต่ผลรวมรวมกันได้</p>
+<p>ตัวอย่าง: ชั่วโมงแรกได้ 2 ตัวอย่าง เฉลี่ย 220 V ชั่วโมงที่สองได้ 358 ตัวอย่าง เฉลี่ย 230 V
+- เฉลี่ยของเฉลี่ย: (220 + 230) ÷ 2 = <strong>225 V</strong> ผิด เพราะให้น้ำหนักชั่วโมงที่มีแค่ 2 ตัวอย่างเท่ากับชั่วโมงที่มี 358
+- จากผลรวม: (440 + 82,340) ÷ 360 = <strong>229.9 V</strong> ถูก</p>
+<p>เหตุผลเดียวกันทำให้ข้อมูลที่มาทีหลัง (ข้อมูลย้อนหลังตอนเน็ตหลุด) บวกเข้าถังเดิมได้ตรง ๆ ด้วย <code>sum = sum + ใหม่</code> ส่วนค่าต่ำสุด/สูงสุดใช้ <code>LEAST</code>/<code>GREATEST</code> ซึ่งรวมกันได้อยู่แล้ว</p>
+<h3 id="4-foreign-key-เลือกพฤติกรรมตอนลบให้เหมาะกับความหมาย">4. Foreign key: เลือกพฤติกรรมตอนลบให้เหมาะกับความหมาย<a class="anchor" href="#4-foreign-key-เลือกพฤติกรรมตอนลบให้เหมาะกับความหมาย">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>ความสัมพันธ์</th>
+<th>ตอนลบแม่</th>
+<th>เหตุผล</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>rooms</code> ← <code>air_conditioners</code>, <code>occupancy_sensors</code>, <code>class_schedules</code></td>
+<td><strong>RESTRICT</strong> (ห้ามลบ)</td>
+<td>ลบห้องแล้วแอร์หายตามเงียบ ๆ อันตรายเกินไป ต้องถอดอุปกรณ์และลบตารางก่อน</td>
+</tr>
+<tr>
+<td><code>rooms</code> ← <code>room_bookings</code></td>
+<td><strong>CASCADE</strong> (ลบตาม)</td>
+<td>การจองของห้องที่ไม่มีแล้วไม่มีความหมาย และไม่มีอุปกรณ์จริงผูกอยู่</td>
+</tr>
+<tr>
+<td><code>users</code> ← <code>password_reset_otps</code></td>
+<td><strong>CASCADE</strong></td>
+<td>OTP ของผู้ใช้ที่ถูกลบไม่มีประโยชน์</td>
+</tr>
+<tr>
+<td><code>energy_hourly</code>, <code>system_alerts</code></td>
+<td><strong>ไม่ผูก FK เลย</strong></td>
+<td>เป็นประวัติ ต้องอยู่ต่อแม้ถอดแอร์หรือลบห้องไปแล้ว</td>
+</tr>
+<tr>
+<td><code>created_by</code>, <code>updated_by</code>, <code>acknowledged_by</code></td>
+<td><strong>ไม่ผูก FK</strong></td>
+<td>เป็นบันทึกว่าใครทำ ลบบัญชีผู้ใช้แล้วบันทึกยังต้องอยู่</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>ทำแบบอื่นได้ไหม:</strong> ไม่ใช้ FK เลยแล้วให้โค้ดตรวจเองก็ได้ (หลายระบบใหญ่ทำแบบนี้เพื่อความเร็ว) แต่ถ้าโค้ดมีบั๊กสักจุด ข้อมูลกำพร้าจะเกิดโดยไม่มีใครรู้ ระบบนี้ใช้ทั้งสองชั้น: โค้ดใน <code>routes/rooms.js</code> นับก่อนว่ายังมีแอร์/ตาราง/เซ็นเซอร์ผูกอยู่ไหม แล้วตอบเป็นภาษาไทยว่า "ยังลบห้องไม่ได้ มีแอร์ 2 เครื่อง…" ส่วน FK เป็นด่านสุดท้ายกันพลาด</p>
+<h3 id="5-ความลับเก็บเป็นแฮชเสมอ">5. ความลับเก็บเป็นแฮชเสมอ<a class="anchor" href="#5-ความลับเก็บเป็นแฮชเสมอ">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>ความลับ</th>
+<th>เก็บเป็น</th>
+<th>ทำไมเลือกแบบนี้</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>รหัสผ่าน</td>
+<td>bcrypt cost 12 (<code>password_hash</code>)</td>
+<td>ช้าโดยตั้งใจ มี salt ต่อรหัส ฐานข้อมูลหลุดก็เดายาก</td>
+</tr>
+<tr>
+<td>OTP 6 หลัก</td>
+<td>HMAC-SHA256 กับ <code>OTP_PEPPER</code> (<code>otp_hash</code>)</td>
+<td>OTP มีแค่ล้านแบบ bcrypt ก็ไล่ครบได้ จึงใช้กุญแจลับ (pepper) ที่อยู่นอกฐานข้อมูลแทน ไม่มีกุญแจก็ไล่ไม่ได้</td>
+</tr>
+<tr>
+<td>token รีเซ็ตรหัส</td>
+<td>HMAC-SHA256 (<code>reset_token_hash</code>)</td>
+<td>เหตุผลเดียวกัน</td>
+</tr>
+<tr>
+<td>token ตั้งค่าบอร์ด</td>
+<td>HMAC-SHA256 (<code>provisioning_token_hash</code>)</td>
+<td>token สุ่ม 24 ไบต์ เดาไม่ได้อยู่แล้ว แฮชไว้กันคนเปิดฐานข้อมูลแล้วเอาไปสวมเป็นบอร์ด</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>ทำแบบอื่นได้ไหม:</strong> เก็บ OTP เป็นข้อความธรรมดาง่ายกว่า แต่ใครเปิดฐานข้อมูลได้ (เช่น ผ่าน <code>db-view.sh</code> หรือไฟล์ backup) จะรีเซ็ตรหัสใครก็ได้ทันที</p>
+<h3 id="6-ลบจริง-hard-delete-เกือบทุกที่">6. ลบจริง (hard delete) เกือบทุกที่<a class="anchor" href="#6-ลบจริง-hard-delete-เกือบทุกที่">#</a></h3>
+<p>โค้ดปัจจุบันลบแถวจริงด้วย <code>DELETE</code> เกือบทุกที่: ลบผู้ใช้ ลบห้อง ลบแอร์ ลบเซ็นเซอร์ ลบการจอง ข้อยกเว้นคือ <code>users.is_active</code> ที่ใช้ "ปิดบัญชี" โดยไม่ลบ</p>
+<p>ผลข้างเคียงคือมีคอลัมน์ที่ออกแบบไว้สำหรับ "ลบแบบซ่อน" (soft delete) แต่โค้ดรุ่นหลังเปลี่ยนไปลบจริงแล้ว จึงเหลือค้างอยู่สองที่ (ดูรายละเอียดในตาราง <code>rooms</code> และ <code>air_conditioners</code>):
+- <code>rooms.is_active</code> ทุก query กรอง <code>is_active = TRUE</code> แต่ไม่มีโค้ดไหนตั้งเป็น <code>FALSE</code>
+- <code>provision_status = 'removed'</code> ยังอยู่ใน ENUM แต่ไม่มีโค้ดไหนตั้งค่านี้แล้ว (ถอดอุปกรณ์ = <code>DELETE</code> แถว แล้วสั่ง <code>unprovision</code> ให้บอร์ดล้างตัวเอง)</p>
+<p><strong>ทำไมเปลี่ยนมาลบจริง:</strong> soft delete ต้องจำใส่ <code>WHERE is_active = TRUE</code> ทุก query ลืมที่เดียวข้อมูลที่ "ลบแล้ว" ก็โผล่ และค่าที่ต้องไม่ซ้ำ (เช่น <code>ble_name</code>) จะชนกับแถวที่ซ่อนอยู่ ส่วนประวัติที่ต้องเก็บไว้ (ค่าไฟ การแจ้งเตือน) แยกไปอยู่ตารางที่ไม่ผูก FK แล้ว จึงลบตัวอุปกรณ์จริงได้โดยไม่เสียประวัติ</p>
+<h3 id="7-เวลา-datetime-ตามเวลาไทย">7. เวลา: DATETIME ตามเวลาไทย<a class="anchor" href="#7-เวลา-datetime-ตามเวลาไทย">#</a></h3>
+<p>container ทุกตัวตั้ง <code>TZ: Asia/Bangkok</code> (<code>deploy/docker-compose.yml</code>) และคอลัมน์เวลาเกือบทั้งหมดเป็น <code>DATETIME</code> ค่าในฐานข้อมูลจึงเป็นเวลาไทยตรง ๆ เปิดดูแล้วอ่านรู้เรื่อง ถังค่าไฟ <code>bucket_start = '2026-10-14 15:00:00'</code> คือ 15:00–16:00 น. เวลาไทย โค้ดคำนวณต้นชั่วโมงตามเวลาไทยเอง (<code>bangkokHourStart()</code> ใน <code>utils/energy-history.js</code>) ไม่ขึ้นกับเขตเวลาของเครื่อง</p>
+<p><strong>ทำแบบอื่นได้ไหม:</strong> เก็บเป็น UTC ทั้งหมด (<code>TIMESTAMP</code>) เป็นแนวที่ระบบหลายประเทศใช้ ถ้ามีผู้ใช้ข้ามเขตเวลา แต่ระบบนี้ใช้ในอาคารเดียวในไทย และตารางเรียนก็เป็นเวลาไทย เก็บเวลาไทยจึงง่ายกว่า (ไม่ต้องแปลงทุกครั้งที่เทียบกับตารางเรียน) ข้อสังเกต: <code>system_settings.updated_at</code> ตารางเดียวใช้ <code>TIMESTAMP</code> ไม่เหมือนที่อื่น ไม่กระทบการทำงานเพราะเป็นแค่เวลาที่ไว้ดู</p>
+<h3 id="8-enum-เมื่อค่าตายตัว-varchar-เมื่อค่าอาจเพิ่ม">8. ENUM เมื่อค่าตายตัว VARCHAR เมื่อค่าอาจเพิ่ม<a class="anchor" href="#8-enum-เมื่อค่าตายตัว-varchar-เมื่อค่าอาจเพิ่ม">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>ใช้ ENUM</th>
+<th>ใช้ VARCHAR + ตรวจในโค้ด</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>users.role</code> (admin/staff), <code>provision_status</code>, <code>system_alerts.kind</code>, <code>system_alerts.status</code></td>
+<td><code>rooms.room_type</code>, <code>air_conditioners.protocol</code>, <code>room_bookings.category</code>, <code>room_bookings.repeat_type</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>ENUM ให้ฐานข้อมูลปฏิเสธค่าผิดเอง แต่จะเพิ่มค่าใหม่ต้อง <code>ALTER TABLE</code> ซึ่งต้องเขียน migration ส่วน <code>protocol</code> ได้ยี่ห้อแอร์ใหม่บ่อย (เพิ่ม Saijo Denki, Daikin สายแอร์) และ <code>room_type</code> ให้แอดมินพิมพ์เองได้ จึงเป็น VARCHAR แล้วให้โค้ดตรวจ (เช่น <code>REPEAT_TYPES = ['once','daily','weekly']</code>, <code>BOOKING_CATEGORIES</code> ใน <code>utils/room-booking.js</code>)</p>
+<p><strong>ทำแบบอื่นได้ไหม:</strong> ทำตารางค้นหา (lookup table) เช่น <code>room_types(id, name)</code> แล้วผูก FK ได้ ถูกหลัก normalization ที่สุด แต่สำหรับค่าไม่กี่ตัวที่ไม่มีข้อมูลประกอบอื่น การเพิ่มตารางและ JOIN ไม่คุ้ม</p>
+<h3 id="9-ตัวเลขวัดไฟเป็น-decimal-และ-null-มีความหมาย">9. ตัวเลขวัดไฟเป็น DECIMAL และ NULL มีความหมาย<a class="anchor" href="#9-ตัวเลขวัดไฟเป็น-decimal-และ-null-มีความหมาย">#</a></h3>
+<p>ค่าไฟใช้ <code>DECIMAL</code> (เลขฐานสิบตรงตัว) ไม่ใช้ <code>FLOAT</code> เพราะต้องบวกสะสมหลายหมื่นครั้ง (บท 5 อธิบายไว้) อีกจุดที่สำคัญคือ <strong>NULL ≠ 0</strong>: <code>voltage = NULL</code> แปลว่า "อ่านค่าไม่ได้" (PZEM ไม่ตอบ) ส่วน <code>power_watts = 0</code> แปลว่า "อ่านได้ และแอร์ไม่กินไฟ" ถ้าใช้ 0 แทน NULL รายงานจะเข้าใจผิดว่าแอร์ปิดอยู่ทั้งที่จริงคือเซนเซอร์เสีย</p>
+<p>ส่วนข้อความที่ไม่บังคับ (ชื่อ หมายเหตุ ผู้สอน) ใช้ <code>NOT NULL DEFAULT ''</code> แทน เพราะ "ไม่มีชื่อ" กับ "ชื่อว่าง" ไม่ต่างกันในความหมาย และโค้ดไม่ต้องคอยเช็ก NULL</p>
+<h3 id="10-ช่องบันทึกว่าใครทำ-audit-ไม่ผูก-fk-และไม่มีใครอ่านในแอป">10. ช่องบันทึกว่าใครทำ (audit) ไม่ผูก FK และไม่มีใครอ่านในแอป<a class="anchor" href="#10-ช่องบันทึกว่าใครทำ-audit-ไม่ผูก-fk-และไม่มีใครอ่านในแอป">#</a></h3>
+<p>เกือบทุกตารางมี <code>created_by</code>, <code>updated_by</code>, <code>created_at</code>, <code>updated_at</code> โค้ดเขียนทุกครั้งที่สร้าง/แก้ แต่ <strong>ไม่มีหน้าจอในแอปหรือเว็บแสดงค่าเหล่านี้</strong> ยกเว้น <code>users.created_at</code> ที่โชว์ในหน้าจัดการผู้ใช้ (API ของปฏิทินภาคเรียนและการจองส่ง <code>updatedBy</code>/<code>createdBy</code> ออกไปด้วย แต่แอปและเว็บไม่ได้แสดง) ช่องพวกนี้จึงมีไว้ให้ผู้ดูแลเปิดฐานข้อมูลดูเวลาสืบปัญหา (เช่นด้วย HeidiSQL ผ่าน <code>db-tunnel.ps1</code>)</p>
+<p><strong>ทำแบบอื่นได้ไหม:</strong> ทำตารางบันทึกเหตุการณ์ (audit log) แยก เก็บทุกการเปลี่ยนแปลงพร้อมค่าก่อน/หลัง ละเอียดกว่ามาก (รู้ว่าแก้อะไรจากอะไรเป็นอะไร ไม่ใช่แค่คนแก้ล่าสุด) แต่ต้องเขียนโค้ดบันทึกทุกจุด สำหรับขนาดโปรเจกต์นี้ "ใครแก้ล่าสุด เมื่อไร" ก็พอ</p>
+<h2 id="ตาราง-users--บัญชีผู้ใช้">ตาราง users — บัญชีผู้ใช้<a class="anchor" href="#ตาราง-users--บัญชีผู้ใช้">#</a></h2>
+<p><strong>ทำไมเป็นตารางแยก:</strong> เป็นตารางพื้นฐานของทุกระบบที่มีการล็อกอิน ต้องมีอยู่แล้ว</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>คอลัมน์</th>
+<th>ใช้ทำอะไรในโค้ดจริง</th>
+<th>จำเป็นแค่ไหน</th>
+<th>ทำแบบอื่นได้ไหม</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>username</code> (PK)</td>
+<td>ล็อกอิน, เป็น <code>subject</code> ของ JWT (<code>routes/auth.js</code>), เขียนลง <code>created_by</code> ทุกตาราง</td>
+<td>🔴 ขาดไม่ได้</td>
+<td>ใช้ <code>id</code> ตัวเลข + <code>username UNIQUE</code> ได้ (เปลี่ยนชื่อง่ายขึ้น แต่ต้อง JOIN ทุกครั้งที่อยากเห็นชื่อ)</td>
+</tr>
+<tr>
+<td><code>password_hash</code></td>
+<td>เทียบรหัสตอนล็อกอินด้วย bcrypt</td>
+<td>🔴 ขาดไม่ได้</td>
+<td>ใช้ล็อกอินผ่านบัญชีมหาวิทยาลัย (SSO/LDAP) ได้ จะไม่ต้องเก็บรหัสเลย แต่ต้องขอเชื่อมกับฝ่ายไอที</td>
+</tr>
+<tr>
+<td><code>first_name</code>, <code>last_name</code></td>
+<td>แสดงชื่อในแอป, ใส่ในอีเมล OTP, แสดงเป็นชื่อแอดมินที่ติดต่อได้</td>
+<td>🟠 ควรมี</td>
+<td>รวมเป็นช่องเดียว <code>full_name</code> ก็ได้ แยกไว้เผื่อเรียงตามนามสกุลหรือแสดงเฉพาะชื่อ</td>
+</tr>
+<tr>
+<td><code>email</code> (UNIQUE)</td>
+<td>ส่ง OTP ตอนลืมรหัส, ล็อกอินด้วยอีเมลแทน username ตอนขอ OTP ได้ (<code>WHERE username = ? OR email = ?</code>)</td>
+<td>🔴 ขาดไม่ได้ (สำหรับลืมรหัส)</td>
+<td>ถ้าตัดฟีเจอร์ลืมรหัส ให้แอดมินรีเซ็ตให้แทน ก็ไม่ต้องบังคับอีเมล</td>
+</tr>
+<tr>
+<td><code>phone</code> (NULL ได้)</td>
+<td><code>GET /api/public/admin-contact</code> เลือกแอดมินคนแรกที่มีเบอร์ แสดงในหน้าล็อกอินให้คนลืมรหัสโทรหา</td>
+<td>🟢 ไว้ดู</td>
+<td>ไม่ใช้ตัดสินอะไร ถ้าไม่มีแอดมินคนไหนกรอกเบอร์ หน้านั้นจะบอกว่ายังไม่ได้กำหนด</td>
+</tr>
+<tr>
+<td><code>role</code> (ENUM)</td>
+<td><code>middleware/require-admin.js</code> กันหน้าที่ต้องเป็นแอดมิน, ใส่ใน JWT</td>
+<td>🔴 ขาดไม่ได้</td>
+<td>ทำตาราง <code>roles</code> + <code>user_roles</code> (ผู้ใช้มีหลายบทบาท) ยืดหยุ่นกว่า แต่เกินจำเป็นสำหรับ 2 บทบาท</td>
+</tr>
+<tr>
+<td><code>is_active</code></td>
+<td>ล็อกอินและทุกคำขอเช็ก <code>is_active = 1</code>, ห้ามปิดหรือลบแอดมินคนสุดท้าย</td>
+<td>🟠 ควรมี</td>
+<td>ลบบัญชีทิ้งเลยก็ได้ (โค้ดก็มีปุ่มลบ) แต่ปิดไว้ก่อนเปิดคืนได้ ลบแล้วต้องสร้างใหม่</td>
+</tr>
+<tr>
+<td><code>token_version</code></td>
+<td>ใส่ใน JWT เป็น <code>ver</code> แล้ว <code>authenticate.js</code> เทียบทุกคำขอ เปลี่ยนรหัส/สิทธิ์แล้ว +1 → token เก่าตายทันที</td>
+<td>🟠 ควรมี (ความปลอดภัย)</td>
+<td>เก็บรายการ token ที่ถูกยกเลิก (blacklist) หรือใช้ token อายุสั้น + refresh token ได้ แต่ซับซ้อนกว่าตัวเลขตัวเดียว</td>
+</tr>
+<tr>
+<td><code>last_login_at</code></td>
+<td>อัปเดตตอนล็อกอิน แสดงในหน้าจัดการผู้ใช้</td>
+<td>🟢 ไว้ดู</td>
+<td>ช่วยแอดมินเห็นบัญชีที่ไม่มีคนใช้แล้ว</td>
+</tr>
+<tr>
+<td><code>password_changed_at</code></td>
+<td>เขียนตอนเปลี่ยน/รีเซ็ตรหัส <strong>ไม่มีโค้ดไหนอ่าน และไม่ส่งออกทาง API</strong></td>
+<td>🟢 ไว้ดู</td>
+<td>ถ้าอยากบังคับเปลี่ยนรหัสทุก 90 วัน คอลัมน์นี้พร้อมใช้ ตอนนี้ยังไม่ได้ทำ</td>
+</tr>
+<tr>
+<td><code>created_at</code></td>
+<td>แสดงในหน้าจัดการผู้ใช้</td>
+<td>🟢 ไว้ดู</td>
+<td></td>
+</tr>
+<tr>
+<td><code>updated_at</code></td>
+<td>ฐานข้อมูลเติมเอง ไม่มีใครอ่าน</td>
+<td>🟢 ไว้ดู</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Index:</strong> <code>uq_users_email</code> กันอีเมลซ้ำ (ถ้าซ้ำ ส่ง OTP แล้วไม่รู้ว่ารีเซ็ตบัญชีไหน) <code>idx_users_role_active</code> ช่วยคำสั่ง "นับแอดมินที่ยังใช้งานอยู่" ซึ่งรันทุกครั้งที่จะปิดหรือลบแอดมิน</p>
+<div class="callout why"><div class="callout-title">ทำไม</div><p><strong>ทำไมห้ามลบหรือปิดแอดมินคนสุดท้าย</strong>
+ถ้าไม่มีแอดมินเหลือ จะไม่มีใครเพิ่มผู้ใช้ เพิ่มห้อง หรือเปิดบัญชีคืนได้ ต้องเข้าไปแก้ฐานข้อมูลเองหรือรัน <code>seed-admin.sh</code> ใหม่ <code>routes/users.js</code> จึงนับ <code>role = 'admin' AND is_active = 1</code> ใน transaction ที่ล็อกแถวไว้ (<code>FOR UPDATE</code>) ก่อนทุกครั้ง</p></div>
+
+<h2 id="ตาราง-password_reset_otps--otp-ลืมรหัสผ่าน">ตาราง password_reset_otps — OTP ลืมรหัสผ่าน<a class="anchor" href="#ตาราง-password_reset_otps--otp-ลืมรหัสผ่าน">#</a></h2>
+<p><strong>ทำไมแยกจาก <code>users</code>:</strong> ทำได้ด้วยการเพิ่ม <code>otp_hash</code>, <code>otp_expires_at</code> ลงในตาราง <code>users</code> ตรง ๆ แต่จะเก็บได้ทีละอันต่อคน และไม่เหลือหลักฐานว่าเคยขอกี่ครั้ง ตารางแยกทำให้:
+- ขอใหม่แล้ว "ทำให้อันเก่าใช้ไม่ได้" ด้วย <code>SET used_at = NOW()</code> แทนการลบ
+- ขั้นตอนมีสองช่วง (ยืนยัน OTP → ได้ token → ตั้งรหัสใหม่) เก็บสถานะแต่ละช่วงได้ชัด
+- ไม่ทำให้ตาราง <code>users</code> บวมด้วยคอลัมน์ที่ใช้แค่ไม่กี่นาที</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>คอลัมน์</th>
+<th>ใช้ทำอะไรในโค้ดจริง</th>
+<th>จำเป็นแค่ไหน</th>
+<th>ทำแบบอื่นได้ไหม</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code> (UUID)</td>
+<td>อ้างถึงคำขอนี้ตอนลบ (ส่งอีเมลไม่สำเร็จ → ลบแถวทิ้ง)</td>
+<td>🔴 ขาดไม่ได้</td>
+<td></td>
+</tr>
+<tr>
+<td><code>username</code> (FK, CASCADE)</td>
+<td>ผูกว่าเป็นของบัญชีไหน</td>
+<td>🔴 ขาดไม่ได้</td>
+<td></td>
+</tr>
+<tr>
+<td><code>otp_hash</code></td>
+<td>เทียบกับ OTP ที่ผู้ใช้กรอก (HMAC)</td>
+<td>🔴 ขาดไม่ได้</td>
+<td>เก็บ OTP ตรง ๆ ง่ายกว่าแต่อันตราย (ดูหลักคิดข้อ 5)</td>
+</tr>
+<tr>
+<td><code>reset_token_hash</code> (UNIQUE, NULL ได้)</td>
+<td>ได้หลังยืนยัน OTP ผ่าน ใช้ในขั้นตั้งรหัสใหม่</td>
+<td>🟠 ควรมี</td>
+<td>ให้ส่ง OTP มาพร้อมรหัสใหม่ในคำขอเดียวก็ได้ (ตัดขั้นที่สองทิ้ง) แต่แยกขั้นทำให้หน้าจอบอกได้ทันทีว่า OTP ถูก ก่อนให้พิมพ์รหัสใหม่ และ OTP ที่ยืนยันแล้วใช้ซ้ำไม่ได้</td>
+</tr>
+<tr>
+<td><code>expires_at</code></td>
+<td>OTP อายุ 10 นาที (<code>OTP_EXPIRES_MINUTES</code>)</td>
+<td>🔴 ขาดไม่ได้</td>
+<td></td>
+</tr>
+<tr>
+<td><code>attempts</code></td>
+<td>กรอกผิดครบ 5 ครั้งตัดสิทธิ์</td>
+<td>🔴 ขาดไม่ได้</td>
+<td>ไม่มีตัวนับ คนร้ายลองได้ไม่จำกัด OTP 6 หลักมีแค่ล้านแบบ</td>
+</tr>
+<tr>
+<td><code>verified_at</code></td>
+<td>ต้องยืนยัน OTP แล้วถึงตั้งรหัสใหม่ได้</td>
+<td>🔴 ขาดไม่ได้</td>
+<td></td>
+</tr>
+<tr>
+<td><code>used_at</code></td>
+<td>ใช้ได้ครั้งเดียว, ขอ OTP ใหม่แล้วอันเก่าถูกตั้งค่านี้</td>
+<td>🔴 ขาดไม่ได้</td>
+<td></td>
+</tr>
+<tr>
+<td><code>created_at</code></td>
+<td>เรียงหา OTP ล่าสุดของผู้ใช้</td>
+<td>🔴 ขาดไม่ได้</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<div class="callout note"><div class="callout-title">หมายเหตุ</div><p><strong>ข้อสังเกต:</strong> ไม่มีงานลบ OTP ที่หมดอายุทิ้ง (ลบเฉพาะกรณีส่งอีเมลไม่สำเร็จ) แถวจึงสะสมไปเรื่อย ๆ แต่มีแค่ตอนคนลืมรหัส ปีหนึ่งน่าจะหลักร้อยแถว ไม่เป็นปัญหา ถ้าอยากเก็บกวาด ใช้ <code>DELETE FROM password_reset_otps WHERE expires_at &lt; NOW() - INTERVAL 30 DAY</code> (มี index <code>idx_password_reset_expiry</code> รองรับอยู่แล้ว)</p></div>
+
+<h2 id="ตาราง-rooms--ห้อง">ตาราง rooms — ห้อง<a class="anchor" href="#ตาราง-rooms--ห้อง">#</a></h2>
+<p><strong>ทำไมเป็นตารางแยก:</strong> ห้องเป็น "แม่" ของเกือบทุกอย่าง แอร์ เซ็นเซอร์ ตารางเรียน การจอง ล้วนอ้างถึงเลขห้อง ถ้าไม่มีตารางห้อง จะพิมพ์เลขห้องผิด (<code>16302</code> กับ <code>16320</code>) ได้โดยไม่มีอะไรกัน</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>คอลัมน์</th>
+<th>ใช้ทำอะไรในโค้ดจริง</th>
+<th>จำเป็นแค่ไหน</th>
+<th>ทำแบบอื่นได้ไหม</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>room_number</code> (PK)</td>
+<td>คีย์ที่ทุกตารางอ้างถึง, ใช้ตรวจว่าห้องมีจริงก่อนเพิ่มแอร์/ตาราง</td>
+<td>🔴 ขาดไม่ได้</td>
+<td><code>room_id</code> ตัวเลข (ดูหลักคิดข้อ 1)</td>
+</tr>
+<tr>
+<td><code>floor_number</code></td>
+<td>จัดกลุ่มห้องตามชั้นในแอปและเว็บ, รายงานค่าไฟแยกชั้น</td>
+<td>🟠 ควรมี</td>
+<td><strong>คำนวณจากเลขห้องไม่ได้ทุกห้อง</strong> <code>16302</code> ตัวที่ 3 คือชั้น 3 ก็จริง แต่ <code>CL503</code> ไม่เข้ารูปแบบ จึงต้องเก็บแยก (<code>CL503</code> ใช้ชั้น 0 = ห้องพิเศษ)</td>
+</tr>
+<tr>
+<td><code>room_index</code></td>
+<td>เรียงห้องในชั้นให้ตรงผังจริง</td>
+<td>🟢 ไว้ดู (ใช้เรียงอย่างเดียว)</td>
+<td>เรียงตามเลขห้องก็ได้ แต่ผังจริงบางชั้นไม่ได้เรียงตามเลข</td>
+</tr>
+<tr>
+<td><code>room_type</code></td>
+<td>แสดงประเภทห้องในแอปและเว็บ และในสรุปค่าไฟรายห้อง</td>
+<td>🟢 ไว้ดู</td>
+<td>ทำตาราง <code>room_types</code> แยก (ดูหลักคิดข้อ 8)</td>
+</tr>
+<tr>
+<td><code>is_active</code></td>
+<td>ทุก query กรอง <code>is_active = TRUE</code> แต่ <strong>ไม่มีโค้ดไหนตั้งเป็น FALSE</strong> ลบห้อง = <code>DELETE</code> จริง</td>
+<td>⚪ เหลือจากรุ่นเก่า</td>
+<td>ลบออกได้ (ต้องแก้ query ที่กรองอยู่) หรือทำปุ่ม "ซ่อนห้องชั่วคราว" ให้ใช้คอลัมน์นี้จริง เช่น ห้องปิดซ่อม</td>
+</tr>
+<tr>
+<td><code>created_by</code>, <code>updated_by</code>, <code>created_at</code>, <code>updated_at</code></td>
+<td>เขียนอย่างเดียว</td>
+<td>🟢 ไว้ดู</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Index:</strong> <code>idx_rooms_floor_active (floor_number, is_active, room_index, room_number)</code> ตอบคำถาม "ห้องชั้นนี้ เรียงตามผัง" ได้จาก index อย่างเดียว (covering index) ถ้าวันหลังลบ <code>is_active</code> ออก ต้องปรับ index นี้ด้วย</p>
+<div class="callout why"><div class="callout-title">ทำไม</div><p><strong>ทำไมห้องมีข้อมูลน้อยมาก (ไม่มีขนาดห้อง ความจุ จำนวนแอร์)</strong>
+จำนวนแอร์ได้จากการนับใน <code>air_conditioners</code> อยู่แล้ว (<code>COUNT(*)</code> ใน <code>routes/rooms.js</code>) ถ้าเก็บซ้ำในตารางห้อง ต้องคอยอัปเดตสองที่และมีโอกาสไม่ตรงกัน ส่วนความจุหรือขนาดห้องไม่มีฟีเจอร์ไหนใช้ หลักการคือ <strong>เก็บเฉพาะสิ่งที่ระบบใช้ และอย่าเก็บสิ่งที่นับจากที่อื่นได้</strong></p></div>
+
+<h2 id="ตาราง-class_schedules--ตารางเรียน">ตาราง class_schedules — ตารางเรียน<a class="anchor" href="#ตาราง-class_schedules--ตารางเรียน">#</a></h2>
+<p><strong>ทำไมแยกจาก <code>room_bookings</code>:</strong> คาบเรียนซ้ำทุกสัปดาห์ตลอดภาคเรียน ไม่มีวันที่ (มีแค่ "ทุกวันจันทร์ 09:00–12:00") ส่วนการจองมีวันที่กำกับเสมอ ถ้ารวมเป็นตารางเดียว คาบเรียนต้องกรอกวันเริ่ม–วันจบทุกแถว และไฟล์ตารางเรียนจากมหาวิทยาลัยต้องแปลงเพิ่ม</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>คอลัมน์</th>
+<th>ใช้ทำอะไรในโค้ดจริง</th>
+<th>จำเป็นแค่ไหน</th>
+<th>ทำแบบอื่นได้ไหม</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code> (UUID)</td>
+<td>แก้/ลบทีละคาบจากแอป</td>
+<td>🔴 ขาดไม่ได้</td>
+<td>ใช้คีย์ผสม (ห้อง วัน เวลาเริ่ม) เป็น PK ได้ แต่แก้เวลาคาบ = เปลี่ยนคีย์ ยุ่งกว่ามี id</td>
+</tr>
+<tr>
+<td><code>room_number</code> (FK, RESTRICT)</td>
+<td>หาคาบของห้องนี้ตอนตัดสินปิดแอร์</td>
+<td>🔴 ขาดไม่ได้</td>
+<td></td>
+</tr>
+<tr>
+<td><code>day_of_week</code></td>
+<td>0 = อาทิตย์ … 6 = เสาร์ ตรงกับ <code>getDay()</code> ของ JavaScript</td>
+<td>🔴 ขาดไม่ได้</td>
+<td>เก็บเป็นข้อความ <code>'Mon'</code> ก็ได้ แต่ตัวเลขเทียบกับวันปัจจุบันได้ตรง และเรียงได้</td>
+</tr>
+<tr>
+<td><code>start_time</code>, <code>end_time</code> (TIME)</td>
+<td>ตอนนี้อยู่ในคาบไหม: <code>start ≤ เวลาปัจจุบัน &lt; end</code></td>
+<td>🔴 ขาดไม่ได้</td>
+<td>เก็บเป็นนาทีนับจากเที่ยงคืน (INT) ก็ได้ คำนวณง่ายกว่าแต่เปิดดูแล้วอ่านยาก</td>
+</tr>
+<tr>
+<td><code>subject_name</code></td>
+<td>แสดงในแอป และเป็นส่วนหนึ่งของคีย์ห้ามซ้ำ</td>
+<td>🟢 ไว้ดู (ไม่ใช้ตัดสินปิดแอร์)</td>
+<td></td>
+</tr>
+<tr>
+<td><code>section_name</code>, <code>instructor</code></td>
+<td>แสดงในแอป</td>
+<td>🟢 ไว้ดู</td>
+<td></td>
+</tr>
+<tr>
+<td><code>created_by</code> … <code>updated_at</code></td>
+<td>เขียนอย่างเดียว</td>
+<td>🟢 ไว้ดู</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Index:</strong>
+- <code>uq_class_schedule_entry (room_number, day_of_week, start_time, end_time, subject_name)</code> กันนำเข้าไฟล์ซ้ำแล้วได้คาบซ้อน ใส่ <code>subject_name</code> ไว้ในคีย์เพราะ <strong>สองวิชาเรียนห้องเดียวกันเวลาเดียวกันได้จริง</strong> (เช่น วิชาบรรยายรวมสองกลุ่ม) ถ้าไม่ใส่ จะนำเข้าไม่ได้
+- <code>idx_class_schedule_lookup (room_number, day_of_week, start_time)</code> ใช้ตอนอ่านคาบของห้อง ระบบปิดแอร์อ่านทุก 10 วินาทีต่อเครื่อง จึงต้องเร็ว</p>
+<div class="callout why"><div class="callout-title">ทำไม</div><p><strong>ทำไมไม่มีคอลัมน์ภาคเรียน (semester)</strong>
+ระบบเก็บตารางเรียน <strong>ชุดเดียว</strong> คือของภาคเรียนที่ใช้อยู่ ชื่อภาคเรียนเก็บไว้ที่เดียวใน <code>system_settings.timetable_semester</code> เปลี่ยนเทอมก็นำเข้าแบบ "แทนที่ทั้งหมด" ใน transaction เดียว (ลบเก่า + ใส่ใหม่พร้อมกัน ไม่มีช่วงที่ตารางว่าง) ส่วน "ตารางมีผลวันไหนถึงวันไหน" ไปอยู่ที่ <code>academic_terms</code></p>
+<p><strong>แบบอื่นที่ทำได้:</strong> เพิ่ม <code>semester</code> ทุกแถว แล้วเก็บตารางทุกเทอมไว้ ได้ประวัติย้อนหลังและนำเข้าเทอมหน้าล่วงหน้าโดยไม่ทับเทอมนี้ แต่ทุก query ต้องกรองเทอมปัจจุบันเพิ่ม และคีย์ห้ามซ้ำต้องมีเทอมด้วย สิ่งที่เสียไปจากแบบปัจจุบันคือ <strong>ตารางเทอมก่อนหายไปเมื่อนำเข้าเทอมใหม่</strong> (ถ้าอยากเก็บ ต้องเก็บไฟล์ Excel ต้นฉบับไว้เอง)</p></div>
+
+<h2 id="ตาราง-air_conditioners--เครื่องปรับอากาศ">ตาราง air_conditioners — เครื่องปรับอากาศ<a class="anchor" href="#ตาราง-air_conditioners--เครื่องปรับอากาศ">#</a></h2>
+<p><strong>ทำไมตารางนี้กว้างมาก (40 คอลัมน์):</strong> รวมสี่เรื่องไว้ในแถวเดียว ทะเบียนอุปกรณ์ ค่าตั้ง MQTT สถานะสดจากบอร์ด และสถานะนาฬิกาปิดแอร์อัตโนมัติ เหตุผลคือทั้งสี่เรื่องเป็น <strong>หนึ่งต่อหนึ่งกับแอร์หนึ่งเครื่อง</strong> และหน้าจอเกือบทุกหน้าต้องใช้ครบ อ่านแถวเดียวได้ทั้งหมดโดยไม่ต้อง JOIN และบอร์ดส่งสถานะมาก็ <code>UPDATE</code> แถวเดียว</p>
+<p><strong>ทำแบบอื่นได้ไหม:</strong> แยกเป็น <code>air_devices</code> (ทะเบียน), <code>air_live_status</code> (ค่าสด), <code>auto_off_timers</code> (นาฬิกา) ตามหลัก "หนึ่งตาราง หนึ่งเรื่อง" ได้ และอ่านง่ายกว่า แต่ทุกหน้าจอต้อง JOIN สามตาราง และตอนเพิ่มแอร์ต้อง INSERT สามที่ใน transaction เดียว สำหรับระบบที่มีแอร์หลักสิบเครื่อง แบบตารางเดียวง่ายกว่า ถ้าระบบโตเป็นหลายพันเครื่องหรือหลายทีมดูแลคนละส่วน ค่อยแยก</p>
+<h3 id="กลุ่ม-1-ทะเบียนอุปกรณ์">กลุ่ม 1: ทะเบียนอุปกรณ์<a class="anchor" href="#กลุ่ม-1-ทะเบียนอุปกรณ์">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>คอลัมน์</th>
+<th>ใช้ทำอะไรในโค้ดจริง</th>
+<th>จำเป็นแค่ไหน</th>
+<th>ทำแบบอื่นได้ไหม</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>device_id</code> (PK)</td>
+<td>คีย์หลัก, เป็นส่วนของ topic MQTT, บอร์ดส่งมาทุกข้อความ</td>
+<td>🔴 ขาดไม่ได้</td>
+<td></td>
+</tr>
+<tr>
+<td><code>room_number</code> (FK) + <code>air_number</code> (UNIQUE คู่กัน)</td>
+<td>อยู่ห้องไหน เครื่องที่เท่าไร, กันสองบอร์ดลงช่อง "ห้อง 16302 เครื่อง 1" ซ้ำ</td>
+<td>🔴 ขาดไม่ได้</td>
+<td></td>
+</tr>
+<tr>
+<td><code>name</code></td>
+<td>ชื่อที่คนเห็น เช่น "แอร์หน้าห้อง", ใส่ในการแจ้งเตือน</td>
+<td>🟠 ควรมี</td>
+<td>สร้างจาก "ห้อง + หมายเลข" อัตโนมัติก็ได้ แต่ชื่อเองสื่อความกว่า</td>
+</tr>
+<tr>
+<td><code>ble_name</code> (UNIQUE)</td>
+<td>ชื่อบลูทูธที่แอปใช้หาบอร์ดตอนตั้งค่า</td>
+<td>🔴 ขาดไม่ได้ (ตอนตั้งค่า)</td>
+<td>ใช้ <code>device_id</code> เป็นชื่อบลูทูธเลยก็ได้ แต่ชื่อบลูทูธยาวได้จำกัด และคนอ่านชื่อสั้นง่ายกว่า</td>
+</tr>
+<tr>
+<td><code>protocol</code></td>
+<td>ยี่ห้อ/รุ่นรีโมต IR (เช่น <code>HAIER_AC160</code>) หรือ <code>DAIKIN_WIRED</code>, ใช้ตัดสิน <code>controlType</code> (ir/wired) และชนิดไฟล์เฟิร์มแวร์ที่อัปเดตได้</td>
+<td>🔴 ขาดไม่ได้</td>
+<td>แยกเป็นสองคอลัมน์ <code>brand</code> กับ <code>control_type</code> ก็ได้ ตอนนี้ได้ชนิดการควบคุมจากชื่อโปรโตคอลแทน (<code>controlTypeOf()</code>)</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="กลุ่ม-2-ค่าตั้ง-mqtt-และการลงทะเบียน-provisioning">กลุ่ม 2: ค่าตั้ง MQTT และการลงทะเบียน (provisioning)<a class="anchor" href="#กลุ่ม-2-ค่าตั้ง-mqtt-และการลงทะเบียน-provisioning">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>คอลัมน์</th>
+<th>ใช้ทำอะไรในโค้ดจริง</th>
+<th>จำเป็นแค่ไหน</th>
+<th>ทำแบบอื่นได้ไหม</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>mqtt_topic</code> (UNIQUE)</td>
+<td>topic ของเครื่องนี้ (<code>&lt;prefix&gt;/&lt;device_id&gt;</code>) ส่งออกทาง API</td>
+<td>🟢 ไว้ดู</td>
+<td><strong>คำนวณได้</strong> จาก prefix + <code>device_id</code> เก็บไว้เพราะถ้าวันหลังเปลี่ยน prefix บอร์ดเก่ายังใช้ topic เดิมอยู่ จะได้รู้ว่าบอร์ดไหนอยู่ topic ไหน</td>
+</tr>
+<tr>
+<td><code>mqtt_host</code></td>
+<td>ที่อยู่ broker ที่ส่งให้บอร์ด และ <strong>ใช้สร้าง URL ไฟล์เฟิร์มแวร์ตอนสั่ง OTA</strong> (<code>firmwareUrl(row.mqtt_host, …)</code>)</td>
+<td>🔴 ขาดไม่ได้ (OTA)</td>
+<td>อ่านจาก <code>.env</code> ปัจจุบันแทนก็ได้ แต่บอร์ดที่ตั้งค่าไว้นานแล้วอาจใช้ host เดิม การใช้ค่าที่บอร์ดได้รับจริงจึงปลอดภัยกว่า</td>
+</tr>
+<tr>
+<td><code>mqtt_port</code>, <code>mqtt_username</code></td>
+<td><strong>เขียนตอนตั้งค่าอย่างเดียว ไม่มีโค้ดไหนอ่าน</strong></td>
+<td>🟢 ไว้ดู</td>
+<td>เป็นบันทึกว่าบอร์ดได้ค่าอะไรไป ใช้สืบปัญหาตอนบอร์ดต่อ broker ไม่ได้ (รหัสผ่าน MQTT ของบอร์ดไม่เก็บในฐานข้อมูล)</td>
+</tr>
+<tr>
+<td><code>provision_status</code></td>
+<td><code>reserved</code> = จองไว้ รอบอร์ดยืนยัน 15 นาที, <code>active</code> = บอร์ดยืนยันผ่าน MQTT แล้ว ระบบปิดแอร์ทำงานเฉพาะ <code>active</code>, <code>removed</code> = <strong>ไม่ถูกตั้งแล้ว</strong> (ถอด = ลบแถว)</td>
+<td>🔴 ขาดไม่ได้ (<code>reserved</code>/<code>active</code>) · ⚪ (<code>removed</code>)</td>
+<td>ใช้ boolean <code>is_confirmed</code> สองสถานะก็พอ ENUM สามค่าเหลือจากรุ่นที่ยังซ่อนแถวแทนการลบ โค้ดหลายที่ยังกรอง <code>&lt;&gt; 'removed'</code> ไว้ จึงยังเอาค่านี้ออกไม่ได้ทันที ต้องแก้ query พร้อม migration</td>
+</tr>
+<tr>
+<td><code>provisioning_token_hash</code>, <code>provisioning_expires_at</code></td>
+<td>token ใช้ครั้งเดียวที่บอร์ดต้องส่งกลับมาทาง MQTT เพื่อยืนยันว่าเป็นบอร์ดที่แอปเพิ่งตั้งค่าจริง หมดอายุ 15 นาที ยืนยันแล้วล้างเป็น NULL</td>
+<td>🔴 ขาดไม่ได้ (ความปลอดภัย)</td>
+<td>ไม่มี token ใครรู้ <code>device_id</code> (อ่านจาก MAC ได้) ก็สวมเป็นบอร์ดได้</td>
+</tr>
+<tr>
+<td><code>daily_on</code>, <code>daily_off</code></td>
+<td>เวลาเปิด–ปิดประจำวันที่ส่งให้บอร์ดตอนตั้งค่า บอร์ดใช้เป็น <strong>ตารางสำรอง</strong> เมื่อห้องไม่มีตารางเรียน แสดงในแอป/เว็บ</td>
+<td>🟠 ควรมี</td>
+<td>ตัดทิ้งแล้วพึ่งตารางเรียนอย่างเดียวได้ แต่ห้องพักอาจารย์หรือห้องทำงานที่ไม่มีคาบเรียนจะไม่มีเวลามาตรฐาน</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="กลุ่ม-3-สถานะสดจากบอร์ด">กลุ่ม 3: สถานะสดจากบอร์ด<a class="anchor" href="#กลุ่ม-3-สถานะสดจากบอร์ด">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>คอลัมน์</th>
+<th>ใช้ทำอะไรในโค้ดจริง</th>
+<th>จำเป็นแค่ไหน</th>
+<th>ทำแบบอื่นได้ไหม</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>is_online</code></td>
+<td>บอร์ดส่ง <code>online</code> หรือ broker ส่ง Last Will ตอนบอร์ดหลุด, OTA สั่งได้เฉพาะตอนออนไลน์</td>
+<td>🔴 ขาดไม่ได้</td>
+<td>คำนวณจาก <code>last_seen_at</code> (เงียบเกิน 30 วิ = ออฟไลน์) ได้ แต่ Last Will บอกได้ทันทีและแม่นกว่า</td>
+</tr>
+<tr>
+<td><code>last_seen_at</code></td>
+<td>ได้ข้อมูลล่าสุดเมื่อไร, แสดงในแอป, ใช้คำนวณช่วงเวลาในค่าไฟ (สำรองเมื่อยังไม่มีจุดต่อ)</td>
+<td>🟠 ควรมี</td>
+<td></td>
+</tr>
+<tr>
+<td><code>state_json</code></td>
+<td>สถานะรีโมตล่าสุดที่สั่งไป (14 ค่า: เปิดปิด อุณหภูมิ โหมด ความแรงลม ฯลฯ) ระบบปิดแอร์เอาไปแก้แค่ <code>power: false</code> แล้วส่งทั้งชุด ค่าอื่นไม่เปลี่ยน</td>
+<td>🔴 ขาดไม่ได้</td>
+<td>แยกเป็น 14 คอลัมน์ได้ ค้นด้วย SQL ง่ายกว่า (เช่น "แอร์ที่ตั้ง 18 องศา") แต่ทุกครั้งที่เพิ่มปุ่มรีโมตใหม่ต้อง <code>ALTER TABLE</code> ส่วน JSON เพิ่มได้ทันที และ Backend ไม่ต้องเข้าใจทุกค่า แค่ส่งต่อ (ดูกล่องด้านล่าง)</td>
+</tr>
+<tr>
+<td><code>voltage</code>, <code>current_amp</code>, <code>power_watts</code>, <code>energy_kwh</code>, <code>frequency_hz</code>, <code>power_factor</code></td>
+<td>ค่าล่าสุดจาก PZEM แสดงหน้าค่าไฟสด, <code>energy_kwh</code> ใช้หาผลต่างค่าไฟ</td>
+<td>🔴 <code>energy_kwh</code>, <code>power_watts</code> · 🟢 ที่เหลือ</td>
+<td>NULL = อ่านไม่ได้ (ดูหลักคิดข้อ 9)</td>
+</tr>
+<tr>
+<td><code>pzem_available</code></td>
+<td>PZEM อ่านค่าได้ไหม, <strong>ระบบปิดแอร์ไม่ทำงานถ้าเป็น false</strong> เพราะตรวจไม่ได้ว่าแอร์หยุดจริงหรือยัง</td>
+<td>🔴 ขาดไม่ได้</td>
+<td></td>
+</tr>
+<tr>
+<td><code>ac_running</code></td>
+<td>แอร์ทำงานอยู่ไหม (บอร์ดตัดสินจากกำลังไฟจริง ไม่ใช่จากคำสั่งที่ส่งไป) ใช้เริ่มนาฬิกาปิดแอร์และนับเวลาทำงาน</td>
+<td>🔴 ขาดไม่ได้</td>
+<td>อ่านจาก <code>state_json.power</code> ก็ได้ แต่นั่นคือ "สิ่งที่สั่ง" ถ้ามีคนกดรีโมตเอง ค่าจะไม่ตรงความจริง การวัดจากไฟจริงแม่นกว่า</td>
+</tr>
+<tr>
+<td><code>outside_schedule</code></td>
+<td>บอร์ดรายงานว่าแอร์ทำงานนอกคาบ (ไฟ LED แดง) แสดงในแอป</td>
+<td>🟢 ไว้ดู</td>
+<td>ระบบแจ้งเตือนคำนวณ "นอกคาบ" เองจากตารางเรียน ไม่ได้อ่านคอลัมน์นี้</td>
+</tr>
+</tbody>
+</table></div>
+<div class="callout why"><div class="callout-title">ทำไม</div><p><strong>ทำไม state_json เก็บเป็นข้อความ JSON ในฐานข้อมูลเชิงสัมพันธ์ ผิดหลักไหม</strong>
+ผิดหลัก "ทุกค่าต้องเป็นคอลัมน์" (First Normal Form) ถ้ามองแบบเคร่งครัด แต่ค่าพวกนี้มีลักษณะพิเศษ: Backend <strong>ไม่ได้ใช้ค่าข้างในตัดสินอะไรเลย</strong> นอกจาก <code>power</code> ทุกค่าแค่รับจากแอปแล้วส่งต่อให้บอร์ด และรีโมตแต่ละยี่ห้อรองรับปุ่มไม่เท่ากัน (แอร์สายแอร์ Daikin ไม่มีบางปุ่ม) การเก็บเป็นก้อนเดียวจึงยืดหยุ่นกว่า MariaDB มีฟังก์ชัน <code>JSON_EXTRACT()</code> ถ้าวันหนึ่งต้องค้นค่าข้างในก็ยังทำได้ สิ่งที่เสียไปคือฐานข้อมูลไม่ตรวจว่า JSON ถูกรูปแบบ โค้ดจึงต้องมีค่าตั้งต้นสำรองเสมอ (<code>parseState()</code> ใน <code>services/auto-off.js</code>)</p></div>
+
+<h3 id="กลุ่ม-4-นาฬิกาปิดแอร์อัตโนมัติ">กลุ่ม 4: นาฬิกาปิดแอร์อัตโนมัติ<a class="anchor" href="#กลุ่ม-4-นาฬิกาปิดแอร์อัตโนมัติ">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>คอลัมน์</th>
+<th>ใช้ทำอะไรในโค้ดจริง</th>
+<th>จำเป็นแค่ไหน</th>
+<th>ทำแบบอื่นได้ไหม</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>auto_off_enabled</code></td>
+<td>เปิด/ปิดระบบนี้รายเครื่อง (สวิตช์รวมทั้งอาคารอยู่ที่ <code>system_settings</code>)</td>
+<td>🟠 ควรมี</td>
+<td>ใช้สวิตช์รวมอย่างเดียวได้ แต่บางห้อง (เช่น ห้องเซิร์ฟเวอร์) ต้องไม่ถูกปิดเลย</td>
+</tr>
+<tr>
+<td><code>auto_off_deadline_at</code></td>
+<td>เวลาที่จะสั่งปิด, <strong>NULL = ไม่ได้นับถอยหลังอยู่</strong> แอปเอาไปแสดงนาฬิกา</td>
+<td>🔴 ขาดไม่ได้</td>
+<td></td>
+</tr>
+<tr>
+<td><code>auto_off_attempts</code></td>
+<td>สั่งปิดไปแล้วกี่ครั้ง ครบ 5 ครั้ง (<code>AUTO_OFF_MAX_ATTEMPTS</code>) แอร์ยังไม่ดับ → แจ้งเตือนว่าปิดไม่สำเร็จ</td>
+<td>🔴 ขาดไม่ได้</td>
+<td></td>
+</tr>
+<tr>
+<td><code>auto_off_last_attempt_at</code></td>
+<td>เว้นห่าง 20 วินาที (<code>AUTO_OFF_RETRY_SECONDS</code>) ระหว่างแต่ละครั้ง</td>
+<td>🔴 ขาดไม่ได้</td>
+<td></td>
+</tr>
+<tr>
+<td><code>auto_off_in_class</code></td>
+<td>ตอนเริ่มนับอยู่ในคาบไหม (ในคาบรอ 15 นาที นอกคาบ 5 นาที) แสดงในแอป</td>
+<td>🟢 ไว้ดู</td>
+<td>ความยาวของนาฬิกาถูกคำนวณไปเป็น <code>deadline_at</code> แล้วตอนเริ่มนับ ค่านี้ใช้บอกผู้ใช้ว่าทำไมรอนานไม่เท่ากัน</td>
+</tr>
+<tr>
+<td><code>auto_off_started_at</code></td>
+<td>ตั้งตอนเริ่มนับ ล้างตอนจบ <strong>ไม่มีตรรกะไหนใช้ตัดสิน และไม่ส่งออกทาง API</strong></td>
+<td>🟢 ไว้ดู</td>
+<td>หาได้จาก <code>deadline_at</code> ลบ 5 หรือ 15 นาที</td>
+</tr>
+</tbody>
+</table></div>
+<div class="callout why"><div class="callout-title">ทำไม</div><p><strong>ทำไมเก็บนาฬิกาปิดแอร์ในฐานข้อมูล ไม่เก็บในหน่วยความจำของ Backend</strong>
+เก็บเป็นตัวแปรใน Node.js ง่ายและเร็วกว่า แต่ (1) Backend รีสตาร์ต (อัปเดตโค้ด เซิร์ฟเวอร์ดับ) นาฬิกาทุกเครื่องหายหมด แอร์ที่ควรถูกปิดใน 2 นาทีจะเริ่มนับใหม่ 5 นาที (2) แอปและเว็บต้องเห็นนาฬิกาเดียวกัน ซึ่งอ่านจากฐานข้อมูลผ่าน API ได้ตรง ๆ (3) ถ้าวันหน้ารัน Backend สองตัว ทั้งสองตัวเห็นค่าเดียวกัน ข้อแลกเปลี่ยนคือเขียนฐานข้อมูลบ่อยขึ้น โค้ดจึงเขียนเฉพาะตอนสถานะเปลี่ยน (<code>WHERE auto_off_deadline_at IS NOT NULL</code> ใน <code>clearCountdown()</code>) ไม่เขียนทุกรอบ 10 วินาที</p></div>
+
+<h3 id="กลุ่ม-5-เฟิร์มแวร์-และจุดต่อของค่าไฟ">กลุ่ม 5: เฟิร์มแวร์ และจุดต่อของค่าไฟ<a class="anchor" href="#กลุ่ม-5-เฟิร์มแวร์-และจุดต่อของค่าไฟ">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>คอลัมน์</th>
+<th>ใช้ทำอะไรในโค้ดจริง</th>
+<th>จำเป็นแค่ไหน</th>
+<th>ทำแบบอื่นได้ไหม</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>firmware_version</code>, <code>ota_error</code></td>
+<td>รุ่นเฟิร์มแวร์ที่บอร์ดรายงาน และข้อความผิดพลาดของ OTA ครั้งล่าสุด แสดงในหน้าเฟิร์มแวร์ของเว็บ</td>
+<td>🟢 ไว้ดู</td>
+<td></td>
+</tr>
+<tr>
+<td><code>energy_chain_kwh</code>, <code>energy_chain_at</code>, <code>energy_chain_running</code></td>
+<td>"จุดต่อ" = เลขมิเตอร์ เวลา และสถานะแอร์ของตัวอย่างล่าสุดที่ <strong>บันทึกลงถังแล้ว</strong> ตัวอย่างถัดไป (ทั้งข้อมูลสดและย้อนหลัง) คิดพลังงานจากผลต่างกับจุดนี้</td>
+<td>🔴 ขาดไม่ได้</td>
+<td>ดูกล่องด้านล่าง</td>
+</tr>
+<tr>
+<td><code>history_pending</code></td>
+<td>บอร์ดยังมีข้อมูลย้อนหลังค้างส่งกี่รายการ ระหว่างที่ &gt; 0 Backend <strong>ไม่บันทึกข้อมูลสด</strong> ลงถัง แสดงบนเว็บ</td>
+<td>🔴 ขาดไม่ได้</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<div class="callout why"><div class="callout-title">ทำไม</div><p><strong>ทำไมต้องมีจุดต่อ ใช้ <code>energy_kwh</code> (ค่าล่าสุด) ไม่ได้หรือ</strong>
+<code>energy_kwh</code> ถูกเขียนทับทุกครั้งที่บอร์ดส่งสถานะ แต่ตอนเน็ตหลุด บอร์ดเก็บข้อมูลไว้แล้วส่งย้อนหลังมาทีหลัง ซึ่งเป็นข้อมูลของ "อดีต" ที่มาถึงหลังข้อมูล "ปัจจุบัน" ถ้าคิดผลต่างจากค่าล่าสุด พลังงานช่วงเน็ตหลุดจะถูกนับซ้ำหรือหายไป จุดต่อจึงจำว่า "บันทึกถึงตรงไหนแล้ว" แยกจาก "ค่าล่าสุดที่เห็น" ข้อมูลย้อนหลังที่เวลาไม่เกินจุดต่อถูกข้าม บอร์ดส่งซ้ำกี่ครั้งก็ไม่นับซ้ำ และระหว่างที่ยังส่งย้อนหลังไม่ครบ (<code>history_pending &gt; 0</code>) ข้อมูลสดถูกพักไว้ ไม่งั้นพลังงานช่วงเน็ตหลุดทั้งหมดจะไปกองที่ชั่วโมงที่เน็ตกลับมา</p></div>
+
+<h2 id="ตาราง-occupancy_sensors--เซ็นเซอร์ตรวจจับคน">ตาราง occupancy_sensors — เซ็นเซอร์ตรวจจับคน<a class="anchor" href="#ตาราง-occupancy_sensors--เซ็นเซอร์ตรวจจับคน">#</a></h2>
+<p><strong>ทำไมแยกจาก <code>air_conditioners</code>:</strong> ทั้งสองเป็น "บอร์ด ESP32 ที่ลงทะเบียนผ่านบลูทูธแล้วคุย MQTT" เหมือนกัน แต่ข้อมูลที่เหลือต่างกันเกือบหมด (เซ็นเซอร์ไม่มีค่าไฟ ไม่มีรีโมต แอร์ไม่มีสถานะคน) และ <strong>หนึ่งห้องมีเซ็นเซอร์ได้ตัวเดียว</strong> (<code>UNIQUE (room_number)</code>) แต่มีแอร์ได้หลายเครื่อง</p>
+<p><strong>ทำแบบอื่นได้ไหม:</strong> ทำตาราง <code>devices</code> ตารางเดียวมีคอลัมน์ <code>device_type</code> แล้วปล่อยคอลัมน์ที่ไม่เกี่ยวเป็น NULL (single-table inheritance) โค้ดลงทะเบียนและ OTA ใช้ร่วมกันได้ แต่ตารางจะมีคอลัมน์ว่างเยอะ และกฎ "ห้องละหนึ่งเซ็นเซอร์" เขียนเป็น UNIQUE ตรง ๆ ไม่ได้ อีกทางคือตาราง <code>devices</code> เก็บส่วนร่วม + ตารางลูกต่อชนิด (class-table inheritance) ถูกหลักที่สุดแต่ต้อง JOIN ทุกครั้ง โปรเจกต์นี้มีอุปกรณ์แค่สองชนิด แยกตารางตรง ๆ ง่ายที่สุด ส่วนที่ซ้ำกันอยู่ในโค้ดแทน</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>คอลัมน์</th>
+<th>ใช้ทำอะไรในโค้ดจริง</th>
+<th>จำเป็นแค่ไหน</th>
+<th>หมายเหตุ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>device_id</code>, <code>room_number</code> (UNIQUE), <code>ble_name</code>, <code>mqtt_topic</code>, <code>mqtt_host</code>, <code>mqtt_port</code>, <code>mqtt_username</code>, <code>provision_status</code>, <code>provisioning_*</code></td>
+<td>เหมือนตารางแอร์ทุกประการ</td>
+<td>เหมือนตารางแอร์</td>
+<td><code>room_number</code> UNIQUE = ห้องละตัว</td>
+</tr>
+<tr>
+<td><code>is_online</code></td>
+<td>ระบบปิดแอร์ใช้เซ็นเซอร์ได้เฉพาะตอนออนไลน์</td>
+<td>🔴 ขาดไม่ได้</td>
+<td></td>
+</tr>
+<tr>
+<td><code>radar_available</code></td>
+<td>เรดาร์ LD2410 ตอบอยู่ไหม (บอร์ดออนไลน์แต่เรดาร์เสียได้)</td>
+<td>🔴 ขาดไม่ได้</td>
+<td></td>
+</tr>
+<tr>
+<td><code>is_occupied</code></td>
+<td>มีคนในห้องไหม, มีคน = ยกเลิกนาฬิกาปิดแอร์</td>
+<td>🔴 ขาดไม่ได้</td>
+<td></td>
+</tr>
+<tr>
+<td><code>static_threshold</code></td>
+<td>เกณฑ์พลังงานสัญญาณ "คนนั่งนิ่ง" ที่ส่งให้บอร์ด <strong>ตอนนี้โค้ดเขียนค่าคงที่ 25 เสมอ</strong> (<code>STATIC_ENERGY_THRESHOLD</code>) ยังไม่มีหน้าจอให้ปรับ</td>
+<td>🟢 ไว้ดู</td>
+<td>เก็บไว้รองรับการปรับรายห้องในอนาคต (ห้องใหญ่อาจต้องเกณฑ์ต่ำกว่า)</td>
+</tr>
+<tr>
+<td><code>firmware_version</code>, <code>ota_error</code>, <code>last_seen_at</code>, audit</td>
+<td>เหมือนตารางแอร์</td>
+<td>🟢 ไว้ดู</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<div class="callout why"><div class="callout-title">ทำไม</div><p><strong>ทำไมต้องมีทั้ง is_online, radar_available และ is_occupied แค่ is_occupied ไม่พอหรือ</strong>
+เพราะ "ไม่รู้" ต่างจาก "ไม่มีคน" ถ้าบอร์ดหลุดหรือเรดาร์เสีย แล้วเราอ่านแค่ <code>is_occupied = false</code> ระบบจะเข้าใจว่าห้องว่างแล้วสั่งปิดแอร์ทั้งที่อาจมีคนเรียนอยู่ <code>decideAutoOff()</code> จึงใช้เซ็นเซอร์เฉพาะเมื่อ <strong>ออนไลน์ และ เรดาร์ทำงาน</strong> ถ้าไม่ครบ <strong>ไม่ปิดเด็ดขาด</strong> ผิดพลาดแบบ "เปลืองไฟ" ดีกว่า "ปิดแอร์ใส่คนกำลังเรียน"</p></div>
+
+<h2 id="ตาราง-system_alerts--การแจ้งเตือน">ตาราง system_alerts — การแจ้งเตือน<a class="anchor" href="#ตาราง-system_alerts--การแจ้งเตือน">#</a></h2>
+<p><strong>ทำไมเป็นตารางแยก:</strong> การแจ้งเตือนเป็นเหตุการณ์ที่เกิดขึ้นแล้วต้องเก็บไว้ให้คนมารับทราบ และต้องอยู่ต่อแม้ถอดแอร์ไปแล้ว</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>คอลัมน์</th>
+<th>ใช้ทำอะไรในโค้ดจริง</th>
+<th>จำเป็นแค่ไหน</th>
+<th>ทำแบบอื่นได้ไหม</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code> (UUID)</td>
+<td>กดรับทราบทีละใบ</td>
+<td>🔴 ขาดไม่ได้</td>
+<td></td>
+</tr>
+<tr>
+<td><code>kind</code> (ENUM)</td>
+<td>ชนิด: มีคนใช้ห้องนอกตาราง, ปิดแอร์สำเร็จ, ปิดแอร์ไม่สำเร็จ แอปแปลเป็นข้อความเอง</td>
+<td>🔴 ขาดไม่ได้</td>
+<td>เก็บข้อความภาษาไทยสำเร็จรูปได้ แต่แปลเป็นภาษาอังกฤษไม่ได้ และแก้ถ้อยคำทีหลังไม่ได้ (ข้อความเก่าค้างอยู่ในฐานข้อมูล)</td>
+</tr>
+<tr>
+<td><code>room_number</code>, <code>device_id</code> (ไม่มี FK)</td>
+<td>ห้อง/เครื่องที่เกี่ยว, ใช้หาใบที่ยังเปิดอยู่เพื่อไม่สร้างซ้ำ</td>
+<td>🔴 ขาดไม่ได้</td>
+<td>ไม่ผูก FK เพราะเป็นประวัติ (หลักคิดข้อ 4)</td>
+</tr>
+<tr>
+<td><code>device_name</code></td>
+<td>ชื่อแอร์ <strong>ณ ตอนที่เกิดเหตุ</strong> (สำเนาไว้)</td>
+<td>🟠 ควรมี</td>
+<td>JOIN ไป <code>air_conditioners</code> เอาชื่อปัจจุบันได้ แต่ถ้าถอดแอร์ไปแล้วจะไม่เหลือชื่อให้แสดง</td>
+</tr>
+<tr>
+<td><code>detail</code></td>
+<td>รายละเอียดสั้น เช่น <code>attempts=5</code></td>
+<td>🟢 ไว้ดู</td>
+<td></td>
+</tr>
+<tr>
+<td><code>status</code> (ENUM)</td>
+<td><code>open</code> = ต้องมีคนจัดการ, <code>acknowledged</code> = มีคนรับทราบแล้ว, <code>resolved</code> = เหตุหายไปเอง (เช่น คนออกจากห้องแล้ว) หรือเป็นแค่รายงานผล</td>
+<td>🔴 ขาดไม่ได้</td>
+<td></td>
+</tr>
+<tr>
+<td><code>acknowledged_at</code>, <code>acknowledged_by</code></td>
+<td>ใครกดรับทราบ เมื่อไร แสดงในแอป</td>
+<td>🟢 ไว้ดู</td>
+<td></td>
+</tr>
+<tr>
+<td><code>resolved_at</code></td>
+<td>เหตุหายไปเมื่อไร</td>
+<td>🟢 ไว้ดู</td>
+<td></td>
+</tr>
+<tr>
+<td><code>created_at</code></td>
+<td>เรียงรายการล่าสุดก่อน</td>
+<td>🔴 ขาดไม่ได้</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Index:</strong> <code>idx_system_alerts_open (status, kind, room_number, device_id)</code> ตรงกับคำสั่ง "มีใบเดิมของเครื่องนี้ที่ยังเปิดอยู่ไหม" ซึ่งรันทุกครั้งก่อนสร้างใบใหม่ (ระบบตรวจทุก 10 วินาที ถ้าไม่กันซ้ำ จะได้ใบใหม่ทุก 10 วินาที) <code>idx_system_alerts_feed (created_at)</code> สำหรับหน้ารายการ</p>
+<div class="callout note"><div class="callout-title">หมายเหตุ</div><p>ไม่มีงานลบการแจ้งเตือนเก่า ตารางโตช้า ๆ (เกิดเฉพาะเมื่อมีเหตุ) ถ้าวันหนึ่งใหญ่เกิน ลบใบ <code>resolved</code> ที่เก่ากว่า 1 ปีได้โดยไม่กระทบอะไร</p></div>
+
+<h2 id="ตาราง-energy_hourly--ค่าไฟรายชั่วโมง">ตาราง energy_hourly — ค่าไฟรายชั่วโมง<a class="anchor" href="#ตาราง-energy_hourly--ค่าไฟรายชั่วโมง">#</a></h2>
+<p><strong>ทำไมเป็นถังรายชั่วโมง:</strong> ดูหลักคิดข้อ 2 และ 3 ส่วนนี้ดูว่าคอลัมน์ไหนออกรายงานจริง</p>
+<p><strong>คีย์หลัก <code>(device_id, bucket_start)</code>:</strong> หนึ่งเครื่องหนึ่งชั่วโมงมีแถวเดียว คีย์นี้ทำให้ใช้ <code>INSERT … ON DUPLICATE KEY UPDATE</code> ได้ คือ "ถ้ายังไม่มีถังชั่วโมงนี้ สร้าง ถ้ามีแล้ว บวกเพิ่ม" ในคำสั่งเดียว ไม่ต้องอ่านก่อนเขียน ถ้าใช้ UUID เป็นคีย์ จะต้องอ่านหาก่อนว่ามีถังหรือยัง และสองคำขอพร้อมกันอาจสร้างถังซ้ำ</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>คอลัมน์</th>
+<th>ออกรายงานไหม (<code>METRIC_CATALOG</code>)</th>
+<th>จำเป็นแค่ไหน</th>
+<th>หมายเหตุ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>device_id</code>, <code>bucket_start</code></td>
+<td>—</td>
+<td>🔴 ขาดไม่ได้</td>
+<td>คีย์</td>
+</tr>
+<tr>
+<td><code>room_number</code>, <code>device_name</code></td>
+<td>ใช้กรองตามห้อง และแสดงชื่อ</td>
+<td>🔴 ขาดไม่ได้</td>
+<td>สำเนาไว้ในถัง (ไม่ผูก FK) ถอดแอร์แล้วรายงานเก่ายังรู้ว่าเป็นห้องไหน</td>
+</tr>
+<tr>
+<td><code>consumption_kwh</code></td>
+<td>✅ พลังงานที่ใช้ และค่าไฟโดยประมาณ (× อัตราค่าไฟ)</td>
+<td>🔴 ขาดไม่ได้</td>
+<td>ตัวเลขหลักของระบบ</td>
+</tr>
+<tr>
+<td><code>runtime_seconds</code></td>
+<td>✅ เวลาที่แอร์ทำงาน</td>
+<td>🔴 ขาดไม่ได้</td>
+<td></td>
+</tr>
+<tr>
+<td><code>sample_count</code></td>
+<td>✅ จำนวนครั้งที่บันทึก (โหมดละเอียด)</td>
+<td>🟠 ควรมี</td>
+<td>บอกว่าชั่วโมงนั้นข้อมูลครบแค่ไหน</td>
+</tr>
+<tr>
+<td><code>pzem_samples</code></td>
+<td>ใช้เป็นตัวหารค่าเฉลี่ย</td>
+<td>🔴 ขาดไม่ได้</td>
+<td>ตัวหารต้องเป็นตัวอย่างที่ PZEM อ่านได้ ไม่ใช่ทุกตัวอย่าง</td>
+</tr>
+<tr>
+<td><code>voltage_sum</code>, <code>current_sum</code>, <code>power_sum</code>, <code>power_factor_sum</code>, <code>frequency_sum</code></td>
+<td>✅ ค่าเฉลี่ย (÷ <code>pzem_samples</code>)</td>
+<td>🟢 ไว้ดู (ใช้ในรายงานละเอียด)</td>
+<td>ต้องเก็บเป็นผลรวม (หลักคิดข้อ 3)</td>
+</tr>
+<tr>
+<td><code>power_max</code>, <code>power_min</code>, <code>voltage_min</code>, <code>voltage_max</code>, <code>current_max</code></td>
+<td>✅ ค่าสูงสุด/ต่ำสุด</td>
+<td>🟢 ไว้ดู</td>
+<td><code>power_max</code> ใช้ในสรุปภาพรวม (พีกของช่วงนั้น)</td>
+</tr>
+<tr>
+<td><code>energy_end_kwh</code></td>
+<td>✅ เลขมิเตอร์สะสม (โหมดละเอียด)</td>
+<td>🟢 ไว้ดู</td>
+<td>ใช้ตรวจย้อนกับมิเตอร์จริง</td>
+</tr>
+<tr>
+<td><code>online_seconds</code></td>
+<td>✅ เวลาที่อุปกรณ์ออนไลน์ (โหมดละเอียด)</td>
+<td>🟢 ไว้ดู</td>
+<td></td>
+</tr>
+<tr>
+<td><code>current_min</code></td>
+<td>❌ ไม่ออกรายงาน</td>
+<td>🟢 ไว้ดู</td>
+<td>เก็บให้ครบชุด min/max ของกระแส</td>
+</tr>
+<tr>
+<td><code>running_samples</code></td>
+<td>❌ ไม่ออกรายงาน</td>
+<td>🟢 ไว้ดู</td>
+<td></td>
+</tr>
+<tr>
+<td><code>energy_start_kwh</code></td>
+<td>❌ ไม่ออกรายงาน</td>
+<td>🟢 ไว้ดู</td>
+<td>คู่กับ <code>energy_end_kwh</code> ใช้ตรวจว่า <code>consumption_kwh</code> ≈ ปลาย − ต้น</td>
+</tr>
+<tr>
+<td><code>first_sample_at</code>, <code>last_sample_at</code></td>
+<td>❌ ไม่ออกรายงาน</td>
+<td>🔴 ขาดไม่ได้</td>
+<td>ใช้ตัดสินตอนบวกข้อมูลเข้าถังว่า "เลขมิเตอร์ต้นชั่วโมง" และ "ปลายชั่วโมง" ควรเป็นค่าไหน (ข้อมูลย้อนหลังอาจมาถึงทีหลังข้อมูลที่ใหม่กว่า)</td>
+</tr>
+<tr>
+<td><code>created_at</code>, <code>updated_at</code></td>
+<td>—</td>
+<td>🟢 ไว้ดู</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<div class="callout why"><div class="callout-title">ทำไม</div><p><strong>ทำไมค่าไฟในรายงานคำนวณตอนดึง ไม่เก็บเป็นบาทไว้ในถัง</strong>
+ถังเก็บแค่ kWh แล้วค่อยคูณอัตราค่าไฟตอนสร้างรายงาน (อัตราส่งมาพร้อมคำขอจากค่าใน <code>system_settings.electricity_rate</code>) แก้อัตราแล้วรายงานทุกช่วงเปลี่ยนตามทันที ไม่ต้องคำนวณข้อมูลเก่าใหม่ <strong>ข้อแลกเปลี่ยน:</strong> ถ้าการไฟฟ้าขึ้นค่าไฟกลางปี รายงานย้อนหลังจะคิดด้วยอัตราใหม่ทั้งหมด ไม่ใช่อัตราจริง ณ ตอนนั้น ถ้าต้องการแม่นตามช่วงเวลา ต้องเพิ่มตาราง <code>electricity_rates(effective_from, rate)</code> แล้ว JOIN ตามวันที่</p></div>
+
+<div class="callout note"><div class="callout-title">หมายเหตุ</div><p>ค่าเริ่มต้นคือเก็บถังค่าไฟไว้ตลอด มีฟังก์ชัน <code>purgeEnergyHistoryOlderThan(days)</code> ใน <code>services/energy-recorder.js</code> สำหรับลบข้อมูลเก่า แต่ไม่มีอะไรเรียกใช้อัตโนมัติ ด้วยขนาดราว 4 แสนแถวต่อปี เก็บได้หลายปีโดยไม่ต้องลบ</p></div>
+
+<h2 id="ตาราง-system_settings--ค่าตั้งระดับระบบ">ตาราง system_settings — ค่าตั้งระดับระบบ<a class="anchor" href="#ตาราง-system_settings--ค่าตั้งระดับระบบ">#</a></h2>
+<p><strong>ทำไมเป็นตาราง key-value:</strong> มีค่าตั้งแค่ 3 ตัว</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th><code>setting_key</code></th>
+<th>ค่า</th>
+<th>ใช้ทำอะไร</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>auto_off_enabled</code></td>
+<td><code>true</code>/<code>false</code></td>
+<td>สวิตช์รวมระบบปิดแอร์อัตโนมัติทั้งอาคาร ปิดแล้วล้างนาฬิกาทุกเครื่อง</td>
+</tr>
+<tr>
+<td><code>electricity_rate</code></td>
+<td>เช่น <code>4.5</code></td>
+<td>อัตราค่าไฟต่อหน่วย (ยอมรับ 0.01–100)</td>
+</tr>
+<tr>
+<td><code>timetable_semester</code></td>
+<td>เช่น <code>2/2569</code></td>
+<td>ตารางเรียนในระบบเป็นของเทอมไหน (ไว้ดู ไม่ใช้ตัดสินปิดแอร์) และใช้เลือกวันเปิด-ปิดภาคใน <code>academic_terms</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>ไม่มีค่าไหนเก็บอยู่ ระบบใช้ค่าตั้งต้นในโค้ด (เปิดระบบปิดแอร์ไว้ อัตรา 4.50 บาท)</p>
+<p><strong>ทำแบบอื่นได้ไหม:</strong>
+- <strong>ตารางแถวเดียวมีคอลัมน์ตามค่าตั้ง</strong> (<code>auto_off_enabled BOOLEAN, electricity_rate DECIMAL, …</code>) ได้ชนิดข้อมูลถูกต้อง ฐานข้อมูลตรวจให้ แต่เพิ่มค่าตั้งใหม่ต้อง <code>ALTER TABLE</code>
+- <strong>เก็บใน <code>.env</code></strong> ง่ายสุด แต่แอดมินต้องแก้ไฟล์บนเซิร์ฟเวอร์แล้วรีสตาร์ต ไม่ใช่กดในเว็บ
+- <strong>เก็บในแอปมือถือ</strong> ไม่ได้เลย เพราะตัวที่สั่งปิดแอร์คือ Backend ถ้าสวิตช์อยู่ในมือถือเครื่องหนึ่ง เครื่องอื่นและ Backend ไม่รู้</p>
+<p>แบบ key-value แลกความเข้มงวดของชนิดข้อมูล (ทุกค่าเป็นข้อความ โค้ดต้องแปลงเอง: <code>parseRate()</code>, <code>parseBoolean</code>) กับความง่ายในการเพิ่มค่าใหม่ ค่าที่อ่านบ่อย (ทุก 10 วินาที) ถูกพักไว้ในหน่วยความจำ 5 วินาที เพื่อไม่ให้อ่านฐานข้อมูลถี่เกินไป</p>
+<h2 id="ตาราง-academic_terms--ปฏิทินภาคเรียน">ตาราง academic_terms — ปฏิทินภาคเรียน<a class="anchor" href="#ตาราง-academic_terms--ปฏิทินภาคเรียน">#</a></h2>
+<p><strong>ทำไมเป็นตารางแยก:</strong> ตารางเรียนใช้ได้เฉพาะช่วงเปิดภาค ช่วงปิดภาคห้องควรถือว่า "นอกคาบ" (ปิดแอร์เร็ว 5 นาทีและแจ้งเตือน) โดยไม่ต้องลบตารางเรียนทิ้ง แล้วนำเข้าใหม่ตอนเปิดเทอม</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>คอลัมน์</th>
+<th>ใช้ทำอะไรในโค้ดจริง</th>
+<th>จำเป็นแค่ไหน</th>
+<th>ทำแบบอื่นได้ไหม</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>semester</code> (PK)</td>
+<td>รูปแบบ <code>เทอม/ปี</code> เช่น <code>1/2569</code> ตรวจด้วย <code>/^[1-3]\/\d{4}$/</code></td>
+<td>🔴 ขาดไม่ได้</td>
+<td></td>
+</tr>
+<tr>
+<td><code>start_date</code>, <code>end_date</code> (DATE)</td>
+<td>วันนี้อยู่ในภาคไหม: ก่อนเปิด / ในภาค / หลังปิด</td>
+<td>🔴 ขาดไม่ได้</td>
+<td></td>
+</tr>
+<tr>
+<td><code>updated_by</code></td>
+<td>ส่งออกทาง API แต่หน้าจอยังไม่แสดง</td>
+<td>🟢 ไว้ดู</td>
+<td></td>
+</tr>
+<tr>
+<td><code>created_at</code>, <code>updated_at</code></td>
+<td>—</td>
+<td>🟢 ไว้ดู</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>ทำแบบอื่นได้ไหม:</strong> เก็บวันเปิด-ปิดไว้ใน <code>system_settings</code> สองคีย์ได้ แต่จะเก็บได้แค่เทอมเดียว ตารางแยกทำให้ตั้งปฏิทินเทอมหน้าไว้ล่วงหน้าได้ และถ้าภาคเรียนที่ใช้อยู่ไม่ได้ตั้งวันไว้ ระบบใช้ตารางเรียนได้ทุกวันเหมือนเดิม (ค่า <code>none</code>) ไม่พัง</p>
+<div class="callout note"><div class="callout-title">หมายเหตุ</div><p>ฐานข้อมูลไม่ได้กันวันปิดก่อนวันเปิด (ไม่มี <code>CHECK</code>) โค้ด <code>validateTermInput()</code> ตรวจให้ แต่ถ้าแก้ด้วย SQL ตรง ๆ อาจใส่ค่าผิดได้ MariaDB 10.2 ขึ้นไปรองรับ <code>CHECK (end_date &gt;= start_date)</code> ถ้าอยากให้ฐานข้อมูลกันอีกชั้น</p></div>
+
+<h2 id="ตาราง-room_bookings--การใช้ห้องนอกตารางเรียน">ตาราง room_bookings — การใช้ห้องนอกตารางเรียน<a class="anchor" href="#ตาราง-room_bookings--การใช้ห้องนอกตารางเรียน">#</a></h2>
+<p><strong>ทำไมแยกจาก <code>class_schedules</code>:</strong> ดูหัวข้อตารางเรียน การจองมีวันที่กำกับ ทำซ้ำได้หลายแบบ และมีผลแม้ปิดภาค (สอบชดเชย ประชุม)</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>คอลัมน์</th>
+<th>ใช้ทำอะไรในโค้ดจริง</th>
+<th>จำเป็นแค่ไหน</th>
+<th>ทำแบบอื่นได้ไหม</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code> (UUID)</td>
+<td>แก้/ลบรายการ</td>
+<td>🔴 ขาดไม่ได้</td>
+<td></td>
+</tr>
+<tr>
+<td><code>room_number</code> (FK, CASCADE)</td>
+<td>ห้องที่จอง</td>
+<td>🔴 ขาดไม่ได้</td>
+<td></td>
+</tr>
+<tr>
+<td><code>title</code></td>
+<td>ชื่อกิจกรรม แสดงในแอป</td>
+<td>🟢 ไว้ดู</td>
+<td></td>
+</tr>
+<tr>
+<td><code>category</code></td>
+<td><code>class</code>, <code>meeting</code>, <code>exam</code>, <code>event</code>, <code>other</code> เลือกและแสดงประเภทในแอป/เว็บ</td>
+<td>🟢 ไว้ดู</td>
+<td></td>
+</tr>
+<tr>
+<td><code>note</code></td>
+<td>หมายเหตุ</td>
+<td>🟢 ไว้ดู</td>
+<td></td>
+</tr>
+<tr>
+<td><code>repeat_type</code></td>
+<td><code>once</code> วันเดียว / <code>daily</code> ทุกวันในช่วง / <code>weekly</code> เฉพาะวันที่เลือก</td>
+<td>🔴 ขาดไม่ได้</td>
+<td></td>
+</tr>
+<tr>
+<td><code>days_of_week</code></td>
+<td>เช่น <code>"1,3"</code> = จันทร์ พุธ (ใช้เมื่อ <code>weekly</code>)</td>
+<td>🔴 ขาดไม่ได้</td>
+<td>ดูกล่องด้านล่าง</td>
+</tr>
+<tr>
+<td><code>start_date</code>, <code>end_date</code></td>
+<td>ช่วงวันที่มีผล (<code>once</code> ให้สองค่าเท่ากัน) ยาวไม่เกิน 400 วัน</td>
+<td>🔴 ขาดไม่ได้</td>
+<td></td>
+</tr>
+<tr>
+<td><code>start_time</code>, <code>end_time</code></td>
+<td>ช่วงเวลาในวันนั้น ระหว่างนั้นถือว่า "อยู่ในคาบ"</td>
+<td>🔴 ขาดไม่ได้</td>
+<td></td>
+</tr>
+<tr>
+<td>audit</td>
+<td>API ส่ง <code>createdBy</code>/<code>updatedBy</code> ออกไป แต่แอปไม่แสดง</td>
+<td>🟢 ไว้ดู</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<div class="callout why"><div class="callout-title">ทำไม</div><p><strong>ทำไม days_of_week เก็บเป็นข้อความ "1,3" ผิดหลัก normalization ไหม</strong>
+ถ้าเคร่งครัด ควรมีตารางลูก <code>room_booking_days(booking_id, day_of_week)</code> หนึ่งแถวต่อหนึ่งวัน แล้ว SQL จะกรองวันได้เอง แต่ในระบบนี้ SQL กรองแค่ "การจองที่ช่วงวันที่ครอบคลุมวันนี้" (<code>start_date &lt;= วันนี้ AND end_date &gt;= วันนี้</code>) ซึ่งได้ไม่กี่แถวต่อห้อง แล้วโค้ด JavaScript เช็กวันในสัปดาห์ต่อ (<code>bookingOccursOn()</code> ใน <code>utils/room-booking.js</code>) การมีตารางลูกจะเพิ่มความซับซ้อนตอนบันทึกและแก้ไข (ลบลูกเก่า ใส่ลูกใหม่ ใน transaction) โดยไม่ได้อะไรเพิ่มในการใช้งานจริง <strong>ข้อแลกเปลี่ยน:</strong> ถ้าวันหนึ่งต้องการ "หาการจองทุกวันพุธทั้งตึก" ด้วย SQL ล้วน ๆ จะทำยาก (ต้องใช้ <code>FIND_IN_SET('3', days_of_week)</code> ซึ่งใช้ index ไม่ได้)</p></div>
+
+<div class="callout note"><div class="callout-title">หมายเหตุ</div><p>ฐานข้อมูลไม่ได้กันการจองซ้อนเวลากัน (สองกิจกรรมห้องเดียวกันเวลาเดียวกัน) เพราะผลต่อระบบปิดแอร์เหมือนกัน คือ "ห้องอยู่ในคาบ" ถ้าต้องการใช้เป็นระบบจองห้องจริงจัง ต้องเพิ่มการตรวจเวลาชนกันในโค้ด</p></div>
+
+<h2 id="สรุป-อะไรตัดได้-อะไรห้ามตัด">สรุป: อะไรตัดได้ อะไรห้ามตัด<a class="anchor" href="#สรุป-อะไรตัดได้-อะไรห้ามตัด">#</a></h2>
+<h3 id="เหลือจากรุ่นเก่า-หรือยังไม่ถูกใช้-ตัดหรือปรับได้">เหลือจากรุ่นเก่า หรือยังไม่ถูกใช้ (ตัดหรือปรับได้)<a class="anchor" href="#เหลือจากรุ่นเก่า-หรือยังไม่ถูกใช้-ตัดหรือปรับได้">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>จุด</th>
+<th>สถานะตอนนี้</th>
+<th>ทางเลือก</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>rooms.is_active</code></td>
+<td>ทุก query กรอง แต่ไม่มีใครตั้งเป็น FALSE</td>
+<td>ลบออก (แก้ query + index) หรือทำปุ่ม "ซ่อนห้อง" ให้ใช้จริง</td>
+</tr>
+<tr>
+<td>ค่า <code>'removed'</code> ใน <code>provision_status</code></td>
+<td>ถอดอุปกรณ์ = ลบแถว ไม่ตั้งค่านี้แล้ว</td>
+<td>เอาออกจาก ENUM พร้อมแก้ query ที่กรอง <code>&lt;&gt; 'removed'</code></td>
+</tr>
+<tr>
+<td><code>air_conditioners.mqtt_port</code>, <code>mqtt_username</code> (และของ <code>occupancy_sensors</code>)</td>
+<td>เขียนอย่างเดียว</td>
+<td>เก็บไว้เป็นบันทึกสืบปัญหาก็ได้</td>
+</tr>
+<tr>
+<td><code>auto_off_started_at</code></td>
+<td>เขียนอย่างเดียว</td>
+<td>เก็บไว้ดูก็ได้ หรือส่งออกทาง API ให้แอปแสดง "เริ่มนับเมื่อ"</td>
+</tr>
+<tr>
+<td><code>users.password_changed_at</code></td>
+<td>เขียนอย่างเดียว</td>
+<td>ใช้ทำนโยบาย "เปลี่ยนรหัสทุก N วัน" ได้</td>
+</tr>
+<tr>
+<td><code>occupancy_sensors.static_threshold</code></td>
+<td>ค่าคงที่ 25 เสมอ</td>
+<td>ทำหน้าจอให้แอดมินปรับรายห้อง</td>
+</tr>
+<tr>
+<td><code>energy_hourly.current_min</code>, <code>running_samples</code>, <code>energy_start_kwh</code></td>
+<td>ไม่ออกรายงาน</td>
+<td>เก็บไว้ ใช้ตรวจสอบข้อมูลได้ เปลืองที่น้อย</td>
+</tr>
+</tbody>
+</table></div>
+<div class="callout tip"><div class="callout-title">เคล็ดลับ</div><p><strong>อย่าลบคอลัมน์ทิ้งก่อนพรีเซนต์</strong> การลบคอลัมน์ต้องเขียน migration, แก้ <code>schema.sql</code>, แก้ query ทุกที่ที่อ้างถึง และรันเทสต์ใหม่ทั้งหมด ถ้าอาจารย์ถาม ตอบได้ว่า "รู้ว่าคอลัมน์นี้ไม่ได้ใช้แล้ว เหลือจากรุ่นที่ใช้วิธีซ่อนแทนการลบ วางแผนจะเอาออกพร้อม migration" ซึ่งแสดงว่าเข้าใจระบบจริง ดีกว่าแก้ลวก ๆ แล้วระบบพัง</p></div>
+
+<h3 id="ดูเหมือนซ้ำซ้อน-แต่ห้ามตัด">ดูเหมือนซ้ำซ้อน แต่ห้ามตัด<a class="anchor" href="#ดูเหมือนซ้ำซ้อน-แต่ห้ามตัด">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>จุด</th>
+<th>ทำไมห้ามตัด</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>energy_chain_*</code> กับ <code>energy_kwh</code></td>
+<td>ค่าหนึ่งคือ "ล่าสุดที่เห็น" อีกค่าคือ "บันทึกถึงตรงไหนแล้ว" ตัดแล้วข้อมูลตอนเน็ตหลุดนับซ้ำ/หาย</td>
+</tr>
+<tr>
+<td><code>pzem_samples</code> กับ <code>sample_count</code></td>
+<td>ตัวหารค่าเฉลี่ยต้องนับเฉพาะตัวอย่างที่ PZEM อ่านได้</td>
+</tr>
+<tr>
+<td><code>ac_running</code> กับ <code>state_json.power</code></td>
+<td>อันหนึ่งคือไฟจริง อันหนึ่งคือคำสั่งที่ส่งไป มีคนกดรีโมตเองได้</td>
+</tr>
+<tr>
+<td><code>is_online</code> + <code>radar_available</code> + <code>is_occupied</code></td>
+<td>"ไม่รู้" ≠ "ไม่มีคน" ตัดแล้วอาจปิดแอร์ใส่คน</td>
+</tr>
+<tr>
+<td><code>device_name</code>, <code>room_number</code> ใน <code>energy_hourly</code> และ <code>system_alerts</code></td>
+<td>ประวัติต้องอ่านรู้เรื่องหลังถอดอุปกรณ์ไปแล้ว</td>
+</tr>
+<tr>
+<td><code>mqtt_host</code></td>
+<td>ใช้สร้าง URL ไฟล์เฟิร์มแวร์ตอน OTA</td>
+</tr>
+<tr>
+<td><code>first_sample_at</code>, <code>last_sample_at</code></td>
+<td>ใช้ตัดสินเลขมิเตอร์ต้น/ปลายชั่วโมงตอนข้อมูลมาไม่ตามลำดับ</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="คำถามที่อาจารย์อาจถาม">คำถามที่อาจารย์อาจถาม<a class="anchor" href="#คำถามที่อาจารย์อาจถาม">#</a></h2>
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> ฐานข้อมูลนี้ normalize ถึงระดับไหน?</p>
+<p><strong>ตอบ:</strong> ส่วนใหญ่อยู่ระดับ 3NF คือไม่เก็บข้อมูลที่ได้จากที่อื่น เช่น จำนวนแอร์ในห้องนับจาก <code>air_conditioners</code> ไม่เก็บซ้ำในห้อง แต่มีจุดที่ตั้งใจ denormalize สามที่: (1) <code>state_json</code> เก็บเป็น JSON เพราะ Backend แค่ส่งต่อ ไม่ใช้ค่าข้างใน (2) <code>device_name</code>/<code>room_number</code> ใน <code>energy_hourly</code> และ <code>system_alerts</code> สำเนาไว้เพื่อให้ประวัติอยู่ได้หลังลบอุปกรณ์ (3) <code>days_of_week</code> เก็บเป็น "1,3" เพราะกรองต่อในโค้ดได้ง่ายกว่าตารางลูก ทุกจุดเป็นการแลกความถูกหลักกับความง่ายหรือความทนทานของประวัติ</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> ทำไมใช้เลขห้องเป็น primary key ถ้าวันหนึ่งเปลี่ยนเลขห้องจะทำอย่างไร?</p>
+<p><strong>ตอบ:</strong> เลขห้องเป็นชื่อที่ไม่ซ้ำและทุกคนใช้อยู่แล้ว เปิดดูข้อมูลอ่านรู้เรื่อง และไม่ต้อง JOIN เพื่อดูว่าแอร์อยู่ห้องไหน แอปไม่ให้แก้เลขห้อง แต่ถ้าจำเป็น แอดมินแก้ด้วย SQL ได้ เพราะ FK ทุกตัวที่ชี้มาที่ห้องตั้ง <code>ON UPDATE CASCADE</code> ตารางลูกจะเปลี่ยนตาม ส่วน <code>energy_hourly</code> และ <code>system_alerts</code> ไม่ผูก FK จึงต้องแก้เองถ้าอยากให้ประวัติใช้เลขใหม่</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> ทำไมตาราง air_conditioners มีคอลัมน์เยอะมาก ไม่แยกตาราง?</p>
+<p><strong>ตอบ:</strong> ข้อมูลทั้งหมดเป็นหนึ่งต่อหนึ่งกับแอร์หนึ่งเครื่อง (ทะเบียน ค่าสด นาฬิกาปิดแอร์) และเกือบทุกหน้าจอต้องใช้ครบ แถวเดียวจึงอ่านได้ทั้งหมดโดยไม่ JOIN และบอร์ดส่งสถานะมาก็ UPDATE ครั้งเดียว แยกเป็นสามตารางได้และถูกหลักแยกความรับผิดชอบกว่า แต่สำหรับแอร์หลักสิบเครื่อง ความซับซ้อนที่เพิ่มขึ้นไม่คุ้ม</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> ทำไมไม่เก็บค่าไฟทุก 10 วินาทีไว้ทั้งหมด จะได้ละเอียด?</p>
+<p><strong>ตอบ:</strong> แอร์ 45 เครื่องส่งทุก 10 วินาทีจะได้ราว 3.9 แสนแถวต่อวัน 142 ล้านแถวต่อปี รายงานจะช้าลงเรื่อย ๆ ถังรายชั่วโมงได้ 1,080 แถวต่อวัน และเก็บผลรวม ตัวนับ ค่าต่ำสุด สูงสุด ไว้ จึงยังคำนวณค่าเฉลี่ยและพีกได้ถูกต้อง สิ่งที่เสียไปคือดูรายวินาทีไม่ได้ ซึ่งรายงานค่าไฟไม่ต้องใช้ ถ้าต้องการจริงควรใช้ฐานข้อมูล time-series แยก</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> มีคอลัมน์ไหนที่ไม่ได้ใช้บ้าง?</p>
+<p><strong>ตอบ:</strong> มีครับ <code>rooms.is_active</code> กับค่า <code>removed</code> ของ <code>provision_status</code> เหลือจากรุ่นที่ใช้วิธีซ่อนแถวแทนการลบ ตอนนี้ลบจริงแล้ว และมีคอลัมน์ที่เขียนเก็บไว้อย่างเดียวเพื่อสืบปัญหา เช่น <code>mqtt_port</code>, <code>auto_off_started_at</code>, <code>password_changed_at</code> ยังไม่ได้ลบเพราะการลบคอลัมน์ต้องทำ migration และแก้ query ทุกจุดพร้อมกัน วางแผนจะเก็บกวาดในรุ่นถัดไป</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> ถ้าฐานข้อมูลหลุดออกไป อะไรรั่วบ้าง?</p>
+<p><strong>ตอบ:</strong> ชื่อ อีเมล เบอร์โทรของผู้ใช้ ตารางเรียน และค่าไฟ แต่ <strong>รหัสผ่านไม่รั่ว</strong> (เก็บเป็น bcrypt) OTP, token รีเซ็ต และ token ตั้งค่าบอร์ดเป็น HMAC ที่ต้องใช้กุญแจ <code>OTP_PEPPER</code> ซึ่งอยู่ใน <code>.env</code> ไม่อยู่ในฐานข้อมูล รหัสผ่าน MQTT ของบอร์ดไม่เก็บในฐานข้อมูลเลย และฐานข้อมูลเปิดพอร์ตแค่ <code>127.0.0.1</code> ของเซิร์ฟเวอร์ ต้องเข้าเซิร์ฟเวอร์ก่อนถึงจะต่อได้</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> ทำไมระบบปิดแอร์ไม่ปิดเลยถ้าเซ็นเซอร์เสีย ไม่เปลืองไฟหรือ?</p>
+<p><strong>ตอบ:</strong> ตั้งใจให้เป็นแบบนั้น ฐานข้อมูลแยก <code>is_online</code>, <code>radar_available</code>, <code>is_occupied</code> ไว้ก็เพื่อแยก "ไม่รู้" ออกจาก "ไม่มีคน" ถ้าเซ็นเซอร์ใช้ไม่ได้ ระบบไม่รู้ว่ามีคนไหม การปิดแอร์ใส่นักศึกษาที่กำลังเรียนเป็นความผิดพลาดที่แย่กว่าเปลืองไฟชั่วคราว ส่วนผู้ดูแลเห็นได้จากหน้าห้องในแอปและเว็บว่าเซ็นเซอร์ออฟไลน์หรือเรดาร์ไม่ตอบ</p></div>
+
+<h2 id="เช็กลิสต์ความเข้าใจ">เช็กลิสต์ความเข้าใจ<a class="anchor" href="#เช็กลิสต์ความเข้าใจ">#</a></h2>
+<ul>
+<li class="check"><input type="checkbox"> อธิบายได้ว่าทำไมบางตารางใช้ชื่อจริงเป็นคีย์ (เลขห้อง username MAC) บางตารางใช้ UUID</li>
+<li class="check"><input type="checkbox"> บอกได้ว่า FK ตัวไหน RESTRICT ตัวไหน CASCADE และทำไม <code>energy_hourly</code>/<code>system_alerts</code> ไม่มี FK</li>
+<li class="check"><input type="checkbox"> คำนวณให้อาจารย์ดูได้ว่าทำไมเก็บผลรวม + จำนวน ไม่เก็บค่าเฉลี่ย</li>
+<li class="check"><input type="checkbox"> อธิบายได้ว่า <code>energy_chain_*</code> ต่างจาก <code>energy_kwh</code> อย่างไร</li>
+<li class="check"><input type="checkbox"> รู้ว่าคอลัมน์ไหนเหลือจากรุ่นเก่า และตอบได้ว่าทำไมยังไม่ลบ</li>
+<li class="check"><input type="checkbox"> บอกทางเลือกอื่นได้อย่างน้อยหนึ่งแบบต่อหนึ่งการตัดสินใจ พร้อมเหตุผลที่ไม่เลือก</li>
+</ul><nav class="pager"><a class="prev" href="19-daikin-slm8.html"><span>← บทก่อนหน้า</span>19. แอร์ Daikin ผ่านสาย SLM8: จากการแกะโปรโตคอลถึงบอร์ดสายแอร์</a></nav>
+  </main>
+  <aside class="toc"><div class="toc-title">ในบทนี้</div><ul><li><a href="#วิธีอ่านบทนี้">วิธีอ่านบทนี้</a></li><li><a href="#หลักคิดที่ใช้ทั้งฐานข้อมูล">หลักคิดที่ใช้ทั้งฐานข้อมูล</a></li><li><a href="#ตาราง-users--บัญชีผู้ใช้">ตาราง users — บัญชีผู้ใช้</a></li><li><a href="#ตาราง-password_reset_otps--otp-ลืมรหัสผ่าน">ตาราง password_reset_otps — OTP ลืมรหัสผ่าน</a></li><li><a href="#ตาราง-rooms--ห้อง">ตาราง rooms — ห้อง</a></li><li><a href="#ตาราง-class_schedules--ตารางเรียน">ตาราง class_schedules — ตารางเรียน</a></li><li><a href="#ตาราง-air_conditioners--เครื่องปรับอากาศ">ตาราง air_conditioners — เครื่องปรับอากาศ</a></li><li><a href="#ตาราง-occupancy_sensors--เซ็นเซอร์ตรวจจับคน">ตาราง occupancy_sensors — เซ็นเซอร์ตรวจจับคน</a></li><li><a href="#ตาราง-system_alerts--การแจ้งเตือน">ตาราง system_alerts — การแจ้งเตือน</a></li><li><a href="#ตาราง-energy_hourly--ค่าไฟรายชั่วโมง">ตาราง energy_hourly — ค่าไฟรายชั่วโมง</a></li><li><a href="#ตาราง-system_settings--ค่าตั้งระดับระบบ">ตาราง system_settings — ค่าตั้งระดับระบบ</a></li><li><a href="#ตาราง-academic_terms--ปฏิทินภาคเรียน">ตาราง academic_terms — ปฏิทินภาคเรียน</a></li><li><a href="#ตาราง-room_bookings--การใช้ห้องนอกตารางเรียน">ตาราง room_bookings — การใช้ห้องนอกตารางเรียน</a></li><li><a href="#สรุป-อะไรตัดได้-อะไรห้ามตัด">สรุป: อะไรตัดได้ อะไรห้ามตัด</a></li><li><a href="#คำถามที่อาจารย์อาจถาม">คำถามที่อาจารย์อาจถาม</a></li><li><a href="#เช็กลิสต์ความเข้าใจ">เช็กลิสต์ความเข้าใจ</a></li></ul></aside>
+</div>
+<button class="to-top" id="toTop" aria-label="กลับขึ้นด้านบน">↑</button>
+<script src="../assets/search.js"></script>
+<script src="../assets/app.js"></script>
+</body>
+</html>
