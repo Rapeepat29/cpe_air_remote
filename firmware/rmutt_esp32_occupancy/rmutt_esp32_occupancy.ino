@@ -54,7 +54,7 @@ constexpr uint32_t BLE_READVERTISE_DELAY_MS = 600;
 constexpr uint32_t ONLINE_SETUP_WINDOW_MS = 5UL * 60UL * 1000UL;
 constexpr size_t MAX_CONFIG_BYTES = 3072;
 constexpr uint32_t NTP_SYNC_TIMEOUT_MS = 15000;
-constexpr char FIRMWARE_VERSION[] = "1.3.1";
+constexpr char FIRMWARE_VERSION[] = "1.3.2";
 
 // The service layout is shared with the A/C board, while the advertised name
 // and identity clearly distinguish RMUTT-OCC devices.
@@ -136,6 +136,7 @@ bool wifiRecoveryActive = false;
 uint32_t lastWifiRecoveryAttemptAt = 0;
 String pendingOtaUrl;
 bool otaRequested = false;
+bool unprovisionRequested = false;
 String lastOtaError;
 
 String createDeviceId();
@@ -157,6 +158,7 @@ bool connectWifiCredentials(
     uint32_t timeoutMs);
 void connectMqtt();
 void mqttCallback(char *topic, byte *payload, unsigned int length);
+void unprovisionAndRestart(const String &reason);
 void initialiseRadar();
 void updateOccupancy();
 void captureRadarRawBytes();
@@ -390,6 +392,7 @@ void loop() {
       publishStatus();
     }
   }
+  if (unprovisionRequested) unprovisionAndRestart("removed from the app");
   if (otaRequested) performOtaUpdate();
   delay(5);
 }
@@ -821,6 +824,18 @@ void mqttCallback(char *topic, byte *payload, unsigned int length) {
     enterBleReconfiguration("Flutter app requested reconfiguration");
     return;
   }
+  if (action == "unprovision") {
+    // Backend ส่งมาเมื่อแอดมินกดนำเซ็นเซอร์ออกในแอป
+    // ตรวจ deviceId ซ้ำอีกชั้น กันข้อความหลงมาผิด topic
+    // ทำต่อใน loop ไม่ใช่ใน callback เพราะต้อง publish และตัด MQTT
+    const String target = document["deviceId"] | "";
+    if (target != config.deviceId) {
+      Serial.printf("Unprovision ignored: deviceId '%s' is not this board\n", target.c_str());
+      return;
+    }
+    unprovisionRequested = true;
+    return;
+  }
   if (action == "ota") {
     // ทำใน loop ไม่ใช่ใน callback เพราะต้องตัดการเชื่อมต่อ MQTT ก่อนดาวน์โหลด
     const String url = document["url"] | "";
@@ -833,6 +848,41 @@ void mqttCallback(char *topic, byte *payload, unsigned int length) {
     pendingOtaUrl = url;
     otaRequested = true;
   }
+}
+
+// ---------------------------------------------------------------------------
+// ล้างบอร์ดเมื่อถูกนำออกจากแอป (คำสั่ง {"action":"unprovision"})
+// ลบค่าทั้งหมดใน NVS (Wi-Fi, MQTT, ห้อง) แล้วรีบูต บอร์ดกลับเป็นสภาพเหมือนใหม่
+// รอตั้งค่าผ่านบลูทูธ  Device ID ไม่เปลี่ยน เพราะสร้างจาก eFuse MAC
+// ---------------------------------------------------------------------------
+void unprovisionAndRestart(const String &reason) {
+  unprovisionRequested = false;
+  Serial.printf("Unprovision: %s - clearing all saved settings\n", reason.c_str());
+  if (mqttClient.connected()) {
+    // ตอบ Backend ว่าล้างค่าแล้ว (Backend รอคำตอบนี้ก่อนลบบัญชี MQTT ของบอร์ด)
+    DynamicJsonDocument ack(128);
+    ack["deviceId"] = config.deviceId;
+    ack["online"] = false;
+    ack["unprovisioned"] = true;
+    String ackPayload;
+    serializeJson(ack, ackPayload);
+    const String statusTopic = config.mqttTopic + "/status";
+    mqttClient.publish(statusTopic.c_str(), ackPayload.c_str(), false);
+    // ล้าง retained ของตัวเอง แล้วตัดการเชื่อมต่อแบบปกติ
+    // (ตัดแบบปกติ Broker จะไม่ส่ง Last Will "online:false" กลับมาค้างเป็น retained)
+    mqttClient.publish(statusTopic.c_str(), "", true);
+    mqttClient.loop();
+    delay(300);
+    mqttClient.disconnect();
+  }
+
+  preferences.begin("rmutt-occ", false);
+  preferences.clear();
+  preferences.end();
+
+  Serial.println("Unprovision: done, restarting into BLE setup mode");
+  delay(300);
+  ESP.restart();
 }
 
 // ดาวน์โหลดเฟิร์มแวร์ใหม่แล้วรีบูต ถ้าไม่สำเร็จจะทำงานต่อด้วยเฟิร์มแวร์เดิม

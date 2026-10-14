@@ -11,6 +11,7 @@ import {
   publishAirCommand,
   publishEnterSetupMode,
   publishOtaCommand,
+  unprovisionDevice,
 } from '../services/mqtt.js';
 import {
   publicAirConditioner,
@@ -419,6 +420,8 @@ airConditionersRouter.delete(
       [deviceId],
     );
     const deletedRows = Number(result.affectedRows ?? 0);
+    // สั่งบอร์ดล้างค่าในตัวเองก่อนลบบัญชี MQTT (ลบบัญชีแล้วคำสั่งจะไปไม่ถึง)
+    const board = await unprovisionDevice('air', deviceId);
     const retainedTopicsCleared = await clearRetainedAirTopics(deviceId);
     const mqttAccountRemoved = await removeDeviceAccount(deviceId);
 
@@ -426,7 +429,8 @@ airConditionersRouter.delete(
       `[air] ลบ ${deviceId} โดย ${request.authUser.username}: `
         + `deletedRows=${deletedRows} `
         + `retainedTopicsCleared=${retainedTopicsCleared} `
-        + `mqttAccountRemoved=${mqttAccountRemoved}`,
+        + `mqttAccountRemoved=${mqttAccountRemoved} `
+        + `boardCleared=${board.acknowledged}`,
     );
 
     // ลบซ้ำถือว่าสำเร็จ เพื่อไม่ให้แอปค้างกับแถวที่หายไปแล้ว
@@ -436,6 +440,9 @@ airConditionersRouter.delete(
       deletedRows,
       retainedTopicsCleared,
       mqttAccountRemoved,
+      // true = บอร์ดยืนยันว่าล้างค่าแล้ว, false = บอร์ดออฟไลน์หรือไม่ตอบ
+      // (ต้องล้างที่ตัวบอร์ดเอง: อัปโหลด firmware/reset หรือตั้งค่าใหม่ผ่านบลูทูธ)
+      boardCleared: board.acknowledged,
     });
   }),
 );

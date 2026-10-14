@@ -9,6 +9,11 @@ import {
   OCCUPANCY_RETAINED_SUFFIXES,
   retainedTopics,
 } from '../utils/mqtt-topics.js';
+import {
+  UNPROVISION_ACK_TIMEOUT_MS,
+  buildUnprovisionCommand,
+  isUnprovisionAck,
+} from '../utils/unprovision.js';
 import { bangkokDate, evaluateClassSchedule } from '../utils/class-schedule.js';
 import { readActiveTermGate } from './academic-terms.js';
 import { readTodayBookings } from './room-bookings.js';
@@ -288,6 +293,65 @@ export async function publishEnterOccupancySetupMode(deviceId) {
   return { topic, payload: JSON.parse(payload) };
 }
 
+// บอร์ดที่กำลังรอให้ตอบกลับว่าล้างค่าแล้ว: deviceId -> ฟังก์ชันปิดการรอ
+const unprovisionWaiters = new Map();
+
+/**
+ * สั่งบอร์ดล้างค่าทั้งหมดในตัวเอง แล้วรอให้ตอบกลับ (ใช้ตอนลบอุปกรณ์)
+ * kind = 'air' | 'occupancy'
+ * คืน { sent, acknowledged }  sent=false แปลว่า Backend ยังไม่ต่อ Broker
+ * acknowledged=false แปลว่าบอร์ดไม่ตอบในเวลาที่กำหนด (มักเพราะออฟไลน์อยู่)
+ * ไม่โยน error เพราะการลบในฐานข้อมูลต้องสำเร็จเสมอแม้บอร์ดไม่ตอบ
+ */
+export async function unprovisionDevice(
+  kind,
+  deviceId,
+  { timeoutMs = UNPROVISION_ACK_TIMEOUT_MS } = {},
+) {
+  if (!client?.connected) return { sent: false, acknowledged: false };
+  const prefix = kind === 'occupancy'
+    ? config.mqtt.occupancyTopicPrefix
+    : config.mqtt.topicPrefix;
+  const topic = `${prefix}/${deviceId}/command`;
+  const payload = JSON.stringify(
+    buildUnprovisionCommand(deviceId, {
+      commandId: crypto.randomUUID(),
+      sentAt: new Date().toISOString(),
+    }),
+  );
+
+  unprovisionWaiters.get(deviceId)?.(false);
+  const acknowledged = new Promise((resolve) => {
+    const timer = setTimeout(() => finish(false), timeoutMs);
+    function finish(value) {
+      clearTimeout(timer);
+      if (unprovisionWaiters.get(deviceId) === finish) {
+        unprovisionWaiters.delete(deviceId);
+      }
+      resolve(value);
+    }
+    unprovisionWaiters.set(deviceId, finish);
+  });
+
+  try {
+    await publish(topic, payload, { qos: 1, retain: false });
+  } catch (error) {
+    console.error(`ส่งคำสั่งล้างค่าไปที่ ${deviceId} ไม่สำเร็จ`, error.message);
+    unprovisionWaiters.get(deviceId)?.(false);
+    await acknowledged;
+    return { sent: false, acknowledged: false };
+  }
+  return { sent: true, acknowledged: await acknowledged };
+}
+
+// คืน true ถ้าข้อความนี้คือคำตอบ "ล้างค่าแล้ว" ของบอร์ด (ไม่ต้องบันทึกต่อ)
+function consumeUnprovisionAck(deviceId, message) {
+  if (!isUnprovisionAck(message, deviceId)) return false;
+  console.log(`[unprovision] ${deviceId} ยืนยันว่าล้างค่าในบอร์ดแล้ว`);
+  unprovisionWaiters.get(deviceId)?.(true);
+  return true;
+}
+
 // ล้างข้อความ retain ทั้งหมดของอุปกรณ์ ใช้ตอนนำอุปกรณ์ออกจากระบบ
 // คืนค่าจำนวน topic ที่ล้างสำเร็จ (0 = Broker ยังไม่เชื่อมต่อ จึงยังล้างไม่ได้)
 export async function clearRetainedAirTopics(deviceId) {
@@ -344,6 +408,7 @@ async function handleIncomingMessage(topic, payloadBuffer) {
   }
 
   const [, deviceId, type] = match;
+  if (type === 'status' && consumeUnprovisionAck(deviceId, message)) return;
   if (type === 'provision') {
     await activateProvisioning(deviceId, message);
     return;
@@ -534,6 +599,7 @@ async function handleOccupancyMessage(match, payloadBuffer) {
   }
 
   const [, deviceId, type] = match;
+  if (type === 'status' && consumeUnprovisionAck(deviceId, message)) return;
   if (type === 'provision') {
     await activateOccupancyProvisioning(deviceId, message);
     return;
