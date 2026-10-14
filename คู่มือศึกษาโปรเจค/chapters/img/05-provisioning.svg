@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="720" viewBox="0 0 1120 720" font-family="Sarabun, Tahoma, 'Leelawadee UI', sans-serif">
+  <defs>
+    <marker id="p" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#0D7A4B"/>
+    </marker>
+    <marker id="po" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#C97A1B"/>
+    </marker>
+  </defs>
+  <rect width="1120" height="720" fill="#FFFFFF"/>
+
+  <text x="36" y="42" font-size="21" font-weight="700" fill="#17241D">ขั้นตอน provisioning · ทำไมต้องมี token</text>
+  <text x="36" y="66" font-size="12.5" fill="#66766E">เส้นส้ม = BLE (ต้องอยู่ใกล้บอร์ด) · เส้นเขียว = ผ่านเครือข่าย</text>
+
+  <!-- lanes -->
+  <rect x="60" y="92" width="180" height="42" rx="8" fill="#E3F3E9" stroke="#0D7A4B" stroke-width="2"/>
+  <text x="150" y="119" font-size="14" font-weight="700" fill="#0D7A4B" text-anchor="middle">แอป Flutter</text>
+  <line x1="150" y1="134" x2="150" y2="670" stroke="#D7E2DB" stroke-width="2"/>
+
+  <rect x="420" y="92" width="180" height="42" rx="8" fill="#0D7A4B"/>
+  <text x="510" y="119" font-size="14" font-weight="700" fill="#FFFFFF" text-anchor="middle">Backend</text>
+  <line x1="510" y1="134" x2="510" y2="670" stroke="#D7E2DB" stroke-width="2"/>
+
+  <rect x="700" y="92" width="180" height="42" rx="8" fill="#ECF3EF" stroke="#0D7A4B" stroke-width="2"/>
+  <text x="790" y="119" font-size="14" font-weight="700" fill="#0D7A4B" text-anchor="middle">Broker</text>
+  <line x1="790" y1="134" x2="790" y2="670" stroke="#D7E2DB" stroke-width="2"/>
+
+  <rect x="940" y="92" width="140" height="42" rx="8" fill="#FFFFFF" stroke="#17241D" stroke-width="2"/>
+  <text x="1010" y="119" font-size="14" font-weight="700" fill="#17241D" text-anchor="middle">ESP32</text>
+  <line x1="1010" y1="134" x2="1010" y2="670" stroke="#D7E2DB" stroke-width="2"/>
+
+  <!-- step 1 -->
+  <text x="36" y="180" font-size="15" font-weight="700" fill="#0D7A4B">1</text>
+  <path d="M154,180 L506,180" stroke="#0D7A4B" stroke-width="2.2" fill="none" marker-end="url(#p)"/>
+  <text x="180" y="172" font-size="11.5" fill="#17241D">POST /reservations { ห้อง, ลำดับแอร์ }</text>
+  <path d="M506,214 L154,214" stroke="#0D7A4B" stroke-width="2.2" fill="none" marker-end="url(#p)"/>
+  <text x="180" y="206" font-size="11.5" fill="#17241D">{ provisioningToken, mqttHost, mqttPort, ... }</text>
+  <rect x="404" y="228" width="212" height="46" rx="7" fill="#F5F8F6" stroke="#D7E2DB"/>
+  <text x="414" y="246" font-size="10.5" fill="#66766E">สร้างแถว provision_status='reserved'</text>
+  <text x="414" y="263" font-size="10.5" fill="#DC4C5C">เก็บเฉพาะ hash ของ token</text>
+
+  <!-- step 2 -->
+  <text x="36" y="316" font-size="15" font-weight="700" fill="#C97A1B">2</text>
+  <path d="M154,316 L1006,316" stroke="#C97A1B" stroke-width="2.5" stroke-dasharray="8 5" fill="none" marker-end="url(#po)"/>
+  <text x="300" y="308" font-size="11.5" fill="#C97A1B">BLE เขียน Wi-Fi + MQTT + ห้อง + token (แบ่งเป็นแพ็กเก็ต)</text>
+
+  <!-- step 3 -->
+  <text x="36" y="368" font-size="15" font-weight="700" fill="#17241D">3</text>
+  <rect x="892" y="344" width="220" height="52" rx="7" fill="#F5F8F6" stroke="#D7E2DB"/>
+  <text x="902" y="362" font-size="10.5" fill="#66766E">บันทึกลง NVS (ไม่หายเมื่อไฟดับ)</text>
+  <text x="902" y="378" font-size="10.5" fill="#66766E">ต่อ Wi-Fi แล้วต่อ MQTTS 8883</text>
+  <text x="902" y="392" font-size="10.5" fill="#66766E">ตรวจใบรับรอง ISRG Root X1</text>
+
+  <!-- step 4 -->
+  <text x="36" y="430" font-size="15" font-weight="700" fill="#0D7A4B">4</text>
+  <path d="M1006,430 L794,430" stroke="#0D7A4B" stroke-width="2.2" fill="none" marker-end="url(#p)"/>
+  <text x="812" y="422" font-size="11.5" fill="#17241D">publish /provision { token } retained</text>
+  <path d="M786,458 L514,458" stroke="#0D7A4B" stroke-width="2.2" fill="none" marker-end="url(#p)"/>
+
+  <!-- step 5 -->
+  <text x="36" y="500" font-size="15" font-weight="700" fill="#0D7A4B">5</text>
+  <rect x="380" y="480" width="260" height="64" rx="7" fill="#E3F3E9" stroke="#0D7A4B" stroke-width="1.5"/>
+  <text x="392" y="500" font-size="11" fill="#17241D">hash token ที่ได้ แล้วเทียบกับที่เก็บไว้</text>
+  <text x="392" y="518" font-size="11" fill="#0D7A4B">ถูก → provision_status = 'active'</text>
+  <text x="392" y="536" font-size="11" fill="#66766E">ล้าง retained ของ /provision ทิ้ง</text>
+  <path d="M514,566 L786,566" stroke="#0D7A4B" stroke-width="2.2" fill="none" marker-end="url(#p)"/>
+  <text x="546" y="558" font-size="11.5" fill="#17241D">/provision-ack { token เดิม } retained</text>
+  <path d="M794,594 L1006,594" stroke="#0D7A4B" stroke-width="2.2" fill="none" marker-end="url(#p)"/>
+
+  <!-- step 6 -->
+  <text x="36" y="636" font-size="15" font-weight="700" fill="#17241D">6</text>
+  <rect x="892" y="614" width="220" height="46" rx="7" fill="#F5F8F6" stroke="#D7E2DB"/>
+  <text x="902" y="632" font-size="10.5" fill="#66766E">เทียบว่า token ตรงกับที่ส่งไป</text>
+  <text x="902" y="650" font-size="10.5" fill="#0D7A4B">ตรง → ลบ token ออกจาก NVS</text>
+
+  <!-- why box -->
+  <rect x="36" y="344" width="330" height="116" rx="10" fill="#FFF0DC" stroke="#C97A1B" stroke-width="1.5"/>
+  <text x="50" y="366" font-size="12.5" font-weight="700" fill="#C97A1B">ทำไมต้องมี token</text>
+  <text x="50" y="388" font-size="11" fill="#17241D">deviceId มาจาก MAC ซึ่งไม่ใช่ความลับ</text>
+  <text x="50" y="406" font-size="11" fill="#17241D">พิมพ์อยู่บนบอร์ดและประกาศผ่าน BLE</text>
+  <text x="50" y="428" font-size="11" fill="#66766E">ถ้าไม่มี token ใครก็อ้างเป็นบอร์ดนั้นได้</text>
+  <text x="50" y="448" font-size="11" fill="#0D7A4B">token ส่งผ่าน BLE = ต้องอยู่ใกล้บอร์ดจริง</text>
+
+  <rect x="36" y="480" width="330" height="100" rx="10" fill="#F5F8F6" stroke="#D7E2DB" stroke-width="1.5"/>
+  <text x="50" y="502" font-size="12.5" font-weight="700" fill="#17241D">ทำไมต้อง reserved ก่อน active</text>
+  <text x="50" y="524" font-size="11" fill="#66766E">ขั้น 2 อาจใช้เวลาเป็นนาที</text>
+  <text x="50" y="542" font-size="11" fill="#66766E">ถ้าไม่จองไว้ คนที่สองจองซ้ำได้</text>
+  <text x="50" y="562" font-size="11" fill="#0D7A4B">UNIQUE(room, air_number) ทำงานตั้งแต่ขั้น 1</text>
+</svg>

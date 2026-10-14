@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3. สถาปัตยกรรมและเส้นทางของข้อมูล — คู่มือศึกษา RMUTT Save Energy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Chakra+Petch:wght@600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+<script>try{var t=localStorage.getItem('guide.theme');if(t)document.documentElement.dataset.theme=t;var f=localStorage.getItem('guide.font');if(f)document.documentElement.dataset.font=f;}catch(e){}</script>
+</head>
+<body>
+<header class="topbar">
+  <button class="menu-btn" id="menuBtn" aria-label="เปิดเมนู">☰</button>
+  <a class="brand" href="../index.html"><span class="brand-mark">⚡</span><span>คู่มือศึกษา <b>RMUTT Save Energy</b></span></a>
+  <div class="top-actions">
+    <button id="fontBtn" title="ขนาดตัวอักษร">ก<small>±</small></button>
+    <button id="themeBtn" title="สลับโหมดสว่าง/มืด">☾</button>
+  </div>
+</header>
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <input class="nav-search" id="navSearch" type="search" placeholder="ค้นหาบทหรือหัวข้อ…">
+    <div id="searchResults" class="search-results"></div>
+    <nav class="nav" id="nav">
+<a class="nav-home" href="../index.html">หน้าแรก</a>
+<div class="nav-part">ภาพรวม</div><ul>
+<li><a href="01-concept.html"><span class="num">1</span>แนวคิดและหลักการคิดของโปรเจค</a></li>
+<li><a href="02-roadmap.html"><span class="num">2</span>เริ่มจากอะไร และต้องเรียนรู้อะไรบ้าง</a></li>
+<li><a class="active" href="03-architecture-flows.html"><span class="num">3</span>สถาปัตยกรรมและเส้นทางของข้อมูล</a></li>
+</ul>
+<div class="nav-part">โครงสร้างพื้นฐาน</div><ul>
+<li><a href="04-network-server.html"><span class="num">4</span>เครือข่าย เซิร์ฟเวอร์ และ Tailscale</a></li>
+<li><a href="05-database.html"><span class="num">5</span>ฐานข้อมูล MariaDB</a></li>
+</ul>
+<div class="nav-part">เซิร์ฟเวอร์</div><ul>
+<li><a href="06-backend-api.html"><span class="num">6</span>Backend ตอนที่ 1: โครงหลัก ระบบสมาชิก และ REST API</a></li>
+<li><a href="07-backend-services.html"><span class="num">7</span>Backend ตอนที่ 2: งานเบื้องหลังและตรรกะหลักของระบบ</a></li>
+<li><a href="08-protocols.html"><span class="num">8</span>โปรโตคอลสื่อสาร: MQTT และ Bluetooth Low Energy</a></li>
+</ul>
+<div class="nav-part">อุปกรณ์และหน้าจอ</div><ul>
+<li><a href="09-firmware.html"><span class="num">9</span>เฟิร์มแวร์ ESP32: บอร์ดแอร์ (IR และสายแอร์) และบอร์ดตรวจจับคน</a></li>
+<li><a href="10-flutter-architecture.html"><span class="num">10</span>แอป Flutter ตอนที่ 1: โครงสร้าง ข้อมูล และ State</a></li>
+<li><a href="11-flutter-screens.html"><span class="num">11</span>แอป Flutter ตอนที่ 2: หน้าจอหลักและวิดเจ็ต</a></li>
+<li><a href="12-flutter-admin-screens.html"><span class="num">12</span>แอป Flutter ตอนที่ 3: หน้าจอผู้ดูแลระบบและการตั้งค่า</a></li>
+<li><a href="13-webapp.html"><span class="num">13</span>เว็บแอป: HTML, CSS และ JavaScript ล้วน</a></li>
+</ul>
+<div class="nav-part">ใช้งานจริง</div><ul>
+<li><a href="14-deploy-scripts-testing.html"><span class="num">14</span>การติดตั้งระบบ สคริปต์อัตโนมัติ และการทดสอบ</a></li>
+<li><a href="15-security.html"><span class="num">15</span>ความปลอดภัยทั้งระบบ</a></li>
+<li><a href="16-presentation-qa.html"><span class="num">16</span>เตรียมนำเสนอและคำถามที่อาจารย์มักถาม</a></li>
+</ul>
+<div class="nav-part">ภาคผนวก</div><ul>
+<li><a href="17-glossary.html"><span class="num">17</span>อภิธานศัพท์</a></li>
+<li><a href="18-file-map.html"><span class="num">18</span>แผนที่ไฟล์ทั้งโปรเจค</a></li>
+</ul>
+<div class="nav-part">งานที่กำลังพัฒนา</div><ul>
+<li><a href="19-daikin-slm8.html"><span class="num">19</span>แอร์ Daikin ผ่านสาย SLM8: จากการแกะโปรโตคอลถึงบอร์ดสายแอร์</a></li>
+</ul>
+    </nav>
+  </aside>
+  <main class="content" id="content">
+<div class="chapter-head"><div class="kicker">บทที่ 3 · ภาพรวม</div><h1>สถาปัตยกรรมและเส้นทางของข้อมูล</h1></div>
+<h2 id="ภาพรวม">ภาพรวม<a class="anchor" href="#ภาพรวม">#</a></h2>
+<p>บทนี้เป็น "แผนที่" ของทั้งระบบ ก่อนลงรายละเอียดแต่ละส่วนในบทถัดไป
+เราจะดู 3 เรื่อง: <strong>ใครคุยกับใคร ด้วยภาษาอะไร</strong>, <strong>ข้อมูลไหลอย่างไรในสถานการณ์จริง 7 แบบ</strong> และ <strong>ไฟล์ไหนรับผิดชอบแต่ละขั้น</strong></p>
+<p>ถ้าเข้าใจเส้นทางทั้ง 7 เส้นในบทนี้ คุณจะตอบคำถามอาจารย์ได้เกือบทุกข้อที่ขึ้นต้นด้วย "ถ้าผู้ใช้กด... แล้วเกิดอะไรขึ้น"</p>
+<h2 id="องค์ประกอบทั้งหมดของระบบ">องค์ประกอบทั้งหมดของระบบ<a class="anchor" href="#องค์ประกอบทั้งหมดของระบบ">#</a></h2>
+<div class="code-block"><div class="hl"><pre><span></span><code>                         ┌───────────────────────── เซิร์ฟเวอร์ (Docker) ─────────────────────────┐
+  แอป Flutter ───────────┤ ทางเข้า A: Funnel *.ts.net:443  ─► tailscale ─► caddy:8080           │
+  (Android/Windows)      │ ทางเข้า B: duckdns.org:443 (ในมหาวิทยาลัย) ─► caddy:443              │
+  เว็บแอป (เบราว์เซอร์) ──┤                     caddy ──/api/*──► backend:3000 ──► db (MariaDB)   │
+                         │          (เว็บ + ไฟล์เฟิร์มแวร์ /firmware)  │                           │
+                         │                                    ▼ mqtt:1883 (ภายใน Docker)       │
+                         │ ทางเข้า C: Funnel *.ts.net:8443 ─► tailscale ถอด TLS ─► mqtt:1883     │
+                         │ ทางเข้า D: duckdns.org:8883 (ในมหาวิทยาลัย) ─► mqtt (TLS ของ Mosquitto) │
+                         └──────────────────────────────▲─────────────────────────────────────┘
+                                                        │ MQTTS ค่าเริ่มต้น = ทางเข้า C (ts.net:8443)
+                               ┌────────────────────────┴───────────────┐
+                        บอร์ดแอร์ ESP32-&lt;MAC&gt;                บอร์ดตรวจจับคน OCC32-&lt;MAC&gt;
+                        IR ─► แอร์, PZEM ◄─ สายไฟแอร์          LD2410 เรดาร์
+       แอป Flutter ──BLE (เฉพาะตอนตั้งค่า)──► บอร์ดทั้งสองแบบ
+</code></pre></div>
+</div>
+
+<h3 id="ใครคุยกับใคร-ด้วยโปรโตคอลอะไร">ใครคุยกับใคร ด้วยโปรโตคอลอะไร<a class="anchor" href="#ใครคุยกับใคร-ด้วยโปรโตคอลอะไร">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>จาก</th>
+<th>ถึง</th>
+<th>โปรโตคอล / พอร์ต</th>
+<th>ใช้ทำอะไร</th>
+<th>ไฟล์หลัก</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>แอป Flutter</td>
+<td>Backend</td>
+<td>HTTPS + JSON (REST) พร้อม JWT</td>
+<td>ทุกอย่างที่ผู้ใช้ทำ</td>
+<td><code>lib/services/*_service.dart</code></td>
+</tr>
+<tr>
+<td>เว็บแอป</td>
+<td>Backend</td>
+<td>HTTPS <code>/api</code> โดเมนเดียวกัน</td>
+<td>ทุกอย่างที่ผู้ใช้ทำ</td>
+<td><code>webapp/assets/js/api.js</code></td>
+</tr>
+<tr>
+<td>Caddy</td>
+<td>Backend</td>
+<td>HTTP ภายใน Docker <code>backend:3000</code></td>
+<td>ส่งต่อคำขอ <code>/api/*</code></td>
+<td><code>deploy/Caddyfile</code></td>
+</tr>
+<tr>
+<td>Backend</td>
+<td>MariaDB</td>
+<td>MariaDB protocol <code>db:3306</code></td>
+<td>อ่าน/เขียนข้อมูล</td>
+<td><code>backend/src/db.js</code></td>
+</tr>
+<tr>
+<td>Backend</td>
+<td>Mosquitto</td>
+<td>MQTT <code>mqtt:1883</code> (ภายใน)</td>
+<td>ส่งคำสั่ง รับสถานะ</td>
+<td><code>backend/src/services/mqtt.js</code></td>
+</tr>
+<tr>
+<td>บอร์ด ESP32</td>
+<td>Mosquitto</td>
+<td>MQTTS (TLS) ผ่าน Tailscale Funnel <code>*.ts.net:8443</code> (ค่าเริ่มต้น) หรือ <code>duckdns.org:8883</code> ในมหาวิทยาลัย</td>
+<td>ส่งสถานะ รับคำสั่ง</td>
+<td><code>firmware/*/*.ino</code>, <code>deploy/tailscale-serve.json</code></td>
+</tr>
+<tr>
+<td>กล่อง tailscale</td>
+<td>Mosquitto</td>
+<td>ถอด TLS แล้วส่ง MQTT ธรรมดาไป <code>mqtt:1883</code> ภายใน Docker</td>
+<td>ทางผ่านของบอร์ด</td>
+<td><code>deploy/tailscale-serve.json</code></td>
+</tr>
+<tr>
+<td>บอร์ด ESP32</td>
+<td>Caddy</td>
+<td>HTTPS 443 <code>/firmware/*.bin</code> บนโฮสต์เดียวกับ Broker (ผ่าน Funnel 443 → caddy:8080 เมื่อใช้ ts.net)</td>
+<td>ดาวน์โหลดเฟิร์มแวร์ใหม่ (OTA)</td>
+<td><code>firmware/*/ota_update.h</code></td>
+</tr>
+<tr>
+<td>แอป Flutter</td>
+<td>บอร์ด ESP32</td>
+<td>Bluetooth Low Energy (GATT)</td>
+<td>ตั้งค่า Wi-Fi/บัญชี MQTT ครั้งแรก</td>
+<td><code>lib/services/ble_provisioning_service.dart</code></td>
+</tr>
+<tr>
+<td>บอร์ดแอร์</td>
+<td>แอร์</td>
+<td>อินฟราเรด 38 kHz</td>
+<td>สั่งเปิด/ปิด/ปรับ</td>
+<td><code>IRremoteESP8266</code>, <code>SaijoDenkiAC.cpp</code></td>
+</tr>
+<tr>
+<td>บอร์ดแอร์</td>
+<td>PZEM-004T</td>
+<td>UART (Modbus)</td>
+<td>อ่านแรงดัน กระแส กำลัง พลังงาน</td>
+<td><code>rmutt_esp32_air.ino</code></td>
+</tr>
+<tr>
+<td>บอร์ดตรวจจับคน</td>
+<td>LD2410</td>
+<td>UART 256000 baud</td>
+<td>อ่านค่าเรดาร์</td>
+<td><code>rmutt_esp32_occupancy.ino</code></td>
+</tr>
+</tbody>
+</table></div>
+<div class="callout why"><div class="callout-title">ทำไม</div><p>แอปและเว็บไม่เคยคุยกับบอร์ดหรือฐานข้อมูลโดยตรง (ยกเว้น BLE ตอนติดตั้ง) ทุกอย่างผ่าน Backend จึงมี <strong>จุดตรวจสิทธิ์จุดเดียว</strong> และ <strong>ข้อมูลจริงอยู่ที่เดียว</strong> ถ้าวันหนึ่งเปลี่ยนฐานข้อมูลหรือเปลี่ยนบอร์ด แอปไม่ต้องแก้</p></div>
+
+<h2 id="เส้นทางที่-1-ผู้ใช้กด-เปิดแอร์-25c-ในแอป">เส้นทางที่ 1: ผู้ใช้กด "เปิดแอร์ 25°C" ในแอป<a class="anchor" href="#เส้นทางที่-1-ผู้ใช้กด-เปิดแอร์-25c-ในแอป">#</a></h2>
+<div class="code-block"><div class="hl"><pre><span></span><code>[แอป] AirControlCard ─► AirConditionerController.sendCommand ─► AirConditionerService
+        │  POST /api/air-conditioners/ESP32-XXXX/command   body: { power:true, temperature:25, mode:"cool", ... }
+        ▼
+[Caddy] ─► [Backend] authenticate (ตรวจ JWT) ─► routes/air-conditioners.js
+        │  ตรวจว่าเครื่องมีอยู่และ provision_status = 'active'
+        │  validateAirState() ตรวจค่าทุกช่อง
+        │  publishAirCommand() ──MQTT QoS1──► rmutt/ac/ESP32-XXXX/command
+        │  ตอบ 202 Accepted { commandId }
+        ▼
+[Mosquitto] ─► [บอร์ดแอร์] mqttCallback() เก็บข้อความไว้ → loop() เรียก processMqttCommand()
+        │  ตรวจช่วงอุณหภูมิ (Saijo 18–29°C, รุ่นอื่น 16–30°C) และโหมด
+        │  saveAirState() จำลง NVS → sendCurrentIrState() ยิง IR → publishState(commandId)
+        ▼
+[แอร์] รับสัญญาณ IR แล้วเปิด
+        │
+[บอร์ดแอร์] ─► rmutt/ac/ESP32-XXXX/state (retained)  และ  /status ทุก 10 วินาที
+        ▼
+[Backend] mqtt.js: 'state' → UPDATE air_conditioners SET state_json ...
+        ▼
+[แอป] ดึง /api/rooms ใหม่ทุก 10 วินาที → การ์ดแอร์แสดงสถานะล่าสุด
+</code></pre></div>
+</div>
+
+<p>ประเด็นที่ควรอธิบายได้</p>
+<ul>
+<li><strong>ทำไมตอบ 202 ไม่ใช่ 200:</strong> 202 แปลว่า "รับคำสั่งแล้ว กำลังดำเนินการ" Backend ส่งต่อให้บอร์ดแล้ว แต่ยังไม่รู้ว่าแอร์เปิดจริงหรือยัง ผลจริงจะมาทาง <code>/state</code> และ <code>/status</code></li>
+<li><strong>ทำไมบอร์ดไม่ประมวลผลใน callback ทันที:</strong> <code>mqttCallback</code> แค่คัดลอกข้อความและตั้งธง <code>mqttCommandReady</code> แล้วให้ <code>loop()</code> ทำงานหนัก (แปลง JSON ยิง IR) เพื่อไม่ให้ callback ของไลบรารีค้างนาน</li>
+<li><strong>ตรวจซ้ำสองฝั่ง:</strong> Backend ตรวจค่า (<code>validateAirState</code>) และบอร์ดตรวจอีกรอบ เพราะบอร์ดไม่ควรเชื่อข้อความที่มาทางเครือข่ายโดยไม่ตรวจ</li>
+<li><strong>รู้ได้อย่างไรว่าแอร์ทำงานจริง:</strong> จากกำลังไฟที่ PZEM วัด (≥ 30 W ติดกัน 3 ครั้ง = ทำงาน) ไม่ใช่จากว่ายิง IR แล้ว เพราะ IR ส่งทางเดียว ไม่มีการตอบรับจากแอร์</li>
+</ul>
+<h2 id="เส้นทางที่-2-วัดไฟ--เก็บเป็นถังรายชั่วโมง--กราฟ">เส้นทางที่ 2: วัดไฟ → เก็บเป็นถังรายชั่วโมง → กราฟ<a class="anchor" href="#เส้นทางที่-2-วัดไฟ--เก็บเป็นถังรายชั่วโมง--กราฟ">#</a></h2>
+<div class="code-block"><div class="hl"><pre><span></span><code>[บอร์ดแอร์] อ่าน PZEM ทุก 2 วินาที (แรงดัน กระแส กำลัง พลังงานสะสม ความถี่ PF)
+        │  ตัดสิน ac_running ด้วย hysteresis: ≥30 W ×3 = ทำงาน, ≤10 W ×3 = หยุด
+        │  ส่ง /status ทุก 10 วินาที (และส่งทันทีเมื่อมีเหตุการณ์)
+        ▼
+[Backend] mqtt.js handleAirStatus()  (ทำทีละข้อความต่อเครื่อง ด้วย runSerialForDevice)
+        │  1. readPreviousAirRow()   อ่านค่ามิเตอร์ "ครั้งก่อน" จาก DB
+        │  2. recordEnergySample()   หาผลต่าง (ใหม่ − เก่า) แล้วบวกเข้าถังชั่วโมงนั้นใน energy_hourly
+        │  3. UPDATE air_conditioners  เขียนค่าล่าสุดทับ
+        │  4. แจ้ง auto-off ให้ประเมินใหม่
+        ▼
+[MariaDB] energy_hourly: 1 แถว ต่อ 1 เครื่อง ต่อ 1 ชั่วโมง (เวลาไทย)
+        ▼
+[แอป/เว็บ] GET /api/energy/summary, /history, /live → กราฟ, ค่าไฟ = kWh × อัตรา (ค่าเริ่มต้น 4.50 บาท)
+</code></pre></div>
+</div>
+
+<div class="callout warn"><div class="callout-title">ระวัง</div><p>ลำดับ <strong>อ่านค่าเก่า → คำนวณผลต่าง → ค่อยเขียนทับ</strong> สำคัญมาก ถ้าเขียนทับก่อนจะไม่เหลือค่าเก่าให้ลบ และค่าที่บันทึกจะกลายเป็นพลังงานสะสมทั้งหมดตั้งแต่ติดตั้ง แทนที่จะเป็นของชั่วโมงนั้น นอกจากนี้ถ้าผลต่างติดลบ (มิเตอร์ถูกรีเซ็ต) หรือมากผิดปกติ (เกิน 50 kWh) ระบบจะนับเป็น 0 เพื่อกันข้อมูลเพี้ยน</p></div>
+
+<h2 id="เส้นทางที่-3-ห้องว่าง--ปิดแอร์อัตโนมัติ">เส้นทางที่ 3: ห้องว่าง → ปิดแอร์อัตโนมัติ<a class="anchor" href="#เส้นทางที่-3-ห้องว่าง--ปิดแอร์อัตโนมัติ">#</a></h2>
+<figure><img alt="ระบบปิดแอร์อัตโนมัติ" src="img/06-auto-off.svg" /></figure>
+<div class="code-block"><div class="hl"><pre><span></span><code>[บอร์ดตรวจจับคน] อ่าน LD2410 ทุก 250 ms
+        │  มีคน = มีเกต 0–8 เกตใดเกตหนึ่งที่ static energy &gt; 25
+        │  ส่ง rmutt/occupancy/OCC32-XXXX/status ทุก 10 วินาที และทันทีเมื่อเปลี่ยน
+        ▼
+[Backend] mqtt.js → UPDATE occupancy_sensors → แจ้ง services/auto-off.js
+        │  auto-off ยังประเมินซ้ำเองทุก 10 วินาทีด้วย (TICK_INTERVAL_MS)
+        ▼
+[Backend] utils/auto-off.js decideAutoOff() — ฟังก์ชันบริสุทธิ์ ตรวจทีละด่าน
+        │  เซนเซอร์มีและออนไลน์และเรดาร์ใช้ได้? เปิดฟีเจอร์รายเครื่อง? PZEM อ่านได้?
+        │  ไม่มีคน? แอร์ยังเดินอยู่?
+        │  → ยังไม่นับ: เริ่มนับถอยหลัง (นอกคาบ 300 วิ / ในคาบเรียน 900 วิ)
+        │  → ครบเวลา: ส่งคำสั่งปิด (power:false) ไป /command
+        │  → แอร์ยังเดิน: ยิงซ้ำทุก 20 วิ สูงสุด 5 ครั้ง แล้วยอมแพ้ + แจ้งเตือน auto_off_failed
+        │  → กำลังไฟลดลงหลังยิง: สำเร็จ + แจ้งเตือน auto_off_succeeded
+        │  → มีคนกลับมาระหว่างนับ: ยกเลิกการนับ
+        ▼
+[แอป/เว็บ] แสดงนาฬิกานับถอยหลังบนการ์ดแอร์ และรายการแจ้งเตือน
+</code></pre></div>
+</div>
+
+<div class="callout why"><div class="callout-title">ทำไม</div><p>ทุกด่านแรก ๆ เป็นการตรวจว่า <strong>"ข้อมูลเชื่อได้ไหม"</strong> ถ้าเรดาร์ออฟไลน์หรือ PZEM อ่านไม่ได้ ระบบเลือก <strong>ไม่ปิด</strong> เพราะการปิดแอร์ตอนมีคนเรียนอยู่เสียหายกว่าการเปิดค้างอีกไม่กี่นาที (หลัก fail-safe) และการตัดสินใจถูกเขียนเป็นฟังก์ชันบริสุทธิ์ใน <code>utils/auto-off.js</code> จึงเขียนเทสต์ครอบได้ทุกกรณีใน <code>backend/test/auto-off.test.js</code></p></div>
+
+<div class="callout note"><div class="callout-title">หมายเหตุ</div><p>Backend ใช้ล็อกของ MariaDB ชื่อ <code>rmutt_auto_off_runner</code> (<code>GET_LOCK</code>) เพื่อให้มีตัวประเมินทำงานทีละตัว ถ้าวันหนึ่งรัน Backend สองตัว จะไม่ส่งคำสั่งปิดซ้ำกัน</p></div>
+
+<h2 id="เส้นทางที่-4-ติดตั้งบอร์ดใหม่-provisioning">เส้นทางที่ 4: ติดตั้งบอร์ดใหม่ (Provisioning)<a class="anchor" href="#เส้นทางที่-4-ติดตั้งบอร์ดใหม่-provisioning">#</a></h2>
+<figure><img alt="ขั้นตอน provisioning" src="img/05-provisioning.svg" /></figure>
+<div class="code-block"><div class="hl"><pre><span></span><code> แอดมิน          แอป Flutter               Backend                 บอร์ด ESP32 ใหม่
+   │ เลือกห้อง →  │ POST /api/air-conditioners/reservations →│ จองช่อง (status=reserved)
+   │              │ ◄── deviceId, ค่า MQTT, token (15 นาที) ──│ สร้างบัญชี MQTT ของบอร์ด
+   │              │ สแกน BLE หา "RMUTT-AC-&lt;MAC&gt;" ───────────────────────────► │ (โฆษณาตัวอยู่)
+   │              │ อ่าน characteristic Wi-Fi ใกล้เคียง ◄──────────────────── │ สแกน Wi-Fi
+   │ เลือก Wi-Fi + ใส่รหัส → │ เขียน config เป็นชิ้น ๆ (150 ไบต์/ชิ้น) ──────► │ ประกอบ JSON, ทดสอบ Wi-Fi
+   │              │ ◄────────────── notify: บันทึกสำเร็จ ─────────────────── │ เก็บลง NVS
+   │              │                          │ ◄── MQTTS: /provision (token) ── │ ต่อ Wi-Fi + Broker
+   │              │                          │ ตรวจ token → status=active       │
+   │              │                          │ ── /provision-ack ──────────────►│ ลบ token ทิ้ง
+   │              │ ดึง /api/rooms → เห็นบอร์ดออนไลน์                               │ เริ่มทำงานปกติ
+</code></pre></div>
+</div>
+
+<p>จุดที่ควรเข้าใจ</p>
+<ul>
+<li><strong>ที่อยู่ Broker ที่บอร์ดได้รับ</strong> มาจากตัวแปร <code>MQTT_DEVICE_URL</code> ใน <code>deploy/docker-compose.yml</code> ค่าเริ่มต้นคือ <code>mqtts://rmutt-energy.tailb292b4.ts.net:8443</code> (ผ่าน Tailscale Funnel) บอร์ดจึงอยู่ Wi-Fi ไหนก็ได้ที่ออกอินเทอร์เน็ตได้ ถ้าจะให้บอร์ดในมหาวิทยาลัยต่อตรง ตั้งเป็น <code>mqtts://&lt;DOMAIN&gt;:8883</code> ใน <code>.env</code> แล้วตั้งค่าบอร์ดใหม่</li>
+<li><strong>แอปไม่ส่งรหัสผ่าน MQTT ที่ผู้ใช้พิมพ์เอง</strong> ค่าทั้งหมดมาจาก Backend ผู้ใช้กรอกแค่รหัส Wi-Fi</li>
+<li><strong>token ใช้ครั้งเดียว อายุ 15 นาที</strong> Backend เก็บแค่ค่า hash จึงใช้พิสูจน์ได้ว่าบอร์ดตัวนี้คือตัวที่แอดมินเพิ่งตั้งค่า</li>
+<li><strong>บัญชี MQTT รายบอร์ด</strong> รหัสคำนวณจาก <code>HMAC-SHA256(MQTT_DEVICE_SECRET, deviceId)</code> บอร์ดเห็นได้เฉพาะ topic ของตัวเอง</li>
+</ul>
+<h2 id="เส้นทางที่-5-เข้าสู่ระบบ">เส้นทางที่ 5: เข้าสู่ระบบ<a class="anchor" href="#เส้นทางที่-5-เข้าสู่ระบบ">#</a></h2>
+<div class="code-block"><div class="hl"><pre><span></span><code>[แอป/เว็บ] POST /api/auth/login { username, password }
+        ▼
+[Backend] loginLimiter (ผิดได้ 10 ครั้ง / 15 นาที / IP)
+        │  SELECT users → bcrypt.compare (ถ้าไม่มีผู้ใช้ ก็ยังเทียบกับ hash หลอก เพื่อให้ใช้เวลาเท่ากัน)
+        │  ออก JWT (HS256, อายุ 8 ชม.) ใส่ sub=username, role, ver=token_version
+        ▼
+[แอป] เก็บ token ใน flutter_secure_storage   [เว็บ] เก็บใน localStorage
+        │  ทุกคำขอต่อไปส่ง Header: Authorization: Bearer &lt;token&gt;
+        ▼
+[Backend] authenticate.js ตรวจลายเซ็น + อายุ แล้วอ่านผู้ใช้จาก DB ทุกครั้ง
+        │  ถ้า is_active = 0 หรือ token_version ไม่ตรง (เช่นเพิ่งเปลี่ยนรหัส) → 401
+</code></pre></div>
+</div>
+
+<h2 id="เส้นทางที่-6-เน็ตหลุด--บอร์ดเก็บข้อมูลไว้เอง--ส่งย้อนหลัง">เส้นทางที่ 6: เน็ตหลุด → บอร์ดเก็บข้อมูลไว้เอง → ส่งย้อนหลัง<a class="anchor" href="#เส้นทางที่-6-เน็ตหลุด--บอร์ดเก็บข้อมูลไว้เอง--ส่งย้อนหลัง">#</a></h2>
+<div class="code-block"><div class="hl"><pre><span></span><code>[บอร์ดแอร์] ต่อเซิร์ฟเวอร์ไม่ได้ → สรุปค่าไฟทุก 5 นาที เก็บลงพาร์ติชัน flash "rmuttlog" (64 KB)
+        │  รายการละ 32 ไบต์ เก็บได้ 2,048 รายการ ≈ 7 วัน (เต็มแล้วทับของเก่าสุด)
+        ▼ เน็ตกลับมา
+        │  รอสุ่ม 5–45 วินาที (กันทั้งตึกส่งพร้อมกัน)
+        │  ส่ง /history ทีละ 10 รายการ → รอ /history-ack { upTo } ภายใน 20 วินาที
+        ▼
+[Backend] ตรวจ (ไม่เก่ากว่า 31 วัน, ไม่ล้ำอนาคต) → ลงถังรายชั่วโมงแบบไม่นับซ้ำ → ส่ง ack
+        ▼
+[บอร์ดแอร์] ได้ ack แล้วจึงลบชุดนั้น จำตำแหน่งที่ยืนยันแล้วใน NVS แล้วส่งชุดถัดไป
+</code></pre></div>
+</div>
+
+<div class="callout why"><div class="callout-title">ทำไม</div><p>"ลบหลังได้ ack เท่านั้น" คือหลักเดียวกับการส่งพัสดุแบบมีใบตอบรับ ถ้าส่งแล้วลบเลยแต่ข้อความหาย ข้อมูลจะหายถาวร ส่วนฝั่ง Backend ต้องรับข้อมูลซ้ำได้โดยไม่นับซ้ำ (idempotent) เพราะบอร์ดอาจส่งชุดเดิมอีกครั้งถ้า ack หาย</p></div>
+
+<h2 id="เส้นทางที่-7-อัปเดตเฟิร์มแวร์ผ่าน-wi-fi-ota">เส้นทางที่ 7: อัปเดตเฟิร์มแวร์ผ่าน Wi-Fi (OTA)<a class="anchor" href="#เส้นทางที่-7-อัปเดตเฟิร์มแวร์ผ่าน-wi-fi-ota">#</a></h2>
+<div class="code-block"><div class="hl"><pre><span></span><code>[ผู้ดูแล] คอมไพล์ .bin → scp ไปไว้ /opt/rmutt/firmware/ บนเซิร์ฟเวอร์
+[เว็บแอป] หน้าห้องและอุปกรณ์ → กด "อัปเดตเฟิร์มแวร์" (เฉพาะ admin)
+[Backend] POST /api/air-conditioners/:id/ota → MQTT /command { action:"ota", url }
+[บอร์ด] ตรวจว่า URL อยู่บนโดเมนเดียวกับ Broker (ค่าเริ่มต้นคือ ts.net จึงวิ่งผ่าน Funnel 443 → caddy:8080)
+        → ดาวน์โหลด HTTPS (ตรวจใบรับรองด้วย root CA ของ Let's Encrypt ในเฟิร์มแวร์ ใบ ts.net ก็ออกโดย Let's Encrypt)
+        → เขียนลงช่องแอปอีกช่อง (มี 2 ช่องสำหรับ OTA) → รีบูตเข้าเวอร์ชันใหม่ → รายงานเวอร์ชันใน /status
+</code></pre></div>
+</div>
+
+<h2 id="แผนที่-ข้อมูลอยู่ที่ไหน">แผนที่ "ข้อมูลอยู่ที่ไหน"<a class="anchor" href="#แผนที่-ข้อมูลอยู่ที่ไหน">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>ข้อมูล</th>
+<th>ที่เก็บจริง</th>
+<th>ใครเขียน</th>
+<th>ใครอ่าน</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>บัญชีผู้ใช้, รหัสผ่าน (hash)</td>
+<td>ตาราง <code>users</code></td>
+<td>Backend (<code>routes/auth.js</code>, <code>routes/users.js</code>)</td>
+<td>Backend</td>
+</tr>
+<tr>
+<td>ห้อง</td>
+<td><code>rooms</code></td>
+<td>แอดมินผ่าน API, นำเข้าตารางเรียน</td>
+<td>ทุกหน้าจอ</td>
+</tr>
+<tr>
+<td>แอร์และสถานะล่าสุด</td>
+<td><code>air_conditioners</code></td>
+<td><code>services/mqtt.js</code></td>
+<td>แอป/เว็บผ่าน <code>/api/rooms</code></td>
+</tr>
+<tr>
+<td>เซนเซอร์และมีคนไหม</td>
+<td><code>occupancy_sensors</code></td>
+<td><code>services/mqtt.js</code></td>
+<td>auto-off, หน้าจอ</td>
+</tr>
+<tr>
+<td>ค่าไฟรายชั่วโมง</td>
+<td><code>energy_hourly</code></td>
+<td><code>services/energy-recorder.js</code></td>
+<td><code>/api/energy/*</code></td>
+</tr>
+<tr>
+<td>ตารางเรียน, ภาคเรียน, การจองห้อง</td>
+<td><code>class_schedules</code>, <code>academic_terms</code>, <code>room_bookings</code></td>
+<td>แอดมิน</td>
+<td>auto-off, หน้าตารางเรียน</td>
+</tr>
+<tr>
+<td>การแจ้งเตือน</td>
+<td><code>system_alerts</code></td>
+<td><code>services/alerts.js</code>, auto-off</td>
+<td>หน้าการแจ้งเตือน</td>
+</tr>
+<tr>
+<td>ค่าตั้งระบบ (อัตราค่าไฟ, สวิตช์ auto-off)</td>
+<td><code>system_settings</code></td>
+<td>แอดมิน</td>
+<td>Backend</td>
+</tr>
+<tr>
+<td>Wi-Fi, ห้อง, บัญชี MQTT ของบอร์ด</td>
+<td>NVS ในบอร์ด</td>
+<td>ตอน provisioning</td>
+<td>เฟิร์มแวร์</td>
+</tr>
+<tr>
+<td>ค่าไฟตอนเน็ตหลุด</td>
+<td>พาร์ติชัน <code>rmuttlog</code> ในบอร์ด</td>
+<td>เฟิร์มแวร์</td>
+<td>ส่งไป Backend</td>
+</tr>
+<tr>
+<td>token เข้าสู่ระบบ</td>
+<td>secure storage (แอป), localStorage (เว็บ)</td>
+<td>หน้าล็อกอิน</td>
+<td>ทุกคำขอ API</td>
+</tr>
+<tr>
+<td>secret ของเซิร์ฟเวอร์</td>
+<td><code>/opt/rmutt/.env</code></td>
+<td><code>init-env.sh</code></td>
+<td>docker compose</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="ตัวเลขสำคัญที่ควรจำ">ตัวเลขสำคัญที่ควรจำ<a class="anchor" href="#ตัวเลขสำคัญที่ควรจำ">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>ค่า</th>
+<th>ตัวเลข</th>
+<th>อยู่ที่ไหน</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>รอบอ่าน PZEM</td>
+<td>2 วินาที</td>
+<td>เฟิร์มแวร์แอร์</td>
+</tr>
+<tr>
+<td>ส่งสถานะบอร์ด</td>
+<td>ทุก 10 วินาที + ทันทีเมื่อเปลี่ยน</td>
+<td>เฟิร์มแวร์ทั้งสอง</td>
+</tr>
+<tr>
+<td>เกณฑ์แอร์ทำงาน / หยุด</td>
+<td>≥ 30 W ×3 / ≤ 10 W ×3</td>
+<td>เฟิร์มแวร์แอร์</td>
+</tr>
+<tr>
+<td>เกณฑ์มีคน</td>
+<td>static energy เกตใดเกตหนึ่ง &gt; 25</td>
+<td>เฟิร์มแวร์ตรวจคน</td>
+</tr>
+<tr>
+<td>นับถอยหลังนอกคาบ / ในคาบ</td>
+<td>300 / 900 วินาที</td>
+<td><code>utils/auto-off.js</code></td>
+</tr>
+<tr>
+<td>ยิงซ้ำ</td>
+<td>ทุก 20 วินาที สูงสุด 5 ครั้ง</td>
+<td><code>utils/auto-off.js</code></td>
+</tr>
+<tr>
+<td>รอบประเมิน auto-off</td>
+<td>10 วินาที</td>
+<td><code>services/auto-off.js</code></td>
+</tr>
+<tr>
+<td>แอป/เว็บดึงข้อมูลห้องใหม่</td>
+<td>ทุก 10 วินาที</td>
+<td>controllers, <code>webapp/assets/js/config.js</code></td>
+</tr>
+<tr>
+<td>อายุ JWT / OTP / token ติดตั้ง</td>
+<td>8 ชม. / 10 นาที / 15 นาที</td>
+<td><code>config.js</code>, routes</td>
+</tr>
+<tr>
+<td>ล็อกอินผิด</td>
+<td>10 ครั้ง / 15 นาที</td>
+<td><code>routes/auth.js</code></td>
+</tr>
+<tr>
+<td>บันทึกในบอร์ดตอนเน็ตหลุด</td>
+<td>5 นาที/รายการ, 2,048 รายการ ≈ 7 วัน</td>
+<td><code>history_log.h</code></td>
+</tr>
+<tr>
+<td>สำรองฐานข้อมูล</td>
+<td>ทุกวัน 02:30 เก็บ 14 วัน</td>
+<td><code>backup-db.sh</code>, cron</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="คำถามที่อาจารย์อาจถาม">คำถามที่อาจารย์อาจถาม<a class="anchor" href="#คำถามที่อาจารย์อาจถาม">#</a></h2>
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> ถ้าผู้ใช้สองคนกดสั่งแอร์เครื่องเดียวกันพร้อมกัน จะเกิดอะไร?</p>
+<p><strong>ตอบ:</strong> Backend ส่งคำสั่งทั้งสองไปตามลำดับที่มาถึง แต่ละคำสั่งมี <code>commandId</code> ไม่ซ้ำกัน บอร์ดทำทีละคำสั่ง คำสั่งที่มาถึงทีหลังจะเป็นสถานะสุดท้าย และบอร์ดรายงานสถานะจริงกลับทาง <code>/state</code> ทุกหน้าจอจึงเห็นค่าเดียวกันในรอบดึงข้อมูลถัดไป</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> แอปรู้ได้อย่างไรว่าบอร์ดออฟไลน์?</p>
+<p><strong>ตอบ:</strong> ตอนบอร์ดต่อ Broker มันฝาก Last Will ไว้ที่ topic <code>/status</code> เป็น <code>{online:false}</code> แบบ retained ถ้าบอร์ดหลุด (ไฟดับ, Wi-Fi หาย) Broker จะประกาศข้อความนี้แทน Backend รับแล้วบันทึกว่าออฟไลน์ แอปเห็นในรอบดึงข้อมูลถัดไป</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> ทำไมแอปใช้วิธีดึงข้อมูลซ้ำทุก 10 วินาที ไม่ใช้ระบบ push?</p>
+<p><strong>ตอบ:</strong> ง่ายและทนทานกว่าสำหรับขนาดระบบนี้ครับ ไม่ต้องดูแลการเชื่อมต่อค้าง (WebSocket) ผ่าน proxy หลายชั้น และข้อมูลแอร์เปลี่ยนไม่บ่อย 10 วินาทีถือว่าสดพอ ถ้าระบบใหญ่ขึ้นค่อยเปลี่ยนเป็น WebSocket หรือ Server-Sent Events</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> จุดไหนของระบบเป็น single point of failure?</p>
+<p><strong>ตอบ:</strong> เซิร์ฟเวอร์เครื่องเดียว (Backend + DB + Broker) ครับ ถ้าล่ม การสั่งจากแอปและ auto-off หยุด แต่แอร์ยังใช้รีโมตได้ และบอร์ดแอร์เก็บค่าไฟไว้ได้ราว 7 วัน ส่วนข้อมูลมีสำรองรายวัน ทางแก้ในอนาคตคือทำเครื่องสำรอง หรือใช้ snapshot ของ VM</p></div>
+
+<h2 id="สรุปและเช็กลิสต์ความเข้าใจ">สรุปและเช็กลิสต์ความเข้าใจ<a class="anchor" href="#สรุปและเช็กลิสต์ความเข้าใจ">#</a></h2>
+<ul>
+<li class="check"><input type="checkbox"> วาดแผนภาพองค์ประกอบทั้งหมดได้ พร้อมโปรโตคอลบนแต่ละเส้น</li>
+<li class="check"><input type="checkbox"> เล่าเส้นทาง "กดเปิดแอร์" ได้ครบตั้งแต่แอปถึงแอร์และกลับมา</li>
+<li class="check"><input type="checkbox"> อธิบายได้ว่าทำไมต้องอ่านค่ามิเตอร์เก่าก่อนเขียนทับ</li>
+<li class="check"><input type="checkbox"> บอกด่านตรวจของ auto-off ได้ และอธิบายหลัก fail-safe</li>
+<li class="check"><input type="checkbox"> เล่าขั้นตอน provisioning ได้ว่าข้อมูลอะไรมาจากไหน</li>
+<li class="check"><input type="checkbox"> อธิบายการส่งข้อมูลย้อนหลังแบบมี ack ได้</li>
+<li class="check"><input type="checkbox"> จำตัวเลขสำคัญในตารางได้อย่างน้อยครึ่งหนึ่ง</li>
+</ul><nav class="pager"><a class="prev" href="02-roadmap.html"><span>← บทก่อนหน้า</span>2. เริ่มจากอะไร และต้องเรียนรู้อะไรบ้าง</a><a class="next" href="04-network-server.html"><span>บทถัดไป →</span>4. เครือข่าย เซิร์ฟเวอร์ และ Tailscale</a></nav>
+  </main>
+  <aside class="toc"><div class="toc-title">ในบทนี้</div><ul><li><a href="#ภาพรวม">ภาพรวม</a></li><li><a href="#องค์ประกอบทั้งหมดของระบบ">องค์ประกอบทั้งหมดของระบบ</a></li><li><a href="#เส้นทางที่-1-ผู้ใช้กด-เปิดแอร์-25c-ในแอป">เส้นทางที่ 1: ผู้ใช้กด &quot;เปิดแอร์ 25°C&quot; ในแอป</a></li><li><a href="#เส้นทางที่-2-วัดไฟ--เก็บเป็นถังรายชั่วโมง--กราฟ">เส้นทางที่ 2: วัดไฟ → เก็บเป็นถังรายชั่วโมง → กราฟ</a></li><li><a href="#เส้นทางที่-3-ห้องว่าง--ปิดแอร์อัตโนมัติ">เส้นทางที่ 3: ห้องว่าง → ปิดแอร์อัตโนมัติ</a></li><li><a href="#เส้นทางที่-4-ติดตั้งบอร์ดใหม่-provisioning">เส้นทางที่ 4: ติดตั้งบอร์ดใหม่ (Provisioning)</a></li><li><a href="#เส้นทางที่-5-เข้าสู่ระบบ">เส้นทางที่ 5: เข้าสู่ระบบ</a></li><li><a href="#เส้นทางที่-6-เน็ตหลุด--บอร์ดเก็บข้อมูลไว้เอง--ส่งย้อนหลัง">เส้นทางที่ 6: เน็ตหลุด → บอร์ดเก็บข้อมูลไว้เอง → ส่งย้อนหลัง</a></li><li><a href="#เส้นทางที่-7-อัปเดตเฟิร์มแวร์ผ่าน-wi-fi-ota">เส้นทางที่ 7: อัปเดตเฟิร์มแวร์ผ่าน Wi-Fi (OTA)</a></li><li><a href="#แผนที่-ข้อมูลอยู่ที่ไหน">แผนที่ &quot;ข้อมูลอยู่ที่ไหน&quot;</a></li><li><a href="#ตัวเลขสำคัญที่ควรจำ">ตัวเลขสำคัญที่ควรจำ</a></li><li><a href="#คำถามที่อาจารย์อาจถาม">คำถามที่อาจารย์อาจถาม</a></li><li><a href="#สรุปและเช็กลิสต์ความเข้าใจ">สรุปและเช็กลิสต์ความเข้าใจ</a></li></ul></aside>
+</div>
+<button class="to-top" id="toTop" aria-label="กลับขึ้นด้านบน">↑</button>
+<script src="../assets/search.js"></script>
+<script src="../assets/app.js"></script>
+</body>
+</html>
