@@ -225,6 +225,22 @@ export const api = {
 
   // ------------------------------------------------------------ เฟิร์มแวร์
   firmwareFiles: () => get('/firmware'),
+  /**
+   * อัปโหลดไฟล์ .bin ส่งเป็นไฟล์ดิบเหมือนการนำเข้าตารางเรียน
+   * kind = แท็บที่ผู้ใช้อยู่ (air | wired | occupancy) ให้ Backend ตรวจซ้ำว่าชื่อไฟล์ตรงชนิด
+   * replace = ยอมเขียนทับไฟล์ชื่อเดิม (ไม่งั้นได้ 409)
+   */
+  uploadFirmware: (file, fileName, kind, replace = false) =>
+    request('POST', '/firmware', {
+      upload: file,
+      query: { kind, replace: replace ? '1' : null },
+      headers: {
+        'Content-Type': 'application/octet-stream',
+        'X-File-Name': encodeURIComponent(fileName),
+      },
+    }).then((r) => r.file),
+  deleteFirmware: (fileName) =>
+    remove(`/firmware/${encodeURIComponent(fileName)}`),
 
   // ----------------------------------------------------------------- ค่าไฟ
   energyMetrics: () => get('/energy/metrics'),

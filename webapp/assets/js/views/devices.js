@@ -17,6 +17,7 @@ import {
   airControlSummary,
   decimal,
   floorLabel,
+  isWiredProtocol,
   relativeTime,
 } from '../format.js';
 import { icons } from '../icons.js';
@@ -368,7 +369,8 @@ function airRow(unit, update) {
       class: 'btn btn-sm',
       type: 'button',
       text: 'อัปเดตเฟิร์มแวร์',
-      onclick: () => startOta(unit, 'air', update),
+      // บอร์ดสายแอร์ใช้ไฟล์คนละชุดกับบอร์ด IR (ชื่อไฟล์มีคำว่า wired)
+      onclick: () => startOta(unit, isWiredProtocol(unit.protocol) ? 'wired' : 'air', update),
     }),
     el('button', {
       class: 'btn btn-sm btn-danger',
@@ -419,7 +421,7 @@ async function startOta(device, kind, update) {
   const files = (listing?.files ?? []).filter((file) => file.kind === kind);
   if (files.length === 0) {
     toastInfo(
-      'ยังไม่มีไฟล์เฟิร์มแวร์บนเซิร์ฟเวอร์ ให้วางไฟล์ .bin ไว้ที่ /opt/rmutt/firmware ก่อน',
+      'ยังไม่มีไฟล์เฟิร์มแวร์ของบอร์ดชนิดนี้ อัปโหลดไฟล์ .bin ได้ที่เมนู "เฟิร์มแวร์"',
     );
     return;
   }

@@ -42,6 +42,11 @@ if ! grep -q '^DB_ROOT_PASSWORD=.\+' .env; then
   echo '       ดูวิธีย้ายไปใช้ user แยกใน DEPLOY.md หัวข้อ "ย้ายจากระบบเดิม"'
 fi
 mkdir -p firmware backups
+# Backend (user node uid 1000) ต้องเขียนโฟลเดอร์ firmware ได้ เพื่อรับไฟล์ที่อัปโหลดจากเว็บ
+if [ "$(stat -c %u firmware)" != 1000 ]; then
+  chown 1000:1000 firmware 2>/dev/null || sudo -n chown 1000:1000 firmware 2>/dev/null \
+    || echo 'เตือน: เปลี่ยนเจ้าของ firmware ไม่ได้ อัปโหลดเฟิร์มแวร์จากเว็บจะไม่สำเร็จ ให้รัน: sudo chown 1000:1000 /opt/rmutt/firmware'
+fi
 
 step '1/6 Build backend ใหม่'
 # รหัสแอดมินตัวแรกใช้แค่ตอน seed ครั้งแรก ไม่ต้องค้างเป็นข้อความธรรมดาใน .env
