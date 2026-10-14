@@ -1,8 +1,9 @@
 # เริ่มใช้งาน RMUTT Save Energy
 
-ระบบนี้ประกอบด้วย Flutter App, Node.js Backend, MariaDB, Mosquitto MQTT Broker
-ESP32 Firmware หนึ่งบอร์ดต่อแอร์หนึ่งเครื่อง และบอร์ด ESP32 + LD2410 แยก
-อีกหนึ่งบอร์ดต่อห้องที่ต้องการตรวจคน
+ระบบนี้ประกอบด้วย Flutter App (3.16.0+32), Node.js Backend, MariaDB, Mosquitto MQTT Broker
+ESP32 Firmware หนึ่งบอร์ดต่อแอร์หนึ่งเครื่อง (บอร์ดรีโมต IR `rmutt_esp32_air` 2.5.1
+หรือบอร์ดต่อสายแอร์ Daikin `rmutt_esp32_air_wired` 2.5.2-slm8 สำหรับแอร์ที่ใช้รีโมตติดผนัง)
+และบอร์ด ESP32 + LD2410 (`rmutt_esp32_occupancy` 1.3.2) แยกอีกหนึ่งบอร์ดต่อห้องที่ต้องการตรวจคน
 
 ## 1. เตรียมโปรแกรม
 
@@ -90,8 +91,14 @@ flutter run -d windows --dart-define=API_BASE_URL=http://127.0.0.1:3000/api
 firmware/rmutt_esp32_air/rmutt_esp32_air.ino
 ```
 
-ติดตั้ง ArduinoJson 6.x, PubSubClient และ IRremoteESP8266 2.9.0 แล้วอัปโหลด
+ติดตั้ง ArduinoJson 6.x, PubSubClient, PZEM004Tv30, IRremoteESP8266 2.9.0 และ U8g2
+(จอ OLED) เลือก Tools → Partition Scheme → "No FS 4MB (2MB APP x2)" แล้วอัปโหลด
 ลง ESP32 จากนั้นเข้าแอปด้วย Admin เปิดห้อง และเลือกเพิ่มแอร์ผ่าน Bluetooth
+
+แอร์ Daikin ที่ใช้รีโมตติดผนัง ให้ใช้ `firmware/rmutt_esp32_air_wired/rmutt_esp32_air_wired.ino`
+แทน (ไม่ต้องใช้ IRremoteESP8266 แต่ต้องมี U8g2 และ DHT sensor library) วิธีต่อสายดู
+`firmware/rmutt_esp32_air_wired/README_WIRED_TH.md` ขั้นเพิ่มในแอปเหมือนกัน
+และแอปจะล็อกยี่ห้อเป็น Daikin · สายแอร์ให้เอง
 
 ในหน้า Bluetooth ให้เลือกชื่อ Wi-Fi ที่ ESP32 สแกนพบและกรอกเฉพาะรหัสผ่าน
 Wi-Fi เท่านั้น ค่า MQTT ทั้งหมดมาจาก `backend/.env` อัตโนมัติ
@@ -104,5 +111,5 @@ Wi-Fi เท่านั้น ค่า MQTT ทั้งหมดมาจา�
 เมื่อบันทึกสำเร็จ เส้นทางคำสั่งคือ:
 
 ```text
-Flutter -> Backend API -> Mosquitto -> ESP32 -> IR -> แอร์
+Flutter -> Backend API -> Mosquitto -> ESP32 -> IR หรือสายแอร์ -> แอร์
 ```

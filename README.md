@@ -11,6 +11,13 @@ Backend API, MariaDB, การเปลี่ยนรหัสผ่านด�
 > **ใช้งานจริงบนเซิร์ฟเวอร์ของมหาวิทยาลัย:** ดูขั้นตอนที่ `deploy/DEPLOY.md`
 > และสเปกเครื่องที่ต้องขอที่ `deploy/SERVER_REQUIREMENTS.md`
 
+> **สิ่งที่เปลี่ยนล่าสุด:** ดู `RELEASE_NOTES.md` (เรียงใหม่สุดไว้บนสุด พร้อมขั้นตอน
+> "ต้องทำหลังได้โค้ดชุดนี้") รุ่นปัจจุบัน: แอป **3.16.0+32**, เฟิร์มแวร์แอร์ IR
+> **2.5.1**, บอร์ดสายแอร์ Daikin **2.5.2-slm8**, เซ็นเซอร์ LD2410 **1.3.2**
+> ล่าสุดมีหน้าเฟิร์มแวร์บนเว็บ (อัปโหลด/ลบไฟล์ และอัปเดตหลายบอร์ดพร้อมกัน),
+> ลบอุปกรณ์แล้วบอร์ดล้างค่าเอง, บอร์ดสายแอร์ Daikin + จอ OLED,
+> ตารางเรียนแบบตามวันที่ + การใช้ห้อง + ปฏิทินภาคเรียนในแอปมือถือ และกราฟแท่งในหน้าสถิติ
+
 ## ฟังก์ชันในโปรเจกต์
 
 ### ระบบบัญชี
@@ -90,7 +97,15 @@ Backend API, MariaDB, การเปลี่ยนรหัสผ่านด�
 - บอร์ดแอร์ทั้งสองแบบต่อจอ OLED 1.3" I2C (SDA GPIO21, SCL GPIO22) แสดงห้อง
   อุณหภูมิที่ตั้ง โหมด พัดลม และกำลังไฟ ไม่ต่อจอก็ทำงานได้ตามปกติ
 - หน้าควบคุมแอร์แสดงค่าที่วัดจาก PZEM และสถานะทำงานจริง ส่วนสรุป Dashboard
-  และสถิติย้อนหลังบางส่วนยังเป็นข้อมูลตัวอย่างจนกว่าจะเพิ่มระบบเก็บประวัติ
+  และสถิติย้อนหลังดึงจากตาราง `energy_hourly` แล้ว (ดูหัวข้อ
+  “หน้าหลักและหน้าสถิติใช้ข้อมูลจริงแล้ว”)
+- **สถานะเปิด/ปิดเชื่อ PZEM ด้วย** (`AirConditioner.isPoweredOn` ใน
+  `lib/models/air_conditioner.dart`): แอร์ถือว่า “เปิดอยู่” ถ้าคำสั่งล่าสุดคือเปิด
+  **หรือ** PZEM ยืนยันว่าแอร์ทำงาน (เฟิร์มแวร์นับว่าทำงานเมื่อกำลังไฟ ≥ 30 W
+  ติดกัน 3 ครั้ง) แอร์ที่มีคนเปิดด้วยรีโมตจริงจึงไม่ขึ้นว่า “ปิดอยู่” ทั้งที่กินไฟ
+  การ์ดแอร์ สรุปห้อง และรีโมตเต็มรูปแบบใช้ค่านี้ และเป็นค่าตั้งต้นของคำสั่งถัดไป
+  กดปรับอุณหภูมิจึงไม่เผลอสั่งปิดแอร์ที่เปิดด้วยรีโมต ส่วนสั่งปิดจากแอปแล้ว
+  หน้าจอขึ้นว่าปิดทันทีไม่ต้องรอ PZEM เว็บแอปใช้กติกาเดียวกัน
 
 ### เงื่อนไขที่บอร์ดเปิดบลูทูธให้ตั้งค่าใหม่
 
@@ -217,8 +232,31 @@ retain บน Broker ทุก topic ของอุปกรณ์นั้น 
 
 ### ตารางเรียนแต่ละห้อง
 
+แท็บตารางเรียนในแอปมือถือ (`lib/screens/schedule_screen.dart`) ทำได้เหมือน
+หน้าตารางเรียนของเว็บแอป (`webapp/assets/js/views/schedule.js`) ตั้งแต่ 9 ต.ค.:
+
+- **ดูตามวันที่จริง** เลือกวันจากแถบสัปดาห์และเลื่อนทีละสัปดาห์ได้ (เดิมเลือกได้แค่
+  วันในสัปดาห์) เพราะวันเดียวกันในสัปดาห์คนละสัปดาห์อาจมีรายการไม่เหมือนกัน
+- **การใช้ห้องนอกตารางเรียน** (`lib/screens/booking_editor_screen.dart`)
+  ประเภท ประชุม / คาบเรียน / สอบ / กิจกรรม / อื่น ๆ ทำซ้ำได้แบบครั้งเดียว /
+  ทุกวัน / ทุกสัปดาห์ เพิ่ม แก้ ลบ หรือ “หยุดตั้งแต่วันที่ดู” สำหรับรายการที่ทำซ้ำ
+  เก็บในตาราง `room_bookings` ผ่าน `GET/POST /api/bookings` และ
+  `PUT/DELETE /api/bookings/:id`
+- **ปฏิทินภาคเรียน** (`lib/screens/term_calendar_screen.dart`) เพิ่ม แก้ ลบ
+  วันเปิด–ปิดภาค (ตาราง `academic_terms`, `GET/PUT/DELETE /api/schedules/terms`)
+  และแสดงว่าตารางเรียนมีผลอยู่หรือไม่ นอกช่วงภาคเรียนทุกห้องถือว่าอยู่นอกคาบ
+- การใช้ห้องและภาคเรียนมีผลกับระบบปิดแอร์อัตโนมัติและการแจ้งเตือน “แอร์ทำงานนอก
+  เวลาเรียน” ด้วย (Backend รวมไว้ใน `services/auto-off.js` และ `services/mqtt.js`)
+- **นำเข้าไฟล์** Excel/CSV (`lib/screens/schedule_import_screen.dart`) เลือกได้ว่า
+  แทนที่เฉพาะห้องที่อยู่ในไฟล์ หรือ **“เปลี่ยนภาคเรียน”** ซึ่งล้างตารางเดิมทุกห้อง
+  ก่อนนำเข้า (ส่ง `replaceAll` ไปที่ `POST /api/schedules/import/commit`)
+- **ดาวน์โหลด CSV** ของตารางที่ใช้อยู่ (`rmutt-timetable-….csv`) ใช้ได้ทั้ง
+  Windows และมือถือ (เมนูแชร์)
+
+ความสามารถเดิมที่ยังอยู่:
+
 - ปุ่มปฏิทินมุมขวาบนของหน้า `Room Schedule` สำหรับ Admin
-- เลือกชั้น ห้อง และวันในสัปดาห์ได้
+- เลือกชั้นและห้องได้
 - เพิ่มชื่อวิชา กลุ่มเรียน ชื่ออาจารย์ เวลาเริ่ม และเวลาเลิก
 - แก้ไขหรือลบรายการเดิมได้
 - ป้องกันการเพิ่มช่วงเวลาที่ซ้อนกันภายในห้องและวันเดียวกัน
@@ -237,12 +275,14 @@ retain บน Broker ทุก topic ของอุปกรณ์นั้น 
 - เปิดและปิด Dark Mode ได้ทันทีทั้งแอป
 - จดจำค่า Dark Mode ด้วย Secure Storage หลังปิดและเปิดแอปใหม่
 - ภาษาและ Dark Mode บันทึกแยกจากกัน
-- ข้อความในแอปผ่านตารางคำแปลทั้งหมด 501 คำ ครอบคลุมทั้งหน้าจอ ปุ่ม กล่องยืนยัน
+- ข้อความในแอปผ่านตารางคำแปล (`lib/localization/app_localizations.dart`
+  ตอนนี้มีคู่คำแปลไทยราว 677 รายการ) ครอบคลุมทั้งหน้าจอ ปุ่ม กล่องยืนยัน
   และ SnackBar แจ้งเตือน เมื่อเลือกภาษาไทยจะไม่มีข้อความอังกฤษหลงเหลือ ยกเว้น
   ชื่อยี่ห้อแอร์ ชื่อหน่วย (kWh, dBm) และตัวเลือกภาษา `English` ที่คงไว้ตามเดิม
 - ข้อความที่มีตัวแปรปนอยู่ เช่น `ห้อง 16101` หรือ `3 เครื่อง` แยกคำที่ต้องแปล
   ออกจากตัวแปรด้วย `context.tr()` จึงแปลได้ครบโดยตัวเลขยังถูกต้อง
-- ยังไม่รวมการตั้งค่า Notifications ในเวอร์ชันนี้
+- การตั้งค่า Notifications มีแล้วตั้งแต่ v3.10.0 / v3.12.0 (ดูหัวข้อ
+  “ขนาดตัวอักษรและการแจ้งเตือนแบบละเอียด” ด้านล่าง)
 
 ### อัตราค่าไฟฟ้า
 
@@ -306,7 +346,8 @@ Backend จึงเป็นคนคุมจังหวะทั้งหม
   ซึ่งอ่านจากตาราง `energy_hourly` ไม่ใช่ตัวเลขตัวอย่างที่ฝังไว้ในโค้ดอีกต่อไป
 - มี **Dropdown เลือกช่วงเวลา** ทั้งสองหน้า: `วันนี้` / `7 วันล่าสุด` /
   `30 วันล่าสุด` / `กำหนดช่วงเอง` (เปิดปฏิทินเลือกวันเริ่ม–วันจบในหน้าจอเดียว)
-- เลือก `วันนี้` กราฟจะเป็นรายชั่วโมง 24 จุด ช่วงยาวกว่านั้นเป็นรายวัน
+- เลือก `วันนี้` กราฟจะเป็นรายชั่วโมง 24 แท่ง ช่วงยาวกว่านั้นเป็นรายวัน
+  (เป็นกราฟแท่งตั้งแต่ 9 ต.ค. ดูหัวข้อกราฟด้านล่าง)
 - ป้ายเพิ่มขึ้น/ลดลงเทียบกับช่วงก่อนหน้าที่ยาวเท่ากันโดยอัตโนมัติ
   ถ้าช่วงก่อนหน้ายังไม่มีข้อมูลจะขึ้นว่า `ยังไม่มีข้อมูลช่วงก่อนหน้าให้เทียบ`
 - หน้าสถิติกรองตามชั้นได้ รวมทั้งตัวเลือก `ทุกชั้น`
@@ -399,18 +440,58 @@ Flutter App                      เว็บแอป (web/)
     │ HTTPS/HTTP (JSON)                  │ HTTPS (JSON) โดเมนเดียวกัน จึงไม่ติด CORS
     ▼                                    ▼
 Node.js Backend API
-    ├── MariaDB: users + OTP + schedules + air_conditioners
-    │            + occupancy_sensors + energy_hourly + system_alerts
+    ├── MariaDB: users + password_reset_otps + rooms + class_schedules
+    │            + air_conditioners + occupancy_sensors + energy_hourly
+    │            + system_alerts + system_settings + academic_terms
+    │            + room_bookings
     ├── SMTP: ส่งอีเมล OTP
+    ├── /firmware/*.bin (Caddy เสิร์ฟให้บอร์ดดาวน์โหลดตอน OTA)
     └── MQTT Broker
-            │ Wi-Fi/MQTT
+            │ Wi-Fi/MQTT (บนเซิร์ฟเวอร์จริงใช้ TLS; บอร์ดนอกเครือข่ายมหาวิทยาลัย
+            │ ต่อผ่าน Tailscale Funnel พอร์ต 8443 ดู deploy/DEPLOY.md)
             ▼
-        ESP32 แอร์ ── IR/PZEM ── เครื่องปรับอากาศ
+        ESP32 แอร์ IR ── IR/PZEM/OLED ── เครื่องปรับอากาศ
+        ESP32 สายแอร์ Daikin ── สายแอร์ SLM8/PZEM/OLED ── แอร์ Daikin
         ESP32 ห้อง ── UART ── HLK-LD2410
 ```
 
 แอป Flutter ไม่ควรเชื่อม MariaDB โดยตรง เพราะจะทำให้รหัสฐานข้อมูลถูกดึงออกจาก
 ไฟล์ APK ได้ Backend จึงเป็นผู้ตรวจรหัสผ่านและเรียกฐานข้อมูลแทน
+
+### โฟลเดอร์ในโปรเจกต์
+
+```text
+cpe_air_remote/
+├── lib/                     แอป Flutter (screens, widgets, controllers, services, models)
+├── test/                    เทสต์ของแอป Flutter
+├── android/ windows/ web/   โฟลเดอร์แพลตฟอร์มของ Flutter (web/ = ตัวโหลด Flutter Web)
+├── assets/                  โลโก้ ไอคอน ฟอนต์
+├── webapp/                  เว็บแอป HTML + JavaScript ล้วน (ดู webapp/README.md)
+├── backend/                 Node.js + Express API, database/schema.sql, scripts/, test/
+├── mqtt/                    Mosquitto สำหรับรันในเครื่อง (setup/start/stop/test_mqtt.ps1)
+├── deploy/                  docker-compose.yml, Caddyfile, สคริปต์ขึ้นเซิร์ฟเวอร์, DEPLOY.md
+├── firmware/
+│   ├── rmutt_esp32_air/         บอร์ดแอร์แบบรีโมต IR (+ PZEM, OLED, OTA)
+│   ├── rmutt_esp32_air_wired/   บอร์ดสายแอร์ Daikin SLM8 (+ PZEM, DHT11, OLED, OTA)
+│   ├── rmutt_esp32_occupancy/   เซ็นเซอร์ตรวจคน ESP32 + HLK-LD2410
+│   ├── ld2410_pinscan/          สเก็ตช์หาขาที่สาย TX ของเรดาร์ต่ออยู่
+│   ├── reset/                   ล้าง NVS ของบอร์ด
+│   ├── tests/                   เทสต์ history_log.h บนคอมพิวเตอร์ (g++)
+│   └── update-root-ca.ps1       อัปเดตใบรากใน letsencrypt_ca.h
+├── docs/
+│   ├── BLE_MQTT_PROTOCOL.md     สัญญา BLE/MQTT ฉบับเต็ม
+│   ├── study/                   เอกสารเชิงลึก (ดูหัวข้อท้ายไฟล์)
+│   └── learn/                   คู่มือเรียนรู้ทีละขั้นสำหรับผู้เริ่มต้น
+├── examples/                ไฟล์ตารางเรียนตัวอย่างสำหรับนำเข้า
+├── .github/workflows/
+│   ├── test.yml                 flutter analyze + flutter test
+│   ├── build-android.yml        build APK (กดสั่งเอง)
+│   └── build-ios.yml            build IPA ไม่เซ็น (กดสั่งเอง)
+├── run_all.ps1, check_system.ps1, diagnose.ps1, db-tunnel.ps1
+├── build-apk.ps1, BUILD-ANDROID.bat, create-keystore.ps1, change-keystore-password.ps1
+├── RELEASE_NOTES.md, START_HERE.md
+└── README_*_TH.txt          บันทึกการแก้ไขรายรุ่นแบบเก่า
+```
 
 ## เริ่มใช้งานเร็วสุดด้วย `run_all.ps1`
 
@@ -427,7 +508,7 @@ Set-ExecutionPolicy -Scope Process Bypass
 1. ตรวจว่า Docker Desktop ทำงานอยู่
 2. เปิด MariaDB container แล้วรอจนพอร์ต `DB_PORT` ตอบ
 3. รัน `db:migrate:pzem`, `db:migrate:occupancy`, `db:migrate:energy`,
-   `db:migrate:autooff` และ `scripts/doctor.js --fix` เพื่อเติมตารางกับ
+   `db:migrate:autooff`, `db:migrate:settings` และ `scripts/doctor.js --fix` เพื่อเติมตารางกับ
    คอลัมน์ที่ขาดให้ตรงกับ `database/schema.sql`
 4. หา LAN IPv4 ปัจจุบัน แล้วเขียน `MQTT_URL`, `MQTT_USERNAME`, `MQTT_PASSWORD`
    ลง `backend/.env` ให้ตรงกับ `mqtt/.env`
@@ -441,6 +522,7 @@ Set-ExecutionPolicy -Scope Process Bypass
 .\run_all.ps1 -SkipFlutter                 # เฉพาะ MariaDB + MQTT + Backend
 .\run_all.ps1 -BrokerHost 192.168.1.153    # กำหนด LAN IP เอง
 .\run_all.ps1 -InitDb                      # สร้างตารางครั้งแรก
+.\run_all.ps1 -Server                      # ใช้เซิร์ฟเวอร์จริง ไม่เปิดอะไรในเครื่อง
 ```
 
 ถ้า LAN IP เปลี่ยนไปจากตอนที่คอนฟิก ESP32 ไว้ ต้องตั้งค่าบอร์ดผ่าน Bluetooth
@@ -565,13 +647,20 @@ npm run db:migrate:pzem
 npm run db:migrate:occupancy
 npm run db:migrate:energy
 npm run db:migrate:autooff
+npm run db:migrate:settings
+npm run db:migrate:firmware
+npm run db:migrate:history
 ```
 
 `db:migrate:occupancy` สร้างตาราง `occupancy_sensors` แบบหนึ่งเซ็นเซอร์ต่อ
 หนึ่งห้อง ส่วน `db:migrate:energy` สร้างตาราง `energy_hourly` สำหรับเก็บค่าไฟ
 รายชั่วโมง ส่วน `db:migrate:autooff` เพิ่มคอลัมน์นาฬิกาปิดอัตโนมัติใน
-`air_conditioners` และสร้างตาราง `system_alerts` ทุกคำสั่งไม่ลบข้อมูลห้อง
-แอร์ ตารางเรียน หรือผู้ใช้เดิม
+`air_conditioners` และสร้างตาราง `system_alerts` ส่วน `db:migrate:settings`
+สร้าง `system_settings` (สวิตช์ปิดอัตโนมัติและอัตราค่าไฟ), `db:migrate:firmware`
+เพิ่มคอลัมน์รุ่นเฟิร์มแวร์และผล OTA และ `db:migrate:history` เพิ่มคอลัมน์ของ
+ข้อมูลไฟฟ้าย้อนหลังตอนบอร์ดเน็ตหลุด ตาราง `academic_terms` กับ `room_bookings`
+ไม่มีคำสั่งแยก ให้ใช้ `node scripts/doctor.js --fix` (หัวข้อถัดไป) สร้างจาก
+`database/schema.sql` ทุกคำสั่งไม่ลบข้อมูลห้อง แอร์ ตารางเรียน หรือผู้ใช้เดิม
 
 ### ตรวจโครงสร้างฐานข้อมูลด้วย `db:doctor`
 
@@ -746,6 +835,16 @@ flutter run -d windows --dart-define=API_BASE_URL=http://127.0.0.1:3000/api
 ในหน้าค้นหา หากเป็นบอร์ดที่คอนฟิกแล้ว ให้กดปุ่ม BOOT ค้างขณะรีเซ็ตเพื่อเปิด
 Setup Mode แล้วเลือก `ตั้งค่าใหม่ผ่านบลูทูธ` จากเมนูของแอร์ตัวเดิม
 
+### สร้างไฟล์ติดตั้ง (APK / IPA)
+
+- ในเครื่อง Windows: ดับเบิลคลิก `BUILD-ANDROID.bat` (สร้างกุญแจด้วย
+  `create-keystore.ps1` ครั้งแรกถ้ายังไม่มี แล้วเรียก `build-apk.ps1 -ApiBaseUrl …`)
+  หรือรัน `.\build-apk.ps1` เอง
+- บน GitHub ไม่ต้องลง Flutter ในเครื่อง: แท็บ Actions → **Build Android (APK)**
+  หรือ **Build iOS (IPA ไม่เซ็น)** → Run workflow (รายละเอียดในหัวข้อ “ทดสอบ”)
+- เลขรุ่นของแอปอยู่ที่ `version:` ใน `pubspec.yaml` (ตอนนี้ `3.16.0+32`)
+  ชื่อไฟล์ APK/IPA จาก GitHub ใช้เลขนี้
+
 ## อัปเดตเซิร์ฟเวอร์จริง (VPS)
 
 ตอนแก้โค้ด Backend แล้วอยากให้ของบนเซิร์ฟเวอร์ตามทัน ให้ดึงโค้ดล่าสุดก่อน
@@ -771,15 +870,20 @@ git pull
 สคริปต์จะถามรหัสผ่าน SSH ไม่เกิน 2 ครั้ง แล้วทำให้ครบทุกขั้น:
 
 1. อัปโหลด `src`, `scripts`, `database`, `package.json`, `package-lock.json`
-   ขึ้น `/opt/rmutt/backend/` พร้อมสคริปต์ `update-remote.sh`
+   ขึ้น `/opt/rmutt/backend/` พร้อมสคริปต์ `update-remote.sh` และไฟล์ตั้งค่า
+   ใน `deploy/` (`docker-compose.yml`, `Caddyfile` ฯลฯ) แล้วอัปโหลดเว็บแอป
+   (`webapp/`) ขึ้น `/opt/rmutt/www`
 2. บนเซิร์ฟเวอร์: `docker compose up -d --build backend`
+   และตั้งเจ้าของโฟลเดอร์ `/opt/rmutt/firmware` เป็น uid 1000 (user `node`
+   ใน container) ให้ Backend เขียนไฟล์ที่อัปโหลดจากหน้าเฟิร์มแวร์ได้
 3. รอจน backend พร้อมรับคำสั่ง แล้วรัน migration ทุกตัว
-   (`energy-history-v370`, `auto-off-v380`, `doctor.js --fix`)
+   (`energy-history-v370`, `auto-off-v380`, `system-settings-v3100`,
+   `firmware-v3140`, `offline-history-v3150`, `doctor.js --fix`)
    ทุกคำสั่งปลอดภัยที่จะรันซ้ำ ถ้ามีอยู่แล้วจะข้ามให้เอง
 4. รีสตาร์ท backend ให้รู้จักตารางใหม่
 5. ตรวจว่าใช้งานได้จริง: `/api/health` ต้องเป็น `status: ok` และ
    `mqtt.connected: true` ส่วน `/api/alerts`, `/api/energy/summary`,
-   `/api/energy/live` ต้องตอบ **401** (แปลว่าเส้นทางมีแล้ว รอแค่ token)
+   `/api/energy/live`, `/api/settings` ต้องตอบ **401** (แปลว่าเส้นทางมีแล้ว รอแค่ token)
    ถ้าตอบ 404 แปลว่าโค้ดใหม่ยังไม่ขึ้น
 
 ตัวเลือกเพิ่มเติม:
@@ -787,6 +891,7 @@ git pull
 ```powershell
 .\deploy\update-server.ps1 -Server <IP-เซิร์ฟเวอร์>  # เปลี่ยนเครื่องปลายทาง
 .\deploy\update-server.ps1 -SkipUpload             # รันขั้นบนเซิร์ฟเวอร์ซ้ำ
+.\deploy\update-server.ps1 -SkipWeb                # แก้แต่ Backend ไม่อัปโหลดเว็บ
 ```
 
 ถ้ามีปัญหา ดู log ด้วย:
@@ -834,6 +939,10 @@ npm test
 เท่านั้น ไฟล์ทดสอบที่ import โมดูลซึ่งอ้าง `db.js` เช่น `services/mqtt.js`
 หรือ `routes/schedules.js` จะได้ไม่ค้างจน `node --test` ต้องกด Ctrl+C
 
+ตอนนี้มี 136 เทสต์ใน 21 ไฟล์ของ `backend/test/` (นับจาก `test(...)`) รวมถึง
+การนำเข้าตารางเรียน การใช้ห้อง (`room-booking.test.js`) เฟิร์มแวร์/OTA
+(`firmware.test.js`) และการล้างค่าบอร์ดตอนลบ (`unprovision.test.js`)
+
 Flutter:
 
 ```powershell
@@ -841,14 +950,36 @@ flutter analyze
 flutter test
 ```
 
+ตอนนี้มี 122 เทสต์ (`test(...)` + `testWidgets(...)`) ใน 22 ไฟล์ของ `test/`
+เช่น ปฏิทินและการทำซ้ำของการใช้ห้อง (`room_calendar_test.dart`), กราฟแท่ง
+และ `niceScaleMax` (`energy_usage_chart_test.dart`) และบอร์ดสายแอร์ Daikin
+(`daikin_wired_support_test.dart`)
+
+เฟิร์มแวร์มีเทสต์ `history_log.h` ที่รันบนคอมพิวเตอร์ได้โดยไม่ต้องมีบอร์ด:
+
+```bash
+cd firmware/tests
+g++ -std=c++17 -I../rmutt_esp32_air history_log_test.cpp -o t && ./t
+```
+
+### GitHub Actions
+
+| Workflow | รันเมื่อ | ทำอะไร |
+|---|---|---|
+| `.github/workflows/test.yml` (“ทดสอบแอป Flutter”) | ทุก `push` ที่แก้ `lib/**`, `test/**`, `pubspec.yaml`, `pubspec.lock` หรือตัว workflow เอง และกดสั่งเองได้ (`workflow_dispatch`) ไม่ได้ตั้งให้รันกับ pull request | `flutter analyze --no-fatal-infos --no-fatal-warnings` แล้ว `flutter test` บน `ubuntu-latest` ข้อผิดพลาดขึ้นเป็น annotation ในหน้า Summary |
+| `.github/workflows/build-android.yml` (“Build Android (APK)”) | กดสั่งเองเท่านั้น (แท็บ Actions → Run workflow) ใส่ `api_base_url` ได้ | `flutter build apk --release` เซ็นด้วยกุญแจจาก Secrets `ANDROID_KEYSTORE_BASE64` + `ANDROID_KEY_PASSWORD` (alias `rmutt-upload`) ถ้ายังไม่ตั้งจะเซ็นด้วย debug key และชื่อไฟล์ลงท้าย `-DEBUG-KEY` (ใช้ทดสอบเท่านั้น ห้ามแจก) ได้ไฟล์ `RMUTT-Energy-<version>.apk` ใน Artifacts เก็บ 14 วัน |
+| `.github/workflows/build-ios.yml` (“Build iOS (IPA ไม่เซ็น)”) | กดสั่งเองเท่านั้น | build บน `macos-latest` แบบ `--no-codesign` ได้ `RMUTT-Energy-<version>-unsigned.ipa` ไปเซ็นต่อด้วย Sideloadly |
+
+Backend ยังไม่มี workflow บน GitHub ให้รัน `npm test` ในเครื่องก่อน push
+
 ## 4. อัปโหลด Firmware ESP32
 
 บอร์ดแอร์มี 2 แบบ เลือกตามวิธีที่ต่อกับแอร์:
 
 | แบบ | ไฟล์ | ใช้เมื่อ |
 |---|---|---|
-| รีโมต IR (2.5.0) | `firmware/rmutt_esp32_air/rmutt_esp32_air.ino` | แอร์ทุกยี่ห้อที่สั่งด้วยรีโมตมือถือ |
-| สายแอร์ Daikin (2.5.1-slm8) | `firmware/rmutt_esp32_air_wired/rmutt_esp32_air_wired.ino` | แอร์ Daikin ที่ถอดรีโมตติดผนังออก แล้วต่อ ESP32 แทน |
+| รีโมต IR (2.5.1) | `firmware/rmutt_esp32_air/rmutt_esp32_air.ino` | แอร์ทุกยี่ห้อที่สั่งด้วยรีโมตมือถือ |
+| สายแอร์ Daikin (2.5.2-slm8) | `firmware/rmutt_esp32_air_wired/rmutt_esp32_air_wired.ino` | แอร์ Daikin ที่ถอดรีโมตติดผนังออก แล้วต่อ ESP32 แทน |
 
 ติดตั้ง Arduino libraries:
 
@@ -881,7 +1012,44 @@ flutter test
 ฟังก์ชันบางรายการ เช่น Eco, Clean หรือ Swing อาจไม่มีในแอร์บางรุ่น
 บอร์ดสายแอร์ไม่ต้องเลือก แอปล็อกเป็น Daikin · สายแอร์ ให้เอง
 
-Firmware ตรวจคนอยู่ที่:
+### แฟลชครั้งแรกผ่าน USB แล้วอัปเดตต่อผ่าน Wi-Fi (OTA) จากหน้าเว็บ
+
+ครั้งแรกต้องแฟลชผ่าน USB ใน Arduino IDE เลือก
+**Tools → Partition Scheme → "No FS 4MB (2MB APP x2)"** (ไฟล์ `partitions.csv`
+ในโฟลเดอร์สเก็ตช์ทำให้มีช่องโปรแกรมสองช่องสำหรับ OTA) หลังจากนั้นอัปเดตผ่าน
+Wi-Fi ได้จาก **เว็บแอป → เมนู `เฟิร์มแวร์`** (เฉพาะแอดมิน) ไม่ต้อง `scp`
+ไฟล์ขึ้นเซิร์ฟเวอร์เองอีก:
+
+1. Arduino IDE: **Sketch → Export Compiled Binary** ได้ `<สเก็ตช์>.ino.bin`
+   (ใช้ `.ino.bin` เท่านั้น ไม่ใช่ `.merged.bin`)
+2. เลือกแท็บชนิดบอร์ด **แอร์ IR** / **สายแอร์ Daikin** / **เซ็นเซอร์ LD2410**
+   แล้วลากไฟล์มาวาง ถ้าชื่อไฟล์ยังไม่มีเลขรุ่น เว็บจะถามรุ่น (ดูจาก
+   `FIRMWARE_VERSION`) แล้วตั้งชื่อเป็น `<สเก็ตช์>-<รุ่น>.bin` ให้ ลบไฟล์เก่าได้จากหน้าเดียวกัน
+3. ตารางบอร์ดบอกว่าบอร์ดไหนยังเก่า กด **อัปเดต** ทีละตัว หรือเลือกหลายตัว
+   (เช่น “เลือกทุกตัวที่ยังเก่า”) แล้วสั่งพร้อมกัน เว็บขึ้น “กำลังอัปเดต” จนบอร์ด
+   รายงานรุ่นใหม่ หรือแจ้งไม่สำเร็จเมื่อเกิน 5 นาที บอร์ดที่ไม่สำเร็จทำงานต่อด้วยรุ่นเดิม
+
+ชนิดไฟล์ดูจากชื่อ: มี `occ` = เซ็นเซอร์, มี `wired` หรือ `slm8` = สายแอร์,
+นอกนั้น = แอร์ IR (`backend/src/utils/firmware.js`) Backend ปฏิเสธไฟล์ที่ไม่ตรงแท็บ
+ไฟล์ที่ไม่ขึ้นต้นด้วยไบต์ `0xE9` หรือใหญ่เกิน 0x1F0000 (1,984 KB) และไม่ยอมสั่ง
+ไฟล์ผิดชนิดให้บอร์ด (บอร์ดสายแอร์รับเฉพาะไฟล์สายแอร์ บอร์ด IR รับเฉพาะไฟล์ IR)
+
+| Method | Path | ใช้ทำอะไร |
+|---|---|---|
+| `GET` | `/api/firmware` | รายการไฟล์ใน `FIRMWARE_DIR` พร้อมชนิดและรุ่น |
+| `POST` | `/api/firmware?kind=air\|wired\|occupancy` | อัปโหลดไฟล์ดิบ ชื่อไฟล์อยู่ใน `X-File-Name` (`&replace=1` = เขียนทับ) |
+| `DELETE` | `/api/firmware/:fileName` | ลบไฟล์ |
+| `POST` | `/api/air-conditioners/:deviceId/ota` | สั่งบอร์ดแอร์อัปเดต `{"file":"…"}` |
+| `POST` | `/api/occupancy-sensors/:deviceId/ota` | สั่งเซ็นเซอร์อัปเดต `{"file":"…"}` |
+
+ทุกเส้นทางต้องเป็นแอดมิน บนเซิร์ฟเวอร์ไฟล์อยู่ที่ `/opt/rmutt/firmware`
+ซึ่ง `docker-compose.yml` ผูกเข้า backend เป็น `/firmware` แบบเขียนได้ (ไม่มี `:ro`
+แล้ว Caddy ยังอ่านอย่างเดียวที่ `/srv/firmware`) และต้องเป็นของ uid 1000
+(user `node` ใน container) `update-remote.sh` ตั้งให้เอง ถ้าอัปโหลดแล้วขึ้นว่า
+เขียนโฟลเดอร์ไม่ได้ ให้รัน `sudo chown 1000:1000 /opt/rmutt/firmware`
+รายละเอียดเต็มอยู่ใน `deploy/DEPLOY.md` หัวข้อ “อัปเดตเฟิร์มแวร์ผ่าน Wi-Fi”
+
+Firmware ตรวจคน (1.3.2) อยู่ที่:
 
 ```text
 firmware/rmutt_esp32_occupancy/rmutt_esp32_occupancy.ino
@@ -898,9 +1066,12 @@ firmware/rmutt_esp32_occupancy/rmutt_esp32_occupancy.ino
 "จิ้มผิดแพด" ใช้สเก็ตช์ตรวจ 2 ตัวนี้ ไล่ตามลำดับ
 
 ```text
-firmware/ld2410_probe/ld2410_probe.ino      ตรวจ GPIO32/33 และไล่ baud ทั้งสองทิศ
 firmware/ld2410_pinscan/ld2410_pinscan.ino  สแกนทีละขา หาว่าสายไปถึงขาไหนจริง
 ```
+
+> หมายเหตุ: ใน repo ตอนนี้มีเฉพาะ `firmware/ld2410_pinscan/` ส่วน
+> `ld2410_probe` ไม่ได้ถูก commit ไว้ (คำอธิบายยังอยู่ใน `firmware/README.md`)
+> ถ้าไม่มีไฟล์ ให้ข้ามไปใช้ `ld2410_pinscan` ได้เลย
 
 วิธีใช้ `ld2410_pinscan` โดยย่อ
 
@@ -922,6 +1093,20 @@ firmware/ld2410_pinscan/ld2410_pinscan.ino  สแกนทีละขา ห�
 แฟลชสเก็ตช์หลักกลับไปก็ใช้งานต่อได้ทันที รายละเอียดเต็มอยู่ใน `firmware/README.md`
 
 ## กราฟบอกค่าไฟรายจุด และหน่วยที่สลับอัตโนมัติ (v3.9.0)
+
+> **อัปเดต 9 ต.ค.: กราฟหน้าสถิติเป็นกราฟแท่งแล้ว** (`lib/widgets/energy_usage_chart.dart`)
+> เนื้อหาเรื่องกราฟเส้นด้านล่างเก็บไว้เป็นประวัติ ส่วนเรื่องหน่วยที่สลับอัตโนมัติยังใช้อยู่เหมือนเดิม
+>
+> - หนึ่งแท่งต่อหนึ่งชั่วโมง (`วันนี้`) หรือหนึ่งวัน (7 วัน / 30 วัน / กำหนดเอง)
+> - **ป้ายตัวเลขเฉพาะแท่งที่สูงที่สุด** แท่งอื่นแตะหรือลากนิ้วเพื่อดูกล่องรายละเอียด
+>   (วันที่ ค่าไฟ และเงินบาท) แตะแท่งเดิมซ้ำเพื่อปิด
+> - ช่วงที่ไม่ใช้ไฟเหลือ **ขีดจาง ๆ** ไม่มีป้าย `0.00 kWh` ซ้ำเต็มแกน
+> - แกนตั้งเป็น **ตัวเลขกลม 3 ระดับ** (`niceScaleMax()`) พร้อมหน่วยไว้บนสุด
+>   ป้ายแกนนอนทุก 6 ชั่วโมง / ชื่อวัน / ทุก 7 วัน ตามช่วงที่เลือก
+> - ข้อมูลรายวันตั้งแต่ **7 วันขึ้นไป** มี **เส้นประค่าเฉลี่ยต่อวัน** (`เฉลี่ย … /วัน`)
+> - ทุกแท่งยังใช้หน่วยเดียวกันจาก `energyScaleReference()` ตามหัวข้อ
+>   “ทำไมทั้งชุดต้องใช้หน่วยเดียวกัน”
+> - เทสต์อยู่ใน `test/energy_usage_chart_test.dart` (`EnergyChartGeometry`, `niceScaleMax`)
 
 เดิมกราฟหน้าสถิติวาดแค่เส้นกับจุด ไม่มีตัวเลขกำกับเลย และทุกหน้าจอตรึงหน่วยไว้
 ที่ `kWh` ทศนิยมตำแหน่งเดียว พอลองวัดโหลดเล็ก ๆ อย่างที่ชาร์จมือถือ (21 W)
@@ -1149,7 +1334,7 @@ test/system_settings_test.dart                   เทสต์ฝั่งแ�
 เซิร์ฟเวอร์มี Caddy ที่เสิร์ฟไฟล์ static อยู่แล้ว การเพิ่ม React หรือ Vite
 หมายถึงต้องมี Node บนเครื่องที่ deploy ต้องจำว่าแก้แล้วต้อง `npm run build`
 ก่อน และเวลาโปรเจกต์ถูกส่งต่อ ต้องมานั่งไล่ว่าทำไม build พัง สิ่งที่ได้
-กลับมาคือความสะดวกตอนเขียนโค้ด ซึ่งไม่คุ้มกับเว็บขนาด 9 หน้า
+กลับมาคือความสะดวกตอนเขียนโค้ด ซึ่งไม่คุ้มกับเว็บขนาด 9 หน้า (ตอนนี้ 10 หน้า หลังเพิ่มหน้าเฟิร์มแวร์)
 
 ผลคือ `deploy-web.ps1` ทำแค่ `scp` ไฟล์ขึ้นไป ไม่ต้อง build ไม่ต้องรีสตาร์ท
 อะไรเลย และเปิดโค้ดในโฟลเดอร์ `webapp/` แล้วอ่านได้ตรง ๆ โดยไม่ต้องมีเครื่องมือ
@@ -1163,12 +1348,13 @@ test/system_settings_test.dart                   เทสต์ฝั่งแ�
 | หน้า | ทำอะไรได้ | สิทธิ์ |
 |---|---|---|
 | ภาพรวม | สรุปค่าไฟรายวัน/7 วัน/30 วัน กราฟมีป้ายบอกค่าทุกจุด, Building Pulse แสดงห้องที่กินไฟและห้องที่แอร์ทำงานอยู่, แจ้งเตือนล่าสุด, 5 ห้องที่ใช้ไฟมากที่สุด | ทุกคน |
-| ห้องและควบคุม | สถานะห้อง (มีคน/ไม่มีคน, นาฬิกาปิดอัตโนมัติ) และรีโมตเต็มรูปแบบ: เปิด-ปิด อุณหภูมิ โหมด พัดลม ทิศลม Eco/Turbo/Sleep/Quiet/ไฟหน้าจอ/ทำความสะอาด พร้อมค่า V/A/W/kWh/PF/Hz จาก PZEM | ทุกคน |
+| ห้องและควบคุม | สถานะห้อง (มีคน/ไม่มีคน, นาฬิกาปิดอัตโนมัติ) ป้ายยี่ห้อ · วิธีควบคุม (เช่น `Daikin · สายแอร์`) และรีโมตเต็มรูปแบบที่แสดงเฉพาะปุ่มที่เครื่องนั้นทำได้: เปิด-ปิด อุณหภูมิ โหมด พัดลม ทิศลม Eco/Turbo/Sleep/Quiet/ไฟหน้าจอ/ทำความสะอาด พร้อมค่า V/A/W/kWh/PF/Hz จาก PZEM | ทุกคน |
 | ข้อมูลไฟฟ้า | เลือกระดับ (รวมอาคาร/รายห้อง/รายเครื่อง) ช่วงวัน และค่าที่ต้องการจาก 16 ค่า ดูเป็นตารางพร้อมกราฟ แล้วส่งออกเป็น Excel ไทยหรืออังกฤษ | ทุกคน |
-| ตารางเรียน | ดูตามวันและชั้น คาบที่กำลังเรียนอยู่ถูกเน้น เพิ่ม/แก้/ลบได้ | ทุกคน / แก้ = แอดมิน |
+| ตารางเรียน | ดูตามวันที่จริงและชั้น (เลื่อนทีละสัปดาห์) คาบที่กำลังเรียนอยู่ถูกเน้น เพิ่ม/แก้/ลบคาบเรียน การใช้ห้อง (ประชุม สอบ กิจกรรม ทำซ้ำได้) ปฏิทินภาคเรียน นำเข้า Excel/CSV และดาวน์โหลด CSV | ทุกคน / แก้ = แอดมิน |
 | การแจ้งเตือน | กรองตามสถานะและห้อง กดรับทราบ | ทุกคน |
 | อัตราค่าไฟ | ดูอัตราและตัวอย่างการคำนวณจากข้อมูลจริง | ดู = ทุกคน, แก้ = แอดมิน |
 | ห้องและอุปกรณ์ | เพิ่ม/แก้/ลบห้อง จองช่องติดตั้งบอร์ด เปลี่ยนชื่อ เปิด-ปิดการปิดอัตโนมัติรายเครื่อง ถอดอุปกรณ์ | แอดมิน |
+| เฟิร์มแวร์ | แท็บ แอร์ IR / สายแอร์ Daikin / เซ็นเซอร์ LD2410: อัปโหลด (ลากไฟล์) และลบไฟล์ `.bin` ตารางบอร์ดบอกตัวที่ยังเก่า เลือกหลายตัวแล้วอัปเดตผ่าน Wi-Fi พร้อมกัน (ดูหัวข้อ “4. อัปโหลด Firmware ESP32”) | แอดมิน |
 | ผู้ใช้งาน | เพิ่มบัญชี เปลี่ยนสิทธิ์ เปิด-ปิดบัญชี ลบบัญชี | แอดมิน |
 | ตั้งค่า | สวิตช์รวมของระบบปิดแอร์อัตโนมัติ แก้ข้อมูลส่วนตัว เปลี่ยนรหัสผ่าน สถานะ API/MQTT | ทุกคน / สวิตช์รวม = แอดมิน |
 
@@ -1217,6 +1403,7 @@ Caddy และ Docker ซึ่งเสี่ยงกว่าประโย
 | `/` | เว็บแอป (`/opt/rmutt/www/index.html`) |
 | `/status.html` | หน้าสถานะแบบเดิมที่เคยอยู่ที่ `/` |
 | `/api/*` | Backend Express ผ่าน reverse proxy ของ Caddy |
+| `/firmware/*` | ไฟล์ `.bin` จาก `/opt/rmutt/firmware` ให้บอร์ดดาวน์โหลดตอน OTA |
 
 เว็บกับ API อยู่โดเมนเดียวกัน จึงไม่ต้องตั้ง CORS เพิ่มและไม่ต้องขอใบรับรอง
 ใหม่ `Caddyfile` เพิ่มแค่หัวเรื่องแคช: ไฟล์ใน `/assets/*` เก็บแคช 1 ชั่วโมง
@@ -1288,7 +1475,7 @@ webapp/assets/js/icons.js                         ไอคอน SVG
 webapp/assets/js/ui.js                            แถบแจ้งผลและกล่องโต้ตอบ
 webapp/assets/js/auth.js                          หน้าเข้าสู่ระบบและลืมรหัสผ่าน
 webapp/assets/js/app.js                           เมนู แถบบน การสลับหน้า ลิ้นชัก
-webapp/assets/js/views/*.js                       9 หน้าจอ
+webapp/assets/js/views/*.js                       10 หน้าจอ + ตัวช่วย (booking-form, term-calendar, schedule-import)
 backend/src/services/system-settings.js        เพิ่มคีย์ electricity_rate
 backend/src/routes/settings.js                 เพิ่ม PATCH /api/settings/rate
 backend/scripts/migrate-system-settings-v3100.js  ใส่ค่าเริ่มต้นของอัตราค่าไฟ
@@ -1307,13 +1494,30 @@ deploy/upload.ps1                              ติดตั้งครั้
 | ไฟล์ | เนื้อหา |
 |---|---|
 | `00-system-overview.md` | ภาพรวม ปัญหาที่แก้ เหตุผลของการแบ่งส่วน และตัวเลขสำคัญทั้งหมด |
-| `01-database.md` | ฐานข้อมูล 8 ตาราง ทุกคอลัมน์ ทุก index พร้อมเหตุผล |
+| `01-database.md` | ฐานข้อมูลทุกตาราง ทุกคอลัมน์ ทุก index พร้อมเหตุผล |
 | `02-backend.md` | ชั้น route / service / util และกฎที่ทำให้ทดสอบได้ |
 | `03-flutter-app.md` | สถาปัตยกรรม state ระบบแปลภาษา และกราฟค่าไฟ |
-| `04-esp32-firmware.md` | เฟิร์มแวร์สองแบบ IR, PZEM, LD2410 และการหาสาเหตุ |
+| `04-esp32-firmware.md` | เฟิร์มแวร์บอร์ดแอร์และเซ็นเซอร์ IR, PZEM, LD2410 และการหาสาเหตุ |
 | `05-mqtt-ble.md` | โปรโตคอลคุยกับอุปกรณ์ และเหตุผลของ provisioning token |
 | `06-auto-off.md` | เครื่องสถานะปิดแอร์อัตโนมัติและกติกากันพลาด |
 | `07-energy-export.md` | เส้นทางข้อมูลค่าไฟตั้งแต่ PZEM ถึงไฟล์ Excel |
 | `08-deploy-security.md` | การนำขึ้นเซิร์ฟเวอร์ ความปลอดภัย และรายการตรวจก่อนส่งมอบ |
 
 ภาพเป็น SVG ซูมได้ไม่แตก เปิดในเบราว์เซอร์หรือแทรกในเอกสารได้
+
+> โครงฐานข้อมูลจริงอยู่ที่ `backend/database/schema.sql` (ตอนนี้ 11 ตาราง รวม
+> `system_settings`, `academic_terms`, `room_bookings`) ถ้าเอกสารเชิงลึกกับโค้ดขัดกัน
+> ให้เชื่อโค้ดก่อน
+
+เอกสารอื่นที่ควรรู้:
+
+| ที่อยู่ | เนื้อหา |
+|---|---|
+| `docs/learn/` | คู่มือเรียนรู้ทีละขั้นสำหรับผู้เริ่มต้น 18 บท (`00-เริ่มต้นอ่านที่นี่.md` ถึง `17-อภิธานศัพท์.md`) พร้อมแผนการอ่าน `.xlsx` |
+| `docs/BLE_MQTT_PROTOCOL.md` | สัญญา BLE/MQTT ฉบับเต็ม |
+| `firmware/README.md` | การต่อสาย ขา GPIO และการหาสาเหตุของบอร์ดทุกแบบ |
+| `firmware/rmutt_esp32_air_wired/README_WIRED_TH.md` | บอร์ดสายแอร์ Daikin |
+| `firmware/rmutt_esp32_air/README_OLED_TH.md` | จอ OLED |
+| `deploy/DEPLOY.md` | ติดตั้งและดูแลเซิร์ฟเวอร์จริง รวม OTA |
+| `webapp/README.md` | เว็บแอป |
+| `RELEASE_NOTES.md` | สิ่งที่เปลี่ยนในแต่ละรุ่นและขั้นตอนหลังอัปเดต |
