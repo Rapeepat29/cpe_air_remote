@@ -19,13 +19,10 @@ roomsRouter.get(
   asyncHandler(async (request, response) => {
     const rows = await pool.query(
       `SELECT r.room_number, r.floor_number, r.room_index, r.room_type,
-              COUNT(DISTINCT CASE
-                WHEN a.provision_status <> 'removed' THEN a.device_id
-              END) AS air_conditioner_count,
+              COUNT(DISTINCT a.device_id) AS air_conditioner_count,
               COUNT(DISTINCT s.id) AS schedule_count,
               COUNT(DISTINCT CASE
-                WHEN a.provision_status <> 'removed' AND a.ac_running = 1
-                  THEN a.device_id
+                WHEN a.ac_running = 1 THEN a.device_id
               END) AS running_air_count,
               MIN(CASE
                 WHEN a.provision_status = 'active'
@@ -39,31 +36,14 @@ roomsRouter.get(
                 WHEN a.provision_status = 'active'
                   THEN a.auto_off_in_class
               END) AS auto_off_in_class,
-              MAX(CASE
-                WHEN o.provision_status <> 'removed' THEN o.device_id
-              END) AS occupancy_sensor_device_id,
-              MAX(CASE
-                WHEN o.provision_status <> 'removed' THEN o.ble_name
-              END) AS occupancy_sensor_ble_name,
-              MAX(CASE
-                WHEN o.provision_status <> 'removed'
-                  THEN o.provision_status
-              END) AS occupancy_sensor_provision_status,
-              MAX(CASE
-                WHEN o.provision_status <> 'removed' THEN o.is_online
-              END) AS occupancy_sensor_online,
-              MAX(CASE
-                WHEN o.provision_status <> 'removed' THEN o.radar_available
-              END) AS occupancy_sensor_available,
-              MAX(CASE
-                WHEN o.provision_status <> 'removed' THEN o.is_occupied
-              END) AS is_occupied,
-              MAX(CASE
-                WHEN o.provision_status <> 'removed' THEN o.static_threshold
-              END) AS occupancy_static_threshold,
-              MAX(CASE
-                WHEN o.provision_status <> 'removed' THEN o.last_seen_at
-              END) AS occupancy_updated_at
+              MAX(o.device_id) AS occupancy_sensor_device_id,
+              MAX(o.ble_name) AS occupancy_sensor_ble_name,
+              MAX(o.provision_status) AS occupancy_sensor_provision_status,
+              MAX(o.is_online) AS occupancy_sensor_online,
+              MAX(o.radar_available) AS occupancy_sensor_available,
+              MAX(o.is_occupied) AS is_occupied,
+              MAX(o.static_threshold) AS occupancy_static_threshold,
+              MAX(o.last_seen_at) AS occupancy_updated_at
          FROM rooms r
          LEFT JOIN air_conditioners a
            ON a.room_number = r.room_number
@@ -71,8 +51,6 @@ roomsRouter.get(
            ON s.room_number = r.room_number
          LEFT JOIN occupancy_sensors o
            ON o.room_number = r.room_number
-          AND o.provision_status <> 'removed'
-        WHERE r.is_active = TRUE
         GROUP BY r.room_number, r.floor_number, r.room_index, r.room_type
         ORDER BY r.floor_number, r.room_index, r.room_number`,
     );
@@ -128,7 +106,7 @@ roomsRouter.put(
     const existingRows = await pool.query(
       `SELECT room_number
          FROM rooms
-        WHERE room_number = ? AND is_active = TRUE
+        WHERE room_number = ?
         LIMIT 1`,
       [roomNumber],
     );
@@ -141,7 +119,7 @@ roomsRouter.put(
               room_index = ?,
               room_type = ?,
               updated_by = ?
-        WHERE room_number = ? AND is_active = TRUE`,
+        WHERE room_number = ?`,
       [
         input.floorNumber,
         input.roomIndex,
@@ -170,7 +148,7 @@ roomsRouter.delete(
       const roomRows = await connection.query(
         `SELECT room_number
            FROM rooms
-          WHERE room_number = ? AND is_active = TRUE
+          WHERE room_number = ?
           FOR UPDATE`,
         [roomNumber],
       );
@@ -178,29 +156,17 @@ roomsRouter.delete(
         throw new ApiError(404, 'ไม่พบห้องนี้');
       }
 
-      await connection.query(
-        `DELETE FROM air_conditioners
-          WHERE room_number = ? AND provision_status = 'removed'`,
-        [roomNumber],
-      );
-      await connection.query(
-        `DELETE FROM occupancy_sensors
-          WHERE room_number = ? AND provision_status = 'removed'`,
-        [roomNumber],
-      );
       const dependencyRows = await connection.query(
         `SELECT
            (SELECT COUNT(*)
               FROM air_conditioners
-             WHERE room_number = ?
-               AND provision_status <> 'removed') AS air_count,
+             WHERE room_number = ?) AS air_count,
            (SELECT COUNT(*)
               FROM class_schedules
              WHERE room_number = ?) AS schedule_count,
            (SELECT COUNT(*)
               FROM occupancy_sensors
-             WHERE room_number = ?
-               AND provision_status <> 'removed') AS occupancy_count`,
+             WHERE room_number = ?) AS occupancy_count`,
         [roomNumber, roomNumber, roomNumber],
       );
       const airCount = Number(dependencyRows[0]?.air_count ?? 0);

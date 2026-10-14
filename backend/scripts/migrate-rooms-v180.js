@@ -32,15 +32,14 @@ try {
       floor_number TINYINT UNSIGNED NOT NULL DEFAULT 0,
       room_index SMALLINT UNSIGNED NOT NULL DEFAULT 0,
       room_type VARCHAR(100) NOT NULL DEFAULT 'Classroom',
-      is_active BOOLEAN NOT NULL DEFAULT TRUE,
       created_by VARCHAR(100) NOT NULL,
       updated_by VARCHAR(100) NOT NULL,
       created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
         ON UPDATE CURRENT_TIMESTAMP,
       PRIMARY KEY (room_number),
-      KEY idx_rooms_floor_active
-        (floor_number, is_active, room_index, room_number)
+      KEY idx_rooms_floor_order
+        (floor_number, room_index, room_number)
     ) ENGINE=InnoDB
       DEFAULT CHARSET=utf8mb4
       COLLATE=utf8mb4_unicode_ci

@@ -1038,7 +1038,7 @@ airConditionersRouter.delete(
 
 | Method | Path | ล็อกอิน | admin | หน้าที่ | ตาราง |
 |---|---|---|---|---|---|
-| GET | `/api/air-conditioners` | ใช่ | ไม่ | รายการแอร์ (ที่ไม่ `removed`) พร้อมค่า PZEM, สถานะ, นับถอยหลัง และ `controlType` (`ir`/`wired`, เพิ่ม 11 ต.ค. 2569) | `air_conditioners` |
+| GET | `/api/air-conditioners` | ใช่ | ไม่ | รายการแอร์ทุกเครื่อง พร้อมค่า PZEM, สถานะ, นับถอยหลัง และ `controlType` (`ir`/`wired`, เพิ่ม 11 ต.ค. 2569) | `air_conditioners` |
 | POST | `/api/air-conditioners/reservations` | ใช่ | ใช่ | จองอุปกรณ์ให้ ESP32 ตอน provisioning: ออก token ใช้ได้ 15 นาที + ข้อมูล MQTT | `air_conditioners`, `rooms` |
 | POST | `/api/air-conditioners/:deviceId/command` | ใช่ | **ไม่** | สั่งแอร์ผ่าน MQTT (202) ใครล็อกอินก็สั่งได้ แอร์ `DAIKIN_WIRED` รับเฉพาะ Cool/Dry/Fan, ไม่มีพัดลม Turbo, สวิง Auto/Off (แก้ 11 ต.ค. 2569) | `air_conditioners` |
 | POST | `/api/air-conditioners/:deviceId/setup-mode` | ใช่ | ใช่ | สั่งบอร์ดเข้าโหมดตั้งค่า (202) | `air_conditioners` |
@@ -1099,7 +1099,7 @@ endpoint เดียว ไม่ผ่าน `authenticate` เพราะห
 
 1. **นำเข้าไฟล์:** `import/preview` ใช้ `express.raw({type: () => true, limit: '8mb'})` เป็น middleware เฉพาะ route นี้ (รับไบนารีของไฟล์ Excel/CSV ตรง ๆ แทน JSON และเพิ่มเพดานเป็น 8 MB เพราะ `express.json` ที่ใช้ทั่วไปจำกัดแค่ 256 KB) แล้วส่งให้ `parseScheduleFile` (บทตอนที่ 2) แยกห้องที่มีอยู่แล้วกับห้องใหม่ (`roomDefaultsForImport` เดาชั้น/ประเภท) `import/commit` ใน `withTransaction` เดียว: สร้างห้องที่ขาด (ถ้าผู้ใช้ยืนยัน `createMissingRooms`) → ลบตารางเดิม (ทั้งหมดถ้า `replaceAll` หรือเฉพาะห้องที่อยู่ในไฟล์) → `INSERT` ทุกคาบ (id เป็น `crypto.randomUUID()`) → บันทึกภาคเรียน → บันทึกว่านำเข้าเมื่อไร ทำใน transaction เดียวเพื่อไม่ให้มีช่วงที่ตารางว่างครึ่งทาง ซึ่งระบบปิดแอร์อัตโนมัติจะเข้าใจว่าทุกห้อง "ไม่มีคาบเรียน" แล้วปิดแอร์ระหว่างสอน
 2. **ปฏิทินภาคเรียน:** `GET/PUT/DELETE /terms` เรียก `readCalendar`, `upsertTerm`, `deleteTerm` ของ `services/academic-terms.js` **ต้องประกาศก่อน `/:id`** (ดูหมายเหตุ) และเรียก `clearTermCache()` หลังแก้เพื่อล้างแคชที่ระบบปิดแอร์ใช้
-3. **CRUD คาบเรียน:** `validateScheduleInput` ตรวจ, `ensureRoomsExist` (ห้องต้องมีและ `is_active`), `ensureNoOverlap` ตรวจการซ้อนด้วยเงื่อนไขคลาสสิก `start_time < ใหม่.end AND end_time > ใหม่.start` (ไม่ซ้อนถ้าคาบหนึ่งจบตอนอีกคาบเริ่มพอดี) พร้อมข้าม id ตัวเองตอนแก้ `validateId` บังคับรูปแบบ UUID เวอร์ชัน 1–5 export `deleteAllSchedules` และ `ensureImportedRooms` ให้ test เรียกด้วย "database ปลอม" ได้
+3. **CRUD คาบเรียน:** `validateScheduleInput` ตรวจ, `ensureRoomsExist` (ห้องต้องมีในตาราง `rooms`), `ensureNoOverlap` ตรวจการซ้อนด้วยเงื่อนไขคลาสสิก `start_time < ใหม่.end AND end_time > ใหม่.start` (ไม่ซ้อนถ้าคาบหนึ่งจบตอนอีกคาบเริ่มพอดี) พร้อมข้าม id ตัวเองตอนแก้ `validateId` บังคับรูปแบบ UUID เวอร์ชัน 1–5 export `deleteAllSchedules` และ `ensureImportedRooms` ให้ test เรียกด้วย "database ปลอม" ได้
 
 > [!WARN]
 > ลำดับการประกาศ route สำคัญ Express จับ route ตามลำดับที่ประกาศ ถ้าประกาศ `PUT /:id` ก่อน `PUT /terms` คำขอ `PUT /terms` จะถูกจับเป็นแก้คาบเรียนที่มี id = "terms" โค้ดจึงวาง `/terms` ไว้ก่อน (มีคอมเมนต์เตือนในไฟล์)

@@ -10,7 +10,7 @@ try {
       mqtt_host VARCHAR(253) NOT NULL,
       mqtt_port SMALLINT UNSIGNED NOT NULL DEFAULT 1883,
       mqtt_username VARCHAR(100) NULL,
-      provision_status ENUM('reserved', 'active', 'removed')
+      provision_status ENUM('reserved', 'active')
         NOT NULL DEFAULT 'reserved',
       provisioning_token_hash CHAR(64) NULL,
       provisioning_expires_at DATETIME NULL,

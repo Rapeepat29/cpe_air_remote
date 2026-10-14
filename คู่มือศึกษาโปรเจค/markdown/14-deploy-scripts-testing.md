@@ -207,7 +207,7 @@ cron (root): 02:30 backup-db.sh   03:10 sync-mqtt-cert.sh
 
 ใช้ครั้งแรก (หรือ `-BackendOnly` ตอนแก้เฉพาะ backend) ขั้น: `ssh mkdir -p /opt/rmutt/backend /opt/rmutt/www` → ส่งทุกอย่างใน `deploy/` ยกเว้น `www`, ไฟล์ `.ps1`, `.tmp`, `.env*`, `server.config*` (ไม่ส่ง `.ps1` เพราะใช้บน Windows อย่างเดียว ไม่ส่งความลับ) → ส่ง `webapp/` ไปที่ `www/` → ส่งซอร์ส backend เฉพาะ `src, scripts, database, package.json, package-lock.json, .dockerignore` (ไม่ส่ง `node_modules` และ `.env` ของเครื่อง dev) → `cp backend.Dockerfile backend/Dockerfile && chmod +x *.sh` แล้วบอกขั้นถัดไป `sudo bash init-env.sh`
 
-#### `deploy/update-server.ps1` (133 บรรทัด) และ `deploy/update-remote.sh` (176 บรรทัด)
+#### `deploy/update-server.ps1` (133 บรรทัด) และ `deploy/update-remote.sh` (179 บรรทัด)
 
 คู่ "ผู้สั่ง/ผู้ทำ" สำหรับอัปเดตทุกครั้งหลังแก้โค้ด (เจาะโค้ดด้านล่าง) พารามิเตอร์ `-Server`, `-User`, `-SkipUpload` (รันขั้นบนเซิร์ฟเวอร์ซ้ำอย่างเดียว), `-SkipWeb` (ไม่อัปโหลดเว็บ) ขั้น 5 ของ `update-remote.sh` โหลด Caddyfile ใหม่ **และสร้างกล่อง `tailscale` ใหม่** เพื่อให้ `tailscale-serve.json` (เว็บ 443 + MQTT 8443) ที่เพิ่งอัปโหลดมีผล ก่อนขั้น 1 (เพิ่ม 14 ต.ค. 2569) ตรวจว่าโฟลเดอร์ `firmware` เป็นของ uid 1000 ถ้าไม่ใช่จะ `chown` ให้ (ไม่ได้ก็แค่เตือน)
 
@@ -794,7 +794,7 @@ done
 - **63** `up -d --build backend` สร้าง image ใหม่และเปลี่ยนคอนเทนเนอร์ (เฉพาะ backend ไม่แตะ db/mqtt จึงข้อมูลไม่หาย)
 - **67–73** วนสูงสุด 40 รอบ × 2 วินาที = 80 วินาที รอจน `docker compose exec backend node -e 'process.exit(0)'` สำเร็จ `for _ in ...` ใช้ `_` เป็นตัวแปรที่ไม่ใช้ค่า **ทำไมต้องรอ:** `up -d` กลับทันทีก่อนคอนเทนเนอร์พร้อมจริง ถ้า migrate ทันทีจะเจอ "container is not running"
 
-**บรรทัด 77–95 (migrate) ของ `deploy/update-remote.sh`**
+**บรรทัด 77–98 (migrate) ของ `deploy/update-remote.sh`**
 
 ```bash:77
 step '3/6 อัปเดตโครงสร้างฐานข้อมูล'
@@ -809,6 +809,9 @@ docker compose exec -T backend node scripts/migrate-firmware-v3140.js \
   || fail 'migrate firmware ไม่สำเร็จ'
 docker compose exec -T backend node scripts/migrate-offline-history-v3150.js \
   || fail 'migrate offline history ไม่สำเร็จ'
+# เอาคอลัมน์ rooms.is_active และสถานะ 'removed' ที่ไม่ใช้แล้วออก (ต้องรันหลัง backend รุ่นใหม่ขึ้น)
+docker compose exec -T backend node scripts/migrate-drop-unused.js \
+  || fail 'migrate ลบส่วนที่ไม่ใช้ ไม่สำเร็จ'
 docker compose exec -T backend node scripts/doctor.js --fix \
   || fail 'doctor ไม่สำเร็จ'
 # ใบรับรองของ MQTTS อาจถูกต่ออายุไปแล้วระหว่างที่ไม่ได้อัปเดต
@@ -818,11 +821,11 @@ step '4/6 รีสตาร์ท backend ให้รู้จักตาร�
 docker compose restart backend || fail 'รีสตาร์ทไม่สำเร็จ'
 ```
 
-รัน migration 5 ตัวตามลำดับ (`energy-history-v370`, `auto-off-v380`, `system-settings-v3100`, `firmware-v3140`, `offline-history-v3150`) แล้ว `doctor.js --fix` (เทียบกับ `database/schema.sql` และเติมตาราง/คอลัมน์ที่ขาด) **หัวใจคือ idempotent** ทุกสคริปต์ตรวจก่อนว่ามีอยู่แล้วหรือยัง จึงรันซ้ำทุกครั้งได้ ไม่ต้องจำว่ารอบนี้ต้องรันตัวไหน `-T` จำเป็นเพราะ SSH แบบสั่งคำสั่งเดียวไม่มี terminal บรรทัด 92 ก๊อปใบรับรองเผื่อต่ออายุระหว่างนั้น (ล้มเหลวได้เพราะไม่ใช่ root จึงแค่เตือน) บรรทัด 95 รีสตาร์ทให้ Backend รู้จักตารางใหม่
+รัน migration 6 ตัวตามลำดับ (`energy-history-v370`, `auto-off-v380`, `system-settings-v3100`, `firmware-v3140`, `offline-history-v3150`, `drop-unused`) แล้ว `doctor.js --fix` (เทียบกับ `database/schema.sql` และเติมตาราง/คอลัมน์ที่ขาด) **หัวใจคือ idempotent** ทุกสคริปต์ตรวจก่อนว่ามีอยู่แล้วหรือยัง จึงรันซ้ำทุกครั้งได้ ไม่ต้องจำว่ารอบนี้ต้องรันตัวไหน `-T` จำเป็นเพราะ SSH แบบสั่งคำสั่งเดียวไม่มี terminal บรรทัด 95 ก๊อปใบรับรองเผื่อต่ออายุระหว่างนั้น (ล้มเหลวได้เพราะไม่ใช่ root จึงแค่เตือน) บรรทัด 98 รีสตาร์ทให้ Backend รู้จักตารางใหม่
 
-**บรรทัด 108–120 (ขั้น 5: โหลด Caddy ใหม่ และสร้างกล่อง tailscale ใหม่) ของ `deploy/update-remote.sh`**
+**บรรทัด 111–123 (ขั้น 5: โหลด Caddy ใหม่ และสร้างกล่อง tailscale ใหม่) ของ `deploy/update-remote.sh`**
 
-```bash:108
+```bash:111
 # Caddy อ่านไฟล์เว็บจากดิสก์ทุกครั้งอยู่แล้ว แต่ Caddyfile ต้องโหลดใหม่
 docker compose up -d caddy >/dev/null 2>&1
 docker compose exec -T caddy caddy reload --config /etc/caddy/Caddyfile >/dev/null 2>&1 \
@@ -838,14 +841,14 @@ if docker compose ps --services 2>/dev/null | grep -qx tailscale; then
 fi
 ```
 
-- **109–112** เดิมของขั้นนี้: ให้ Caddy ขึ้น แล้ว `caddy reload` อ่าน `Caddyfile` ใหม่โดยไม่ตัดการเชื่อมต่อ ถ้าล้มเหลวแค่เตือน (`&& ... || ...` เป็นรูปแบบ "สำเร็จพิมพ์อย่างหนึ่ง ล้มพิมพ์อีกอย่าง" ไม่ใช้ `fail` เพราะไม่ควรหยุดทั้งสคริปต์)
-- **114–115** เหตุผลของขั้นใหม่: `update-server.ps1` อัปโหลด `tailscale-serve.json` ทับเป็นไฟล์ใหม่ แต่ container tailscale ที่รันอยู่ยังเห็นไฟล์เก่า (bind mount ของไฟล์เดี่ยวผูกกับตัวไฟล์เดิม แบบเดียวกับปัญหา inode ของโฟลเดอร์ `www` ในบทนี้) ถ้าแค่ `restart` กฎใหม่ (เช่นพอร์ต 8443 ของ MQTT) จะไม่มีผล จึงต้องสร้างกล่องใหม่ สถานะล็อกอินอยู่ในโฟลเดอร์ `./tailscale/state` (bind mount ของโฟลเดอร์ จึงอยู่รอด) ชื่อ ts.net จึงไม่เปลี่ยนและไม่ต้องล็อกอินใหม่
-- **116** `docker compose ps --services` พิมพ์ชื่อ service ของ compose นี้ `grep -qx tailscale` (`-q` เงียบ, `-x` ต้องตรงทั้งบรรทัด) ใช้เป็นเงื่อนไข ทำเฉพาะเมื่อมี service ชื่อ `tailscale` กัน compose รุ่นเก่าที่ยังไม่มีกล่องนี้
-- **117–119** `up -d --force-recreate tailscale` สร้างกล่องนี้ใหม่ทั้งที่ config ไม่เปลี่ยน (เฉพาะกล่องนี้ ไม่แตะ db/mqtt/backend) ผลเป็นข้อความ "เว็บ 443 + MQTT 8443" ถ้าล้มเหลวแค่เตือน เพราะ Backend อัปเดตเสร็จไปแล้ว การสร้างใหม่ทำให้ Funnel หลุดช่วงสั้น ๆ ระหว่างกล่องเริ่มใหม่
+- **112–115** เดิมของขั้นนี้: ให้ Caddy ขึ้น แล้ว `caddy reload` อ่าน `Caddyfile` ใหม่โดยไม่ตัดการเชื่อมต่อ ถ้าล้มเหลวแค่เตือน (`&& ... || ...` เป็นรูปแบบ "สำเร็จพิมพ์อย่างหนึ่ง ล้มพิมพ์อีกอย่าง" ไม่ใช้ `fail` เพราะไม่ควรหยุดทั้งสคริปต์)
+- **117–118** เหตุผลของขั้นใหม่: `update-server.ps1` อัปโหลด `tailscale-serve.json` ทับเป็นไฟล์ใหม่ แต่ container tailscale ที่รันอยู่ยังเห็นไฟล์เก่า (bind mount ของไฟล์เดี่ยวผูกกับตัวไฟล์เดิม แบบเดียวกับปัญหา inode ของโฟลเดอร์ `www` ในบทนี้) ถ้าแค่ `restart` กฎใหม่ (เช่นพอร์ต 8443 ของ MQTT) จะไม่มีผล จึงต้องสร้างกล่องใหม่ สถานะล็อกอินอยู่ในโฟลเดอร์ `./tailscale/state` (bind mount ของโฟลเดอร์ จึงอยู่รอด) ชื่อ ts.net จึงไม่เปลี่ยนและไม่ต้องล็อกอินใหม่
+- **119** `docker compose ps --services` พิมพ์ชื่อ service ของ compose นี้ `grep -qx tailscale` (`-q` เงียบ, `-x` ต้องตรงทั้งบรรทัด) ใช้เป็นเงื่อนไข ทำเฉพาะเมื่อมี service ชื่อ `tailscale` กัน compose รุ่นเก่าที่ยังไม่มีกล่องนี้
+- **120–122** `up -d --force-recreate tailscale` สร้างกล่องนี้ใหม่ทั้งที่ config ไม่เปลี่ยน (เฉพาะกล่องนี้ ไม่แตะ db/mqtt/backend) ผลเป็นข้อความ "เว็บ 443 + MQTT 8443" ถ้าล้มเหลวแค่เตือน เพราะ Backend อัปเดตเสร็จไปแล้ว การสร้างใหม่ทำให้ Funnel หลุดช่วงสั้น ๆ ระหว่างกล่องเริ่มใหม่
 
-**บรรทัด 123–142 (ตรวจว่าใช้งานได้จริง) ของ `deploy/update-remote.sh`**
+**บรรทัด 126–145 (ตรวจว่าใช้งานได้จริง) ของ `deploy/update-remote.sh`**
 
-```bash:123
+```bash:126
 health=$(curl -s --max-time 20 "https://$DOMAIN/api/health")
 echo "health: $health"
 case "$health" in
@@ -868,11 +871,11 @@ for path in /api/alerts /api/energy/summary /api/energy/live /api/settings; do
 done
 ```
 
-- **123–128** `curl -s --max-time 20` ดึง health (เงียบ จำกัดเวลา) แล้ว `case` เทียบรูปแบบข้อความ ถ้าไม่มี `"status":"ok"` → `fail` (exit 1 ทำให้ฝั่ง Windows `throw`) ส่วน `"connected":true` (MQTT) เป็นแค่คำเตือน
-- **135–142** ยิง 4 เส้นทางที่เพิ่มในรุ่นหลังโดยไม่ล็อกอิน: **401 = เส้นทางมีอยู่ (ต้องการ token)** / 404 = ยังไม่ได้ลงโค้ดใหม่ `-w '%{http_code}'` ให้ curl พิมพ์เฉพาะรหัส HTTP `-o /dev/null` ทิ้งเนื้อหา เป็นวิธีตรวจ "deploy ครบ" โดยไม่ต้องมีรหัสผ่านใด ๆ
-- **144–151** เรียก `/` ต้องได้ 200 และเนื้อหามีคำว่า `RMUTT` (กันกรณีได้ 200 แต่เป็นหน้าอื่น)
-- **153–166** ถ้า `/` ไม่ใช่ 200 ทั้งที่ `www/index.html` มี แปลว่า bind mount ของ Caddy ชี้โฟลเดอร์เก่า → `up -d --force-recreate caddy` (สร้างคอนเทนเนอร์ใหม่ เพราะรีสตาร์ทเฉย ๆ ผูก mount ใหม่ไม่ได้) แล้วตรวจอีกรอบ
-- **168–173** ดู log 200 บรรทัดว่ามี `Auto-off service started` ไหม (ยืนยันว่าตัวคุมปิดแอร์อัตโนมัติเริ่มทำงาน)
+- **126–131** `curl -s --max-time 20` ดึง health (เงียบ จำกัดเวลา) แล้ว `case` เทียบรูปแบบข้อความ ถ้าไม่มี `"status":"ok"` → `fail` (exit 1 ทำให้ฝั่ง Windows `throw`) ส่วน `"connected":true` (MQTT) เป็นแค่คำเตือน
+- **138–145** ยิง 4 เส้นทางที่เพิ่มในรุ่นหลังโดยไม่ล็อกอิน: **401 = เส้นทางมีอยู่ (ต้องการ token)** / 404 = ยังไม่ได้ลงโค้ดใหม่ `-w '%{http_code}'` ให้ curl พิมพ์เฉพาะรหัส HTTP `-o /dev/null` ทิ้งเนื้อหา เป็นวิธีตรวจ "deploy ครบ" โดยไม่ต้องมีรหัสผ่านใด ๆ
+- **147–154** เรียก `/` ต้องได้ 200 และเนื้อหามีคำว่า `RMUTT` (กันกรณีได้ 200 แต่เป็นหน้าอื่น)
+- **156–169** ถ้า `/` ไม่ใช่ 200 ทั้งที่ `www/index.html` มี แปลว่า bind mount ของ Caddy ชี้โฟลเดอร์เก่า → `up -d --force-recreate caddy` (สร้างคอนเทนเนอร์ใหม่ เพราะรีสตาร์ทเฉย ๆ ผูก mount ใหม่ไม่ได้) แล้วตรวจอีกรอบ
+- **171–176** ดู log 200 บรรทัดว่ามี `Auto-off service started` ไหม (ยืนยันว่าตัวคุมปิดแอร์อัตโนมัติเริ่มทำงาน)
 
 ### 6. `deploy/sync-mqtt-cert.sh` — ก๊อปใบรับรองให้ Mosquitto
 

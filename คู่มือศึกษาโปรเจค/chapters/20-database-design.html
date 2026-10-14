@@ -65,7 +65,7 @@
   </aside>
   <main class="content" id="content">
 <div class="chapter-head"><div class="kicker">บทที่ 20 · เจาะลึก</div><h1>เจาะลึกการออกแบบฐานข้อมูล</h1></div>
-<p>บท 5 อธิบายแล้วว่าแต่ละตารางและคอลัมน์ "คืออะไร" บทนี้ตอบอีกสามคำถามที่อาจารย์ชอบถามต่อ: <strong>ทำไมแยกเป็นตารางนี้</strong>, <strong>คอลัมน์นี้จำเป็นจริงไหม (ถ้าลบทิ้งจะเกิดอะไร)</strong> และ <strong>ทำแบบอื่นได้ไหม ทำไมไม่เลือกแบบนั้น</strong> ทุกข้อในบทนี้ตรวจจากโค้ดจริงในโปรเจกต์ (<code>backend/src/</code>) ว่าคอลัมน์ไหนถูกอ่านไปตัดสินอะไร คอลัมน์ไหนแค่เขียนเก็บไว้ และคอลัมน์ไหนเหลือจากรุ่นเก่า (ตรวจกับโค้ด main วันที่ 14 ต.ค. 2569)</p>
+<p>บท 5 อธิบายแล้วว่าแต่ละตารางและคอลัมน์ "คืออะไร" บทนี้ตอบอีกสามคำถามที่อาจารย์ชอบถามต่อ: <strong>ทำไมแยกเป็นตารางนี้</strong>, <strong>คอลัมน์นี้จำเป็นจริงไหม (ถ้าลบทิ้งจะเกิดอะไร)</strong> และ <strong>ทำแบบอื่นได้ไหม ทำไมไม่เลือกแบบนั้น</strong> ทุกข้อในบทนี้ตรวจจากโค้ดจริงในโปรเจกต์ (<code>backend/src/</code>) ว่าคอลัมน์ไหนถูกอ่านไปตัดสินอะไร คอลัมน์ไหนแค่เขียนเก็บไว้ และคอลัมน์ไหนเหลือจากรุ่นเก่า (ตรวจกับโค้ด main วันที่ 14 ต.ค. 2569 และหลังเก็บกวาดส่วนที่ไม่ใช้แล้วในวันเดียวกัน)</p>
 <h2 id="วิธีอ่านบทนี้">วิธีอ่านบทนี้<a class="anchor" href="#วิธีอ่านบทนี้">#</a></h2>
 <p>ทุกตารางมีตารางสรุปคอลัมน์ ช่อง "จำเป็นแค่ไหน" ใช้ 4 ระดับนี้</p>
 <div class="table-wrap"><table>
@@ -94,7 +94,7 @@
 </tr>
 <tr>
 <td>⚪ <strong>เหลือจากรุ่นเก่า</strong></td>
-<td>ยังอยู่ใน schema แต่โค้ดปัจจุบันไม่ได้ใช้แล้วจริง ๆ</td>
+<td>ยังอยู่ใน schema แต่โค้ดปัจจุบันไม่ได้ใช้แล้วจริง ๆ (สองจุดที่เจอถูกลบออกแล้ว 14 ต.ค. 2569 ดูหัวข้อสรุป)</td>
 <td>ไม่มีผลอะไร (ต้องแก้ query ที่ยังอ้างถึงเท่านั้น)</td>
 </tr>
 </tbody>
@@ -268,9 +268,9 @@ UUID สร้างได้ในโค้ด (<code>crypto.randomUUID()</code
 <p><strong>ทำแบบอื่นได้ไหม:</strong> เก็บ OTP เป็นข้อความธรรมดาง่ายกว่า แต่ใครเปิดฐานข้อมูลได้ (เช่น ผ่าน <code>db-view.sh</code> หรือไฟล์ backup) จะรีเซ็ตรหัสใครก็ได้ทันที</p>
 <h3 id="6-ลบจริง-hard-delete-เกือบทุกที่">6. ลบจริง (hard delete) เกือบทุกที่<a class="anchor" href="#6-ลบจริง-hard-delete-เกือบทุกที่">#</a></h3>
 <p>โค้ดปัจจุบันลบแถวจริงด้วย <code>DELETE</code> เกือบทุกที่: ลบผู้ใช้ ลบห้อง ลบแอร์ ลบเซ็นเซอร์ ลบการจอง ข้อยกเว้นคือ <code>users.is_active</code> ที่ใช้ "ปิดบัญชี" โดยไม่ลบ</p>
-<p>ผลข้างเคียงคือมีคอลัมน์ที่ออกแบบไว้สำหรับ "ลบแบบซ่อน" (soft delete) แต่โค้ดรุ่นหลังเปลี่ยนไปลบจริงแล้ว จึงเหลือค้างอยู่สองที่ (ดูรายละเอียดในตาราง <code>rooms</code> และ <code>air_conditioners</code>):
-- <code>rooms.is_active</code> ทุก query กรอง <code>is_active = TRUE</code> แต่ไม่มีโค้ดไหนตั้งเป็น <code>FALSE</code>
-- <code>provision_status = 'removed'</code> ยังอยู่ใน ENUM แต่ไม่มีโค้ดไหนตั้งค่านี้แล้ว (ถอดอุปกรณ์ = <code>DELETE</code> แถว แล้วสั่ง <code>unprovision</code> ให้บอร์ดล้างตัวเอง)</p>
+<p>ผลข้างเคียงคือเคยมีคอลัมน์ที่ออกแบบไว้สำหรับ "ลบแบบซ่อน" (soft delete) ค้างอยู่สองที่ ทั้งสองที่ <strong>ถูกลบออกแล้วเมื่อ 14 ต.ค. 2569</strong> ด้วย <code>backend/scripts/migrate-drop-unused.js</code>:
+- <code>rooms.is_active</code> ทุก query เคยกรอง <code>is_active = TRUE</code> แต่ไม่มีโค้ดไหนตั้งเป็น <code>FALSE</code>
+- <code>provision_status = 'removed'</code> อยู่ใน ENUM แต่ไม่มีโค้ดไหนตั้งค่านี้แล้ว (ถอดอุปกรณ์ = <code>DELETE</code> แถว แล้วสั่ง <code>unprovision</code> ให้บอร์ดล้างตัวเอง) ตอนนี้ ENUM เหลือ <code>reserved</code> กับ <code>active</code></p>
 <p><strong>ทำไมเปลี่ยนมาลบจริง:</strong> soft delete ต้องจำใส่ <code>WHERE is_active = TRUE</code> ทุก query ลืมที่เดียวข้อมูลที่ "ลบแล้ว" ก็โผล่ และค่าที่ต้องไม่ซ้ำ (เช่น <code>ble_name</code>) จะชนกับแถวที่ซ่อนอยู่ ส่วนประวัติที่ต้องเก็บไว้ (ค่าไฟ การแจ้งเตือน) แยกไปอยู่ตารางที่ไม่ผูก FK แล้ว จึงลบตัวอุปกรณ์จริงได้โดยไม่เสียประวัติ</p>
 <h3 id="7-เวลา-datetime-ตามเวลาไทย">7. เวลา: DATETIME ตามเวลาไทย<a class="anchor" href="#7-เวลา-datetime-ตามเวลาไทย">#</a></h3>
 <p>container ทุกตัวตั้ง <code>TZ: Asia/Bangkok</code> (<code>deploy/docker-compose.yml</code>) และคอลัมน์เวลาเกือบทั้งหมดเป็น <code>DATETIME</code> ค่าในฐานข้อมูลจึงเป็นเวลาไทยตรง ๆ เปิดดูแล้วอ่านรู้เรื่อง ถังค่าไฟ <code>bucket_start = '2026-10-14 15:00:00'</code> คือ 15:00–16:00 น. เวลาไทย โค้ดคำนวณต้นชั่วโมงตามเวลาไทยเอง (<code>bangkokHourStart()</code> ใน <code>utils/energy-history.js</code>) ไม่ขึ้นกับเขตเวลาของเครื่อง</p>
@@ -498,12 +498,6 @@ UUID สร้างได้ในโค้ด (<code>crypto.randomUUID()</code
 <td>ทำตาราง <code>room_types</code> แยก (ดูหลักคิดข้อ 8)</td>
 </tr>
 <tr>
-<td><code>is_active</code></td>
-<td>ทุก query กรอง <code>is_active = TRUE</code> แต่ <strong>ไม่มีโค้ดไหนตั้งเป็น FALSE</strong> ลบห้อง = <code>DELETE</code> จริง</td>
-<td>⚪ เหลือจากรุ่นเก่า</td>
-<td>ลบออกได้ (ต้องแก้ query ที่กรองอยู่) หรือทำปุ่ม "ซ่อนห้องชั่วคราว" ให้ใช้คอลัมน์นี้จริง เช่น ห้องปิดซ่อม</td>
-</tr>
-<tr>
 <td><code>created_by</code>, <code>updated_by</code>, <code>created_at</code>, <code>updated_at</code></td>
 <td>เขียนอย่างเดียว</td>
 <td>🟢 ไว้ดู</td>
@@ -511,7 +505,9 @@ UUID สร้างได้ในโค้ด (<code>crypto.randomUUID()</code
 </tr>
 </tbody>
 </table></div>
-<p><strong>Index:</strong> <code>idx_rooms_floor_active (floor_number, is_active, room_index, room_number)</code> ตอบคำถาม "ห้องชั้นนี้ เรียงตามผัง" ได้จาก index อย่างเดียว (covering index) ถ้าวันหลังลบ <code>is_active</code> ออก ต้องปรับ index นี้ด้วย</p>
+<p><strong>Index:</strong> <code>idx_rooms_floor_order (floor_number, room_index, room_number)</code> ตอบคำถาม "ห้องชั้นนี้ เรียงตามผัง" ได้จาก index อย่างเดียว (covering index)</p>
+<div class="callout note"><div class="callout-title">หมายเหตุ</div><p><strong>เดิมมีคอลัมน์ <code>is_active</code> (ลบแล้ว 14 ต.ค. 2569)</strong> ทุก query เคยกรอง <code>is_active = TRUE</code> แต่ไม่มีโค้ดไหนตั้งเป็น FALSE เพราะลบห้องคือ <code>DELETE</code> จริง จึงเป็นคอลัมน์ที่เหลือจากรุ่นเก่า migration ลบห้องที่ถูกซ่อนและไม่มีอะไรผูกทิ้ง แล้วลบคอลัมน์และเปลี่ยน index จาก <code>idx_rooms_floor_active</code> เป็นตัวนี้ ถ้าวันหน้าอยากมีปุ่ม "ปิดห้องชั่วคราว" (เช่น ห้องปิดซ่อม) ควรเพิ่มคอลัมน์ที่มีความหมายชัดกว่า เช่น <code>closed_until DATE</code> พร้อมหน้าจอที่ใช้มันจริง</p></div>
+
 <div class="callout why"><div class="callout-title">ทำไม</div><p><strong>ทำไมห้องมีข้อมูลน้อยมาก (ไม่มีขนาดห้อง ความจุ จำนวนแอร์)</strong>
 จำนวนแอร์ได้จากการนับใน <code>air_conditioners</code> อยู่แล้ว (<code>COUNT(*)</code> ใน <code>routes/rooms.js</code>) ถ้าเก็บซ้ำในตารางห้อง ต้องคอยอัปเดตสองที่และมีโอกาสไม่ตรงกัน ส่วนความจุหรือขนาดห้องไม่มีฟีเจอร์ไหนใช้ หลักการคือ <strong>เก็บเฉพาะสิ่งที่ระบบใช้ และอย่าเก็บสิ่งที่นับจากที่อื่นได้</strong></p></div>
 
@@ -655,9 +651,9 @@ UUID สร้างได้ในโค้ด (<code>crypto.randomUUID()</code
 </tr>
 <tr>
 <td><code>provision_status</code></td>
-<td><code>reserved</code> = จองไว้ รอบอร์ดยืนยัน 15 นาที, <code>active</code> = บอร์ดยืนยันผ่าน MQTT แล้ว ระบบปิดแอร์ทำงานเฉพาะ <code>active</code>, <code>removed</code> = <strong>ไม่ถูกตั้งแล้ว</strong> (ถอด = ลบแถว)</td>
-<td>🔴 ขาดไม่ได้ (<code>reserved</code>/<code>active</code>) · ⚪ (<code>removed</code>)</td>
-<td>ใช้ boolean <code>is_confirmed</code> สองสถานะก็พอ ENUM สามค่าเหลือจากรุ่นที่ยังซ่อนแถวแทนการลบ โค้ดหลายที่ยังกรอง <code>&lt;&gt; 'removed'</code> ไว้ จึงยังเอาค่านี้ออกไม่ได้ทันที ต้องแก้ query พร้อม migration</td>
+<td><code>reserved</code> = จองไว้ รอบอร์ดยืนยัน 15 นาที, <code>active</code> = บอร์ดยืนยันผ่าน MQTT แล้ว ระบบปิดแอร์ทำงานเฉพาะ <code>active</code></td>
+<td>🔴 ขาดไม่ได้</td>
+<td>ใช้ boolean <code>is_confirmed</code> ก็ได้ แต่ ENUM เพิ่มสถานะใหม่ได้ (เช่น <code>maintenance</code>) เดิมมีค่าที่สาม <code>removed</code> ไว้ซ่อนแถวแทนการลบ โค้ดเลิกใช้แล้วจึงเอาออก (14 ต.ค. 2569)</td>
 </tr>
 <tr>
 <td><code>provisioning_token_hash</code>, <code>provisioning_expires_at</code></td>
@@ -1207,7 +1203,29 @@ UUID สร้างได้ในโค้ด (<code>crypto.randomUUID()</code
 <div class="callout note"><div class="callout-title">หมายเหตุ</div><p>ฐานข้อมูลไม่ได้กันการจองซ้อนเวลากัน (สองกิจกรรมห้องเดียวกันเวลาเดียวกัน) เพราะผลต่อระบบปิดแอร์เหมือนกัน คือ "ห้องอยู่ในคาบ" ถ้าต้องการใช้เป็นระบบจองห้องจริงจัง ต้องเพิ่มการตรวจเวลาชนกันในโค้ด</p></div>
 
 <h2 id="สรุป-อะไรตัดได้-อะไรห้ามตัด">สรุป: อะไรตัดได้ อะไรห้ามตัด<a class="anchor" href="#สรุป-อะไรตัดได้-อะไรห้ามตัด">#</a></h2>
-<h3 id="เหลือจากรุ่นเก่า-หรือยังไม่ถูกใช้-ตัดหรือปรับได้">เหลือจากรุ่นเก่า หรือยังไม่ถูกใช้ (ตัดหรือปรับได้)<a class="anchor" href="#เหลือจากรุ่นเก่า-หรือยังไม่ถูกใช้-ตัดหรือปรับได้">#</a></h3>
+<h3 id="เคยเหลือจากรุ่นเก่า-ลบแล้ว-14-ตค-2569">เคยเหลือจากรุ่นเก่า (ลบแล้ว 14 ต.ค. 2569)<a class="anchor" href="#เคยเหลือจากรุ่นเก่า-ลบแล้ว-14-ตค-2569">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>จุด</th>
+<th>เดิม</th>
+<th>ทำอะไรไป</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>rooms.is_active</code></td>
+<td>ทุก query กรอง แต่ไม่มีใครตั้งเป็น FALSE</td>
+<td>ลบคอลัมน์ เอาเงื่อนไขออกจาก query ทุกจุด (11 บรรทัดใน 4 ไฟล์) เปลี่ยน index เป็น <code>idx_rooms_floor_order</code></td>
+</tr>
+<tr>
+<td>ค่า <code>'removed'</code> ใน <code>provision_status</code></td>
+<td>ถอดอุปกรณ์ = ลบแถว ไม่ตั้งค่านี้แล้ว</td>
+<td>ลบแถว <code>removed</code> ที่ค้าง (ประวัติค่าไฟยังอยู่ และขึ้นเป็น "นำออกแล้ว") แล้ว ENUM เหลือ <code>reserved</code>/<code>active</code> เอาเงื่อนไข <code>&lt;&gt; 'removed'</code> ออกจาก query ทั้งหมด</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="เขียนเก็บไว้อย่างเดียว-หรือยังไม่ถูกใช้-คงไว้">เขียนเก็บไว้อย่างเดียว หรือยังไม่ถูกใช้ (คงไว้)<a class="anchor" href="#เขียนเก็บไว้อย่างเดียว-หรือยังไม่ถูกใช้-คงไว้">#</a></h3>
 <div class="table-wrap"><table>
 <thead>
 <tr>
@@ -1217,16 +1235,6 @@ UUID สร้างได้ในโค้ด (<code>crypto.randomUUID()</code
 </tr>
 </thead>
 <tbody>
-<tr>
-<td><code>rooms.is_active</code></td>
-<td>ทุก query กรอง แต่ไม่มีใครตั้งเป็น FALSE</td>
-<td>ลบออก (แก้ query + index) หรือทำปุ่ม "ซ่อนห้อง" ให้ใช้จริง</td>
-</tr>
-<tr>
-<td>ค่า <code>'removed'</code> ใน <code>provision_status</code></td>
-<td>ถอดอุปกรณ์ = ลบแถว ไม่ตั้งค่านี้แล้ว</td>
-<td>เอาออกจาก ENUM พร้อมแก้ query ที่กรอง <code>&lt;&gt; 'removed'</code></td>
-</tr>
 <tr>
 <td><code>air_conditioners.mqtt_port</code>, <code>mqtt_username</code> (และของ <code>occupancy_sensors</code>)</td>
 <td>เขียนอย่างเดียว</td>
@@ -1254,7 +1262,7 @@ UUID สร้างได้ในโค้ด (<code>crypto.randomUUID()</code
 </tr>
 </tbody>
 </table></div>
-<div class="callout tip"><div class="callout-title">เคล็ดลับ</div><p><strong>อย่าลบคอลัมน์ทิ้งก่อนพรีเซนต์</strong> การลบคอลัมน์ต้องเขียน migration, แก้ <code>schema.sql</code>, แก้ query ทุกที่ที่อ้างถึง และรันเทสต์ใหม่ทั้งหมด ถ้าอาจารย์ถาม ตอบได้ว่า "รู้ว่าคอลัมน์นี้ไม่ได้ใช้แล้ว เหลือจากรุ่นที่ใช้วิธีซ่อนแทนการลบ วางแผนจะเอาออกพร้อม migration" ซึ่งแสดงว่าเข้าใจระบบจริง ดีกว่าแก้ลวก ๆ แล้วระบบพัง</p></div>
+<div class="callout tip"><div class="callout-title">เคล็ดลับ</div><p><strong>การลบคอลัมน์ทำอย่างไรให้ปลอดภัย (ตัวอย่างจริงจาก <code>migrate-drop-unused.js</code>)</strong> (1) แก้โค้ดให้เลิกอ้างถึงก่อน (2) ให้ Backend รุ่นใหม่ขึ้นก่อน แล้วค่อยรัน migration (<code>update-remote.sh</code> ทำตามลำดับนี้) เพราะ Backend รุ่นเก่ายังกรอง <code>is_active</code> อยู่ ถ้าลบคอลัมน์ก่อนจะพัง (3) migration รันซ้ำได้ และมี <code>--dry-run</code> ให้ดูก่อนว่าจะลบอะไร (4) ถ้าเจอข้อมูลที่ตัดสินใจแทนคนไม่ได้ (ห้องที่ถูกซ่อนแต่ยังมีแอร์ผูก) สคริปต์ไม่ลบ แต่บอกให้ผู้ดูแลจัดการก่อน คอลัมน์กลุ่ม "เขียนเก็บไว้อย่างเดียว" ด้านบนยังคงไว้ เพราะมีประโยชน์ตอนสืบปัญหาและต้นทุนต่ำ</p></div>
 
 <h3 id="ดูเหมือนซ้ำซ้อน-แต่ห้ามตัด">ดูเหมือนซ้ำซ้อน แต่ห้ามตัด<a class="anchor" href="#ดูเหมือนซ้ำซ้อน-แต่ห้ามตัด">#</a></h3>
 <div class="table-wrap"><table>
@@ -1309,7 +1317,7 @@ UUID สร้างได้ในโค้ด (<code>crypto.randomUUID()</code
 <p><strong>ตอบ:</strong> แอร์ 45 เครื่องส่งทุก 10 วินาทีจะได้ราว 3.9 แสนแถวต่อวัน 142 ล้านแถวต่อปี รายงานจะช้าลงเรื่อย ๆ ถังรายชั่วโมงได้ 1,080 แถวต่อวัน และเก็บผลรวม ตัวนับ ค่าต่ำสุด สูงสุด ไว้ จึงยังคำนวณค่าเฉลี่ยและพีกได้ถูกต้อง สิ่งที่เสียไปคือดูรายวินาทีไม่ได้ ซึ่งรายงานค่าไฟไม่ต้องใช้ ถ้าต้องการจริงควรใช้ฐานข้อมูล time-series แยก</p></div>
 
 <div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> มีคอลัมน์ไหนที่ไม่ได้ใช้บ้าง?</p>
-<p><strong>ตอบ:</strong> มีครับ <code>rooms.is_active</code> กับค่า <code>removed</code> ของ <code>provision_status</code> เหลือจากรุ่นที่ใช้วิธีซ่อนแถวแทนการลบ ตอนนี้ลบจริงแล้ว และมีคอลัมน์ที่เขียนเก็บไว้อย่างเดียวเพื่อสืบปัญหา เช่น <code>mqtt_port</code>, <code>auto_off_started_at</code>, <code>password_changed_at</code> ยังไม่ได้ลบเพราะการลบคอลัมน์ต้องทำ migration และแก้ query ทุกจุดพร้อมกัน วางแผนจะเก็บกวาดในรุ่นถัดไป</p></div>
+<p><strong>ตอบ:</strong> เคยมีสองจุดคือ <code>rooms.is_active</code> กับค่า <code>removed</code> ของ <code>provision_status</code> เหลือจากรุ่นที่ใช้วิธีซ่อนแถวแทนการลบ ตอนหลังโค้ดเปลี่ยนไปลบจริงแล้ว จึงเขียน migration เอาออก โดยแก้โค้ดให้เลิกอ้างถึงก่อน ให้ Backend รุ่นใหม่ขึ้นก่อนแล้วค่อยลบคอลัมน์ และสคริปต์รันซ้ำได้ มี dry-run ส่วนคอลัมน์ที่เขียนเก็บไว้อย่างเดียว เช่น <code>mqtt_port</code>, <code>auto_off_started_at</code>, <code>password_changed_at</code> ยังคงไว้ เพราะใช้สืบปัญหาได้และไม่มีต้นทุนอะไร</p></div>
 
 <div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> ถ้าฐานข้อมูลหลุดออกไป อะไรรั่วบ้าง?</p>
 <p><strong>ตอบ:</strong> ชื่อ อีเมล เบอร์โทรของผู้ใช้ ตารางเรียน และค่าไฟ แต่ <strong>รหัสผ่านไม่รั่ว</strong> (เก็บเป็น bcrypt) OTP, token รีเซ็ต และ token ตั้งค่าบอร์ดเป็น HMAC ที่ต้องใช้กุญแจ <code>OTP_PEPPER</code> ซึ่งอยู่ใน <code>.env</code> ไม่อยู่ในฐานข้อมูล รหัสผ่าน MQTT ของบอร์ดไม่เก็บในฐานข้อมูลเลย และฐานข้อมูลเปิดพอร์ตแค่ <code>127.0.0.1</code> ของเซิร์ฟเวอร์ ต้องเข้าเซิร์ฟเวอร์ก่อนถึงจะต่อได้</p></div>
@@ -1323,7 +1331,7 @@ UUID สร้างได้ในโค้ด (<code>crypto.randomUUID()</code
 <li class="check"><input type="checkbox"> บอกได้ว่า FK ตัวไหน RESTRICT ตัวไหน CASCADE และทำไม <code>energy_hourly</code>/<code>system_alerts</code> ไม่มี FK</li>
 <li class="check"><input type="checkbox"> คำนวณให้อาจารย์ดูได้ว่าทำไมเก็บผลรวม + จำนวน ไม่เก็บค่าเฉลี่ย</li>
 <li class="check"><input type="checkbox"> อธิบายได้ว่า <code>energy_chain_*</code> ต่างจาก <code>energy_kwh</code> อย่างไร</li>
-<li class="check"><input type="checkbox"> รู้ว่าคอลัมน์ไหนเหลือจากรุ่นเก่า และตอบได้ว่าทำไมยังไม่ลบ</li>
+<li class="check"><input type="checkbox"> อธิบายได้ว่าเอา <code>rooms.is_active</code> และสถานะ <code>removed</code> ออกอย่างไรให้ปลอดภัย (ลำดับ: แก้โค้ด → Backend ใหม่ขึ้น → migration)</li>
 <li class="check"><input type="checkbox"> บอกทางเลือกอื่นได้อย่างน้อยหนึ่งแบบต่อหนึ่งการตัดสินใจ พร้อมเหตุผลที่ไม่เลือก</li>
 </ul><nav class="pager"><a class="prev" href="19-daikin-slm8.html"><span>← บทก่อนหน้า</span>19. แอร์ Daikin ผ่านสาย SLM8: จากการแกะโปรโตคอลถึงบอร์ดสายแอร์</a></nav>
   </main>

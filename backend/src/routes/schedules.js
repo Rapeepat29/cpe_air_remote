@@ -41,7 +41,7 @@ schedulesRouter.post(
   }),
   asyncHandler(async (request, response) => {
     const roomRows = await pool.query(
-      'SELECT room_number FROM rooms WHERE is_active = TRUE',
+      'SELECT room_number FROM rooms',
     );
     const preview = await parseScheduleFile({
       buffer: request.body,
@@ -379,8 +379,7 @@ export async function ensureImportedRooms({
   const rows = await database.query(
     `SELECT room_number
        FROM rooms
-      WHERE is_active = TRUE
-        AND room_number IN (${placeholders})`,
+      WHERE room_number IN (${placeholders})`,
     uniqueRoomNumbers,
   );
   const existing = new Set(rows.map((row) => row.room_number));
@@ -400,10 +399,9 @@ export async function ensureImportedRooms({
     await database.query(
       `INSERT INTO rooms
          (room_number, floor_number, room_index, room_type,
-          is_active, created_by, updated_by)
-       VALUES (?, ?, ?, ?, TRUE, ?, ?)
+          created_by, updated_by)
+       VALUES (?, ?, ?, ?, ?, ?)
        ON DUPLICATE KEY UPDATE
-         is_active = TRUE,
          updated_by = VALUES(updated_by)`,
       [
         room.roomNumber,
@@ -454,8 +452,7 @@ async function ensureRoomsExist(roomNumbers, database = pool) {
   const rows = await database.query(
     `SELECT room_number
        FROM rooms
-      WHERE is_active = TRUE
-        AND room_number IN (${placeholders})`,
+      WHERE room_number IN (${placeholders})`,
     uniqueRoomNumbers,
   );
   const existing = new Set(rows.map((row) => row.room_number));

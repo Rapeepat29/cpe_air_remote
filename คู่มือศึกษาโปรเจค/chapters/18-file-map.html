@@ -141,7 +141,7 @@
 </tbody>
 </table></div>
 <h2 id="ฐานข้อมูลและสคริปต์ดูแลข้อมูล">ฐานข้อมูลและสคริปต์ดูแลข้อมูล<a class="anchor" href="#ฐานข้อมูลและสคริปต์ดูแลข้อมูล">#</a></h2>
-<p>รายละเอียดอยู่ในบทฐานข้อมูล MariaDB (25 รายการ)</p>
+<p>รายละเอียดอยู่ในบทฐานข้อมูล MariaDB (26 รายการ)</p>
 <div class="table-wrap"><table>
 <thead>
 <tr>
@@ -213,6 +213,10 @@
 <tr>
 <td><code>backend/scripts/migrate-offline-history-v3150.js</code></td>
 <td>เพิ่มคอลัมน์จุดต่อประวัติไฟฟ้า (<code>energy_chain_*</code>) และ <code>history_pending</code> พร้อมตั้งจุดต่อเริ่มต้น (<code>npm run db:migrate:history</code>)</td>
+</tr>
+<tr>
+<td><code>backend/scripts/migrate-drop-unused.js</code></td>
+<td>(14 ต.ค.) เอา <code>rooms.is_active</code> และสถานะ <code>removed</code> ที่โค้ดไม่ใช้แล้วออกจากฐานข้อมูล รันซ้ำได้ มี <code>--dry-run</code> ถูกเรียกใน <code>update-remote.sh</code></td>
 </tr>
 <tr>
 <td><code>backend/scripts/migrate-legacy-user.js</code></td>
@@ -1581,7 +1585,7 @@
 </tbody>
 </table></div>
 <h2 id="สรุป">สรุป<a class="anchor" href="#สรุป">#</a></h2>
-<p>รวมทั้งหมด 345 รายการ ครอบคลุมโค้ดและไฟล์ตั้งค่าทุกส่วนของโปรเจค</p><nav class="pager"><a class="prev" href="17-glossary.html"><span>← บทก่อนหน้า</span>17. อภิธานศัพท์</a><a class="next" href="19-daikin-slm8.html"><span>บทถัดไป →</span>19. แอร์ Daikin ผ่านสาย SLM8: จากการแกะโปรโตคอลถึงบอร์ดสายแอร์</a></nav>
+<p>รวมทั้งหมด 349 รายการ ครอบคลุมโค้ดและไฟล์ตั้งค่าทุกส่วนของโปรเจค</p><nav class="pager"><a class="prev" href="17-glossary.html"><span>← บทก่อนหน้า</span>17. อภิธานศัพท์</a><a class="next" href="19-daikin-slm8.html"><span>บทถัดไป →</span>19. แอร์ Daikin ผ่านสาย SLM8: จากการแกะโปรโตคอลถึงบอร์ดสายแอร์</a></nav>
   </main>
   <aside class="toc"><div class="toc-title">ในบทนี้</div><ul><li><a href="#เครือข่าย-เซิร์ฟเวอร์-และ-docker">เครือข่าย เซิร์ฟเวอร์ และ Docker</a></li><li><a href="#ฐานข้อมูลและสคริปต์ดูแลข้อมูล">ฐานข้อมูลและสคริปต์ดูแลข้อมูล</a></li><li><a href="#backend-โครงหลัก-ระบบสมาชิก-api-และเทสต์">Backend: โครงหลัก ระบบสมาชิก API และเทสต์</a></li><li><a href="#backend-services-และ-utils">Backend: services และ utils</a></li><li><a href="#โปรโตคอล-broker-สำหรับพัฒนา-และเอกสาร-readme">โปรโตคอล Broker สำหรับพัฒนา และเอกสาร README</a></li><li><a href="#เฟิร์มแวร์-esp32">เฟิร์มแวร์ ESP32</a></li><li><a href="#แอป-flutter-โครงสร้าง-ข้อมูล-state-และเทสต์">แอป Flutter: โครงสร้าง ข้อมูล State และเทสต์</a></li><li><a href="#แอป-flutter-หน้าจอและวิดเจ็ต">แอป Flutter: หน้าจอและวิดเจ็ต</a></li><li><a href="#เว็บแอป">เว็บแอป</a></li><li><a href="#สคริปต์ติดตั้ง-สร้างแอป-และ-ci">สคริปต์ติดตั้ง สร้างแอป และ CI</a></li><li><a href="#สรุป">สรุป</a></li></ul></aside>
 </div>

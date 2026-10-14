@@ -650,6 +650,7 @@ npm run db:migrate:autooff
 npm run db:migrate:settings
 npm run db:migrate:firmware
 npm run db:migrate:history
+npm run db:migrate:cleanup
 ```
 
 `db:migrate:occupancy` สร้างตาราง `occupancy_sensors` แบบหนึ่งเซ็นเซอร์ต่อ
@@ -658,7 +659,8 @@ npm run db:migrate:history
 `air_conditioners` และสร้างตาราง `system_alerts` ส่วน `db:migrate:settings`
 สร้าง `system_settings` (สวิตช์ปิดอัตโนมัติและอัตราค่าไฟ), `db:migrate:firmware`
 เพิ่มคอลัมน์รุ่นเฟิร์มแวร์และผล OTA และ `db:migrate:history` เพิ่มคอลัมน์ของ
-ข้อมูลไฟฟ้าย้อนหลังตอนบอร์ดเน็ตหลุด ตาราง `academic_terms` กับ `room_bookings`
+ข้อมูลไฟฟ้าย้อนหลังตอนบอร์ดเน็ตหลุด ส่วน `db:migrate:cleanup` เอาส่วนที่โค้ดไม่ใช้แล้วออก
+(คอลัมน์ `rooms.is_active` และสถานะ `removed` ของอุปกรณ์ ดู `--dry-run` ได้ก่อน) ตาราง `academic_terms` กับ `room_bookings`
 ไม่มีคำสั่งแยก ให้ใช้ `node scripts/doctor.js --fix` (หัวข้อถัดไป) สร้างจาก
 `database/schema.sql` ทุกคำสั่งไม่ลบข้อมูลห้อง แอร์ ตารางเรียน หรือผู้ใช้เดิม
 

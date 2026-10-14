@@ -52,7 +52,6 @@ airConditionersRouter.get(
               auto_off_in_class, firmware_version, ota_error,
               history_pending
          FROM air_conditioners
-        WHERE provision_status <> 'removed'
         ORDER BY room_number, air_number`,
     );
     response.json({
@@ -70,7 +69,7 @@ airConditionersRouter.post(
     const roomRows = await pool.query(
       `SELECT room_number
          FROM rooms
-        WHERE room_number = ? AND is_active = TRUE
+        WHERE room_number = ?
         LIMIT 1`,
       [input.roomNumber],
     );
@@ -353,7 +352,7 @@ airConditionersRouter.patch(
     const result = await pool.query(
       `UPDATE air_conditioners
           SET ${fields.join(', ')}
-        WHERE device_id = ? AND provision_status <> 'removed'`,
+        WHERE device_id = ?`,
       params,
     );
     if (Number(result.affectedRows) === 0) {

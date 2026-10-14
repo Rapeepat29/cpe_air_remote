@@ -29,7 +29,7 @@
 
 ## ฐานข้อมูลและสคริปต์ดูแลข้อมูล
 
-รายละเอียดอยู่ในบทฐานข้อมูล MariaDB (25 รายการ)
+รายละเอียดอยู่ในบทฐานข้อมูล MariaDB (26 รายการ)
 
 | ไฟล์ | หน้าที่ |
 |---|---|
@@ -49,6 +49,7 @@
 | `backend/scripts/migrate-system-settings-v3100.js` | สร้างตาราง `system_settings` และค่าเริ่มต้น `auto_off_enabled`, `electricity_rate` ด้วย `INSERT IGNORE` (`npm run db:migrate:settings`) |
 | `backend/scripts/migrate-firmware-v3140.js` | เพิ่มคอลัมน์ `firmware_version` และ `ota_error` ให้ทั้งตารางแอร์และตารางเซ็นเซอร์ (`npm run db:migrate:firmware`) |
 | `backend/scripts/migrate-offline-history-v3150.js` | เพิ่มคอลัมน์จุดต่อประวัติไฟฟ้า (`energy_chain_*`) และ `history_pending` พร้อมตั้งจุดต่อเริ่มต้น (`npm run db:migrate:history`) |
+| `backend/scripts/migrate-drop-unused.js` | (14 ต.ค.) เอา `rooms.is_active` และสถานะ `removed` ที่โค้ดไม่ใช้แล้วออกจากฐานข้อมูล รันซ้ำได้ มี `--dry-run` ถูกเรียกใน `update-remote.sh` |
 | `backend/scripts/migrate-legacy-user.js` | ย้ายผู้ใช้จากตารางเก่าเข้า `users` ใน transaction เดียวและแฮชรหัสผ่านที่ยังเป็นข้อความธรรมดา (`npm run migrate:legacy`) |
 | `backend/scripts/convert-schedule-file.js` | แปลงไฟล์ตารางเรียน `.xlsx` เป็น CSV ด้วย `parseScheduleFile` โดยไม่แตะฐานข้อมูล (`npm run schedules:convert`) |
 | `backend/src/utils/schema-doctor.js` | ฟังก์ชันบริสุทธิ์ (`parseSchemaTables`, `parseColumns`, `isAutoAddableColumn`, `diffTables`, `stripLineComments`) ที่แยก `schema.sql` เป็นตาราง/คอลัมน์และเทียบกับฐานข้อมูลจริง |
@@ -425,4 +426,4 @@
 
 ## สรุป
 
-รวมทั้งหมด 345 รายการ ครอบคลุมโค้ดและไฟล์ตั้งค่าทุกส่วนของโปรเจค
+รวมทั้งหมด 349 รายการ ครอบคลุมโค้ดและไฟล์ตั้งค่าทุกส่วนของโปรเจค
