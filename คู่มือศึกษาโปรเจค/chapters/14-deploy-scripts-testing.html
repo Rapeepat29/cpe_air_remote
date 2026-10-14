@@ -285,7 +285,7 @@ cron (root): 02:30 backup-db.sh   03:10 sync-mqtt-cert.sh
 <h3 id="กลุ่ม-d-สคริปต์-deploy-ฝั่ง-windows">กลุ่ม D: สคริปต์ deploy ฝั่ง Windows<a class="anchor" href="#กลุ่ม-d-สคริปต์-deploy-ฝั่ง-windows">#</a></h3>
 <h4 id="deployuploadps1-80-บรรทัด"><code>deploy/upload.ps1</code> (80 บรรทัด)<a class="anchor" href="#deployuploadps1-80-บรรทัด">#</a></h4>
 <p>ใช้ครั้งแรก (หรือ <code>-BackendOnly</code> ตอนแก้เฉพาะ backend) ขั้น: <code>ssh mkdir -p /opt/rmutt/backend /opt/rmutt/www</code> → ส่งทุกอย่างใน <code>deploy/</code> ยกเว้น <code>www</code>, ไฟล์ <code>.ps1</code>, <code>.tmp</code>, <code>.env*</code>, <code>server.config*</code> (ไม่ส่ง <code>.ps1</code> เพราะใช้บน Windows อย่างเดียว ไม่ส่งความลับ) → ส่ง <code>webapp/</code> ไปที่ <code>www/</code> → ส่งซอร์ส backend เฉพาะ <code>src, scripts, database, package.json, package-lock.json, .dockerignore</code> (ไม่ส่ง <code>node_modules</code> และ <code>.env</code> ของเครื่อง dev) → <code>cp backend.Dockerfile backend/Dockerfile &amp;&amp; chmod +x *.sh</code> แล้วบอกขั้นถัดไป <code>sudo bash init-env.sh</code></p>
-<h4 id="deployupdate-serverps1-133-บรรทัด-และ-deployupdate-remotesh-176-บรรทัด"><code>deploy/update-server.ps1</code> (133 บรรทัด) และ <code>deploy/update-remote.sh</code> (176 บรรทัด)<a class="anchor" href="#deployupdate-serverps1-133-บรรทัด-และ-deployupdate-remotesh-176-บรรทัด">#</a></h4>
+<h4 id="deployupdate-serverps1-133-บรรทัด-และ-deployupdate-remotesh-179-บรรทัด"><code>deploy/update-server.ps1</code> (133 บรรทัด) และ <code>deploy/update-remote.sh</code> (179 บรรทัด)<a class="anchor" href="#deployupdate-serverps1-133-บรรทัด-และ-deployupdate-remotesh-179-บรรทัด">#</a></h4>
 <p>คู่ "ผู้สั่ง/ผู้ทำ" สำหรับอัปเดตทุกครั้งหลังแก้โค้ด (เจาะโค้ดด้านล่าง) พารามิเตอร์ <code>-Server</code>, <code>-User</code>, <code>-SkipUpload</code> (รันขั้นบนเซิร์ฟเวอร์ซ้ำอย่างเดียว), <code>-SkipWeb</code> (ไม่อัปโหลดเว็บ) ขั้น 5 ของ <code>update-remote.sh</code> โหลด Caddyfile ใหม่ <strong>และสร้างกล่อง <code>tailscale</code> ใหม่</strong> เพื่อให้ <code>tailscale-serve.json</code> (เว็บ 443 + MQTT 8443) ที่เพิ่งอัปโหลดมีผล ก่อนขั้น 1 (เพิ่ม 14 ต.ค. 2569) ตรวจว่าโฟลเดอร์ <code>firmware</code> เป็นของ uid 1000 ถ้าไม่ใช่จะ <code>chown</code> ให้ (ไม่ได้ก็แค่เตือน)</p>
 <h4 id="deploydeploy-webps1-56-บรรทัด"><code>deploy/deploy-web.ps1</code> (56 บรรทัด)<a class="anchor" href="#deploydeploy-webps1-56-บรรทัด">#</a></h4>
 <p>อัปโหลดเฉพาะ <code>webapp/</code> ไป <code>/opt/rmutt/www</code> ไม่ build ไม่รีสตาร์ท (เร็วกว่ามาก) เพราะ Caddy อ่านไฟล์จากดิสก์ทุกคำขอ ขั้น: สร้าง <code>www.new</code> ว่าง → <code>scp</code> ขึ้นไป → <code>find www -mindepth 1 -delete &amp;&amp; cp -a www.new/. www/</code> (ลบ "ข้างใน" แล้วก๊อป "เข้าไปใน" โฟลเดอร์เดิม ไม่ใช่ <code>mv</code> สลับโฟลเดอร์) <strong>ทำไม:</strong> Docker bind mount ผูกโฟลเดอร์ตาม inode ถ้าสลับชื่อโฟลเดอร์ Caddy จะยังเห็นโฟลเดอร์เก่าที่ถูกลบ แล้วตอบ 404 ทุกหน้าแบบเงียบ ๆ และที่ลบไฟล์เก่าก่อนก็เพื่อไม่ให้ JavaScript เก่าที่ถูกลบจากโปรเจกต์แล้วยังค้างบนเซิร์ฟเวอร์</p>
@@ -1290,7 +1290,7 @@ step<span class="w"> </span><span class="s1">'2/6 รอให้ backend พร
 <li><strong>63</strong> <code>up -d --build backend</code> สร้าง image ใหม่และเปลี่ยนคอนเทนเนอร์ (เฉพาะ backend ไม่แตะ db/mqtt จึงข้อมูลไม่หาย)</li>
 <li><strong>67–73</strong> วนสูงสุด 40 รอบ × 2 วินาที = 80 วินาที รอจน <code>docker compose exec backend node -e 'process.exit(0)'</code> สำเร็จ <code>for _ in ...</code> ใช้ <code>_</code> เป็นตัวแปรที่ไม่ใช้ค่า <strong>ทำไมต้องรอ:</strong> <code>up -d</code> กลับทันทีก่อนคอนเทนเนอร์พร้อมจริง ถ้า migrate ทันทีจะเจอ "container is not running"</li>
 </ul>
-<p><strong>บรรทัด 77–95 (migrate) ของ <code>deploy/update-remote.sh</code></strong></p>
+<p><strong>บรรทัด 77–98 (migrate) ของ <code>deploy/update-remote.sh</code></strong></p>
 <div class="code-block"><span class="code-lang">bash</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">77</span>
 <span class="normal">78</span>
 <span class="normal">79</span>
@@ -1309,7 +1309,10 @@ step<span class="w"> </span><span class="s1">'2/6 รอให้ backend พร
 <span class="normal">92</span>
 <span class="normal">93</span>
 <span class="normal">94</span>
-<span class="normal">95</span></pre></div></td><td class="code"><div><pre><span></span><code>step<span class="w"> </span><span class="s1">'3/6 อัปเดตโครงสร้างฐานข้อมูล'</span>
+<span class="normal">95</span>
+<span class="normal">96</span>
+<span class="normal">97</span>
+<span class="normal">98</span></pre></div></td><td class="code"><div><pre><span></span><code>step<span class="w"> </span><span class="s1">'3/6 อัปเดตโครงสร้างฐานข้อมูล'</span>
 <span class="c1"># แต่ละคำสั่งปลอดภัยที่จะรันซ้ำ ถ้ามีอยู่แล้วจะข้ามให้เอง</span>
 docker<span class="w"> </span>compose<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-T<span class="w"> </span>backend<span class="w"> </span>node<span class="w"> </span>scripts/migrate-energy-history-v370.js<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span><span class="o">||</span><span class="w"> </span>fail<span class="w"> </span><span class="s1">'migrate energy ไม่สำเร็จ'</span>
@@ -1321,6 +1324,9 @@ docker<span class="w"> </span>compose<span class="w"> </span><span class="nb">ex
 <span class="w">  </span><span class="o">||</span><span class="w"> </span>fail<span class="w"> </span><span class="s1">'migrate firmware ไม่สำเร็จ'</span>
 docker<span class="w"> </span>compose<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-T<span class="w"> </span>backend<span class="w"> </span>node<span class="w"> </span>scripts/migrate-offline-history-v3150.js<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span><span class="o">||</span><span class="w"> </span>fail<span class="w"> </span><span class="s1">'migrate offline history ไม่สำเร็จ'</span>
+<span class="c1"># เอาคอลัมน์ rooms.is_active และสถานะ 'removed' ที่ไม่ใช้แล้วออก (ต้องรันหลัง backend รุ่นใหม่ขึ้น)</span>
+docker<span class="w"> </span>compose<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-T<span class="w"> </span>backend<span class="w"> </span>node<span class="w"> </span>scripts/migrate-drop-unused.js<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span><span class="o">||</span><span class="w"> </span>fail<span class="w"> </span><span class="s1">'migrate ลบส่วนที่ไม่ใช้ ไม่สำเร็จ'</span>
 docker<span class="w"> </span>compose<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-T<span class="w"> </span>backend<span class="w"> </span>node<span class="w"> </span>scripts/doctor.js<span class="w"> </span>--fix<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span><span class="o">||</span><span class="w"> </span>fail<span class="w"> </span><span class="s1">'doctor ไม่สำเร็จ'</span>
 <span class="c1"># ใบรับรองของ MQTTS อาจถูกต่ออายุไปแล้วระหว่างที่ไม่ได้อัปเดต</span>
@@ -1331,12 +1337,9 @@ docker<span class="w"> </span>compose<span class="w"> </span>restart<span class=
 </code></pre></div></td></tr></table></div>
 </div>
 
-<p>รัน migration 5 ตัวตามลำดับ (<code>energy-history-v370</code>, <code>auto-off-v380</code>, <code>system-settings-v3100</code>, <code>firmware-v3140</code>, <code>offline-history-v3150</code>) แล้ว <code>doctor.js --fix</code> (เทียบกับ <code>database/schema.sql</code> และเติมตาราง/คอลัมน์ที่ขาด) <strong>หัวใจคือ idempotent</strong> ทุกสคริปต์ตรวจก่อนว่ามีอยู่แล้วหรือยัง จึงรันซ้ำทุกครั้งได้ ไม่ต้องจำว่ารอบนี้ต้องรันตัวไหน <code>-T</code> จำเป็นเพราะ SSH แบบสั่งคำสั่งเดียวไม่มี terminal บรรทัด 92 ก๊อปใบรับรองเผื่อต่ออายุระหว่างนั้น (ล้มเหลวได้เพราะไม่ใช่ root จึงแค่เตือน) บรรทัด 95 รีสตาร์ทให้ Backend รู้จักตารางใหม่</p>
-<p><strong>บรรทัด 108–120 (ขั้น 5: โหลด Caddy ใหม่ และสร้างกล่อง tailscale ใหม่) ของ <code>deploy/update-remote.sh</code></strong></p>
-<div class="code-block"><span class="code-lang">bash</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">108</span>
-<span class="normal">109</span>
-<span class="normal">110</span>
-<span class="normal">111</span>
+<p>รัน migration 6 ตัวตามลำดับ (<code>energy-history-v370</code>, <code>auto-off-v380</code>, <code>system-settings-v3100</code>, <code>firmware-v3140</code>, <code>offline-history-v3150</code>, <code>drop-unused</code>) แล้ว <code>doctor.js --fix</code> (เทียบกับ <code>database/schema.sql</code> และเติมตาราง/คอลัมน์ที่ขาด) <strong>หัวใจคือ idempotent</strong> ทุกสคริปต์ตรวจก่อนว่ามีอยู่แล้วหรือยัง จึงรันซ้ำทุกครั้งได้ ไม่ต้องจำว่ารอบนี้ต้องรันตัวไหน <code>-T</code> จำเป็นเพราะ SSH แบบสั่งคำสั่งเดียวไม่มี terminal บรรทัด 95 ก๊อปใบรับรองเผื่อต่ออายุระหว่างนั้น (ล้มเหลวได้เพราะไม่ใช่ root จึงแค่เตือน) บรรทัด 98 รีสตาร์ทให้ Backend รู้จักตารางใหม่</p>
+<p><strong>บรรทัด 111–123 (ขั้น 5: โหลด Caddy ใหม่ และสร้างกล่อง tailscale ใหม่) ของ <code>deploy/update-remote.sh</code></strong></p>
+<div class="code-block"><span class="code-lang">bash</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">111</span>
 <span class="normal">112</span>
 <span class="normal">113</span>
 <span class="normal">114</span>
@@ -1345,7 +1348,10 @@ docker<span class="w"> </span>compose<span class="w"> </span>restart<span class=
 <span class="normal">117</span>
 <span class="normal">118</span>
 <span class="normal">119</span>
-<span class="normal">120</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c1"># Caddy อ่านไฟล์เว็บจากดิสก์ทุกครั้งอยู่แล้ว แต่ Caddyfile ต้องโหลดใหม่</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c1"># Caddy อ่านไฟล์เว็บจากดิสก์ทุกครั้งอยู่แล้ว แต่ Caddyfile ต้องโหลดใหม่</span>
 docker<span class="w"> </span>compose<span class="w"> </span>up<span class="w"> </span>-d<span class="w"> </span>caddy<span class="w"> </span>&gt;/dev/null<span class="w"> </span><span class="m">2</span>&gt;<span class="p">&amp;</span><span class="m">1</span>
 docker<span class="w"> </span>compose<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-T<span class="w"> </span>caddy<span class="w"> </span>caddy<span class="w"> </span>reload<span class="w"> </span>--config<span class="w"> </span>/etc/caddy/Caddyfile<span class="w"> </span>&gt;/dev/null<span class="w"> </span><span class="m">2</span>&gt;<span class="p">&amp;</span><span class="m">1</span><span class="w"> </span><span class="se">\</span>
 <span class="w">  </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s1">'โหลด Caddyfile ใหม่แล้ว'</span><span class="w"> </span><span class="se">\</span>
@@ -1362,16 +1368,13 @@ docker<span class="w"> </span>compose<span class="w"> </span><span class="nb">ex
 </div>
 
 <ul>
-<li><strong>109–112</strong> เดิมของขั้นนี้: ให้ Caddy ขึ้น แล้ว <code>caddy reload</code> อ่าน <code>Caddyfile</code> ใหม่โดยไม่ตัดการเชื่อมต่อ ถ้าล้มเหลวแค่เตือน (<code>&amp;&amp; ... || ...</code> เป็นรูปแบบ "สำเร็จพิมพ์อย่างหนึ่ง ล้มพิมพ์อีกอย่าง" ไม่ใช้ <code>fail</code> เพราะไม่ควรหยุดทั้งสคริปต์)</li>
-<li><strong>114–115</strong> เหตุผลของขั้นใหม่: <code>update-server.ps1</code> อัปโหลด <code>tailscale-serve.json</code> ทับเป็นไฟล์ใหม่ แต่ container tailscale ที่รันอยู่ยังเห็นไฟล์เก่า (bind mount ของไฟล์เดี่ยวผูกกับตัวไฟล์เดิม แบบเดียวกับปัญหา inode ของโฟลเดอร์ <code>www</code> ในบทนี้) ถ้าแค่ <code>restart</code> กฎใหม่ (เช่นพอร์ต 8443 ของ MQTT) จะไม่มีผล จึงต้องสร้างกล่องใหม่ สถานะล็อกอินอยู่ในโฟลเดอร์ <code>./tailscale/state</code> (bind mount ของโฟลเดอร์ จึงอยู่รอด) ชื่อ ts.net จึงไม่เปลี่ยนและไม่ต้องล็อกอินใหม่</li>
-<li><strong>116</strong> <code>docker compose ps --services</code> พิมพ์ชื่อ service ของ compose นี้ <code>grep -qx tailscale</code> (<code>-q</code> เงียบ, <code>-x</code> ต้องตรงทั้งบรรทัด) ใช้เป็นเงื่อนไข ทำเฉพาะเมื่อมี service ชื่อ <code>tailscale</code> กัน compose รุ่นเก่าที่ยังไม่มีกล่องนี้</li>
-<li><strong>117–119</strong> <code>up -d --force-recreate tailscale</code> สร้างกล่องนี้ใหม่ทั้งที่ config ไม่เปลี่ยน (เฉพาะกล่องนี้ ไม่แตะ db/mqtt/backend) ผลเป็นข้อความ "เว็บ 443 + MQTT 8443" ถ้าล้มเหลวแค่เตือน เพราะ Backend อัปเดตเสร็จไปแล้ว การสร้างใหม่ทำให้ Funnel หลุดช่วงสั้น ๆ ระหว่างกล่องเริ่มใหม่</li>
+<li><strong>112–115</strong> เดิมของขั้นนี้: ให้ Caddy ขึ้น แล้ว <code>caddy reload</code> อ่าน <code>Caddyfile</code> ใหม่โดยไม่ตัดการเชื่อมต่อ ถ้าล้มเหลวแค่เตือน (<code>&amp;&amp; ... || ...</code> เป็นรูปแบบ "สำเร็จพิมพ์อย่างหนึ่ง ล้มพิมพ์อีกอย่าง" ไม่ใช้ <code>fail</code> เพราะไม่ควรหยุดทั้งสคริปต์)</li>
+<li><strong>117–118</strong> เหตุผลของขั้นใหม่: <code>update-server.ps1</code> อัปโหลด <code>tailscale-serve.json</code> ทับเป็นไฟล์ใหม่ แต่ container tailscale ที่รันอยู่ยังเห็นไฟล์เก่า (bind mount ของไฟล์เดี่ยวผูกกับตัวไฟล์เดิม แบบเดียวกับปัญหา inode ของโฟลเดอร์ <code>www</code> ในบทนี้) ถ้าแค่ <code>restart</code> กฎใหม่ (เช่นพอร์ต 8443 ของ MQTT) จะไม่มีผล จึงต้องสร้างกล่องใหม่ สถานะล็อกอินอยู่ในโฟลเดอร์ <code>./tailscale/state</code> (bind mount ของโฟลเดอร์ จึงอยู่รอด) ชื่อ ts.net จึงไม่เปลี่ยนและไม่ต้องล็อกอินใหม่</li>
+<li><strong>119</strong> <code>docker compose ps --services</code> พิมพ์ชื่อ service ของ compose นี้ <code>grep -qx tailscale</code> (<code>-q</code> เงียบ, <code>-x</code> ต้องตรงทั้งบรรทัด) ใช้เป็นเงื่อนไข ทำเฉพาะเมื่อมี service ชื่อ <code>tailscale</code> กัน compose รุ่นเก่าที่ยังไม่มีกล่องนี้</li>
+<li><strong>120–122</strong> <code>up -d --force-recreate tailscale</code> สร้างกล่องนี้ใหม่ทั้งที่ config ไม่เปลี่ยน (เฉพาะกล่องนี้ ไม่แตะ db/mqtt/backend) ผลเป็นข้อความ "เว็บ 443 + MQTT 8443" ถ้าล้มเหลวแค่เตือน เพราะ Backend อัปเดตเสร็จไปแล้ว การสร้างใหม่ทำให้ Funnel หลุดช่วงสั้น ๆ ระหว่างกล่องเริ่มใหม่</li>
 </ul>
-<p><strong>บรรทัด 123–142 (ตรวจว่าใช้งานได้จริง) ของ <code>deploy/update-remote.sh</code></strong></p>
-<div class="code-block"><span class="code-lang">bash</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">123</span>
-<span class="normal">124</span>
-<span class="normal">125</span>
-<span class="normal">126</span>
+<p><strong>บรรทัด 126–145 (ตรวจว่าใช้งานได้จริง) ของ <code>deploy/update-remote.sh</code></strong></p>
+<div class="code-block"><span class="code-lang">bash</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">126</span>
 <span class="normal">127</span>
 <span class="normal">128</span>
 <span class="normal">129</span>
@@ -1387,7 +1390,10 @@ docker<span class="w"> </span>compose<span class="w"> </span><span class="nb">ex
 <span class="normal">139</span>
 <span class="normal">140</span>
 <span class="normal">141</span>
-<span class="normal">142</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nv">health</span><span class="o">=</span><span class="k">$(</span>curl<span class="w"> </span>-s<span class="w"> </span>--max-time<span class="w"> </span><span class="m">20</span><span class="w"> </span><span class="s2">"https://</span><span class="nv">$DOMAIN</span><span class="s2">/api/health"</span><span class="k">)</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nv">health</span><span class="o">=</span><span class="k">$(</span>curl<span class="w"> </span>-s<span class="w"> </span>--max-time<span class="w"> </span><span class="m">20</span><span class="w"> </span><span class="s2">"https://</span><span class="nv">$DOMAIN</span><span class="s2">/api/health"</span><span class="k">)</span>
 <span class="nb">echo</span><span class="w"> </span><span class="s2">"health: </span><span class="nv">$health</span><span class="s2">"</span>
 <span class="k">case</span><span class="w"> </span><span class="s2">"</span><span class="nv">$health</span><span class="s2">"</span><span class="w"> </span><span class="k">in</span>
 <span class="w">  </span>*<span class="s1">'"status":"ok"'</span>*<span class="o">)</span><span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s1">'API ตอบปกติ'</span><span class="w"> </span><span class="p">;;</span>
@@ -1411,11 +1417,11 @@ docker<span class="w"> </span>compose<span class="w"> </span><span class="nb">ex
 </div>
 
 <ul>
-<li><strong>123–128</strong> <code>curl -s --max-time 20</code> ดึง health (เงียบ จำกัดเวลา) แล้ว <code>case</code> เทียบรูปแบบข้อความ ถ้าไม่มี <code>"status":"ok"</code> → <code>fail</code> (exit 1 ทำให้ฝั่ง Windows <code>throw</code>) ส่วน <code>"connected":true</code> (MQTT) เป็นแค่คำเตือน</li>
-<li><strong>135–142</strong> ยิง 4 เส้นทางที่เพิ่มในรุ่นหลังโดยไม่ล็อกอิน: <strong>401 = เส้นทางมีอยู่ (ต้องการ token)</strong> / 404 = ยังไม่ได้ลงโค้ดใหม่ <code>-w '%{http_code}'</code> ให้ curl พิมพ์เฉพาะรหัส HTTP <code>-o /dev/null</code> ทิ้งเนื้อหา เป็นวิธีตรวจ "deploy ครบ" โดยไม่ต้องมีรหัสผ่านใด ๆ</li>
-<li><strong>144–151</strong> เรียก <code>/</code> ต้องได้ 200 และเนื้อหามีคำว่า <code>RMUTT</code> (กันกรณีได้ 200 แต่เป็นหน้าอื่น)</li>
-<li><strong>153–166</strong> ถ้า <code>/</code> ไม่ใช่ 200 ทั้งที่ <code>www/index.html</code> มี แปลว่า bind mount ของ Caddy ชี้โฟลเดอร์เก่า → <code>up -d --force-recreate caddy</code> (สร้างคอนเทนเนอร์ใหม่ เพราะรีสตาร์ทเฉย ๆ ผูก mount ใหม่ไม่ได้) แล้วตรวจอีกรอบ</li>
-<li><strong>168–173</strong> ดู log 200 บรรทัดว่ามี <code>Auto-off service started</code> ไหม (ยืนยันว่าตัวคุมปิดแอร์อัตโนมัติเริ่มทำงาน)</li>
+<li><strong>126–131</strong> <code>curl -s --max-time 20</code> ดึง health (เงียบ จำกัดเวลา) แล้ว <code>case</code> เทียบรูปแบบข้อความ ถ้าไม่มี <code>"status":"ok"</code> → <code>fail</code> (exit 1 ทำให้ฝั่ง Windows <code>throw</code>) ส่วน <code>"connected":true</code> (MQTT) เป็นแค่คำเตือน</li>
+<li><strong>138–145</strong> ยิง 4 เส้นทางที่เพิ่มในรุ่นหลังโดยไม่ล็อกอิน: <strong>401 = เส้นทางมีอยู่ (ต้องการ token)</strong> / 404 = ยังไม่ได้ลงโค้ดใหม่ <code>-w '%{http_code}'</code> ให้ curl พิมพ์เฉพาะรหัส HTTP <code>-o /dev/null</code> ทิ้งเนื้อหา เป็นวิธีตรวจ "deploy ครบ" โดยไม่ต้องมีรหัสผ่านใด ๆ</li>
+<li><strong>147–154</strong> เรียก <code>/</code> ต้องได้ 200 และเนื้อหามีคำว่า <code>RMUTT</code> (กันกรณีได้ 200 แต่เป็นหน้าอื่น)</li>
+<li><strong>156–169</strong> ถ้า <code>/</code> ไม่ใช่ 200 ทั้งที่ <code>www/index.html</code> มี แปลว่า bind mount ของ Caddy ชี้โฟลเดอร์เก่า → <code>up -d --force-recreate caddy</code> (สร้างคอนเทนเนอร์ใหม่ เพราะรีสตาร์ทเฉย ๆ ผูก mount ใหม่ไม่ได้) แล้วตรวจอีกรอบ</li>
+<li><strong>171–176</strong> ดู log 200 บรรทัดว่ามี <code>Auto-off service started</code> ไหม (ยืนยันว่าตัวคุมปิดแอร์อัตโนมัติเริ่มทำงาน)</li>
 </ul>
 <h3 id="6-deploysync-mqtt-certsh--ก๊อปใบรับรองให้-mosquitto">6. <code>deploy/sync-mqtt-cert.sh</code> — ก๊อปใบรับรองให้ Mosquitto<a class="anchor" href="#6-deploysync-mqtt-certsh--ก๊อปใบรับรองให้-mosquitto">#</a></h3>
 <p><strong>บรรทัด 11–56 (ย่อ)</strong></p>

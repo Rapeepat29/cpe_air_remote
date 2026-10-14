@@ -2327,7 +2327,7 @@
 <td><code>/api/air-conditioners</code></td>
 <td>ใช่</td>
 <td>ไม่</td>
-<td>รายการแอร์ (ที่ไม่ <code>removed</code>) พร้อมค่า PZEM, สถานะ, นับถอยหลัง และ <code>controlType</code> (<code>ir</code>/<code>wired</code>, เพิ่ม 11 ต.ค. 2569)</td>
+<td>รายการแอร์ทุกเครื่อง พร้อมค่า PZEM, สถานะ, นับถอยหลัง และ <code>controlType</code> (<code>ir</code>/<code>wired</code>, เพิ่ม 11 ต.ค. 2569)</td>
 <td><code>air_conditioners</code></td>
 </tr>
 <tr>
@@ -2570,7 +2570,7 @@
 <ol>
 <li><strong>นำเข้าไฟล์:</strong> <code>import/preview</code> ใช้ <code>express.raw({type: () =&gt; true, limit: '8mb'})</code> เป็น middleware เฉพาะ route นี้ (รับไบนารีของไฟล์ Excel/CSV ตรง ๆ แทน JSON และเพิ่มเพดานเป็น 8 MB เพราะ <code>express.json</code> ที่ใช้ทั่วไปจำกัดแค่ 256 KB) แล้วส่งให้ <code>parseScheduleFile</code> (บทตอนที่ 2) แยกห้องที่มีอยู่แล้วกับห้องใหม่ (<code>roomDefaultsForImport</code> เดาชั้น/ประเภท) <code>import/commit</code> ใน <code>withTransaction</code> เดียว: สร้างห้องที่ขาด (ถ้าผู้ใช้ยืนยัน <code>createMissingRooms</code>) → ลบตารางเดิม (ทั้งหมดถ้า <code>replaceAll</code> หรือเฉพาะห้องที่อยู่ในไฟล์) → <code>INSERT</code> ทุกคาบ (id เป็น <code>crypto.randomUUID()</code>) → บันทึกภาคเรียน → บันทึกว่านำเข้าเมื่อไร ทำใน transaction เดียวเพื่อไม่ให้มีช่วงที่ตารางว่างครึ่งทาง ซึ่งระบบปิดแอร์อัตโนมัติจะเข้าใจว่าทุกห้อง "ไม่มีคาบเรียน" แล้วปิดแอร์ระหว่างสอน</li>
 <li><strong>ปฏิทินภาคเรียน:</strong> <code>GET/PUT/DELETE /terms</code> เรียก <code>readCalendar</code>, <code>upsertTerm</code>, <code>deleteTerm</code> ของ <code>services/academic-terms.js</code> <strong>ต้องประกาศก่อน <code>/:id</code></strong> (ดูหมายเหตุ) และเรียก <code>clearTermCache()</code> หลังแก้เพื่อล้างแคชที่ระบบปิดแอร์ใช้</li>
-<li><strong>CRUD คาบเรียน:</strong> <code>validateScheduleInput</code> ตรวจ, <code>ensureRoomsExist</code> (ห้องต้องมีและ <code>is_active</code>), <code>ensureNoOverlap</code> ตรวจการซ้อนด้วยเงื่อนไขคลาสสิก <code>start_time &lt; ใหม่.end AND end_time &gt; ใหม่.start</code> (ไม่ซ้อนถ้าคาบหนึ่งจบตอนอีกคาบเริ่มพอดี) พร้อมข้าม id ตัวเองตอนแก้ <code>validateId</code> บังคับรูปแบบ UUID เวอร์ชัน 1–5 export <code>deleteAllSchedules</code> และ <code>ensureImportedRooms</code> ให้ test เรียกด้วย "database ปลอม" ได้</li>
+<li><strong>CRUD คาบเรียน:</strong> <code>validateScheduleInput</code> ตรวจ, <code>ensureRoomsExist</code> (ห้องต้องมีในตาราง <code>rooms</code>), <code>ensureNoOverlap</code> ตรวจการซ้อนด้วยเงื่อนไขคลาสสิก <code>start_time &lt; ใหม่.end AND end_time &gt; ใหม่.start</code> (ไม่ซ้อนถ้าคาบหนึ่งจบตอนอีกคาบเริ่มพอดี) พร้อมข้าม id ตัวเองตอนแก้ <code>validateId</code> บังคับรูปแบบ UUID เวอร์ชัน 1–5 export <code>deleteAllSchedules</code> และ <code>ensureImportedRooms</code> ให้ test เรียกด้วย "database ปลอม" ได้</li>
 </ol>
 <div class="callout warn"><div class="callout-title">ระวัง</div><p>ลำดับการประกาศ route สำคัญ Express จับ route ตามลำดับที่ประกาศ ถ้าประกาศ <code>PUT /:id</code> ก่อน <code>PUT /terms</code> คำขอ <code>PUT /terms</code> จะถูกจับเป็นแก้คาบเรียนที่มี id = "terms" โค้ดจึงวาง <code>/terms</code> ไว้ก่อน (มีคอมเมนต์เตือนในไฟล์)</p></div>
 

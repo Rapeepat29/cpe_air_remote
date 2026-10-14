@@ -44,7 +44,6 @@ occupancySensorsRouter.get(
               provision_status, is_online, radar_available, is_occupied,
               static_threshold, last_seen_at, firmware_version, ota_error
          FROM occupancy_sensors
-        WHERE provision_status <> 'removed'
         ORDER BY room_number, device_id`,
     );
     response.json({
@@ -62,7 +61,7 @@ occupancySensorsRouter.post(
     const roomRows = await pool.query(
       `SELECT room_number
          FROM rooms
-        WHERE room_number = ? AND is_active = TRUE
+        WHERE room_number = ?
         LIMIT 1`,
       [input.roomNumber],
     );

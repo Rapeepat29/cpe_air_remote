@@ -212,9 +212,8 @@ room_number VARCHAR(20) NOT NULL,
 floor_number TINYINT UNSIGNED NOT NULL DEFAULT 0,
 room_index SMALLINT UNSIGNED NOT NULL DEFAULT 0,
 room_type VARCHAR(100) NOT NULL DEFAULT 'Classroom',
-is_active BOOLEAN NOT NULL DEFAULT TRUE,
 PRIMARY KEY (room_number),
-KEY idx_rooms_floor_active (floor_number, is_active, room_index, room_number)
+KEY idx_rooms_floor_order (floor_number, room_index, room_number)
 ```
 
 **`room_number VARCHAR(20)` ไม่ใช่ `INT`** — เพราะห้องพิเศษชื่อ `CL503`
@@ -236,17 +235,19 @@ KEY idx_rooms_floor_active (floor_number, is_active, room_index, room_number)
 `Network Room`, `Special Computer Laboratory`, …) ถ้าเป็น ENUM ต้อง
 `ALTER TABLE` ทุกครั้งที่มีประเภทใหม่ ซึ่งเป็นงาน migration จริง ๆ
 
-**`is_active`** — เหมือน `users` คือซ่อนห้องโดยไม่ลบ เพราะ `air_conditioners`
-กับ `class_schedules` ยังอ้างถึงอยู่
+**ไม่มี `is_active` แล้ว (14 ต.ค. 2569)** — เดิมมีไว้ซ่อนห้องแบบ `users`
+แต่โค้ดลบห้องด้วย `DELETE` จริงมาตลอด ไม่มีที่ไหนตั้งเป็น FALSE จึงเอาออกด้วย
+`npm run db:migrate:cleanup` การลบห้องที่ยังมีแอร์ เซ็นเซอร์ หรือตารางเรียน
+ถูกกันทั้งในโค้ด (ตอบ 409 พร้อมจำนวน) และ FK แบบ `RESTRICT`
 
 ### index บอกอะไร
 
 ```sql
-KEY idx_rooms_floor_active (floor_number, is_active, room_index, room_number)
+KEY idx_rooms_floor_order (floor_number, room_index, room_number)
 ```
 
 index นี้ตรงกับคำสั่งที่ใช้จริงที่สุดในระบบ คือ
-**"เอาห้องที่ใช้งานอยู่ของชั้นนี้ เรียงตามลำดับ"** ซึ่งเป็นสิ่งที่หน้ารายการห้อง
+**"เอาห้องของชั้นนี้ เรียงตามลำดับ"** ซึ่งเป็นสิ่งที่หน้ารายการห้อง
 ถามทุกครั้งที่เปิด ทั้งการกรองและการเรียงอ่านจาก index ได้เลย
 ฐานข้อมูลไม่ต้องดึงข้อมูลมาเรียงเองในหน่วยความจำ
 
@@ -291,7 +292,7 @@ CONSTRAINT fk_class_schedule_room FOREIGN KEY (room_number)
 
 **`ON DELETE RESTRICT` ไม่ใช่ CASCADE** — ตั้งใจให้ลบห้องที่ยังมีตารางเรียน
 ไม่ได้ เพราะการลบห้องทิ้งแล้วตารางเรียนหายตามเงียบ ๆ เป็นความเสียหายที่กู้ยาก
-ผู้ดูแลต้องจัดการตารางเรียนก่อน หรือใช้ `is_active = false` แทน
+ผู้ดูแลต้องลบตารางเรียนของห้องนั้นก่อน (หรือนำเข้าตารางใหม่แบบแทนที่ทั้งหมด)
 
 **`ON UPDATE CASCADE`** — ถ้าเปลี่ยนเลขห้อง ตารางเรียนจะตามไปเอง
 กรณีนี้ปลอดภัยเพราะไม่ได้ทำให้ข้อมูลหาย
@@ -337,7 +338,7 @@ mqtt_topic VARCHAR(160) NOT NULL,
 mqtt_host VARCHAR(253) NOT NULL,
 mqtt_port SMALLINT UNSIGNED NOT NULL DEFAULT 1883,
 mqtt_username VARCHAR(100) NULL,
-provision_status ENUM('reserved','active','removed') NOT NULL DEFAULT 'reserved',
+provision_status ENUM('reserved','active') NOT NULL DEFAULT 'reserved',
 provisioning_token_hash CHAR(64) NULL,
 provisioning_expires_at DATETIME NULL,
 UNIQUE KEY uq_air_mqtt_topic (mqtt_topic)
@@ -358,22 +359,23 @@ Backend คุยกับ Broker ผ่านชื่อ service ภายใ�
 การเก็บค่าที่ **ส่งให้บอร์ดจริง** ไว้ในแถว ทำให้ตรวจสอบย้อนหลังได้ว่าบอร์ดนี้
 ถูกบอกให้ไปที่ไหน เวลาบอร์ดต่อไม่ได้จะได้รู้ว่าเป็นเพราะค่าเก่าหรือเปล่า
 
-**`provision_status` สามค่า ทำไมไม่ใช้ boolean**
+**`provision_status` ทำไมเป็น ENUM ไม่ใช่ boolean**
 
 | ค่า | ความหมาย | เกิดตอนไหน |
 |---|---|---|
 | `reserved` | จองตำแหน่งไว้แล้ว รอบอร์ดมารายงานตัว | แอปกดสร้างในฐานข้อมูล |
 | `active` | บอร์ดยืนยันตัวตนแล้ว ใช้งานได้ | บอร์ดส่ง token ที่ถูกต้องมา |
-| `removed` | ถูกนำออกจากระบบ | แอดมินสั่งลบ |
 
 **`reserved` มีไว้ปิดช่องว่างระหว่างสองขั้นตอน** — แอปต้องจองตำแหน่งใน
 ฐานข้อมูลก่อน (เพื่อขอ token) แล้วค่อยเขียนค่าลงบอร์ดผ่าน BLE ถ้าระหว่างนั้น
 มีคนอื่นจองตำแหน่งเดียวกัน จะชนกัน สถานะ `reserved` ทำให้ `uq_air_room_number`
 ทำงานตั้งแต่ขั้นจอง
 
-**`removed` ไม่ลบแถวทิ้ง** เพราะ `energy_hourly` ยังมีประวัติค่าไฟของอุปกรณ์นี้
-อยู่ ถ้าลบแถวทิ้งจะไม่รู้ว่าประวัตินั้นเป็นของเครื่องไหนห้องไหน
-ในหน้าเลือกอุปกรณ์จะขึ้นป้าย `นำออกแล้ว` ให้เลือกดูย้อนหลังได้
+**ถอดอุปกรณ์ = ลบแถวทิ้ง** (เดิมมีค่า `removed` ไว้ซ่อนแถว แต่โค้ดเลิกใช้แล้ว
+และเอาออกจาก ENUM เมื่อ 14 ต.ค. 2569) ประวัติค่าไฟไม่หาย เพราะ `energy_hourly`
+เก็บ `room_number` กับ `device_name` ไว้ในแถวเอง และไม่ผูก FK กับตารางแอร์
+ในหน้าข้อมูลไฟฟ้าเครื่องที่ถอดแล้วจะขึ้นป้าย `นำออกแล้ว` ให้เลือกดูย้อนหลังได้
+ENUM ยังดีกว่า boolean เพราะเพิ่มสถานะใหม่ได้ในอนาคต (เช่น `maintenance`)
 
 **`provisioning_token_hash CHAR(64)`** — เก็บ hash ไม่ใช่ token จริง
 ด้วยเหตุผลเดียวกับ OTP คือถ้าฐานข้อมูลรั่ว คนได้ไปก็ปลอมเป็นบอร์ดไม่ได้

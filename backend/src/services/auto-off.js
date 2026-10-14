@@ -150,7 +150,6 @@ async function readDevices({ deviceId, roomNumber }) {
        FROM air_conditioners a
        LEFT JOIN occupancy_sensors o
          ON o.room_number = a.room_number
-        AND o.provision_status <> 'removed'
       WHERE ${filters.join('\n        AND ')}`,
     params,
   );

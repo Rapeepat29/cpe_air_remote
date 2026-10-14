@@ -101,9 +101,9 @@ export async function reconcileAccounts() {
   );
 
   const rows = await pool.query(
-    `SELECT device_id FROM air_conditioners WHERE provision_status <> 'removed'
+    `SELECT device_id FROM air_conditioners
      UNION
-     SELECT device_id FROM occupancy_sensors WHERE provision_status <> 'removed'`,
+     SELECT device_id FROM occupancy_sensors`,
   );
   let ok = 0;
   for (const row of rows) {

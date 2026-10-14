@@ -22,12 +22,12 @@
 
 ```text
 ตาราง rooms
-┌─────────────┬──────────────┬────────────┬───────────────┬───────────┐
-│ room_number │ floor_number │ room_index │ room_type     │ is_active │  ← คอลัมน์
-├─────────────┼──────────────┼────────────┼───────────────┼───────────┤
-│ 16101       │ 1            │ 1          │ Admin Office  │ 1         │  ← แถว
-│ 16302       │ 3            │ 2          │ Storage Room  │ 1         │
-└─────────────┴──────────────┴────────────┴───────────────┴───────────┘
+┌─────────────┬──────────────┬────────────┬───────────────┐
+│ room_number │ floor_number │ room_index │ room_type     │  ← คอลัมน์
+├─────────────┼──────────────┼────────────┼───────────────┤
+│ 16101       │ 1            │ 1          │ Admin Office  │  ← แถว
+│ 16302       │ 3            │ 2          │ Storage Room  │
+└─────────────┴──────────────┴────────────┴───────────────┘
 ```
 
 ---
@@ -141,7 +141,7 @@ KEY idx_energy_hourly_room (room_number, bucket_start)
 | `password_reset_otps` | OTP ที่ส่งทางอีเมล | `otp_hash`, `expires_at`, `attempts` (ผิดได้ 5), `used_at` |
 | `rooms` | ห้อง | `room_number` เช่น `16302`, `floor_number`, `room_type` |
 | `class_schedules` | คาบเรียน | `day_of_week` (0=อาทิตย์ 1=จันทร์ … 6=เสาร์), `start_time`, `end_time`, `subject_name` |
-| `air_conditioners` | แอร์และบอร์ด | `provision_status` (reserved/active/removed), `protocol` (ยี่ห้อ IR), `is_online`, ค่า PZEM ล่าสุด (`voltage`, `power_watts`, `energy_kwh`...), `ac_running`, คอลัมน์ `auto_off_*` |
+| `air_conditioners` | แอร์และบอร์ด | `provision_status` (reserved/active), `protocol` (ยี่ห้อ IR), `is_online`, ค่า PZEM ล่าสุด (`voltage`, `power_watts`, `energy_kwh`...), `ac_running`, คอลัมน์ `auto_off_*` |
 | `occupancy_sensors` | เซ็นเซอร์ | `is_online`, `radar_available`, `is_occupied`, `static_threshold` |
 | `energy_hourly` | ถังค่าไฟรายชั่วโมง | `bucket_start` (ต้นชั่วโมง), `consumption_kwh`, `*_sum/min/max`, `runtime_seconds` |
 | `system_alerts` | การแจ้งเตือน | `kind`, `status` (open/acknowledged/resolved) |
@@ -258,7 +258,7 @@ SELECT a.room_number, a.name, a.power_watts, o.is_occupied
 SELECT r.room_number, COUNT(a.device_id) AS air_count
   FROM rooms r
   LEFT JOIN air_conditioners a
-         ON a.room_number = r.room_number AND a.provision_status <> 'removed'
+         ON a.room_number = r.room_number AND a.provision_status = 'active'
  GROUP BY r.room_number;
 ```
 
@@ -404,6 +404,7 @@ for (const [name, definition] of columns) {
 | `npm run db:migrate:settings` | ตาราง `system_settings` + ค่าไฟเริ่มต้น (v3.10.0) |
 | `npm run db:migrate:firmware` | คอลัมน์ `firmware_version`, `ota_error` (v3.14.0) |
 | `npm run db:migrate:history` | คอลัมน์ข้อมูลย้อนหลังตอนเน็ตหลุด (v3.15.0) |
+| `npm run db:migrate:cleanup` | เอา `rooms.is_active` และสถานะ `removed` ที่ไม่ใช้แล้วออก (14 ต.ค. 2569) |
 
 > 💡 ฐานข้อมูลใหม่เอี่ยม: แค่ `db:init` ก็พอ (schema.sql เป็นรุ่นล่าสุดแล้ว)
 > ฐานข้อมูลเก่า: รัน migration ที่ขาด หรือใช้ `doctor --fix` ด้านล่าง

@@ -521,7 +521,7 @@ Transaction คือกลุ่มคำสั่งที่ต้อง "ส
 
 <figure><img alt="แผนภาพฐานข้อมูล" src="img/02-database.svg" /></figure>
 <div class="callout note"><div class="callout-title">หมายเหตุ</div><p><strong>รูปแผนภาพนี้เก่ากว่า schema จริง</strong>
-รูป <code>02-database.svg</code> วาดไว้ 8 ตาราง (หัวรูปเขียน "8 ตาราง") และระบุว่า <code>air_conditioners</code> มี 37 คอลัมน์ แต่ <code>schema.sql</code> ปัจจุบันมี <strong>11 ตาราง</strong> รูปยังไม่มี <code>academic_terms</code> กับ <code>room_bookings</code> และ <code>air_conditioners</code> มี <strong>43 คอลัมน์</strong> (เพิ่ม <code>firmware_version</code>, <code>ota_error</code>, <code>energy_chain_*</code>, <code>history_pending</code>) ให้เชื่อ ER diagram แบบตัวอักษรด้านบนและตารางในบทนี้ จำนวนคอลัมน์ที่ได้จาก <code>parseSchemaTables()</code> คือ users 13, password_reset_otps 9, rooms 9, class_schedules 12, air_conditioners 43, occupancy_sensors 21, system_alerts 11, energy_hourly 27, system_settings 4, academic_terms 6, room_bookings 15</p></div>
+รูป <code>02-database.svg</code> วาดไว้ 8 ตาราง (หัวรูปเขียน "8 ตาราง") และระบุว่า <code>air_conditioners</code> มี 37 คอลัมน์ แต่ <code>schema.sql</code> ปัจจุบันมี <strong>11 ตาราง</strong> รูปยังไม่มี <code>academic_terms</code> กับ <code>room_bookings</code> และ <code>air_conditioners</code> มี <strong>43 คอลัมน์</strong> (เพิ่ม <code>firmware_version</code>, <code>ota_error</code>, <code>energy_chain_*</code>, <code>history_pending</code>) ให้เชื่อ ER diagram แบบตัวอักษรด้านบนและตารางในบทนี้ จำนวนคอลัมน์ที่ได้จาก <code>parseSchemaTables()</code> คือ users 13, password_reset_otps 9, rooms 8, class_schedules 12, air_conditioners 43, occupancy_sensors 21, system_alerts 11, energy_hourly 27, system_settings 4, academic_terms 6, room_bookings 15</p></div>
 
 <h2 id="ตารางทีละตาราง">ตารางทีละตาราง<a class="anchor" href="#ตารางทีละตาราง">#</a></h2>
 <p>ในหัวข้อนี้ เลขบรรทัดอ้างอิงตามแต่ละ code block (เริ่มนับ 1 ใหม่ทุกบล็อก)</p>
@@ -767,15 +767,14 @@ JWT ที่ออกให้ตอนล็อกอินบรรจุ <co
 <span class="w">  </span><span class="n">floor_number</span><span class="w"> </span><span class="n">TINYINT</span><span class="w"> </span><span class="n">UNSIGNED</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
 <span class="w">  </span><span class="n">room_index</span><span class="w"> </span><span class="nb">SMALLINT</span><span class="w"> </span><span class="n">UNSIGNED</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
 <span class="w">  </span><span class="n">room_type</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">'Classroom'</span><span class="p">,</span>
-<span class="w">  </span><span class="n">is_active</span><span class="w"> </span><span class="nb">BOOLEAN</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">TRUE</span><span class="p">,</span>
 <span class="w">  </span><span class="n">created_by</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
 <span class="w">  </span><span class="n">updated_by</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
 <span class="w">  </span><span class="n">created_at</span><span class="w"> </span><span class="n">DATETIME</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">CURRENT_TIMESTAMP</span><span class="p">,</span>
 <span class="w">  </span><span class="n">updated_at</span><span class="w"> </span><span class="n">DATETIME</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">CURRENT_TIMESTAMP</span>
 <span class="w">    </span><span class="k">ON</span><span class="w"> </span><span class="k">UPDATE</span><span class="w"> </span><span class="k">CURRENT_TIMESTAMP</span><span class="p">,</span>
 <span class="w">  </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="p">(</span><span class="n">room_number</span><span class="p">),</span>
-<span class="w">  </span><span class="k">KEY</span><span class="w"> </span><span class="n">idx_rooms_floor_active</span>
-<span class="w">    </span><span class="p">(</span><span class="n">floor_number</span><span class="p">,</span><span class="w"> </span><span class="n">is_active</span><span class="p">,</span><span class="w"> </span><span class="n">room_index</span><span class="p">,</span><span class="w"> </span><span class="n">room_number</span><span class="p">)</span>
+<span class="w">  </span><span class="k">KEY</span><span class="w"> </span><span class="n">idx_rooms_floor_order</span>
+<span class="w">    </span><span class="p">(</span><span class="n">floor_number</span><span class="p">,</span><span class="w"> </span><span class="n">room_index</span><span class="p">,</span><span class="w"> </span><span class="n">room_number</span><span class="p">)</span>
 <span class="p">)</span><span class="w"> </span><span class="n">ENGINE</span><span class="o">=</span><span class="n">InnoDB</span>
 <span class="w">  </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">CHARSET</span><span class="o">=</span><span class="n">utf8mb4</span>
 <span class="w">  </span><span class="k">COLLATE</span><span class="o">=</span><span class="n">utf8mb4_unicode_ci</span><span class="p">;</span>
@@ -787,10 +786,9 @@ JWT ที่ออกให้ตอนล็อกอินบรรจุ <co
 <li><strong>บรรทัด 3</strong> — <code>floor_number</code> ชั้น ใช้จัดกลุ่มในหน้าแอป</li>
 <li><strong>บรรทัด 4</strong> — <code>room_index</code> ลำดับห้องในชั้น ใช้เรียงให้ตรงกับผังจริง</li>
 <li><strong>บรรทัด 5</strong> — <code>room_type</code> ประเภทห้อง (Classroom, Laboratory, ...)</li>
-<li><strong>บรรทัด 6</strong> — <code>is_active</code> ห้องที่ยังใช้งาน (คำค้นใน <code>routes/rooms.js</code> กรอง <code>is_active = TRUE</code> เสมอ)</li>
-<li><strong>บรรทัด 7–8</strong> — ใครสร้าง/แก้ล่าสุด</li>
-<li><strong>บรรทัด 12</strong> — คีย์หลักคือเลขห้อง ทุกตารางที่เกี่ยวกับห้องอ้างถึงคอลัมน์นี้</li>
-<li><strong>บรรทัด 13–14</strong> — index สำหรับ "แสดงห้องตามชั้น เรียงตามลำดับ เฉพาะที่ใช้งาน"</li>
+<li><strong>บรรทัด 6–7</strong> — ใครสร้าง/แก้ล่าสุด</li>
+<li><strong>บรรทัด 11</strong> — คีย์หลักคือเลขห้อง ทุกตารางที่เกี่ยวกับห้องอ้างถึงคอลัมน์นี้</li>
+<li><strong>บรรทัด 12–13</strong> — index สำหรับ "แสดงห้องตามชั้น เรียงตามลำดับ"</li>
 </ol>
 <div class="table-wrap"><table>
 <thead>
@@ -827,12 +825,6 @@ JWT ที่ออกให้ตอนล็อกอินบรรจุ <co
 <td>เป็นข้อความอิสระ เพิ่มประเภทใหม่ได้โดยไม่แก้ schema</td>
 </tr>
 <tr>
-<td><code>is_active</code></td>
-<td>BOOLEAN</td>
-<td>ใช้งานอยู่</td>
-<td>ซ่อนห้องได้</td>
-</tr>
-<tr>
 <td><code>created_by</code>, <code>updated_by</code></td>
 <td>VARCHAR(100)</td>
 <td>ผู้สร้าง/แก้</td>
@@ -847,7 +839,7 @@ JWT ที่ออกให้ตอนล็อกอินบรรจุ <co
 </tbody>
 </table></div>
 <div class="callout note"><div class="callout-title">หมายเหตุ</div><p><strong>index ที่มีคีย์หลักต่อท้าย</strong>
-ใน InnoDB ทุก secondary index แนบคีย์หลักไว้ในตัวอยู่แล้ว การเขียน <code>room_number</code> ต่อท้าย <code>idx_rooms_floor_active</code> จึงเป็นการเขียนให้เห็นชัดว่า index นี้ตอบคำถาม "รายชื่อห้องเรียงตามชั้น" ได้จาก index อย่างเดียว (covering index) โดยไม่ต้องกลับไปอ่านตัวตาราง</p></div>
+ใน InnoDB ทุก secondary index แนบคีย์หลักไว้ในตัวอยู่แล้ว การเขียน <code>room_number</code> ต่อท้าย <code>idx_rooms_floor_order</code> จึงเป็นการเขียนให้เห็นชัดว่า index นี้ตอบคำถาม "รายชื่อห้องเรียงตามชั้น" ได้จาก index อย่างเดียว (covering index) โดยไม่ต้องกลับไปอ่านตัวตาราง</p></div>
 
 <p><strong>ใครอ่าน/เขียน:</strong> <code>routes/rooms.js</code> (CRUD ห้อง ลบห้องใน transaction พร้อม <code>FOR UPDATE</code>), <code>routes/schedules.js</code> (นำเข้าตารางเรียนแล้วสร้างห้องที่ยังไม่มีด้วย <code>ON DUPLICATE KEY UPDATE</code>), และถูก JOIN ใน <code>routes/air-conditioners.js</code>, <code>routes/occupancy-sensors.js</code>, <code>routes/bookings.js</code>, <code>routes/energy.js</code></p>
 <div class="callout tip"><div class="callout-title">เคล็ดลับ</div><p><strong>ทำไมลบห้องแล้วได้ข้อความภาษาไทยแทน error ของ FK</strong>
@@ -974,8 +966,7 @@ JWT ที่ออกให้ตอนล็อกอินบรรจุ <co
 <span class="w">  </span><span class="n">mqtt_username</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
 <span class="w">  </span><span class="n">provision_status</span><span class="w"> </span><span class="n">ENUM</span><span class="p">(</span>
 <span class="w">    </span><span class="s1">'reserved'</span><span class="p">,</span>
-<span class="w">    </span><span class="s1">'active'</span><span class="p">,</span>
-<span class="w">    </span><span class="s1">'removed'</span>
+<span class="w">    </span><span class="s1">'active'</span>
 <span class="w">  </span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">'reserved'</span><span class="p">,</span>
 <span class="w">  </span><span class="n">provisioning_token_hash</span><span class="w"> </span><span class="nb">CHAR</span><span class="p">(</span><span class="mi">64</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
 <span class="w">  </span><span class="n">provisioning_expires_at</span><span class="w"> </span><span class="n">DATETIME</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
@@ -993,16 +984,16 @@ JWT ที่ออกให้ตอนล็อกอินบรรจุ <co
 <li><strong>บรรทัด 6</strong> — <code>ble_name</code> ชื่อ Bluetooth ที่บอร์ดประกาศ ใช้ตอนตั้งค่าครั้งแรกจากแอป</li>
 <li><strong>บรรทัด 7</strong> — <code>protocol</code> โปรโตคอล IR ของรีโมตแอร์ ค่าเริ่มต้นคือแอร์ Haier รุ่นที่ใช้ในโปรเจค</li>
 <li><strong>บรรทัด 8–11</strong> — ข้อมูล MQTT ที่ส่งให้บอร์ดตอน provisioning: topic ของเครื่องนี้ ที่อยู่ broker พอร์ต และชื่อบัญชี MQTT ของบอร์ด (253 คือความยาวสูงสุดของชื่อโดเมน)</li>
-<li><strong>บรรทัด 12–16</strong> — <code>provision_status</code> วงจรชีวิตของอุปกรณ์ (ดูกล่องด้านล่าง)</li>
-<li><strong>บรรทัด 17–18</strong> — แฮชของ token ใช้ครั้งเดียวที่บอร์ดต้องยื่นตอนยืนยันตัวผ่าน MQTT และเวลาหมดอายุ</li>
-<li><strong>บรรทัด 19–20</strong> — เวลาเปิด/ปิดประจำวัน (ไม่บังคับ)</li>
-<li><strong>บรรทัด 21</strong> — <code>is_online</code> ออนไลน์อยู่หรือไม่</li>
-<li><strong>บรรทัด 22</strong> — <code>state_json</code> สถานะรีโมตล่าสุดทั้งก้อน (โหมด อุณหภูมิ พัดลม ...) เก็บเป็น JSON ข้อความ เขียนโดย <code>services/mqtt.js</code> เมื่อได้ข้อความชนิด <code>state</code></li>
+<li><strong>บรรทัด 12–15</strong> — <code>provision_status</code> วงจรชีวิตของอุปกรณ์ (ดูกล่องด้านล่าง)</li>
+<li><strong>บรรทัด 16–17</strong> — แฮชของ token ใช้ครั้งเดียวที่บอร์ดต้องยื่นตอนยืนยันตัวผ่าน MQTT และเวลาหมดอายุ</li>
+<li><strong>บรรทัด 18–19</strong> — เวลาเปิด/ปิดประจำวัน (ไม่บังคับ)</li>
+<li><strong>บรรทัด 20</strong> — <code>is_online</code> ออนไลน์อยู่หรือไม่</li>
+<li><strong>บรรทัด 21</strong> — <code>state_json</code> สถานะรีโมตล่าสุดทั้งก้อน (โหมด อุณหภูมิ พัดลม ...) เก็บเป็น JSON ข้อความ เขียนโดย <code>services/mqtt.js</code> เมื่อได้ข้อความชนิด <code>state</code></li>
 </ol>
-<div class="callout note"><div class="callout-title">หมายเหตุ</div><p><strong>provision_status: reserved → active → removed</strong>
+<div class="callout note"><div class="callout-title">หมายเหตุ</div><p><strong>provision_status: reserved → active</strong>
 - <code>reserved</code> — แอดมินลงทะเบียนเครื่องในแอปแล้ว ระบบออก token ให้ แต่บอร์ดยังไม่ยืนยันตัวผ่าน MQTT (สั่งงานยังไม่ได้)
 - <code>active</code> — บอร์ดยื่น token ถูกต้องภายในเวลา ระบบล้าง <code>provisioning_token_hash</code> เป็น <code>NULL</code> แล้วเปลี่ยนสถานะ
-- <code>removed</code> — ถอดออกแล้ว แต่ยังเก็บแถวไว้ (<code>routes/rooms.js</code> ลบแถวสถานะนี้ทิ้งก่อนลบห้อง)
+- ถอดอุปกรณ์ = ลบแถวทิ้ง (<code>DELETE</code>) แล้วสั่ง <code>unprovision</code> ให้บอร์ดล้างค่าตัวเอง ประวัติค่าไฟใน <code>energy_hourly</code> ยังอยู่ และแสดงเป็น "นำออกแล้ว" ในหน้าข้อมูลไฟฟ้า (เดิมมีค่า <code>removed</code> ไว้ซ่อนแถวแทนการลบ แต่โค้ดเลิกใช้แล้ว จึงเอาออกจาก ENUM เมื่อ 14 ต.ค. 2569 ด้วย <code>scripts/migrate-drop-unused.js</code>)
 <code>scripts/doctor.js</code> พิมพ์เตือนเครื่องที่ค้างอยู่ใน <code>reserved</code> ว่า "ESP32 ยังไม่ยืนยันตัวเองผ่าน MQTT"</p></div>
 
 <p>ไฟล์: <code>backend/database/schema.sql</code> (บล็อกที่ 2: ค่าไฟล่าสุดและระบบปิดแอร์อัตโนมัติ)</p>
@@ -1139,7 +1130,7 @@ JWT ที่ออกให้ตอนล็อกอินบรรจุ <co
 <tr>
 <td><code>provision_status</code></td>
 <td>ENUM</td>
-<td><code>reserved</code>/<code>active</code>/<code>removed</code></td>
+<td><code>reserved</code>/<code>active</code></td>
 <td>วงจรชีวิตอุปกรณ์</td>
 </tr>
 <tr>
@@ -1250,8 +1241,7 @@ JWT ที่ออกให้ตอนล็อกอินบรรจุ <co
 <span class="w">  </span><span class="n">mqtt_username</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
 <span class="w">  </span><span class="n">provision_status</span><span class="w"> </span><span class="n">ENUM</span><span class="p">(</span>
 <span class="w">    </span><span class="s1">'reserved'</span><span class="p">,</span>
-<span class="w">    </span><span class="s1">'active'</span><span class="p">,</span>
-<span class="w">    </span><span class="s1">'removed'</span>
+<span class="w">    </span><span class="s1">'active'</span>
 <span class="w">  </span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">'reserved'</span><span class="p">,</span>
 <span class="w">  </span><span class="n">provisioning_token_hash</span><span class="w"> </span><span class="nb">CHAR</span><span class="p">(</span><span class="mi">64</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
 <span class="w">  </span><span class="n">provisioning_expires_at</span><span class="w"> </span><span class="n">DATETIME</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
@@ -1285,12 +1275,12 @@ JWT ที่ออกให้ตอนล็อกอินบรรจุ <co
 <p>โครงสร้างคล้าย <code>air_conditioners</code> (ทะเบียน MQTT provisioning) ต่างกันตรงนี้:</p>
 <ol>
 <li><strong>บรรทัด 2</strong> — <code>device_id</code> รูปแบบ <code>OCC32-</code> + เลขฐานสิบหก 12 หลัก (<code>utils/occupancy-sensor.js</code>) คำนำหน้าต่างจากแอร์ จึงแยกชนิดบอร์ดได้จากรหัส</li>
-<li><strong>บรรทัด 15</strong> — <code>static_threshold</code> เกณฑ์ค่าพลังงานสัญญาณสำหรับตรวจ "คนนั่งนิ่ง" ของ LD2410 ค่าเริ่มต้น 25 ตรงกับ <code>STATIC_ENERGY_THRESHOLD = 25</code> ในโค้ด แอดมินปรับได้ต่อห้อง</li>
-<li><strong>บรรทัด 17</strong> — <code>radar_available</code> บอร์ดคุยกับเรดาร์ได้หรือไม่</li>
-<li><strong>บรรทัด 18</strong> — <code>is_occupied</code> ตอนนี้มีคนในห้องหรือไม่ (ค่าที่ระบบปิดแอร์อัตโนมัติใช้)</li>
-<li><strong>บรรทัด 28</strong> — <code>uq_occupancy_room (room_number)</code> เป็น UNIQUE: <strong>หนึ่งห้องมีเซ็นเซอร์ได้ตัวเดียว</strong> ความสัมพันธ์กับ <code>rooms</code> จึงเป็น 1 ต่อ 1 (ส่วนแอร์เป็น 1 ต่อหลาย)</li>
-<li><strong>บรรทัด 31</strong> — index ตามสถานะ provisioning และออนไลน์</li>
-<li><strong>บรรทัด 32–35</strong> — FK ไปที่ห้อง ห้ามลบห้องที่ยังมีเซ็นเซอร์</li>
+<li><strong>บรรทัด 14</strong> — <code>static_threshold</code> เกณฑ์ค่าพลังงานสัญญาณสำหรับตรวจ "คนนั่งนิ่ง" ของ LD2410 ค่าเริ่มต้น 25 ตรงกับ <code>STATIC_ENERGY_THRESHOLD = 25</code> ในโค้ด (ตอนนี้โค้ดตั้ง 25 ทุกครั้งที่ลงทะเบียน ยังไม่มีหน้าจอให้ปรับรายห้อง)</li>
+<li><strong>บรรทัด 16</strong> — <code>radar_available</code> บอร์ดคุยกับเรดาร์ได้หรือไม่</li>
+<li><strong>บรรทัด 17</strong> — <code>is_occupied</code> ตอนนี้มีคนในห้องหรือไม่ (ค่าที่ระบบปิดแอร์อัตโนมัติใช้)</li>
+<li><strong>บรรทัด 27</strong> — <code>uq_occupancy_room (room_number)</code> เป็น UNIQUE: <strong>หนึ่งห้องมีเซ็นเซอร์ได้ตัวเดียว</strong> ความสัมพันธ์กับ <code>rooms</code> จึงเป็น 1 ต่อ 1 (ส่วนแอร์เป็น 1 ต่อหลาย)</li>
+<li><strong>บรรทัด 30</strong> — index ตามสถานะ provisioning และออนไลน์</li>
+<li><strong>บรรทัด 31–34</strong> — FK ไปที่ห้อง ห้ามลบห้องที่ยังมีเซ็นเซอร์</li>
 </ol>
 <div class="table-wrap"><table>
 <thead>
@@ -2267,8 +2257,8 @@ JWT ที่ออกให้ตอนล็อกอินบรรจุ <co
 <td>แก้/ลบผู้ใช้โดยล็อกแถวและตรวจว่ายังเหลือแอดมินที่ใช้งานได้</td>
 </tr>
 <tr>
-<td><code>routes/rooms.js</code> บรรทัด 169</td>
-<td>ลบห้อง: ล็อกห้อง ลบอุปกรณ์สถานะ <code>removed</code> นับของที่ยังผูกอยู่ แล้วค่อยลบ</td>
+<td><code>routes/rooms.js</code> บรรทัด 141</td>
+<td>ลบห้อง: ล็อกห้อง นับแอร์ ตารางเรียน และเซ็นเซอร์ที่ยังผูกอยู่ แล้วค่อยลบ</td>
 </tr>
 <tr>
 <td><code>routes/schedules.js</code> บรรทัด 114 และ 286</td>
@@ -2383,7 +2373,7 @@ JWT ที่ออกให้ตอนล็อกอินบรรจุ <co
 <tr>
 <td></td>
 <td><code>routes/rooms.js</code>, <code>routes/energy.js</code></td>
-<td>R/D ลบแถว <code>removed</code> ก่อนลบห้อง, อ่านชื่อเครื่องในรายงาน</td>
+<td>R นับแอร์ต่อห้อง, อ่านชื่อเครื่องในรายงาน</td>
 </tr>
 <tr>
 <td><code>occupancy_sensors</code></td>
@@ -2531,6 +2521,11 @@ JWT ที่ออกให้ตอนล็อกอินบรรจุ <co
 <td><code>migrate-firmware-v3140.js</code></td>
 <td><code>db:migrate:firmware</code></td>
 <td>เพิ่ม <code>firmware_version</code>, <code>ota_error</code> ให้ทั้ง <code>air_conditioners</code> และ <code>occupancy_sensors</code> (รุ่น 3.14.0)</td>
+</tr>
+<tr>
+<td><code>migrate-drop-unused.js</code></td>
+<td><code>db:migrate:cleanup</code></td>
+<td>(14 ต.ค. 2569) ลบ <code>rooms.is_active</code> และค่า <code>removed</code> ของ <code>provision_status</code> ที่โค้ดไม่ใช้แล้ว ลบแถว/ห้องที่ค้างสถานะซ่อน ถ้าห้องที่ซ่อนยังมีของผูกจะไม่ลบคอลัมน์และบอกผู้ดูแล มี <code>--dry-run</code></td>
 </tr>
 <tr>
 <td><code>migrate-offline-history-v3150.js</code></td>
@@ -3410,24 +3405,22 @@ section<span class="o">()</span><span class="w"> </span><span class="o">{</span>
 <span class="w">       </span><span class="n">a</span><span class="p">.</span><span class="n">provision_status</span><span class="p">,</span><span class="w"> </span><span class="n">a</span><span class="p">.</span><span class="n">is_online</span><span class="p">,</span><span class="w"> </span><span class="n">a</span><span class="p">.</span><span class="n">power_watts</span><span class="p">,</span><span class="w"> </span><span class="n">a</span><span class="p">.</span><span class="n">last_seen_at</span>
 <span class="w">  </span><span class="k">FROM</span><span class="w"> </span><span class="n">air_conditioners</span><span class="w"> </span><span class="n">a</span>
 <span class="w">  </span><span class="k">JOIN</span><span class="w"> </span><span class="n">rooms</span><span class="w"> </span><span class="n">r</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">r</span><span class="p">.</span><span class="n">room_number</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="p">.</span><span class="n">room_number</span>
-<span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">a</span><span class="p">.</span><span class="n">provision_status</span><span class="w"> </span><span class="o">&lt;&gt;</span><span class="w"> </span><span class="s1">'removed'</span>
 <span class="w"> </span><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">r</span><span class="p">.</span><span class="n">floor_number</span><span class="p">,</span><span class="w"> </span><span class="n">a</span><span class="p">.</span><span class="n">room_number</span><span class="p">,</span><span class="w"> </span><span class="n">a</span><span class="p">.</span><span class="n">air_number</span><span class="p">;</span>
 </code></pre></div>
 </div>
 
-<p><code>JOIN ... ON</code> เชื่อมสองตารางด้วยคีย์ที่ตรงกัน (ตรงกับ FK <code>fk_air_conditioner_room</code>) <code>&lt;&gt;</code> คือ "ไม่เท่ากับ"</p>
+<p><code>JOIN ... ON</code> เชื่อมสองตารางด้วยคีย์ที่ตรงกัน (ตรงกับ FK <code>fk_air_conditioner_room</code>)</p>
 <p><strong>3. ห้องที่ยังไม่มีแอร์เลย (หา "ห้องว่างอุปกรณ์")</strong></p>
 <div class="code-block"><span class="code-lang">sql</span><div class="hl"><pre><span></span><code><span class="k">SELECT</span><span class="w"> </span><span class="n">r</span><span class="p">.</span><span class="n">room_number</span><span class="p">,</span><span class="w"> </span><span class="n">r</span><span class="p">.</span><span class="n">floor_number</span><span class="p">,</span><span class="w"> </span><span class="n">r</span><span class="p">.</span><span class="n">room_type</span>
 <span class="w">  </span><span class="k">FROM</span><span class="w"> </span><span class="n">rooms</span><span class="w"> </span><span class="n">r</span>
 <span class="w">  </span><span class="k">LEFT</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">air_conditioners</span><span class="w"> </span><span class="n">a</span>
 <span class="w">         </span><span class="k">ON</span><span class="w"> </span><span class="n">a</span><span class="p">.</span><span class="n">room_number</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">r</span><span class="p">.</span><span class="n">room_number</span>
-<span class="w">        </span><span class="k">AND</span><span class="w"> </span><span class="n">a</span><span class="p">.</span><span class="n">provision_status</span><span class="w"> </span><span class="o">&lt;&gt;</span><span class="w"> </span><span class="s1">'removed'</span>
-<span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">r</span><span class="p">.</span><span class="n">is_active</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">TRUE</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">a</span><span class="p">.</span><span class="n">device_id</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="k">NULL</span>
+<span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">a</span><span class="p">.</span><span class="n">device_id</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="k">NULL</span>
 <span class="w"> </span><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">r</span><span class="p">.</span><span class="n">floor_number</span><span class="p">,</span><span class="w"> </span><span class="n">r</span><span class="p">.</span><span class="n">room_index</span><span class="p">;</span>
 </code></pre></div>
 </div>
 
-<p><code>LEFT JOIN</code> เก็บทุกแถวฝั่งซ้าย (<code>rooms</code>) แม้ไม่มีคู่ฝั่งขวา แล้วคู่ที่ไม่เจอจะเป็น <code>NULL</code> ทำให้ <code>a.device_id IS NULL</code> คือห้องที่ไม่มีแอร์ ต้องใส่เงื่อนไข <code>provision_status</code> ไว้ใน <code>ON</code> ไม่ใช่ <code>WHERE</code> ไม่งั้นห้องที่มีแต่แอร์สถานะ <code>removed</code> จะหลุดจากผลลัพธ์</p>
+<p><code>LEFT JOIN</code> เก็บทุกแถวฝั่งซ้าย (<code>rooms</code>) แม้ไม่มีคู่ฝั่งขวา แล้วคู่ที่ไม่เจอจะเป็น <code>NULL</code> ทำให้ <code>a.device_id IS NULL</code> คือห้องที่ไม่มีแอร์ (ถ้าจะกรองแอร์เพิ่ม เช่น เฉพาะ <code>provision_status = 'active'</code> ต้องใส่เงื่อนไขไว้ใน <code>ON</code> ไม่ใช่ <code>WHERE</code> ไม่งั้นห้องที่มีแต่แอร์ <code>reserved</code> จะหลุดจากผลลัพธ์)</p>
 <p><strong>4. ไฟฟ้าที่ใช้ 7 วันล่าสุดรายห้อง พร้อมค่าไฟโดยประมาณ</strong></p>
 <div class="code-block"><span class="code-lang">sql</span><div class="hl"><pre><span></span><code><span class="k">SELECT</span><span class="w"> </span><span class="n">h</span><span class="p">.</span><span class="n">room_number</span><span class="p">,</span>
 <span class="w">       </span><span class="n">ROUND</span><span class="p">(</span><span class="k">SUM</span><span class="p">(</span><span class="n">h</span><span class="p">.</span><span class="n">consumption_kwh</span><span class="p">),</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">kwh</span><span class="p">,</span>

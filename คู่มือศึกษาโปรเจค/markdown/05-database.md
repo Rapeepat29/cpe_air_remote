@@ -296,7 +296,7 @@ updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 
 > [!NOTE]
 > **รูปแผนภาพนี้เก่ากว่า schema จริง**
-> รูป `02-database.svg` วาดไว้ 8 ตาราง (หัวรูปเขียน "8 ตาราง") และระบุว่า `air_conditioners` มี 37 คอลัมน์ แต่ `schema.sql` ปัจจุบันมี **11 ตาราง** รูปยังไม่มี `academic_terms` กับ `room_bookings` และ `air_conditioners` มี **43 คอลัมน์** (เพิ่ม `firmware_version`, `ota_error`, `energy_chain_*`, `history_pending`) ให้เชื่อ ER diagram แบบตัวอักษรด้านบนและตารางในบทนี้ จำนวนคอลัมน์ที่ได้จาก `parseSchemaTables()` คือ users 13, password_reset_otps 9, rooms 9, class_schedules 12, air_conditioners 43, occupancy_sensors 21, system_alerts 11, energy_hourly 27, system_settings 4, academic_terms 6, room_bookings 15
+> รูป `02-database.svg` วาดไว้ 8 ตาราง (หัวรูปเขียน "8 ตาราง") และระบุว่า `air_conditioners` มี 37 คอลัมน์ แต่ `schema.sql` ปัจจุบันมี **11 ตาราง** รูปยังไม่มี `academic_terms` กับ `room_bookings` และ `air_conditioners` มี **43 คอลัมน์** (เพิ่ม `firmware_version`, `ota_error`, `energy_chain_*`, `history_pending`) ให้เชื่อ ER diagram แบบตัวอักษรด้านบนและตารางในบทนี้ จำนวนคอลัมน์ที่ได้จาก `parseSchemaTables()` คือ users 13, password_reset_otps 9, rooms 8, class_schedules 12, air_conditioners 43, occupancy_sensors 21, system_alerts 11, energy_hourly 27, system_settings 4, academic_terms 6, room_bookings 15
 
 ## ตารางทีละตาราง
 
@@ -436,15 +436,14 @@ CREATE TABLE IF NOT EXISTS rooms (
   floor_number TINYINT UNSIGNED NOT NULL DEFAULT 0,
   room_index SMALLINT UNSIGNED NOT NULL DEFAULT 0,
   room_type VARCHAR(100) NOT NULL DEFAULT 'Classroom',
-  is_active BOOLEAN NOT NULL DEFAULT TRUE,
   created_by VARCHAR(100) NOT NULL,
   updated_by VARCHAR(100) NOT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
     ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (room_number),
-  KEY idx_rooms_floor_active
-    (floor_number, is_active, room_index, room_number)
+  KEY idx_rooms_floor_order
+    (floor_number, room_index, room_number)
 ) ENGINE=InnoDB
   DEFAULT CHARSET=utf8mb4
   COLLATE=utf8mb4_unicode_ci;
@@ -454,10 +453,9 @@ CREATE TABLE IF NOT EXISTS rooms (
 2. **บรรทัด 3** — `floor_number` ชั้น ใช้จัดกลุ่มในหน้าแอป
 3. **บรรทัด 4** — `room_index` ลำดับห้องในชั้น ใช้เรียงให้ตรงกับผังจริง
 4. **บรรทัด 5** — `room_type` ประเภทห้อง (Classroom, Laboratory, ...)
-5. **บรรทัด 6** — `is_active` ห้องที่ยังใช้งาน (คำค้นใน `routes/rooms.js` กรอง `is_active = TRUE` เสมอ)
-6. **บรรทัด 7–8** — ใครสร้าง/แก้ล่าสุด
-7. **บรรทัด 12** — คีย์หลักคือเลขห้อง ทุกตารางที่เกี่ยวกับห้องอ้างถึงคอลัมน์นี้
-8. **บรรทัด 13–14** — index สำหรับ "แสดงห้องตามชั้น เรียงตามลำดับ เฉพาะที่ใช้งาน"
+5. **บรรทัด 6–7** — ใครสร้าง/แก้ล่าสุด
+6. **บรรทัด 11** — คีย์หลักคือเลขห้อง ทุกตารางที่เกี่ยวกับห้องอ้างถึงคอลัมน์นี้
+7. **บรรทัด 12–13** — index สำหรับ "แสดงห้องตามชั้น เรียงตามลำดับ"
 
 | คอลัมน์ | ชนิด | ความหมาย | ทำไม |
 |---|---|---|---|
@@ -465,13 +463,12 @@ CREATE TABLE IF NOT EXISTS rooms (
 | `floor_number` | TINYINT UNSIGNED | ชั้น (0 = ไม่ระบุ/ห้องพิเศษ เช่น CL503) | ตึกไม่มีเกิน 255 ชั้น 1 ไบต์พอ |
 | `room_index` | SMALLINT UNSIGNED | ลำดับในชั้น | เรียงตามผัง ไม่ใช่ตามตัวอักษร |
 | `room_type` | VARCHAR(100) | ประเภทห้อง | เป็นข้อความอิสระ เพิ่มประเภทใหม่ได้โดยไม่แก้ schema |
-| `is_active` | BOOLEAN | ใช้งานอยู่ | ซ่อนห้องได้ |
 | `created_by`, `updated_by` | VARCHAR(100) | ผู้สร้าง/แก้ | ตรวจย้อนหลัง |
 | `created_at`, `updated_at` | DATETIME | เวลา | อัตโนมัติ |
 
 > [!NOTE]
 > **index ที่มีคีย์หลักต่อท้าย**
-> ใน InnoDB ทุก secondary index แนบคีย์หลักไว้ในตัวอยู่แล้ว การเขียน `room_number` ต่อท้าย `idx_rooms_floor_active` จึงเป็นการเขียนให้เห็นชัดว่า index นี้ตอบคำถาม "รายชื่อห้องเรียงตามชั้น" ได้จาก index อย่างเดียว (covering index) โดยไม่ต้องกลับไปอ่านตัวตาราง
+> ใน InnoDB ทุก secondary index แนบคีย์หลักไว้ในตัวอยู่แล้ว การเขียน `room_number` ต่อท้าย `idx_rooms_floor_order` จึงเป็นการเขียนให้เห็นชัดว่า index นี้ตอบคำถาม "รายชื่อห้องเรียงตามชั้น" ได้จาก index อย่างเดียว (covering index) โดยไม่ต้องกลับไปอ่านตัวตาราง
 
 **ใครอ่าน/เขียน:** `routes/rooms.js` (CRUD ห้อง ลบห้องใน transaction พร้อม `FOR UPDATE`), `routes/schedules.js` (นำเข้าตารางเรียนแล้วสร้างห้องที่ยังไม่มีด้วย `ON DUPLICATE KEY UPDATE`), และถูก JOIN ใน `routes/air-conditioners.js`, `routes/occupancy-sensors.js`, `routes/bookings.js`, `routes/energy.js`
 
@@ -558,8 +555,7 @@ CREATE TABLE IF NOT EXISTS air_conditioners (
   mqtt_username VARCHAR(100) NULL,
   provision_status ENUM(
     'reserved',
-    'active',
-    'removed'
+    'active'
   ) NOT NULL DEFAULT 'reserved',
   provisioning_token_hash CHAR(64) NULL,
   provisioning_expires_at DATETIME NULL,
@@ -575,17 +571,17 @@ CREATE TABLE IF NOT EXISTS air_conditioners (
 4. **บรรทัด 6** — `ble_name` ชื่อ Bluetooth ที่บอร์ดประกาศ ใช้ตอนตั้งค่าครั้งแรกจากแอป
 5. **บรรทัด 7** — `protocol` โปรโตคอล IR ของรีโมตแอร์ ค่าเริ่มต้นคือแอร์ Haier รุ่นที่ใช้ในโปรเจค
 6. **บรรทัด 8–11** — ข้อมูล MQTT ที่ส่งให้บอร์ดตอน provisioning: topic ของเครื่องนี้ ที่อยู่ broker พอร์ต และชื่อบัญชี MQTT ของบอร์ด (253 คือความยาวสูงสุดของชื่อโดเมน)
-7. **บรรทัด 12–16** — `provision_status` วงจรชีวิตของอุปกรณ์ (ดูกล่องด้านล่าง)
-8. **บรรทัด 17–18** — แฮชของ token ใช้ครั้งเดียวที่บอร์ดต้องยื่นตอนยืนยันตัวผ่าน MQTT และเวลาหมดอายุ
-9. **บรรทัด 19–20** — เวลาเปิด/ปิดประจำวัน (ไม่บังคับ)
-10. **บรรทัด 21** — `is_online` ออนไลน์อยู่หรือไม่
-11. **บรรทัด 22** — `state_json` สถานะรีโมตล่าสุดทั้งก้อน (โหมด อุณหภูมิ พัดลม ...) เก็บเป็น JSON ข้อความ เขียนโดย `services/mqtt.js` เมื่อได้ข้อความชนิด `state`
+7. **บรรทัด 12–15** — `provision_status` วงจรชีวิตของอุปกรณ์ (ดูกล่องด้านล่าง)
+8. **บรรทัด 16–17** — แฮชของ token ใช้ครั้งเดียวที่บอร์ดต้องยื่นตอนยืนยันตัวผ่าน MQTT และเวลาหมดอายุ
+9. **บรรทัด 18–19** — เวลาเปิด/ปิดประจำวัน (ไม่บังคับ)
+10. **บรรทัด 20** — `is_online` ออนไลน์อยู่หรือไม่
+11. **บรรทัด 21** — `state_json` สถานะรีโมตล่าสุดทั้งก้อน (โหมด อุณหภูมิ พัดลม ...) เก็บเป็น JSON ข้อความ เขียนโดย `services/mqtt.js` เมื่อได้ข้อความชนิด `state`
 
 > [!NOTE]
-> **provision_status: reserved → active → removed**
+> **provision_status: reserved → active**
 > - `reserved` — แอดมินลงทะเบียนเครื่องในแอปแล้ว ระบบออก token ให้ แต่บอร์ดยังไม่ยืนยันตัวผ่าน MQTT (สั่งงานยังไม่ได้)
 > - `active` — บอร์ดยื่น token ถูกต้องภายในเวลา ระบบล้าง `provisioning_token_hash` เป็น `NULL` แล้วเปลี่ยนสถานะ
-> - `removed` — ถอดออกแล้ว แต่ยังเก็บแถวไว้ (`routes/rooms.js` ลบแถวสถานะนี้ทิ้งก่อนลบห้อง)
+> - ถอดอุปกรณ์ = ลบแถวทิ้ง (`DELETE`) แล้วสั่ง `unprovision` ให้บอร์ดล้างค่าตัวเอง ประวัติค่าไฟใน `energy_hourly` ยังอยู่ และแสดงเป็น "นำออกแล้ว" ในหน้าข้อมูลไฟฟ้า (เดิมมีค่า `removed` ไว้ซ่อนแถวแทนการลบ แต่โค้ดเลิกใช้แล้ว จึงเอาออกจาก ENUM เมื่อ 14 ต.ค. 2569 ด้วย `scripts/migrate-drop-unused.js`)
 > `scripts/doctor.js` พิมพ์เตือนเครื่องที่ค้างอยู่ใน `reserved` ว่า "ESP32 ยังไม่ยืนยันตัวเองผ่าน MQTT"
 
 ไฟล์: `backend/database/schema.sql` (บล็อกที่ 2: ค่าไฟล่าสุดและระบบปิดแอร์อัตโนมัติ)
@@ -671,7 +667,7 @@ CREATE TABLE IF NOT EXISTS air_conditioners (
 | `protocol` | VARCHAR(40) | โปรโตคอล IR | รองรับแอร์ยี่ห้ออื่นในอนาคต |
 | `mqtt_topic` | VARCHAR(160) UNIQUE | topic ของเครื่อง | แยกช่องสื่อสารของแต่ละบอร์ด |
 | `mqtt_host`, `mqtt_port`, `mqtt_username` | | ข้อมูล broker และบัญชีของบอร์ด | ส่งให้บอร์ดตอน provisioning |
-| `provision_status` | ENUM | `reserved`/`active`/`removed` | วงจรชีวิตอุปกรณ์ |
+| `provision_status` | ENUM | `reserved`/`active` | วงจรชีวิตอุปกรณ์ |
 | `provisioning_token_hash` | CHAR(64) NULL | แฮชของ token ยืนยันตัว | ไม่เก็บ token จริง |
 | `provisioning_expires_at` | DATETIME NULL | token หมดอายุ | token อายุสั้น |
 | `daily_on`, `daily_off` | TIME NULL | เวลาเปิด/ปิดประจำวัน | ไม่บังคับ จึง NULL ได้ |
@@ -709,8 +705,7 @@ CREATE TABLE IF NOT EXISTS occupancy_sensors (
   mqtt_username VARCHAR(100) NULL,
   provision_status ENUM(
     'reserved',
-    'active',
-    'removed'
+    'active'
   ) NOT NULL DEFAULT 'reserved',
   provisioning_token_hash CHAR(64) NULL,
   provisioning_expires_at DATETIME NULL,
@@ -743,12 +738,12 @@ CREATE TABLE IF NOT EXISTS occupancy_sensors (
 โครงสร้างคล้าย `air_conditioners` (ทะเบียน MQTT provisioning) ต่างกันตรงนี้:
 
 1. **บรรทัด 2** — `device_id` รูปแบบ `OCC32-` + เลขฐานสิบหก 12 หลัก (`utils/occupancy-sensor.js`) คำนำหน้าต่างจากแอร์ จึงแยกชนิดบอร์ดได้จากรหัส
-2. **บรรทัด 15** — `static_threshold` เกณฑ์ค่าพลังงานสัญญาณสำหรับตรวจ "คนนั่งนิ่ง" ของ LD2410 ค่าเริ่มต้น 25 ตรงกับ `STATIC_ENERGY_THRESHOLD = 25` ในโค้ด แอดมินปรับได้ต่อห้อง
-3. **บรรทัด 17** — `radar_available` บอร์ดคุยกับเรดาร์ได้หรือไม่
-4. **บรรทัด 18** — `is_occupied` ตอนนี้มีคนในห้องหรือไม่ (ค่าที่ระบบปิดแอร์อัตโนมัติใช้)
-5. **บรรทัด 28** — `uq_occupancy_room (room_number)` เป็น UNIQUE: **หนึ่งห้องมีเซ็นเซอร์ได้ตัวเดียว** ความสัมพันธ์กับ `rooms` จึงเป็น 1 ต่อ 1 (ส่วนแอร์เป็น 1 ต่อหลาย)
-6. **บรรทัด 31** — index ตามสถานะ provisioning และออนไลน์
-7. **บรรทัด 32–35** — FK ไปที่ห้อง ห้ามลบห้องที่ยังมีเซ็นเซอร์
+2. **บรรทัด 14** — `static_threshold` เกณฑ์ค่าพลังงานสัญญาณสำหรับตรวจ "คนนั่งนิ่ง" ของ LD2410 ค่าเริ่มต้น 25 ตรงกับ `STATIC_ENERGY_THRESHOLD = 25` ในโค้ด (ตอนนี้โค้ดตั้ง 25 ทุกครั้งที่ลงทะเบียน ยังไม่มีหน้าจอให้ปรับรายห้อง)
+3. **บรรทัด 16** — `radar_available` บอร์ดคุยกับเรดาร์ได้หรือไม่
+4. **บรรทัด 17** — `is_occupied` ตอนนี้มีคนในห้องหรือไม่ (ค่าที่ระบบปิดแอร์อัตโนมัติใช้)
+5. **บรรทัด 27** — `uq_occupancy_room (room_number)` เป็น UNIQUE: **หนึ่งห้องมีเซ็นเซอร์ได้ตัวเดียว** ความสัมพันธ์กับ `rooms` จึงเป็น 1 ต่อ 1 (ส่วนแอร์เป็น 1 ต่อหลาย)
+6. **บรรทัด 30** — index ตามสถานะ provisioning และออนไลน์
+7. **บรรทัด 31–34** — FK ไปที่ห้อง ห้ามลบห้องที่ยังมีเซ็นเซอร์
 
 | คอลัมน์ | ชนิด | ความหมาย | ทำไม |
 |---|---|---|---|
@@ -1232,7 +1227,7 @@ await pool.query(
 | `routes/auth.js` บรรทัด 268 | ทำ OTP เก่าของผู้ใช้ใช้ไม่ได้ + INSERT OTP ใหม่ |
 | `routes/auth.js` บรรทัด 382 | ยืนยันรีเซ็ตรหัส: `SELECT ... FOR UPDATE` ล็อกแถว OTP แล้วเปลี่ยนรหัสผ่าน |
 | `routes/users.js` บรรทัด 92 และ 150 | แก้/ลบผู้ใช้โดยล็อกแถวและตรวจว่ายังเหลือแอดมินที่ใช้งานได้ |
-| `routes/rooms.js` บรรทัด 169 | ลบห้อง: ล็อกห้อง ลบอุปกรณ์สถานะ `removed` นับของที่ยังผูกอยู่ แล้วค่อยลบ |
+| `routes/rooms.js` บรรทัด 141 | ลบห้อง: ล็อกห้อง นับแอร์ ตารางเรียน และเซ็นเซอร์ที่ยังผูกอยู่ แล้วค่อยลบ |
 | `routes/schedules.js` บรรทัด 114 และ 286 | นำเข้า/แก้ตารางเรียนหลายแถวพร้อมกัน |
 | `services/energy-recorder.js` บรรทัด 115 | บันทึกข้อมูลย้อนหลังจากบอร์ด: ล็อกแถวอุปกรณ์ upsert ถังหลายชั่วโมง และอัปเดตจุดต่อ |
 | `scripts/migrate-legacy-user.js` | นำเข้าผู้ใช้เก่าทั้งหมดหรือไม่เข้าเลย |
@@ -1260,7 +1255,7 @@ await pool.query(
 | | `services/energy-recorder.js` | R/U `energy_chain_*` (และล็อกแถวด้วย `FOR UPDATE`) |
 | | `services/auto-off.js` | R เลือกเครื่องที่ต้องตรวจ, U `auto_off_*` |
 | | `services/mqtt-accounts.js` | R รายชื่อบอร์ดที่ยังไม่ถูกถอด เพื่อสร้างบัญชีให้ Mosquitto |
-| | `routes/rooms.js`, `routes/energy.js` | R/D ลบแถว `removed` ก่อนลบห้อง, อ่านชื่อเครื่องในรายงาน |
+| | `routes/rooms.js`, `routes/energy.js` | R นับแอร์ต่อห้อง, อ่านชื่อเครื่องในรายงาน |
 | `occupancy_sensors` | `routes/occupancy-sensors.js` | C R U D |
 | | `services/mqtt.js` | U `is_occupied` `is_online` `last_seen_at` |
 | | `services/auto-off.js` | R LEFT JOIN ว่ามีคนในห้องไหม |
@@ -1307,6 +1302,7 @@ await pool.query(
 | `migrate-auto-off-v380.js` | `db:migrate:autooff` | เพิ่ม 6 คอลัมน์ `auto_off_*` ใน `air_conditioners` และสร้าง `system_alerts` (รุ่น 3.8.0) |
 | `migrate-system-settings-v3100.js` | `db:migrate:settings` | สร้าง `system_settings` และ `INSERT IGNORE` ค่าเริ่มต้น `auto_off_enabled='true'`, `electricity_rate='4.50'` (รุ่น 3.10.0/3.13.0) |
 | `migrate-firmware-v3140.js` | `db:migrate:firmware` | เพิ่ม `firmware_version`, `ota_error` ให้ทั้ง `air_conditioners` และ `occupancy_sensors` (รุ่น 3.14.0) |
+| `migrate-drop-unused.js` | `db:migrate:cleanup` | (14 ต.ค. 2569) ลบ `rooms.is_active` และค่า `removed` ของ `provision_status` ที่โค้ดไม่ใช้แล้ว ลบแถว/ห้องที่ค้างสถานะซ่อน ถ้าห้องที่ซ่อนยังมีของผูกจะไม่ลบคอลัมน์และบอกผู้ดูแล มี `--dry-run` |
 | `migrate-offline-history-v3150.js` | `db:migrate:history` | เพิ่ม `energy_chain_kwh`, `energy_chain_at`, `energy_chain_running`, `history_pending` และตั้งจุดต่อเริ่มต้นจากค่าล่าสุดของแต่ละเครื่อง (รุ่น 3.15.0) |
 | `migrate-legacy-user.js` | `migrate:legacy` | ย้ายผู้ใช้จากตารางเก่า (ชื่อปริยาย `user`) เข้า `users` ใน transaction เดียว แฮชรหัสผ่านที่ยังเป็นข้อความธรรมดาด้วย bcrypt cost 12 (ถ้าเป็นแฮช bcrypt อยู่แล้วเก็บตามเดิม) ชื่อตาราง/คอลัมน์เก่าปรับได้ด้วย `LEGACY_*` |
 | `convert-schedule-file.js` | `schedules:convert` | ไม่แตะฐานข้อมูล: แปลงไฟล์ตารางเรียน `.xlsx` เป็น CSV ผ่าน `parseScheduleFile()` ใช้ร่วมกับ `examples/*.csv` |
@@ -1875,11 +1871,10 @@ SELECT a.device_id, a.room_number, r.floor_number, a.air_number,
        a.provision_status, a.is_online, a.power_watts, a.last_seen_at
   FROM air_conditioners a
   JOIN rooms r ON r.room_number = a.room_number
- WHERE a.provision_status <> 'removed'
  ORDER BY r.floor_number, a.room_number, a.air_number;
 ```
 
-`JOIN ... ON` เชื่อมสองตารางด้วยคีย์ที่ตรงกัน (ตรงกับ FK `fk_air_conditioner_room`) `<>` คือ "ไม่เท่ากับ"
+`JOIN ... ON` เชื่อมสองตารางด้วยคีย์ที่ตรงกัน (ตรงกับ FK `fk_air_conditioner_room`)
 
 **3. ห้องที่ยังไม่มีแอร์เลย (หา "ห้องว่างอุปกรณ์")**
 
@@ -1888,12 +1883,11 @@ SELECT r.room_number, r.floor_number, r.room_type
   FROM rooms r
   LEFT JOIN air_conditioners a
          ON a.room_number = r.room_number
-        AND a.provision_status <> 'removed'
- WHERE r.is_active = TRUE AND a.device_id IS NULL
+ WHERE a.device_id IS NULL
  ORDER BY r.floor_number, r.room_index;
 ```
 
-`LEFT JOIN` เก็บทุกแถวฝั่งซ้าย (`rooms`) แม้ไม่มีคู่ฝั่งขวา แล้วคู่ที่ไม่เจอจะเป็น `NULL` ทำให้ `a.device_id IS NULL` คือห้องที่ไม่มีแอร์ ต้องใส่เงื่อนไข `provision_status` ไว้ใน `ON` ไม่ใช่ `WHERE` ไม่งั้นห้องที่มีแต่แอร์สถานะ `removed` จะหลุดจากผลลัพธ์
+`LEFT JOIN` เก็บทุกแถวฝั่งซ้าย (`rooms`) แม้ไม่มีคู่ฝั่งขวา แล้วคู่ที่ไม่เจอจะเป็น `NULL` ทำให้ `a.device_id IS NULL` คือห้องที่ไม่มีแอร์ (ถ้าจะกรองแอร์เพิ่ม เช่น เฉพาะ `provision_status = 'active'` ต้องใส่เงื่อนไขไว้ใน `ON` ไม่ใช่ `WHERE` ไม่งั้นห้องที่มีแต่แอร์ `reserved` จะหลุดจากผลลัพธ์)
 
 **4. ไฟฟ้าที่ใช้ 7 วันล่าสุดรายห้อง พร้อมค่าไฟโดยประมาณ**
 
