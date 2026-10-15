@@ -130,7 +130,7 @@
 
 **คำสั่งแบบ action** (ไม่มี `state`): `{"version":1,"commandId":"…","sentAt":"…","action":"enter_setup"}` และ `{"version":1,…,"action":"ota","url":"https://<host>/firmware/<ไฟล์>.bin"}`
 
-**คำสั่ง `unprovision`** Backend สร้างด้วย `buildUnprovisionCommand` ใน `utils/unprovision.js` ตอนแอดมินลบอุปกรณ์ ใช้กับทั้งบอร์ดแอร์ (IR 2.5.1, สายแอร์ 2.5.2-slm8) และบอร์ดตรวจคน (1.3.2) ขึ้นไป
+**คำสั่ง `unprovision`** Backend สร้างด้วย `buildUnprovisionCommand` ใน `utils/unprovision.js` ตอนแอดมินลบอุปกรณ์ ใช้กับทั้งบอร์ดแอร์ (IR และสายแอร์) และบอร์ดตรวจคน
 
 ```json
 { "version": 1, "commandId": "UUID", "sentAt": "2026-10-13T12:00:00.000Z",
@@ -526,7 +526,7 @@ DELETE /api/...  ───► 1. DELETE แถวในฐานข้อมู�
 | สถานการณ์ | เกิดอะไรขึ้น | ผลต่อผู้ใช้ |
 |---|---|---|
 | บอร์ดออนไลน์ เฟิร์มแวร์ใหม่ | ล้างค่า ตอบภายในไม่ถึงวินาที | `boardCleared: true` บอร์ดกลับเป็นสภาพใหม่ รอตั้งค่าผ่าน BLE |
-| บอร์ดออฟไลน์ตอนกดลบ | คำสั่งไม่ retained จึงไม่ค้าง Backend รอครบ 4 วินาที (`UNPROVISION_ACK_TIMEOUT_MS`) แล้วลบต่อ | `boardCleared: false` บอร์ดยังเก็บค่าเดิม แต่บัญชี MQTT ถูกลบ (โหมด dynsec) จึงต่อ Broker ไม่ได้อีก ต้องล้างที่ตัวบอร์ดเอง: แฟลช `reset.ino`, BOOT + RESET แล้วตั้งค่าใหม่ หรือแฟลชเฟิร์มแวร์ใหม่ |
+| บอร์ดออฟไลน์ตอนกดลบ | คำสั่งไม่ retained จึงไม่ค้าง Backend รอครบ 4 วินาที (`UNPROVISION_ACK_TIMEOUT_MS`) แล้วลบต่อ | `boardCleared: false` บอร์ดยังเก็บค่าเดิม แต่บัญชี MQTT ถูกลบ (โหมด dynsec) พอบอร์ดกลับมาออนไลน์ Broker จะปฏิเสธบัญชีทุกครั้ง เมื่อถูกปฏิเสธติดกันครบ 2 นาทีและ 10 ครั้ง บอร์ดล้างค่าตัวเองแล้วรีบูตเข้าโหมดตั้งค่า BLE (ดูหัวข้อถัดไป) ถ้าบอร์ดไม่กลับมาออนไลน์อีก ต้องล้างที่ตัวบอร์ด: แฟลช `reset.ino` หรือ BOOT + RESET แล้วตั้งค่าใหม่ |
 | บอร์ดเฟิร์มแวร์เก่า (ก่อน IR 2.5.1 / สายแอร์ 2.5.2-slm8 / เซ็นเซอร์ 1.3.2) | ไม่รู้จัก action นี้ (บอร์ดแอร์รุ่นเก่าตกไปตรวจ `state` ไม่พบ พิมพ์ `MQTT command rejected: state is missing` แล้วทิ้ง) ไม่ตอบ | เหมือนบอร์ดออฟไลน์: รอ 4 วินาที `boardCleared: false` |
 | Backend ไม่ได้ต่อ Broker | `unprovisionDevice` คืน `{sent:false}` ทันที ไม่รอ | ลบในฐานข้อมูลสำเร็จ `boardCleared: false` |
 | `deviceId` ในข้อความไม่ตรงกับบอร์ด | บอร์ดพิมพ์ `Unprovision ignored` แล้วไม่ทำอะไร | ไม่มีบอร์ดผิดตัวถูกล้าง |
@@ -534,6 +534,17 @@ DELETE /api/...  ───► 1. DELETE แถวในฐานข้อมู�
 
 > [!WARN]
 > โหมด `shared` (บัญชี MQTT เดียวทุกบอร์ด ใช้ตอนพัฒนา) ไม่มีบัญชีรายบอร์ดให้ลบ ถ้าบอร์ดออฟไลน์ตอนลบแล้วกลับมาทีหลัง มันจะต่อ Broker และส่ง `status` ได้ตามเดิม (Backend ไม่บันทึกเพราะไม่มีแถวของบอร์ดนี้ `UPDATE` จึงไม่โดนแถวไหน) นี่เป็นอีกเหตุผลที่ระบบจริงต้องใช้ `MQTT_DEVICE_AUTH=dynsec`
+
+### บอร์ดที่ถูกลบตอนออฟไลน์: ล้างตัวเองเมื่อบัญชีถูกปฏิเสธ
+
+เฟิร์มแวร์ทั้งสามตัวมีฟังก์ชัน `checkMqttAccountRemoved(state)` ที่ `connectMqtt()` เรียกทุกครั้งที่ต่อ Broker ไม่ติด
+
+- นับเฉพาะ `state` **4** (`MQTT_CONNECT_BAD_CREDENTIALS` รหัสผิด) และ **5** (`MQTT_CONNECT_UNAUTHORIZED` ไม่ได้รับอนุญาต) ซึ่งเป็นอาการของ "บัญชีถูกลบ" ส่วน `state` ติดลบ (เน็ตหลุด หา Broker ไม่เจอ หมดเวลา) ไม่นับและไม่ล้างตัวนับ
+- จำเวลาที่เริ่มถูกปฏิเสธ (`mqttAuthRejectedSince`) และจำนวนครั้ง (`mqttAuthRejectCount`) ต่อติดเมื่อไรก็ล้างทั้งสองค่า
+- ถูกปฏิเสธต่อเนื่องครบ **2 นาที** (`MQTT_AUTH_REJECT_RESET_MS`) **และ** อย่างน้อย **10 ครั้ง** (`MQTT_AUTH_REJECT_MIN_COUNT`) → เรียก `unprovisionAndRestart("MQTT account was removed (rejected by broker)")` ล้าง Wi-Fi, MQTT, ห้อง แล้วรีบูตเข้าโหมดตั้งค่าบลูทูธ เหมือนได้รับคำสั่ง unprovision
+
+> [!WHY]
+> **ทำไมต้องรอทั้งเวลาและจำนวนครั้ง** การล้างค่าย้อนกลับไม่ได้ ห้องนั้นจะใช้งานไม่ได้จนกว่าจะมีคนไปตั้งค่าใหม่ ถ้า Broker ปฏิเสธชั่วคราว (เช่น ไฟล์บัญชี `dynamic-security.json` กำลังถูกสร้างใหม่หลังย้ายเซิร์ฟเวอร์ และ Backend ยังไม่ได้ `reconcileAccounts`) บอร์ดไม่ควรล้างตัวเองทันที การต้องถูกปฏิเสธต่อเนื่องอย่างน้อย 2 นาทีและ 10 ครั้งกันการล้างผิดจากเหตุชั่วคราว ส่วนโหมด `shared` ไม่มีการลบบัญชีรายบอร์ด กลไกนี้จึงไม่ทำงานในโหมดนั้น
 
 > [!NOTE]
 > หลังล้าง Device ID **ไม่เปลี่ยน** เพราะสร้างจาก MAC ใน eFuse ไม่ได้เก็บใน NVS เอาบอร์ดไปตั้งค่าใหม่ก็ได้รหัสเดิม และบอร์ดแอร์ IR ไม่สั่งแอร์เพิ่ม (แอร์ค้างสถานะล่าสุด) ส่วนบอร์ดสายแอร์ล้างสถานะแอร์ที่จำไว้ด้วย หลังรีบูตจึงส่งเฟรม "ปิด" ทางสาย (ตามคอมเมนต์ใน `rmutt_esp32_air_wired.ino`)
@@ -553,7 +564,7 @@ DELETE /api/...  ───► 1. DELETE แถวในฐานข้อมู�
 
 1. แอดมินเลือกไฟล์ `.bin` บนเซิร์ฟเวอร์ (อัปโหลดจากหน้า **เฟิร์มแวร์** ในเว็บด้วย `POST /api/firmware`) → `POST /api/air-conditioners/:deviceId/ota` (หรือ `/api/occupancy-sensors/:deviceId/ota`) ตรวจว่า **ชนิดไฟล์ตรงกับชนิดบอร์ด** (`assertFirmwareKind`: ชื่อมี `occ` = เซ็นเซอร์, มี `wired`/`slm8` = สายแอร์ ใช้กับแอร์ที่ protocol `DAIKIN_WIRED`, นอกนั้น = แอร์ IR ผิดตอบ 400) ตรวจว่าบอร์ด `active` และ **online** → Backend สร้าง URL `https://<mqtt_host>/firmware/<ชื่อไฟล์>` (`firmwareUrl`) → `publishOtaCommand` ส่ง `{"action":"ota","url":…}` ไป `/command` → ตอบ 202
 2. บอร์ดเช็ก `otaUrlAllowed(url, config.mqttHost)`: ต้องขึ้นต้น `https://<MQTT host เดิมของบอร์ด>/firmware/`, ลงท้าย `.bin`, ยาวไม่เกิน 300, ไม่มี `..`, ตัวอักษรชื่อไฟล์จำกัด ไม่ผ่านจะตั้ง `otaError = "url_rejected"` ใน status
-3. `performOtaUpdate()` sync เวลา, **ตัด MQTT ก่อน** (หน่วยความจำไม่พอเปิด TLS สองชุดพร้อมกัน), ดาวน์โหลดผ่าน HTTPS ตรวจใบรับรองกับใบราก, สำเร็จ → รีสตาร์ต ล้มเหลว → ใช้เฟิร์มแวร์เดิมต่อ รายงาน `otaError` และ `firmwareVersion` ใน `status` ซึ่ง Backend เก็บผ่าน `recordFirmwareStatus`
+3. `performOtaUpdate()` sync เวลา, **ตัด MQTT ก่อน** (หน่วยความจำไม่พอเปิด TLS สองชุดพร้อมกัน), ดาวน์โหลดผ่าน HTTPS ตรวจใบรับรองกับใบราก, สำเร็จ → รีสตาร์ต ล้มเหลว → ใช้เฟิร์มแวร์เดิมต่อ รายงาน `otaError` และ `firmwareVersion` ใน `status` ซึ่ง Backend เก็บผ่าน `recordFirmwareStatus` ถ้าดาวน์โหลดสะดุดเพราะเครือข่าย (เช่น `Stream Read Timeout`) บอร์ดดาวน์โหลดใหม่เองสูงสุด 3 ครั้ง เว้นครั้งละ 5 วินาที (`runHttpsOta` ใน `ota_update.h`) ส่วนข้อผิดพลาดที่มาจากไฟล์ไม่ลองซ้ำ
 
 > [!WHY]
 > ป้องกันเฟิร์มแวร์ปลอม 3 ชั้น: (1) คำสั่งมาจาก topic `command` ที่มีแต่ Backend ส่งได้ตาม ACL (2) URL ชี้ได้เฉพาะเซิร์ฟเวอร์เดียวกับ MQTT ของบอร์ดเอง (3) ตรวจใบรับรอง HTTPS
@@ -655,9 +666,9 @@ export function retainedTopics(prefix, deviceId, suffixes) {
 
 ### 2) เฟิร์มแวร์: ต่อ MQTT พร้อม LWT — `connectMqtt()`
 
-**ไฟล์ `firmware/rmutt_esp32_air/rmutt_esp32_air.ino` บรรทัด 1064–1098**
+**ไฟล์ `firmware/rmutt_esp32_air/rmutt_esp32_air.ino` บรรทัด 1067–1108**
 
-```cpp:1064
+```cpp:1067
   const String statusTopic = config.mqttTopic + "/status";
   const String clientId = "rmutt-" + config.deviceId;
   DynamicJsonDocument offline(96);
@@ -685,9 +696,13 @@ export function retainedTopics(prefix, deviceId, suffixes) {
         willPayload.c_str());
   }
   if (!connected) {
-    Serial.printf("MQTT connection failed, state: %d\n", mqttClient.state());
+    const int state = mqttClient.state();
+    Serial.printf("MQTT connection failed, state: %d\n", state);
+    checkMqttAccountRemoved(state);
     return;
   }
+  mqttAuthRejectedSince = 0;
+  mqttAuthRejectCount = 0;
 
   mqttClient.subscribe((config.mqttTopic + "/command").c_str(), 1);
   mqttClient.subscribe((config.mqttTopic + "/provision-ack").c_str(), 1);
@@ -697,30 +712,31 @@ export function retainedTopics(prefix, deviceId, suffixes) {
 
 | บรรทัด | ความหมาย |
 |---|---|
-| 1064 | `config.mqttTopic` คือ `rmutt/ac/ESP32-<MAC>` (ได้จาก Backend ผ่าน BLE) ต่อ `/status` = topic ที่จะฝากพินัยกรรม `const String` = ตัวแปรสตริงของ Arduino ที่แก้ไม่ได้ |
-| 1065 | client ID `rmutt-ESP32-<MAC>` ต้องตรงกับที่ Backend ลงทะเบียนในบัญชี Dynamic Security (`clientIdPrefix: 'rmutt-'`) ไม่ตรง Broker ปฏิเสธ |
-| 1066–1070 | สร้าง JSON พินัยกรรม `{"online":false,"deviceId":…}` ด้วย ArduinoJson (`DynamicJsonDocument` ขนาด 96 ไบต์ในหน่วยความจำ heap) แล้ว `serializeJson` ลงสตริง |
-| 1073–1079 | กรณีไม่มี username (โหมด Broker ไม่ต้อง auth) เรียก `connect(clientId, willTopic, willQoS, willRetain, willMessage)` อาร์กิวเมนต์ที่ 3 = `1` = **Will QoS 1** และที่ 4 = `true` = **Will retained** |
-| 1080–1089 | กรณีมี username: เพิ่มอาร์กิวเมนต์ username/password เข้าไปก่อน (ลำดับพารามิเตอร์ของ `PubSubClient::connect`) Dynamic Security ใช้ username = Device ID |
-| 1090–1093 | ต่อไม่ติด → พิมพ์ `state` (รหัสข้อผิดพลาดของ PubSubClient เช่น 5 = ไม่ได้รับอนุญาต) แล้ว `return` โดย `loop()` จะลองใหม่ทุก 3 วินาที |
-| 1095–1098 | subscribe 4 topic ด้วย QoS 1 ทุกครั้งที่ต่อติด (เพราะ clean session) ตรงกับ ACL `subscribe` ของบอร์ดแอร์พอดี ถ้า subscribe topic ที่ไม่มีสิทธิ์ Broker จะเงียบ |
+| 1067 | `config.mqttTopic` คือ `rmutt/ac/ESP32-<MAC>` (ได้จาก Backend ผ่าน BLE) ต่อ `/status` = topic ที่จะฝากพินัยกรรม `const String` = ตัวแปรสตริงของ Arduino ที่แก้ไม่ได้ |
+| 1068 | client ID `rmutt-ESP32-<MAC>` ต้องตรงกับที่ Backend ลงทะเบียนในบัญชี Dynamic Security (`clientIdPrefix: 'rmutt-'`) ไม่ตรง Broker ปฏิเสธ |
+| 1069–1073 | สร้าง JSON พินัยกรรม `{"online":false,"deviceId":…}` ด้วย ArduinoJson (`DynamicJsonDocument` ขนาด 96 ไบต์ในหน่วยความจำ heap) แล้ว `serializeJson` ลงสตริง |
+| 1076–1082 | กรณีไม่มี username (โหมด Broker ไม่ต้อง auth) เรียก `connect(clientId, willTopic, willQoS, willRetain, willMessage)` อาร์กิวเมนต์ที่ 3 = `1` = **Will QoS 1** และที่ 4 = `true` = **Will retained** |
+| 1083–1092 | กรณีมี username: เพิ่มอาร์กิวเมนต์ username/password เข้าไปก่อน (ลำดับพารามิเตอร์ของ `PubSubClient::connect`) Dynamic Security ใช้ username = Device ID |
+| 1093–1099 | ต่อไม่ติด → พิมพ์ `state` (รหัสข้อผิดพลาดของ PubSubClient เช่น 4 = รหัสผิด, 5 = ไม่ได้รับอนุญาต) ส่งให้ `checkMqttAccountRemoved(state)` นับว่าถูก Broker ปฏิเสธบัญชีติดกันนานแค่ไหน (ดูหัวข้อถัดไป) แล้ว `return` โดย `loop()` จะลองใหม่ทุก 3 วินาที |
+| 1100–1101 | ต่อติด → ล้างตัวนับการถูกปฏิเสธ |
+| 1103–1106 | subscribe 4 topic ด้วย QoS 1 ทุกครั้งที่ต่อติด (เพราะ clean session) ตรงกับ ACL `subscribe` ของบอร์ดแอร์พอดี ถ้า subscribe topic ที่ไม่มีสิทธิ์ Broker จะเงียบ |
 
-หลังบรรทัด 1098 โค้ดตั้งหน่วงสุ่มก่อนส่งประวัติ แล้วเรียก `publishStatus()`, `publishState()` และ `publishProvisioningToken()` ทันที ทำไม publish `status` ทันทีที่ต่อติด: เพื่อ **ทับพินัยกรรมเก่า** (retained `online:false`) ที่ Broker ปล่อยไว้ตอนหลุดครั้งก่อน ให้กลับเป็น `online:true`
+หลังบรรทัด 1106 โค้ดตั้งหน่วงสุ่มก่อนส่งประวัติ แล้วเรียก `publishStatus()`, `publishState()` และ `publishProvisioningToken()` ทันที ทำไม publish `status` ทันทีที่ต่อติด: เพื่อ **ทับพินัยกรรมเก่า** (retained `online:false`) ที่ Broker ปล่อยไว้ตอนหลุดครั้งก่อน ให้กลับเป็น `online:true`
 
 > [!WHY]
 > **ทำไม LWT ต้อง retained**: ถ้า Backend รีสตาร์ตระหว่างที่บอร์ดหลุด แล้ว LWT ไม่ retained Backend จะไม่เคยรู้ว่าบอร์ด offline เพราะข้อความหลุดไปตอนมันไม่ได้ฟัง retained ทำให้ Backend ได้ "สถานะล่าสุดจริง" ทันทีที่ subscribe
 
 ### 3) เฟิร์มแวร์: callback ตอนรับ MQTT — `mqttCallback()`
 
-**ไฟล์ `firmware/rmutt_esp32_air/rmutt_esp32_air.ino` บรรทัด 1114–1116 และ 1143–1165**
+**ไฟล์ `firmware/rmutt_esp32_air/rmutt_esp32_air.ino` บรรทัด 1121–1123 และ 1150–1172**
 
-```cpp:1114
+```cpp:1121
 void mqttCallback(char *topic, byte *payload, unsigned int length) {
   if (length == 0 || length > 2048) return;
   const String incomingTopic(topic);
 ```
 
-```cpp:1143
+```cpp:1150
   if (incomingTopic == config.mqttTopic + "/provision-ack") {
     DynamicJsonDocument acknowledgement(512);
     if (deserializeJson(acknowledgement, payload, length)) return;
@@ -748,25 +764,25 @@ void mqttCallback(char *topic, byte *payload, unsigned int length) {
 
 | บรรทัด | ความหมาย |
 |---|---|
-| 1114 | ลายเซ็น callback ที่ PubSubClient บังคับ: `char *topic` (ชื่อ topic), `byte *payload` (ไบต์ดิบ ไม่มี `\0` ปิดท้าย), `length` (จำนวนไบต์) `*` คือ pointer = ที่อยู่ของหน่วยความจำที่เก็บข้อมูล |
-| 1115 | ทิ้งข้อความว่าง (เช่นข้อความล้าง retained) หรือใหญ่เกิน 2048 ไบต์ (ขนาด buffer ที่ตั้ง `setBufferSize(2048)` ใน `setup`) |
-| 1116 | แปลง topic เป็น `String` เพื่อเทียบด้วย `==` |
-| 1143 | แยกตามชนิด topic: นี่คือ ack ของ provisioning |
-| 1145 | `deserializeJson(doc, payload, length)` คืนค่า error (ไม่ใช่ศูนย์ = true) ถ้า JSON เสีย → `return` ทิ้ง ต้องส่ง `length` เพราะ payload ไม่มี `\0` |
-| 1146 | `acknowledgement["token"] \| ""` — ใน ArduinoJson `\|` ใช้ให้ค่าเริ่มต้นถ้าไม่มีฟิลด์ (ต่างจาก `\|\|` ของภาษาอื่น) |
-| 1147–1149 | เงื่อนไข 3 ข้อพร้อมกัน: ack บอกว่า `activated == true`, บอร์ดยังมี token เก็บอยู่ และ token ใน ack **ตรงกับของตัวเอง** (กันใครส่ง ack ปลอม/ของบอร์ดอื่นมา) |
-| 1150–1152 | ลบ key `prov_token` ออกจาก NVS (namespace `rmutt-air`) ผ่าน `Preferences` ลบแล้ว token ที่เคยส่งผ่านอากาศไม่มีเหลือที่บอร์ด |
-| 1153–1154 | ล้าง token ในหน่วยความจำ และตั้งธง `provisionAckClearReady` ให้ `loop()` ไป publish ข้อความว่างล้าง retained ของ `/provision-ack` |
-| 1158 | ถ้าไม่ใช่ `/command` ทิ้ง (เช่น `schedule-status`, `history-ack` ถูกจัดการก่อนหน้านี้แล้ว) |
-| 1159–1164 | **คัดลอกคำสั่งไปเก็บ** แล้วตั้งธง `mqttCommandReady` ไม่ได้ประมวลผลทันที |
+| 1121 | ลายเซ็น callback ที่ PubSubClient บังคับ: `char *topic` (ชื่อ topic), `byte *payload` (ไบต์ดิบ ไม่มี `\0` ปิดท้าย), `length` (จำนวนไบต์) `*` คือ pointer = ที่อยู่ของหน่วยความจำที่เก็บข้อมูล |
+| 1122 | ทิ้งข้อความว่าง (เช่นข้อความล้าง retained) หรือใหญ่เกิน 2048 ไบต์ (ขนาด buffer ที่ตั้ง `setBufferSize(2048)` ใน `setup`) |
+| 1123 | แปลง topic เป็น `String` เพื่อเทียบด้วย `==` |
+| 1150 | แยกตามชนิด topic: นี่คือ ack ของ provisioning |
+| 1152 | `deserializeJson(doc, payload, length)` คืนค่า error (ไม่ใช่ศูนย์ = true) ถ้า JSON เสีย → `return` ทิ้ง ต้องส่ง `length` เพราะ payload ไม่มี `\0` |
+| 1153 | `acknowledgement["token"] \| ""` — ใน ArduinoJson `\|` ใช้ให้ค่าเริ่มต้นถ้าไม่มีฟิลด์ (ต่างจาก `\|\|` ของภาษาอื่น) |
+| 1154–1156 | เงื่อนไข 3 ข้อพร้อมกัน: ack บอกว่า `activated == true`, บอร์ดยังมี token เก็บอยู่ และ token ใน ack **ตรงกับของตัวเอง** (กันใครส่ง ack ปลอม/ของบอร์ดอื่นมา) |
+| 1157–1159 | ลบ key `prov_token` ออกจาก NVS (namespace `rmutt-air`) ผ่าน `Preferences` ลบแล้ว token ที่เคยส่งผ่านอากาศไม่มีเหลือที่บอร์ด |
+| 1160–1161 | ล้าง token ในหน่วยความจำ และตั้งธง `provisionAckClearReady` ให้ `loop()` ไป publish ข้อความว่างล้าง retained ของ `/provision-ack` |
+| 1165 | ถ้าไม่ใช่ `/command` ทิ้ง (เช่น `schedule-status`, `history-ack` ถูกจัดการก่อนหน้านี้แล้ว) |
+| 1166–1171 | **คัดลอกคำสั่งไปเก็บ** แล้วตั้งธง `mqttCommandReady` ไม่ได้ประมวลผลทันที |
 
 **ทำไมไม่ทำงานใน callback**: callback ถูกเรียกขณะ `mqttClient.loop()` ทำงานอยู่ ถ้าทำงานหนัก (ส่งสัญญาณ IR ซึ่งใช้เวลา, เขียน NVS, parse JSON ใหญ่, publish ตอบกลับซึ่งเรียก PubSubClient ซ้ำซ้อนกลางการประมวลผล) อาจทำให้เชื่อมต่อค้างหรือหลุด keep-alive และ buffer ชนกัน จึงใช้แพทเทิร์น "callback แค่ฝากของ แล้วให้ `loop()` เป็นคนทำ" (`if (mqttCommandReady) processMqttCommand();` ใน `loop`) เช่นเดียวกับ OTA (`otaRequested`) และการลบ flash ของ history
 
 ### 4) เฟิร์มแวร์: ตัวรับคำสั่งเขียน BLE — `ConfigCallbacks::onWrite`
 
-**ไฟล์ `firmware/rmutt_esp32_air/rmutt_esp32_air.ino` บรรทัด 315–338**
+**ไฟล์ `firmware/rmutt_esp32_air/rmutt_esp32_air.ino` บรรทัด 318–341**
 
-```cpp:315
+```cpp:318
   void onWrite(BLECharacteristic *characteristic) override {
     auto raw = characteristic->getValue();
     const size_t length = raw.length();
@@ -793,9 +809,9 @@ void mqttCallback(char *topic, byte *payload, unsigned int length) {
     }
 ```
 
-**บรรทัด 339–368 (ประกอบข้อมูล)**
+**บรรทัด 342–371 (ประกอบข้อมูล)**
 
-```cpp:339
+```cpp:342
     if (sequence == 0) {
       receivedConfig = "";
       expectedSequence = 0;
@@ -831,27 +847,27 @@ void mqttCallback(char *topic, byte *payload, unsigned int length) {
 
 | บรรทัด | ความหมาย |
 |---|---|
-| 315 | `onWrite` = callback ที่ไลบรารี BLE เรียกทุกครั้งที่แอปเขียน characteristic `…0002` `override` = บอกว่าเป็นการเขียนทับเมธอดของคลาสแม่ `BLECharacteristicCallbacks` |
-| 316–317 | `auto` ให้คอมไพเลอร์เดาชนิด `getValue()` ได้ข้อมูลที่แอปเพิ่งเขียน |
-| 318–321 | หัว packet 6 ไบต์ ถ้าสั้นกว่านั้นผิดแน่ แจ้ง error ทาง Notify |
-| 324–325 | `reinterpret_cast<const uint8_t*>` = ตีความตัวอักษรของสตริงเป็น "อาร์เรย์ไบต์ไม่มีเครื่องหมาย" เพื่ออ่านค่า 0–255 ได้ตรง ๆ |
-| 326 | ตรวจ `data[0]` (เวอร์ชัน) และ `data[1]` (ชนิดข้อความ) ต้องเป็น 1 ทั้งคู่ — ถ้าปรับโปรโตคอลในอนาคต บอร์ดเก่าจะปฏิเสธชัดเจน |
-| 331–332 | ประกอบเลข 16 บิตแบบ **big-endian**: ไบต์ `data[2]` เป็นครึ่งบน เลื่อนซ้าย 8 บิต (`<< 8`) แล้ว `\|` ไบต์ล่าง `data[3]` ตัวอย่าง `0x01 0x2C` → 256 + 44 = 300 `static_cast<uint16_t>` กันไม่ให้ไบต์ถูกเลื่อนบิตจนล้นก่อนแปลง |
-| 333–334 | `total` จากไบต์ 4–5 ด้วยวิธีเดียวกัน |
-| 335 | กันข้อมูลเพี้ยน: `total` ต้อง 1–32 และ `sequence` ต้องน้อยกว่า `total` (จำกัด 32 packet = 32×150 ≈ 4.8 KB เกิน `MAX_CONFIG_BYTES` พอดี เป็นแนวกันชั้นแรก) |
-| 339–344 | packet แรก (`sequence == 0`) → เริ่มประกอบใหม่: ล้างบัฟเฟอร์ จำจำนวน packet ทั้งหมด จองหน่วยความจำ 4096 ไบต์ล่วงหน้า (`reserve`) ลดการจัดสรรใหม่ซ้ำ ๆ ที่ทำให้หน่วยความจำแตกเป็นชิ้น |
-| 345–351 | ถ้า packet ที่มาไม่ใช่ลำดับที่รอ หรือ `total` เปลี่ยน → ทิ้งทั้งหมดแล้วให้แอปเริ่มใหม่ (ใช้ write-with-response ของแอปจึงปกติมาเรียง แต่ป้องกันไว้) |
-| 352–356 | กันบัฟเฟอร์ล้น: ขนาดสะสม + ขนาดชิ้นนี้ (ตัดหัว 6 ไบต์) ต้องไม่เกิน 4096 |
-| 358–360 | วนต่อไบต์ข้อมูล (ตั้งแต่ index 6) ลงสตริงทีละตัว |
-| 361–368 | นับ packet ที่ได้รับ ถ้าครบ → ย้ายไป `pendingConfig`, ตั้งธง `configReady`, ล้างตัวแปรประกอบ — แล้วจบ **ไม่ประมวลผลที่นี่** |
+| 318 | `onWrite` = callback ที่ไลบรารี BLE เรียกทุกครั้งที่แอปเขียน characteristic `…0002` `override` = บอกว่าเป็นการเขียนทับเมธอดของคลาสแม่ `BLECharacteristicCallbacks` |
+| 319–320 | `auto` ให้คอมไพเลอร์เดาชนิด `getValue()` ได้ข้อมูลที่แอปเพิ่งเขียน |
+| 321–324 | หัว packet 6 ไบต์ ถ้าสั้นกว่านั้นผิดแน่ แจ้ง error ทาง Notify |
+| 327–328 | `reinterpret_cast<const uint8_t*>` = ตีความตัวอักษรของสตริงเป็น "อาร์เรย์ไบต์ไม่มีเครื่องหมาย" เพื่ออ่านค่า 0–255 ได้ตรง ๆ |
+| 329 | ตรวจ `data[0]` (เวอร์ชัน) และ `data[1]` (ชนิดข้อความ) ต้องเป็น 1 ทั้งคู่ — ถ้าปรับโปรโตคอลในอนาคต บอร์ดเก่าจะปฏิเสธชัดเจน |
+| 334–335 | ประกอบเลข 16 บิตแบบ **big-endian**: ไบต์ `data[2]` เป็นครึ่งบน เลื่อนซ้าย 8 บิต (`<< 8`) แล้ว `\|` ไบต์ล่าง `data[3]` ตัวอย่าง `0x01 0x2C` → 256 + 44 = 300 `static_cast<uint16_t>` กันไม่ให้ไบต์ถูกเลื่อนบิตจนล้นก่อนแปลง |
+| 336–337 | `total` จากไบต์ 4–5 ด้วยวิธีเดียวกัน |
+| 338 | กันข้อมูลเพี้ยน: `total` ต้อง 1–32 และ `sequence` ต้องน้อยกว่า `total` (จำกัด 32 packet = 32×150 ≈ 4.8 KB เกิน `MAX_CONFIG_BYTES` พอดี เป็นแนวกันชั้นแรก) |
+| 342–347 | packet แรก (`sequence == 0`) → เริ่มประกอบใหม่: ล้างบัฟเฟอร์ จำจำนวน packet ทั้งหมด จองหน่วยความจำ 4096 ไบต์ล่วงหน้า (`reserve`) ลดการจัดสรรใหม่ซ้ำ ๆ ที่ทำให้หน่วยความจำแตกเป็นชิ้น |
+| 348–354 | ถ้า packet ที่มาไม่ใช่ลำดับที่รอ หรือ `total` เปลี่ยน → ทิ้งทั้งหมดแล้วให้แอปเริ่มใหม่ (ใช้ write-with-response ของแอปจึงปกติมาเรียง แต่ป้องกันไว้) |
+| 355–359 | กันบัฟเฟอร์ล้น: ขนาดสะสม + ขนาดชิ้นนี้ (ตัดหัว 6 ไบต์) ต้องไม่เกิน 4096 |
+| 361–363 | วนต่อไบต์ข้อมูล (ตั้งแต่ index 6) ลงสตริงทีละตัว |
+| 364–371 | นับ packet ที่ได้รับ ถ้าครบ → ย้ายไป `pendingConfig`, ตั้งธง `configReady`, ล้างตัวแปรประกอบ — แล้วจบ **ไม่ประมวลผลที่นี่** |
 
 **ทำไมใช้ธง `configReady` แล้วให้ `loop()` เรียก `processPendingConfig()`**: การประมวลผลต้องทดสอบ Wi-Fi (นานถึง 15 วินาที), เขียน NVS, ซึ่งทำใน callback ของ BLE ไม่ได้ (callback รันบน task ของ BLE stack การบล็อกนานทำให้การเชื่อมต่อหลุด/หมดเวลา) แพทเทิร์นเดียวกับ MQTT ข้างบน และผลลัพธ์ส่งกลับทาง Notify (`notifyBle`) ซึ่งแอปรอได้สูงสุด 40 วินาที
 
 ### 5) เฟิร์มแวร์: ล้างค่าเมื่อถูกลบออกจากแอป — `unprovisionAndRestart()`
 
-**ไฟล์ `firmware/rmutt_esp32_air/rmutt_esp32_air.ino` บรรทัด 1229–1239** (กิ่ง `unprovision` ใน `processMqttCommand`)
+**ไฟล์ `firmware/rmutt_esp32_air/rmutt_esp32_air.ino` บรรทัด 1265–1275** (กิ่ง `unprovision` ใน `processMqttCommand`)
 
-```cpp:1229
+```cpp:1265
   if (action == "unprovision") {
     // Backend ส่งมาเมื่อแอดมินกดลบอุปกรณ์ในแอป
     // ตรวจ deviceId ซ้ำอีกชั้น กันข้อความหลงมาผิด topic
@@ -867,16 +883,16 @@ void mqttCallback(char *topic, byte *payload, unsigned int length) {
 
 | บรรทัด | ความหมาย |
 |---|---|
-| 1229 | `action` อ่านมาก่อนหน้านี้ด้วย `document["action"] \| ""` (ไม่มีฟิลด์ได้สตริงว่าง) โค้ดนี้อยู่ใน `processMqttCommand()` ที่ `loop()` เรียก ไม่ใช่ใน callback จึง publish/disconnect ได้อย่างปลอดภัย |
-| 1232 | ดึง `deviceId` ที่ Backend ใส่มาในข้อความ ถ้าไม่มีได้ `""` |
-| 1233–1236 | ไม่ตรงกับรหัสของตัวเอง → พิมพ์ลง Serial แล้ว `return` **ไม่ล้าง** ปกติ topic ก็บอกอยู่แล้วว่าเป็นของบอร์ดไหน แต่คำสั่งนี้ทำลายค่าทั้งหมดและย้อนกลับไม่ได้ จึงตรวจซ้ำอีกชั้น (defense in depth) |
-| 1237 | ผ่านแล้วเรียกฟังก์ชันล้างค่า ซึ่งจบด้วย `ESP.restart()` (ไม่กลับมาที่บรรทัด 1238 จริง ๆ แต่เขียน `return` ไว้ให้อ่านง่ายและปลอดภัยถ้าแก้ฟังก์ชันภายหลัง) |
+| 1265 | `action` อ่านมาก่อนหน้านี้ด้วย `document["action"] \| ""` (ไม่มีฟิลด์ได้สตริงว่าง) โค้ดนี้อยู่ใน `processMqttCommand()` ที่ `loop()` เรียก ไม่ใช่ใน callback จึง publish/disconnect ได้อย่างปลอดภัย |
+| 1268 | ดึง `deviceId` ที่ Backend ใส่มาในข้อความ ถ้าไม่มีได้ `""` |
+| 1269–1272 | ไม่ตรงกับรหัสของตัวเอง → พิมพ์ลง Serial แล้ว `return` **ไม่ล้าง** ปกติ topic ก็บอกอยู่แล้วว่าเป็นของบอร์ดไหน แต่คำสั่งนี้ทำลายค่าทั้งหมดและย้อนกลับไม่ได้ จึงตรวจซ้ำอีกชั้น (defense in depth) |
+| 1273 | ผ่านแล้วเรียกฟังก์ชันล้างค่า ซึ่งจบด้วย `ESP.restart()` (ไม่กลับมาที่บรรทัด 1274 จริง ๆ แต่เขียน `return` ไว้ให้อ่านง่ายและปลอดภัยถ้าแก้ฟังก์ชันภายหลัง) |
 
 บอร์ดตรวจคน (`rmutt_esp32_occupancy.ino`) ต่างนิดเดียว: ตรวจ `deviceId` ใน `mqttCallback` แล้ว**ตั้งธง** `unprovisionRequested = true` ให้ `loop()` เรียก `unprovisionAndRestart` ภายหลัง เพราะบอร์ดนั้นประมวลผลคำสั่งใน callback โดยตรง และการ publish + disconnect ภายใน callback ของ PubSubClient เสี่ยงทำให้ไลบรารีพัง (แพทเทิร์นเดียวกับ `otaRequested`)
 
-**ไฟล์ `firmware/rmutt_esp32_air/rmutt_esp32_air.ino` บรรทัด 1174–1208**
+**ไฟล์ `firmware/rmutt_esp32_air/rmutt_esp32_air.ino` บรรทัด 1210–1244**
 
-```cpp:1174
+```cpp:1210
 void unprovisionAndRestart(const String &reason) {
   Serial.printf("Unprovision: %s - clearing all saved settings\n", reason.c_str());
   if (mqttClient.connected()) {
@@ -917,17 +933,17 @@ void unprovisionAndRestart(const String &reason) {
 
 | บรรทัด | ความหมาย |
 |---|---|
-| 1174 | `const String &reason` = รับสตริงแบบอ้างอิง (reference `&`) ไม่คัดลอก และ `const` = ห้ามแก้ ใช้แค่พิมพ์ลง Serial |
-| 1176 | ส่งคำตอบได้เฉพาะตอนยังต่อ MQTT อยู่ (ปกติต่ออยู่เพราะเพิ่งได้คำสั่งมา) ถ้าไม่ต่อก็ข้ามไปล้าง NVS เลย ไม่ค้างรอ |
-| 1178–1183 | สร้าง JSON คำตอบ `{"deviceId":…,"online":false,"unprovisioned":true}` ขนาด 128 ไบต์ ใส่ `online:false` ด้วยเพื่อให้ Backend รุ่นเก่าที่ไม่รู้จัก `unprovisioned` อย่างน้อยเข้าใจว่าบอร์ดออฟไลน์ |
-| 1185 | publish คำตอบที่ `…/status` อาร์กิวเมนต์สุดท้าย `false` = **ไม่ retained** (เหตุการณ์ครั้งเดียว) ใช้ topic `status` เพราะ ACL ของบอร์ดอนุญาตให้ publish อยู่แล้ว ไม่ต้องเพิ่ม topic ใหม่ |
-| 1188–1189 | publish ข้อความว่าง `""` แบบ retained (`true`) ที่ `status` และ `state` = ลบ retained ของตัวเองบน Broker บอร์ดตรวจคนล้างแค่ `status` เพราะไม่มี `state` |
-| 1190–1191 | `mqttClient.loop()` + หน่วง 300 ms ให้ PubSubClient ส่งข้อความในบัฟเฟอร์ออกไปจริงก่อนตัด |
-| 1192 | `disconnect()` ส่งแพ็กเก็ต DISCONNECT ตามมาตรฐาน Broker จึงรู้ว่า "ลาอย่างปกติ" และ **ทิ้ง Last Will** ไม่ปล่อย `online:false` แบบ retained กลับมาทับ |
-| 1195–1197 | เปิด namespace `rmutt-air` ของ NVS แบบเขียนได้ (`false` = ไม่ใช่ read-only) แล้ว `clear()` ลบทุก key: Wi-Fi SSID/รหัส, MQTT host/port/username/password, ห้อง, เบอร์แอร์, token, ตารางเปิดปิด |
-| 1198–1200 | ล้าง namespace `rmutt-state` (สถานะแอร์ล่าสุดและตัวชี้ `hist_ack` ของประวัติ) |
-| 1202–1204 | ลบพาร์ติชันประวัติ `rmuttlog` ทั้งก้อนด้วย `esp_partition_erase_range` (flash ต้อง erase เป็นบล็อก) ไม่ให้ข้อมูลไฟของห้องเก่าถูกส่งขึ้นไปในนามห้องใหม่หลังตั้งค่าใหม่ ตรวจ `nullptr` ก่อนเพราะถ้าแฟลชด้วย partition table ที่ไม่มี `rmuttlog` ตัวชี้จะว่าง |
-| 1206–1208 | หน่วงให้ Serial พิมพ์ทัน แล้ว `ESP.restart()` บูตใหม่ บอร์ดพบว่า `configured` เป็น false (ถูกล้าง) จึงเปิด BLE รอตั้งค่าเหมือนบอร์ดใหม่ |
+| 1210 | `const String &reason` = รับสตริงแบบอ้างอิง (reference `&`) ไม่คัดลอก และ `const` = ห้ามแก้ ใช้แค่พิมพ์ลง Serial |
+| 1212 | ส่งคำตอบได้เฉพาะตอนยังต่อ MQTT อยู่ (ปกติต่ออยู่เพราะเพิ่งได้คำสั่งมา) ถ้าไม่ต่อก็ข้ามไปล้าง NVS เลย ไม่ค้างรอ |
+| 1214–1219 | สร้าง JSON คำตอบ `{"deviceId":…,"online":false,"unprovisioned":true}` ขนาด 128 ไบต์ ใส่ `online:false` ด้วยเพื่อให้ Backend รุ่นเก่าที่ไม่รู้จัก `unprovisioned` อย่างน้อยเข้าใจว่าบอร์ดออฟไลน์ |
+| 1221 | publish คำตอบที่ `…/status` อาร์กิวเมนต์สุดท้าย `false` = **ไม่ retained** (เหตุการณ์ครั้งเดียว) ใช้ topic `status` เพราะ ACL ของบอร์ดอนุญาตให้ publish อยู่แล้ว ไม่ต้องเพิ่ม topic ใหม่ |
+| 1224–1225 | publish ข้อความว่าง `""` แบบ retained (`true`) ที่ `status` และ `state` = ลบ retained ของตัวเองบน Broker บอร์ดตรวจคนล้างแค่ `status` เพราะไม่มี `state` |
+| 1226–1227 | `mqttClient.loop()` + หน่วง 300 ms ให้ PubSubClient ส่งข้อความในบัฟเฟอร์ออกไปจริงก่อนตัด |
+| 1228 | `disconnect()` ส่งแพ็กเก็ต DISCONNECT ตามมาตรฐาน Broker จึงรู้ว่า "ลาอย่างปกติ" และ **ทิ้ง Last Will** ไม่ปล่อย `online:false` แบบ retained กลับมาทับ |
+| 1231–1233 | เปิด namespace `rmutt-air` ของ NVS แบบเขียนได้ (`false` = ไม่ใช่ read-only) แล้ว `clear()` ลบทุก key: Wi-Fi SSID/รหัส, MQTT host/port/username/password, ห้อง, เบอร์แอร์, token, ตารางเปิดปิด |
+| 1234–1236 | ล้าง namespace `rmutt-state` (สถานะแอร์ล่าสุดและตัวชี้ `hist_ack` ของประวัติ) |
+| 1238–1240 | ลบพาร์ติชันประวัติ `rmuttlog` ทั้งก้อนด้วย `esp_partition_erase_range` (flash ต้อง erase เป็นบล็อก) ไม่ให้ข้อมูลไฟของห้องเก่าถูกส่งขึ้นไปในนามห้องใหม่หลังตั้งค่าใหม่ ตรวจ `nullptr` ก่อนเพราะถ้าแฟลชด้วย partition table ที่ไม่มี `rmuttlog` ตัวชี้จะว่าง |
+| 1242–1244 | หน่วงให้ Serial พิมพ์ทัน แล้ว `ESP.restart()` บูตใหม่ บอร์ดพบว่า `configured` เป็น false (ถูกล้าง) จึงเปิด BLE รอตั้งค่าเหมือนบอร์ดใหม่ |
 
 > [!WHY]
 > ทำไมไม่ใช้ `nvs_flash_erase()` แบบ `reset.ino` ที่ล้างทั้งชิป: `preferences.clear()` ล้างเฉพาะ namespace ของโปรแกรมเรา ไม่ไปยุ่งกับข้อมูลระบบอื่นใน NVS (เช่นค่าคาลิเบรตของ Wi-Fi/PHY ที่ไลบรารีเก็บ) และทำได้ขณะโปรแกรมรันอยู่ ไม่ต้อง deinit NVS ก่อน ผลที่ต้องการ (ลืม Wi-Fi/MQTT/ห้อง) ได้ครบเหมือนกัน
@@ -991,11 +1007,11 @@ void unprovisionAndRestart(const String &reason) {
 
 > [!ASK]
 > **ลบแอร์ในแอปแล้ว บอร์ดยังจำรหัส Wi-Fi อยู่ไหม?**
-> ถ้าบอร์ดออนไลน์ตอนลบ ไม่จำครับ Backend ส่ง `{"action":"unprovision","deviceId":…}` ไปที่ `command` ก่อนลบบัญชี MQTT บอร์ดตรวจว่า `deviceId` เป็นของตัวเอง ตอบ `{"unprovisioned":true}` ทาง `status` ล้าง retained ของตัวเอง ตัดการเชื่อมต่อแบบปกติ แล้ว `preferences.clear()` ลบ Wi-Fi, MQTT, ห้องใน NVS และรีบูตเข้าโหมดตั้งค่า BLE API ตอบ `boardCleared: true` ถ้าบอร์ดออฟไลน์ คำสั่งไปไม่ถึง (ไม่ได้ส่งแบบ retained) API ตอบ `boardCleared: false` บอร์ดยังเก็บค่าเดิมแต่ต่อ Broker ไม่ได้แล้วเพราะบัญชีถูกลบ ต้องไปล้างที่ตัวบอร์ด
+> ถ้าบอร์ดออนไลน์ตอนลบ ไม่จำครับ Backend ส่ง `{"action":"unprovision","deviceId":…}` ไปที่ `command` ก่อนลบบัญชี MQTT บอร์ดตรวจว่า `deviceId` เป็นของตัวเอง ตอบ `{"unprovisioned":true}` ทาง `status` ล้าง retained ของตัวเอง ตัดการเชื่อมต่อแบบปกติ แล้ว `preferences.clear()` ลบ Wi-Fi, MQTT, ห้องใน NVS และรีบูตเข้าโหมดตั้งค่า BLE API ตอบ `boardCleared: true` ถ้าบอร์ดออฟไลน์ คำสั่งไปไม่ถึง (ไม่ได้ส่งแบบ retained) API ตอบ `boardCleared: false` บอร์ดยังเก็บค่าเดิมจนกว่าจะกลับมาออนไลน์ แล้ว Broker ปฏิเสธบัญชีที่ถูกลบไปแล้ว ครบ 2 นาทีและ 10 ครั้งบอร์ดจะล้างตัวเอง ถ้าไม่กลับมาออนไลน์เลยต้องไปล้างที่ตัวบอร์ด
 
 > [!ASK]
 > **ทำไมคำสั่ง unprovision ไม่ส่งแบบ retained จะได้ถึงบอร์ดที่ออฟไลน์ตอนกลับมา?**
-> เพราะ Device ID มาจาก MAC ไม่เปลี่ยน ถ้าคำสั่งค้างบน Broker แล้ววันหลังเราเพิ่มบอร์ดตัวเดิมกลับเข้าระบบ บอร์ดจะได้คำสั่งค้างทันทีที่ subscribe แล้วล้างตัวเองทิ้งอีกรอบ อีกอย่างบัญชี MQTT ของบอร์ดถูกลบไปแล้ว บอร์ดที่กลับมาก็ต่อ Broker ไม่ได้อยู่ดี คำสั่ง retained จึงไม่มีประโยชน์และมีโทษ
+> เพราะ Device ID มาจาก MAC ไม่เปลี่ยน ถ้าคำสั่งค้างบน Broker แล้ววันหลังเราเพิ่มบอร์ดตัวเดิมกลับเข้าระบบ บอร์ดจะได้คำสั่งค้างทันทีที่ subscribe แล้วล้างตัวเองทิ้งอีกรอบ อีกอย่างบัญชี MQTT ของบอร์ดถูกลบไปแล้ว บอร์ดที่กลับมาต่อ Broker ไม่ได้และจะล้างตัวเองเมื่อถูกปฏิเสธต่อเนื่อง (`checkMqttAccountRemoved`) คำสั่ง retained จึงไม่จำเป็นและมีโทษ
 
 > [!ASK]
 > **บอร์ดสายแอร์กับบอร์ด IR แยกกันอย่างไรในโปรโตคอล?**

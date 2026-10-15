@@ -999,7 +999,7 @@
 </ul>
 <p>ส่วนที่เหลือของเมธอดใช้ <code>Scrollable.ensureVisible</code> เลื่อนหน้าจอไปที่กล่อง Device ID (อ้างด้วย <code>GlobalKey</code> ชื่อ <code>_detailsKey</code>) และในบล็อก <code>finally</code> ปิดธง <code>_isReadingIdentity</code></p>
 <h3 id="บอร์ดสายแอร์-daikin-ล็อกยี่ห้อ">บอร์ดสายแอร์ Daikin: ล็อกยี่ห้อ<a class="anchor" href="#บอร์ดสายแอร์-daikin-ล็อกยี่ห้อ">#</a></h3>
-<p>บอร์ด <code>rmutt_esp32_air_wired</code> ใช้ชื่อ BLE <code>RMUTT-AC-...</code> เหมือนบอร์ด IR การสแกนและเชื่อมต่อจึงเหมือนเดิมทุกอย่าง ต่างกันแค่ identity ที่อ่านได้มี <code>controlType: "wired"</code> และ <code>brand: "Daikin"</code> (เฟิร์มแวร์ <code>2.5.2-slm8</code>) หน้าจอใช้ค่านี้ 3 จุด</p>
+<p>บอร์ด <code>rmutt_esp32_air_wired</code> ใช้ชื่อ BLE <code>RMUTT-AC-...</code> เหมือนบอร์ด IR การสแกนและเชื่อมต่อจึงเหมือนเดิมทุกอย่าง ต่างกันแค่ identity ที่อ่านได้มี <code>controlType: "wired"</code> และ <code>brand: "Daikin"</code> หน้าจอใช้ค่านี้ 3 จุด</p>
 <p><strong>จุดที่ 1: กล่องเขียวบอกชนิดบอร์ด</strong> — ไฟล์ <code>lib/screens/ble_provisioning_screen.dart</code> บรรทัด 186–206</p>
 <div class="code-block"><span class="code-lang">dart</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">186</span>
 <span class="normal">187</span>
@@ -1490,7 +1490,7 @@
 
 <h3 id="กรณีตั้งค่าใหม่บอร์ดที่ออนไลน์อยู่">กรณีตั้งค่าใหม่บอร์ดที่ออนไลน์อยู่<a class="anchor" href="#กรณีตั้งค่าใหม่บอร์ดที่ออนไลน์อยู่">#</a></h3>
 <p>บอร์ดที่ใช้งานปกติจะปิดการประกาศตัว BLE ไว้ เมื่อแอดมินกด "ตั้งค่าใหม่" หน้าห้อง (<code>room_control_screen.dart</code>) จะเรียก <code>repository.enterSetupMode(deviceId)</code> ก่อน ซึ่งยิง <code>POST /air-conditioners/&lt;deviceId&gt;/setup-mode</code> ให้ Backend Publish คำสั่ง <code>{"action":"enter_setup",...}</code> ไปที่ <code>rmutt/ac/&lt;deviceId&gt;/command</code> บอร์ดจึงเปิด BLE ชั่วคราว แอปรอ 1.2 วินาทีแล้วเปิดหน้าจอนี้ ถ้าคำสั่งนี้ล้มเหลว (เช่นบอร์ดออฟไลน์) แอปแนะนำให้ลองค้นหาเลย เพราะบอร์ดอาจอยู่ในโหมดกู้คืน Wi-Fi อยู่แล้ว หรือให้กด BOOT ค้างแล้ว RESET</p>
-<div class="callout note"><div class="callout-title">หมายเหตุ</div><p>** บอร์ดที่ถูกลบในแอปกลับมาโหมดตั้งค่าเอง** ถ้าแอดมินกด "Remove Unit" หรือลบเซ็นเซอร์ในหน้าห้องขณะบอร์ดออนไลน์ Backend ส่ง <code>{"action":"unprovision"}</code> ไปที่ topic <code>command</code> บอร์ดล้าง NVS แล้วรีบูตเข้าโหมดตั้งค่าบลูทูธ จึงนำบอร์ดไปติดห้องอื่นด้วยหน้าจอนี้ได้ทันที (เหมือนบอร์ดใหม่ ไม่ต้องกด "ตั้งค่าใหม่") ถ้าบอร์ดออฟไลน์ตอนลบ บอร์ดยังจำค่าเดิม ต้องรีเซ็ตที่ตัวบอร์ด รายละเอียดอยู่ในบทหน้าจอหลัก หัวข้อลบแอร์หรือเซ็นเซอร์</p></div>
+<div class="callout note"><div class="callout-title">หมายเหตุ</div><p>** บอร์ดที่ถูกลบในแอปกลับมาโหมดตั้งค่าเอง** ถ้าแอดมินกด "Remove Unit" หรือลบเซ็นเซอร์ในหน้าห้องขณะบอร์ดออนไลน์ Backend ส่ง <code>{"action":"unprovision"}</code> ไปที่ topic <code>command</code> บอร์ดล้าง NVS แล้วรีบูตเข้าโหมดตั้งค่าบลูทูธ จึงนำบอร์ดไปติดห้องอื่นด้วยหน้าจอนี้ได้ทันที (เหมือนบอร์ดใหม่ ไม่ต้องกด "ตั้งค่าใหม่") ถ้าบอร์ดออฟไลน์ตอนลบ บอร์ดยังจำค่าเดิมจนกว่าจะกลับมาออนไลน์ แล้วจะล้างตัวเองเมื่อ Broker ปฏิเสธบัญชีที่ถูกลบต่อเนื่องครบ 2 นาที (บทโปรโตคอล) ถ้าไม่กลับมาออนไลน์ต้องรีเซ็ตที่ตัวบอร์ด</p></div>
 
 <hr />
 <h2 id="การจัดการข้อผิดพลาด-และการแก้ปัญหาบน-windows">การจัดการข้อผิดพลาด และการแก้ปัญหาบน Windows<a class="anchor" href="#การจัดการข้อผิดพลาด-และการแก้ปัญหาบน-windows">#</a></h2>
@@ -1656,7 +1656,7 @@
 </table></div>
 <div class="callout why"><div class="callout-title">ทำไม · <span class="ct">ทำไมไม่ให้แอดมินตั้งเกณฑ์เอง</span></div><p>เกณฑ์ "พลังงานเป้าหมายนิ่ง" ของเรดาร์ LD2410 เป็นค่าที่ต้องทดลองกับห้องจริง ถ้าให้ตั้งเองรายห้องจะเพิ่มโอกาสตั้งผิดจนระบบปิดแอร์ใส่คนที่นั่งอยู่ ค่าที่ใช้ตัดสินจริงจึงฝังอยู่ในเฟิร์มแวร์ (<code>STATIC_ENERGY_THRESHOLD</code> ใน <code>.ino</code>) ส่วนค่าที่ Backend ส่งใน JSON ตอนตั้งค่า บอร์ดไม่ได้อ่าน หน้าจอแค่แสดงกฎให้รู้</p></div>
 
-<div class="callout warn"><div class="callout-title">ระวัง · <span class="ct">ค่าที่แสดงกับค่าที่บอร์ดใช้ไม่ตรงกัน</span></div><p>เฟิร์มแวร์ตรวจคน 1.3.3 ลดเกณฑ์เป็น <strong>15</strong> (ไวขึ้น) แต่ Backend ยังเป็น 25 แอปและเว็บจึงแสดง "เกณฑ์ 25" ทั้งที่บอร์ดใช้ 15 บอร์ดส่ง <code>"staticThreshold":15</code> มากับ <code>/status</code> อยู่แล้ว แต่ Backend ไม่ได้บันทึกฟิลด์นี้ ถ้าอาจารย์ถาม ให้ตอบตามเฟิร์มแวร์ (15) และบอกว่าค่าที่แสดงยังไม่ได้ปรับตาม</p></div>
+<div class="callout warn"><div class="callout-title">ระวัง · <span class="ct">ค่าที่แสดงกับค่าที่บอร์ดใช้ไม่ตรงกัน</span></div><p>เฟิร์มแวร์ตรวจคนใช้เกณฑ์ <strong>15</strong> แต่ Backend ยังเป็น 25 แอปและเว็บจึงแสดง "เกณฑ์ 25" ทั้งที่บอร์ดใช้ 15 บอร์ดส่ง <code>"staticThreshold":15</code> มากับ <code>/status</code> อยู่แล้ว แต่ Backend ไม่ได้บันทึกฟิลด์นี้ ถ้าอาจารย์ถาม ให้ตอบตามเฟิร์มแวร์ (15) และบอกว่าค่าที่แสดงยังไม่ได้ปรับตาม</p></div>
 
 <hr />
 <h2 id="room_management_screendart--จัดการห้อง">room_management_screen.dart — จัดการห้อง<a class="anchor" href="#room_management_screendart--จัดการห้อง">#</a></h2>
@@ -2388,7 +2388,7 @@
 </li>
 <li>
 <p><strong>ถาม:</strong> บอร์ดที่ถูกลบออกจากห้องในแอป จะเอาไปตั้งค่าห้องใหม่ได้เลยไหม?
-    <strong>ตอบ:</strong> ได้ ถ้าตอนลบบอร์ดออนไลน์อยู่ Backend ส่ง <code>{"action":"unprovision"}</code> ให้บอร์ดก่อนลบบัญชี MQTT บอร์ดล้าง NVS แล้วรีบูตเข้าโหมดตั้งค่าบลูทูธเอง หน้าตั้งค่า BLE จะเห็นบอร์ดนี้เหมือนบอร์ดใหม่ ไม่ต้องกด "ตั้งค่าใหม่" ก่อน แต่ถ้าบอร์ดออฟไลน์ตอนลบ บอร์ดยังจำค่าเดิม ต้องกด BOOT ค้าง + RESET หรือแฟลช <code>reset.ino</code> ส่วนแอปเองไม่ได้แสดงว่าบอร์ดถูกล้างแล้วหรือยัง (<code>boardCleared</code> ไม่ถูกอ่าน)</p>
+    <strong>ตอบ:</strong> ได้ ถ้าตอนลบบอร์ดออนไลน์อยู่ Backend ส่ง <code>{"action":"unprovision"}</code> ให้บอร์ดก่อนลบบัญชี MQTT บอร์ดล้าง NVS แล้วรีบูตเข้าโหมดตั้งค่าบลูทูธเอง หน้าตั้งค่า BLE จะเห็นบอร์ดนี้เหมือนบอร์ดใหม่ ไม่ต้องกด "ตั้งค่าใหม่" ก่อน แต่ถ้าบอร์ดออฟไลน์ตอนลบ บอร์ดจะล้างตัวเองเมื่อกลับมาออนไลน์แล้วถูก Broker ปฏิเสธบัญชีต่อเนื่องครบ 2 นาที ถ้าไม่กลับมาออนไลน์เลยต้องกด BOOT ค้าง + RESET หรือแฟลช <code>reset.ino</code> ส่วนแอปเองไม่ได้แสดงว่าบอร์ดถูกล้างแล้วหรือยัง (<code>boardCleared</code> ไม่ถูกอ่าน)</p>
 </li>
 </ol>
 <h2 id="สรุปและเช็กลิสต์ความเข้าใจ">สรุปและเช็กลิสต์ความเข้าใจ<a class="anchor" href="#สรุปและเช็กลิสต์ความเข้าใจ">#</a></h2>

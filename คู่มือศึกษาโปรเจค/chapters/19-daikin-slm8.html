@@ -94,7 +94,7 @@
 </tr>
 <tr>
 <td>เฟิร์มแวร์บอร์ดสายแอร์</td>
-<td>✅ รุ่น <code>2.5.2-slm8</code> (รองรับคำสั่ง <code>unprovision</code>)</td>
+<td>✅ รุ่น <code>2.5.5-slm8</code> (รองรับคำสั่ง <code>unprovision</code>)</td>
 </tr>
 <tr>
 <td>ส่งเฟรมทุก 1 วินาทีใน FreeRTOS task แยก</td>
@@ -148,8 +148,8 @@
 <tbody>
 <tr>
 <td><code>rmutt_esp32_air_wired.ino</code></td>
-<td>2031</td>
-<td>เฟิร์มแวร์หลัก <code>2.5.2-slm8</code> แตกมาจากบอร์ด IR เปลี่ยนเฉพาะช่องทางสั่งแอร์ + DHT11 + สถานะจากแอร์</td>
+<td>2067</td>
+<td>เฟิร์มแวร์หลัก <code>2.5.5-slm8</code> แตกมาจากบอร์ด IR เปลี่ยนเฉพาะช่องทางสั่งแอร์ + DHT11 + สถานะจากแอร์</td>
 </tr>
 <tr>
 <td><code>DaikinSLM8.h</code></td>
@@ -184,7 +184,7 @@
 <tr>
 <td><code>oled_display.h</code>, <code>oled_ui.h</code></td>
 <td>—</td>
-<td>จอ OLED (ดูบทเฟิร์มแวร์ ส่วนจอ OLED) บอร์ดนี้เพิ่มป้าย <code>BUS</code> และ <code>COMP ON</code></td>
+<td>จอ OLED (ดูบทเฟิร์มแวร์ ส่วนจอ OLED) บอร์ดนี้เพิ่มป้าย <code>BUS</code> และ <code>COMP ON</code> และหมุนจอ 180° (<code>OLED_ROTATE_180 true</code>)</td>
 </tr>
 </tbody>
 </table></div>
@@ -370,7 +370,7 @@ IR ส่งได้ทางเดียว ระบบไม่มีทา�
 <td>8</td>
 <td><code>wired_bus.h</code> + <code>rmutt_esp32_air_wired.ino</code></td>
 <td>ใช้งานจริงร่วมกับแอปได้ไหม</td>
-<td>บอร์ดสายแอร์ <code>2.5.1-slm8</code></td>
+<td>บอร์ดสายแอร์ <code>2.5.5-slm8</code></td>
 </tr>
 </tbody>
 </table></div>
@@ -2552,7 +2552,7 @@ b7 = (s mod 16) &lt;&lt; 4          ← ผลอยู่ใน nibble บน, 
 <span class="normal">79</span>
 <span class="normal">80</span>
 <span class="normal">81</span>
-<span class="normal">82</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">constexpr</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="n">FIRMWARE_VERSION</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"2.5.2-slm8"</span><span class="p">;</span>
+<span class="normal">82</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">constexpr</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="n">FIRMWARE_VERSION</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"2.5.5-slm8"</span><span class="p">;</span>
 <span class="c1">// บอกแอปว่าเป็นบอร์ดสายแอร์ ยี่ห้อไหน (แอปแสดงให้ผู้ใช้เห็น ไม่ให้เลือกยี่ห้อ IR)</span>
 <span class="k">constexpr</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="n">CONTROL_TYPE</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"wired"</span><span class="p">;</span>
 <span class="k">constexpr</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="n">AIR_BRAND</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"Daikin"</span><span class="p">;</span>
@@ -2586,7 +2586,7 @@ b7 = (s mod 16) &lt;&lt; 4          ← ผลอยู่ใน nibble บน, 
 </tr>
 <tr>
 <td>78</td>
-<td>เวอร์ชัน <code>2.5.2-slm8</code> ส่วน <code>-slm8</code> ทำให้แยกจากเวอร์ชันบอร์ด IR ได้ทันที</td>
+<td>เวอร์ชัน <code>2.5.5-slm8</code> ส่วน <code>-slm8</code> ทำให้แยกจากเวอร์ชันบอร์ด IR ได้ทันที</td>
 </tr>
 <tr>
 <td>80–82</td>
@@ -2662,14 +2662,14 @@ b7 = (s mod 16) &lt;&lt; 4          ← ผลอยู่ใน nibble บน, 
 </tbody>
 </table></div>
 <h3 id="setup-ค่าที่จำไว้ส่งตั้งแต่เฟรมแรก"><code>setup()</code>: ค่าที่จำไว้ส่งตั้งแต่เฟรมแรก<a class="anchor" href="#setup-ค่าที่จำไว้ส่งตั้งแต่เฟรมแรก">#</a></h3>
-<p><strong>ไฟล์ <code>firmware/rmutt_esp32_air_wired/rmutt_esp32_air_wired.ino</code> บรรทัด 472–478</strong></p>
-<div class="code-block"><span class="code-lang">cpp</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">472</span>
-<span class="normal">473</span>
-<span class="normal">474</span>
-<span class="normal">475</span>
+<p><strong>ไฟล์ <code>firmware/rmutt_esp32_air_wired/rmutt_esp32_air_wired.ino</code> บรรทัด 475–481</strong></p>
+<div class="code-block"><span class="code-lang">cpp</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">475</span>
 <span class="normal">476</span>
 <span class="normal">477</span>
-<span class="normal">478</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="w">  </span><span class="n">initHistoryLog</span><span class="p">();</span>
+<span class="normal">478</span>
+<span class="normal">479</span>
+<span class="normal">480</span>
+<span class="normal">481</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="w">  </span><span class="n">initHistoryLog</span><span class="p">();</span>
 <span class="w">  </span><span class="n">loadConfig</span><span class="p">();</span>
 <span class="w">  </span><span class="n">loadAirState</span><span class="p">();</span>
 <span class="w">  </span><span class="c1">// ค่าที่จำไว้ส่งตั้งแต่เฟรมแรก: บอร์ดรีบูตแล้วแอร์ทำงานต่อเหมือนเดิม ไม่ดับเอง</span>
@@ -2688,26 +2688,26 @@ b7 = (s mod 16) &lt;&lt; 4          ← ผลอยู่ใน nibble บน, 
 </thead>
 <tbody>
 <tr>
-<td>472–474</td>
-<td>เตรียมพื้นที่ข้อมูลย้อนหลัง โหลดค่าตั้ง (Wi-Fi/MQTT/ห้อง) และ <strong>สถานะแอร์ล่าสุด</strong> จาก NVS namespace <code>rmutt-state</code> (<code>loadAirState()</code> บรรทัด 662–677)</td>
+<td>475–477</td>
+<td>เตรียมพื้นที่ข้อมูลย้อนหลัง โหลดค่าตั้ง (Wi-Fi/MQTT/ห้อง) และ <strong>สถานะแอร์ล่าสุด</strong> จาก NVS namespace <code>rmutt-state</code> (<code>loadAirState()</code> บรรทัด 665–680)</td>
 </tr>
 <tr>
-<td>476</td>
+<td>479</td>
 <td>ผ่าน <code>normalizeAirState()</code> ก่อน เผื่อ NVS เก็บค่าที่สายแอร์ทำไม่ได้ (เช่น ตั้งด้วยเฟิร์มแวร์ IR มาก่อน) ส่ง <code>airState</code> เป็นทั้งค่าใหม่และค่าเดิม</td>
 </tr>
 <tr>
-<td>477</td>
-<td>เริ่ม task สายแอร์ด้วยค่าที่จำไว้ <strong>ก่อน</strong> ต่อ Wi-Fi (บรรทัด 491) แอร์จึงได้เฟรมภายในวินาทีแรก แม้เน็ตยังไม่มา หรือบอร์ดเข้าโหมดตั้งค่า BLE</td>
+<td>480</td>
+<td>เริ่ม task สายแอร์ด้วยค่าที่จำไว้ <strong>ก่อน</strong> ต่อ Wi-Fi (บรรทัด 494) แอร์จึงได้เฟรมภายในวินาทีแรก แม้เน็ตยังไม่มา หรือบอร์ดเข้าโหมดตั้งค่า BLE</td>
 </tr>
 <tr>
-<td>478</td>
+<td>481</td>
 <td>เริ่มไลบรารี DHT11</td>
 </tr>
 </tbody>
 </table></div>
 <div class="callout why"><div class="callout-title">ทำไม</div><p><strong>ทำไมรีบูตแล้วแอร์ไม่ดับ</strong> สายแอร์ต่างจาก IR ตรงที่แอร์ "ฟัง" ตลอดเวลา ถ้าหลังบูตบอร์ดส่งค่าเริ่มต้นของ <code>Settings</code> (ปิด) แอร์ที่กำลังเย็นอยู่จะดับทุกครั้งที่บอร์ดรีบูต เช่น หลัง OTA หรือไฟกระพริบ การส่งค่าที่จำไว้ตั้งแต่เฟรมแรกทำให้แอร์ไม่รู้ด้วยซ้ำว่าบอร์ดเพิ่งรีบูต ส่วนบอร์ด IR ไม่มีปัญหานี้เพราะไม่ยิงอะไรตอนบูต</p></div>
 
-<p>ใน <code>loop()</code> สิ่งเดียวที่เพิ่มคือบรรทัด 503 <code>readRoomTemperature();</code> ซึ่งวางไว้ก่อนการตรวจ Wi-Fi/BLE เพื่อให้อ่านอุณหภูมิห้องต่อได้แม้บอร์ดอยู่ในโหมดกู้ Wi-Fi ส่วนการส่งเฟรมไม่ได้อยู่ใน <code>loop()</code> เลย (อยู่ใน task)</p>
+<p>ใน <code>loop()</code> สิ่งเดียวที่เพิ่มคือบรรทัด 506 <code>readRoomTemperature();</code> ซึ่งวางไว้ก่อนการตรวจ Wi-Fi/BLE เพื่อให้อ่านอุณหภูมิห้องต่อได้แม้บอร์ดอยู่ในโหมดกู้ Wi-Fi ส่วนการส่งเฟรมไม่ได้อยู่ใน <code>loop()</code> เลย (อยู่ใน task)</p>
 <h3 id="คำสั่ง-mqtt-กลายเป็นเฟรมอย่างไร">คำสั่ง MQTT กลายเป็นเฟรมอย่างไร<a class="anchor" href="#คำสั่ง-mqtt-กลายเป็นเฟรมอย่างไร">#</a></h3>
 <p>ลำดับเมื่อผู้ใช้กดในแอป (รูปแบบ JSON ของ <code>command</code> เหมือนบอร์ด IR ดูบทโปรโตคอล)</p>
 <ol>
@@ -2718,11 +2718,11 @@ b7 = (s mod 16) &lt;&lt; 4          ← ผลอยู่ใน nibble บน, 
 <li><code>sendCurrentAirState()</code> → <code>wiredBus.apply()</code> → เฟรมใหม่ออกสายภายใน 1 วินาที พร้อมแฟล็กคำสั่งใหม่ 4 เฟรม</li>
 <li><code>publishState()</code> ส่งค่าที่ <strong>ปรับแล้ว</strong> กลับ topic <code>.../state</code> แอปจึงเห็นสิ่งที่แอร์ทำจริง</li>
 </ol>
-<p><strong>ไฟล์ <code>firmware/rmutt_esp32_air_wired/rmutt_esp32_air_wired.ino</code> บรรทัด 1359–1362 (ท้าย <code>processMqttCommand()</code>)</strong></p>
-<div class="code-block"><span class="code-lang">cpp</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1359</span>
-<span class="normal">1360</span>
-<span class="normal">1361</span>
-<span class="normal">1362</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="w">  </span><span class="n">normalizeAirState</span><span class="p">(</span><span class="n">airState</span><span class="p">,</span><span class="w"> </span><span class="n">previousState</span><span class="p">);</span>
+<p><strong>ไฟล์ <code>firmware/rmutt_esp32_air_wired/rmutt_esp32_air_wired.ino</code> บรรทัด 1395–1398 (ท้าย <code>processMqttCommand()</code>)</strong></p>
+<div class="code-block"><span class="code-lang">cpp</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1395</span>
+<span class="normal">1396</span>
+<span class="normal">1397</span>
+<span class="normal">1398</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="w">  </span><span class="n">normalizeAirState</span><span class="p">(</span><span class="n">airState</span><span class="p">,</span><span class="w"> </span><span class="n">previousState</span><span class="p">);</span>
 <span class="w">  </span><span class="n">saveAirState</span><span class="p">();</span>
 <span class="w">  </span><span class="n">sendCurrentAirState</span><span class="p">(</span><span class="o">&amp;</span><span class="n">previousState</span><span class="p">);</span>
 <span class="w">  </span><span class="n">publishState</span><span class="p">(</span><span class="n">document</span><span class="p">[</span><span class="s">"commandId"</span><span class="p">]</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="s">""</span><span class="p">);</span>
@@ -2730,28 +2730,28 @@ b7 = (s mod 16) &lt;&lt; 4          ← ผลอยู่ใน nibble บน, 
 </div>
 
 <p>ลำดับสำคัญ: ปรับค่าก่อนบันทึก ก่อนส่ง และก่อนตอบ ทั้งสามที่จึงเห็นค่าเดียวกัน ถ้าปรับหลังบันทึก NVS จะเก็บค่าที่แอร์ทำไม่ได้ ถ้าตอบก่อนปรับ แอปจะแสดง "Turbo" ทั้งที่แอร์เดิน High</p>
-<p><strong>ไฟล์ <code>firmware/rmutt_esp32_air_wired/rmutt_esp32_air_wired.ino</code> บรรทัด 1371–1391</strong></p>
-<div class="code-block"><span class="code-lang">cpp</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1371</span>
-<span class="normal">1372</span>
-<span class="normal">1373</span>
-<span class="normal">1374</span>
-<span class="normal">1375</span>
-<span class="normal">1376</span>
-<span class="normal">1377</span>
-<span class="normal">1378</span>
-<span class="normal">1379</span>
-<span class="normal">1380</span>
-<span class="normal">1381</span>
-<span class="normal">1382</span>
-<span class="normal">1383</span>
-<span class="normal">1384</span>
-<span class="normal">1385</span>
-<span class="normal">1386</span>
-<span class="normal">1387</span>
-<span class="normal">1388</span>
-<span class="normal">1389</span>
-<span class="normal">1390</span>
-<span class="normal">1391</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">normalizeAirState</span><span class="p">(</span><span class="n">AirState</span><span class="w"> </span><span class="o">&amp;</span><span class="n">state</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">AirState</span><span class="w"> </span><span class="o">&amp;</span><span class="n">previous</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<p><strong>ไฟล์ <code>firmware/rmutt_esp32_air_wired/rmutt_esp32_air_wired.ino</code> บรรทัด 1407–1427</strong></p>
+<div class="code-block"><span class="code-lang">cpp</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1407</span>
+<span class="normal">1408</span>
+<span class="normal">1409</span>
+<span class="normal">1410</span>
+<span class="normal">1411</span>
+<span class="normal">1412</span>
+<span class="normal">1413</span>
+<span class="normal">1414</span>
+<span class="normal">1415</span>
+<span class="normal">1416</span>
+<span class="normal">1417</span>
+<span class="normal">1418</span>
+<span class="normal">1419</span>
+<span class="normal">1420</span>
+<span class="normal">1421</span>
+<span class="normal">1422</span>
+<span class="normal">1423</span>
+<span class="normal">1424</span>
+<span class="normal">1425</span>
+<span class="normal">1426</span>
+<span class="normal">1427</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">normalizeAirState</span><span class="p">(</span><span class="n">AirState</span><span class="w"> </span><span class="o">&amp;</span><span class="n">state</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">AirState</span><span class="w"> </span><span class="o">&amp;</span><span class="n">previous</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">state</span><span class="p">.</span><span class="n">mode</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="s">"cool"</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">state</span><span class="p">.</span><span class="n">mode</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="s">"dry"</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">state</span><span class="p">.</span><span class="n">mode</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="s">"fan"</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="n">Serial</span><span class="p">.</span><span class="n">printf</span><span class="p">(</span><span class="s">"Wired: mode '%s' is not available on this unit, keeping '%s'</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span>
 <span class="w">                  </span><span class="n">state</span><span class="p">.</span><span class="n">mode</span><span class="p">.</span><span class="n">c_str</span><span class="p">(),</span><span class="w"> </span><span class="n">previous</span><span class="p">.</span><span class="n">mode</span><span class="p">.</span><span class="n">c_str</span><span class="p">());</span>
@@ -2784,60 +2784,60 @@ b7 = (s mod 16) &lt;&lt; 4          ← ผลอยู่ใน nibble บน, 
 </thead>
 <tbody>
 <tr>
-<td>1372–1376</td>
+<td>1408–1412</td>
 <td>โหมดที่ไม่ใช่ Cool/Dry/Fan (เช่น Auto, Heat) ไม่เปลี่ยนเป็นค่ามั่ว แต่ <strong>คงโหมดเดิม</strong> (ถ้าเดิมก็ใช้ไม่ได้ ใช้ Cool) แอร์รุ่นนี้ทำความเย็นอย่างเดียว</td>
 </tr>
 <tr>
-<td>1377–1378</td>
+<td>1413–1414</td>
 <td>บีบอุณหภูมิ 16–30°C ตามช่วงของ panel</td>
 </tr>
 <tr>
-<td>1379–1382</td>
+<td>1415–1418</td>
 <td>Turbo → High, ค่าแปลก ๆ → Auto</td>
 </tr>
 <tr>
-<td>1384</td>
+<td>1420</td>
 <td>ตำแหน่งใบพัด (top/upper/middle/lower/bottom) ไม่มีบนสายนี้ มีแค่ "ส่าย" กับ "หยุด"</td>
 </tr>
 <tr>
-<td>1385–1389</td>
+<td>1421–1425</td>
 <td>ปิดฟังก์ชันที่ panel ไม่มี: ส่ายแนวนอน, Eco, Turbo, Quiet, Clean</td>
 </tr>
 <tr>
-<td>1390</td>
+<td>1426</td>
 <td>Sleep ในโหมด Dry ปิด ตรงกับพฤติกรรมของ panel ที่สังเกตได้ในขั้นที่ 6</td>
 </tr>
 </tbody>
 </table></div>
-<p><strong>ไฟล์ <code>firmware/rmutt_esp32_air_wired/rmutt_esp32_air_wired.ino</code> บรรทัด 1393–1420</strong></p>
-<div class="code-block"><span class="code-lang">cpp</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1393</span>
-<span class="normal">1394</span>
-<span class="normal">1395</span>
-<span class="normal">1396</span>
-<span class="normal">1397</span>
-<span class="normal">1398</span>
-<span class="normal">1399</span>
-<span class="normal">1400</span>
-<span class="normal">1401</span>
-<span class="normal">1402</span>
-<span class="normal">1403</span>
-<span class="normal">1404</span>
-<span class="normal">1405</span>
-<span class="normal">1406</span>
-<span class="normal">1407</span>
-<span class="normal">1408</span>
-<span class="normal">1409</span>
-<span class="normal">1410</span>
-<span class="normal">1411</span>
-<span class="normal">1412</span>
-<span class="normal">1413</span>
-<span class="normal">1414</span>
-<span class="normal">1415</span>
-<span class="normal">1416</span>
-<span class="normal">1417</span>
-<span class="normal">1418</span>
-<span class="normal">1419</span>
-<span class="normal">1420</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">slm8</span><span class="o">::</span><span class="n">Settings</span><span class="w"> </span><span class="nf">toBusSettings</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">AirState</span><span class="w"> </span><span class="o">&amp;</span><span class="n">state</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<p><strong>ไฟล์ <code>firmware/rmutt_esp32_air_wired/rmutt_esp32_air_wired.ino</code> บรรทัด 1429–1456</strong></p>
+<div class="code-block"><span class="code-lang">cpp</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1429</span>
+<span class="normal">1430</span>
+<span class="normal">1431</span>
+<span class="normal">1432</span>
+<span class="normal">1433</span>
+<span class="normal">1434</span>
+<span class="normal">1435</span>
+<span class="normal">1436</span>
+<span class="normal">1437</span>
+<span class="normal">1438</span>
+<span class="normal">1439</span>
+<span class="normal">1440</span>
+<span class="normal">1441</span>
+<span class="normal">1442</span>
+<span class="normal">1443</span>
+<span class="normal">1444</span>
+<span class="normal">1445</span>
+<span class="normal">1446</span>
+<span class="normal">1447</span>
+<span class="normal">1448</span>
+<span class="normal">1449</span>
+<span class="normal">1450</span>
+<span class="normal">1451</span>
+<span class="normal">1452</span>
+<span class="normal">1453</span>
+<span class="normal">1454</span>
+<span class="normal">1455</span>
+<span class="normal">1456</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">slm8</span><span class="o">::</span><span class="n">Settings</span><span class="w"> </span><span class="nf">toBusSettings</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">AirState</span><span class="w"> </span><span class="o">&amp;</span><span class="n">state</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="n">slm8</span><span class="o">::</span><span class="n">Settings</span><span class="w"> </span><span class="n">s</span><span class="p">;</span>
 <span class="w">  </span><span class="n">s</span><span class="p">.</span><span class="n">power</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">state</span><span class="p">.</span><span class="n">power</span><span class="p">;</span>
 <span class="w">  </span><span class="n">s</span><span class="p">.</span><span class="n">setC</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">state</span><span class="p">.</span><span class="n">temperature</span><span class="p">;</span>
@@ -2877,27 +2877,27 @@ b7 = (s mod 16) &lt;&lt; 4          ← ผลอยู่ใน nibble บน, 
 </thead>
 <tbody>
 <tr>
-<td>1393–1407</td>
+<td>1429–1443</td>
 <td><code>toBusSettings()</code> แปลงชื่อแบบแอป (<code>"dry"</code>, <code>"low"</code>) เป็นค่าบนสาย (<code>MODE_DRY</code> = <code>0x20</code>, <code>FAN_1</code> = <code>0x04</code>) ด้วยตัวดำเนินการสามทาง <code>เงื่อนไข ? ค่า1 : ค่า2</code> ต่อกันเป็นลูกโซ่</td>
 </tr>
 <tr>
-<td>1404</td>
+<td>1440</td>
 <td>ส่ายเมื่อ <code>verticalSwing</code> ไม่ใช่ <code>"off"</code></td>
 </tr>
 <tr>
-<td>1409</td>
+<td>1445</td>
 <td>พารามิเตอร์ <code>previousState</code> ไม่ได้ใช้ แต่คงไว้ให้หน้าตาเหมือน <code>sendCurrentIrState()</code> ของบอร์ด IR จุดที่เรียกทั้งหมด (<code>processTimers()</code>, <code>processDailySchedule()</code>) จึงแทบไม่ต้องแก้</td>
 </tr>
 <tr>
-<td>1410</td>
+<td>1446</td>
 <td>ส่งค่าให้ task สายแอร์ผ่าน mutex ฟังก์ชันนี้ <strong>ไม่รอ</strong> ให้เฟรมส่งเสร็จ เฟรมออกในรอบถัดไปของ task</td>
 </tr>
 <tr>
-<td>1411</td>
+<td>1447</td>
 <td><code>poke()</code> ให้จอ OLED วาดใหม่ทันที</td>
 </tr>
 <tr>
-<td>1412–1419</td>
+<td>1448–1455</td>
 <td>พิมพ์ลง Serial เป็นหลักฐานตอนทดสอบ (<code>Wired sent: power=ON ...</code> ตาม README)</td>
 </tr>
 </tbody>
@@ -2975,20 +2975,20 @@ b7 = (s mod 16) &lt;&lt; 4          ← ผลอยู่ใน nibble บน, 
 </tbody>
 </table></div>
 <h3 id="อุณหภูมิห้องจาก-dht11">อุณหภูมิห้องจาก DHT11<a class="anchor" href="#อุณหภูมิห้องจาก-dht11">#</a></h3>
-<p><strong>ไฟล์ <code>firmware/rmutt_esp32_air_wired/rmutt_esp32_air_wired.ino</code> บรรทัด 1422–1434</strong></p>
-<div class="code-block"><span class="code-lang">cpp</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1422</span>
-<span class="normal">1423</span>
-<span class="normal">1424</span>
-<span class="normal">1425</span>
-<span class="normal">1426</span>
-<span class="normal">1427</span>
-<span class="normal">1428</span>
-<span class="normal">1429</span>
-<span class="normal">1430</span>
-<span class="normal">1431</span>
-<span class="normal">1432</span>
-<span class="normal">1433</span>
-<span class="normal">1434</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c1">// DHT11 อ่านทุก 5 วินาที ในช่วงที่สายแอร์ว่าง (ไลบรารีปิด interrupt ระหว่างอ่าน)</span>
+<p><strong>ไฟล์ <code>firmware/rmutt_esp32_air_wired/rmutt_esp32_air_wired.ino</code> บรรทัด 1458–1470</strong></p>
+<div class="code-block"><span class="code-lang">cpp</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1458</span>
+<span class="normal">1459</span>
+<span class="normal">1460</span>
+<span class="normal">1461</span>
+<span class="normal">1462</span>
+<span class="normal">1463</span>
+<span class="normal">1464</span>
+<span class="normal">1465</span>
+<span class="normal">1466</span>
+<span class="normal">1467</span>
+<span class="normal">1468</span>
+<span class="normal">1469</span>
+<span class="normal">1470</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c1">// DHT11 อ่านทุก 5 วินาที ในช่วงที่สายแอร์ว่าง (ไลบรารีปิด interrupt ระหว่างอ่าน)</span>
 <span class="kt">void</span><span class="w"> </span><span class="nf">readRoomTemperature</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">millis</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">lastDhtReadAt</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">DHT_READ_INTERVAL_MS</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="p">;</span>
 <span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">wiredBus</span><span class="p">.</span><span class="n">quietWindow</span><span class="p">())</span><span class="w"> </span><span class="k">return</span><span class="p">;</span>
@@ -3013,44 +3013,44 @@ b7 = (s mod 16) &lt;&lt; 4          ← ผลอยู่ใน nibble บน, 
 </thead>
 <tbody>
 <tr>
-<td>1422</td>
+<td>1458</td>
 <td>คอมเมนต์บอกเหตุผล: ไลบรารี DHT <strong>ปิด interrupt ชั่วครู่</strong> ระหว่างอ่านบิตจากเซนเซอร์ ซึ่งชนกับตัวรับสายแอร์ที่พึ่ง interrupt ทุกขอบ</td>
 </tr>
 <tr>
-<td>1424</td>
+<td>1460</td>
 <td>อ่านอย่างมากทุก 5 วินาที (DHT11 เองก็อ่านถี่กว่า 1 ครั้ง/วินาทีไม่ได้)</td>
 </tr>
 <tr>
-<td>1425</td>
+<td>1461</td>
 <td>ขอ "ช่วงเงียบ" จาก <code>wiredBus</code> ก่อน</td>
 </tr>
 <tr>
-<td>1426</td>
+<td>1462</td>
 <td>จำเวลาก่อนอ่าน อ่านพลาดก็รอ 5 วินาทีเหมือนกัน ไม่รัวอ่านซ้ำ</td>
 </tr>
 <tr>
-<td>1428–1431</td>
+<td>1464–1467</td>
 <td>อ่านพลาดได้ <code>NaN</code> ไม่ส่งค่าเสียให้แอร์ แอร์ได้ค่าดีล่าสุดต่อไป</td>
 </tr>
 <tr>
-<td>1432–1433</td>
+<td>1468–1469</td>
 <td>บวกค่าชดเชย เก็บไว้รายงาน แล้วส่งให้ task สายแอร์ใช้ในเฟรมถัดไป (ปัดเป็นจำนวนเต็มใน <code>setRoomTemp()</code>)</td>
 </tr>
 </tbody>
 </table></div>
-<div class="callout warn"><div class="callout-title">ระวัง</div><p><strong>ข้อสังเกตจากการอ่านโค้ด เรื่องช่วงเงียบ:</strong> <code>quietWindow()</code> จะรู้ว่า "เพิ่งส่งเฟรม" ได้ก็ต่อเมื่อถูกเรียกบ่อย แต่ <code>readRoomTemperature()</code> เรียกมันเฉพาะหลังครบ 5 วินาทีแล้ว (บรรทัด 1424 return ก่อน) ครั้งแรกที่เรียกหลังครบ 5 วินาที จำนวนเฟรมเปลี่ยนไปแล้วเสมอ จึงตอบว่า "อยู่ในช่วงเงียบ" ทันทีไม่ว่าเฟรมจะส่งไปเมื่อไร ผลคือการอ่าน DHT11 ไม่ได้ตรงจังหวะหลังเฟรมจริง ผลเสียที่เป็นไปได้มีเล็กน้อย: เฟรมสถานะของแอร์ที่บังเอิญมาตรงช่วงนั้นอาจเสีย 1 เฟรม (<code>busOk</code> ทน 3 วินาที จึงไม่เตือนผิด) หรือ DHT11 อ่านพลาดเพราะ task แทรกระหว่างอ่าน (รอบหน้าอ่านใหม่) ถ้าจะให้ตรงตามเจตนา ให้เรียก <code>wiredBus.quietWindow()</code> ทุกรอบ <code>loop()</code> ก่อนเช็ก 5 วินาที อีกเรื่องคือแอร์ส่งเฟรมสถานะตามจังหวะของตัวเอง ไม่ล็อกกับเฟรมของเรา ช่วงเงียบจึงกันได้เฉพาะเฟรมฝั่งเรา</p></div>
+<div class="callout warn"><div class="callout-title">ระวัง</div><p><strong>ข้อสังเกตจากการอ่านโค้ด เรื่องช่วงเงียบ:</strong> <code>quietWindow()</code> จะรู้ว่า "เพิ่งส่งเฟรม" ได้ก็ต่อเมื่อถูกเรียกบ่อย แต่ <code>readRoomTemperature()</code> เรียกมันเฉพาะหลังครบ 5 วินาทีแล้ว (บรรทัด 1460 return ก่อน) ครั้งแรกที่เรียกหลังครบ 5 วินาที จำนวนเฟรมเปลี่ยนไปแล้วเสมอ จึงตอบว่า "อยู่ในช่วงเงียบ" ทันทีไม่ว่าเฟรมจะส่งไปเมื่อไร ผลคือการอ่าน DHT11 ไม่ได้ตรงจังหวะหลังเฟรมจริง ผลเสียที่เป็นไปได้มีเล็กน้อย: เฟรมสถานะของแอร์ที่บังเอิญมาตรงช่วงนั้นอาจเสีย 1 เฟรม (<code>busOk</code> ทน 3 วินาที จึงไม่เตือนผิด) หรือ DHT11 อ่านพลาดเพราะ task แทรกระหว่างอ่าน (รอบหน้าอ่านใหม่) ถ้าจะให้ตรงตามเจตนา ให้เรียก <code>wiredBus.quietWindow()</code> ทุกรอบ <code>loop()</code> ก่อนเช็ก 5 วินาที อีกเรื่องคือแอร์ส่งเฟรมสถานะตามจังหวะของตัวเอง ไม่ล็อกกับเฟรมของเรา ช่วงเงียบจึงกันได้เฉพาะเฟรมฝั่งเรา</p></div>
 
 <h3 id="สถานะที่ส่งขึ้น-mqtt">สถานะที่ส่งขึ้น MQTT<a class="anchor" href="#สถานะที่ส่งขึ้น-mqtt">#</a></h3>
-<p><strong>ไฟล์ <code>firmware/rmutt_esp32_air_wired/rmutt_esp32_air_wired.ino</code> บรรทัด 1456–1464 (ใน <code>publishStatus()</code>)</strong></p>
-<div class="code-block"><span class="code-lang">cpp</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1456</span>
-<span class="normal">1457</span>
-<span class="normal">1458</span>
-<span class="normal">1459</span>
-<span class="normal">1460</span>
-<span class="normal">1461</span>
-<span class="normal">1462</span>
-<span class="normal">1463</span>
-<span class="normal">1464</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="w">  </span><span class="c1">// ค่าที่รุ่นสายแอร์มีเพิ่ม (Backend/แอปเดิมไม่อ่าน ไม่กระทบอะไร)</span>
+<p><strong>ไฟล์ <code>firmware/rmutt_esp32_air_wired/rmutt_esp32_air_wired.ino</code> บรรทัด 1492–1500 (ใน <code>publishStatus()</code>)</strong></p>
+<div class="code-block"><span class="code-lang">cpp</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1492</span>
+<span class="normal">1493</span>
+<span class="normal">1494</span>
+<span class="normal">1495</span>
+<span class="normal">1496</span>
+<span class="normal">1497</span>
+<span class="normal">1498</span>
+<span class="normal">1499</span>
+<span class="normal">1500</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="w">  </span><span class="c1">// ค่าที่รุ่นสายแอร์มีเพิ่ม (Backend/แอปเดิมไม่อ่าน ไม่กระทบอะไร)</span>
 <span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="n">WiredBus</span><span class="o">::</span><span class="n">Status</span><span class="w"> </span><span class="n">bus</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">wiredBus</span><span class="p">.</span><span class="n">status</span><span class="p">();</span>
 <span class="w">  </span><span class="n">document</span><span class="p">[</span><span class="s">"controlMode"</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CONTROL_TYPE</span><span class="p">;</span>
 <span class="w">  </span><span class="n">document</span><span class="p">[</span><span class="s">"airBrand"</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AIR_BRAND</span><span class="p">;</span>
@@ -3115,13 +3115,13 @@ b7 = (s mod 16) &lt;&lt; 4          ← ผลอยู่ใน nibble บน, 
 
 <h3 id="บอร์ดบอกตัวเองว่าเป็นบอร์ดสายแอร์">บอร์ดบอกตัวเองว่าเป็นบอร์ดสายแอร์<a class="anchor" href="#บอร์ดบอกตัวเองว่าเป็นบอร์ดสายแอร์">#</a></h3>
 <p>มี 3 จุดในเฟิร์มแวร์ที่ทำให้ทั้งระบบรู้ว่าบอร์ดนี้ไม่ใช่ IR โดยผู้ใช้ไม่ต้องเลือก</p>
-<p><strong>ไฟล์ <code>firmware/rmutt_esp32_air_wired/rmutt_esp32_air_wired.ino</code> บรรทัด 729–734 (ข้อมูล identity ทาง BLE)</strong></p>
-<div class="code-block"><span class="code-lang">cpp</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">729</span>
-<span class="normal">730</span>
-<span class="normal">731</span>
-<span class="normal">732</span>
+<p><strong>ไฟล์ <code>firmware/rmutt_esp32_air_wired/rmutt_esp32_air_wired.ino</code> บรรทัด 732–737 (ข้อมูล identity ทาง BLE)</strong></p>
+<div class="code-block"><span class="code-lang">cpp</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">732</span>
 <span class="normal">733</span>
-<span class="normal">734</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="w">  </span><span class="n">identity</span><span class="p">[</span><span class="s">"deviceId"</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">config</span><span class="p">.</span><span class="n">deviceId</span><span class="p">;</span>
+<span class="normal">734</span>
+<span class="normal">735</span>
+<span class="normal">736</span>
+<span class="normal">737</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="w">  </span><span class="n">identity</span><span class="p">[</span><span class="s">"deviceId"</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">config</span><span class="p">.</span><span class="n">deviceId</span><span class="p">;</span>
 <span class="w">  </span><span class="n">identity</span><span class="p">[</span><span class="s">"bleName"</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">config</span><span class="p">.</span><span class="n">bleName</span><span class="p">;</span>
 <span class="w">  </span><span class="n">identity</span><span class="p">[</span><span class="s">"firmwareVersion"</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FIRMWARE_VERSION</span><span class="p">;</span>
 <span class="w">  </span><span class="n">identity</span><span class="p">[</span><span class="s">"configured"</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">config</span><span class="p">.</span><span class="n">configured</span><span class="p">;</span>
@@ -3130,12 +3130,12 @@ b7 = (s mod 16) &lt;&lt; 4          ← ผลอยู่ใน nibble บน, 
 </code></pre></div></td></tr></table></div>
 </div>
 
-<p><strong>ไฟล์ <code>firmware/rmutt_esp32_air_wired/rmutt_esp32_air_wired.ino</code> บรรทัด 938–942 (ใน <code>processPendingConfig()</code>)</strong></p>
-<div class="code-block"><span class="code-lang">cpp</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">938</span>
-<span class="normal">939</span>
-<span class="normal">940</span>
-<span class="normal">941</span>
-<span class="normal">942</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">incoming</span><span class="p">.</span><span class="n">airProtocol</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">WIRED_PROTOCOL</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<p><strong>ไฟล์ <code>firmware/rmutt_esp32_air_wired/rmutt_esp32_air_wired.ino</code> บรรทัด 941–945 (ใน <code>processPendingConfig()</code>)</strong></p>
+<div class="code-block"><span class="code-lang">cpp</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">941</span>
+<span class="normal">942</span>
+<span class="normal">943</span>
+<span class="normal">944</span>
+<span class="normal">945</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">incoming</span><span class="p">.</span><span class="n">airProtocol</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">WIRED_PROTOCOL</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="n">Serial</span><span class="p">.</span><span class="n">printf</span><span class="p">(</span><span class="s">"BLE config: protocol %s -&gt; %s (บอร์ดสายแอร์)</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span>
 <span class="w">                  </span><span class="n">incoming</span><span class="p">.</span><span class="n">airProtocol</span><span class="p">.</span><span class="n">c_str</span><span class="p">(),</span><span class="w"> </span><span class="n">WIRED_PROTOCOL</span><span class="p">);</span>
 <span class="w">    </span><span class="n">incoming</span><span class="p">.</span><span class="n">airProtocol</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">WIRED_PROTOCOL</span><span class="p">;</span>
@@ -3143,9 +3143,9 @@ b7 = (s mod 16) &lt;&lt; 4          ← ผลอยู่ใน nibble บน, 
 </code></pre></div></td></tr></table></div>
 </div>
 
-<p><strong>ไฟล์ <code>firmware/rmutt_esp32_air_wired/rmutt_esp32_air_wired.ino</code> บรรทัด 625–626 (ใน <code>loadConfig()</code>)</strong></p>
-<div class="code-block"><span class="code-lang">cpp</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">625</span>
-<span class="normal">626</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="w">  </span><span class="c1">// ค่าเดิมใน NVS อาจเป็นยี่ห้อ IR ที่เลือกจากแอปรุ่นเก่า รุ่นนี้ใช้ DAIKIN_WIRED เสมอ</span>
+<p><strong>ไฟล์ <code>firmware/rmutt_esp32_air_wired/rmutt_esp32_air_wired.ino</code> บรรทัด 628–629 (ใน <code>loadConfig()</code>)</strong></p>
+<div class="code-block"><span class="code-lang">cpp</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">628</span>
+<span class="normal">629</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="w">  </span><span class="c1">// ค่าเดิมใน NVS อาจเป็นยี่ห้อ IR ที่เลือกจากแอปรุ่นเก่า รุ่นนี้ใช้ DAIKIN_WIRED เสมอ</span>
 <span class="w">  </span><span class="n">config</span><span class="p">.</span><span class="n">airProtocol</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">WIRED_PROTOCOL</span><span class="p">;</span>
 </code></pre></div></td></tr></table></div>
 </div>
@@ -3160,41 +3160,41 @@ b7 = (s mod 16) &lt;&lt; 4          ← ผลอยู่ใน nibble บน, 
 </thead>
 <tbody>
 <tr>
-<td>identity BLE บรรทัด 733–734</td>
+<td>identity BLE บรรทัด 736–737</td>
 <td>ส่ง <code>"controlType":"wired","brand":"Daikin"</code> ให้แอปตอนสแกน</td>
 <td>แอปล็อกช่องยี่ห้อเป็น "Daikin · สายแอร์" และส่ง <code>DAIKIN_WIRED</code> ไปจองกับ Backend (บอร์ด IR ส่ง <code>"ir"</code> บอร์ดเก่าไม่มีช่องนี้ = IR)</td>
 </tr>
 <tr>
-<td><code>processPendingConfig()</code> บรรทัด 938–942</td>
+<td><code>processPendingConfig()</code> บรรทัด 941–945</td>
 <td>ถ้าแอปส่งโปรโตคอลอื่นมา (แอปรุ่นเก่าที่ยังให้เลือกยี่ห้อ IR) เปลี่ยนเป็น <code>DAIKIN_WIRED</code> แทนการปฏิเสธ</td>
 <td>แอปเก่ายังตั้งค่าบอร์ดได้ แต่บอร์ดเก็บค่าที่ถูกเสมอ</td>
 </tr>
 <tr>
-<td><code>loadConfig()</code> บรรทัด 626</td>
+<td><code>loadConfig()</code> บรรทัด 629</td>
 <td>ไม่อ่านโปรโตคอลจาก NVS เลย ตั้งเป็น <code>DAIKIN_WIRED</code> ทุกครั้ง</td>
 <td>NVS อาจมีค่าจากเฟิร์มแวร์ IR ที่แฟลชไว้ก่อน</td>
 </tr>
 </tbody>
 </table></div>
-<p>นอกจากนี้ <code>isSaijoProtocol()</code> คืน <code>false</code> เสมอ และ <code>isSupportedAirProtocol()</code> รับทุกค่าที่ไม่ว่าง (บรรทัด 611–617) เพื่อให้โค้ดตรวจคำสั่งที่ยกมาจากบอร์ด IR ทำงานได้โดยไม่ต้องแก้</p>
+<p>นอกจากนี้ <code>isSaijoProtocol()</code> คืน <code>false</code> เสมอ และ <code>isSupportedAirProtocol()</code> รับทุกค่าที่ไม่ว่าง (บรรทัด 614–620) เพื่อให้โค้ดตรวจคำสั่งที่ยกมาจากบอร์ด IR ทำงานได้โดยไม่ต้องแก้</p>
 <h3 id="จอ-oled-ของบอร์ดสายแอร์">จอ OLED ของบอร์ดสายแอร์<a class="anchor" href="#จอ-oled-ของบอร์ดสายแอร์">#</a></h3>
 <p>จอเป็นไฟล์เดียวกับบอร์ด IR (อธิบายในบทเฟิร์มแวร์ ส่วนจอ OLED) บอร์ดสายแอร์ตั้ง <code>d.wired = true</code> แล้ว <code>oled_ui.h</code> จะแสดงป้าย <code>BUS</code> (ทึบ = แอร์ตอบ) และ <code>COMP ON</code> / <code>COMP --</code> ตอนแอร์เปิด</p>
-<p><strong>ไฟล์ <code>firmware/rmutt_esp32_air_wired/rmutt_esp32_air_wired.ino</code> บรรทัด 2016–2030 (ท้าย <code>refreshOled()</code>)</strong></p>
-<div class="code-block"><span class="code-lang">cpp</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">2016</span>
-<span class="normal">2017</span>
-<span class="normal">2018</span>
-<span class="normal">2019</span>
-<span class="normal">2020</span>
-<span class="normal">2021</span>
-<span class="normal">2022</span>
-<span class="normal">2023</span>
-<span class="normal">2024</span>
-<span class="normal">2025</span>
-<span class="normal">2026</span>
-<span class="normal">2027</span>
-<span class="normal">2028</span>
-<span class="normal">2029</span>
-<span class="normal">2030</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="n">WiredBus</span><span class="o">::</span><span class="n">Status</span><span class="w"> </span><span class="n">bus</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">wiredBus</span><span class="p">.</span><span class="n">status</span><span class="p">();</span>
+<p><strong>ไฟล์ <code>firmware/rmutt_esp32_air_wired/rmutt_esp32_air_wired.ino</code> บรรทัด 2052–2066 (ท้าย <code>refreshOled()</code>)</strong></p>
+<div class="code-block"><span class="code-lang">cpp</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">2052</span>
+<span class="normal">2053</span>
+<span class="normal">2054</span>
+<span class="normal">2055</span>
+<span class="normal">2056</span>
+<span class="normal">2057</span>
+<span class="normal">2058</span>
+<span class="normal">2059</span>
+<span class="normal">2060</span>
+<span class="normal">2061</span>
+<span class="normal">2062</span>
+<span class="normal">2063</span>
+<span class="normal">2064</span>
+<span class="normal">2065</span>
+<span class="normal">2066</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="n">WiredBus</span><span class="o">::</span><span class="n">Status</span><span class="w"> </span><span class="n">bus</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">wiredBus</span><span class="p">.</span><span class="n">status</span><span class="p">();</span>
 <span class="w">  </span><span class="n">d</span><span class="p">.</span><span class="n">wired</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
 <span class="w">  </span><span class="n">d</span><span class="p">.</span><span class="n">busOk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">bus</span><span class="p">.</span><span class="n">linkOk</span><span class="p">;</span>
 <span class="w">  </span><span class="n">d</span><span class="p">.</span><span class="n">compressor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">bus</span><span class="p">.</span><span class="n">compressor</span><span class="p">;</span>
@@ -3221,15 +3221,15 @@ b7 = (s mod 16) &lt;&lt; 4          ← ผลอยู่ใน nibble บน, 
 </thead>
 <tbody>
 <tr>
-<td>2016–2020</td>
+<td>2052–2056</td>
 <td>ขอสำเนาสถานะจาก task แล้วใส่ลงข้อมูลที่จอใช้ รวมอุณหภูมิห้องจาก DHT11</td>
 </tr>
 <tr>
-<td>2021–2024</td>
+<td>2057–2060</td>
 <td>โหมดตั้งค่า BLE และกำลังต่อ Wi-Fi มีหน้าจอของตัวเองเหมือนบอร์ด IR</td>
 </tr>
 <tr>
-<td>2025–2027</td>
+<td>2061–2063</td>
 <td>ถ้าแอร์ไม่ตอบ และบอร์ดเปิดมาเกิน 15 วินาที (ให้เวลาแอร์ส่งเฟรมแรก) สลับขึ้นหน้าเตือน <code>AIRCON BUS / No reply from unit / Check bus wires</code> กับหน้าปกติทุก 3 วินาที (<code>(millis() / 3000) % 2</code>) ช่างเห็นปัญหาสายได้ทันทีโดยไม่ต้องต่อคอม</td>
 </tr>
 </tbody>
@@ -3247,7 +3247,7 @@ b7 = (s mod 16) &lt;&lt; 4          ← ผลอยู่ใน nibble บน, 
 <tr>
 <td>บอร์ดรีบูต (OTA, ไฟกระพริบ, watchdog)</td>
 <td>ส่งค่าที่จำไว้ใน NVS ตั้งแต่เฟรมแรก แอร์ไม่ดับ</td>
-<td><code>setup()</code> บรรทัด 474–477, <code>WiredBus::begin()</code> บรรทัด 31</td>
+<td><code>setup()</code> บรรทัด 477–480, <code>WiredBus::begin()</code> บรรทัด 31</td>
 </tr>
 <tr>
 <td>Wi-Fi / MQTT หลุด, อยู่โหมดตั้งค่า BLE</td>
@@ -3338,8 +3338,8 @@ b7 = (s mod 16) &lt;&lt; 4          ← ผลอยู่ใน nibble บน, 
 </tr>
 <tr>
 <td>เวอร์ชันปัจจุบัน</td>
-<td><code>2.5.1</code></td>
-<td><code>2.5.2-slm8</code></td>
+<td><code>2.5.2</code></td>
+<td><code>2.5.5-slm8</code></td>
 </tr>
 <tr>
 <td>ไฟล์เฟิร์มแวร์สำหรับ OTA</td>
@@ -3413,12 +3413,12 @@ b7 = (s mod 16) &lt;&lt; 4          ← ผลอยู่ใน nibble บน, 
 <h2 id="การรวมเข้ากับระบบหลัก">การรวมเข้ากับระบบหลัก<a class="anchor" href="#การรวมเข้ากับระบบหลัก">#</a></h2>
 <h3 id="ทางเลือกที่พิจารณากับสิ่งที่ใช้จริง">ทางเลือกที่พิจารณากับสิ่งที่ใช้จริง<a class="anchor" href="#ทางเลือกที่พิจารณากับสิ่งที่ใช้จริง">#</a></h3>
 <p>ทางเลือกแรกที่ง่ายที่สุดคือเพิ่มทางแยกต้นฟังก์ชันส่ง IR ในเฟิร์มแวร์ <code>rmutt_esp32_air</code> แบบเดียวกับที่ทำให้ Saijo Denki</p>
-<p><strong>ไฟล์ <code>firmware/rmutt_esp32_air/rmutt_esp32_air.ino</code> บรรทัด 1335–1339</strong></p>
-<div class="code-block"><span class="code-lang">cpp</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1335</span>
-<span class="normal">1336</span>
-<span class="normal">1337</span>
-<span class="normal">1338</span>
-<span class="normal">1339</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">sendCurrentIrState</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">AirState</span><span class="w"> </span><span class="o">*</span><span class="n">previousState</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<p><strong>ไฟล์ <code>firmware/rmutt_esp32_air/rmutt_esp32_air.ino</code> บรรทัด 1371–1375</strong></p>
+<div class="code-block"><span class="code-lang">cpp</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1371</span>
+<span class="normal">1372</span>
+<span class="normal">1373</span>
+<span class="normal">1374</span>
+<span class="normal">1375</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">sendCurrentIrState</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">AirState</span><span class="w"> </span><span class="o">*</span><span class="n">previousState</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">isSaijoProtocol</span><span class="p">(</span><span class="n">config</span><span class="p">.</span><span class="n">airProtocol</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="n">sendSaijoCurrentIrState</span><span class="p">(</span><span class="n">previousState</span><span class="p">);</span>
 <span class="w">    </span><span class="k">return</span><span class="p">;</span>
@@ -3729,7 +3729,7 @@ b7 = (s mod 16) &lt;&lt; 4          ← ผลอยู่ใน nibble บน, 
 <p><strong>ตอบ:</strong> สายแอร์ต้องได้เฟรมทุก 1 วินาทีตลอดเวลาเหมือน panel แต่ <code>loop()</code> มีช่วงค้างนาน เช่น ต่อ Wi-Fi ได้ถึง 20 วินาที ต่อ MQTT แบบ TLS หรือดาวน์โหลด OTA ถ้าส่งใน <code>loop()</code> แอร์จะขาดเฟรมเป็นสิบวินาที <code>wired_bus.h</code> จึงสร้าง task บน core 1 priority 3 (สูงกว่า <code>loop()</code> ที่เป็น 1) ถึงเวลาส่งเมื่อไรระบบแทรก <code>loop()</code> ทันที ใช้ mutex กันสองงานแตะ <code>Controller</code> พร้อมกัน และไม่ไปอยู่ core 0 เพราะ core 0 ดูแล Wi-Fi ถ้าถูกบล็อก 80 ms ทุกวินาทีอาจหลุด</p></div>
 
 <div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> ถ้าบอร์ดรีบูตระหว่างแอร์ทำงาน แอร์จะดับไหม?</p>
-<p><strong>ตอบ:</strong> ไม่ดับ ทุกคำสั่งถูกบันทึกลง NVS (<code>saveAirState()</code>) ตอนบูต <code>setup()</code> โหลดค่ากลับ ปรับด้วย <code>normalizeAirState()</code> แล้วส่งให้ <code>wiredBus.begin()</code> เป็นค่าเริ่มต้นตั้งแต่ก่อนต่อ Wi-Fi เฟรมแรกจึงเป็นค่าเดิม แอร์ไม่รู้ว่าบอร์ดรีบูต ยกเว้นกรณีลบอุปกรณ์ในแอป (2.5.2-slm8) ที่ล้าง NVS ทั้งหมด หลังรีบูตบอร์ดจึงส่ง "ปิด"</p></div>
+<p><strong>ตอบ:</strong> ไม่ดับ ทุกคำสั่งถูกบันทึกลง NVS (<code>saveAirState()</code>) ตอนบูต <code>setup()</code> โหลดค่ากลับ ปรับด้วย <code>normalizeAirState()</code> แล้วส่งให้ <code>wiredBus.begin()</code> เป็นค่าเริ่มต้นตั้งแต่ก่อนต่อ Wi-Fi เฟรมแรกจึงเป็นค่าเดิม แอร์ไม่รู้ว่าบอร์ดรีบูต ยกเว้นกรณีลบอุปกรณ์ในแอป ที่ล้าง NVS ทั้งหมด หลังรีบูตบอร์ดจึงส่ง "ปิด"</p></div>
 
 <div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> แอร์รู้อุณหภูมิห้องได้อย่างไร ในเมื่อถอด panel ที่มีเซนเซอร์ออกไปแล้ว?</p>
 <p><strong>ตอบ:</strong> บอร์ดอ่าน DHT11 ที่ GPIO4 ทุก 5 วินาที บวกค่าชดเชย <code>ROOM_TEMP_OFFSET_C</code> แล้วส่งให้ <code>Controller</code> ปัดเป็นจำนวนเต็มใส่ไบต์ 2 ของทุกเฟรมแทนเทอร์มิสเตอร์ TH1 ของ panel แอร์ใช้ค่านี้ตัดสินว่าจะเดินคอมเพรสเซอร์ไหม ถ้า DHT11 อ่านพลาดใช้ค่าดีล่าสุด ถ้ายังไม่เคยอ่านได้ใช้ 26°C ช่วงทดลองเคยส่งค่าคงที่ 28°C ซึ่งทำให้แอร์ตัดคอมเพรสเซอร์ตามห้องจริงไม่ได้</p></div>

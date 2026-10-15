@@ -694,11 +694,11 @@
 <tbody>
 <tr>
 <td>firmware/README.md</td>
-<td>คู่มือรวมของเฟิร์มแวร์ ESP32 ทั้งสองบอร์ด: ไลบรารี ขา GPIO ขั้นตอนตั้งค่า การกู้ Wi-Fi การต่อสายเรดาร์ การอ่าน log และตาราง MQTT state หัวข้อ unprovision (บางจุดยังไม่ตรงโค้ด: เขียนเซ็นเซอร์เป็น 1.3.2 และขา PZEM/LED เหลืองของบอร์ดสายแอร์เป็น 16/18/27) ครอบคลุม 3 เฟิร์มแวร์ รวมบอร์ดสายแอร์ ไลบรารี U8g2/DHT ตารางขารวมจอ OLED GPIO21/22</td>
+<td>คู่มือรวมของเฟิร์มแวร์ ESP32 ทั้งสองบอร์ด: ไลบรารี ขา GPIO ขั้นตอนตั้งค่า การกู้ Wi-Fi การต่อสายเรดาร์ การอ่าน log และตาราง MQTT state หัวข้อ unprovision (บางจุดยังไม่ตรงโค้ด: เลขรุ่นยังเป็น 2.5.1 / 2.5.2-slm8 / 1.3.2 และขา PZEM/LED เหลืองของบอร์ดสายแอร์เป็น 16/18/27) ครอบคลุม 3 เฟิร์มแวร์ รวมบอร์ดสายแอร์ ไลบรารี U8g2/DHT ตารางขารวมจอ OLED GPIO21/22</td>
 </tr>
 <tr>
 <td>firmware/rmutt_esp32_air/rmutt_esp32_air.ino</td>
-<td>โปรแกรมหลักของบอร์ดแอร์ (ปัจจุบัน 2.5.1 เริ่มเขียนบทนี้ตอน 2.4.1): BLE provisioning, Wi-Fi/MQTT (TLS, LWT), ยิง IR สั่งแอร์, อ่าน PZEM และตัดสินว่าแอร์ทำงาน, LED, ตารางเวลา, OTA และเก็บ/ส่งข้อมูลย้อนหลังตอนเน็ตหลุด (2.5.1) เพิ่มจอ OLED, <code>controlType:"ir"</code> ใน BLE และคำสั่ง <code>unprovision</code> ล้างบอร์ด</td>
+<td>โปรแกรมหลักของบอร์ดแอร์ (2.5.2): BLE provisioning, Wi-Fi/MQTT (TLS, LWT), ยิง IR สั่งแอร์, อ่าน PZEM และตัดสินว่าแอร์ทำงาน, LED, ตารางเวลา, OTA และเก็บ/ส่งข้อมูลย้อนหลังตอนเน็ตหลุด (2.5.1) เพิ่มจอ OLED, <code>controlType:"ir"</code> ใน BLE และคำสั่ง <code>unprovision</code> ล้างบอร์ด ล้างค่าตัวเองเมื่อ Broker ปฏิเสธบัญชีที่ถูกลบต่อเนื่อง 2 นาที</td>
 </tr>
 <tr>
 <td>firmware/rmutt_esp32_air/SaijoDenkiAC.h</td>
@@ -730,7 +730,7 @@
 </tr>
 <tr>
 <td>firmware/rmutt_esp32_air_wired/rmutt_esp32_air_wired.ino</td>
-<td>เฟิร์มแวร์บอร์ดสายแอร์ Daikin 2.5.2-slm8 สั่งแอร์ทางสาย SLM8 + DHT11 รายงานสถานะจากแอร์ BLE/MQTT/PZEM/OTA เหมือนบอร์ด IR (บท 19) ขา PZEM ย้ายเป็น RX18/TX14 และ LED เหลืองเป็น GPIO23</td>
+<td>เฟิร์มแวร์บอร์ดสายแอร์ Daikin 2.5.5-slm8 สั่งแอร์ทางสาย SLM8 + DHT11 รายงานสถานะจากแอร์ BLE/MQTT/PZEM/OTA เหมือนบอร์ด IR (บท 19) ขา PZEM ย้ายเป็น RX18/TX14 และ LED เหลืองเป็น GPIO23</td>
 </tr>
 <tr>
 <td>firmware/rmutt_esp32_air_wired/DaikinSLM8.h</td>
@@ -774,7 +774,7 @@
 </tr>
 <tr>
 <td>firmware/rmutt_esp32_air/ota_update.h</td>
-<td>ตรวจ URL ที่อนุญาตและดาวน์โหลดเฟิร์มแวร์ใหม่ผ่าน HTTPS (ตรวจใบรับรองกับใบรากที่ฝังไว้) เขียนลงช่อง OTA ที่ว่าง</td>
+<td>ตรวจ URL ที่อนุญาตและดาวน์โหลดเฟิร์มแวร์ใหม่ผ่าน HTTPS (ตรวจใบรับรองกับใบรากที่ฝังไว้) เขียนลงช่อง OTA ที่ว่าง ลองดาวน์โหลดใหม่สูงสุด 3 ครั้งเมื่อเครือข่ายสะดุด</td>
 </tr>
 <tr>
 <td>firmware/rmutt_esp32_air/letsencrypt_ca.h</td>
@@ -786,7 +786,7 @@
 </tr>
 <tr>
 <td>firmware/rmutt_esp32_occupancy/rmutt_esp32_occupancy.ino</td>
-<td>โปรแกรมหลักของบอร์ดตรวจจับคน (v1.3.3): อ่านเรดาร์ LD2410 ใน Engineering mode, ตัดสินมีคนเมื่อ static energy เกต 0–8 มากกว่า 15, ไฟ LED เขียว GPIO25 = การเชื่อมต่อ แดง GPIO26 = มีคน, ส่งสถานะผ่าน MQTT, BLE provisioning, OTA และคำสั่ง <code>unprovision</code> ล้าง NVS แล้วรีบูตเข้า BLE</td>
+<td>โปรแกรมหลักของบอร์ดตรวจจับคน (v1.3.9): อ่านเรดาร์ LD2410 ใน Engineering mode, ตัดสินมีคนเมื่อ static energy เกต 0–8 มากกว่า 15, ไฟ LED เขียว GPIO25 = การเชื่อมต่อ แดง GPIO26 = มีคน, ส่งสถานะผ่าน MQTT, BLE provisioning, OTA และคำสั่ง <code>unprovision</code> ล้าง NVS แล้วรีบูตเข้า BLE</td>
 </tr>
 <tr>
 <td>firmware/rmutt_esp32_occupancy/ota_update.h</td>
