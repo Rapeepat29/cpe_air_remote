@@ -23,7 +23,7 @@ export function validateScheduleInput(body) {
   const startTime = cleanString(body?.startTime);
   const endTime = cleanString(body?.endTime);
 
-  if (!/^[A-Z0-9][A-Z0-9_-]{1,19}$/.test(roomNumber)) {
+  if (!/^[A-Z0-9][A-Z0-9_-]{1,9}$/.test(roomNumber)) {
     throw new ApiError(400, 'หมายเลขห้องไม่ถูกต้อง');
   }
   if (
@@ -33,17 +33,17 @@ export function validateScheduleInput(body) {
   ) {
     throw new ApiError(400, 'วันในสัปดาห์ไม่ถูกต้อง');
   }
-  if (!subjectName || subjectName.length > 150) {
+  if (!subjectName || subjectName.length > 100) {
     throw new ApiError(
       400,
-      'ชื่อวิชาต้องมีความยาว 1 ถึง 150 ตัวอักษร',
+      'ชื่อวิชาต้องมีความยาว 1 ถึง 100 ตัวอักษร',
     );
   }
-  if (section.length > 80) {
-    throw new ApiError(400, 'กลุ่มเรียนต้องไม่เกิน 80 ตัวอักษร');
+  if (section.length > 30) {
+    throw new ApiError(400, 'กลุ่มเรียนต้องไม่เกิน 30 ตัวอักษร');
   }
-  if (instructor.length > 150) {
-    throw new ApiError(400, 'ชื่ออาจารย์ต้องไม่เกิน 150 ตัวอักษร');
+  if (instructor.length > 100) {
+    throw new ApiError(400, 'ชื่ออาจารย์ต้องไม่เกิน 100 ตัวอักษร');
   }
   if (!isValidTime(startTime) || !isValidTime(endTime)) {
     throw new ApiError(400, 'รูปแบบเวลาต้องเป็น HH:mm');

@@ -98,7 +98,7 @@ test('multi-line and parenthesised column types are read as one column', () => {
 });
 
 test('columns that cannot be added to a filled table are detected', () => {
-  assert.equal(isAutoAddableColumn('DECIMAL(12,3) NULL'), true);
+  assert.equal(isAutoAddableColumn('DECIMAL(10,3) NULL'), true);
   assert.equal(isAutoAddableColumn('BOOLEAN NOT NULL DEFAULT FALSE'), true);
   assert.equal(isAutoAddableColumn('VARCHAR(100) NOT NULL'), false);
 });
@@ -146,7 +146,7 @@ test('diff reports missing tables and missing columns separately', () => {
   assert.deepEqual(missingColumns, [
     {
       table: 'air_conditioners',
-      column: { name: 'energy_kwh', definition: 'DECIMAL(12,3) NULL' },
+      column: { name: 'energy_kwh', definition: 'DECIMAL(10,3) NULL' },
     },
   ]);
 });

@@ -62,7 +62,7 @@ export async function raiseAlert({
       kind,
       roomNumber,
       deviceId,
-      String(deviceName ?? '').slice(0, 60),
+      String(deviceName ?? '').slice(0, 50),
       String(detail ?? '').slice(0, 255),
       needsAction ? 'open' : 'resolved',
     ],

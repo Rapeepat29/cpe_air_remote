@@ -68,7 +68,7 @@ test('new user input is normalised and validated', () => {
     firstName: ' Somsri ',
     lastName: 'Kaewta',
     email: ' Somsri@Example.COM ',
-    phone: '081-234-5678',
+    phone: '0812345678',
     role: 'ADMIN',
   });
 
@@ -78,7 +78,7 @@ test('new user input is normalised and validated', () => {
     firstName: 'Somsri',
     lastName: 'Kaewta',
     email: 'somsri@example.com',
-    phone: '081-234-5678',
+    phone: '0812345678',
     password: 'strongpassword',
   });
 });
@@ -120,4 +120,11 @@ test('user update accepts role, status, or both, but never nothing', () => {
     () => validateUserUpdate({ isActive: 'yes' }),
     /true หรือ false/,
   );
+});
+
+test('normalizePhone ตัดขีดและแปลง +66 เป็น 0', async () => {
+  const { normalizePhone } = await import('../src/utils/user.js');
+  assert.equal(normalizePhone('081-234-5678'), '0812345678');
+  assert.equal(normalizePhone('+66812345678'), '0812345678');
+  assert.equal(normalizePhone(null), '');
 });

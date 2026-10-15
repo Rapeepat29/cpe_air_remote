@@ -285,7 +285,7 @@ async function upsertBucket(database, {
       deviceId,
       delta.bucketStart,
       roomNumber,
-      String(deviceName ?? '').slice(0, 60),
+      String(deviceName ?? '').slice(0, 50),
       delta.sampleCount,
       delta.pzemSamples,
       delta.runningSamples,

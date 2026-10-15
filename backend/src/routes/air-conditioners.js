@@ -320,8 +320,8 @@ airConditionersRouter.patch(
       const name = typeof request.body.name === 'string'
         ? request.body.name.trim()
         : '';
-      if (name.length < 1 || name.length > 60) {
-        throw new ApiError(400, 'ชื่อแอร์ต้องมีความยาว 1–60 ตัวอักษร');
+      if (name.length < 1 || name.length > 50) {
+        throw new ApiError(400, 'ชื่อแอร์ต้องมีความยาว 1–50 ตัวอักษร');
       }
       fields.push('name = ?');
       params.push(name);

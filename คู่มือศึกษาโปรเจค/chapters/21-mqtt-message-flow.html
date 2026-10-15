@@ -1,0 +1,744 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>21. เส้นทางข้อความ MQTT: จากบอร์ดถึง Backend และกลับไปบอร์ด — คู่มือศึกษา RMUTT Save Energy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Chakra+Petch:wght@600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+<script>try{var t=localStorage.getItem('guide.theme');if(t)document.documentElement.dataset.theme=t;var f=localStorage.getItem('guide.font');if(f)document.documentElement.dataset.font=f;}catch(e){}</script>
+</head>
+<body>
+<header class="topbar">
+  <button class="menu-btn" id="menuBtn" aria-label="เปิดเมนู">☰</button>
+  <a class="brand" href="../index.html"><span class="brand-mark">⚡</span><span>คู่มือศึกษา <b>RMUTT Save Energy</b></span></a>
+  <div class="top-actions">
+    <button id="fontBtn" title="ขนาดตัวอักษร">ก<small>±</small></button>
+    <button id="themeBtn" title="สลับโหมดสว่าง/มืด">☾</button>
+  </div>
+</header>
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <input class="nav-search" id="navSearch" type="search" placeholder="ค้นหาบทหรือหัวข้อ…">
+    <div id="searchResults" class="search-results"></div>
+    <nav class="nav" id="nav">
+<a class="nav-home" href="../index.html">หน้าแรก</a>
+<div class="nav-part">ภาพรวม</div><ul>
+<li><a href="01-concept.html"><span class="num">1</span>แนวคิดและหลักการคิดของโปรเจค</a></li>
+<li><a href="02-roadmap.html"><span class="num">2</span>เริ่มจากอะไร และต้องเรียนรู้อะไรบ้าง</a></li>
+<li><a href="03-architecture-flows.html"><span class="num">3</span>สถาปัตยกรรมและเส้นทางของข้อมูล</a></li>
+</ul>
+<div class="nav-part">โครงสร้างพื้นฐาน</div><ul>
+<li><a href="04-network-server.html"><span class="num">4</span>เครือข่าย เซิร์ฟเวอร์ และ Tailscale</a></li>
+<li><a href="05-database.html"><span class="num">5</span>ฐานข้อมูล MariaDB</a></li>
+</ul>
+<div class="nav-part">เซิร์ฟเวอร์</div><ul>
+<li><a href="06-backend-api.html"><span class="num">6</span>Backend ตอนที่ 1: โครงหลัก ระบบสมาชิก และ REST API</a></li>
+<li><a href="07-backend-services.html"><span class="num">7</span>Backend ตอนที่ 2: งานเบื้องหลังและตรรกะหลักของระบบ</a></li>
+<li><a href="08-protocols.html"><span class="num">8</span>โปรโตคอลสื่อสาร: MQTT และ Bluetooth Low Energy</a></li>
+</ul>
+<div class="nav-part">อุปกรณ์และหน้าจอ</div><ul>
+<li><a href="09-firmware.html"><span class="num">9</span>เฟิร์มแวร์ ESP32: บอร์ดแอร์ (IR และสายแอร์) และบอร์ดตรวจจับคน</a></li>
+<li><a href="10-flutter-architecture.html"><span class="num">10</span>แอป Flutter ตอนที่ 1: โครงสร้าง ข้อมูล และ State</a></li>
+<li><a href="11-flutter-screens.html"><span class="num">11</span>แอป Flutter ตอนที่ 2: หน้าจอหลักและวิดเจ็ต</a></li>
+<li><a href="12-flutter-admin-screens.html"><span class="num">12</span>แอป Flutter ตอนที่ 3: หน้าจอผู้ดูแลระบบและการตั้งค่า</a></li>
+<li><a href="13-webapp.html"><span class="num">13</span>เว็บแอป: HTML, CSS และ JavaScript ล้วน</a></li>
+</ul>
+<div class="nav-part">ใช้งานจริง</div><ul>
+<li><a href="14-deploy-scripts-testing.html"><span class="num">14</span>การติดตั้งระบบ สคริปต์อัตโนมัติ และการทดสอบ</a></li>
+<li><a href="15-security.html"><span class="num">15</span>ความปลอดภัยทั้งระบบ</a></li>
+<li><a href="16-presentation-qa.html"><span class="num">16</span>เตรียมนำเสนอและคำถามที่อาจารย์มักถาม</a></li>
+</ul>
+<div class="nav-part">ภาคผนวก</div><ul>
+<li><a href="17-glossary.html"><span class="num">17</span>อภิธานศัพท์</a></li>
+<li><a href="18-file-map.html"><span class="num">18</span>แผนที่ไฟล์ทั้งโปรเจค</a></li>
+</ul>
+<div class="nav-part">เจาะลึก</div><ul>
+<li><a href="19-daikin-slm8.html"><span class="num">19</span>แอร์ Daikin ผ่านสาย SLM8: จากการแกะโปรโตคอลถึงบอร์ดสายแอร์</a></li>
+<li><a href="20-database-design.html"><span class="num">20</span>เจาะลึกการออกแบบฐานข้อมูล</a></li>
+<li><a href="21-mqtt-message-flow.html"><span class="num">21</span>เส้นทางข้อความ MQTT: จากบอร์ดถึง Backend และกลับไปบอร์ด</a></li>
+<li><a class="active" href="21-mqtt-message-flow.html"><span class="num">21</span>เส้นทางข้อความ MQTT: จากบอร์ดถึง Backend และกลับไปบอร์ด</a></li>
+</ul>
+    </nav>
+  </aside>
+  <main class="content" id="content">
+<div class="chapter-head"><div class="kicker">บทที่ 21 · เจาะลึก</div><h1>เส้นทางข้อความ MQTT: จากบอร์ดถึง Backend และกลับไปบอร์ด</h1></div>
+<p>บท 3 เล่าเส้นทางของข้อมูลแบบภาพรวม บท 8 อธิบายโปรโตคอล MQTT เอง และบท 7 อธิบายตรรกะใน Backend บทนี้เก็บทุกอย่างมาเรียงเป็น <strong>เรื่องเดียวระดับข้อความ</strong>: บอร์ดส่งข้อความอะไร ไปที่ topic ไหน ทุกกี่วินาที Backend รับแล้วทำอะไรกับฐานข้อมูล แล้วส่งอะไรกลับไปต่อ ทุกข้อในบทนี้ตรวจจากโค้ดจริง ได้แก่ <code>backend/src/services/mqtt.js</code>, <code>energy-recorder.js</code>, <code>auto-off.js</code>, <code>utils/mqtt-accounts.js</code> และเฟิร์มแวร์ <code>firmware/rmutt_esp32_air</code>, <code>rmutt_esp32_air_wired</code>, <code>rmutt_esp32_occupancy</code></p>
+<div class="callout note"><div class="callout-title">หมายเหตุ</div><p>ตัวเลขเวลาทั้งหมดอ่านจากค่าคงที่ในโค้ด (เช่น <code>STATUS_INTERVAL_MS = 10000</code>) ถ้าแก้ค่าในโค้ด ตัวเลขในบทนี้ต้องแก้ตาม</p></div>
+
+<h2 id="ภาพรวม-ใครส่งอะไรให้ใคร">ภาพรวม: ใครส่งอะไรให้ใคร<a class="anchor" href="#ภาพรวม-ใครส่งอะไรให้ใคร">#</a></h2>
+<div class="code-block"><div class="hl"><pre><span></span><code> [บอร์ดแอร์ ESP32]                         [บอร์ดตรวจคน OCC32]
+   │ ส่ง: status, state,                     │ ส่ง: status,
+   │      provision, history                 │      provision
+   │ รับ: command, provision-ack,            │ รับ: command,
+   │      schedule-status, history-ack       │      provision-ack
+   ▼                                         ▼
+ ┌─────────────────────────────────────────────────┐
+ │            Mosquitto (Broker)                   │
+ │  rmutt/ac/&lt;ESP32-…&gt;/…                           │
+ │  rmutt/occupancy/&lt;OCC32-…&gt;/…                    │
+ └─────────────────────────────────────────────────┘
+        ▲ รับ status/state/history/provision
+        │ ส่ง command/ack/schedule-status
+        ▼
+ [Backend Node.js] ───► MariaDB
+        ▲
+        │ REST API (HTTP)
+ [แอป Flutter / เว็บ]
+</code></pre></div></div>
+<p>จุดที่ต้องจำสามข้อ</p>
+<ol>
+<li><strong>บอร์ดไม่คุยกับ Backend ตรง ๆ</strong> ทุกอย่างผ่าน Broker โดยบอร์ดกับ Backend ต่างก็เป็น client ของ Broker</li>
+<li><strong>แอปไม่ฟัง MQTT เลย</strong> แอปคุยกับ Backend ด้วย REST แล้ว Backend ค่อยส่งต่อเป็นข้อความ MQTT ส่วนค่าที่แอปแสดงมาจากฐานข้อมูล ซึ่ง Backend อัปเดตจากข้อความที่บอร์ดส่งมา แอปจึงเห็นค่าใหม่เมื่อดึงรอบถัดไป (บอร์ดแอร์และห้อง ดึงทุก 10 วินาที แดชบอร์ดทุก 30 วินาที)</li>
+<li><strong>เซ็นเซอร์ตรวจคนกับบอร์ดแอร์ไม่คุยกันเอง</strong> คนที่เห็นทั้งสองฝั่งคือ Backend จึงให้ Backend ตัดสินใจปิดแอร์</li>
+</ol>
+<h2 id="กติกาพื้นฐานของทุกข้อความ">กติกาพื้นฐานของทุกข้อความ<a class="anchor" href="#กติกาพื้นฐานของทุกข้อความ">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>เรื่อง</th>
+<th>ค่าที่ใช้</th>
+<th>หมายเหตุ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>รูปแบบข้อมูล</td>
+<td>JSON ทุกข้อความ</td>
+<td>ข้อความที่แปลง JSON ไม่ได้ Backend ทิ้งเงียบ ๆ</td>
+</tr>
+<tr>
+<td>Topic ของบอร์ดแอร์</td>
+<td><code>rmutt/ac/&lt;deviceId&gt;/&lt;ชนิด&gt;</code></td>
+<td><code>deviceId</code> รูปแบบ <code>ESP32-</code> ตามด้วย hex 12 ตัว ตั้งต้นจากค่าใน <code>MQTT_TOPIC_PREFIX</code></td>
+</tr>
+<tr>
+<td>Topic ของบอร์ดตรวจคน</td>
+<td><code>rmutt/occupancy/&lt;deviceId&gt;/&lt;ชนิด&gt;</code></td>
+<td><code>deviceId</code> รูปแบบ <code>OCC32-</code> ตามด้วย hex 12 ตัว ตั้งจาก <code>MQTT_OCCUPANCY_TOPIC_PREFIX</code></td>
+</tr>
+<tr>
+<td>Backend ตรวจ topic</td>
+<td>regular expression ตายตัว</td>
+<td>topic ที่รหัสอุปกรณ์หรือชนิดไม่ตรงถูกทิ้ง</td>
+</tr>
+<tr>
+<td>Client ID</td>
+<td>บอร์ด <code>rmutt-&lt;deviceId&gt;</code>, Backend <code>rmutt-api-&lt;pid&gt;</code></td>
+<td>Backend ตั้ง <code>clean: true</code> และต่อใหม่เองทุก 3 วินาทีเมื่อหลุด</td>
+</tr>
+<tr>
+<td>QoS ฝั่งบอร์ด</td>
+<td>publish เป็น QoS 0, subscribe เป็น QoS 1, Last Will เป็น QoS 1</td>
+<td>ไลบรารี PubSubClient ส่งข้อความได้เฉพาะ QoS 0</td>
+</tr>
+<tr>
+<td>QoS ฝั่ง Backend</td>
+<td>subscribe และ publish เป็น QoS 1 ทั้งหมด</td>
+<td>คำสั่งถึงบอร์ดอย่างน้อยหนึ่งครั้งถ้าบอร์ดออนไลน์</td>
+</tr>
+<tr>
+<td>การเข้ารหัส</td>
+<td>TLS (<code>mqtts</code> ปกติพอร์ต 8883) ได้ ถ้าตั้งค่าตอน provisioning</td>
+<td>บอร์ดต้องซิงก์เวลา NTP ก่อน ไม่งั้นตรวจใบรับรองไม่ผ่าน และใช้ใบรับรอง Let's Encrypt ที่ฝังในเฟิร์มแวร์</td>
+</tr>
+<tr>
+<td>บัญชีต่อบอร์ด</td>
+<td>username = deviceId (โหมด <code>dynsec</code>)</td>
+<td>Backend สร้างบัญชีและ ACL ในตัว Broker ผ่าน Dynamic Security</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="ใครมีสิทธิ์ส่งรับ-topic-ไหน-acl-ต่อบอร์ด">ใครมีสิทธิ์ส่ง/รับ topic ไหน (ACL ต่อบอร์ด)<a class="anchor" href="#ใครมีสิทธิ์ส่งรับ-topic-ไหน-acl-ต่อบอร์ด">#</a></h3>
+<p>Backend สร้างบัญชีให้บอร์ดแต่ละตัวพร้อมสิทธิ์เฉพาะ topic ของตัวเอง (<code>utils/mqtt-accounts.js</code>) บอร์ดตัวหนึ่งจึงอ่านหรือปลอมข้อความของบอร์ดอื่นไม่ได้</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>ประเภทบอร์ด</th>
+<th>ส่งได้ (publish)</th>
+<th>รับได้ (subscribe)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>บอร์ดแอร์</td>
+<td><code>state</code>, <code>status</code>, <code>provision</code>, <code>provision-ack</code>, <code>history</code></td>
+<td><code>command</code>, <code>provision-ack</code>, <code>schedule-status</code>, <code>history-ack</code></td>
+</tr>
+<tr>
+<td>บอร์ดตรวจคน</td>
+<td><code>status</code>, <code>provision</code>, <code>provision-ack</code></td>
+<td><code>command</code>, <code>provision-ack</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>บอร์ดตรวจคนไม่มี topic <code>state</code>, <code>history</code> และ <code>schedule-status</code></p>
+<h2 id="topic-ทั้งหมดของบอร์ดแอร์">Topic ทั้งหมดของบอร์ดแอร์<a class="anchor" href="#topic-ทั้งหมดของบอร์ดแอร์">#</a></h2>
+<p>ฐาน <code>rmutt/ac/&lt;deviceId&gt;/</code> แล้วตามด้วยชื่อในคอลัมน์แรก</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Topic</th>
+<th>ทิศทาง</th>
+<th>Retain</th>
+<th>ใครส่งเมื่อไร</th>
+<th>ใครรับและทำอะไร</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>status</code></td>
+<td>บอร์ด → Backend</td>
+<td>ใช่</td>
+<td>บอร์ดส่งทุก 10 วินาที และทันทีเมื่อเหตุการณ์สำคัญเปลี่ยน</td>
+<td>Backend อัปเดตค่าไฟ สถานะแอร์ รุ่นเฟิร์มแวร์ บันทึกถังรายชั่วโมง ส่ง schedule-status กลับ และปลุกระบบปิดแอร์อัตโนมัติ</td>
+</tr>
+<tr>
+<td><code>status</code> (Last Will)</td>
+<td>Broker → Backend</td>
+<td>ใช่</td>
+<td>Broker ส่งแทนบอร์ดเมื่อบอร์ดหลุดแบบไม่ได้ตัดการเชื่อมต่อ</td>
+<td>Backend ตั้ง <code>is_online = 0</code></td>
+</tr>
+<tr>
+<td><code>state</code></td>
+<td>บอร์ด → Backend</td>
+<td>ใช่</td>
+<td>ส่งตอนต่อ Broker ได้ และหลังบอร์ดทำตามคำสั่งเสร็จ</td>
+<td>Backend เก็บลง <code>state_json</code></td>
+</tr>
+<tr>
+<td><code>command</code></td>
+<td>Backend → บอร์ด</td>
+<td>ไม่</td>
+<td>Backend ส่งเมื่อผู้ใช้สั่ง หรือระบบปิดแอร์ยิง</td>
+<td>บอร์ดตรวจค่า ส่ง IR แล้วตอบด้วย <code>state</code></td>
+</tr>
+<tr>
+<td><code>schedule-status</code></td>
+<td>Backend → บอร์ด</td>
+<td>ใช่</td>
+<td>Backend ส่งทุกครั้งที่ได้ <code>status</code> ที่บอร์ดบอกว่าออนไลน์ (ราว ๆ ทุก 10 วินาที)</td>
+<td>บอร์ดใช้ตัดสินว่าตอนนี้อยู่ในคาบเรียนหรือไม่ เพื่อเปิดไฟเตือนนอกคาบ</td>
+</tr>
+<tr>
+<td><code>provision</code></td>
+<td>บอร์ด → Backend</td>
+<td>ใช่</td>
+<td>ส่งซ้ำทุก 10 วินาทีจนกว่าจะได้ provision-ack</td>
+<td>Backend ตรวจ token แล้วเปิดใช้งานอุปกรณ์</td>
+</tr>
+<tr>
+<td><code>provision-ack</code></td>
+<td>Backend → บอร์ด</td>
+<td>ใช่</td>
+<td>ตอบหลังตรวจ token ผ่าน</td>
+<td>บอร์ดลบ token ทิ้ง แล้วล้างข้อความ retain ของ topic นี้</td>
+</tr>
+<tr>
+<td><code>history</code></td>
+<td>บอร์ด → Backend</td>
+<td>ไม่</td>
+<td>ส่งเมื่อมีข้อมูลที่เก็บไว้ตอนเน็ตหลุด ครั้งละ 10 รายการ</td>
+<td>Backend บันทึกลงถังรายชั่วโมงแล้วตอบ history-ack</td>
+</tr>
+<tr>
+<td><code>history-ack</code></td>
+<td>Backend → บอร์ด</td>
+<td>ไม่</td>
+<td>ตอบหลังบันทึกสำเร็จ</td>
+<td>บอร์ดลบรายการที่ยืนยันแล้วออกจาก flash</td>
+</tr>
+</tbody>
+</table></div>
+<p>บอร์ดตรวจคนใช้ฐาน <code>rmutt/occupancy/&lt;deviceId&gt;/</code> และมีแค่ <code>status</code>, <code>command</code>, <code>provision</code>, <code>provision-ack</code> ความหมายเหมือนกัน</p>
+<h2 id="ตารางเวลา-อะไรเกิดทุกกี่วินาที">ตารางเวลา: อะไรเกิดทุกกี่วินาที<a class="anchor" href="#ตารางเวลา-อะไรเกิดทุกกี่วินาที">#</a></h2>
+<h3 id="ฝั่งบอร์ดแอร์">ฝั่งบอร์ดแอร์<a class="anchor" href="#ฝั่งบอร์ดแอร์">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>เหตุการณ์</th>
+<th>รอบเวลา</th>
+<th>ที่มาในโค้ด</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>อ่าน PZEM (แรงดัน กระแส กำลัง ฯลฯ)</td>
+<td>ทุก 2 วินาที</td>
+<td><code>PZEM_READ_INTERVAL_MS</code></td>
+</tr>
+<tr>
+<td>ส่ง <code>status</code></td>
+<td>ทุก 10 วินาที</td>
+<td><code>STATUS_INTERVAL_MS</code></td>
+</tr>
+<tr>
+<td>ส่ง <code>status</code> ทันที</td>
+<td>เมื่อ PZEM กลับมาอ่านได้/อ่านไม่ได้ เมื่อแอร์เริ่มหรือหยุดกินไฟ เมื่อสถานะนอกคาบเปลี่ยน เมื่อส่งข้อมูลย้อนหลังครบ หรือเมื่อ OTA ล้มเหลว</td>
+<td><code>statusPublishRequested</code></td>
+</tr>
+<tr>
+<td>ตัดสินว่าแอร์ "ทำงาน"</td>
+<td>กำลังไฟ ≥ 30 W ติดกัน 3 ครั้ง = ทำงาน, ≤ 10 W ติดกัน 3 ครั้ง = หยุด</td>
+<td><code>AC_RUNNING_*</code></td>
+</tr>
+<tr>
+<td>ถือว่า PZEM เสีย</td>
+<td>อ่านไม่ได้ติดกัน 3 ครั้ง</td>
+<td><code>PZEM_FAILURE_LIMIT</code></td>
+</tr>
+<tr>
+<td>ต่อ MQTT ใหม่เมื่อหลุด</td>
+<td>ลองทุก 3 วินาที</td>
+<td><code>loop()</code></td>
+</tr>
+<tr>
+<td>ส่ง <code>provision</code> ซ้ำ</td>
+<td>ทุก 10 วินาทีจนกว่าจะได้ provision-ack</td>
+<td><code>lastProvisionAt</code></td>
+</tr>
+<tr>
+<td>เวลาที่ใช้ผลจาก <code>schedule-status</code></td>
+<td>ไม่เกิน 2 นาทีนับจากข้อความล่าสุด เลยจากนั้นใช้ตารางเปิด-ปิดประจำวันในบอร์ดแทน</td>
+<td><code>CLASS_SCHEDULE_TTL_MS</code></td>
+</tr>
+<tr>
+<td>สรุปค่าไฟเก็บไว้ตอนเน็ตหลุด</td>
+<td>ช่วงละ 5 นาที (เก็บเมื่อต่อ MQTT ไม่ได้หรือยังมีค้างส่ง)</td>
+<td><code>HISTORY_INTERVAL_SECONDS = 300</code></td>
+</tr>
+<tr>
+<td>เริ่มส่งข้อมูลย้อนหลัง</td>
+<td>หน่วงแบบสุ่ม 5–45 วินาทีหลังต่อ MQTT ได้ (กันบอร์ดทั้งตึกส่งพร้อมกัน)</td>
+<td><code>HISTORY_START_DELAY_*</code></td>
+</tr>
+<tr>
+<td>ส่งข้อมูลย้อนหลัง</td>
+<td>ครั้งละ 10 รายการ ห่างกันอย่างน้อย 1 วินาที</td>
+<td><code>HISTORY_BATCH_SIZE</code>, <code>HISTORY_SEND_GAP_MS</code></td>
+</tr>
+<tr>
+<td>รอ <code>history-ack</code></td>
+<td>20 วินาที ถ้าไม่ได้ ส่งชุดเดิมใหม่หลังรออีก 5 วินาที</td>
+<td><code>HISTORY_ACK_TIMEOUT_MS</code>, <code>HISTORY_RETRY_DELAY_MS</code></td>
+</tr>
+<tr>
+<td>บัญชี MQTT ถูกลบ</td>
+<td>ถ้า Broker ปฏิเสธรหัสติดกันนานเกิน 2 นาทีและอย่างน้อย 10 ครั้ง บอร์ดล้างค่าทั้งหมดแล้วเข้าโหมดตั้งค่า</td>
+<td><code>MQTT_AUTH_REJECT_*</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="ฝั่งบอร์ดตรวจคน">ฝั่งบอร์ดตรวจคน<a class="anchor" href="#ฝั่งบอร์ดตรวจคน">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>เหตุการณ์</th>
+<th>รอบเวลา</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>อ่านเรดาร์ LD2410</td>
+<td>ทุก 250 มิลลิวินาที</td>
+</tr>
+<tr>
+<td>ส่ง <code>status</code></td>
+<td>ทุก 10 วินาที และทันทีเมื่อสถานะ "มีคน/ไม่มีคน" หรือเรดาร์พร้อม/ไม่พร้อมเปลี่ยน</td>
+</tr>
+<tr>
+<td>ลองเริ่มเรดาร์ใหม่เมื่อเริ่มไม่สำเร็จ</td>
+<td>ทุก 10 วินาที</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="ฝั่ง-backend-และแอป">ฝั่ง Backend และแอป<a class="anchor" href="#ฝั่ง-backend-และแอป">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>เหตุการณ์</th>
+<th>รอบเวลา</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ส่ง <code>schedule-status</code> ให้บอร์ดแอร์</td>
+<td>ทุกครั้งที่รับ <code>status</code> ที่ออนไลน์ (ตามจังหวะ 10 วินาทีของบอร์ด)</td>
+</tr>
+<tr>
+<td>ประเมินระบบปิดแอร์อัตโนมัติ</td>
+<td>ทันทีที่ได้ status ของแอร์หรือเซ็นเซอร์ และตั้งเวลาเองทุก 10 วินาทีด้วย</td>
+</tr>
+<tr>
+<td>รอก่อนสั่งปิด</td>
+<td>5 นาทีเมื่อห้องว่าง (15 นาทีถ้าอยู่ในคาบเรียนหรือมีการจอง)</td>
+</tr>
+<tr>
+<td>ยิงคำสั่งปิดซ้ำถ้าแอร์ยังกินไฟ</td>
+<td>ทุก 20 วินาที สูงสุด 5 ครั้ง</td>
+</tr>
+<tr>
+<td>รอคำตอบ "ล้างค่าแล้ว" ตอนลบอุปกรณ์</td>
+<td>4 วินาที</td>
+</tr>
+<tr>
+<td>รอคำตอบจาก Dynamic Security ของ Broker</td>
+<td>8 วินาที</td>
+</tr>
+<tr>
+<td>token ติดตั้งบอร์ดหมดอายุ</td>
+<td>15 นาที (900 วินาที)</td>
+</tr>
+<tr>
+<td>แอปดึงข้อมูลแอร์/ห้อง</td>
+<td>ทุก 10 วินาที (แดชบอร์ด 30 วินาที)</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="เส้นทางที่-1-บอร์ดต่อ-broker-ได้">เส้นทางที่ 1: บอร์ดต่อ Broker ได้<a class="anchor" href="#เส้นทางที่-1-บอร์ดต่อ-broker-ได้">#</a></h2>
+<p>เกิดทุกครั้งที่บอร์ดบูต หรือต่อใหม่หลังเน็ตหลุด (<code>connectMqtt()</code> ใน <code>.ino</code>)</p>
+<ol>
+<li>ถ้าเปิด TLS บอร์ดซิงก์เวลา NTP ก่อน (รอได้ 15 วินาที) แล้วตั้งใบรับรอง</li>
+<li>ต่อ Broker ด้วย client ID <code>rmutt-&lt;deviceId&gt;</code> ใส่ username/password ที่ได้ตอนติดตั้ง และฝาก <strong>Last Will</strong> ไว้ที่ <code>…/status</code> แบบ QoS 1 retain ว่า <code>{"online":false,"deviceId":"ESP32-…"}</code></li>
+<li>subscribe topic <code>command</code>, <code>provision-ack</code>, <code>schedule-status</code>, <code>history-ack</code> (QoS 1)</li>
+<li>ตั้งเวลาเริ่มส่งข้อมูลย้อนหลังแบบสุ่ม 5–45 วินาที</li>
+<li>ส่ง <code>status</code> ทันที, ส่ง <code>state</code> ทันที และส่ง <code>provision</code> ถ้ายังมี token ค้าง</li>
+</ol>
+<div class="callout why"><div class="callout-title">ทำไม</div><p><strong>Last Will คืออะไร และทำไมสำคัญ</strong>
+ถ้าไฟดับหรือสาย LAN หลุด บอร์ดบอกใครไม่ทัน Last Will คือข้อความที่บอร์ดฝากไว้กับ Broker ล่วงหน้า เมื่อ Broker พบว่าบอร์ดหายไปโดยไม่ได้ตัดการเชื่อมต่อตามปกติ Broker จะส่งข้อความนั้นแทนบอร์ด Backend จึงรู้ทันทีว่าเครื่องออฟไลน์ โดยไม่ต้องรอ timeout เอง ถ้าบอร์ดตัดการเชื่อมต่อแบบปกติ (เช่นตอนรีบูตเพื่อ OTA) Broker จะไม่ส่ง Last Will</p></div>
+
+<h2 id="เส้นทางที่-2-บอร์ดแอร์ส่ง-status-หัวใจของระบบ">เส้นทางที่ 2: บอร์ดแอร์ส่ง <code>status</code> (หัวใจของระบบ)<a class="anchor" href="#เส้นทางที่-2-บอร์ดแอร์ส่ง-status-หัวใจของระบบ">#</a></h2>
+<h3 id="สิ่งที่บอร์ดส่ง">สิ่งที่บอร์ดส่ง<a class="anchor" href="#สิ่งที่บอร์ดส่ง">#</a></h3>
+<p>ทุก 10 วินาทีที่ <code>…/status</code> แบบ retain</p>
+<div class="code-block"><span class="code-lang">json</span><div class="hl"><pre><span></span><code>{
+  "online": true,
+  "deviceId": "ESP32-A1B2C3D4E5F6",
+  "firmwareVersion": "2.5.2",
+  "roomNumber": "16302",
+  "airNumber": 1,
+  "ip": "192.168.1.45",
+  "rssi": -58,
+  "pzemAvailable": true,
+  "acRunning": true,
+  "outsideSchedule": false,
+  "scheduleConfigured": true,
+  "classScheduleConfigured": true,
+  "historyPending": 0,
+  "voltage": 221.4,
+  "current": 4.512,
+  "powerWatts": 980.2,
+  "energyKwh": 123.456,
+  "frequencyHz": 50.0,
+  "powerFactor": 0.98
+}
+</code></pre></div></div>
+<ul>
+<li>ถ้า PZEM อ่านไม่ได้ ค่าไฟทั้ง 6 ค่าจะเป็น <code>null</code></li>
+<li>ถ้ามีข้อผิดพลาดจาก OTA จะมี <code>otaError</code> เพิ่ม</li>
+<li>บอร์ดรุ่นสายแอร์ (Daikin SLM8) เพิ่มฟิลด์ <code>controlMode</code>, <code>airBrand</code>, <code>busOk</code>, <code>compressorRunning</code>, <code>unitRoomTemperature</code>, <code>roomTemperature</code> ซึ่ง Backend อ่านเฉพาะ <code>controlMode</code>: ถ้าเป็น <code>wired</code> จะปรับคอลัมน์ <code>protocol</code> ของเครื่องนั้นให้เป็นโปรโตคอลสายแอร์ ส่วนฟิลด์อื่นไม่ได้ถูกเก็บ</li>
+</ul>
+<h3 id="สิ่งที่-backend-ทำต่อ-ตามลำดับ">สิ่งที่ Backend ทำต่อ (ตามลำดับ)<a class="anchor" href="#สิ่งที่-backend-ทำต่อ-ตามลำดับ">#</a></h3>
+<p>ฟังก์ชัน <code>handleIncomingMessage</code> → <code>handleAirStatus</code> ใน <code>services/mqtt.js</code> ทำ <strong>ทีละข้อความต่อบอร์ด</strong> ผ่าน <code>runSerialForDevice</code> เพื่อไม่ให้ status สดกับข้อมูลย้อนหลังแย่งแก้ค่าเดียวกัน</p>
+<ol>
+<li><strong>ตรวจ topic</strong> ว่าตรงรูปแบบและ JSON อ่านได้ ถ้าไม่ใช่ ทิ้ง</li>
+<li><strong>ตรวจว่าใช่คำตอบ "ล้างค่าแล้ว"</strong> (<code>unprovisioned: true</code>) หรือไม่ ถ้าใช่ ปลดการรอแล้วจบ</li>
+<li><strong>ปรับ <code>protocol</code></strong> ถ้าเป็นบอร์ดสายแอร์และค่าไม่ตรง (เขียนเฉพาะเมื่อไม่ตรง ไม่เขียนทุก 10 วินาที)</li>
+<li><strong>จัดรูปค่า</strong> (<code>normalizePowerStatus</code>): ถ้า <code>pzemAvailable</code> ไม่เป็น <code>true</code> ค่าไฟทุกค่าถูกบังคับเป็น <code>null</code> และ <code>acRunning</code>, <code>outsideSchedule</code> เป็น <code>false</code></li>
+<li><strong>อ่านแถวเดิมของเครื่อง</strong> ก่อนทับ เพื่อใช้หาผลต่างเลขมิเตอร์</li>
+<li><strong>บันทึกถังรายชั่วโมง</strong> (<code>recordEnergySample</code>) เฉพาะเมื่อ <code>historyPending = 0</code> คำนวณผลต่างของ <code>energyKwh</code> กับครั้งก่อน นับเวลาที่แอร์ทำงานและเวลาออนไลน์ แล้วบวกเข้าแถวของชั่วโมงนั้น (เวลาไทย) ใน <code>energy_hourly</code></li>
+<li><strong>เขียนค่าล่าสุดทับ</strong> ใน <code>air_conditioners</code> (<code>is_online</code>, <code>voltage</code>, <code>current_amp</code>, <code>power_watts</code>, <code>energy_kwh</code>, <code>frequency_hz</code>, <code>power_factor</code>, <code>pzem_available</code>, <code>ac_running</code>, <code>outside_schedule</code>, <code>last_seen_at</code>)</li>
+<li><strong>บันทึกรุ่นเฟิร์มแวร์และผล OTA</strong> (<code>firmware_version</code>, <code>ota_error</code>)</li>
+<li><strong>บันทึก <code>history_pending</code></strong> (เฉพาะตอนออนไลน์)</li>
+<li><strong>ส่ง <code>schedule-status</code> กลับ</strong> ให้บอร์ดนี้ (ถ้าออนไลน์และอุปกรณ์เปิดใช้งานแล้ว) ดูเส้นทางที่ 5</li>
+<li><strong>แจ้งผู้ฟังเหตุการณ์</strong> ซึ่งก็คือระบบปิดแอร์อัตโนมัติ ให้ประเมินห้องนี้ใหม่ทันที</li>
+</ol>
+<div class="callout warn"><div class="callout-title">ระวัง</div><p>ขั้น 5 → 6 → 7 ต้องเรียงแบบนี้ ถ้าเขียนค่าทับก่อน จะไม่เหลือเลขมิเตอร์เดิมไว้ลบ และถ้าผลต่างติดลบ (มิเตอร์ PZEM ถูกรีเซ็ต) หรือเกิน 50 kWh Backend นับเป็น 0 กันตัวเลขเพี้ยน และถ้าบอร์ดเงียบนานเกิน 5 นาที เวลาที่หายไปจะไม่ถูกนับเป็นเวลาทำงาน</p></div>
+
+<h3 id="เมื่อบอร์ดหลุด-last-will">เมื่อบอร์ดหลุด (Last Will)<a class="anchor" href="#เมื่อบอร์ดหลุด-last-will">#</a></h3>
+<p>ข้อความ <code>{"online":false,"deviceId":"…"}</code> เข้าทางเดียวกับ status ปกติ ผลคือ Backend ตั้ง <code>is_online = 0</code>, ค่าไฟทุกค่าเป็น <code>null</code> และ <code>ac_running = 0</code> ไม่ส่ง <code>schedule-status</code> (เพราะไม่ออนไลน์) และไม่ทับรุ่นเฟิร์มแวร์เดิม (ข้อความนี้ไม่มีฟิลด์นั้น) ค่าที่แอปเห็นจะเปลี่ยนเป็นออฟไลน์เมื่อดึงรอบถัดไป</p>
+<h2 id="เส้นทางที่-3-ผู้ใช้สั่งแอร์-command--ir--state">เส้นทางที่ 3: ผู้ใช้สั่งแอร์ (<code>command</code> → IR → <code>state</code>)<a class="anchor" href="#เส้นทางที่-3-ผู้ใช้สั่งแอร์-command--ir--state">#</a></h2>
+<div class="code-block"><div class="hl"><pre><span></span><code>[แอป] POST /api/air-conditioners/:deviceId/command  (ต้องล็อกอิน)
+   │
+[Backend routes/air-conditioners.js]
+   │  1. หาเครื่องในฐานข้อมูล ไม่พบ → 404
+   │  2. provision_status ต้องเป็น active ไม่งั้น → 409
+   │  3. validateAirState() ตรวจค่าตามชนิดแอร์ (อุณหภูมิ โหมด ลม ฯลฯ)
+   │  4. publishAirCommand() → ส่งเข้า Broker  (ถ้า Broker ไม่ต่อ → 503)
+   │  5. ตอบแอปทันที 202 พร้อม commandId  (ยังไม่รอบอร์ด)
+   ▼
+[Broker] rmutt/ac/&lt;deviceId&gt;/command   QoS 1, ไม่ retain
+   ▼
+[บอร์ดแอร์] mqttCallback เก็บข้อความ → loop() เรียก processMqttCommand()
+   │  ตรวจซ้ำที่บอร์ด: อุณหภูมิ 16–30 °C (แอร์ Saijo Denki 18–29 °C),
+   │  โหมด/ความแรงลม/ทิศทางลมที่แอร์ Saijo Denki รองรับ
+   │  → saveAirState() (เก็บลง flash) → ส่ง IR / สั่งผ่านสายแอร์
+   │  → publishState(commandId)
+   ▼
+[Broker] rmutt/ac/&lt;deviceId&gt;/state   retain
+   ▼
+[Backend] UPDATE air_conditioners SET state_json = …, is_online = 1, last_seen_at = NOW
+   ▼
+[แอป] ดึงข้อมูลรอบถัดไป (≤ 10 วินาที) เห็น state ใหม่
+</code></pre></div></div>
+<p>ข้อความ <code>command</code> ที่ Backend ส่ง</p>
+<div class="code-block"><span class="code-lang">json</span><div class="hl"><pre><span></span><code>{
+  "version": 1,
+  "commandId": "0b7c…-uuid",
+  "sentAt": "2026-10-15T09:30:00.000Z",
+  "state": {
+    "power": true, "temperature": 25, "mode": "cool",
+    "fanSpeed": "auto", "verticalSwing": "auto", "horizontalSwing": false,
+    "eco": false, "turbo": false, "sleep": false, "quiet": false,
+    "displayLight": true, "clean": false,
+    "timerOnMinutes": null, "timerOffMinutes": null
+  }
+}
+</code></pre></div></div>
+<p>บอร์ดตอบด้วย <code>state</code> ที่มี <code>commandId</code> เดิมกลับมา รูปแบบ <code>{"commandId":"…","state":{…}}</code> และ Backend เก็บเฉพาะส่วน <code>state</code></p>
+<div class="callout why"><div class="callout-title">ทำไม</div><p><strong>ทำไมตอบแอปทันทีแทนที่จะรอให้แอร์เปลี่ยนจริง</strong>
+IR เป็นการยิงทางเดียว บอร์ดไม่มีทางรู้ว่าแอร์รับคำสั่งหรือไม่ ค่า <code>state</code> ที่ตอบกลับคือ "สิ่งที่บอร์ดสั่งไป" ไม่ใช่สิ่งที่แอร์ทำจริง ส่วนหลักฐานว่าแอร์ทำตามจริงคือกำลังไฟจาก PZEM ใน <code>status</code> (เช่นสั่งปิดแล้วกำลังไฟตกลงต่ำกว่า 10 W) การตอบ 202 ทันทีจึงตรงกับธรรมชาติของระบบและไม่ทำให้แอปค้าง</p></div>
+
+<h2 id="เส้นทางที่-4-ข้อมูลช่วงเน็ตหลุด-history--history-ack">เส้นทางที่ 4: ข้อมูลช่วงเน็ตหลุด (<code>history</code> ↔ <code>history-ack</code>)<a class="anchor" href="#เส้นทางที่-4-ข้อมูลช่วงเน็ตหลุด-history--history-ack">#</a></h2>
+<p>ถ้าไม่มีส่วนนี้ ค่าไฟช่วงที่บอร์ดต่อ Broker ไม่ได้จะหายไปจากรายงาน</p>
+<p><strong>ฝั่งบอร์ด</strong></p>
+<ol>
+<li>ระหว่างที่ต่อ MQTT ไม่ได้ (หรือยังมีรายการค้างส่ง) บอร์ดสรุปค่าไฟทุก 5 นาที เขียนลง flash พาร์ติชัน <code>rmuttlog</code> เป็น ring buffer รายการละ 32 ไบต์ เก็บได้ 2,048 รายการ (ราว 7 วัน) เต็มแล้วทับของเก่า</li>
+<li>พอต่อได้ รอแบบสุ่ม 5–45 วินาที แล้วส่งชุดละไม่เกิน 10 รายการที่ <code>…/history</code> ห่างกันอย่างน้อย 1 วินาที</li>
+<li><strong>ส่งชุดต่อไปได้ก็ต่อเมื่อได้ <code>history-ack</code></strong> ถ้าไม่ได้ใน 20 วินาที ส่งชุดเดิมซ้ำ</li>
+<li>ได้ <code>history-ack</code> แล้วลบรายการที่ยืนยันออกจาก flash</li>
+</ol>
+<p><strong>แต่ละรายการ</strong> เป็น array ตัวเลข 15 ช่อง เรียงตามนี้ <code>[เวลาปลายช่วง, เลขมิเตอร์ kWh, แรงดันเฉลี่ย×10, ต่ำสุด×10, สูงสุด×10, กระแสเฉลี่ย×1000, สูงสุด×1000, กำลังเฉลี่ย×10, ต่ำสุด×10, สูงสุด×10, PF×100, (ความถี่−40)×10, วินาทีที่แอร์ทำงาน, จำนวนตัวอย่าง, flags]</code> ส่งเป็นจำนวนเต็มคูณสเกลเพื่อให้ข้อความสั้นและเก็บได้ในไบต์น้อย</p>
+<div class="code-block"><span class="code-lang">json</span><div class="hl"><pre><span></span><code>{
+  "v": 1,
+  "deviceId": "ESP32-A1B2C3D4E5F6",
+  "records": [
+    [1760520300, 123.4, 2214, 2205, 2230, 4512, 5100,
+     9802, 120, 11000, 98, 100, 240, 150, 1]
+  ]
+}
+</code></pre></div></div>
+<p><strong>ฝั่ง Backend</strong> (<code>handleAirHistory</code> → <code>recordHistoryBatch</code>)</p>
+<ol>
+<li>รับสูงสุด 50 รายการต่อชุด ถอดรหัสทีละรายการ รายการผิดรูปแบบนับเป็น <code>invalid</code></li>
+<li>เปิด transaction แล้วล็อกแถวของเครื่อง (<code>FOR UPDATE</code>)</li>
+<li>ข้ามรายการที่เก่ากว่า 31 วัน อยู่ในอนาคตเกิน 5 นาที หรือเวลาไม่เกิน "จุดต่อ" ที่บันทึกไปแล้ว (จึงส่งซ้ำกี่ครั้งก็ไม่นับซ้ำ)</li>
+<li>ที่เหลือคำนวณผลต่างจากจุดต่อ บวกเข้าถังรายชั่วโมง และขยับจุดต่อไปข้างหน้า</li>
+<li>ตอบ <code>history-ack</code> ที่ <code>rmutt/ac/&lt;deviceId&gt;/history-ack</code></li>
+</ol>
+<div class="code-block"><span class="code-lang">json</span><div class="hl"><pre><span></span><code>{
+  "version": 1,
+  "upTo": 1760520300,
+  "stored": 10,
+  "skipped": 0
+}
+</code></pre></div></div>
+<p>ถ้าบันทึกไม่สำเร็จ Backend <strong>ไม่ตอบ</strong> บอร์ดจึงส่งชุดเดิมใหม่เอง ระหว่างที่ <code>historyPending &gt; 0</code> Backend ไม่บันทึก status สดลงถัง ไม่งั้นพลังงานช่วงเน็ตหลุดจะถูกนับซ้ำ</p>
+<div class="callout note"><div class="callout-title">หมายเหตุ</div><p>"จุดต่อ" คือคอลัมน์ <code>energy_chain_*</code> ในตาราง <code>air_conditioners</code> (เวลา เลขมิเตอร์ และสถานะแอร์ของตัวอย่างล่าสุดที่บันทึกแล้ว) ข้อมูลสดและข้อมูลย้อนหลังใช้จุดต่อเดียวกัน จึงไม่มีช่วงไหนซ้ำหรือหาย รายละเอียดอยู่ในบท 20</p></div>
+
+<h2 id="เส้นทางที่-5-schedule-status--บอกบอร์ดว่าตอนนี้-อยู่ในคาบ-หรือไม่">เส้นทางที่ 5: <code>schedule-status</code> — บอกบอร์ดว่าตอนนี้ "อยู่ในคาบ" หรือไม่<a class="anchor" href="#เส้นทางที่-5-schedule-status--บอกบอร์ดว่าตอนนี้-อยู่ในคาบ-หรือไม่">#</a></h2>
+<p>Backend รู้ตารางเรียน วันเปิดภาคเรียน และการจองห้อง บอร์ดไม่รู้ Backend จึงประเมินให้ทุกครั้งที่ได้ status ที่ออนไลน์ แล้วส่งที่ <code>…/schedule-status</code> แบบ retain</p>
+<div class="code-block"><span class="code-lang">json</span><div class="hl"><pre><span></span><code>{
+  "version": 1,
+  "classScheduleConfigured": true,
+  "withinClassSchedule": true,
+  "evaluatedAt": "2026-10-15T09:30:10.000Z",
+  "timezone": "Asia/Bangkok"
+}
+</code></pre></div></div>
+<ul>
+<li>Backend อ่านตาราง <code>class_schedules</code> ของห้อง ตรวจว่าอยู่ในช่วงภาคเรียนหรือไม่ (<code>academic_terms</code>) และนับ <code>room_bookings</code> ที่กำลังเกิดขึ้นเป็น "อยู่ในคาบ" ด้วย</li>
+<li>บอร์ดเก็บค่าไว้และใช้ได้ 2 นาที ถ้าไม่ได้ข้อความใหม่เกินนั้น (เช่น Backend ล่ม) จะใช้ตารางเปิด-ปิดประจำวันที่ตั้งไว้ในบอร์ดแทน</li>
+<li>บอร์ดใช้ค่านี้ตั้งธง <code>outsideSchedule</code> (แอร์ทำงาน และไม่อยู่ในคาบ) แล้วรายงานกลับใน status ถัดไป พร้อมเปลี่ยนไฟ LED เตือน</li>
+</ul>
+<h2 id="เส้นทางที่-6-บอร์ดตรวจคน--ปิดแอร์อัตโนมัติ">เส้นทางที่ 6: บอร์ดตรวจคน → ปิดแอร์อัตโนมัติ<a class="anchor" href="#เส้นทางที่-6-บอร์ดตรวจคน--ปิดแอร์อัตโนมัติ">#</a></h2>
+<h3 id="บอร์ดตรวจคนส่ง-status">บอร์ดตรวจคนส่ง <code>status</code><a class="anchor" href="#บอร์ดตรวจคนส่ง-status">#</a></h3>
+<div class="code-block"><span class="code-lang">json</span><div class="hl"><pre><span></span><code>{
+  "online": true,
+  "deviceId": "OCC32-A1B2C3D4E5F6",
+  "firmwareVersion": "1.3.9",
+  "roomNumber": "16302",
+  "radarAvailable": true,
+  "occupied": false,
+  "staticThreshold": 25
+}
+</code></pre></div></div>
+<p>ส่งทุก 10 วินาที และทันทีที่ <code>occupied</code> หรือ <code>radarAvailable</code> เปลี่ยน Backend อัปเดต <code>occupancy_sensors</code> (<code>is_online</code>, <code>radar_available</code>, <code>is_occupied</code>, <code>last_seen_at</code>, รุ่นเฟิร์มแวร์) แล้วค้นหาห้องของเซ็นเซอร์นั้น ส่งให้ระบบปิดแอร์ประเมินเฉพาะแอร์ในห้องนั้น</p>
+<h3 id="ระบบปิดแอร์ตัดสินใจ">ระบบปิดแอร์ตัดสินใจ<a class="anchor" href="#ระบบปิดแอร์ตัดสินใจ">#</a></h3>
+<p><code>services/auto-off.js</code> ถูกปลุกจากสามทาง คือ status ของแอร์ status ของเซ็นเซอร์ และจับเวลาเองทุก 10 วินาที (เผื่ออุปกรณ์เงียบไปเฉย ๆ) โดยมีล็อกใน MariaDB กันไม่ให้ Backend สองตัวยิงซ้ำกัน ถ้าแอดมินปิดสวิตช์รวมไว้ ระบบหยุดและล้างนาฬิกาที่ค้าง</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>เงื่อนไขที่ตรวจ</th>
+<th>ถ้าไม่ผ่าน</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>เซ็นเซอร์ในห้อง ออนไลน์ และเรดาร์พร้อม</td>
+<td>ไม่ปิด (ไม่รู้ว่ามีคนไหม จึงไม่เสี่ยง) ถ้ากำลังนับถอยหลังอยู่ ยกเลิก</td>
+</tr>
+<tr>
+<td>PZEM อ่านได้</td>
+<td>ไม่ปิด (ตรวจไม่ได้ว่าแอร์หยุดจริงไหม)</td>
+</tr>
+<tr>
+<td>ห้องว่าง</td>
+<td>มีคนเข้ามา → ยกเลิกทันที</td>
+</tr>
+<tr>
+<td>แอร์กินไฟอยู่</td>
+<td>ถ้ากำลังนับและเคยสั่งปิดแล้ว = สำเร็จ ถ้ายังไม่เคยสั่ง = ยกเลิก</td>
+</tr>
+</tbody>
+</table></div>
+<p>ถ้าผ่านทั้งหมดและยังไม่นับ → เริ่มนับถอยหลัง 5 นาที (15 นาทีถ้าอยู่ในคาบเรียนหรือมีการจอง) เก็บเวลาไว้ใน <code>auto_off_deadline_at</code> ครบเวลาแล้วยังว่าง → ส่ง <code>command</code> ปิดแอร์ (ใช้ค่าสถานะล่าสุด แล้วตั้ง <code>power: false</code>) ยิงซ้ำทุก 20 วินาทีได้สูงสุด 5 ครั้ง ผลลัพธ์</p>
+<ul>
+<li>กำลังไฟตกจนถือว่าแอร์หยุด → บันทึกแจ้งเตือน <code>auto_off_succeeded</code> แล้วล้างนาฬิกา</li>
+<li>ครบ 5 ครั้งแล้วยังกินไฟ → แจ้งเตือน <code>auto_off_failed</code> ให้คนมาจัดการ</li>
+<li>ไม่มีคาบเรียน แต่แอร์ทำงานและมีคนอยู่ → แจ้งเตือน <code>outside_schedule_occupied</code> (ปิดอัตโนมัติเมื่อเงื่อนไขหมดไป)</li>
+</ul>
+<p>คำสั่งปิดที่ยิงออกไปหน้าตาเหมือนคำสั่งที่ผู้ใช้สั่งทุกประการ บอร์ดจึงไม่รู้ด้วยซ้ำว่าใครสั่ง</p>
+<h2 id="เส้นทางที่-7-ติดตั้งบอร์ดใหม่-provision--provision-ack">เส้นทางที่ 7: ติดตั้งบอร์ดใหม่ (<code>provision</code> ↔ <code>provision-ack</code>)<a class="anchor" href="#เส้นทางที่-7-ติดตั้งบอร์ดใหม่-provision--provision-ack">#</a></h2>
+<div class="code-block"><div class="hl"><pre><span></span><code>แอดมิน (แอป) กรอกห้อง/แอร์ → POST /api/air-conditioners/reservations (ขอจองอุปกรณ์)
+   │ Backend สร้างแถว provision_status = reserved
+   │ สร้าง token แบบสุ่ม เก็บเฉพาะ "แฮช" + เวลาหมดอายุ 15 นาที
+   │ (โหมด dynsec) สร้างบัญชี MQTT + ACL ให้บอร์ดนี้
+   ▼
+แอป → บอร์ด ทาง Bluetooth: Wi-Fi + MQTT (host, topic, user/pass) + token
+   ▼
+บอร์ดต่อ Wi-Fi และ Broker แล้วส่ง  …/provision  (retain) ทุก 10 วินาที
+   { "token": "…", "deviceId": "ESP32-…", "roomNumber": "16302", "airNumber": 1 }
+   ▼
+Backend activateProvisioning():
+   ตรวจว่าแถวเป็น reserved/active, token ยังไม่หมดอายุ, แฮชของ token ตรงกัน
+   → provision_status = 'active', is_online = 1
+   → ส่ง  …/provision-ack (retain)  { "version":1, "activated":true, "deviceId":"…", "token":"…" }
+   → ลบแฮช token และเวลาหมดอายุออกจากฐานข้อมูล
+   → ล้าง retained ของ  …/provision  (ส่งข้อความว่าง)
+   ▼
+บอร์ดได้ provision-ack ที่ token ตรงกับของตัวเอง → ลบ token ใน flash
+   → ล้าง retained ของ  …/provision-ack (ส่งข้อความว่าง)
+</code></pre></div></div>
+<p>ถ้า token ไม่ตรงหรือหมดอายุ Backend ไม่ทำอะไรเลย (ไม่ตอบ ไม่บันทึก) ผู้ใช้จึงเห็นเครื่องค้างที่สถานะ reserved แล้วต้องจองใหม่ บอร์ดตรวจคนทำแบบเดียวกันทุกประการที่ <code>rmutt/occupancy/…</code></p>
+<div class="callout why"><div class="callout-title">ทำไม</div><p><strong>ทำไมใช้ retain กับ provision และ provision-ack แล้วต้องล้างทิ้ง</strong>
+retain ทำให้ข้อความรออยู่ที่ Broker แม้อีกฝ่ายยังไม่ต่อ ถ้า Backend รีสตาร์ตอยู่พอดี พอกลับมาก็ยังเห็น <code>provision</code> ของบอร์ด และถ้าบอร์ดหลุดก่อนได้ ack พอต่อกลับมาก็ยังได้ <code>provision-ack</code> แต่ข้อความพวกนี้มีความลับ (token) จึงต้องล้างทิ้งเมื่อใช้เสร็จ ไม่ให้ค้างบน Broker</p></div>
+
+<h2 id="เส้นทางที่-8-คำสั่งพิเศษทาง-command">เส้นทางที่ 8: คำสั่งพิเศษทาง <code>command</code><a class="anchor" href="#เส้นทางที่-8-คำสั่งพิเศษทาง-command">#</a></h2>
+<p>นอกจาก <code>state</code> แล้ว topic <code>command</code> รับ <code>action</code> อีกสามแบบ (ทั้งบอร์ดแอร์และบอร์ดตรวจคน) ส่งเข้า QoS 1 ไม่ retain</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th><code>action</code></th>
+<th>ใครสั่ง</th>
+<th>บอร์ดทำอะไร</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>enter_setup</code></td>
+<td>แอดมินกด "ตั้งค่าใหม่" (<code>POST …/setup-mode</code>)</td>
+<td>เปิดโหมดตั้งค่า Bluetooth โดยยังออนไลน์อยู่ ใช้ได้ภายในหน้าต่าง 5 นาที</td>
+</tr>
+<tr>
+<td><code>ota</code> พร้อม <code>url</code></td>
+<td>แอดมินกดอัปเดตเฟิร์มแวร์</td>
+<td>ตรวจว่า URL เป็นของ Backend ที่อนุญาต (ไม่งั้นรายงาน <code>otaError: url_rejected</code>) ตัดการเชื่อมต่อ MQTT ดาวน์โหลดผ่าน HTTPS เขียนลงเครื่อง แล้วรีบูต ถ้าล้มเหลวทำงานต่อด้วยรุ่นเดิมและรายงานสาเหตุใน <code>otaError</code></td>
+</tr>
+<tr>
+<td><code>unprovision</code> พร้อม <code>deviceId</code></td>
+<td>Backend ตอนแอดมินลบอุปกรณ์</td>
+<td>ตรวจว่า <code>deviceId</code> เป็นของตัวเองอีกชั้น แล้วล้างค่าทั้งหมด (Wi-Fi, MQTT, ห้อง, สถานะแอร์, ข้อมูลย้อนหลัง) และรีบูตเข้าโหมดตั้งค่า</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="ลำดับตอนลบอุปกรณ์">ลำดับตอนลบอุปกรณ์<a class="anchor" href="#ลำดับตอนลบอุปกรณ์">#</a></h3>
+<p>ลำดับสำคัญเพราะถ้าลบบัญชี MQTT ก่อน Broker จะตัดบอร์ดทันทีและคำสั่งไปไม่ถึง</p>
+<ol>
+<li>ลบแถวในฐานข้อมูล</li>
+<li>ส่ง <code>{"action":"unprovision","deviceId":"…"}</code> ไปที่ <code>command</code> แล้วรอสูงสุด 4 วินาที</li>
+<li>บอร์ดตอบที่ <code>status</code> ว่า <code>{"deviceId":"…","online":false,"unprovisioned":true}</code> แล้วล้าง retained ของ <code>status</code> และ <code>state</code> ของตัวเอง ตัดการเชื่อมต่อแบบปกติ (ไม่ให้ Last Will ถูกส่ง) แล้วล้างค่าและรีบูต</li>
+<li>Backend ล้างข้อความ retain ของอุปกรณ์ทั้งหมดบน Broker (<code>command</code>, <code>state</code>, <code>status</code>, <code>provision</code>, <code>provision-ack</code>, <code>schedule-status</code>)</li>
+<li>ลบบัญชี MQTT ของบอร์ด</li>
+</ol>
+<p>ถ้าบอร์ดออฟไลน์ คำสั่งไม่ถึง แต่การลบในฐานข้อมูลยังสำเร็จเสมอ (ไม่ส่งแบบ retain เพราะถ้าเพิ่มบอร์ดตัวเดิมกลับมา คำสั่งค้างจะล้างบอร์ดอีกรอบ) เมื่อบอร์ดตัวนั้นกลับมาออนไลน์ Broker จะปฏิเสธรหัสทุกครั้ง และบอร์ดล้างค่าตัวเองหลังถูกปฏิเสธติดกันเกิน 2 นาที (อย่างน้อย 10 ครั้ง)</p>
+<h2 id="สรุป-ข้อความไหนเปลี่ยนอะไรในฐานข้อมูล">สรุป: ข้อความไหนเปลี่ยนอะไรในฐานข้อมูล<a class="anchor" href="#สรุป-ข้อความไหนเปลี่ยนอะไรในฐานข้อมูล">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>ข้อความ</th>
+<th>ตาราง/คอลัมน์ที่เปลี่ยน</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>status</code> ของแอร์</td>
+<td><code>air_conditioners</code>: <code>is_online</code>, ค่าไฟ 6 ค่า, <code>pzem_available</code>, <code>ac_running</code>, <code>outside_schedule</code>, <code>last_seen_at</code>, <code>firmware_version</code>, <code>ota_error</code>, <code>history_pending</code>, <code>protocol</code> และ <code>energy_chain_*</code>; <code>energy_hourly</code>: บวกเข้าถังชั่วโมง</td>
+</tr>
+<tr>
+<td><code>state</code></td>
+<td><code>air_conditioners.state_json</code>, <code>is_online</code>, <code>last_seen_at</code></td>
+</tr>
+<tr>
+<td><code>history</code></td>
+<td><code>energy_hourly</code> (ผ่าน transaction) และ <code>energy_chain_*</code></td>
+</tr>
+<tr>
+<td><code>status</code> ของเซ็นเซอร์</td>
+<td><code>occupancy_sensors</code>: <code>is_online</code>, <code>radar_available</code>, <code>is_occupied</code>, <code>last_seen_at</code>, <code>firmware_version</code>, <code>ota_error</code></td>
+</tr>
+<tr>
+<td><code>provision</code></td>
+<td><code>provision_status = 'active'</code>, ล้าง <code>provisioning_token_hash</code> และ <code>provisioning_expires_at</code></td>
+</tr>
+<tr>
+<td>การตัดสินใจปิดแอร์</td>
+<td><code>air_conditioners.auto_off_*</code>, <code>state_json</code>; <code>system_alerts</code></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="ลองดูข้อความจริงด้วยตัวเอง">ลองดูข้อความจริงด้วยตัวเอง<a class="anchor" href="#ลองดูข้อความจริงด้วยตัวเอง">#</a></h2>
+<p>ถ้าเครื่องที่ต่อ Broker ได้มีโปรแกรม Mosquitto client ติดตั้งอยู่ ใช้ดูข้อความที่ไหลผ่านได้ (ต้องมีบัญชีที่มีสิทธิ์อ่าน topic เหล่านี้ เช่นบัญชีของ Backend)</p>
+<div class="code-block"><span class="code-lang">bash</span><div class="hl"><pre><span></span><code># ดูทุกข้อความของบอร์ดแอร์ทั้งหมด (-v แสดงชื่อ topic ด้วย)
+mosquitto_sub -h &lt;broker&gt; -p 1883 -u &lt;user&gt; -P &lt;password&gt; -t 'rmutt/ac/#' -v
+
+# ดูเฉพาะ status ของเซ็นเซอร์ตรวจคน
+mosquitto_sub -h &lt;broker&gt; -p 1883 -u &lt;user&gt; -P &lt;password&gt; -t 'rmutt/occupancy/+/status' -v
+</code></pre></div></div>
+<p>ข้อความ <code>status</code> และ <code>state</code> เป็น retain เปิดดูแล้วจะเห็นค่าล่าสุดทันทีแม้บอร์ดยังไม่ส่งรอบใหม่ ส่วน <code>command</code> ไม่ retain จะเห็นเฉพาะตอนมีคนสั่ง</p>
+<h2 id="คำถามที่อาจารย์อาจถาม">คำถามที่อาจารย์อาจถาม<a class="anchor" href="#คำถามที่อาจารย์อาจถาม">#</a></h2>
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> ทำไมแอปไม่ subscribe MQTT เองเพื่อให้เห็นค่าเรียลไทม์?</p>
+<p><strong>ตอบ:</strong> ตั้งใจให้ Backend เป็นประตูเดียว เพราะต้องตรวจสิทธิ์ผู้ใช้ ตรวจค่าที่สั่ง และบันทึกประวัติ ถ้าแอปต่อ Broker ตรงต้องแจกรหัส Broker ให้ทุกเครื่องและกระจายกติกาไปทุกแอป ข้อเสียคือแอปเห็นค่าช้ากว่าจริงได้สูงสุดราว 10 วินาที (ช่วงดึงข้อมูล) ซึ่งยอมรับได้เพราะค่าไฟและสถานะแอร์ไม่ได้เปลี่ยนเร็วขนาดนั้น</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> ถ้า Backend ล่มระหว่างที่บอร์ดส่ง status จะเกิดอะไรขึ้น?</p>
+<p><strong>ตอบ:</strong> บอร์ดส่ง QoS 0 และ Backend ต่อ Broker แบบ <code>clean: true</code> ข้อความ status ช่วงนั้นหายไป แต่ไม่กระทบความถูกต้องของค่าไฟสะสม เพราะค่าไฟคิดจากผลต่างของเลขมิเตอร์ PZEM ครั้งแรกที่กลับมาจะบวกพลังงานของช่วงที่หายไปเข้าชั่วโมงปัจจุบัน (ถ้าเงียบเกิน 5 นาที เวลาทำงานช่วงนั้นไม่นับ แต่พลังงานนับตามผลต่างเลขมิเตอร์) ส่วน <code>status</code> และ <code>state</code> ที่เป็น retain ทำให้เห็นค่าล่าสุดทันทีเมื่อกลับมาต่อ</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> ถ้าบอร์ดส่งข้อมูลย้อนหลังซ้ำ จะนับค่าไฟซ้ำไหม?</p>
+<p><strong>ตอบ:</strong> ไม่นับ Backend จำ "จุดต่อ" (เวลาของตัวอย่างล่าสุดที่บันทึก) รายการที่เวลาไม่เกินจุดต่อถูกข้าม และจะไม่ตอบ <code>history-ack</code> ถ้าบันทึกไม่สำเร็จ บอร์ดจึงส่งซ้ำได้อย่างปลอดภัย ระหว่างที่ยังส่งไม่ครบ Backend ยังไม่บันทึก status สดลงถังด้วย</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> ทำไมระบบปิดแอร์อยู่ที่ Backend ไม่ใช่ในบอร์ด?</p>
+<p><strong>ตอบ:</strong> เซ็นเซอร์ตรวจคนกับบอร์ดแอร์เป็นคนละตัวและไม่ได้คุยกันเอง Backend เป็นที่เดียวที่เห็นทั้งสองฝั่ง รวมทั้งตารางเรียน ภาคเรียน และการจองห้อง ข้อเสียคือถ้า Backend ล่ม ระบบปิดอัตโนมัติหยุด แต่ตารางเปิด-ปิดประจำวันในบอร์ดยังทำงานต่อได้</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> ใครสั่งปิดแอร์ ผู้ใช้หรือระบบ บอร์ดแยกออกไหม?</p>
+<p><strong>ตอบ:</strong> แยกไม่ออกและไม่จำเป็นต้องแยก ทั้งสองทางส่ง <code>command</code> รูปแบบเดียวกัน บอร์ดทำตามค่าที่ตรวจผ่าน ส่วนการแยกว่าใครสั่งอยู่ที่ Backend (ระบบปิดแอร์เขียน <code>auto_off_*</code> และสร้างแจ้งเตือน)</p></div>
+
+<h2 id="เช็กลิสต์ความเข้าใจ">เช็กลิสต์ความเข้าใจ<a class="anchor" href="#เช็กลิสต์ความเข้าใจ">#</a></h2>
+<ul>
+<li class="check"><input type="checkbox"> เล่าได้ว่า status หนึ่งข้อความผ่านขั้นตอนไหนใน Backend บ้างจนถึงการส่ง <code>schedule-status</code> กลับ</li>
+<li class="check"><input type="checkbox"> บอกได้ว่าข้อความไหน retain ข้อความไหนไม่ retain และเพราะอะไร</li>
+<li class="check"><input type="checkbox"> อธิบายได้ว่า Last Will ทำงานอย่างไร และทำไมตัดการเชื่อมต่อแบบปกติจึงไม่ส่ง</li>
+<li class="check"><input type="checkbox"> บอกรอบเวลาหลักได้: PZEM 2 วินาที, status 10 วินาที, history 5 นาที, ปิดแอร์รอ 5/15 นาที ยิงซ้ำทุก 20 วินาที</li>
+<li class="check"><input type="checkbox"> อธิบายได้ว่าทำไมต้องรอ <code>history-ack</code> ก่อนส่งชุดต่อไป และอะไรกันไม่ให้นับค่าไฟซ้ำ</li>
+<li class="check"><input type="checkbox"> วาดลำดับตอนลบอุปกรณ์ได้ และบอกได้ว่าทำไมต้องส่งคำสั่งก่อนลบบัญชี MQTT</li>
+<li class="check"><input type="checkbox"> บอกได้ว่าทำไมแอปไม่ฟัง MQTT และข้อดีข้อเสียของการเลือกแบบนี้</li>
+</ul><nav class="pager"><a class="prev" href="20-database-design.html"><span>← บทก่อนหน้า</span>20. เจาะลึกการออกแบบฐานข้อมูล</a></nav>
+  </main>
+  <aside class="toc"><div class="toc-title">ในบทนี้</div><ul><li><a href="#ภาพรวม-ใครส่งอะไรให้ใคร">ภาพรวม: ใครส่งอะไรให้ใคร</a></li><li><a href="#กติกาพื้นฐานของทุกข้อความ">กติกาพื้นฐานของทุกข้อความ</a></li><li><a href="#topic-ทั้งหมดของบอร์ดแอร์">Topic ทั้งหมดของบอร์ดแอร์</a></li><li><a href="#ตารางเวลา-อะไรเกิดทุกกี่วินาที">ตารางเวลา: อะไรเกิดทุกกี่วินาที</a></li><li><a href="#เส้นทางที่-1-บอร์ดต่อ-broker-ได้">เส้นทางที่ 1: บอร์ดต่อ Broker ได้</a></li><li><a href="#เส้นทางที่-2-บอร์ดแอร์ส่ง-status-หัวใจของระบบ">เส้นทางที่ 2: บอร์ดแอร์ส่ง status (หัวใจของระบบ)</a></li><li><a href="#เส้นทางที่-3-ผู้ใช้สั่งแอร์-command--ir--state">เส้นทางที่ 3: ผู้ใช้สั่งแอร์ (command → IR → state)</a></li><li><a href="#เส้นทางที่-4-ข้อมูลช่วงเน็ตหลุด-history--history-ack">เส้นทางที่ 4: ข้อมูลช่วงเน็ตหลุด (history ↔ history-ack)</a></li><li><a href="#เส้นทางที่-5-schedule-status--บอกบอร์ดว่าตอนนี้-อยู่ในคาบ-หรือไม่">เส้นทางที่ 5: schedule-status — บอกบอร์ดว่าตอนนี้ &quot;อยู่ในคาบ&quot; หรือไม่</a></li><li><a href="#เส้นทางที่-6-บอร์ดตรวจคน--ปิดแอร์อัตโนมัติ">เส้นทางที่ 6: บอร์ดตรวจคน → ปิดแอร์อัตโนมัติ</a></li><li><a href="#เส้นทางที่-7-ติดตั้งบอร์ดใหม่-provision--provision-ack">เส้นทางที่ 7: ติดตั้งบอร์ดใหม่ (provision ↔ provision-ack)</a></li><li><a href="#เส้นทางที่-8-คำสั่งพิเศษทาง-command">เส้นทางที่ 8: คำสั่งพิเศษทาง command</a></li><li><a href="#สรุป-ข้อความไหนเปลี่ยนอะไรในฐานข้อมูล">สรุป: ข้อความไหนเปลี่ยนอะไรในฐานข้อมูล</a></li><li><a href="#ลองดูข้อความจริงด้วยตัวเอง">ลองดูข้อความจริงด้วยตัวเอง</a></li><li><a href="#คำถามที่อาจารย์อาจถาม">คำถามที่อาจารย์อาจถาม</a></li><li><a href="#เช็กลิสต์ความเข้าใจ">เช็กลิสต์ความเข้าใจ</a></li></ul></aside>
+</div>
+<button class="to-top" id="toTop" aria-label="กลับขึ้นด้านบน">↑</button>
+<script src="../assets/search.js"></script>
+<script src="../assets/app.js"></script>
+</body>
+</html>

@@ -1156,14 +1156,16 @@ const _englishTranslations = <String, String>{
   // --- User permission management (v3.7.0) ---
   'เฉพาะผู้ดูแลระบบเท่านั้นที่ทำรายการนี้ได้':
       'Only administrators can perform this action.',
-  'Username ต้องยาว 3–100 ตัว ใช้ได้เฉพาะ A–Z, 0–9, จุด, ขีดกลางและขีดล่าง':
-      'The username must be 3–100 characters using A–Z, 0–9, dot, hyphen or underscore.',
+  'Username ต้องยาว 3–30 ตัว ใช้ได้เฉพาะ A–Z, 0–9, จุด, ขีดกลางและขีดล่าง':
+      'The username must be 3–30 characters using A–Z, 0–9, dot, hyphen or underscore.',
   'สิทธิ์ต้องเป็น admin หรือ staff เท่านั้น':
       'The role must be either admin or staff.',
   'กรุณากรอกชื่อ': 'Please enter the first name.',
   'กรุณากรอกนามสกุล': 'Please enter the last name.',
   'รูปแบบอีเมลไม่ถูกต้อง': 'The email format is invalid.',
   'รูปแบบเบอร์โทรไม่ถูกต้อง': 'The phone number format is invalid.',
+  'เบอร์โทรต้องเป็นตัวเลข 9–10 หลัก ขึ้นต้นด้วย 0':
+      'The phone number must be 9–10 digits starting with 0.',
   'สถานะบัญชีต้องเป็น true หรือ false':
       'The account status must be true or false.',
   'ไม่มีข้อมูลที่ต้องแก้ไข': 'There is nothing to update.',

@@ -227,6 +227,231 @@ export function areaChart(points, options = {}) {
 }
 
 /**
+ * กราฟเปรียบเทียบสองชุด (A กับ B) ซ้อนกันบนแกนเดียวกัน
+ *
+ * จุดของสองชุดจับคู่กันตาม "ลำดับ" ไม่ใช่ตามวันที่จริง วันชนวันจึงเทียบชั่วโมงที่ 0
+ * กับชั่วโมงที่ 0 ส่วนช่วงชนช่วงเทียบวันที่ 1 กับวันที่ 1 ถ้าสองช่วงยาวไม่เท่ากัน
+ * เส้นที่สั้นกว่าจะจบก่อน (ไม่ลากไปเป็นศูนย์ให้เข้าใจผิดว่าใช้ไฟ 0)
+ *
+ * ทั้งสองเส้นใช้เพดานแกนตั้งเดียวกัน ไม่งั้นดูด้วยตาเทียบกันไม่ได้
+ *
+ * @param {{name:string, color:string, dashed?:boolean, fill?:boolean,
+ *          points:{label:string, value:number, tip?:string}[]}[]} seriesList
+ * @param {{height:number, axisLabels:string[], headOf:Function}} options
+ *   `axisLabels[i]` คือป้ายแกนนอนของลำดับที่ i
+ *   `headOf(i)` คือหัวข้อของกล่องค่าตอนชี้ที่ลำดับ i
+ */
+export function compareChart(seriesList, options = {}) {
+  const { height = 190, axisLabels = [], headOf = null } = options;
+  const wrapper = el('div', { class: 'spark-wrap compare-chart' });
+  const count = Math.max(0, ...seriesList.map((item) => item.points.length));
+  if (count === 0) {
+    wrapper.appendChild(el('div', { class: 'empty', text: 'ยังไม่มีข้อมูล' }));
+    return wrapper;
+  }
+
+  const width = 1000;
+  const padTop = 26;
+  const padBottom = 4;
+  const valuesOf = (item) => item.points.map((point) => Number(point.value) || 0);
+  const all = seriesList.flatMap(valuesOf);
+  const reference = scaleReference(all);
+  const unit = energyUnit(reference);
+  const labelOf = (value) =>
+    energy(value, { scaleReference: reference, withUnit: false });
+  const max = Math.max(...all) * 1.15 || 1;
+  const innerHeight = height - padTop - padBottom;
+  const x = (index) => (count > 1 ? (index * width) / (count - 1) : width / 2);
+  const y = (value) => padTop + innerHeight - (value / max) * innerHeight;
+
+  const svg = node('svg', {
+    viewBox: `0 0 ${width} ${height}`,
+    width: '100%',
+    height,
+    preserveAspectRatio: 'none',
+    class: 'spark-hit',
+  });
+
+  const gradientIds = [];
+  const defs = node('defs');
+  seriesList.forEach((item, seriesIndex) => {
+    if (!item.fill) return;
+    const id = `cmpFill-${seriesIndex}-${Math.random().toString(36).slice(2, 8)}`;
+    gradientIds[seriesIndex] = id;
+    const gradient = node('linearGradient', { id, x1: 0, y1: 0, x2: 0, y2: 1 });
+    const top = node('stop', { offset: '0%', 'stop-opacity': 0.26 });
+    const bottom = node('stop', { offset: '100%', 'stop-opacity': 0 });
+    top.style.stopColor = item.color;
+    bottom.style.stopColor = item.color;
+    gradient.append(top, bottom);
+    defs.appendChild(gradient);
+  });
+  svg.appendChild(defs);
+
+  // เส้นที่มีพื้นสีวาดก่อน เส้นประของอีกชุดจะได้ไม่ถูกพื้นสีทับ
+  const order = seriesList
+    .map((item, index) => ({ item, index }))
+    .sort((left, right) => Number(Boolean(right.item.fill)) - Number(Boolean(left.item.fill)));
+  for (const { item, index: seriesIndex } of order) {
+    const values = valuesOf(item);
+    if (values.length === 0) continue;
+    const line = values.map((value, index) => `${x(index)},${y(value)}`);
+    if (gradientIds[seriesIndex]) {
+      svg.appendChild(
+        node('path', {
+          d: `M${line.join(' L')} L${x(values.length - 1)},${height} L${x(0)},${height} Z`,
+          fill: `url(#${gradientIds[seriesIndex]})`,
+        }),
+      );
+    }
+    const polyline = node('polyline', {
+      points: line.join(' '),
+      fill: 'none',
+      'stroke-width': 2.4,
+      'stroke-linecap': 'round',
+      'stroke-linejoin': 'round',
+      'stroke-dasharray': item.dashed ? '7 6' : null,
+      'vector-effect': 'non-scaling-stroke',
+    });
+    polyline.style.stroke = item.color;
+    svg.appendChild(polyline);
+    if (count <= 60) {
+      values.forEach((value, index) => {
+        const dot = node('circle', {
+          cx: x(index),
+          cy: y(value),
+          r: 3.5,
+          'stroke-width': 1.6,
+          'vector-effect': 'non-scaling-stroke',
+        });
+        // จุดของเส้นประเป็นวงกลวง จะแยกออกจากเส้นทึบได้แม้ตาบอดสี
+        dot.style.fill = item.dashed ? 'var(--panel)' : item.color;
+        dot.style.stroke = item.color;
+        svg.appendChild(dot);
+      });
+    }
+  }
+  wrapper.appendChild(svg);
+  wrapper.style.position = 'relative';
+
+  // ป้ายค่าสูงสุดของแต่ละชุด (ค่าอื่น ๆ ดูได้จากการชี้)
+  const layer = el('div', {
+    style: {
+      position: 'absolute',
+      left: '0',
+      right: '0',
+      top: '0',
+      height: `${height}px`,
+      pointerEvents: 'none',
+    },
+  });
+  for (const item of seriesList) {
+    const values = valuesOf(item);
+    const peak = Math.max(0, ...values);
+    if (peak <= 0) continue;
+    const index = values.indexOf(peak);
+    layer.appendChild(
+      el('div', {
+        class: 'chart-label peak',
+        text: labelOf(peak),
+        style: {
+          left: `${(x(index) / width) * 100}%`,
+          top: `${(y(peak) / height) * 100}%`,
+          color: item.color,
+          transform:
+            index === 0
+              ? 'translate(0, -165%)'
+              : index === count - 1
+                ? 'translate(-100%, -165%)'
+                : null,
+        },
+      }),
+    );
+  }
+  wrapper.appendChild(layer);
+
+  const stride = Math.max(1, Math.ceil(count / 12));
+  wrapper.appendChild(
+    el(
+      'div',
+      { class: 'spark-days', 'aria-hidden': 'true' },
+      Array.from({ length: count }, (_, index) =>
+        el('span', {
+          text: index === 0 || index % stride === 0 ? (axisLabels[index] ?? '') : '',
+        }),
+      ),
+    ),
+  );
+  wrapper.appendChild(
+    el('div', {
+      class: 'chart-unit',
+      text: `หน่วยบนกราฟ: ${unit} · เส้นทึบคือ A เส้นประคือ B · ชี้หรือแตะที่กราฟเพื่อเทียบค่าแต่ละจุด`,
+    }),
+  );
+
+  // เส้นตั้ง จุดของแต่ละชุด และกล่องที่บอกค่าของทั้งสองชุดพร้อมกัน
+  const cursor = el('div', { class: 'chart-cursor', style: { height: `${height}px` } });
+  const dots = seriesList.map((item) => {
+    const dot = el('div', { class: 'chart-dot' });
+    dot.style.background = item.color;
+    return dot;
+  });
+  const tipHead = el('span', { class: 'tip-head' });
+  const tipRows = seriesList.map((item) => {
+    const swatch = el('i', { class: 'tip-swatch' });
+    swatch.style.background = item.color;
+    const value = el('b', { class: 'tip-value' });
+    value.style.color = item.color;
+    return { node: el('div', { class: 'tip-row' }, [swatch, el('span'), value]), value };
+  });
+  const tip = el('div', { class: 'spark-tip compare-tip', role: 'status' }, [
+    tipHead,
+    ...tipRows.map((row) => row.node),
+  ]);
+  wrapper.append(cursor, ...dots, tip);
+
+  const show = (clientX) => {
+    const box = svg.getBoundingClientRect();
+    if (box.width === 0) return;
+    const ratio = Math.min(1, Math.max(0, (clientX - box.left) / box.width));
+    const index = count > 1 ? Math.round(ratio * (count - 1)) : 0;
+    const left = (x(index) / width) * box.width;
+    tipHead.textContent = headOf ? headOf(index) : (axisLabels[index] ?? '');
+    let topMost = height;
+    seriesList.forEach((item, seriesIndex) => {
+      const point = item.points[index];
+      const row = tipRows[seriesIndex];
+      const dot = dots[seriesIndex];
+      if (!point) {
+        row.node.style.display = 'none';
+        dot.style.opacity = '0';
+        return;
+      }
+      const value = Number(point.value) || 0;
+      row.node.style.display = '';
+      row.node.children[1].textContent = point.tip ?? item.name;
+      row.value.textContent = `${labelOf(value)} ${unit}`;
+      dot.style.left = `${left}px`;
+      dot.style.top = `${(y(value) / height) * height}px`;
+      dot.style.opacity = '';
+      topMost = Math.min(topMost, y(value));
+    });
+    cursor.style.left = `${left}px`;
+    const half = tip.offsetWidth / 2;
+    tip.style.left = `${Math.min(box.width - half, Math.max(half, left))}px`;
+    tip.style.top = `${Math.max(topMost, 56)}px`;
+    wrapper.classList.add('hovering');
+  };
+  const hide = () => wrapper.classList.remove('hovering');
+  svg.addEventListener('pointermove', (event) => show(event.clientX));
+  svg.addEventListener('pointerdown', (event) => show(event.clientX));
+  svg.addEventListener('pointerleave', hide);
+  svg.addEventListener('pointercancel', hide);
+
+  return wrapper;
+}
+
+/**
  * เส้นตั้ง จุด และกล่องค่าที่ตามเมาส์ (หรือนิ้ว) บนกราฟ
  *
  * หาจุดที่ใกล้ที่สุดจากตำแหน่งแนวนอนอย่างเดียว ผู้ใช้จึงไม่ต้องเล็งให้โดนจุด

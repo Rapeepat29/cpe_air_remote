@@ -1300,3 +1300,59 @@ table.data.sticky-first tfoot td:first-child {
     flex: 1;
   }
 }
+
+/* ------------------------------------------------ เปรียบเทียบกราฟ (ภาพรวม) */
+
+.compare-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.compare-modes {
+  margin: 0;
+}
+
+.compare-quick {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.compare-quick-label {
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--text-mid);
+}
+
+.compare-range-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.compare-range-groups[hidden],
+.compare-panel .hero-range-fields[hidden] {
+  display: none;
+}
+
+.compare-actions {
+  margin-left: 0;
+  justify-content: flex-end;
+}
+
+.compare-panel .hero-range-msg {
+  margin-top: 0;
+}
+
+.cmp-swatch,
+.tip-swatch {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  margin-right: 6px;
+  vertical-align: baseline;
+  flex: none;
+}

@@ -386,7 +386,7 @@ class _RoomEditorSheetState extends State<_RoomEditorSheet> {
               controller: _numberController,
               enabled: !_isEditing,
               autofocus: !_isEditing,
-              maxLength: 20,
+              maxLength: 10,
               textCapitalization: TextCapitalization.characters,
               inputFormatters: [
                 FilteringTextInputFormatter.allow(RegExp(r'[A-Za-z0-9_-]')),
@@ -429,7 +429,7 @@ class _RoomEditorSheetState extends State<_RoomEditorSheet> {
             TextField(
               key: const Key('room-type-field'),
               controller: _typeController,
-              maxLength: 100,
+              maxLength: 50,
               textInputAction: TextInputAction.done,
               decoration: InputDecoration(
                 labelText: context.tr('Room type or name'),

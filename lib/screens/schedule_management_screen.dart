@@ -790,7 +790,7 @@ class _ScheduleEditorSheetState extends State<_ScheduleEditorSheet> {
               key: const Key('schedule-subject-field'),
               controller: _subjectController,
               autofocus: widget.schedule == null,
-              maxLength: 150,
+              maxLength: 100,
               textInputAction: TextInputAction.next,
               decoration: InputDecoration(
                 labelText: context.tr('Subject name'),
@@ -802,7 +802,7 @@ class _ScheduleEditorSheetState extends State<_ScheduleEditorSheet> {
             TextField(
               key: const Key('schedule-section-field'),
               controller: _sectionController,
-              maxLength: 80,
+              maxLength: 30,
               textInputAction: TextInputAction.next,
               decoration: InputDecoration(
                 labelText: context.tr('Section'),
@@ -814,7 +814,7 @@ class _ScheduleEditorSheetState extends State<_ScheduleEditorSheet> {
             TextField(
               key: const Key('schedule-instructor-field'),
               controller: _instructorController,
-              maxLength: 150,
+              maxLength: 100,
               textInputAction: TextInputAction.done,
               decoration: InputDecoration(
                 labelText: context.tr('Instructor'),

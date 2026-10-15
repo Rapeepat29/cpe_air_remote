@@ -555,7 +555,7 @@ class _CreateUserSheetState extends State<_CreateUserSheet> {
               key: const Key('new-username-field'),
               controller: _usernameController,
               autofocus: true,
-              maxLength: 100,
+              maxLength: 30,
               inputFormatters: [
                 FilteringTextInputFormatter.allow(RegExp(r'[A-Za-z0-9._-]')),
               ],
@@ -590,7 +590,7 @@ class _CreateUserSheetState extends State<_CreateUserSheet> {
                   child: TextField(
                     key: const Key('new-first-name-field'),
                     controller: _firstNameController,
-                    maxLength: 100,
+                    maxLength: 30,
                     decoration: InputDecoration(
                       labelText: context.tr('First name'),
                     ),
@@ -601,7 +601,7 @@ class _CreateUserSheetState extends State<_CreateUserSheet> {
                   child: TextField(
                     key: const Key('new-last-name-field'),
                     controller: _lastNameController,
-                    maxLength: 100,
+                    maxLength: 30,
                     decoration: InputDecoration(
                       labelText: context.tr('Last name'),
                     ),
@@ -614,7 +614,7 @@ class _CreateUserSheetState extends State<_CreateUserSheet> {
               key: const Key('new-email-field'),
               controller: _emailController,
               keyboardType: TextInputType.emailAddress,
-              maxLength: 190,
+              maxLength: 100,
               decoration: InputDecoration(
                 labelText: context.tr('Email'),
                 prefixIcon: const Icon(Icons.mail_outline_rounded),
@@ -624,9 +624,9 @@ class _CreateUserSheetState extends State<_CreateUserSheet> {
               key: const Key('new-phone-field'),
               controller: _phoneController,
               keyboardType: TextInputType.phone,
-              maxLength: 30,
+              maxLength: 10,
               inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp(r'[0-9+()\- ]')),
+                FilteringTextInputFormatter.digitsOnly,
               ],
               decoration: InputDecoration(
                 labelText: context.tr('Phone'),
