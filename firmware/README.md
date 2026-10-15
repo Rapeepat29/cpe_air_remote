@@ -190,6 +190,19 @@ unconnected pin simply goes nowhere — it does not upset the module, the UART
 stream or the ESP32. Never wire `OUT` to `5V` or `GND`: shorting an output is
 the one connection that can damage the module.
 
+#### Status LEDs (firmware 1.3.3+)
+
+| LED | ESP32 pin | Meaning |
+|---|---|---|
+| Green | `GPIO25` (`D25`) | **on** — Wi-Fi and MQTT both connected, the board is reporting to the app · **blinking** — connecting to Wi-Fi, waiting for NTP time, or retrying MQTT · **off** — not configured yet, or in BLE setup because the stored Wi-Fi could not connect (it blinks briefly every 30 s while retrying that Wi-Fi in the background) |
+| Red | `GPIO26` (`D26`) | **on** — someone is in the room (`occupied=true`) · **off** — nobody, or the radar is not sending data |
+
+Wire each LED's long leg (anode) to the pin through a 220–330 Ω resistor and the
+short leg (cathode) to `GND`. The LEDs are optional; the firmware runs the same
+without them. If `ld2410_pinscan` suggests moving the radar to `GPIO25` or
+`GPIO26`, move the matching LED constant (`GREEN_LED_PIN` / `RED_LED_PIN`) to a
+free pin as well.
+
 `GPIO0` remains the BOOT/setup button. Use a stable low-voltage USB supply and
 disconnect power before changing the wiring. This occupancy circuit does not
 connect to mains electricity.
