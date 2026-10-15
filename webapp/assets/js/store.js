@@ -259,6 +259,12 @@ const tasks = [
     every: POLL.rooms,
     run: () => loaders.airConditioners(),
   },
+  {
+    // สถานะออนไลน์ รุ่นเฟิร์มแวร์ และผล OTA ของเซ็นเซอร์ (หน้าเฟิร์มแวร์ใช้ตัดสินผลอัปเดต)
+    key: 'occupancySensors',
+    every: POLL.rooms,
+    run: () => loaders.occupancySensors(),
+  },
   { key: 'alerts', every: POLL.alerts, run: () => loaders.alerts() },
   { key: 'summary', every: POLL.summary, run: () => loaders.summary() },
   { key: 'health', every: POLL.summary, run: () => loaders.health() },
