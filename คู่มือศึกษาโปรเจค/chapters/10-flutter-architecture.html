@@ -1353,7 +1353,7 @@
 <div class="callout why"><div class="callout-title">ทำไม</div><p><strong>ทำไมแอปต้อง "จอง" กับ Backend ก่อนเขียนลงบอร์ด</strong> ข้อมูล MQTT (host, ผู้ใช้, รหัส) และ token เป็นของที่ Backend เป็นผู้ออก แอปแค่ขนส่งผ่าน BLE ไปให้บอร์ดโดยไม่ต้องรู้จักรหัสล่วงหน้า และ token ทำให้บอร์ดยืนยันได้ว่าคำสั่งตั้งค่ามาจากการจองที่ชอบธรรม <code>keepWifiPassword</code> ใช้ตอนตั้งค่าซ้ำ ให้บอร์ดคงรหัส Wi-Fi เดิมโดยแอปไม่ต้องรู้รหัสนั้น</p></div>
 
 <h5><code>controlType</code> และ <code>brand</code> ใน identity ของบอร์ด</h5>
-<p>ตอนแอปอ่าน identity ผ่าน BLE บอร์ดบอกชนิดของตัวเองมาด้วย เฟิร์มแวร์สายแอร์ (<code>2.5.2-slm8</code>) ส่ง <code>controlType: "wired"</code> และ <code>brand: "Daikin"</code> ส่วนเฟิร์มแวร์ IR รุ่นใหม่ส่ง <code>controlType: "ir"</code> แอปใช้ค่านี้ตัดสินว่าหน้าตั้งค่าต้องล็อกยี่ห้อหรือให้เลือก (ดูบทหน้าจอผู้ดูแลระบบ)</p>
+<p>ตอนแอปอ่าน identity ผ่าน BLE บอร์ดบอกชนิดของตัวเองมาด้วย เฟิร์มแวร์สายแอร์ ส่ง <code>controlType: "wired"</code> และ <code>brand: "Daikin"</code> ส่วนเฟิร์มแวร์ IR รุ่นใหม่ส่ง <code>controlType: "ir"</code> แอปใช้ค่านี้ตัดสินว่าหน้าตั้งค่าต้องล็อกยี่ห้อหรือให้เลือก (ดูบทหน้าจอผู้ดูแลระบบ)</p>
 <p><strong>ไฟล์ <code>lib/models/provisioning.dart</code> บรรทัด 83–86</strong></p>
 <div class="code-block"><span class="code-lang">dart</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">83</span>
 <span class="normal">84</span>

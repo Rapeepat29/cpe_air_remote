@@ -289,7 +289,7 @@
 
 <p><code>commandId</code> เป็น UUID สุ่มจาก <code>crypto.randomUUID()</code> ใช้ให้ตามได้ว่าคำสั่งไหนถูกทำแล้ว (บอร์ดส่งกลับใน <code>state</code>) <code>sentAt</code> เป็น ISO-8601</p>
 <p><strong>คำสั่งแบบ action</strong> (ไม่มี <code>state</code>): <code>{"version":1,"commandId":"…","sentAt":"…","action":"enter_setup"}</code> และ <code>{"version":1,…,"action":"ota","url":"https://&lt;host&gt;/firmware/&lt;ไฟล์&gt;.bin"}</code></p>
-<p><strong>คำสั่ง <code>unprovision</code></strong> Backend สร้างด้วย <code>buildUnprovisionCommand</code> ใน <code>utils/unprovision.js</code> ตอนแอดมินลบอุปกรณ์ ใช้กับทั้งบอร์ดแอร์ (IR 2.5.1, สายแอร์ 2.5.2-slm8) และบอร์ดตรวจคน (1.3.2) ขึ้นไป</p>
+<p><strong>คำสั่ง <code>unprovision</code></strong> Backend สร้างด้วย <code>buildUnprovisionCommand</code> ใน <code>utils/unprovision.js</code> ตอนแอดมินลบอุปกรณ์ ใช้กับทั้งบอร์ดแอร์ (IR และสายแอร์) และบอร์ดตรวจคน</p>
 <div class="code-block"><span class="code-lang">json</span><div class="hl"><pre><span></span><code><span class="p">{</span><span class="w"> </span><span class="nt">"version"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="nt">"commandId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"UUID"</span><span class="p">,</span><span class="w"> </span><span class="nt">"sentAt"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-10-13T12:00:00.000Z"</span><span class="p">,</span>
 <span class="w">  </span><span class="nt">"action"</span><span class="p">:</span><span class="w"> </span><span class="s2">"unprovision"</span><span class="p">,</span><span class="w"> </span><span class="nt">"deviceId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ESP32-AABBCCDDEEFF"</span><span class="w"> </span><span class="p">}</span>
 </code></pre></div>
@@ -804,7 +804,7 @@ DELETE /api/...  ───► 1. DELETE แถวในฐานข้อมู�
 <tr>
 <td>บอร์ดออฟไลน์ตอนกดลบ</td>
 <td>คำสั่งไม่ retained จึงไม่ค้าง Backend รอครบ 4 วินาที (<code>UNPROVISION_ACK_TIMEOUT_MS</code>) แล้วลบต่อ</td>
-<td><code>boardCleared: false</code> บอร์ดยังเก็บค่าเดิม แต่บัญชี MQTT ถูกลบ (โหมด dynsec) จึงต่อ Broker ไม่ได้อีก ต้องล้างที่ตัวบอร์ดเอง: แฟลช <code>reset.ino</code>, BOOT + RESET แล้วตั้งค่าใหม่ หรือแฟลชเฟิร์มแวร์ใหม่</td>
+<td><code>boardCleared: false</code> บอร์ดยังเก็บค่าเดิม แต่บัญชี MQTT ถูกลบ (โหมด dynsec) พอบอร์ดกลับมาออนไลน์ Broker จะปฏิเสธบัญชีทุกครั้ง เมื่อถูกปฏิเสธติดกันครบ 2 นาทีและ 10 ครั้ง บอร์ดล้างค่าตัวเองแล้วรีบูตเข้าโหมดตั้งค่า BLE (ดูหัวข้อถัดไป) ถ้าบอร์ดไม่กลับมาออนไลน์อีก ต้องล้างที่ตัวบอร์ด: แฟลช <code>reset.ino</code> หรือ BOOT + RESET แล้วตั้งค่าใหม่</td>
 </tr>
 <tr>
 <td>บอร์ดเฟิร์มแวร์เก่า (ก่อน IR 2.5.1 / สายแอร์ 2.5.2-slm8 / เซ็นเซอร์ 1.3.2)</td>
@@ -830,6 +830,15 @@ DELETE /api/...  ───► 1. DELETE แถวในฐานข้อมู�
 </table></div>
 <div class="callout warn"><div class="callout-title">ระวัง</div><p>โหมด <code>shared</code> (บัญชี MQTT เดียวทุกบอร์ด ใช้ตอนพัฒนา) ไม่มีบัญชีรายบอร์ดให้ลบ ถ้าบอร์ดออฟไลน์ตอนลบแล้วกลับมาทีหลัง มันจะต่อ Broker และส่ง <code>status</code> ได้ตามเดิม (Backend ไม่บันทึกเพราะไม่มีแถวของบอร์ดนี้ <code>UPDATE</code> จึงไม่โดนแถวไหน) นี่เป็นอีกเหตุผลที่ระบบจริงต้องใช้ <code>MQTT_DEVICE_AUTH=dynsec</code></p></div>
 
+<h3 id="บอร์ดที่ถูกลบตอนออฟไลน์-ล้างตัวเองเมื่อบัญชีถูกปฏิเสธ">บอร์ดที่ถูกลบตอนออฟไลน์: ล้างตัวเองเมื่อบัญชีถูกปฏิเสธ<a class="anchor" href="#บอร์ดที่ถูกลบตอนออฟไลน์-ล้างตัวเองเมื่อบัญชีถูกปฏิเสธ">#</a></h3>
+<p>เฟิร์มแวร์ทั้งสามตัวมีฟังก์ชัน <code>checkMqttAccountRemoved(state)</code> ที่ <code>connectMqtt()</code> เรียกทุกครั้งที่ต่อ Broker ไม่ติด</p>
+<ul>
+<li>นับเฉพาะ <code>state</code> <strong>4</strong> (<code>MQTT_CONNECT_BAD_CREDENTIALS</code> รหัสผิด) และ <strong>5</strong> (<code>MQTT_CONNECT_UNAUTHORIZED</code> ไม่ได้รับอนุญาต) ซึ่งเป็นอาการของ "บัญชีถูกลบ" ส่วน <code>state</code> ติดลบ (เน็ตหลุด หา Broker ไม่เจอ หมดเวลา) ไม่นับและไม่ล้างตัวนับ</li>
+<li>จำเวลาที่เริ่มถูกปฏิเสธ (<code>mqttAuthRejectedSince</code>) และจำนวนครั้ง (<code>mqttAuthRejectCount</code>) ต่อติดเมื่อไรก็ล้างทั้งสองค่า</li>
+<li>ถูกปฏิเสธต่อเนื่องครบ <strong>2 นาที</strong> (<code>MQTT_AUTH_REJECT_RESET_MS</code>) <strong>และ</strong> อย่างน้อย <strong>10 ครั้ง</strong> (<code>MQTT_AUTH_REJECT_MIN_COUNT</code>) → เรียก <code>unprovisionAndRestart("MQTT account was removed (rejected by broker)")</code> ล้าง Wi-Fi, MQTT, ห้อง แล้วรีบูตเข้าโหมดตั้งค่าบลูทูธ เหมือนได้รับคำสั่ง unprovision</li>
+</ul>
+<div class="callout why"><div class="callout-title">ทำไม</div><p><strong>ทำไมต้องรอทั้งเวลาและจำนวนครั้ง</strong> การล้างค่าย้อนกลับไม่ได้ ห้องนั้นจะใช้งานไม่ได้จนกว่าจะมีคนไปตั้งค่าใหม่ ถ้า Broker ปฏิเสธชั่วคราว (เช่น ไฟล์บัญชี <code>dynamic-security.json</code> กำลังถูกสร้างใหม่หลังย้ายเซิร์ฟเวอร์ และ Backend ยังไม่ได้ <code>reconcileAccounts</code>) บอร์ดไม่ควรล้างตัวเองทันที การต้องถูกปฏิเสธต่อเนื่องอย่างน้อย 2 นาทีและ 10 ครั้งกันการล้างผิดจากเหตุชั่วคราว ส่วนโหมด <code>shared</code> ไม่มีการลบบัญชีรายบอร์ด กลไกนี้จึงไม่ทำงานในโหมดนั้น</p></div>
+
 <div class="callout note"><div class="callout-title">หมายเหตุ</div><p>หลังล้าง Device ID <strong>ไม่เปลี่ยน</strong> เพราะสร้างจาก MAC ใน eFuse ไม่ได้เก็บใน NVS เอาบอร์ดไปตั้งค่าใหม่ก็ได้รหัสเดิม และบอร์ดแอร์ IR ไม่สั่งแอร์เพิ่ม (แอร์ค้างสถานะล่าสุด) ส่วนบอร์ดสายแอร์ล้างสถานะแอร์ที่จำไว้ด้วย หลังรีบูตจึงส่งเฟรม "ปิด" ทางสาย (ตามคอมเมนต์ใน <code>rmutt_esp32_air_wired.ino</code>)</p></div>
 
 <h3 id="ข้อมูลย้อนหลังตอนเน็ตหลุด-offline-history-พร้อม-ack">ข้อมูลย้อนหลังตอนเน็ตหลุด (offline history) พร้อม ack<a class="anchor" href="#ข้อมูลย้อนหลังตอนเน็ตหลุด-offline-history-พร้อม-ack">#</a></h3>
@@ -844,7 +853,7 @@ DELETE /api/...  ───► 1. DELETE แถวในฐานข้อมู�
 <ol>
 <li>แอดมินเลือกไฟล์ <code>.bin</code> บนเซิร์ฟเวอร์ (อัปโหลดจากหน้า <strong>เฟิร์มแวร์</strong> ในเว็บด้วย <code>POST /api/firmware</code>) → <code>POST /api/air-conditioners/:deviceId/ota</code> (หรือ <code>/api/occupancy-sensors/:deviceId/ota</code>) ตรวจว่า <strong>ชนิดไฟล์ตรงกับชนิดบอร์ด</strong> (<code>assertFirmwareKind</code>: ชื่อมี <code>occ</code> = เซ็นเซอร์, มี <code>wired</code>/<code>slm8</code> = สายแอร์ ใช้กับแอร์ที่ protocol <code>DAIKIN_WIRED</code>, นอกนั้น = แอร์ IR ผิดตอบ 400) ตรวจว่าบอร์ด <code>active</code> และ <strong>online</strong> → Backend สร้าง URL <code>https://&lt;mqtt_host&gt;/firmware/&lt;ชื่อไฟล์&gt;</code> (<code>firmwareUrl</code>) → <code>publishOtaCommand</code> ส่ง <code>{"action":"ota","url":…}</code> ไป <code>/command</code> → ตอบ 202</li>
 <li>บอร์ดเช็ก <code>otaUrlAllowed(url, config.mqttHost)</code>: ต้องขึ้นต้น <code>https://&lt;MQTT host เดิมของบอร์ด&gt;/firmware/</code>, ลงท้าย <code>.bin</code>, ยาวไม่เกิน 300, ไม่มี <code>..</code>, ตัวอักษรชื่อไฟล์จำกัด ไม่ผ่านจะตั้ง <code>otaError = "url_rejected"</code> ใน status</li>
-<li><code>performOtaUpdate()</code> sync เวลา, <strong>ตัด MQTT ก่อน</strong> (หน่วยความจำไม่พอเปิด TLS สองชุดพร้อมกัน), ดาวน์โหลดผ่าน HTTPS ตรวจใบรับรองกับใบราก, สำเร็จ → รีสตาร์ต ล้มเหลว → ใช้เฟิร์มแวร์เดิมต่อ รายงาน <code>otaError</code> และ <code>firmwareVersion</code> ใน <code>status</code> ซึ่ง Backend เก็บผ่าน <code>recordFirmwareStatus</code></li>
+<li><code>performOtaUpdate()</code> sync เวลา, <strong>ตัด MQTT ก่อน</strong> (หน่วยความจำไม่พอเปิด TLS สองชุดพร้อมกัน), ดาวน์โหลดผ่าน HTTPS ตรวจใบรับรองกับใบราก, สำเร็จ → รีสตาร์ต ล้มเหลว → ใช้เฟิร์มแวร์เดิมต่อ รายงาน <code>otaError</code> และ <code>firmwareVersion</code> ใน <code>status</code> ซึ่ง Backend เก็บผ่าน <code>recordFirmwareStatus</code> ถ้าดาวน์โหลดสะดุดเพราะเครือข่าย (เช่น <code>Stream Read Timeout</code>) บอร์ดดาวน์โหลดใหม่เองสูงสุด 3 ครั้ง เว้นครั้งละ 5 วินาที (<code>runHttpsOta</code> ใน <code>ota_update.h</code>) ส่วนข้อผิดพลาดที่มาจากไฟล์ไม่ลองซ้ำ</li>
 </ol>
 <div class="callout why"><div class="callout-title">ทำไม</div><p>ป้องกันเฟิร์มแวร์ปลอม 3 ชั้น: (1) คำสั่งมาจาก topic <code>command</code> ที่มีแต่ Backend ส่งได้ตาม ACL (2) URL ชี้ได้เฉพาะเซิร์ฟเวอร์เดียวกับ MQTT ของบอร์ดเอง (3) ตรวจใบรับรอง HTTPS</p>
 <p>ทำไมต้องตรวจชนิดไฟล์: โปรโตคอล OTA ไม่มีฟิลด์ "ชนิดบอร์ด" บอร์ดรับไฟล์ <code>.bin</code> อะไรก็ได้ที่ URL ผ่านเงื่อนไข ถ้าสั่งไฟล์ของบอร์ด IR ให้บอร์ดสายแอร์ (ชิปเดียวกัน ESP32) มันจะติดตั้งได้สำเร็จแล้วรีบูตเป็นโปรแกรมผิดชนิด ขาที่ต่อก็ผิด จึงต้องกันไว้ที่ Backend ซึ่งรู้ทั้งชื่อไฟล์และ protocol ของบอร์ด</p></div>
@@ -1099,11 +1108,8 @@ DELETE /api/...  ───► 1. DELETE แถวในฐานข้อมู�
 </table></div>
 <p>ฟังก์ชัน <code>clearRetained</code> ใน <code>services/mqtt.js</code> เอา array นี้ไป publish <strong>ข้อความว่าง + <code>retain: true</code></strong> ทีละ topic ซึ่งตามกติกา MQTT คือคำสั่ง "ลบ retained ของ topic นี้" ทำไมต้องล้าง: ถ้าไม่ล้าง <code>status</code>/<code>provision</code> เก่าจะค้างบน Broker แล้วย้อนกลับมาหลอกระบบ เมื่อเพิ่มบอร์ดรหัสเดิมกลับเข้ามาใหม่</p>
 <h3 id="2-เฟิร์มแวร์-ต่อ-mqtt-พร้อม-lwt--connectmqtt">2) เฟิร์มแวร์: ต่อ MQTT พร้อม LWT — <code>connectMqtt()</code><a class="anchor" href="#2-เฟิร์มแวร์-ต่อ-mqtt-พร้อม-lwt--connectmqtt">#</a></h3>
-<p><strong>ไฟล์ <code>firmware/rmutt_esp32_air/rmutt_esp32_air.ino</code> บรรทัด 1064–1098</strong></p>
-<div class="code-block"><span class="code-lang">cpp</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1064</span>
-<span class="normal">1065</span>
-<span class="normal">1066</span>
-<span class="normal">1067</span>
+<p><strong>ไฟล์ <code>firmware/rmutt_esp32_air/rmutt_esp32_air.ino</code> บรรทัด 1067–1108</strong></p>
+<div class="code-block"><span class="code-lang">cpp</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1067</span>
 <span class="normal">1068</span>
 <span class="normal">1069</span>
 <span class="normal">1070</span>
@@ -1134,7 +1140,14 @@ DELETE /api/...  ───► 1. DELETE แถวในฐานข้อมู�
 <span class="normal">1095</span>
 <span class="normal">1096</span>
 <span class="normal">1097</span>
-<span class="normal">1098</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">statusTopic</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">config</span><span class="p">.</span><span class="n">mqttTopic</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">"/status"</span><span class="p">;</span>
+<span class="normal">1098</span>
+<span class="normal">1099</span>
+<span class="normal">1100</span>
+<span class="normal">1101</span>
+<span class="normal">1102</span>
+<span class="normal">1103</span>
+<span class="normal">1104</span>
+<span class="normal">1105</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">statusTopic</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">config</span><span class="p">.</span><span class="n">mqttTopic</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">"/status"</span><span class="p">;</span>
 <span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">clientId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"rmutt-"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">config</span><span class="p">.</span><span class="n">deviceId</span><span class="p">;</span>
 <span class="w">  </span><span class="n">DynamicJsonDocument</span><span class="w"> </span><span class="nf">offline</span><span class="p">(</span><span class="mi">96</span><span class="p">);</span>
 <span class="w">  </span><span class="n">offline</span><span class="p">[</span><span class="s">"online"</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span>
@@ -1161,9 +1174,13 @@ DELETE /api/...  ───► 1. DELETE แถวในฐานข้อมู�
 <span class="w">        </span><span class="n">willPayload</span><span class="p">.</span><span class="n">c_str</span><span class="p">());</span>
 <span class="w">  </span><span class="p">}</span>
 <span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">connected</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="n">Serial</span><span class="p">.</span><span class="n">printf</span><span class="p">(</span><span class="s">"MQTT connection failed, state: %d</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span><span class="w"> </span><span class="n">mqttClient</span><span class="p">.</span><span class="n">state</span><span class="p">());</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mqttClient</span><span class="p">.</span><span class="n">state</span><span class="p">();</span>
+<span class="w">    </span><span class="n">Serial</span><span class="p">.</span><span class="n">printf</span><span class="p">(</span><span class="s">"MQTT connection failed, state: %d</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span><span class="w"> </span><span class="n">state</span><span class="p">);</span>
+<span class="w">    </span><span class="n">checkMqttAccountRemoved</span><span class="p">(</span><span class="n">state</span><span class="p">);</span>
 <span class="w">    </span><span class="k">return</span><span class="p">;</span>
 <span class="w">  </span><span class="p">}</span>
+<span class="w">  </span><span class="n">mqttAuthRejectedSince</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">  </span><span class="n">mqttAuthRejectCount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
 
 <span class="w">  </span><span class="n">mqttClient</span><span class="p">.</span><span class="n">subscribe</span><span class="p">((</span><span class="n">config</span><span class="p">.</span><span class="n">mqttTopic</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">"/command"</span><span class="p">).</span><span class="n">c_str</span><span class="p">(),</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
 <span class="w">  </span><span class="n">mqttClient</span><span class="p">.</span><span class="n">subscribe</span><span class="p">((</span><span class="n">config</span><span class="p">.</span><span class="n">mqttTopic</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">"/provision-ack"</span><span class="p">).</span><span class="n">c_str</span><span class="p">(),</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
@@ -1181,56 +1198,53 @@ DELETE /api/...  ───► 1. DELETE แถวในฐานข้อมู�
 </thead>
 <tbody>
 <tr>
-<td>1064</td>
+<td>1067</td>
 <td><code>config.mqttTopic</code> คือ <code>rmutt/ac/ESP32-&lt;MAC&gt;</code> (ได้จาก Backend ผ่าน BLE) ต่อ <code>/status</code> = topic ที่จะฝากพินัยกรรม <code>const String</code> = ตัวแปรสตริงของ Arduino ที่แก้ไม่ได้</td>
 </tr>
 <tr>
-<td>1065</td>
+<td>1068</td>
 <td>client ID <code>rmutt-ESP32-&lt;MAC&gt;</code> ต้องตรงกับที่ Backend ลงทะเบียนในบัญชี Dynamic Security (<code>clientIdPrefix: 'rmutt-'</code>) ไม่ตรง Broker ปฏิเสธ</td>
 </tr>
 <tr>
-<td>1066–1070</td>
+<td>1069–1073</td>
 <td>สร้าง JSON พินัยกรรม <code>{"online":false,"deviceId":…}</code> ด้วย ArduinoJson (<code>DynamicJsonDocument</code> ขนาด 96 ไบต์ในหน่วยความจำ heap) แล้ว <code>serializeJson</code> ลงสตริง</td>
 </tr>
 <tr>
-<td>1073–1079</td>
+<td>1076–1082</td>
 <td>กรณีไม่มี username (โหมด Broker ไม่ต้อง auth) เรียก <code>connect(clientId, willTopic, willQoS, willRetain, willMessage)</code> อาร์กิวเมนต์ที่ 3 = <code>1</code> = <strong>Will QoS 1</strong> และที่ 4 = <code>true</code> = <strong>Will retained</strong></td>
 </tr>
 <tr>
-<td>1080–1089</td>
+<td>1083–1092</td>
 <td>กรณีมี username: เพิ่มอาร์กิวเมนต์ username/password เข้าไปก่อน (ลำดับพารามิเตอร์ของ <code>PubSubClient::connect</code>) Dynamic Security ใช้ username = Device ID</td>
 </tr>
 <tr>
-<td>1090–1093</td>
-<td>ต่อไม่ติด → พิมพ์ <code>state</code> (รหัสข้อผิดพลาดของ PubSubClient เช่น 5 = ไม่ได้รับอนุญาต) แล้ว <code>return</code> โดย <code>loop()</code> จะลองใหม่ทุก 3 วินาที</td>
+<td>1093–1099</td>
+<td>ต่อไม่ติด → พิมพ์ <code>state</code> (รหัสข้อผิดพลาดของ PubSubClient เช่น 4 = รหัสผิด, 5 = ไม่ได้รับอนุญาต) ส่งให้ <code>checkMqttAccountRemoved(state)</code> นับว่าถูก Broker ปฏิเสธบัญชีติดกันนานแค่ไหน (ดูหัวข้อถัดไป) แล้ว <code>return</code> โดย <code>loop()</code> จะลองใหม่ทุก 3 วินาที</td>
 </tr>
 <tr>
-<td>1095–1098</td>
+<td>1100–1101</td>
+<td>ต่อติด → ล้างตัวนับการถูกปฏิเสธ</td>
+</tr>
+<tr>
+<td>1103–1106</td>
 <td>subscribe 4 topic ด้วย QoS 1 ทุกครั้งที่ต่อติด (เพราะ clean session) ตรงกับ ACL <code>subscribe</code> ของบอร์ดแอร์พอดี ถ้า subscribe topic ที่ไม่มีสิทธิ์ Broker จะเงียบ</td>
 </tr>
 </tbody>
 </table></div>
-<p>หลังบรรทัด 1098 โค้ดตั้งหน่วงสุ่มก่อนส่งประวัติ แล้วเรียก <code>publishStatus()</code>, <code>publishState()</code> และ <code>publishProvisioningToken()</code> ทันที ทำไม publish <code>status</code> ทันทีที่ต่อติด: เพื่อ <strong>ทับพินัยกรรมเก่า</strong> (retained <code>online:false</code>) ที่ Broker ปล่อยไว้ตอนหลุดครั้งก่อน ให้กลับเป็น <code>online:true</code></p>
+<p>หลังบรรทัด 1106 โค้ดตั้งหน่วงสุ่มก่อนส่งประวัติ แล้วเรียก <code>publishStatus()</code>, <code>publishState()</code> และ <code>publishProvisioningToken()</code> ทันที ทำไม publish <code>status</code> ทันทีที่ต่อติด: เพื่อ <strong>ทับพินัยกรรมเก่า</strong> (retained <code>online:false</code>) ที่ Broker ปล่อยไว้ตอนหลุดครั้งก่อน ให้กลับเป็น <code>online:true</code></p>
 <div class="callout why"><div class="callout-title">ทำไม</div><p><strong>ทำไม LWT ต้อง retained</strong>: ถ้า Backend รีสตาร์ตระหว่างที่บอร์ดหลุด แล้ว LWT ไม่ retained Backend จะไม่เคยรู้ว่าบอร์ด offline เพราะข้อความหลุดไปตอนมันไม่ได้ฟัง retained ทำให้ Backend ได้ "สถานะล่าสุดจริง" ทันทีที่ subscribe</p></div>
 
 <h3 id="3-เฟิร์มแวร์-callback-ตอนรับ-mqtt--mqttcallback">3) เฟิร์มแวร์: callback ตอนรับ MQTT — <code>mqttCallback()</code><a class="anchor" href="#3-เฟิร์มแวร์-callback-ตอนรับ-mqtt--mqttcallback">#</a></h3>
-<p><strong>ไฟล์ <code>firmware/rmutt_esp32_air/rmutt_esp32_air.ino</code> บรรทัด 1114–1116 และ 1143–1165</strong></p>
-<div class="code-block"><span class="code-lang">cpp</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1114</span>
-<span class="normal">1115</span>
-<span class="normal">1116</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">mqttCallback</span><span class="p">(</span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">topic</span><span class="p">,</span><span class="w"> </span><span class="kt">byte</span><span class="w"> </span><span class="o">*</span><span class="n">payload</span><span class="p">,</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">length</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<p><strong>ไฟล์ <code>firmware/rmutt_esp32_air/rmutt_esp32_air.ino</code> บรรทัด 1121–1123 และ 1150–1172</strong></p>
+<div class="code-block"><span class="code-lang">cpp</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1121</span>
+<span class="normal">1122</span>
+<span class="normal">1123</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">mqttCallback</span><span class="p">(</span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">topic</span><span class="p">,</span><span class="w"> </span><span class="kt">byte</span><span class="w"> </span><span class="o">*</span><span class="n">payload</span><span class="p">,</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">length</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">length</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">length</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">2048</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="p">;</span>
 <span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">incomingTopic</span><span class="p">(</span><span class="n">topic</span><span class="p">);</span>
 </code></pre></div></td></tr></table></div>
 </div>
 
-<div class="code-block"><span class="code-lang">cpp</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1143</span>
-<span class="normal">1144</span>
-<span class="normal">1145</span>
-<span class="normal">1146</span>
-<span class="normal">1147</span>
-<span class="normal">1148</span>
-<span class="normal">1149</span>
-<span class="normal">1150</span>
+<div class="code-block"><span class="code-lang">cpp</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1150</span>
 <span class="normal">1151</span>
 <span class="normal">1152</span>
 <span class="normal">1153</span>
@@ -1245,7 +1259,14 @@ DELETE /api/...  ───► 1. DELETE แถวในฐานข้อมู�
 <span class="normal">1162</span>
 <span class="normal">1163</span>
 <span class="normal">1164</span>
-<span class="normal">1165</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">incomingTopic</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">config</span><span class="p">.</span><span class="n">mqttTopic</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">"/provision-ack"</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="normal">1165</span>
+<span class="normal">1166</span>
+<span class="normal">1167</span>
+<span class="normal">1168</span>
+<span class="normal">1169</span>
+<span class="normal">1170</span>
+<span class="normal">1171</span>
+<span class="normal">1172</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">incomingTopic</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">config</span><span class="p">.</span><span class="n">mqttTopic</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">"/provision-ack"</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="n">DynamicJsonDocument</span><span class="w"> </span><span class="nf">acknowledgement</span><span class="p">(</span><span class="mi">512</span><span class="p">);</span>
 <span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">deserializeJson</span><span class="p">(</span><span class="n">acknowledgement</span><span class="p">,</span><span class="w"> </span><span class="n">payload</span><span class="p">,</span><span class="w"> </span><span class="n">length</span><span class="p">))</span><span class="w"> </span><span class="k">return</span><span class="p">;</span>
 <span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">acknowledgedToken</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">acknowledgement</span><span class="p">[</span><span class="s">"token"</span><span class="p">]</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="s">""</span><span class="p">;</span>
@@ -1280,58 +1301,55 @@ DELETE /api/...  ───► 1. DELETE แถวในฐานข้อมู�
 </thead>
 <tbody>
 <tr>
-<td>1114</td>
+<td>1121</td>
 <td>ลายเซ็น callback ที่ PubSubClient บังคับ: <code>char *topic</code> (ชื่อ topic), <code>byte *payload</code> (ไบต์ดิบ ไม่มี <code>\0</code> ปิดท้าย), <code>length</code> (จำนวนไบต์) <code>*</code> คือ pointer = ที่อยู่ของหน่วยความจำที่เก็บข้อมูล</td>
 </tr>
 <tr>
-<td>1115</td>
+<td>1122</td>
 <td>ทิ้งข้อความว่าง (เช่นข้อความล้าง retained) หรือใหญ่เกิน 2048 ไบต์ (ขนาด buffer ที่ตั้ง <code>setBufferSize(2048)</code> ใน <code>setup</code>)</td>
 </tr>
 <tr>
-<td>1116</td>
+<td>1123</td>
 <td>แปลง topic เป็น <code>String</code> เพื่อเทียบด้วย <code>==</code></td>
 </tr>
 <tr>
-<td>1143</td>
+<td>1150</td>
 <td>แยกตามชนิด topic: นี่คือ ack ของ provisioning</td>
 </tr>
 <tr>
-<td>1145</td>
+<td>1152</td>
 <td><code>deserializeJson(doc, payload, length)</code> คืนค่า error (ไม่ใช่ศูนย์ = true) ถ้า JSON เสีย → <code>return</code> ทิ้ง ต้องส่ง <code>length</code> เพราะ payload ไม่มี <code>\0</code></td>
 </tr>
 <tr>
-<td>1146</td>
+<td>1153</td>
 <td><code>acknowledgement["token"] | ""</code> — ใน ArduinoJson <code>|</code> ใช้ให้ค่าเริ่มต้นถ้าไม่มีฟิลด์ (ต่างจาก <code>||</code> ของภาษาอื่น)</td>
 </tr>
 <tr>
-<td>1147–1149</td>
+<td>1154–1156</td>
 <td>เงื่อนไข 3 ข้อพร้อมกัน: ack บอกว่า <code>activated == true</code>, บอร์ดยังมี token เก็บอยู่ และ token ใน ack <strong>ตรงกับของตัวเอง</strong> (กันใครส่ง ack ปลอม/ของบอร์ดอื่นมา)</td>
 </tr>
 <tr>
-<td>1150–1152</td>
+<td>1157–1159</td>
 <td>ลบ key <code>prov_token</code> ออกจาก NVS (namespace <code>rmutt-air</code>) ผ่าน <code>Preferences</code> ลบแล้ว token ที่เคยส่งผ่านอากาศไม่มีเหลือที่บอร์ด</td>
 </tr>
 <tr>
-<td>1153–1154</td>
+<td>1160–1161</td>
 <td>ล้าง token ในหน่วยความจำ และตั้งธง <code>provisionAckClearReady</code> ให้ <code>loop()</code> ไป publish ข้อความว่างล้าง retained ของ <code>/provision-ack</code></td>
 </tr>
 <tr>
-<td>1158</td>
+<td>1165</td>
 <td>ถ้าไม่ใช่ <code>/command</code> ทิ้ง (เช่น <code>schedule-status</code>, <code>history-ack</code> ถูกจัดการก่อนหน้านี้แล้ว)</td>
 </tr>
 <tr>
-<td>1159–1164</td>
+<td>1166–1171</td>
 <td><strong>คัดลอกคำสั่งไปเก็บ</strong> แล้วตั้งธง <code>mqttCommandReady</code> ไม่ได้ประมวลผลทันที</td>
 </tr>
 </tbody>
 </table></div>
 <p><strong>ทำไมไม่ทำงานใน callback</strong>: callback ถูกเรียกขณะ <code>mqttClient.loop()</code> ทำงานอยู่ ถ้าทำงานหนัก (ส่งสัญญาณ IR ซึ่งใช้เวลา, เขียน NVS, parse JSON ใหญ่, publish ตอบกลับซึ่งเรียก PubSubClient ซ้ำซ้อนกลางการประมวลผล) อาจทำให้เชื่อมต่อค้างหรือหลุด keep-alive และ buffer ชนกัน จึงใช้แพทเทิร์น "callback แค่ฝากของ แล้วให้ <code>loop()</code> เป็นคนทำ" (<code>if (mqttCommandReady) processMqttCommand();</code> ใน <code>loop</code>) เช่นเดียวกับ OTA (<code>otaRequested</code>) และการลบ flash ของ history</p>
 <h3 id="4-เฟิร์มแวร์-ตัวรับคำสั่งเขียน-ble--configcallbacksonwrite">4) เฟิร์มแวร์: ตัวรับคำสั่งเขียน BLE — <code>ConfigCallbacks::onWrite</code><a class="anchor" href="#4-เฟิร์มแวร์-ตัวรับคำสั่งเขียน-ble--configcallbacksonwrite">#</a></h3>
-<p><strong>ไฟล์ <code>firmware/rmutt_esp32_air/rmutt_esp32_air.ino</code> บรรทัด 315–338</strong></p>
-<div class="code-block"><span class="code-lang">cpp</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">315</span>
-<span class="normal">316</span>
-<span class="normal">317</span>
-<span class="normal">318</span>
+<p><strong>ไฟล์ <code>firmware/rmutt_esp32_air/rmutt_esp32_air.ino</code> บรรทัด 318–341</strong></p>
+<div class="code-block"><span class="code-lang">cpp</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">318</span>
 <span class="normal">319</span>
 <span class="normal">320</span>
 <span class="normal">321</span>
@@ -1351,7 +1369,10 @@ DELETE /api/...  ───► 1. DELETE แถวในฐานข้อมู�
 <span class="normal">335</span>
 <span class="normal">336</span>
 <span class="normal">337</span>
-<span class="normal">338</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="nf">onWrite</span><span class="p">(</span><span class="n">BLECharacteristic</span><span class="w"> </span><span class="o">*</span><span class="n">characteristic</span><span class="p">)</span><span class="w"> </span><span class="k">override</span><span class="w"> </span><span class="p">{</span>
+<span class="normal">338</span>
+<span class="normal">339</span>
+<span class="normal">340</span>
+<span class="normal">341</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="nf">onWrite</span><span class="p">(</span><span class="n">BLECharacteristic</span><span class="w"> </span><span class="o">*</span><span class="n">characteristic</span><span class="p">)</span><span class="w"> </span><span class="k">override</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">raw</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">characteristic</span><span class="o">-&gt;</span><span class="n">getValue</span><span class="p">();</span>
 <span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">size_t</span><span class="w"> </span><span class="n">length</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raw</span><span class="p">.</span><span class="n">length</span><span class="p">();</span>
 <span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">length</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">6</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
@@ -1378,11 +1399,8 @@ DELETE /api/...  ───► 1. DELETE แถวในฐานข้อมู�
 </code></pre></div></td></tr></table></div>
 </div>
 
-<p><strong>บรรทัด 339–368 (ประกอบข้อมูล)</strong></p>
-<div class="code-block"><span class="code-lang">cpp</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">339</span>
-<span class="normal">340</span>
-<span class="normal">341</span>
-<span class="normal">342</span>
+<p><strong>บรรทัด 342–371 (ประกอบข้อมูล)</strong></p>
+<div class="code-block"><span class="code-lang">cpp</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">342</span>
 <span class="normal">343</span>
 <span class="normal">344</span>
 <span class="normal">345</span>
@@ -1409,7 +1427,10 @@ DELETE /api/...  ───► 1. DELETE แถวในฐานข้อมู�
 <span class="normal">366</span>
 <span class="normal">367</span>
 <span class="normal">368</span>
-<span class="normal">369</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">sequence</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="normal">369</span>
+<span class="normal">370</span>
+<span class="normal">371</span>
+<span class="normal">372</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">sequence</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">      </span><span class="n">receivedConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">""</span><span class="p">;</span>
 <span class="w">      </span><span class="n">expectedSequence</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
 <span class="w">      </span><span class="n">expectedTotal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">total</span><span class="p">;</span>
@@ -1452,73 +1473,73 @@ DELETE /api/...  ───► 1. DELETE แถวในฐานข้อมู�
 </thead>
 <tbody>
 <tr>
-<td>315</td>
+<td>318</td>
 <td><code>onWrite</code> = callback ที่ไลบรารี BLE เรียกทุกครั้งที่แอปเขียน characteristic <code>…0002</code> <code>override</code> = บอกว่าเป็นการเขียนทับเมธอดของคลาสแม่ <code>BLECharacteristicCallbacks</code></td>
 </tr>
 <tr>
-<td>316–317</td>
+<td>319–320</td>
 <td><code>auto</code> ให้คอมไพเลอร์เดาชนิด <code>getValue()</code> ได้ข้อมูลที่แอปเพิ่งเขียน</td>
 </tr>
 <tr>
-<td>318–321</td>
+<td>321–324</td>
 <td>หัว packet 6 ไบต์ ถ้าสั้นกว่านั้นผิดแน่ แจ้ง error ทาง Notify</td>
 </tr>
 <tr>
-<td>324–325</td>
+<td>327–328</td>
 <td><code>reinterpret_cast&lt;const uint8_t*&gt;</code> = ตีความตัวอักษรของสตริงเป็น "อาร์เรย์ไบต์ไม่มีเครื่องหมาย" เพื่ออ่านค่า 0–255 ได้ตรง ๆ</td>
 </tr>
 <tr>
-<td>326</td>
+<td>329</td>
 <td>ตรวจ <code>data[0]</code> (เวอร์ชัน) และ <code>data[1]</code> (ชนิดข้อความ) ต้องเป็น 1 ทั้งคู่ — ถ้าปรับโปรโตคอลในอนาคต บอร์ดเก่าจะปฏิเสธชัดเจน</td>
 </tr>
 <tr>
-<td>331–332</td>
+<td>334–335</td>
 <td>ประกอบเลข 16 บิตแบบ <strong>big-endian</strong>: ไบต์ <code>data[2]</code> เป็นครึ่งบน เลื่อนซ้าย 8 บิต (<code>&lt;&lt; 8</code>) แล้ว <code>|</code> ไบต์ล่าง <code>data[3]</code> ตัวอย่าง <code>0x01 0x2C</code> → 256 + 44 = 300 <code>static_cast&lt;uint16_t&gt;</code> กันไม่ให้ไบต์ถูกเลื่อนบิตจนล้นก่อนแปลง</td>
 </tr>
 <tr>
-<td>333–334</td>
+<td>336–337</td>
 <td><code>total</code> จากไบต์ 4–5 ด้วยวิธีเดียวกัน</td>
 </tr>
 <tr>
-<td>335</td>
+<td>338</td>
 <td>กันข้อมูลเพี้ยน: <code>total</code> ต้อง 1–32 และ <code>sequence</code> ต้องน้อยกว่า <code>total</code> (จำกัด 32 packet = 32×150 ≈ 4.8 KB เกิน <code>MAX_CONFIG_BYTES</code> พอดี เป็นแนวกันชั้นแรก)</td>
 </tr>
 <tr>
-<td>339–344</td>
+<td>342–347</td>
 <td>packet แรก (<code>sequence == 0</code>) → เริ่มประกอบใหม่: ล้างบัฟเฟอร์ จำจำนวน packet ทั้งหมด จองหน่วยความจำ 4096 ไบต์ล่วงหน้า (<code>reserve</code>) ลดการจัดสรรใหม่ซ้ำ ๆ ที่ทำให้หน่วยความจำแตกเป็นชิ้น</td>
 </tr>
 <tr>
-<td>345–351</td>
+<td>348–354</td>
 <td>ถ้า packet ที่มาไม่ใช่ลำดับที่รอ หรือ <code>total</code> เปลี่ยน → ทิ้งทั้งหมดแล้วให้แอปเริ่มใหม่ (ใช้ write-with-response ของแอปจึงปกติมาเรียง แต่ป้องกันไว้)</td>
 </tr>
 <tr>
-<td>352–356</td>
+<td>355–359</td>
 <td>กันบัฟเฟอร์ล้น: ขนาดสะสม + ขนาดชิ้นนี้ (ตัดหัว 6 ไบต์) ต้องไม่เกิน 4096</td>
 </tr>
 <tr>
-<td>358–360</td>
+<td>361–363</td>
 <td>วนต่อไบต์ข้อมูล (ตั้งแต่ index 6) ลงสตริงทีละตัว</td>
 </tr>
 <tr>
-<td>361–368</td>
+<td>364–371</td>
 <td>นับ packet ที่ได้รับ ถ้าครบ → ย้ายไป <code>pendingConfig</code>, ตั้งธง <code>configReady</code>, ล้างตัวแปรประกอบ — แล้วจบ <strong>ไม่ประมวลผลที่นี่</strong></td>
 </tr>
 </tbody>
 </table></div>
 <p><strong>ทำไมใช้ธง <code>configReady</code> แล้วให้ <code>loop()</code> เรียก <code>processPendingConfig()</code></strong>: การประมวลผลต้องทดสอบ Wi-Fi (นานถึง 15 วินาที), เขียน NVS, ซึ่งทำใน callback ของ BLE ไม่ได้ (callback รันบน task ของ BLE stack การบล็อกนานทำให้การเชื่อมต่อหลุด/หมดเวลา) แพทเทิร์นเดียวกับ MQTT ข้างบน และผลลัพธ์ส่งกลับทาง Notify (<code>notifyBle</code>) ซึ่งแอปรอได้สูงสุด 40 วินาที</p>
 <h3 id="5-เฟิร์มแวร์-ล้างค่าเมื่อถูกลบออกจากแอป--unprovisionandrestart">5) เฟิร์มแวร์: ล้างค่าเมื่อถูกลบออกจากแอป — <code>unprovisionAndRestart()</code><a class="anchor" href="#5-เฟิร์มแวร์-ล้างค่าเมื่อถูกลบออกจากแอป--unprovisionandrestart">#</a></h3>
-<p><strong>ไฟล์ <code>firmware/rmutt_esp32_air/rmutt_esp32_air.ino</code> บรรทัด 1229–1239</strong> (กิ่ง <code>unprovision</code> ใน <code>processMqttCommand</code>)</p>
-<div class="code-block"><span class="code-lang">cpp</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1229</span>
-<span class="normal">1230</span>
-<span class="normal">1231</span>
-<span class="normal">1232</span>
-<span class="normal">1233</span>
-<span class="normal">1234</span>
-<span class="normal">1235</span>
-<span class="normal">1236</span>
-<span class="normal">1237</span>
-<span class="normal">1238</span>
-<span class="normal">1239</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">action</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s">"unprovision"</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<p><strong>ไฟล์ <code>firmware/rmutt_esp32_air/rmutt_esp32_air.ino</code> บรรทัด 1265–1275</strong> (กิ่ง <code>unprovision</code> ใน <code>processMqttCommand</code>)</p>
+<div class="code-block"><span class="code-lang">cpp</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1265</span>
+<span class="normal">1266</span>
+<span class="normal">1267</span>
+<span class="normal">1268</span>
+<span class="normal">1269</span>
+<span class="normal">1270</span>
+<span class="normal">1271</span>
+<span class="normal">1272</span>
+<span class="normal">1273</span>
+<span class="normal">1274</span>
+<span class="normal">1275</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">action</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s">"unprovision"</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="c1">// Backend ส่งมาเมื่อแอดมินกดลบอุปกรณ์ในแอป</span>
 <span class="w">    </span><span class="c1">// ตรวจ deviceId ซ้ำอีกชั้น กันข้อความหลงมาผิด topic</span>
 <span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">target</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">document</span><span class="p">[</span><span class="s">"deviceId"</span><span class="p">]</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="s">""</span><span class="p">;</span>
@@ -1541,61 +1562,61 @@ DELETE /api/...  ───► 1. DELETE แถวในฐานข้อมู�
 </thead>
 <tbody>
 <tr>
-<td>1229</td>
+<td>1265</td>
 <td><code>action</code> อ่านมาก่อนหน้านี้ด้วย <code>document["action"] | ""</code> (ไม่มีฟิลด์ได้สตริงว่าง) โค้ดนี้อยู่ใน <code>processMqttCommand()</code> ที่ <code>loop()</code> เรียก ไม่ใช่ใน callback จึง publish/disconnect ได้อย่างปลอดภัย</td>
 </tr>
 <tr>
-<td>1232</td>
+<td>1268</td>
 <td>ดึง <code>deviceId</code> ที่ Backend ใส่มาในข้อความ ถ้าไม่มีได้ <code>""</code></td>
 </tr>
 <tr>
-<td>1233–1236</td>
+<td>1269–1272</td>
 <td>ไม่ตรงกับรหัสของตัวเอง → พิมพ์ลง Serial แล้ว <code>return</code> <strong>ไม่ล้าง</strong> ปกติ topic ก็บอกอยู่แล้วว่าเป็นของบอร์ดไหน แต่คำสั่งนี้ทำลายค่าทั้งหมดและย้อนกลับไม่ได้ จึงตรวจซ้ำอีกชั้น (defense in depth)</td>
 </tr>
 <tr>
-<td>1237</td>
-<td>ผ่านแล้วเรียกฟังก์ชันล้างค่า ซึ่งจบด้วย <code>ESP.restart()</code> (ไม่กลับมาที่บรรทัด 1238 จริง ๆ แต่เขียน <code>return</code> ไว้ให้อ่านง่ายและปลอดภัยถ้าแก้ฟังก์ชันภายหลัง)</td>
+<td>1273</td>
+<td>ผ่านแล้วเรียกฟังก์ชันล้างค่า ซึ่งจบด้วย <code>ESP.restart()</code> (ไม่กลับมาที่บรรทัด 1274 จริง ๆ แต่เขียน <code>return</code> ไว้ให้อ่านง่ายและปลอดภัยถ้าแก้ฟังก์ชันภายหลัง)</td>
 </tr>
 </tbody>
 </table></div>
 <p>บอร์ดตรวจคน (<code>rmutt_esp32_occupancy.ino</code>) ต่างนิดเดียว: ตรวจ <code>deviceId</code> ใน <code>mqttCallback</code> แล้ว<strong>ตั้งธง</strong> <code>unprovisionRequested = true</code> ให้ <code>loop()</code> เรียก <code>unprovisionAndRestart</code> ภายหลัง เพราะบอร์ดนั้นประมวลผลคำสั่งใน callback โดยตรง และการ publish + disconnect ภายใน callback ของ PubSubClient เสี่ยงทำให้ไลบรารีพัง (แพทเทิร์นเดียวกับ <code>otaRequested</code>)</p>
-<p><strong>ไฟล์ <code>firmware/rmutt_esp32_air/rmutt_esp32_air.ino</code> บรรทัด 1174–1208</strong></p>
-<div class="code-block"><span class="code-lang">cpp</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1174</span>
-<span class="normal">1175</span>
-<span class="normal">1176</span>
-<span class="normal">1177</span>
-<span class="normal">1178</span>
-<span class="normal">1179</span>
-<span class="normal">1180</span>
-<span class="normal">1181</span>
-<span class="normal">1182</span>
-<span class="normal">1183</span>
-<span class="normal">1184</span>
-<span class="normal">1185</span>
-<span class="normal">1186</span>
-<span class="normal">1187</span>
-<span class="normal">1188</span>
-<span class="normal">1189</span>
-<span class="normal">1190</span>
-<span class="normal">1191</span>
-<span class="normal">1192</span>
-<span class="normal">1193</span>
-<span class="normal">1194</span>
-<span class="normal">1195</span>
-<span class="normal">1196</span>
-<span class="normal">1197</span>
-<span class="normal">1198</span>
-<span class="normal">1199</span>
-<span class="normal">1200</span>
-<span class="normal">1201</span>
-<span class="normal">1202</span>
-<span class="normal">1203</span>
-<span class="normal">1204</span>
-<span class="normal">1205</span>
-<span class="normal">1206</span>
-<span class="normal">1207</span>
-<span class="normal">1208</span>
-<span class="normal">1209</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">unprovisionAndRestart</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="o">&amp;</span><span class="n">reason</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<p><strong>ไฟล์ <code>firmware/rmutt_esp32_air/rmutt_esp32_air.ino</code> บรรทัด 1210–1244</strong></p>
+<div class="code-block"><span class="code-lang">cpp</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1210</span>
+<span class="normal">1211</span>
+<span class="normal">1212</span>
+<span class="normal">1213</span>
+<span class="normal">1214</span>
+<span class="normal">1215</span>
+<span class="normal">1216</span>
+<span class="normal">1217</span>
+<span class="normal">1218</span>
+<span class="normal">1219</span>
+<span class="normal">1220</span>
+<span class="normal">1221</span>
+<span class="normal">1222</span>
+<span class="normal">1223</span>
+<span class="normal">1224</span>
+<span class="normal">1225</span>
+<span class="normal">1226</span>
+<span class="normal">1227</span>
+<span class="normal">1228</span>
+<span class="normal">1229</span>
+<span class="normal">1230</span>
+<span class="normal">1231</span>
+<span class="normal">1232</span>
+<span class="normal">1233</span>
+<span class="normal">1234</span>
+<span class="normal">1235</span>
+<span class="normal">1236</span>
+<span class="normal">1237</span>
+<span class="normal">1238</span>
+<span class="normal">1239</span>
+<span class="normal">1240</span>
+<span class="normal">1241</span>
+<span class="normal">1242</span>
+<span class="normal">1243</span>
+<span class="normal">1244</span>
+<span class="normal">1245</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">unprovisionAndRestart</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="o">&amp;</span><span class="n">reason</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="n">Serial</span><span class="p">.</span><span class="n">printf</span><span class="p">(</span><span class="s">"Unprovision: %s - clearing all saved settings</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span><span class="w"> </span><span class="n">reason</span><span class="p">.</span><span class="n">c_str</span><span class="p">());</span>
 <span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">mqttClient</span><span class="p">.</span><span class="n">connected</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="c1">// ตอบ Backend ว่าล้างค่าแล้ว (Backend รอคำตอบนี้ก่อนลบบัญชี MQTT ของบอร์ด)</span>
@@ -1643,47 +1664,47 @@ DELETE /api/...  ───► 1. DELETE แถวในฐานข้อมู�
 </thead>
 <tbody>
 <tr>
-<td>1174</td>
+<td>1210</td>
 <td><code>const String &amp;reason</code> = รับสตริงแบบอ้างอิง (reference <code>&amp;</code>) ไม่คัดลอก และ <code>const</code> = ห้ามแก้ ใช้แค่พิมพ์ลง Serial</td>
 </tr>
 <tr>
-<td>1176</td>
+<td>1212</td>
 <td>ส่งคำตอบได้เฉพาะตอนยังต่อ MQTT อยู่ (ปกติต่ออยู่เพราะเพิ่งได้คำสั่งมา) ถ้าไม่ต่อก็ข้ามไปล้าง NVS เลย ไม่ค้างรอ</td>
 </tr>
 <tr>
-<td>1178–1183</td>
+<td>1214–1219</td>
 <td>สร้าง JSON คำตอบ <code>{"deviceId":…,"online":false,"unprovisioned":true}</code> ขนาด 128 ไบต์ ใส่ <code>online:false</code> ด้วยเพื่อให้ Backend รุ่นเก่าที่ไม่รู้จัก <code>unprovisioned</code> อย่างน้อยเข้าใจว่าบอร์ดออฟไลน์</td>
 </tr>
 <tr>
-<td>1185</td>
+<td>1221</td>
 <td>publish คำตอบที่ <code>…/status</code> อาร์กิวเมนต์สุดท้าย <code>false</code> = <strong>ไม่ retained</strong> (เหตุการณ์ครั้งเดียว) ใช้ topic <code>status</code> เพราะ ACL ของบอร์ดอนุญาตให้ publish อยู่แล้ว ไม่ต้องเพิ่ม topic ใหม่</td>
 </tr>
 <tr>
-<td>1188–1189</td>
+<td>1224–1225</td>
 <td>publish ข้อความว่าง <code>""</code> แบบ retained (<code>true</code>) ที่ <code>status</code> และ <code>state</code> = ลบ retained ของตัวเองบน Broker บอร์ดตรวจคนล้างแค่ <code>status</code> เพราะไม่มี <code>state</code></td>
 </tr>
 <tr>
-<td>1190–1191</td>
+<td>1226–1227</td>
 <td><code>mqttClient.loop()</code> + หน่วง 300 ms ให้ PubSubClient ส่งข้อความในบัฟเฟอร์ออกไปจริงก่อนตัด</td>
 </tr>
 <tr>
-<td>1192</td>
+<td>1228</td>
 <td><code>disconnect()</code> ส่งแพ็กเก็ต DISCONNECT ตามมาตรฐาน Broker จึงรู้ว่า "ลาอย่างปกติ" และ <strong>ทิ้ง Last Will</strong> ไม่ปล่อย <code>online:false</code> แบบ retained กลับมาทับ</td>
 </tr>
 <tr>
-<td>1195–1197</td>
+<td>1231–1233</td>
 <td>เปิด namespace <code>rmutt-air</code> ของ NVS แบบเขียนได้ (<code>false</code> = ไม่ใช่ read-only) แล้ว <code>clear()</code> ลบทุก key: Wi-Fi SSID/รหัส, MQTT host/port/username/password, ห้อง, เบอร์แอร์, token, ตารางเปิดปิด</td>
 </tr>
 <tr>
-<td>1198–1200</td>
+<td>1234–1236</td>
 <td>ล้าง namespace <code>rmutt-state</code> (สถานะแอร์ล่าสุดและตัวชี้ <code>hist_ack</code> ของประวัติ)</td>
 </tr>
 <tr>
-<td>1202–1204</td>
+<td>1238–1240</td>
 <td>ลบพาร์ติชันประวัติ <code>rmuttlog</code> ทั้งก้อนด้วย <code>esp_partition_erase_range</code> (flash ต้อง erase เป็นบล็อก) ไม่ให้ข้อมูลไฟของห้องเก่าถูกส่งขึ้นไปในนามห้องใหม่หลังตั้งค่าใหม่ ตรวจ <code>nullptr</code> ก่อนเพราะถ้าแฟลชด้วย partition table ที่ไม่มี <code>rmuttlog</code> ตัวชี้จะว่าง</td>
 </tr>
 <tr>
-<td>1206–1208</td>
+<td>1242–1244</td>
 <td>หน่วงให้ Serial พิมพ์ทัน แล้ว <code>ESP.restart()</code> บูตใหม่ บอร์ดพบว่า <code>configured</code> เป็น false (ถูกล้าง) จึงเปิด BLE รอตั้งค่าเหมือนบอร์ดใหม่</td>
 </tr>
 </tbody>
@@ -1737,10 +1758,10 @@ Device ID มาจาก MAC ซึ่งไม่ใช่ความลั�
 ใช้โหมด Dynamic Security: แต่ละบอร์ดมี username/รหัสของตัวเอง (HMAC จาก Device ID กับ secret ของเซิร์ฟเวอร์) และ ACL อนุญาตเฉพาะ topic ของตัวเอง จึงสั่งแอร์ห้องอื่นไม่ได้ ถอดอุปกรณ์ออกจากระบบแล้วบัญชีถูกลบ นอกจากนี้การเชื่อมต่อจริงใช้ TLS (ค่าเริ่มต้นผ่าน Funnel พอร์ต 8443 หรือ 8883 เมื่อต่อตรง) ตรวจใบรับรองกับใบราก และ Broker ที่เข้าถึงจากอินเทอร์เน็ตได้ก็ยังบังคับบัญชีรายบอร์ด</p></div>
 
 <div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ลบแอร์ในแอปแล้ว บอร์ดยังจำรหัส Wi-Fi อยู่ไหม?</strong>
-ถ้าบอร์ดออนไลน์ตอนลบ ไม่จำครับ Backend ส่ง <code>{"action":"unprovision","deviceId":…}</code> ไปที่ <code>command</code> ก่อนลบบัญชี MQTT บอร์ดตรวจว่า <code>deviceId</code> เป็นของตัวเอง ตอบ <code>{"unprovisioned":true}</code> ทาง <code>status</code> ล้าง retained ของตัวเอง ตัดการเชื่อมต่อแบบปกติ แล้ว <code>preferences.clear()</code> ลบ Wi-Fi, MQTT, ห้องใน NVS และรีบูตเข้าโหมดตั้งค่า BLE API ตอบ <code>boardCleared: true</code> ถ้าบอร์ดออฟไลน์ คำสั่งไปไม่ถึง (ไม่ได้ส่งแบบ retained) API ตอบ <code>boardCleared: false</code> บอร์ดยังเก็บค่าเดิมแต่ต่อ Broker ไม่ได้แล้วเพราะบัญชีถูกลบ ต้องไปล้างที่ตัวบอร์ด</p></div>
+ถ้าบอร์ดออนไลน์ตอนลบ ไม่จำครับ Backend ส่ง <code>{"action":"unprovision","deviceId":…}</code> ไปที่ <code>command</code> ก่อนลบบัญชี MQTT บอร์ดตรวจว่า <code>deviceId</code> เป็นของตัวเอง ตอบ <code>{"unprovisioned":true}</code> ทาง <code>status</code> ล้าง retained ของตัวเอง ตัดการเชื่อมต่อแบบปกติ แล้ว <code>preferences.clear()</code> ลบ Wi-Fi, MQTT, ห้องใน NVS และรีบูตเข้าโหมดตั้งค่า BLE API ตอบ <code>boardCleared: true</code> ถ้าบอร์ดออฟไลน์ คำสั่งไปไม่ถึง (ไม่ได้ส่งแบบ retained) API ตอบ <code>boardCleared: false</code> บอร์ดยังเก็บค่าเดิมจนกว่าจะกลับมาออนไลน์ แล้ว Broker ปฏิเสธบัญชีที่ถูกลบไปแล้ว ครบ 2 นาทีและ 10 ครั้งบอร์ดจะล้างตัวเอง ถ้าไม่กลับมาออนไลน์เลยต้องไปล้างที่ตัวบอร์ด</p></div>
 
 <div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ทำไมคำสั่ง unprovision ไม่ส่งแบบ retained จะได้ถึงบอร์ดที่ออฟไลน์ตอนกลับมา?</strong>
-เพราะ Device ID มาจาก MAC ไม่เปลี่ยน ถ้าคำสั่งค้างบน Broker แล้ววันหลังเราเพิ่มบอร์ดตัวเดิมกลับเข้าระบบ บอร์ดจะได้คำสั่งค้างทันทีที่ subscribe แล้วล้างตัวเองทิ้งอีกรอบ อีกอย่างบัญชี MQTT ของบอร์ดถูกลบไปแล้ว บอร์ดที่กลับมาก็ต่อ Broker ไม่ได้อยู่ดี คำสั่ง retained จึงไม่มีประโยชน์และมีโทษ</p></div>
+เพราะ Device ID มาจาก MAC ไม่เปลี่ยน ถ้าคำสั่งค้างบน Broker แล้ววันหลังเราเพิ่มบอร์ดตัวเดิมกลับเข้าระบบ บอร์ดจะได้คำสั่งค้างทันทีที่ subscribe แล้วล้างตัวเองทิ้งอีกรอบ อีกอย่างบัญชี MQTT ของบอร์ดถูกลบไปแล้ว บอร์ดที่กลับมาต่อ Broker ไม่ได้และจะล้างตัวเองเมื่อถูกปฏิเสธต่อเนื่อง (<code>checkMqttAccountRemoved</code>) คำสั่ง retained จึงไม่จำเป็นและมีโทษ</p></div>
 
 <div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>บอร์ดสายแอร์กับบอร์ด IR แยกกันอย่างไรในโปรโตคอล?</strong>
 ใช้ Device ID, ชื่อ BLE, topic และ ACL ชุดเดียวกัน แยกด้วยฟิลด์ข้อมูล: Identity BLE มี <code>controlType: "wired"</code> และ <code>brand: "Daikin"</code> (บอร์ด IR ส่ง <code>"ir"</code>) และ <code>status</code> มี <code>controlMode: "wired"</code> ถ้าฐานข้อมูลยังเก็บยี่ห้อ IR Backend แก้เป็น <code>DAIKIN_WIRED</code> ให้เอง และ REST API ส่ง <code>controlType</code> ให้แอปรู้ว่าต้องซ่อนปุ่มที่รีโมตติดผนังไม่มี (Eco, Turbo, Quiet, Clean, สวิงแนวนอน)</p></div>

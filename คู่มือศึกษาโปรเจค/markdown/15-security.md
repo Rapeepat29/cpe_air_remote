@@ -126,7 +126,7 @@
 
 **ใบรับรองสำหรับ Mosquitto:** Mosquitto ไม่ขอใบเอง `deploy/sync-mqtt-cert.sh` (cron รันทุกวัน) คัดลอกใบที่ Caddy ขอได้ไปที่ `mosquitto/certs/` แล้ว reload เฉพาะเมื่อใบเปลี่ยนจริง เพื่อให้ MQTTS ใช้ใบเดียวกับเว็บ
 
-**Root CA ในเฟิร์มแวร์:** ESP32 ไม่มีที่เก็บ CA ของระบบแบบคอมพิวเตอร์ ต้องฝังใบรากไว้ในโค้ด ไฟล์ `firmware/rmutt_esp32_air/letsencrypt_ca.h` (สร้างด้วย `firmware/update-root-ca.ps1`) ฝัง **ISRG Root X1** (RSA, หมดอายุ 2035) และ **Root X2** (ECDSA, หมดอายุ 2040) ไว้ทั้งคู่ เพราะ Let's Encrypt อาจออกใบจากสายใดสายหนึ่ง ถ้าฝังไว้ใบเดียวแล้ววันหนึ่งสลับสาย บอร์ดทุกตัวจะต่อไม่ได้พร้อมกันจนกว่าจะแฟลชใหม่ ในโค้ดบอร์ดเรียก `secureClient.setCACert(LETSENCRYPT_CA)` (`rmutt_esp32_air.ino` บรรทัด 1057) แปลว่า **ตรวจใบรับรองจริง** ไม่ได้ปิดการตรวจ (ไม่มี `setInsecure()` ในโค้ด) และเพราะใบรับรองมีวันหมดอายุ บอร์ดต้อง **ซิงก์เวลา NTP ให้ได้ก่อน** (`ensureClockSynced()`) ถึงจะตรวจได้ ถ้าเวลาผิด TLS จะล้มเหลวและบอร์ดไม่ต่อ (ล้มแบบปลอดภัย) ใบ ts.net ที่กล่อง tailscale ใช้ถอด TLS ที่พอร์ต 8443 ออกโดย Let's Encrypt เช่นกัน จึงตรวจผ่านด้วยใบรากชุดเดียวกันโดยไม่ต้องแก้เฟิร์มแวร์
+**Root CA ในเฟิร์มแวร์:** ESP32 ไม่มีที่เก็บ CA ของระบบแบบคอมพิวเตอร์ ต้องฝังใบรากไว้ในโค้ด ไฟล์ `firmware/rmutt_esp32_air/letsencrypt_ca.h` (สร้างด้วย `firmware/update-root-ca.ps1`) ฝัง **ISRG Root X1** (RSA, หมดอายุ 2035) และ **Root X2** (ECDSA, หมดอายุ 2040) ไว้ทั้งคู่ เพราะ Let's Encrypt อาจออกใบจากสายใดสายหนึ่ง ถ้าฝังไว้ใบเดียวแล้ววันหนึ่งสลับสาย บอร์ดทุกตัวจะต่อไม่ได้พร้อมกันจนกว่าจะแฟลชใหม่ ในโค้ดบอร์ดเรียก `secureClient.setCACert(LETSENCRYPT_CA)` (`rmutt_esp32_air.ino` บรรทัด 1060) แปลว่า **ตรวจใบรับรองจริง** ไม่ได้ปิดการตรวจ (ไม่มี `setInsecure()` ในโค้ด) และเพราะใบรับรองมีวันหมดอายุ บอร์ดต้อง **ซิงก์เวลา NTP ให้ได้ก่อน** (`ensureClockSynced()`) ถึงจะตรวจได้ ถ้าเวลาผิด TLS จะล้มเหลวและบอร์ดไม่ต่อ (ล้มแบบปลอดภัย) ใบ ts.net ที่กล่อง tailscale ใช้ถอด TLS ที่พอร์ต 8443 ออกโดย Let's Encrypt เช่นกัน จึงตรวจผ่านด้วยใบรากชุดเดียวกันโดยไม่ต้องแก้เฟิร์มแวร์
 
 **HSTS:** `Strict-Transport-Security "max-age=31536000"` (Caddyfile บรรทัด 22) สั่งเบราว์เซอร์จำว่าโดเมนนี้ต้องใช้ HTTPS เท่านั้นเป็นเวลา 1 ปี ป้องกันการถูกลดระดับเป็น HTTP (SSL stripping)
 
@@ -515,9 +515,9 @@ token ยาว 24 ไบต์ (192 บิต) ส่งให้แอปม�
 
 **ภัยคุกคาม:** บอร์ดที่ตั้งค่าแล้วเมื่อ Wi-Fi หลุดจะเปิด BLE รอให้แก้ ใครยืนอยู่ใกล้ก็เชื่อมต่อ BLE ได้ ถ้ายอมให้แก้ได้ทุกช่อง คนแปลกหน้าจะชี้บอร์ดไปหา MQTT Broker ของตัวเองแล้วสั่งแอร์ห้องนั้นได้
 
-**ไฟล์ `firmware/rmutt_esp32_air/rmutt_esp32_air.ino` บรรทัด 811–850**
+**ไฟล์ `firmware/rmutt_esp32_air/rmutt_esp32_air.ino` บรรทัด 814–853**
 
-```cpp:811
+```cpp:814
 void enterBleRecovery(const String &reason, bool retryWifi) {
   Serial.printf("Mode: BLE recovery - %s\n", reason.c_str());
   oledReason = reason.length() > 25 ? reason.substring(0, 25) : reason;
@@ -529,7 +529,7 @@ void enterBleRecovery(const String &reason, bool retryWifi) {
   bleWifiOnlyMode = retryWifi && config.configured;
 ```
 
-```cpp:841
+```cpp:844
 bool keepsServerAssignment(const DeviceConfig &incoming) {
   return incoming.roomNumber == config.roomNumber &&
          incoming.airNumber == config.airNumber &&
@@ -543,7 +543,7 @@ bool keepsServerAssignment(const DeviceConfig &incoming) {
 ```
 
 - `bleWifiOnlyMode = retryWifi && config.configured` เปิดเมื่อ "บอร์ดตั้งค่าแล้ว และเข้าโหมดกู้เพราะ Wi-Fi หลุด"
-- ใน `processPendingConfig` (บรรทัด 914) ถ้า `bleWifiOnlyMode && !keepsServerAssignment(incoming)` → ปฏิเสธด้วยรหัส `wifi_only_mode` (ห้อง, เลขแอร์, host/port/TLS/user/password/topic ของ MQTT ต้องตรงของเดิมทั้งหมด) เปลี่ยนได้เฉพาะ SSID/รหัส Wi-Fi
+- ใน `processPendingConfig` (บรรทัด 917) ถ้า `bleWifiOnlyMode && !keepsServerAssignment(incoming)` → ปฏิเสธด้วยรหัส `wifi_only_mode` (ห้อง, เลขแอร์, host/port/TLS/user/password/topic ของ MQTT ต้องตรงของเดิมทั้งหมด) เปลี่ยนได้เฉพาะ SSID/รหัส Wi-Fi
 - กรณีที่ **ต้อง** เข้าถึงตัวบอร์ดจริง (ยังไม่เคยตั้งค่า หรือกดปุ่ม BOOT ค้างตอนรีเซ็ต GPIO0) ถือว่าเจ้าของอยู่หน้าเครื่อง ให้แก้ได้ทุกช่อง
 
 ### 7.3 โหมดตั้งค่าออนไลน์: เฉพาะแอดมิน และจำกัด 5 นาที
@@ -552,9 +552,9 @@ bool keepsServerAssignment(const DeviceConfig &incoming) {
 
 ### 7.4 OTA ผ่าน HTTPS แต่ไม่มี signature
 
-**ไฟล์ `firmware/rmutt_esp32_air/ota_update.h` บรรทัด 26–39**
+**ไฟล์ `firmware/rmutt_esp32_air/ota_update.h` บรรทัด 27–40**
 
-```cpp:26
+```cpp:27
 inline bool otaUrlAllowed(const String &url, const String &host) {
   if (host.isEmpty() || url.length() > OTA_MAX_URL_LENGTH) return false;
   const String prefix = "https://" + host + "/firmware/";
@@ -575,7 +575,7 @@ inline bool otaUrlAllowed(const String &url, const String &host) {
 
 **จุดอ่อนที่เหลือ:** ความแท้ของไฟล์พึ่ง "ใครวางไฟล์ในโฟลเดอร์ `/opt/rmutt/firmware` บนเซิร์ฟเวอร์ได้" เท่านั้น (มีสองทาง คือ SSH/`scp` และบัญชีแอดมินในเว็บผ่าน `POST /api/firmware` ดูหัวข้อ 7.5) ไม่มี **การเซ็นเฟิร์มแวร์ (code signing)** ไม่มี **secure boot / flash encryption** และไม่มี **rollback** (ค้นหา `esp_ota_mark_app_valid`, `rollback` ในโฟลเดอร์ `firmware/` ไม่พบ) ถ้าเฟิร์มแวร์เสียแต่ดาวน์โหลดครบ บอร์ดจะสลับไปใช้และอาจบูตไม่ขึ้น ถ้าเซิร์ฟเวอร์ถูกเจาะ คนร้ายวาง `.bin` อันตรายแล้วสั่งอัปเดตได้ ปรับปรุงได้ด้วยการเซ็นไฟล์ (เช่น ESP-IDF signed OTA ด้วยคีย์ที่เก็บนอกเซิร์ฟเวอร์), เปิด `CONFIG_APP_ROLLBACK_ENABLE` และเรียก `esp_ota_mark_app_valid_cancel_rollback()` หลังบูตสำเร็จ
 
-อีกประเด็น: เส้นทาง `/firmware/*` ใน Caddy (บรรทัด 35–39) **เปิดสาธารณะ ไม่ต้องล็อกอิน** (ทั้งทางโดเมนหลักและทาง Funnel 443 เพราะใช้บล็อก `(app)` ร่วมกัน และเป็นทางที่บอร์ดซึ่งใช้ชื่อ ts.net ดาวน์โหลด OTA) เพราะบอร์ดไม่มี JWT (จำเป็นต้องเป็นแบบนี้ถ้าไม่เพิ่มกลไกยืนยันตัวบอร์ด) ใครรู้ชื่อไฟล์ดาวน์โหลดเฟิร์มแวร์ไปศึกษาได้ ข้อมูลลับต้องไม่ฝังในไฟล์ `.bin` (ระบบนี้เก็บ Wi-Fi/รหัส MQTT ใน NVS ไม่ใช่ในโค้ด จึงไม่รั่วทางนี้)
+อีกประเด็น: เส้นทาง `/firmware/*` ใน Caddy (บรรทัด 36–40) **เปิดสาธารณะ ไม่ต้องล็อกอิน** (ทั้งทางโดเมนหลักและทาง Funnel 443 เพราะใช้บล็อก `(app)` ร่วมกัน และเป็นทางที่บอร์ดซึ่งใช้ชื่อ ts.net ดาวน์โหลด OTA) เพราะบอร์ดไม่มี JWT (จำเป็นต้องเป็นแบบนี้ถ้าไม่เพิ่มกลไกยืนยันตัวบอร์ด) ใครรู้ชื่อไฟล์ดาวน์โหลดเฟิร์มแวร์ไปศึกษาได้ ข้อมูลลับต้องไม่ฝังในไฟล์ `.bin` (ระบบนี้เก็บ Wi-Fi/รหัส MQTT ใน NVS ไม่ใช่ในโค้ด จึงไม่รั่วทางนี้)
 
 **จุดอ่อนที่เหลือของ BLE (ตรวจจากโค้ด):** ใน `startBleProvisioning()` (บรรทัด 666–740) characteristic สำหรับเขียนค่าตั้ง (`CONFIG_UUID`) เป็นแค่ `PROPERTY_WRITE` ไม่มีการตั้ง pairing/bonding/encryption ใด ๆ (ไม่พบ `setSecurityCallbacks`, `setEncryptionLevel` ในโค้ด) ผลคือ (1) ระหว่างหน้าต่างตั้งค่า 5 นาทีของโหมดออนไลน์ ใครอยู่ในระยะ BLE ก็เชื่อมต่อได้ และเนื่องจาก `bleWifiOnlyMode = false` ในโหมดนี้ จึงเขียนได้ทุกช่อง (บอร์ดตรวจแค่ว่า `deviceId` ตรงและ token ไม่ว่าง ส่วนความถูกต้องของ token ตรวจที่ Backend ภายหลัง) (2) ข้อมูลที่แอปส่งผ่าน BLE ตอนตั้งค่า (รหัส Wi-Fi และรหัส MQTT ของบอร์ด) วิ่งบนลิงก์ที่ไม่ได้เข้ารหัสในชั้นแอป ถูกดักได้ถ้ามีคนอยู่ใกล้ตอนตั้งค่า ข้อมูลที่อ่านออกจากบอร์ดผ่าน BLE ไม่รวมรหัส (มีแค่ `hasWifiPassword`/`hasMqttPassword` เป็น true/false) แต่เปิดเผย SSID, MQTT host/username และ Device ID
 
@@ -587,10 +587,10 @@ inline bool otaUrlAllowed(const String &url, const String &host) {
 
 | ด่าน | ตรวจอะไร | ผิดแล้ว | ไฟล์ |
 |---|---|---|---|
-| 1. สิทธิ์ | `firmwareRouter.use(authenticate, requireAdmin)` คลุมทั้ง router รวมเส้นอัปโหลดและลบ | 401 / 403 | `routes/firmware.js` บรรทัด 23 |
-| 2. ขนาดก่อนอ่าน | `express.raw({ limit: FIRMWARE_MAX_BYTES + 1024 })` Express หยุดอ่าน body ที่ใหญ่เกิน ไม่โหลดเข้าหน่วยความจำทั้งก้อน | 413 | `routes/firmware.js` บรรทัด 47 |
+| 1. สิทธิ์ | `firmwareRouter.use(authenticate, requireAdmin)` คลุมทั้ง router รวมเส้นอัปโหลดและลบ | 401 / 403 | `routes/firmware.js` บรรทัด 24 |
+| 2. ขนาดก่อนอ่าน | `express.raw({ limit: FIRMWARE_MAX_BYTES + 1024 })` Express หยุดอ่าน body ที่ใหญ่เกิน ไม่โหลดเข้าหน่วยความจำทั้งก้อน | 413 | `routes/firmware.js` บรรทัด 63 |
 | 3. ชื่อไฟล์ | `validateFirmwareFileName`: regex `^[A-Za-z0-9][A-Za-z0-9._-]{0,118}\.bin$` (ไม่มี `/` ขึ้นต้นด้วยจุดไม่ได้ ลงท้าย `.bin`) และห้ามมี `..` ชื่อที่ถอด percent-encoding ไม่ได้กลายเป็น `''` ซึ่งไม่ผ่าน | 400 | `utils/firmware.js` บรรทัด 5–16, `routes/firmware.js` บรรทัด 130–136 |
-| 4. ชนิดตรงแท็บ | `?kind=` ต้องเท่ากับ `firmwareKindOf(ชื่อ)` (`occ` / `wired`,`slm8` / ที่เหลือ = `air`) | 400 | `routes/firmware.js` บรรทัด 58–67 |
+| 4. ชนิดตรงแท็บ | `?kind=` ต้องเท่ากับ `firmwareKindOf(ชื่อ)` (`occ` / `wired`,`slm8` / ที่เหลือ = `air`) | 400 | `routes/firmware.js` บรรทัด 74–97 |
 | 5. เนื้อไฟล์ | `validateFirmwareImage`: ไม่ว่าง, ไม่เกิน `0x1F0000` ไบต์ (ขนาดช่องโปรแกรมใน `partitions.csv`), ยาว ≥ 256 ไบต์ และไบต์แรกเป็น magic byte `0xE9` ของ ESP image | 400 / 413 | `utils/firmware.js` บรรทัด 100–124 |
 | 6. ไม่ทับโดยไม่ตั้งใจ | มีไฟล์ชื่อเดิมแล้วต้องส่ง `?replace=1` | 409 | `routes/firmware.js` บรรทัด 71–76 |
 | 7. เขียนแบบ atomic | เขียน `<ชื่อ>.<pid>.part` แล้ว `rename` บอร์ดที่ดาวน์โหลดอยู่ไม่เจอไฟล์ครึ่ง ๆ ล้มกลางทางลบไฟล์ชั่วคราวทิ้ง | 500 (ข้อความบอกให้ตรวจสิทธิ์/`:ro`) | `routes/firmware.js` บรรทัด 81–95 |
@@ -617,7 +617,7 @@ inline bool otaUrlAllowed(const String &url, const String &host) {
 
 1. ตรวจ `deviceId` ในคำสั่งว่าตรงกับตัวเอง ไม่ตรงไม่ทำ (กันข้อความหลงผิด topic)
 2. ตอบ `{"unprovisioned":true,"online":false,"deviceId":...}` ทาง `status` แล้วล้าง retained `status`/`state` ของตัวเอง และตัดการเชื่อมต่อแบบปกติ (ไม่เกิด Last Will)
-3. `preferences.clear()` ล้าง NVS ทั้ง namespace ของการตั้งค่า (Wi-Fi, MQTT, ห้อง) และสถานะแอร์ แล้วรีบูตเข้าโหมดตั้งค่าบลูทูธเหมือนบอร์ดใหม่ (`unprovisionAndRestart` ใน `firmware/rmutt_esp32_air/rmutt_esp32_air.ino` บรรทัด 1174 เป็นต้นไป บอร์ดสายแอร์และเซ็นเซอร์มีฟังก์ชันชื่อเดียวกัน)
+3. `preferences.clear()` ล้าง NVS ทั้ง namespace ของการตั้งค่า (Wi-Fi, MQTT, ห้อง) และสถานะแอร์ แล้วรีบูตเข้าโหมดตั้งค่าบลูทูธเหมือนบอร์ดใหม่ (`unprovisionAndRestart` ใน `firmware/rmutt_esp32_air/rmutt_esp32_air.ino` บรรทัด 1210 เป็นต้นไป บอร์ดสายแอร์และเซ็นเซอร์มีฟังก์ชันชื่อเดียวกัน)
 
 Backend รอคำตอบไม่เกิน 4 วินาที แล้วค่อยล้าง retained และ **ลบบัญชี MQTT เป็นขั้นสุดท้าย** (ถ้าลบบัญชีก่อน Broker จะตัดบอร์ดทันทีและคำสั่งล้างค่าไปไม่ถึง) ผลถูกส่งกลับในฟิลด์ `boardCleared` และ log `boardCleared=true/false`
 
@@ -626,7 +626,7 @@ Backend รอคำตอบไม่เกิน 4 วินาที แล�
 
 **จุดอ่อนที่เหลือ:**
 
-- **บอร์ดที่ออฟไลน์ตอนกดลบ ไม่ถูกล้าง** (`boardCleared: false`) รหัส Wi-Fi ยังอยู่ใน flash ผู้ดูแลต้องล้างที่ตัวบอร์ดเอง (ตั้งค่าใหม่ผ่านบลูทูธหรือแฟลชใหม่) ส่วนบัญชี MQTT ถูกลบแล้ว บอร์ดจึงต่อ Broker ไม่ได้อีก (รหัส MQTT ที่ค้างในบอร์ดไร้ประโยชน์)
+- **บอร์ดที่ออฟไลน์ตอนกดลบ ไม่ถูกล้างทันที** (`boardCleared: false`) ถ้ากลับมาออนไลน์ เฟิร์มแวร์จะล้างตัวเองเมื่อ Broker ปฏิเสธบัญชีที่ถูกลบต่อเนื่องครบ 2 นาทีและ 10 ครั้ง (`checkMqttAccountRemoved`) แต่ถ้าบอร์ดถูกถอดไปแล้วไม่ได้ต่อ Wi-Fi ของอาคารอีก รหัส Wi-Fi ยังอยู่ใน flash ผู้ดูแลต้องล้างที่ตัวบอร์ดเอง (ตั้งค่าใหม่ผ่านบลูทูธหรือแฟลชใหม่)
 - **NVS ไม่ได้เข้ารหัส** (ไม่มี flash encryption ดูจุดอ่อนข้อ 1) ระหว่างที่บอร์ดยังใช้งาน ใครถอดบอร์ดไปอ่าน flash ได้ก็ได้รหัส Wi-Fi และรหัส MQTT ของบอร์ดตัวนั้น unprovision ช่วยเฉพาะตอนเลิกใช้
 - `preferences.clear()` ลบค่าในระดับ NVS ไม่ได้รับประกันว่าเขียนทับข้อมูลเก่าใน flash ทุกไบต์ (เป็นพฤติกรรมของ NVS ทั่วไป ผู้ที่ถอด flash ไปวิเคราะห์ระดับต่ำอาจกู้บางส่วนได้) ถ้าต้องการลบแน่นอนให้แฟลชลบทั้งชิป (`erase_flash`) ก่อนทิ้งบอร์ด
 
@@ -742,7 +742,7 @@ USER node
 | 14 | ฮาร์เดนนิงของ SSH/ฐานข้อมูลสำรอง/เครื่องมือ | `db-tunnel.ps1` ถามรหัสผ่าน SSH; backup ไม่เข้ารหัส และ `BACKUP_REMOTE` ว่าง; ไม่มี `cap_drop`/`read_only` | ดูหัวข้อชั้น 1, 9, 10 | ใช้ SSH key อย่างเดียว, เข้ารหัส backup (เช่น `age`/`gpg`) |
 | 15 | Broker เข้าถึงได้จากอินเทอร์เน็ตผ่าน Funnel 8443 และไม่มี rate limit/ตัวแบน IP ที่ชั้น MQTT | `tailscale-serve.json` บรรทัด 4–7 และ 18 เปิดพอร์ต 8443 → `mqtt:1883`; `mosquitto.conf` ไม่มีการตั้งค่าจำกัดการเชื่อมต่อหรือการล็อกอินผิด และ Mosquitto เห็นต้นทางเป็นกล่อง tailscale | ยิงการเชื่อมต่อใส่ Broker เพื่อกินทรัพยากรหรือทำ log รกได้ (รหัสบอร์ดเป็น HMAC เดาในทางปฏิบัติไม่ได้ แต่ถ้า `MQTT_DEVICE_SECRET` หรือบัญชีหลุดก็ต่อจากนอกอาคารได้ทันที) ช่วงสุดท้ายถึง Mosquitto เป็น MQTT ดิบในเครือข่าย docker | ใช้ 8883 ต่อตรงและถอด 8443 เมื่อบอร์ดอยู่ในอาคารหมด, เฝ้าดู log (`connection_messages true`), เพิ่มตัวนับ/แบน IP หน้า Broker |
 | 16 | Backend เขียนโฟลเดอร์ firmware ได้ | `docker-compose.yml` บรรทัด 126 ไม่มี `:ro` แล้ว; `setup-vps.sh`/`update-remote.sh` ตั้งเจ้าของเป็น uid 1000 | Backend ที่ถูกยึดเปลี่ยนไฟล์ `.bin` ที่บอร์ดจะดาวน์โหลดได้ | เซ็นเฟิร์มแวร์ (ข้อ 1) หรือแยกบริการรับไฟล์ที่มีสิทธิ์เขียนเฉพาะโฟลเดอร์นี้ |
-| 17 | บอร์ดออฟไลน์ตอนลบ ยังเก็บรหัส Wi-Fi ใน NVS | `unprovisionDevice` ไม่ส่งแบบ retain และรอแค่ 4 วินาที; คำตอบ `boardCleared: false` | รหัส Wi-Fi ของอาคารค้างในบอร์ดที่ถูกถอดไป | แจ้งเตือนในแอปเมื่อ `boardCleared` เป็น false, ขั้นตอนเก็บคืนบอร์ด + `erase_flash`, flash encryption |
+| 17 | บอร์ดออฟไลน์ตอนลบ ยังเก็บรหัส Wi-Fi ใน NVS จนกว่าจะกลับมาออนไลน์ | `unprovisionDevice` ไม่ส่งแบบ retain และรอแค่ 4 วินาที; คำตอบ `boardCleared: false`; บอร์ดล้างตัวเองเมื่อถูกปฏิเสธบัญชีครบ 2 นาที แต่บอร์ดที่ไม่กลับมาออนไลน์ไม่ถูกล้าง | รหัส Wi-Fi ของอาคารค้างในบอร์ดที่ถูกถอดไป | แจ้งเตือนในแอปเมื่อ `boardCleared` เป็น false, ขั้นตอนเก็บคืนบอร์ด + `erase_flash`, flash encryption |
 
 > [!WARN]
 > ข้อ 2 และ 3 ควรทดสอบกับระบบจริงก่อนไปบอกอาจารย์ว่าเป็นข้อเท็จจริง (ข้อ 2 ยืนยันได้จากโค้ดตรง ๆ ว่าเส้นทางไม่ตรวจ role ส่วนข้อ 3 เป็นผลจากการวิเคราะห์ลำดับ CORS ของ Express ไม่ได้รันจริง)
@@ -803,7 +803,7 @@ USER node
 
 > [!ASK]
 > **14. ลบอุปกรณ์แล้ว รหัส Wi-Fi ที่อยู่ในบอร์ดยังอยู่ไหม**
-> ถ้าบอร์ดออนไลน์ตอนลบ ไม่อยู่ครับ Backend ส่งคำสั่ง `unprovision` (มี `deviceId` ให้บอร์ดตรวจซ้ำ) บอร์ดตอบกลับแล้วล้าง NVS ทั้ง Wi-Fi, MQTT, ห้อง แล้วรีบูตเป็นบอร์ดเปล่า Backend รอคำตอบ 4 วินาทีก่อนลบบัญชี MQTT เพราะถ้าลบบัญชีก่อนคำสั่งจะไปไม่ถึง ถ้าบอร์ดออฟไลน์ แอปได้ `boardCleared: false` ต้องไปล้างที่ตัวบอร์ด แต่บอร์ดนั้นต่อ Broker ไม่ได้แล้วเพราะบัญชีถูกลบ
+> ถ้าบอร์ดออนไลน์ตอนลบ ไม่อยู่ครับ Backend ส่งคำสั่ง `unprovision` (มี `deviceId` ให้บอร์ดตรวจซ้ำ) บอร์ดตอบกลับแล้วล้าง NVS ทั้ง Wi-Fi, MQTT, ห้อง แล้วรีบูตเป็นบอร์ดเปล่า Backend รอคำตอบ 4 วินาทีก่อนลบบัญชี MQTT เพราะถ้าลบบัญชีก่อนคำสั่งจะไปไม่ถึง ถ้าบอร์ดออฟไลน์ แอปได้ `boardCleared: false` บอร์ดต่อ Broker ไม่ได้แล้วเพราะบัญชีถูกลบ และเมื่อกลับมาออนไลน์แล้วถูกปฏิเสธต่อเนื่องครบ 2 นาที บอร์ดจะล้างตัวเอง ถ้าไม่กลับมาเลยต้องไปล้างที่ตัวบอร์ด
 
 ## สรุปและเช็กลิสต์ความเข้าใจ
 

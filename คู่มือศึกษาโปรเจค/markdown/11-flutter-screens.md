@@ -1613,8 +1613,8 @@ Future<void> refresh({bool silent = false}) async {
 สิ่งที่ Backend ทำหลังได้ `DELETE` (ทั้งแอร์และเซ็นเซอร์ ฟังก์ชัน `unprovisionDevice` ใน `backend/src/services/mqtt.js`)
 
 1. ลบแถวในฐานข้อมูล
-2. **ใหม่:** publish `{"action":"unprovision","deviceId":...}` ไปที่ `<prefix>/<deviceId>/command` แล้วรอให้บอร์ดตอบ `{"unprovisioned":true}` ทาง topic `status` ไม่เกิน 4 วินาที (`UNPROVISION_ACK_TIMEOUT_MS = 4000`)
-3. บอร์ดที่ออนไลน์ (แอร์ 2.5.1, สายแอร์ 2.5.2-slm8, เซ็นเซอร์ 1.3.2) ตรวจ `deviceId` ตรงกับตัวเอง ล้าง retained ของตัวเอง ล้าง NVS (Wi-Fi, MQTT, ห้อง และข้อมูลย้อนหลังของบอร์ดแอร์) แล้วรีบูตเข้าโหมดตั้งค่าบลูทูธ
+2. publish `{"action":"unprovision","deviceId":...}` ไปที่ `<prefix>/<deviceId>/command` แล้วรอให้บอร์ดตอบ `{"unprovisioned":true}` ทาง topic `status` ไม่เกิน 4 วินาที (`UNPROVISION_ACK_TIMEOUT_MS = 4000`)
+3. บอร์ดที่ออนไลน์ (เฟิร์มแวร์ปัจจุบันทั้งสามตัว) ตรวจ `deviceId` ตรงกับตัวเอง ล้าง retained ของตัวเอง ล้าง NVS (Wi-Fi, MQTT, ห้อง และข้อมูลย้อนหลังของบอร์ดแอร์) แล้วรีบูตเข้าโหมดตั้งค่าบลูทูธ
 4. Backend ล้าง retained และลบบัญชี MQTT ของบอร์ด (ต้องทำ **หลัง** ข้อ 2 เพราะลบบัญชีก่อน Broker จะตัดบอร์ดทันที คำสั่งไปไม่ถึง)
 5. ตอบแอปด้วย JSON ที่มี `boardCleared: true` (บอร์ดยืนยัน) หรือ `false` (บอร์ดออฟไลน์หรือไม่ตอบ)
 

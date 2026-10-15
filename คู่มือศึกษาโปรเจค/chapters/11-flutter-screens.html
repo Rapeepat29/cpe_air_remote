@@ -2095,8 +2095,8 @@ Widget เป็น "พิมพ์เขียว" ที่ไม่เปล
 <p>สิ่งที่ Backend ทำหลังได้ <code>DELETE</code> (ทั้งแอร์และเซ็นเซอร์ ฟังก์ชัน <code>unprovisionDevice</code> ใน <code>backend/src/services/mqtt.js</code>)</p>
 <ol>
 <li>ลบแถวในฐานข้อมูล</li>
-<li><strong>ใหม่:</strong> publish <code>{"action":"unprovision","deviceId":...}</code> ไปที่ <code>&lt;prefix&gt;/&lt;deviceId&gt;/command</code> แล้วรอให้บอร์ดตอบ <code>{"unprovisioned":true}</code> ทาง topic <code>status</code> ไม่เกิน 4 วินาที (<code>UNPROVISION_ACK_TIMEOUT_MS = 4000</code>)</li>
-<li>บอร์ดที่ออนไลน์ (แอร์ 2.5.1, สายแอร์ 2.5.2-slm8, เซ็นเซอร์ 1.3.2) ตรวจ <code>deviceId</code> ตรงกับตัวเอง ล้าง retained ของตัวเอง ล้าง NVS (Wi-Fi, MQTT, ห้อง และข้อมูลย้อนหลังของบอร์ดแอร์) แล้วรีบูตเข้าโหมดตั้งค่าบลูทูธ</li>
+<li>publish <code>{"action":"unprovision","deviceId":...}</code> ไปที่ <code>&lt;prefix&gt;/&lt;deviceId&gt;/command</code> แล้วรอให้บอร์ดตอบ <code>{"unprovisioned":true}</code> ทาง topic <code>status</code> ไม่เกิน 4 วินาที (<code>UNPROVISION_ACK_TIMEOUT_MS = 4000</code>)</li>
+<li>บอร์ดที่ออนไลน์ (เฟิร์มแวร์ปัจจุบันทั้งสามตัว) ตรวจ <code>deviceId</code> ตรงกับตัวเอง ล้าง retained ของตัวเอง ล้าง NVS (Wi-Fi, MQTT, ห้อง และข้อมูลย้อนหลังของบอร์ดแอร์) แล้วรีบูตเข้าโหมดตั้งค่าบลูทูธ</li>
 <li>Backend ล้าง retained และลบบัญชี MQTT ของบอร์ด (ต้องทำ <strong>หลัง</strong> ข้อ 2 เพราะลบบัญชีก่อน Broker จะตัดบอร์ดทันที คำสั่งไปไม่ถึง)</li>
 <li>ตอบแอปด้วย JSON ที่มี <code>boardCleared: true</code> (บอร์ดยืนยัน) หรือ <code>false</code> (บอร์ดออฟไลน์หรือไม่ตอบ)</li>
 </ol>

@@ -185,8 +185,8 @@
 
 | ไฟล์ | หน้าที่ |
 |---|---|
-| firmware/README.md | คู่มือรวมของเฟิร์มแวร์ ESP32 ทั้งสองบอร์ด: ไลบรารี ขา GPIO ขั้นตอนตั้งค่า การกู้ Wi-Fi การต่อสายเรดาร์ การอ่าน log และตาราง MQTT state หัวข้อ unprovision (บางจุดยังไม่ตรงโค้ด: เขียนเซ็นเซอร์เป็น 1.3.2 และขา PZEM/LED เหลืองของบอร์ดสายแอร์เป็น 16/18/27) ครอบคลุม 3 เฟิร์มแวร์ รวมบอร์ดสายแอร์ ไลบรารี U8g2/DHT ตารางขารวมจอ OLED GPIO21/22 |
-| firmware/rmutt_esp32_air/rmutt_esp32_air.ino | โปรแกรมหลักของบอร์ดแอร์ (ปัจจุบัน 2.5.1 เริ่มเขียนบทนี้ตอน 2.4.1): BLE provisioning, Wi-Fi/MQTT (TLS, LWT), ยิง IR สั่งแอร์, อ่าน PZEM และตัดสินว่าแอร์ทำงาน, LED, ตารางเวลา, OTA และเก็บ/ส่งข้อมูลย้อนหลังตอนเน็ตหลุด (2.5.1) เพิ่มจอ OLED, `controlType:"ir"` ใน BLE และคำสั่ง `unprovision` ล้างบอร์ด |
+| firmware/README.md | คู่มือรวมของเฟิร์มแวร์ ESP32 ทั้งสองบอร์ด: ไลบรารี ขา GPIO ขั้นตอนตั้งค่า การกู้ Wi-Fi การต่อสายเรดาร์ การอ่าน log และตาราง MQTT state หัวข้อ unprovision (บางจุดยังไม่ตรงโค้ด: เลขรุ่นยังเป็น 2.5.1 / 2.5.2-slm8 / 1.3.2 และขา PZEM/LED เหลืองของบอร์ดสายแอร์เป็น 16/18/27) ครอบคลุม 3 เฟิร์มแวร์ รวมบอร์ดสายแอร์ ไลบรารี U8g2/DHT ตารางขารวมจอ OLED GPIO21/22 |
+| firmware/rmutt_esp32_air/rmutt_esp32_air.ino | โปรแกรมหลักของบอร์ดแอร์ (2.5.2): BLE provisioning, Wi-Fi/MQTT (TLS, LWT), ยิง IR สั่งแอร์, อ่าน PZEM และตัดสินว่าแอร์ทำงาน, LED, ตารางเวลา, OTA และเก็บ/ส่งข้อมูลย้อนหลังตอนเน็ตหลุด (2.5.1) เพิ่มจอ OLED, `controlType:"ir"` ใน BLE และคำสั่ง `unprovision` ล้างบอร์ด ล้างค่าตัวเองเมื่อ Broker ปฏิเสธบัญชีที่ถูกลบต่อเนื่อง 2 นาที |
 | firmware/rmutt_esp32_air/SaijoDenkiAC.h | ประกาศคลาส SaijoDenkiAC และ enum SaijoFan/SaijoSwing สำหรับไดรเวอร์ IR ของแอร์ Saijo Denki |
 | firmware/rmutt_esp32_air/SaijoDenkiAC.cpp | ค่าเวลาสัญญาณ 38 kHz และตารางเฟรม 72 บิตที่จับจากรีโมตจริง พร้อมเมธอดส่งเปิด/ปิด โหมด อุณหภูมิ 18–29 พัดลม และสวิง ผ่าน IRsend::sendGeneric |
 | firmware/rmutt_esp32_air/history_log.h | เทมเพลต HistoryLog ที่เก็บรายการไฟฟ้า 32 ไบต์ทุก 5 นาทีเป็น ring buffer บนพาร์ติชัน rmuttlog พร้อม checksum, ส่งเป็น batch, ack และลบเป็น sector |
@@ -194,7 +194,7 @@
 | firmware/rmutt_esp32_air/oled_ui.h | ฟังก์ชันวาดหน้าจอ 128×64 (`OledData`, หน้าหลัก, SETUP/CONNECTING/ALERT) ใช้ร่วมกับบอร์ดสายแอร์ |
 | firmware/rmutt_esp32_air/build_opt.h | แฟล็กคอมไพเลอร์ปิด I2C/SPI ฮาร์ดแวร์ของ U8g2 และโปรโตคอล IR 28 ยี่ห้อที่ไม่ใช้ ให้เฟิร์มแวร์ที่มีจอพอดีแฟลช (98%) |
 | firmware/rmutt_esp32_air/README_OLED_TH.md | คู่มือต่อจอ OLED หน้าจอที่แสดง ไลบรารี U8g2 และเหตุผลของ `build_opt.h` |
-| firmware/rmutt_esp32_air_wired/rmutt_esp32_air_wired.ino | เฟิร์มแวร์บอร์ดสายแอร์ Daikin 2.5.2-slm8 สั่งแอร์ทางสาย SLM8 + DHT11 รายงานสถานะจากแอร์ BLE/MQTT/PZEM/OTA เหมือนบอร์ด IR (บท 19) ขา PZEM ย้ายเป็น RX18/TX14 และ LED เหลืองเป็น GPIO23 |
+| firmware/rmutt_esp32_air_wired/rmutt_esp32_air_wired.ino | เฟิร์มแวร์บอร์ดสายแอร์ Daikin 2.5.5-slm8 สั่งแอร์ทางสาย SLM8 + DHT11 รายงานสถานะจากแอร์ BLE/MQTT/PZEM/OTA เหมือนบอร์ด IR (บท 19) ขา PZEM ย้ายเป็น RX18/TX14 และ LED เหลืองเป็น GPIO23 |
 | firmware/rmutt_esp32_air_wired/DaikinSLM8.h | โปรโตคอลสาย SLM8: สร้าง/อ่านเฟรม checksum ตัวรับ Rx (interrupt + ring buffer) ตัวส่ง Tx และ Controller |
 | firmware/rmutt_esp32_air_wired/wired_bus.h | รัน Controller ใน FreeRTOS task แยก (core 1, priority 3) พร้อม mutex ส่งเฟรมทุก 1 วินาที |
 | firmware/rmutt_esp32_air_wired/README_WIRED_TH.md | วิธีต่อสาย ไลบรารี ขั้นทดสอบหลังแฟลช และค่าที่ปรับได้ของบอร์ดสายแอร์ (ยังเขียนขา PZEM 16/18 และ LED เหลือง 27 โค้ดจริงคือ 18/14 และ 23) |
@@ -205,10 +205,10 @@
 | firmware/rmutt_esp32_air_wired/letsencrypt_ca.h | สำเนาเดียวกับบอร์ด IR: ใบรับรอง CA ของ Let's Encrypt |
 | firmware/rmutt_esp32_air_wired/oled_display.h | สำเนาเดียวกับบอร์ด IR: ตัวขับจอ OLED |
 | firmware/rmutt_esp32_air_wired/oled_ui.h | สำเนาเดียวกับบอร์ด IR: หน้าจอ OLED |
-| firmware/rmutt_esp32_air/ota_update.h | ตรวจ URL ที่อนุญาตและดาวน์โหลดเฟิร์มแวร์ใหม่ผ่าน HTTPS (ตรวจใบรับรองกับใบรากที่ฝังไว้) เขียนลงช่อง OTA ที่ว่าง |
+| firmware/rmutt_esp32_air/ota_update.h | ตรวจ URL ที่อนุญาตและดาวน์โหลดเฟิร์มแวร์ใหม่ผ่าน HTTPS (ตรวจใบรับรองกับใบรากที่ฝังไว้) เขียนลงช่อง OTA ที่ว่าง ลองดาวน์โหลดใหม่สูงสุด 3 ครั้งเมื่อเครือข่ายสะดุด |
 | firmware/rmutt_esp32_air/letsencrypt_ca.h | ใบรับรองราก Let's Encrypt (ISRG Root X1 และ X2) ที่ฝังในเฟิร์มแวร์เพื่อตรวจ MQTTS และ OTA สร้างโดย update-root-ca.ps1 |
 | firmware/rmutt_esp32_air/partitions.csv | ตารางพาร์ติชัน flash 4 MB ของบอร์ดแอร์: nvs, otadata, app0, app1 (OTA) และ rmuttlog 64 KB สำหรับข้อมูลย้อนหลัง |
-| firmware/rmutt_esp32_occupancy/rmutt_esp32_occupancy.ino | โปรแกรมหลักของบอร์ดตรวจจับคน (v1.3.3): อ่านเรดาร์ LD2410 ใน Engineering mode, ตัดสินมีคนเมื่อ static energy เกต 0–8 มากกว่า 15, ไฟ LED เขียว GPIO25 = การเชื่อมต่อ แดง GPIO26 = มีคน, ส่งสถานะผ่าน MQTT, BLE provisioning, OTA และคำสั่ง `unprovision` ล้าง NVS แล้วรีบูตเข้า BLE |
+| firmware/rmutt_esp32_occupancy/rmutt_esp32_occupancy.ino | โปรแกรมหลักของบอร์ดตรวจจับคน (v1.3.9): อ่านเรดาร์ LD2410 ใน Engineering mode, ตัดสินมีคนเมื่อ static energy เกต 0–8 มากกว่า 15, ไฟ LED เขียว GPIO25 = การเชื่อมต่อ แดง GPIO26 = มีคน, ส่งสถานะผ่าน MQTT, BLE provisioning, OTA และคำสั่ง `unprovision` ล้าง NVS แล้วรีบูตเข้า BLE |
 | firmware/rmutt_esp32_occupancy/ota_update.h | ไฟล์ OTA เหมือนของบอร์ดแอร์ (ต่างแค่ช่องว่างท้ายบรรทัด 22) ใช้ตรวจ URL และอัปเดตเฟิร์มแวร์ผ่าน HTTPS |
 | firmware/rmutt_esp32_occupancy/letsencrypt_ca.h | ใบรับรองรากชุดเดียวกับบอร์ดแอร์ สำหรับ MQTTS และ OTA ของบอร์ดตรวจจับคน |
 | firmware/rmutt_esp32_occupancy/partitions.csv | ตารางพาร์ติชัน flash 4 MB ของบอร์ดตรวจจับคน: nvs, otadata, app0, app1 และ coredump |

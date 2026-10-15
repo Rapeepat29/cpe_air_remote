@@ -6,9 +6,9 @@
 
 | บอร์ด | สเก็ตช์ | เวอร์ชันในโค้ด (`FIRMWARE_VERSION`) | หน้าที่ |
 |---|---|---|---|
-| บอร์ดแอร์ IR | `rmutt_esp32_air/rmutt_esp32_air.ino` | **2.5.1** | หนึ่งบอร์ดต่อแอร์หนึ่งเครื่อง: ยิง IR สั่งแอร์เหมือนรีโมตมือถือ, วัดไฟด้วย PZEM-004T, รายงานสถานะ, เก็บข้อมูลไฟฟ้าตอนเน็ตหลุด, แสดงผลบนจอ OLED |
-| บอร์ดแอร์สายแอร์ | `rmutt_esp32_air_wired/rmutt_esp32_air_wired.ino` | **2.5.2-slm8** | ใช้ **แทนรีโมตติดผนัง Daikin** ที่ถอดออก: สั่งแอร์ผ่านสายของรีโมตติดผนัง (โปรโตคอล SLM8) แทน IR, ได้สถานะจริงจากแอร์ (สายตอบไหม คอมเพรสเซอร์ทำงานไหม), วัดอุณหภูมิห้องด้วย DHT11 ส่วน BLE/MQTT/PZEM/OTA/ข้อมูลย้อนหลังเหมือนบอร์ด IR |
-| บอร์ดตรวจจับคน | `rmutt_esp32_occupancy/rmutt_esp32_occupancy.ino` | **1.3.3** | หนึ่งบอร์ดต่อห้องหนึ่งห้อง: อ่านเรดาร์ HLK-LD2410 แล้วตัดสินว่า "มีคน/ไม่มีคน" มีไฟ LED เขียว/แดงบอกสถานะ |
+| บอร์ดแอร์ IR | `rmutt_esp32_air/rmutt_esp32_air.ino` | **2.5.2** | หนึ่งบอร์ดต่อแอร์หนึ่งเครื่อง: ยิง IR สั่งแอร์เหมือนรีโมตมือถือ, วัดไฟด้วย PZEM-004T, รายงานสถานะ, เก็บข้อมูลไฟฟ้าตอนเน็ตหลุด, แสดงผลบนจอ OLED |
+| บอร์ดแอร์สายแอร์ | `rmutt_esp32_air_wired/rmutt_esp32_air_wired.ino` | **2.5.5-slm8** | ใช้ **แทนรีโมตติดผนัง Daikin** ที่ถอดออก: สั่งแอร์ผ่านสายของรีโมตติดผนัง (โปรโตคอล SLM8) แทน IR, ได้สถานะจริงจากแอร์ (สายตอบไหม คอมเพรสเซอร์ทำงานไหม), วัดอุณหภูมิห้องด้วย DHT11 ส่วน BLE/MQTT/PZEM/OTA/ข้อมูลย้อนหลังเหมือนบอร์ด IR |
+| บอร์ดตรวจจับคน | `rmutt_esp32_occupancy/rmutt_esp32_occupancy.ino` | **1.3.9** | หนึ่งบอร์ดต่อห้องหนึ่งห้อง: อ่านเรดาร์ HLK-LD2410 แล้วตัดสินว่า "มีคน/ไม่มีคน" มีไฟ LED เขียว/แดงบอกสถานะ |
 
 นอกจากนี้มีสเก็ตช์เครื่องมือเล็ก ๆ อีกสองตัว (`reset/reset.ino` ล้างค่าที่จำไว้ และ `ld2410_pinscan/ld2410_pinscan.ino` หาขาที่เรดาร์ส่งข้อมูลมา) กับโค้ดทดสอบ `tests/history_log_test.cpp` ที่รันบนคอมพิวเตอร์ได้โดยไม่ต้องมีบอร์ด
 
@@ -29,7 +29,7 @@
 > หัวข้อ MQTT (topic), รูปแบบ JSON และตาราง BLE characteristic แบบเต็มอยู่ใน **บทโปรโตคอลสื่อสาร** บทนี้อธิบายเฉพาะ "ฝั่งเฟิร์มแวร์ทำอะไรกับมัน" และอ้างค่าที่เห็นในโค้ดจริงเท่านั้น
 
 > [!WARN]
-> เอกสารอื่นในโปรเจกต์บางจุดยังไม่ตรงกับโค้ด: `firmware/README.md` เขียนบอร์ดตรวจคนเป็น 1.3.2 (โค้ดคือ **1.3.3**) และยังเขียนขา PZEM/LED เหลืองของบอร์ดสายแอร์เป็น 16/18/27 (โค้ดคือ **18/14/23**) เช่นเดียวกับ `README_WIRED_TH.md` ส่วนหัวเรื่องของ `README_OLED_TH.md` เป็น "2.5.0" เพราะเป็นบันทึกของรุ่นที่เพิ่มจอ ถ้าเอกสารใดไม่ตรง ให้เชื่อค่าในไฟล์ `.ino` (`FIRMWARE_VERSION` และค่าคงที่ `*_PIN`)
+> เอกสารอื่นในโปรเจกต์บางจุดยังไม่ตรงกับโค้ด: `firmware/README.md` เขียนเลขรุ่นเป็น 2.5.1 / 2.5.2-slm8 / 1.3.2 (โค้ดคือ **2.5.2 / 2.5.5-slm8 / 1.3.9**) และยังเขียนขา PZEM/LED เหลืองของบอร์ดสายแอร์เป็น 16/18/27 (โค้ดคือ **18/14/23**) เช่นเดียวกับ `README_WIRED_TH.md` ส่วนหัวเรื่องของ `README_OLED_TH.md` เป็น "2.5.0" เพราะเป็นบันทึกของรุ่นที่เพิ่มจอ ถ้าเอกสารใดไม่ตรง ให้เชื่อค่าในไฟล์ `.ino` (`FIRMWARE_VERSION` และค่าคงที่ `*_PIN`)
 
 ## ความรู้ที่ต้องมีก่อนอ่านบทนี้
 
@@ -123,7 +123,7 @@ firmware/
 ├── README.md                          # คู่มือรวมของเฟิร์มแวร์ (ขา การตั้งค่า log การแก้ปัญหา)
 ├── update-root-ca.ps1                 # สคริปต์ดาวน์โหลดใบรับรองรากแล้วสร้าง letsencrypt_ca.h
 ├── rmutt_esp32_air/                   # บอร์ดแอร์ IR (สเก็ตช์ Arduino: โฟลเดอร์ชื่อเดียวกับ .ino)
-│   ├── rmutt_esp32_air.ino            # โปรแกรมหลัก 2,032 บรรทัด (2.5.1)
+│   ├── rmutt_esp32_air.ino            # โปรแกรมหลัก 2,068 บรรทัด (2.5.2)
 │   ├── SaijoDenkiAC.h / .cpp          # ไดรเวอร์ IR ของแอร์ Saijo Denki (เขียนเอง)
 │   ├── history_log.h                  # ring buffer เก็บข้อมูลไฟฟ้าตอนเน็ตหลุด
 │   ├── ota_update.h                   # อัปเดตเฟิร์มแวร์ผ่าน HTTPS
@@ -134,16 +134,16 @@ firmware/
 │   ├── build_opt.h                    # (ใหม่) แฟล็กคอมไพเลอร์ ปิดส่วนที่ไม่ใช้ให้โปรแกรมพอดีแฟลช
 │   └── README_OLED_TH.md              # (ใหม่) วิธีต่อจอและเหตุผลของ build_opt.h
 ├── rmutt_esp32_air_wired/             # บอร์ดแอร์รุ่นสายแอร์ Daikin
-│   ├── rmutt_esp32_air_wired.ino      # โปรแกรมหลัก 2,031 บรรทัด (2.5.2-slm8) แตกมาจากรุ่น IR
+│   ├── rmutt_esp32_air_wired.ino      # โปรแกรมหลัก 2,067 บรรทัด (2.5.5-slm8) แตกมาจากรุ่น IR
 │   ├── DaikinSLM8.h                   # โปรโตคอลสายแอร์ SLM8 (รับ/ส่งเฟรม) อธิบายในบทที่ 19
 │   ├── wired_bus.h                    # ห่อ DaikinSLM8 ให้รันใน FreeRTOS task แยก + mutex
-│   ├── oled_display.h / oled_ui.h     # เหมือนของบอร์ด IR ทุกไบต์
+│   ├── oled_display.h / oled_ui.h     # เหมือนของบอร์ด IR (ต่างแค่ OLED_ROTATE_180 = true)
 │   ├── build_opt.h                    # ปิดเฉพาะไดรเวอร์ I2C/SPI ฮาร์ดแวร์ (ไม่มี IR ให้ปิด)
 │   ├── history_log.h, ota_update.h,   # เหมือนของบอร์ด IR ทุกไบต์
 │   │   letsencrypt_ca.h, partitions.csv
 │   └── README_WIRED_TH.md             # วงจร ต่อสาย ตารางความต่างกับรุ่น IR
 ├── rmutt_esp32_occupancy/             # บอร์ดตรวจจับคน
-│   ├── rmutt_esp32_occupancy.ino      # โปรแกรมหลัก 1,162 บรรทัด (1.3.3)
+│   ├── rmutt_esp32_occupancy.ino      # โปรแกรมหลัก 1,198 บรรทัด (1.3.9)
 │   ├── ota_update.h                   # เหมือนของบอร์ดแอร์ (ต่างแค่ช่องว่างท้ายบรรทัด 22)
 │   ├── letsencrypt_ca.h               # เหมือนของบอร์ดแอร์ทุกไบต์
 │   └── partitions.csv                 # ตารางพาร์ติชัน (มี coredump แทน rmuttlog)
@@ -187,7 +187,7 @@ firmware/
 | — | — | — | GND สายแอร์ → GND ของ ESP32 (**ต้องต่อ**), +5 V ของสายแอร์ **ไม่ต่อ** | บอร์ดใช้แหล่งจ่ายของตัวเอง (README ระบุ HDR-15-5) |
 
 > [!WARN]
-> **ขา PZEM และ LED เหลืองของบอร์ดสายแอร์ไม่เหมือนบอร์ด IR** PZEM อยู่ที่ RX=GPIO18 / TX=GPIO14 และ LED เหลืองที่ GPIO23 ถ้าต่อสายตามบอร์ด IR (16/18/27) PZEM จะอ่านไม่ได้ เลขรุ่นของเฟิร์มแวร์นี้ (`2.5.2-slm8`) ไม่ได้ขยับตอนย้ายขา บอร์ดที่แฟลชไว้นานแล้วอาจยังเป็นขาชุดเก่า ถ้าไม่แน่ใจให้แฟลชใหม่จากโค้ดปัจจุบัน และ `firmware/README.md` กับ `README_WIRED_TH.md` ยังเขียนขาชุดเก่าอยู่ ให้เชื่อค่าในไฟล์ `.ino`
+> **ขา PZEM และ LED เหลืองของบอร์ดสายแอร์ไม่เหมือนบอร์ด IR** PZEM อยู่ที่ RX=GPIO18 / TX=GPIO14 และ LED เหลืองที่ GPIO23 ถ้าต่อสายตามบอร์ด IR (16/18/27) PZEM จะอ่านไม่ได้ เลขรุ่นของเฟิร์มแวร์นี้ (`2.5.5-slm8`) ไม่ได้ขยับตอนย้ายขา บอร์ดที่แฟลชไว้นานแล้วอาจยังเป็นขาชุดเก่า ถ้าไม่แน่ใจให้แฟลชใหม่จากโค้ดปัจจุบัน และ `firmware/README.md` กับ `README_WIRED_TH.md` ยังเขียนขาชุดเก่าอยู่ ให้เชื่อค่าในไฟล์ `.ino`
 
 บอร์ดนี้ **ไม่มี GPIO17 (IR)** และขาส่งของสายแอร์ย้ายมาจาก GPIO25 เป็น GPIO33 เพราะ GPIO25 เป็น LED เขียวของเฟิร์มแวร์แอปอยู่แล้ว (ตาม `README_WIRED_TH.md`) ตาราง Pins ใน `firmware/README.md` ถูกแก้ จากรายการธรรมดาเป็นตารางสองคอลัมน์เทียบบอร์ด IR กับบอร์ดสายแอร์
 
@@ -207,7 +207,7 @@ firmware/
 
 UART1 เปิดที่ 256000 baud, `SERIAL_8N1` (8 บิตข้อมูล ไม่มี parity 1 stop bit) บอร์ดนี้ไม่มีการต่อไฟ AC
 
-**ไฟ LED ของบอร์ดตรวจคน** (ฟังก์ชัน `updateStatusLeds()` บรรทัด 1149–1162)
+**ไฟ LED ของบอร์ดตรวจคน** (ฟังก์ชัน `updateStatusLeds()` บรรทัด 1185–1198)
 
 | LED | สถานะ | ความหมาย |
 |---|---|---|
@@ -221,7 +221,7 @@ UART1 เปิดที่ 256000 baud, `SERIAL_8N1` (8 บิตข้อม�
 
 ## อธิบายทีละไฟล์
 
-### `firmware/rmutt_esp32_air/rmutt_esp32_air.ino` (บอร์ดแอร์ IR 2,032 บรรทัด, เวอร์ชัน 2.5.1)
+### `firmware/rmutt_esp32_air/rmutt_esp32_air.ino` (บอร์ดแอร์ IR 2,068 บรรทัด, เวอร์ชัน 2.5.2)
 
 ไฟล์เดียวที่เป็นหัวใจของบอร์ดแอร์ IR เรียงตามลำดับในไฟล์ได้ดังนี้ (เลขในวงเล็บคือบรรทัดของเวอร์ชันปัจจุบัน หลังเพิ่มจอ OLED และ unprovision เลขบรรทัดเลื่อนจากเดิมราว 6–67 บรรทัด)
 
@@ -252,7 +252,7 @@ UART1 เปิดที่ 256000 baud, `SERIAL_8N1` (8 บิตข้อม�
 | `HISTORY_START_DELAY_MIN/MAX_MS` | 5000 / 45000 | หน่วงแบบสุ่ม 5–45 วินาทีหลังต่อ MQTT ได้ก่อนเริ่มส่งย้อนหลัง |
 | `HISTORY_PARTITION_SUBTYPE` | 0x40 | subtype ของพาร์ติชัน `rmuttlog` |
 | `SAIJO_DENKI_PROTOCOL` | `"SAIJO_DENKI"` | ชื่อโปรโตคอลที่แอป Backend ใช้ตรงกัน |
-| `FIRMWARE_VERSION` (บรรทัด 68) | `"2.5.1"` | เวอร์ชันที่บอร์ดรายงานใน BLE IDENTITY และ `/status` |
+| `FIRMWARE_VERSION` (บรรทัด 68) | `"2.5.2"` | เวอร์ชันที่บอร์ดรายงานใน BLE IDENTITY และ `/status` |
 
 UUID 6 ตัว (`SERVICE_UUID` ลงท้าย `0001` ... `SETTINGS_UUID` ลงท้าย `0006`, ขึ้นต้น `7b57`) คือ service และ characteristic ของ BLE ที่แอปต้องรู้ ตารางหน้าที่ของแต่ละตัวอยู่ใน **บทโปรโตคอลสื่อสาร**
 
@@ -261,18 +261,18 @@ UUID 6 ตัว (`SERVICE_UUID` ลงท้าย `0001` ... `SETTINGS_UUID` �
 **4) ตัวแปรโกลบอล (146–248)** — อ็อบเจกต์หลัก: `preferences`, `wifiClient` (TCP ธรรมดา), `secureClient` (TCP + TLS), `mqttClient` (PubSubClient เริ่มด้วย `wifiClient` แล้วสลับเป็น `secureClient` ตอนต่อ), `irAc` (`IRac` ตัวกลางของ IRremoteESP8266), `saijoAc`, `pzem(Serial2, 16, 18)`, ตัวแปร `config`, `airState`, `powerMeasurements` และ `oledDisplay` (อ็อบเจกต์จอ, บรรทัด 158) กับ `oledReason` (ข้อความเหตุผลที่เข้าโหมดตั้งค่า ไว้แสดงบนจอ, บรรทัด 159)
 ถัดมาคือ `PartitionFlash` (ตัวห่อ API พาร์ติชัน flash ให้ `HistoryLog` ใช้) และ `HistoryInterval` (ตัวสะสมค่าในช่วง 5 นาที) กับกลุ่มตัวแปรสถานะ BLE (`bleClientConnected`, `bleBlocksNormalOperation`, `bleWifiOnlyMode`...) และ flag สื่อสารระหว่าง callback กับลูป (`mqttCommandReady`, `otaRequested`, `historyAckReady`, `configReady`)
 
-**5) Forward declaration (250–293)** — ประกาศชื่อฟังก์ชันล่วงหน้า เพื่อให้เรียกใช้ก่อนที่จะนิยามได้ (C++ ต้องรู้จักชื่อก่อนใช้) เพิ่ม `unprovisionAndRestart` (บรรทัด 274) และ `refreshOled` (บรรทัด 290)
+**5) Forward declaration (250–296)** — ประกาศชื่อฟังก์ชันล่วงหน้า เพื่อให้เรียกใช้ก่อนที่จะนิยามได้ (C++ ต้องรู้จักชื่อก่อนใช้) เพิ่ม `unprovisionAndRestart` (บรรทัด 274) และ `refreshOled` (บรรทัด 293)
 
-**6) คลาส callback ของ BLE (295–424)**
+**6) คลาส callback ของ BLE (298–427)**
 - `ServerCallbacks` — `onConnect` ตั้ง `bleClientConnected = true`, `onDisconnect` ไม่เรียกประกาศใหม่ทันที แต่ตั้งเวลา `bleReadvertiseAt = millis() + 600` ให้ `loop()` ทำ (คอมเมนต์บอกว่าทำใน callback task ไม่เสถียรบน Windows)
 - `ConfigCallbacks::onWrite` — รับ JSON ตั้งค่าที่แอปส่งมาเป็นชิ้น ๆ ทุกแพ็กเก็ตมีหัว 6 ไบต์: ไบต์ 0 และ 1 ต้องเป็น `1` (เวอร์ชัน), ไบต์ 2–3 ลำดับแพ็กเก็ต (big-endian), ไบต์ 4–5 จำนวนแพ็กเก็ตทั้งหมด (สูงสุด 32) ตรวจลำดับให้ต่อเนื่อง ตรวจขนาดรวมไม่เกิน `MAX_CONFIG_BYTES` พอครบจึงเก็บใส่ `pendingConfig` แล้วตั้ง `configReady = true` **ไม่ประมวลผลใน callback** เพราะต้องทดสอบ Wi-Fi นานหลายวินาที ซึ่งจะบล็อก BLE stack
 - `WifiScanCallbacks::onRead` — เมื่อแอป "อ่าน" characteristic `WIFI_SCAN_UUID` บอร์ดสแกน Wi-Fi (`WiFi.scanNetworks`) ตัดชื่อซ้ำ เก็บไม่เกิน 8 เครือข่าย และตัด JSON ไม่ให้เกิน ~480 ไบต์ (ขนาดที่อ่านทีเดียวผ่าน BLE ได้) ในรูป `[ssid, rssi, มีรหัสหรือไม่]`
 
-**7) `setup()` และ `loop()` (426–555)** — อธิบายละเอียดในหัวข้อเจาะโค้ด (บรรทัด 436 เพิ่ม `oledDisplay.begin()` ตรวจและเริ่มจอ)
+**7) `setup()` และ `loop()` (429–558)** — อธิบายละเอียดในหัวข้อเจาะโค้ด (บรรทัด 439 เพิ่ม `oledDisplay.begin()` ตรวจและเริ่มจอ)
 
-**8) ฟังก์ชันช่วย (557–594)** — `createDeviceId()` สร้างรหัส `ESP32-XXXXXXXXXXXX` จาก eFuse MAC address (เลขประจำชิป ไม่ซ้ำกัน) จึงไม่ต้องตั้งชื่อเอง `isValidRoomNumber()` ยอมรับเฉพาะ `A–Z 0–9 _ -` ยาว 2–20 ตัว `isSupportedAirProtocol()` ยอม `SAIJO_DENKI` หรือชื่อที่ `IRac::isProtocolSupported(strToDecodeType(...))` รู้จัก
+**8) ฟังก์ชันช่วย (560–597)** — `createDeviceId()` สร้างรหัส `ESP32-XXXXXXXXXXXX` จาก eFuse MAC address (เลขประจำชิป ไม่ซ้ำกัน) จึงไม่ต้องตั้งชื่อเอง `isValidRoomNumber()` ยอมรับเฉพาะ `A–Z 0–9 _ -` ยาว 2–20 ตัว `isSupportedAirProtocol()` ยอม `SAIJO_DENKI` หรือชื่อที่ `IRac::isProtocolSupported(strToDecodeType(...))` รู้จัก
 
-**9) NVS (596–671)** — `loadConfig/saveConfig` ใช้ namespace `"rmutt-air"`, `loadAirState/saveAirState` ใช้ namespace `"rmutt-state"` ตารางคีย์:
+**9) NVS (599–674)** — `loadConfig/saveConfig` ใช้ namespace `"rmutt-air"`, `loadAirState/saveAirState` ใช้ namespace `"rmutt-state"` ตารางคีย์:
 
 | namespace | คีย์ |
 |---|---|
@@ -281,10 +281,10 @@ UUID 6 ตัว (`SERVICE_UUID` ลงท้าย `0001` ... `SETTINGS_UUID` �
 
 แยก namespace เพราะ "ค่าตั้งค่า" เปลี่ยนนาน ๆ ครั้ง ส่วน "สถานะแอร์" เขียนบ่อย การจำสถานะแอร์ไว้ทำให้บูตใหม่ (เช่นไฟดับ) แล้วบอร์ดยังรู้ว่าล่าสุดสั่งอะไรไป (ตัวจับเวลา timerOn/Off **ไม่ถูกเก็บ** จึงหายเมื่อรีบูต)
 
-**10) BLE server (673–776)** — `startBleProvisioning()` สร้าง BLE server ครั้งเดียว (`BLEDevice::init(config.bleName)` ชื่อ `RMUTT-AC-` + 12 หลักท้ายของ Device ID) สร้าง service + 5 characteristic: `CONFIG` (WRITE), `STATUS` (READ+NOTIFY พร้อม descriptor `BLE2902` เพื่อให้แอปสมัครรับแจ้งเตือน), `IDENTITY` (READ), `SETTINGS` (READ), `WIFI_SCAN` (READ) บรรทัด 710 ใส่ `identity["controlType"] = "ir"` ลงใน IDENTITY ให้แอปรู้ว่าเป็นบอร์ด IR (แยกจากบอร์ดสายแอร์ที่ส่ง `"wired"`) ตั้งใจให้ `IDENTITY` สั้น (ไม่เกิน 256 ไบต์ของ JSON buffer) เพราะ Windows ที่ MTU ปกติอ่านค่าใหญ่ไม่ได้ ค่าตั้งค่าเดิมจึงแยกไปอยู่ใน `SETTINGS` `startBleAdvertising()` หยุด-หน่วง 80 ms-เริ่มประกาศใหม่ ไม่ทำถ้ามีแอปต่ออยู่
+**10) BLE server (676–779)** — `startBleProvisioning()` สร้าง BLE server ครั้งเดียว (`BLEDevice::init(config.bleName)` ชื่อ `RMUTT-AC-` + 12 หลักท้ายของ Device ID) สร้าง service + 5 characteristic: `CONFIG` (WRITE), `STATUS` (READ+NOTIFY พร้อม descriptor `BLE2902` เพื่อให้แอปสมัครรับแจ้งเตือน), `IDENTITY` (READ), `SETTINGS` (READ), `WIFI_SCAN` (READ) บรรทัด 713 ใส่ `identity["controlType"] = "ir"` ลงใน IDENTITY ให้แอปรู้ว่าเป็นบอร์ด IR (แยกจากบอร์ดสายแอร์ที่ส่ง `"wired"`) ตั้งใจให้ `IDENTITY` สั้น (ไม่เกิน 256 ไบต์ของ JSON buffer) เพราะ Windows ที่ MTU ปกติอ่านค่าใหญ่ไม่ได้ ค่าตั้งค่าเดิมจึงแยกไปอยู่ใน `SETTINGS` `startBleAdvertising()` หยุด-หน่วง 80 ms-เริ่มประกาศใหม่ ไม่ทำถ้ามีแอปต่ออยู่
 
-**11) โหมดกู้และตั้งค่า (778–966)**
-- `enterBleRecovery(reason, retryWifi)` — บรรทัด 813 เก็บ `reason` ไม่เกิน 25 ตัวอักษรลง `oledReason` ให้หน้า SETUP MODE บนจอแสดงว่าทำไมเข้าโหมดนี้ (จอกว้าง 128 พิกเซล ฟอนต์ 5×7 ใส่ได้ราว 25 ตัว) จากนั้นตั้ง `bleBlocksNormalOperation = true` (หยุดงานปกติ), ถ้า `retryWifi` ตั้ง `wifiRecoveryActive`, ตัด MQTT/Wi-Fi แล้วเปิด BLE ใช้เมื่อ: ยังไม่เคยตั้งค่า, กด BOOT ตอนบูต, ต่อ Wi-Fi เดิมไม่ได้ตอนบูต, หรือ Wi-Fi หลุดระหว่างใช้งาน
+**11) โหมดกู้และตั้งค่า (781–969)**
+- `enterBleRecovery(reason, retryWifi)` — บรรทัด 816 เก็บ `reason` ไม่เกิน 25 ตัวอักษรลง `oledReason` ให้หน้า SETUP MODE บนจอแสดงว่าทำไมเข้าโหมดนี้ (จอกว้าง 128 พิกเซล ฟอนต์ 5×7 ใส่ได้ราว 25 ตัว) จากนั้นตั้ง `bleBlocksNormalOperation = true` (หยุดงานปกติ), ถ้า `retryWifi` ตั้ง `wifiRecoveryActive`, ตัด MQTT/Wi-Fi แล้วเปิด BLE ใช้เมื่อ: ยังไม่เคยตั้งค่า, กด BOOT ตอนบูต, ต่อ Wi-Fi เดิมไม่ได้ตอนบูต, หรือ Wi-Fi หลุดระหว่างใช้งาน
 - `attemptWifiRecovery()` — ในโหมดกู้ที่เกิดจาก Wi-Fi ลองต่อ Wi-Fi เดิมซ้ำทุก 30 วินาที (ครั้งละ 8 วินาที) ไม่ลองถ้ามีแอปต่อ BLE อยู่หรือกำลังจะรีสตาร์ต ถ้าต่อได้ก็ปิด BLE กลับไปทำงานปกติเอง (`connectMqtt()`) **ทำไม:** ถ้าไม่มีกลไกนี้ ต้องมีคนเดินไปกด BOOT+RESET ทุกครั้งที่ router รีบูต
 - `enterBleReconfiguration()` — ถูกเรียกเมื่อ Backend ส่ง `{"action":"enter_setup"}` ทาง MQTT บอร์ดยังออนไลน์อยู่ และเปิด BLE ไว้ 5 นาที (`ONLINE_SETUP_WINDOW_MS`) โดยค่าเดิมยังใช้งานต่อจนกว่าจะกดบันทึก
 - `keepsServerAssignment()` — คืน `true` ถ้าการตั้งค่าใหม่ "ไม่แตะ" ห้อง เลขแอร์ และ MQTT ทุกตัว ใช้กับ `bleWifiOnlyMode` (ดูด้านล่าง)
@@ -294,23 +294,23 @@ UUID 6 ตัว (`SERVICE_UUID` ลงท้าย `0001` ... `SETTINGS_UUID` �
 > [!WHY]
 > **ทำไมต้องมี Wi-Fi-only mode:** ถ้าบอร์ดเข้าโหมดตั้งค่า BLE เพราะ Wi-Fi หลุด ใครก็ตามที่ยืนใกล้บอร์ดสามารถต่อ BLE ได้ หากยอมให้เปลี่ยนห้องหรือ MQTT server ได้ คนแปลกหน้าจะชี้บอร์ดไปหา broker ของตัวเองแล้วสั่งแอร์ห้องนั้นได้ จึงล็อกให้แก้ได้เฉพาะ Wi-Fi ถ้าจะเปลี่ยนห้อง/เซิร์ฟเวอร์ต้องกด BOOT ค้างตอนรีเซ็ต (ต้องเข้าถึงตัวบอร์ด) หรือให้แอดมินส่ง `enter_setup` จาก Backend (`bleWifiOnlyMode = false`)
 
-**12) Wi-Fi และเวลา (980–1047)** — `connectWifi()` เรียก `connectWifiCredentials(ssid, password, timeoutMs)` ซึ่งตั้ง `WIFI_STA`, `WiFi.begin`, วนรอด้วย `delay(50)` จนต่อได้หรือครบเวลา ระหว่างรอเรียก `updateStatusLeds()` ให้ LED เหลืองกระพริบ ถ้า `WL_CONNECT_FAILED` หรือ `WL_NO_SSID_AVAIL` ออกทันที เมื่อต่อสำเร็จครั้งแรกจะเรียก `configTime(7 * 3600, 0, "pool.ntp.org", "time.nist.gov")` เริ่มซิงก์เวลาแบบไม่รอ ส่วน `ensureClockSynced()` เป็นตัวที่ "รอจริง" (สูงสุด 15 วินาที ใช้ `time.google.com`) เรียกก่อนต่อ MQTT แบบ TLS และก่อน OTA
+**12) Wi-Fi และเวลา (983–1050)** — `connectWifi()` เรียก `connectWifiCredentials(ssid, password, timeoutMs)` ซึ่งตั้ง `WIFI_STA`, `WiFi.begin`, วนรอด้วย `delay(50)` จนต่อได้หรือครบเวลา ระหว่างรอเรียก `updateStatusLeds()` ให้ LED เหลืองกระพริบ ถ้า `WL_CONNECT_FAILED` หรือ `WL_NO_SSID_AVAIL` ออกทันที เมื่อต่อสำเร็จครั้งแรกจะเรียก `configTime(7 * 3600, 0, "pool.ntp.org", "time.nist.gov")` เริ่มซิงก์เวลาแบบไม่รอ ส่วน `ensureClockSynced()` เป็นตัวที่ "รอจริง" (สูงสุด 15 วินาที ใช้ `time.google.com`) เรียกก่อนต่อ MQTT แบบ TLS และก่อน OTA
 
-**13) MQTT (1049–1333)** — `connectMqtt()`, `mqttCallback()`, `unprovisionAndRestart()` (บรรทัด 1167–1209), `processMqttCommand()` (เริ่มบรรทัด 1211) ดูหัวข้อเจาะโค้ด ตารางด้านล่าง และหัวข้อ "ล้างบอร์ดเมื่อถูกลบออกจากแอป (unprovision)"
+**13) MQTT (1052–1369)** — `connectMqtt()`, `mqttCallback()`, `checkMqttAccountRemoved()` (บรรทัด 1174–1201), `unprovisionAndRestart()` (บรรทัด 1203–1245), `processMqttCommand()` (เริ่มบรรทัด 1247) ดูหัวข้อเจาะโค้ด ตารางด้านล่าง และหัวข้อ "ล้างบอร์ดเมื่อถูกลบออกจากแอป (unprovision)"
 
-**14) ส่ง IR (1335–1452)** — `sendCurrentIrState()` ทางทั่วไปผ่าน `IRac` และ `sendSaijoCurrentIrState()` ทางไดรเวอร์ของเรา (ดูส่วน IR ด้านล่าง)
+**14) ส่ง IR (1371–1488)** — `sendCurrentIrState()` ทางทั่วไปผ่าน `IRac` และ `sendSaijoCurrentIrState()` ทางไดรเวอร์ของเรา (ดูส่วน IR ด้านล่าง)
 
-**15) publish (1454–1549)** — `publishStatus()` สร้าง JSON ของ `/status` (online, deviceId, firmwareVersion, otaError ถ้ามี, roomNumber, airNumber, ip, rssi, pzemAvailable, acRunning, outsideSchedule, scheduleConfigured, classScheduleConfigured, **historyPending**, และ voltage/current/powerWatts/energyKwh/frequencyHz/powerFactor ถ้า PZEM พร้อม ไม่พร้อมก็ส่ง `null`) ส่งแบบ retained (`publish(..., true)`) `publishState()` (เริ่มบรรทัด 1499) เรียก `oledDisplay.poke()` ก่อน (บรรทัด 1500) ให้จอวาดค่าใหม่ทันทีที่สถานะแอร์เปลี่ยน แล้วส่ง `/state` (สถานะแอร์ + `commandId` ถ้ามี) retained `publishProvisioningToken()` ส่ง `/provision` ทุก 10 วินาทีจนกว่า Backend จะตอบ ack
+**15) publish (1490–1585)** — `publishStatus()` สร้าง JSON ของ `/status` (online, deviceId, firmwareVersion, otaError ถ้ามี, roomNumber, airNumber, ip, rssi, pzemAvailable, acRunning, outsideSchedule, scheduleConfigured, classScheduleConfigured, **historyPending**, และ voltage/current/powerWatts/energyKwh/frequencyHz/powerFactor ถ้า PZEM พร้อม ไม่พร้อมก็ส่ง `null`) ส่งแบบ retained (`publish(..., true)`) `publishState()` (เริ่มบรรทัด 1535) เรียก `oledDisplay.poke()` ก่อน (บรรทัด 1536) ให้จอวาดค่าใหม่ทันทีที่สถานะแอร์เปลี่ยน แล้วส่ง `/state` (สถานะแอร์ + `commandId` ถ้ามี) retained `publishProvisioningToken()` ส่ง `/provision` ทุก 10 วินาทีจนกว่า Backend จะตอบ ack
 
-**16) OTA (1551–1579)** — `performOtaUpdate()` ดูหัวข้อเจาะโค้ดคู่กับ `ota_update.h`
+**16) OTA (1587–1615)** — `performOtaUpdate()` ดูหัวข้อเจาะโค้ดคู่กับ `ota_update.h`
 
-**17) ตัวจับเวลา (1581–1633)** — `processTimers()` ตัวตั้งเวลาเปิด/ปิดที่ผู้ใช้สั่งจากแอป (คิดจาก `millis()` + นาที × 60000) และ `processDailySchedule()` เปิด/ปิดตามเวลา `dailyOn`/`dailyOff` รูปแบบ `"HH:MM"` ที่ตั้งตอน BLE: ใช้ `getLocalTime` (ต้องมี NTP) ตรวจครั้งเดียวต่อนาที (`lastScheduleMinute`) เมื่อเวลาตรงก็ยิง IR และ `publishState()`
+**17) ตัวจับเวลา (1617–1669)** — `processTimers()` ตัวตั้งเวลาเปิด/ปิดที่ผู้ใช้สั่งจากแอป (คิดจาก `millis()` + นาที × 60000) และ `processDailySchedule()` เปิด/ปิดตามเวลา `dailyOn`/`dailyOff` รูปแบบ `"HH:MM"` ที่ตั้งตอน BLE: ใช้ `getLocalTime` (ต้องมี NTP) ตรวจครั้งเดียวต่อนาที (`lastScheduleMinute`) เมื่อเวลาตรงก็ยิง IR และ `publishState()`
 
-**18) PZEM, LED, ตาราง (1635–1775)** — `readPowerMeter()` (เจาะโค้ด, บรรทัด 1698 เพิ่ม `oledDisplay.pushPower(powerWatts)`), `updateStatusLeds()` (ตาราง LED ด้านล่าง, บรรทัด 1735 เพิ่ม `refreshOled()` ท้ายฟังก์ชัน จอจึงถูกอัปเดตทุกรอบ `loop()` เพราะ `updateStatusLeds()` ถูกเรียกทุกรอบอยู่แล้ว), `isWithinConfiguredSchedule()` (ตรวจ "อยู่ในช่วง dailyOn–dailyOff หรือไม่" รองรับช่วงข้ามเที่ยงคืนเช่น 22:00–06:00, ถ้าตั้งไม่ครบหรือไม่รู้เวลาให้ถือว่า "อยู่ในช่วง" เพื่อไม่กล่าวหาผู้ใช้ผิด), `isWithinAllowedSchedule()` (ถ้าผลตารางเรียนจาก Backend ยังสด ≤ 2 นาทีและห้องมีตารางเรียน ใช้ `withinClassSchedule` ไม่งั้นถอยไปใช้ตารางรายวันบนบอร์ด), `parseMinutesOfDay()` (แปลง `"HH:MM"` เป็นนาทีของวัน)
+**18) PZEM, LED, ตาราง (1671–1811)** — `readPowerMeter()` (เจาะโค้ด, บรรทัด 1734 เพิ่ม `oledDisplay.pushPower(powerWatts)`), `updateStatusLeds()` (ตาราง LED ด้านล่าง, บรรทัด 1771 เพิ่ม `refreshOled()` ท้ายฟังก์ชัน จอจึงถูกอัปเดตทุกรอบ `loop()` เพราะ `updateStatusLeds()` ถูกเรียกทุกรอบอยู่แล้ว), `isWithinConfiguredSchedule()` (ตรวจ "อยู่ในช่วง dailyOn–dailyOff หรือไม่" รองรับช่วงข้ามเที่ยงคืนเช่น 22:00–06:00, ถ้าตั้งไม่ครบหรือไม่รู้เวลาให้ถือว่า "อยู่ในช่วง" เพื่อไม่กล่าวหาผู้ใช้ผิด), `isWithinAllowedSchedule()` (ถ้าผลตารางเรียนจาก Backend ยังสด ≤ 2 นาทีและห้องมีตารางเรียน ใช้ `withinClassSchedule` ไม่งั้นถอยไปใช้ตารางรายวันบนบอร์ด), `parseMinutesOfDay()` (แปลง `"HH:MM"` เป็นนาทีของวัน)
 
-**19) ข้อมูลย้อนหลัง (1777–1981)** — `initHistoryLog`, `accumulateHistorySample`, `finalizeHistoryInterval`, `processHistoryUpload`, `applyHistoryAck` (ดูหัวข้อ "ข้อมูลย้อนหลังตอนเน็ตหลุด")
+**19) ข้อมูลย้อนหลัง (1813–2017)** — `initHistoryLog`, `accumulateHistorySample`, `finalizeHistoryInterval`, `processHistoryUpload`, `applyHistoryAck` (ดูหัวข้อ "ข้อมูลย้อนหลังตอนเน็ตหลุด")
 
-**20) จอ OLED (1983–2032)** — `refreshOled()` รวบรวมค่าจาก `config`, `airState`, `powerMeasurements`, Wi-Fi/MQTT และนาฬิกา ใส่ `OledData` แล้วเลือกหน้าจอ SETUP / CONNECTING / NORMAL (ดูหัวข้อ "จอ OLED 1.3 นิ้ว")
+**20) จอ OLED (2019–2068)** — `refreshOled()` รวบรวมค่าจาก `config`, `airState`, `powerMeasurements`, Wi-Fi/MQTT และนาฬิกา ใส่ `OledData` แล้วเลือกหน้าจอ SETUP / CONNECTING / NORMAL (ดูหัวข้อ "จอ OLED 1.3 นิ้ว")
 
 ### ลำดับงานใน `loop()` ของบอร์ดแอร์
 
@@ -387,9 +387,9 @@ UUID 6 ตัว (`SERVICE_UUID` ลงท้าย `0001` ... `SETTINGS_UUID` �
 
 บอร์ดเลือกเส้นทางจาก `config.airProtocol` (เก็บใน NVS) ถ้าเป็น `SAIJO_DENKI` ไปทางไดรเวอร์ของเรา ถ้าไม่ใช่ใช้ `IRac`
 
-**เส้นทางทั่วไป `IRac` (`sendCurrentIrState`, บรรทัด 1335–1393)** — `strToDecodeType(config.airProtocol)` แปลงชื่อเป็นชนิด แล้วกรอกฟิลด์ใน `irAc.next` (protocol, power, celsius, degrees, mode, fanspeed, swingv, swingh, econo, turbo, quiet, light, clean, filter, sleep, clock) ด้วยการแปลงสตริงจากแอป (`"cool"`, `"low"`, `"top"` ฯลฯ) เป็น enum ของไลบรารี แล้ว `irAc.sendAc()` ไลบรารีจะประกอบเฟรมตามยี่ห้อ (รวม checksum) และจำสถานะเก่าไว้เพื่อให้ยี่ห้อที่ต้องใช้ "toggle" ส่งถูก ฟังก์ชันที่ยี่ห้อนั้นไม่มีจะถูกข้ามเงียบ ๆ
+**เส้นทางทั่วไป `IRac` (`sendCurrentIrState`, บรรทัด 1371–1429)** — `strToDecodeType(config.airProtocol)` แปลงชื่อเป็นชนิด แล้วกรอกฟิลด์ใน `irAc.next` (protocol, power, celsius, degrees, mode, fanspeed, swingv, swingh, econo, turbo, quiet, light, clean, filter, sleep, clock) ด้วยการแปลงสตริงจากแอป (`"cool"`, `"low"`, `"top"` ฯลฯ) เป็น enum ของไลบรารี แล้ว `irAc.sendAc()` ไลบรารีจะประกอบเฟรมตามยี่ห้อ (รวม checksum) และจำสถานะเก่าไว้เพื่อให้ยี่ห้อที่ต้องใช้ "toggle" ส่งถูก ฟังก์ชันที่ยี่ห้อนั้นไม่มีจะถูกข้ามเงียบ ๆ
 
-**เส้นทาง Saijo (`sendSaijoCurrentIrState`, บรรทัด 1395–1452)** — ส่งเฉพาะ "ส่วนที่เปลี่ยน" เทียบกับสถานะก่อนหน้า: ถ้า power เปลี่ยน ส่ง `powerOn()`/`powerOff()` **แล้วจบทันที** (ไม่ส่งอย่างอื่นในคำสั่งเดียวกัน) ถ้าแอร์ปิดอยู่ไม่ส่งอะไร ถ้าเปิดอยู่: mode เปลี่ยน → `cool/dry/fanOnly`, อุณหภูมิเปลี่ยน → `setTemperature`, พัดลมเปลี่ยน → `setFan` (low→Level1, medium→Level2, high→Level3, turbo→Turbo, อื่น→Auto), swing เปลี่ยน → `setSwing` (top→Position1 ... bottom→Position5, อื่น→Auto) **ทำไมส่งทีละส่วน:** เฟรมของ Saijo ที่จับมาแต่ละเฟรมเป็น "สถานะเต็มของรีโมต ณ ตอนกดปุ่มนั้น" ไม่ใช่ค่าที่ประกอบแยกฟิลด์ได้ (README ระบุว่ายังไม่รู้โครงบิตและ checksum) จึงทำได้แค่ส่งเฟรมที่จับมา ผลข้างเคียงคือบางเฟรมอาจเปลี่ยนค่าอื่นพร้อมกัน ต้องทดสอบกับแอร์จริง
+**เส้นทาง Saijo (`sendSaijoCurrentIrState`, บรรทัด 1431–1488)** — ส่งเฉพาะ "ส่วนที่เปลี่ยน" เทียบกับสถานะก่อนหน้า: ถ้า power เปลี่ยน ส่ง `powerOn()`/`powerOff()` **แล้วจบทันที** (ไม่ส่งอย่างอื่นในคำสั่งเดียวกัน) ถ้าแอร์ปิดอยู่ไม่ส่งอะไร ถ้าเปิดอยู่: mode เปลี่ยน → `cool/dry/fanOnly`, อุณหภูมิเปลี่ยน → `setTemperature`, พัดลมเปลี่ยน → `setFan` (low→Level1, medium→Level2, high→Level3, turbo→Turbo, อื่น→Auto), swing เปลี่ยน → `setSwing` (top→Position1 ... bottom→Position5, อื่น→Auto) **ทำไมส่งทีละส่วน:** เฟรมของ Saijo ที่จับมาแต่ละเฟรมเป็น "สถานะเต็มของรีโมต ณ ตอนกดปุ่มนั้น" ไม่ใช่ค่าที่ประกอบแยกฟิลด์ได้ (README ระบุว่ายังไม่รู้โครงบิตและ checksum) จึงทำได้แค่ส่งเฟรมที่จับมา ผลข้างเคียงคือบางเฟรมอาจเปลี่ยนค่าอื่นพร้อมกัน ต้องทดสอบกับแอร์จริง
 
 ### ข้อมูลย้อนหลังตอนเน็ตหลุด (offline history)
 
@@ -413,7 +413,7 @@ UUID 6 ตัว (`SERVICE_UUID` ลงท้าย `0001` ... `SETTINGS_UUID` �
 
 ### `firmware/rmutt_esp32_air/oled_display.h` (126 บรรทัด)
 
-คลาส `OledDisplay` ตัวเดียว เป็น "ตัวขับจอ" ที่ห่อไลบรารี U8g2 ไว้ หน้าที่: ตรวจว่ามีจอต่ออยู่ไหม (`begin()`), จำกัดจังหวะวาดไม่ให้ถี่เกิน 400 ms (`due()`, `show()`), สั่งวาดใหม่ทันทีเมื่อสถานะแอร์เปลี่ยน (`poke()`), เก็บค่ากำลังไฟย้อนหลัง 64 จุดไว้วาดกราฟ (`pushPower()`), และพักจอเมื่อแอร์ปิดนาน (`saver()`) ค่าที่ปรับได้อยู่ต้นไฟล์เป็น `#define` ที่ห่อด้วย `#ifndef` (ตั้งทับได้จากภายนอก): `OLED_LAYOUT` (1–5, ตอนนี้ 1), `OLED_ROTATE_180` (false), `OLED_CONTRAST` (160), `OLED_SAVER_AFTER_MS` (10 นาที)
+คลาส `OledDisplay` ตัวเดียว เป็น "ตัวขับจอ" ที่ห่อไลบรารี U8g2 ไว้ หน้าที่: ตรวจว่ามีจอต่ออยู่ไหม (`begin()`), จำกัดจังหวะวาดไม่ให้ถี่เกิน 400 ms (`due()`, `show()`), สั่งวาดใหม่ทันทีเมื่อสถานะแอร์เปลี่ยน (`poke()`), เก็บค่ากำลังไฟย้อนหลัง 64 จุดไว้วาดกราฟ (`pushPower()`), และพักจอเมื่อแอร์ปิดนาน (`saver()`) ค่าที่ปรับได้อยู่ต้นไฟล์เป็น `#define` ที่ห่อด้วย `#ifndef` (ตั้งทับได้จากภายนอก): `OLED_LAYOUT` (1–5, ตอนนี้ 1), `OLED_ROTATE_180` (บอร์ด IR `false`; สำเนาของบอร์ดสายแอร์ตั้ง `true` เพราะติดจอกลับหัว), `OLED_CONTRAST` (160), `OLED_SAVER_AFTER_MS` (10 นาที)
 
 - **ใครเรียก:** `rmutt_esp32_air.ino` สร้าง `OledDisplay oledDisplay;` (บรรทัด 158) แล้วเรียก `begin()` ใน `setup()`, `poke()` ใน `publishState()`, `pushPower()` ใน `readPowerMeter()`, `due()`/`show()` ใน `refreshOled()`
 - **เรียกใคร:** `U8g2lib.h` และฟังก์ชันวาดใน `oled_ui.h`
@@ -452,7 +452,7 @@ UUID 6 ตัว (`SERVICE_UUID` ลงท้าย `0001` ... `SETTINGS_UUID` �
 
 ### `firmware/rmutt_esp32_air/ota_update.h` และ `firmware/rmutt_esp32_occupancy/ota_update.h` (และ `rmutt_esp32_air_wired/ota_update.h`)
 
-สามไฟล์ **เนื้อหาเหมือนกัน** (ตรวจด้วย `diff`; สำเนาของบอร์ดตรวจคนต่างแค่ช่องว่างเกินท้าย `#include <esp_ota_ops.h>` บรรทัด 22 ซึ่งไม่มีผลกับโปรแกรม) ฟังก์ชัน: `otaUrlAllowed(url, host)` ตรวจ URL, `otaPartitionAvailable()` เช็กว่ามีช่องแอปว่าง, `runHttpsOta(url, caCert, currentVersion)` ดาวน์โหลดและเขียน flash เรียกใช้จาก `performOtaUpdate()` ของทุกบอร์ด ทำไมคัดลอกแทนที่จะแชร์ไฟล์: Arduino IDE คอมไพล์เฉพาะไฟล์ในโฟลเดอร์สเก็ตช์ของตัวเอง การแชร์ข้ามโฟลเดอร์ต้องทำเป็นไลบรารีซึ่งยุ่งกับผู้ติดตั้งกว่า (ข้อแลกเปลี่ยนคือถ้าแก้ต้องแก้ทุกสำเนา ตอนนี้มีสามที่)
+สามไฟล์ **เนื้อหาเหมือนกัน** (ตรวจด้วย `diff`; สำเนาของบอร์ดตรวจคนต่างแค่ช่องว่างเกินท้าย `#include <esp_ota_ops.h>` บรรทัด 22 ซึ่งไม่มีผลกับโปรแกรม) ฟังก์ชัน: `otaUrlAllowed(url, host)` ตรวจ URL, `otaPartitionAvailable()` เช็กว่ามีช่องแอปว่าง, `otaErrorIsTransient(code)` แยกข้อผิดพลาดของเครือข่าย, `runHttpsOta(url, caCert, currentVersion)` ดาวน์โหลดและเขียน flash (ลองใหม่สูงสุด 3 ครั้งเมื่อเน็ตสะดุด) เรียกใช้จาก `performOtaUpdate()` ของทุกบอร์ด ทำไมคัดลอกแทนที่จะแชร์ไฟล์: Arduino IDE คอมไพล์เฉพาะไฟล์ในโฟลเดอร์สเก็ตช์ของตัวเอง การแชร์ข้ามโฟลเดอร์ต้องทำเป็นไลบรารีซึ่งยุ่งกับผู้ติดตั้งกว่า (ข้อแลกเปลี่ยนคือถ้าแก้ต้องแก้ทุกสำเนา ตอนนี้มีสามที่)
 
 ### `firmware/rmutt_esp32_air/letsencrypt_ca.h` และ `firmware/rmutt_esp32_occupancy/letsencrypt_ca.h` (และ `rmutt_esp32_air_wired/letsencrypt_ca.h`)
 
@@ -462,7 +462,7 @@ UUID 6 ตัว (`SERVICE_UUID` ลงท้าย `0001` ... `SETTINGS_UUID` �
 
 ตารางพาร์ติชัน flash 4 MB อธิบายทีละบรรทัดในหัวข้อ "ตารางพาร์ติชัน" บอร์ดสายแอร์ใช้สำเนาที่เหมือนของบอร์ด IR ทุกไบต์ (มี `rmuttlog` เพราะเก็บข้อมูลย้อนหลังเหมือนกัน)
 
-### `firmware/rmutt_esp32_occupancy/rmutt_esp32_occupancy.ino` (บอร์ดตรวจจับคน 1,162 บรรทัด, เวอร์ชัน 1.3.3)
+### `firmware/rmutt_esp32_occupancy/rmutt_esp32_occupancy.ino` (บอร์ดตรวจจับคน 1,198 บรรทัด, เวอร์ชัน 1.3.3)
 
 โครงสร้างคล้ายบอร์ดแอร์มากเพราะใช้กลไก BLE/Wi-Fi/MQTT/OTA ชุดเดียวกัน (UUID ของ BLE ใช้ชุดเดียวกัน ต่างกันที่ชื่อ `RMUTT-OCC-` และฟิลด์ `deviceType: "occupancy"` ใน IDENTITY) สิ่งที่ต่างหรือเพิ่ม:
 
@@ -470,25 +470,26 @@ UUID 6 ตัว (`SERVICE_UUID` ลงท้าย `0001` ... `SETTINGS_UUID` �
 |---|---|---|
 | ค่าคงที่เรดาร์และ LED | 30–62 | `RADAR_RX_PIN=32`, `RADAR_TX_PIN=33`, `RADAR_BAUD=256000`, `GREEN_LED_PIN=25`, `RED_LED_PIN=26`, `LED_BLINK_INTERVAL_MS=400`, `STATIC_ENERGY_THRESHOLD=15`, `FIRST_GATE=0`, `LAST_GATE=8`, `PRESENCE_READ_INTERVAL_MS=250`, `STATUS_INTERVAL_MS=10000`, `RADAR_RETRY_INTERVAL_MS=10000`, `DIAGNOSTIC_INTERVAL_MS=10000`, `RADAR_DATA_TIMEOUT_MS=3000`, `MAX_CONFIG_BYTES=3072` |
 | `DeviceConfig` | 80–94 | ไม่มี airNumber/airName/protocol/dailyOn/dailyOff |
-| NVS | 443–473 | namespace `"rmutt-occ"` คีย์ `configured, room, wifi_ssid, wifi_pass, mqtt_host, mqtt_port, mqtt_user, mqtt_pass, mqtt_tls, mqtt_topic, prov_token` |
-| `createDeviceId()` | 418 | รหัส `OCC32-XXXXXXXXXXXX` |
-| `initialiseRadar()` | 943–973 | เริ่ม LD2410 และเปิด Engineering mode |
-| `updateOccupancy()` | 975–1011 | ตัดสินมีคน/ไม่มีคน (เจาะโค้ด) |
-| `captureRadarRawBytes()` | 1043–1053 | นับไบต์ดิบตอนเรดาร์ยังเริ่มไม่ได้ เพื่อแยก "ไม่มีสัญญาณเลย" กับ "baud ผิด" |
-| `printDiagnostics()` | 1055–1130 | พิมพ์ `[diag]` ทุก 10 วินาที |
-| `publishStatus()` | 1013–1039 | ส่ง `/status` retained |
-| `connectMqtt()` | 772–826 | client id `"rmutt-occ-" + deviceId`; LWT payload `{"online":false,"deviceId":...,"radarAvailable":false,"occupied":false}`; subscribe แค่ `/command` และ `/provision-ack` |
-| `mqttCallback()` | 828–877 | จัดการ `provision-ack`, `enter_setup`, `unprovision` (บรรทัด 853–864 ตั้งธง `unprovisionRequested`), `ota` (ไม่มี `schedule-status`/`history-ack`) |
-| `unprovisionAndRestart()` | 884–912 | ตอบ Backend, ล้าง retained `/status`, ล้าง NVS namespace `"rmutt-occ"` แล้วรีบูต เรียกจาก `loop()` บรรทัด 413 |
-| `updateStatusLeds()` | 1149–1162 | ไฟเขียวบอกการเชื่อมต่อ ไฟแดงบอกมีคน เรียกจาก `loop()` และจากลูปรอ Wi-Fi/NTP |
+| NVS | 446–476 | namespace `"rmutt-occ"` คีย์ `configured, room, wifi_ssid, wifi_pass, mqtt_host, mqtt_port, mqtt_user, mqtt_pass, mqtt_tls, mqtt_topic, prov_token` |
+| `createDeviceId()` | 421 | รหัส `OCC32-XXXXXXXXXXXX` |
+| `initialiseRadar()` | 979–1009 | เริ่ม LD2410 และเปิด Engineering mode |
+| `updateOccupancy()` | 1011–1047 | ตัดสินมีคน/ไม่มีคน (เจาะโค้ด) |
+| `captureRadarRawBytes()` | 1079–1089 | นับไบต์ดิบตอนเรดาร์ยังเริ่มไม่ได้ เพื่อแยก "ไม่มีสัญญาณเลย" กับ "baud ผิด" |
+| `printDiagnostics()` | 1091–1166 | พิมพ์ `[diag]` ทุก 10 วินาที |
+| `publishStatus()` | 1049–1075 | ส่ง `/status` retained |
+| `connectMqtt()` | 775–833 | client id `"rmutt-occ-" + deviceId`; LWT payload `{"online":false,"deviceId":...,"radarAvailable":false,"occupied":false}`; subscribe แค่ `/command` และ `/provision-ack` |
+| `mqttCallback()` | 835–884 | จัดการ `provision-ack`, `enter_setup`, `unprovision` (บรรทัด 860–871 ตั้งธง `unprovisionRequested`), `ota` (ไม่มี `schedule-status`/`history-ack`) |
+| `checkMqttAccountRemoved()` | 886–913 | นับครั้งที่ Broker ปฏิเสธบัญชี (state 4/5) ครบ 2 นาทีและ 10 ครั้งก็เรียก `unprovisionAndRestart()` เหมือนบอร์ดแอร์ |
+| `unprovisionAndRestart()` | 920–948 | ตอบ Backend, ล้าง retained `/status`, ล้าง NVS namespace `"rmutt-occ"` แล้วรีบูต เรียกจาก `loop()` บรรทัด 416 |
+| `updateStatusLeds()` | 1185–1198 | ไฟเขียวบอกการเชื่อมต่อ ไฟแดงบอกมีคน เรียกจาก `loop()` และจากลูปรอ Wi-Fi/NTP |
 
-ในโหมดต่อ Wi-Fi `connectWifiCredentials()` ของบอร์ดนี้เรียก `radar.read()` ระหว่างรอ (บรรทัด 733) เพื่อไม่ให้ buffer UART ของเรดาร์ล้นขณะรอ Wi-Fi นาน
+ในโหมดต่อ Wi-Fi `connectWifiCredentials()` ของบอร์ดนี้เรียก `radar.read()` ระหว่างรอ (บรรทัด 736) เพื่อไม่ให้ buffer UART ของเรดาร์ล้นขณะรอ Wi-Fi นาน
 
 บอร์ดนี้ **ไม่อ่านค่าไฟ ไม่ยิง IR ไม่เก็บข้อมูลย้อนหลัง** (มี LED สองดวง) `loop()` ของบอร์ดนี้: ลองเริ่มเรดาร์ใหม่ทุก 10 วินาทีถ้ายังไม่พร้อม, `radar.read()` ถ้า background task ไม่ได้ทำงาน, พิมพ์ diag ทุก 10 วินาที, `updateOccupancy()` ทุก 250 ms, `updateStatusLeds()` ทุกรอบ, จากนั้นงาน BLE/Wi-Fi/MQTT เหมือนบอร์ดแอร์ และ `publishStatus()` เมื่อผลเปลี่ยนหรือครบ 10 วินาที
 
 ### `firmware/rmutt_esp32_air_wired/` (เฟิร์มแวร์ตัวที่สาม: บอร์ดแอร์สายแอร์ Daikin SLM8)
 
-**คืออะไร:** เฟิร์มแวร์บอร์ดแอร์อีกรุ่นที่ใช้ **แทนรีโมตติดผนังของแอร์ Daikin** ที่ถอดออก ESP32 ต่อกับสายรีโมตผนังโดยตรง แล้วส่งเฟรมคำสั่งตามโปรโตคอลที่ทีมถอดรหัสเอง (เรียกว่า SLM8 ตามรุ่นรีโมต) ทุก 1 วินาที และอ่านเฟรมสถานะที่แอร์ตอบกลับ เวอร์ชันในโค้ดคือ **`2.5.2-slm8`** (บรรทัด 78)
+**คืออะไร:** เฟิร์มแวร์บอร์ดแอร์อีกรุ่นที่ใช้ **แทนรีโมตติดผนังของแอร์ Daikin** ที่ถอดออก ESP32 ต่อกับสายรีโมตผนังโดยตรง แล้วส่งเฟรมคำสั่งตามโปรโตคอลที่ทีมถอดรหัสเอง (เรียกว่า SLM8 ตามรุ่นรีโมต) ทุก 1 วินาที และอ่านเฟรมสถานะที่แอร์ตอบกลับ เวอร์ชันในโค้ดคือ **`2.5.5-slm8`** (บรรทัด 78)
 
 **ต่างจากบอร์ด IR อย่างไร (สรุป):**
 
@@ -498,12 +499,12 @@ UUID 6 ตัว (`SERVICE_UUID` ลงท้าย `0001` ... `SETTINGS_UUID` �
 | รู้สถานะจริงของแอร์ | ต้องเดาจาก PZEM | รู้จากสาย: สายตอบไหม (`busOk`), คอมเพรสเซอร์ทำงานไหม (`compressor`) |
 | ยี่ห้อ/โปรโตคอล | ผู้ใช้เลือก (IRac หรือ `SAIJO_DENKI`) | ตายตัว `DAIKIN_WIRED` (บรรทัด 82) แอปแสดง "Daikin · สายแอร์" |
 | BLE IDENTITY | `"controlType":"ir"` | `"controlType":"wired"` (ค่าคงที่ `CONTROL_TYPE` บรรทัด 80) |
-| `/status` | ไม่มี `controlMode` | มี `"controlMode":"wired"` (บรรทัด 1458) ให้ Backend แก้โปรโตคอลในฐานข้อมูลเป็น `DAIKIN_WIRED` เองถ้ายังเป็นยี่ห้อ IR |
+| `/status` | ไม่มี `controlMode` | มี `"controlMode":"wired"` (บรรทัด 1494) ให้ Backend แก้โปรโตคอลในฐานข้อมูลเป็น `DAIKIN_WIRED` เองถ้ายังเป็นยี่ห้อ IR |
 | เซนเซอร์เพิ่ม | — | DHT11 (GPIO4) วัดอุณหภูมิห้องส่งต่อให้แอร์ และแสดง `RM xx°` บนจอ |
 | จอ OLED | หน้า NORMAL/SETUP/CONNECTING | เหมือนกัน + หน้า ALERT "AIRCON BUS / No reply from unit" เมื่อสายไม่ตอบ และป้าย `BUS`, `COMP ON` |
 | ไลบรารี | IRremoteESP8266 2.9.0 | ไม่ใช้ IRremoteESP8266 ใช้ DHT sensor library (Adafruit) แทน |
 
-**ไฟล์ในโฟลเดอร์:** ไฟล์ที่ **คัดลอกมาเหมือนบอร์ด IR ทุกไบต์** (ตรวจด้วย `cmp`) คือ `oled_display.h`, `oled_ui.h`, `history_log.h`, `ota_update.h`, `letsencrypt_ca.h`, `partitions.csv` ไฟล์ที่ **มีเฉพาะบอร์ดนี้** คือ `rmutt_esp32_air_wired.ino` (2,031 บรรทัด แตกมาจาก `.ino` ของบอร์ด IR จึงมี BLE/MQTT/PZEM/LED/OTA/ข้อมูลย้อนหลัง/unprovision ชุดเดียวกัน), `DaikinSLM8.h` (321 บรรทัด: ประกอบ/ถอดเฟรม SLM8), `wired_bus.h` (102 บรรทัด: task + mutex), `README_WIRED_TH.md` ส่วน `build_opt.h` มีแต่ไม่เหมือนกัน (ปิดแค่ I2C/SPI ฮาร์ดแวร์)
+**ไฟล์ในโฟลเดอร์:** ไฟล์ที่ **คัดลอกมาเหมือนบอร์ด IR ทุกไบต์** (ตรวจด้วย `cmp`) คือ `oled_ui.h`, `history_log.h`, `ota_update.h`, `letsencrypt_ca.h`, `partitions.csv` ส่วน `oled_display.h` ต่างแค่ค่าเริ่มต้น `OLED_ROTATE_180` เป็น `true` (จอของบอร์ดนี้ติดกลับหัว) ไฟล์ที่ **มีเฉพาะบอร์ดนี้** คือ `rmutt_esp32_air_wired.ino` (2,067 บรรทัด แตกมาจาก `.ino` ของบอร์ด IR จึงมี BLE/MQTT/PZEM/LED/OTA/ข้อมูลย้อนหลัง/unprovision ชุดเดียวกัน), `DaikinSLM8.h` (321 บรรทัด: ประกอบ/ถอดเฟรม SLM8), `wired_bus.h` (102 บรรทัด: task + mutex), `README_WIRED_TH.md` ส่วน `build_opt.h` มีแต่ไม่เหมือนกัน (ปิดแค่ I2C/SPI ฮาร์ดแวร์)
 
 **ทำไมทำเป็นสเก็ตช์แยก ไม่ใส่ `#if` ในไฟล์เดียว:** สองรุ่นต่างกันทั้งไลบรารี (IR กับ DHT) ขา (GPIO17 กับ GPIO33/34/35/4) และวิธีส่งคำสั่ง (ครั้งเดียว กับส่งซ้ำทุกวินาทีใน task แยก) ถ้ารวมไฟล์เดียวจะมี `#if` กระจายทั่ว 2,000 บรรทัด อ่านยากและเสี่ยงทำบอร์ด IR ที่ใช้งานอยู่พัง ข้อแลกเปลี่ยนคือแก้ส่วนร่วม (เช่น unprovision) ต้องแก้สองที่ ซึ่งเกิดขึ้นจริงในคอมมิต `1f09946`
 
@@ -559,7 +560,7 @@ occupied       = radarAvailable AND (มีเกตใดใน 0..8 ที่ 
 `publishStatus()` ส่ง JSON (retained) ไปที่ `<topic>/status`:
 
 ```json
-{"online":true,"deviceId":"OCC32-AABBCCDDEEFF","firmwareVersion":"1.3.3",
+{"online":true,"deviceId":"OCC32-AABBCCDDEEFF","firmwareVersion":"1.3.9",
  "roomNumber":"16203","radarAvailable":true,"occupied":true,"staticThreshold":15}
 ```
 
@@ -879,9 +880,9 @@ y 63    │ 845 W   [OUT OF CLASS]               │  แถบล่าง: ว
 
 ### หน้าจอตามสถานะของบอร์ด: `refreshOled()`
 
-**ไฟล์ `firmware/rmutt_esp32_air/rmutt_esp32_air.ino` บรรทัด 1987–1999**
+**ไฟล์ `firmware/rmutt_esp32_air/rmutt_esp32_air.ino` บรรทัด 2023–2035**
 
-```cpp:1987
+```cpp:2023
 void refreshOled() {
   if (!oledDisplay.due()) return;
   static char clockText[6];
@@ -899,18 +900,18 @@ void refreshOled() {
 
 | บรรทัด | ความหมาย / เหตุผล |
 |---|---|
-| 1988 | ยังไม่ถึงรอบวาด → ออกทันที รอบส่วนใหญ่ของ `loop()` จบที่บรรทัดนี้ จึงเกือบไม่มีต้นทุน |
-| 1989–1990 | `static char` = ตัวแปรที่อยู่ตลอดอายุโปรแกรม (ไม่หายเมื่อออกจากฟังก์ชัน) จำเป็นเพราะ `OledData` เก็บแค่ **pointer** (`const char*`) ไปยังข้อความ ถ้าเป็นตัวแปร local ธรรมดา pointer จะชี้ไปหน่วยความจำที่ถูกคืนแล้ว |
-| 1992 | `getLocalTime(&timeInfo, 0)` พารามิเตอร์ตัวที่สอง `0` = **ไม่รอ** (ค่าเริ่มต้นของฟังก์ชันรอได้ถึง 5 วินาที) ถ้ายังไม่ได้เวลาจาก NTP ก็แค่ไม่แสดงนาฬิกา ไม่ทำให้ `loop()` ค้าง |
-| 1993–1995 | ได้เวลา → `"HH:MM"` ไม่ได้ → สตริงว่าง (`topBar` ข้ามนาฬิกาเมื่อ `clock[0]` เป็น `'\0'`) |
-| 1997 | แปลง IP เป็นข้อความเก็บไว้ (ใช้ในหน้าเครือข่ายของแบบ 5) |
-| 1999 | สร้าง `OledData` ใหม่ทุกครั้ง ฟิลด์ที่ไม่กรอกได้ค่าเริ่มต้นจาก struct |
+| 2024 | ยังไม่ถึงรอบวาด → ออกทันที รอบส่วนใหญ่ของ `loop()` จบที่บรรทัดนี้ จึงเกือบไม่มีต้นทุน |
+| 2025–2026 | `static char` = ตัวแปรที่อยู่ตลอดอายุโปรแกรม (ไม่หายเมื่อออกจากฟังก์ชัน) จำเป็นเพราะ `OledData` เก็บแค่ **pointer** (`const char*`) ไปยังข้อความ ถ้าเป็นตัวแปร local ธรรมดา pointer จะชี้ไปหน่วยความจำที่ถูกคืนแล้ว |
+| 2028 | `getLocalTime(&timeInfo, 0)` พารามิเตอร์ตัวที่สอง `0` = **ไม่รอ** (ค่าเริ่มต้นของฟังก์ชันรอได้ถึง 5 วินาที) ถ้ายังไม่ได้เวลาจาก NTP ก็แค่ไม่แสดงนาฬิกา ไม่ทำให้ `loop()` ค้าง |
+| 2029–2031 | ได้เวลา → `"HH:MM"` ไม่ได้ → สตริงว่าง (`topBar` ข้ามนาฬิกาเมื่อ `clock[0]` เป็น `'\0'`) |
+| 2033 | แปลง IP เป็นข้อความเก็บไว้ (ใช้ในหน้าเครือข่ายของแบบ 5) |
+| 2035 | สร้าง `OledData` ใหม่ทุกครั้ง ฟิลด์ที่ไม่กรอกได้ค่าเริ่มต้นจาก struct |
 
-บรรทัด 2000–2024 กรอกฟิลด์ทีละตัวจาก `config` (ห้อง, เลขแอร์, SSID, deviceId), `airState` (power, temperature, mode, fanSpeed, `verticalSwing != "off"`, sleep), `powerMeasurements` (ค่าไฟทุกตัว ถ้า PZEM ไม่พร้อมใส่ `NAN` ให้จอแสดง `--` แทนค่าเก่าที่อาจผิด), `WiFi.status()`, `mqttClient.connected()`, `WiFi.RSSI()` และ `FIRMWARE_VERSION`
+บรรทัด 2036–2060 กรอกฟิลด์ทีละตัวจาก `config` (ห้อง, เลขแอร์, SSID, deviceId), `airState` (power, temperature, mode, fanSpeed, `verticalSwing != "off"`, sleep), `powerMeasurements` (ค่าไฟทุกตัว ถ้า PZEM ไม่พร้อมใส่ `NAN` ให้จอแสดง `--` แทนค่าเก่าที่อาจผิด), `WiFi.status()`, `mqttClient.connected()`, `WiFi.RSSI()` และ `FIRMWARE_VERSION`
 
-**ไฟล์ `firmware/rmutt_esp32_air/rmutt_esp32_air.ino` บรรทัด 2025–2032**
+**ไฟล์ `firmware/rmutt_esp32_air/rmutt_esp32_air.ino` บรรทัด 2061–2068**
 
-```cpp:2025
+```cpp:2061
   if (bleBlocksNormalOperation) {
     oledDisplay.show(OledDisplay::SETUP, d, config.bleName.c_str(), oledReason.c_str());
   } else if (wifiConnectionInProgress) {
@@ -923,14 +924,14 @@ void refreshOled() {
 
 | บรรทัด | สถานะของบอร์ด | หน้าจอ |
 |---|---|---|
-| 2025–2026 | อยู่ในโหมดตั้งค่า/กู้ BLE (`bleBlocksNormalOperation`) | **SETUP MODE**: ไอคอนบลูทูธ, "Bluetooth name:" + ชื่อ `RMUTT-AC-xxxx`, "Open RMUTT app > Add AC" และเหตุผลจาก `oledReason` (ตัดไม่เกิน 25 ตัวอักษรใน `enterBleRecovery`) เช่น `No saved configuration` |
-| 2027–2028 | กำลังรอต่อ Wi-Fi (`wifiConnectionInProgress` ตั้งใน `connectWifiCredentials`) | **Connecting Wi-Fi** + ชื่อ SSID + จุด 5 จุดวิ่ง |
-| 2029–2030 | ทำงานปกติ | แบบที่เลือก (`OLED_LAYOUT` = 1 → `screenBig`) หรือพักจอถ้าแอร์ปิดนาน |
+| 2061–2062 | อยู่ในโหมดตั้งค่า/กู้ BLE (`bleBlocksNormalOperation`) | **SETUP MODE**: ไอคอนบลูทูธ, "Bluetooth name:" + ชื่อ `RMUTT-AC-xxxx`, "Open RMUTT app > Add AC" และเหตุผลจาก `oledReason` (ตัดไม่เกิน 25 ตัวอักษรใน `enterBleRecovery`) เช่น `No saved configuration` |
+| 2063–2064 | กำลังรอต่อ Wi-Fi (`wifiConnectionInProgress` ตั้งใน `connectWifiCredentials`) | **Connecting Wi-Fi** + ชื่อ SSID + จุด 5 จุดวิ่ง |
+| 2065–2066 | ทำงานปกติ | แบบที่เลือก (`OLED_LAYOUT` = 1 → `screenBig`) หรือพักจอถ้าแอร์ปิดนาน |
 
 บอร์ด IR ไม่ได้ใช้หน้า `ALERT` (มีเฉพาะบอร์ดสายแอร์ที่ใช้เตือนเมื่อสายแอร์ไม่ตอบ)
 
 > [!NOTE]
-> **ทำไมหน้า Connecting ขึ้นได้ทั้งที่ `connectWifiCredentials()` วนรออยู่:** ฟังก์ชันนั้นวน `delay(50)` รอ Wi-Fi นานได้ถึง 20 วินาที (ไม่กลับไปที่ `loop()`) แต่ในวงรอมันเรียก `updateStatusLeds()` อยู่แล้วเพื่อกระพริบ LED เหลือง และ `refreshOled()` ถูกเรียกท้าย `updateStatusLeds()` (บรรทัด 1735) จอจึงอัปเดตไปด้วยโดยไม่ต้องเพิ่มโค้ดในวงรอ การผูกจอกับ `updateStatusLeds()` จึงเป็นการ "เกาะ" จุดที่ถูกเรียกบ่อยอยู่แล้วทุกที่
+> **ทำไมหน้า Connecting ขึ้นได้ทั้งที่ `connectWifiCredentials()` วนรออยู่:** ฟังก์ชันนั้นวน `delay(50)` รอ Wi-Fi นานได้ถึง 20 วินาที (ไม่กลับไปที่ `loop()`) แต่ในวงรอมันเรียก `updateStatusLeds()` อยู่แล้วเพื่อกระพริบ LED เหลือง และ `refreshOled()` ถูกเรียกท้าย `updateStatusLeds()` (บรรทัด 1771) จอจึงอัปเดตไปด้วยโดยไม่ต้องเพิ่มโค้ดในวงรอ การผูกจอกับ `updateStatusLeds()` จึงเป็นการ "เกาะ" จุดที่ถูกเรียกบ่อยอยู่แล้วทุกที่
 
 ### พักจอเมื่อแอร์ปิดนาน (screen saver)
 
@@ -971,12 +972,12 @@ void refreshOled() {
 |---|---|---|
 | `#include "oled_display.h"` | 38 | ดึงคลาสจอเข้ามา |
 | `OledDisplay oledDisplay;` + `String oledReason;` | 158–159 | อ็อบเจกต์จอแบบ global ตัวเดียว และเหตุผลเข้าโหมดตั้งค่า |
-| `oledDisplay.begin()` ใน `setup()` | 436 | ตรวจ/เริ่มจอก่อนทุกอย่างที่อาจบล็อก |
-| `oledReason = reason...substring(0, 25)` ใน `enterBleRecovery()` | 813 | จอกว้างพอแค่ ~25 ตัวในฟอนต์ 5×7 |
-| `oledDisplay.poke()` ใน `publishState()` | 1500 | สถานะแอร์เปลี่ยน → วาดใหม่ทันที (เรียกก่อนเช็ก MQTT จึงทำงานแม้ MQTT หลุด เช่นตอนตัวตั้งเวลาปิดแอร์เอง) |
-| `oledDisplay.pushPower(powerWatts)` ใน `readPowerMeter()` | 1698 | เก็บกราฟ |
-| `refreshOled()` ท้าย `updateStatusLeds()` | 1735 | อัปเดตจอทุกรอบ `loop()` และระหว่างรอ Wi-Fi |
-| `refreshOled()` | 1987–2032 | ประกอบข้อมูลและเลือกหน้าจอ |
+| `oledDisplay.begin()` ใน `setup()` | 439 | ตรวจ/เริ่มจอก่อนทุกอย่างที่อาจบล็อก |
+| `oledReason = reason...substring(0, 25)` ใน `enterBleRecovery()` | 816 | จอกว้างพอแค่ ~25 ตัวในฟอนต์ 5×7 |
+| `oledDisplay.poke()` ใน `publishState()` | 1536 | สถานะแอร์เปลี่ยน → วาดใหม่ทันที (เรียกก่อนเช็ก MQTT จึงทำงานแม้ MQTT หลุด เช่นตอนตัวตั้งเวลาปิดแอร์เอง) |
+| `oledDisplay.pushPower(powerWatts)` ใน `readPowerMeter()` | 1734 | เก็บกราฟ |
+| `refreshOled()` ท้าย `updateStatusLeds()` | 1771 | อัปเดตจอทุกรอบ `loop()` และระหว่างรอ Wi-Fi |
+| `refreshOled()` | 2023–2068 | ประกอบข้อมูลและเลือกหน้าจอ |
 
 ไม่มีการแก้ BLE/MQTT/IR/PZEM/OTA/ข้อมูลย้อนหลังเพื่อจอ (ตาม `README_OLED_TH.md`) จอเป็น "ผู้อ่าน" สถานะเท่านั้น ไม่เคยเปลี่ยนสถานะของระบบ ถ้าจอเสียหรือถอดออก การควบคุมแอร์ไม่ได้รับผลกระทบ
 
@@ -1031,15 +1032,56 @@ void refreshOled() {
  บอร์ดบูตใหม่: ไม่มี configured → โหมด BLE ตั้งค่า (จอขึ้น SETUP MODE "No saved configuration")
 ```
 
-ฝั่ง Backend (`backend/src/utils/unprovision.js`, `services/mqtt.js` ฟังก์ชัน `unprovisionDevice`) รอคำตอบ `unprovisioned:true` ได้ไม่เกิน 4,000 ms (`UNPROVISION_ACK_TIMEOUT_MS`) ถ้าบอร์ดออฟไลน์ คำสั่งไปไม่ถึง (Backend ตั้งใจไม่ส่งแบบ retained เพราะถ้าเพิ่มบอร์ดตัวเดิมกลับมาภายหลัง คำสั่งที่ค้างอยู่จะล้างบอร์ดทิ้งอีกรอบ) กรณีนั้นยังต้องใช้ `reset.ino` หรือกด BOOT ตั้งค่าใหม่
+ฝั่ง Backend (`backend/src/utils/unprovision.js`, `services/mqtt.js` ฟังก์ชัน `unprovisionDevice`) รอคำตอบ `unprovisioned:true` ได้ไม่เกิน 4,000 ms (`UNPROVISION_ACK_TIMEOUT_MS`) ถ้าบอร์ดออฟไลน์ คำสั่งไปไม่ถึง (Backend ตั้งใจไม่ส่งแบบ retained เพราะถ้าเพิ่มบอร์ดตัวเดิมกลับมาภายหลัง คำสั่งที่ค้างอยู่จะล้างบอร์ดทิ้งอีกรอบ) บอร์ดจะล้างตัวเองเมื่อกลับมาออนไลน์แล้วถูกปฏิเสธบัญชี (หัวข้อถัดไป) ถ้าไม่กลับมาออนไลน์เลยต้องใช้ `reset.ino` หรือกด BOOT ตั้งค่าใหม่
 
-### บอร์ดแอร์ IR: `unprovisionAndRestart()`
+### บอร์ดที่ออฟไลน์ตอนถูกลบ: `checkMqttAccountRemoved()`
 
-คำสั่งถูกรับใน `processMqttCommand()` (บรรทัด 1229–1239 ดูหัวข้อเจาะโค้ด 3) ซึ่งทำงานใน `loop()` อยู่แล้ว (callback แค่ตั้ง `mqttCommandReady`) จึงเรียกฟังก์ชันล้างได้ตรง ๆ
+ถ้าบอร์ดออฟไลน์ตอนแอดมินกดลบ คำสั่ง `unprovision` ไปไม่ถึง แต่บัญชี MQTT ของบอร์ดถูกลบไปแล้ว พอบอร์ดกลับมาต่อ Wi-Fi ได้ ทุกครั้งที่ `connectMqtt()` ต่อไม่ติดจะส่ง `mqttClient.state()` ให้ `checkMqttAccountRemoved(state)` (ทั้งสามเฟิร์มแวร์มีฟังก์ชันเดียวกัน บอร์ด IR บรรทัด 1174–1201)
 
-**ไฟล์ `firmware/rmutt_esp32_air/rmutt_esp32_air.ino` บรรทัด 1174–1193**
+**ไฟล์ `firmware/rmutt_esp32_air/rmutt_esp32_air.ino` บรรทัด 1182–1201**
 
-```cpp:1174
+```cpp:1182
+constexpr uint32_t MQTT_AUTH_REJECT_RESET_MS = 2UL * 60UL * 1000UL;
+constexpr uint16_t MQTT_AUTH_REJECT_MIN_COUNT = 10;
+uint32_t mqttAuthRejectedSince = 0;
+uint16_t mqttAuthRejectCount = 0;
+
+void checkMqttAccountRemoved(int state) {
+  if (state != 4 && state != 5) return;
+  if (mqttAuthRejectedSince == 0) mqttAuthRejectedSince = millis();
+  if (mqttAuthRejectCount < 0xFFFF) mqttAuthRejectCount++;
+  const uint32_t rejectedFor = millis() - mqttAuthRejectedSince;
+  Serial.printf(
+      "MQTT account rejected %u times for %lus (reset after %lus)\n",
+      mqttAuthRejectCount,
+      static_cast<unsigned long>(rejectedFor / 1000),
+      static_cast<unsigned long>(MQTT_AUTH_REJECT_RESET_MS / 1000));
+  if (rejectedFor >= MQTT_AUTH_REJECT_RESET_MS &&
+      mqttAuthRejectCount >= MQTT_AUTH_REJECT_MIN_COUNT) {
+    unprovisionAndRestart("MQTT account was removed (rejected by broker)");
+  }
+}
+```
+
+| บรรทัด | ความหมาย |
+|---|---|
+| 1182–1183 | เกณฑ์: ถูกปฏิเสธต่อเนื่องอย่างน้อย 2 นาที (`MQTT_AUTH_REJECT_RESET_MS`) และอย่างน้อย 10 ครั้ง (`MQTT_AUTH_REJECT_MIN_COUNT`) |
+| 1184–1185 | ตัวแปรจำเวลาที่เริ่มถูกปฏิเสธและจำนวนครั้ง `connectMqtt()` ตั้งกลับเป็น 0 ทุกครั้งที่ต่อติด |
+| 1188 | นับเฉพาะ state 4 (`MQTT_CONNECT_BAD_CREDENTIALS`) และ 5 (`MQTT_CONNECT_UNAUTHORIZED`) ซึ่งหมายถึง "Broker ไม่รับบัญชีนี้" ส่วน state ติดลบ (เน็ตหลุด หา Broker ไม่เจอ) ไม่นับ |
+| 1189–1190 | จำเวลาครั้งแรก และนับจำนวนครั้ง (กันตัวนับล้นที่ `0xFFFF`) |
+| 1191–1196 | พิมพ์ลง Serial ว่าถูกปฏิเสธกี่ครั้ง นานเท่าไร และจะรีเซ็ตเมื่อไร ช่วยสืบปัญหาจาก Serial Monitor |
+| 1197–1200 | ครบทั้งสองเงื่อนไข → `unprovisionAndRestart()` ล้าง Wi-Fi, MQTT, ห้อง แล้วรีบูตเข้าโหมดตั้งค่าบลูทูธ (เหมือนได้คำสั่ง unprovision) |
+
+> [!WHY]
+> **ทำไมต้องรอทั้ง 2 นาทีและ 10 ครั้ง** การล้างค่าย้อนกลับไม่ได้ ถ้า Broker ปฏิเสธชั่วคราว เช่น ไฟล์บัญชีของ Mosquitto ถูกสร้างใหม่หลังย้ายเซิร์ฟเวอร์ และ Backend ยังไม่ได้สร้างบัญชีบอร์ดคืน (`reconcileAccounts`) บอร์ดไม่ควรล้างตัวเองทันที เงื่อนไขสองชั้นกันการล้างผิดจากเหตุชั่วคราว แต่ยังทำให้บอร์ดที่ถูกลบจริงกลับมาตั้งค่าใหม่ผ่านบลูทูธได้เองโดยไม่ต้องมีคนไปกดปุ่ม
+
+
+
+คำสั่งถูกรับใน `processMqttCommand()` (บรรทัด 1265–1275 ดูหัวข้อเจาะโค้ด 3) ซึ่งทำงานใน `loop()` อยู่แล้ว (callback แค่ตั้ง `mqttCommandReady`) จึงเรียกฟังก์ชันล้างได้ตรง ๆ
+
+**ไฟล์ `firmware/rmutt_esp32_air/rmutt_esp32_air.ino` บรรทัด 1210–1229**
+
+```cpp:1210
 void unprovisionAndRestart(const String &reason) {
   Serial.printf("Unprovision: %s - clearing all saved settings\n", reason.c_str());
   if (mqttClient.connected()) {
@@ -1064,16 +1106,16 @@ void unprovisionAndRestart(const String &reason) {
 
 | บรรทัด | ความหมาย / เหตุผล |
 |---|---|
-| 1176 | ตอบ/ล้างได้เฉพาะเมื่อยังต่อ MQTT อยู่ (ปกติต่ออยู่ เพราะเพิ่งรับคำสั่งมา) |
-| 1178–1183 | สร้าง JSON ยืนยัน `{"deviceId":...,"online":false,"unprovisioned":true}` ใส่ `deviceId` ให้ Backend จับคู่ได้ว่าใครตอบ (`isUnprovisionAck` ตรวจทั้ง `unprovisioned === true` และ `deviceId`) |
-| 1185 | ส่งที่ `/status` แบบ **ไม่ retained** (`false`) เพราะเป็นข้อความเหตุการณ์ครั้งเดียว ไม่ใช่สถานะที่ควรค้างใน Broker |
-| 1188–1189 | ส่ง payload ว่างแบบ retained ที่ `/status` และ `/state` = วิธีมาตรฐานของ MQTT ในการ **ลบ** ข้อความ retained ไม่งั้น Broker จะเก็บสถานะสุดท้ายของบอร์ดที่ถูกลบไปตลอด และส่งให้ผู้สมัครใหม่ |
-| 1190–1191 | `mqttClient.loop()` + รอ 300 ms ให้ข้อความออกจากบัฟเฟอร์ไปถึง Broker ก่อนตัด (PubSubClient ส่ง QoS 0 จึงไม่มีการยืนยัน ต้องเผื่อเวลา) |
-| 1192 | `disconnect()` แบบปกติ (ส่งแพ็กเก็ต DISCONNECT) Broker จึง **ไม่** ปล่อย Last Will `online:false` แบบ retained ออกมาทับสิ่งที่เพิ่งล้าง (คอมเมนต์บรรทัด 1186–1187) ถ้าปล่อยให้หลุดเองตอนรีบูต LWT จะกลับมาค้างใน Broker |
+| 1212 | ตอบ/ล้างได้เฉพาะเมื่อยังต่อ MQTT อยู่ (ปกติต่ออยู่ เพราะเพิ่งรับคำสั่งมา) |
+| 1214–1219 | สร้าง JSON ยืนยัน `{"deviceId":...,"online":false,"unprovisioned":true}` ใส่ `deviceId` ให้ Backend จับคู่ได้ว่าใครตอบ (`isUnprovisionAck` ตรวจทั้ง `unprovisioned === true` และ `deviceId`) |
+| 1221 | ส่งที่ `/status` แบบ **ไม่ retained** (`false`) เพราะเป็นข้อความเหตุการณ์ครั้งเดียว ไม่ใช่สถานะที่ควรค้างใน Broker |
+| 1224–1225 | ส่ง payload ว่างแบบ retained ที่ `/status` และ `/state` = วิธีมาตรฐานของ MQTT ในการ **ลบ** ข้อความ retained ไม่งั้น Broker จะเก็บสถานะสุดท้ายของบอร์ดที่ถูกลบไปตลอด และส่งให้ผู้สมัครใหม่ |
+| 1226–1227 | `mqttClient.loop()` + รอ 300 ms ให้ข้อความออกจากบัฟเฟอร์ไปถึง Broker ก่อนตัด (PubSubClient ส่ง QoS 0 จึงไม่มีการยืนยัน ต้องเผื่อเวลา) |
+| 1228 | `disconnect()` แบบปกติ (ส่งแพ็กเก็ต DISCONNECT) Broker จึง **ไม่** ปล่อย Last Will `online:false` แบบ retained ออกมาทับสิ่งที่เพิ่งล้าง (คอมเมนต์บรรทัด 1222–1223) ถ้าปล่อยให้หลุดเองตอนรีบูต LWT จะกลับมาค้างใน Broker |
 
-**ไฟล์ `firmware/rmutt_esp32_air/rmutt_esp32_air.ino` บรรทัด 1195–1209**
+**ไฟล์ `firmware/rmutt_esp32_air/rmutt_esp32_air.ino` บรรทัด 1231–1245**
 
-```cpp:1195
+```cpp:1231
   preferences.begin("rmutt-air", false);
   preferences.clear();
   preferences.end();
@@ -1093,20 +1135,20 @@ void unprovisionAndRestart(const String &reason) {
 
 | บรรทัด | ความหมาย / เหตุผล |
 |---|---|
-| 1195–1197 | เปิด namespace `rmutt-air` แบบเขียนได้ (`false` = ไม่ใช่ read-only) แล้ว `clear()` ลบทุกคีย์ (Wi-Fi, MQTT, ห้อง, เลขแอร์, โปรโตคอล, token, เวลาเปิดปิด) รวม `configured` ด้วย |
-| 1198–1200 | ลบ namespace `rmutt-state` (สถานะแอร์ล่าสุด + `hist_ack`) บอร์ดใหม่จะได้ไม่เริ่มด้วยสถานะของห้องเดิม |
-| 1202–1204 | ลบพาร์ติชัน `rmuttlog` ทั้งหมด (64 KB) ข้อมูลไฟฟ้าย้อนหลังของห้องเดิมต้องไม่ถูกส่งไปปนกับห้องใหม่ เช็ก `nullptr` ก่อนเพราะบอร์ดที่ยังไม่ได้แฟลชตารางพาร์ติชันใหม่จะไม่มีพาร์ติชันนี้ (ต่างจาก `reset.ino` ที่ไม่แตะ `rmuttlog`) |
-| 1206–1208 | พิมพ์ log รอ 300 ms ให้ Serial ส่งออกหมด แล้วรีบูต พอบูตใหม่ `configured` เป็น false → `enterBleRecovery("No saved configuration")` |
+| 1231–1233 | เปิด namespace `rmutt-air` แบบเขียนได้ (`false` = ไม่ใช่ read-only) แล้ว `clear()` ลบทุกคีย์ (Wi-Fi, MQTT, ห้อง, เลขแอร์, โปรโตคอล, token, เวลาเปิดปิด) รวม `configured` ด้วย |
+| 1234–1236 | ลบ namespace `rmutt-state` (สถานะแอร์ล่าสุด + `hist_ack`) บอร์ดใหม่จะได้ไม่เริ่มด้วยสถานะของห้องเดิม |
+| 1238–1240 | ลบพาร์ติชัน `rmuttlog` ทั้งหมด (64 KB) ข้อมูลไฟฟ้าย้อนหลังของห้องเดิมต้องไม่ถูกส่งไปปนกับห้องใหม่ เช็ก `nullptr` ก่อนเพราะบอร์ดที่ยังไม่ได้แฟลชตารางพาร์ติชันใหม่จะไม่มีพาร์ติชันนี้ (ต่างจาก `reset.ino` ที่ไม่แตะ `rmuttlog`) |
+| 1242–1244 | พิมพ์ log รอ 300 ms ให้ Serial ส่งออกหมด แล้วรีบูต พอบูตใหม่ `configured` เป็น false → `enterBleRecovery("No saved configuration")` |
 
-สิ่งที่ **ไม่** เปลี่ยน: Device ID (สร้างจาก eFuse MAC ไม่ได้เก็บใน NVS) และแอร์ไม่ถูกสั่งอะไรเพิ่ม (IR ส่งครั้งเดียว แอร์จึงค้างที่สถานะล่าสุด ตามคอมเมนต์บรรทัด 1171–1172) บอร์ดสายแอร์มีฟังก์ชันเดียวกัน (บรรทัด 1203 ของ `rmutt_esp32_air_wired.ino`)
+สิ่งที่ **ไม่** เปลี่ยน: Device ID (สร้างจาก eFuse MAC ไม่ได้เก็บใน NVS) และแอร์ไม่ถูกสั่งอะไรเพิ่ม (IR ส่งครั้งเดียว แอร์จึงค้างที่สถานะล่าสุด ตามคอมเมนต์บรรทัด 1178–1179) บอร์ดสายแอร์มีฟังก์ชันเดียวกัน (บรรทัด 1239 ของ `rmutt_esp32_air_wired.ino`)
 
 ### บอร์ดตรวจจับคน: ตั้งธงใน callback แล้วทำใน `loop()`
 
 บอร์ดตรวจจับคนจัดการ `/command` **ใน `mqttCallback()` โดยตรง** (ไม่มี `processMqttCommand()` แบบบอร์ดแอร์) จึงต้องเลื่อนงานออกไปแบบเดียวกับ OTA
 
-**ไฟล์ `firmware/rmutt_esp32_occupancy/rmutt_esp32_occupancy.ino` บรรทัด 853–864**
+**ไฟล์ `firmware/rmutt_esp32_occupancy/rmutt_esp32_occupancy.ino` บรรทัด 860–871**
 
-```cpp:853
+```cpp:860
   if (action == "unprovision") {
     // Backend ส่งมาเมื่อแอดมินกดนำเซ็นเซอร์ออกในแอป
     // ตรวจ deviceId ซ้ำอีกชั้น กันข้อความหลงมาผิด topic
@@ -1123,10 +1165,10 @@ void unprovisionAndRestart(const String &reason) {
 
 | บรรทัด | ความหมาย / เหตุผล |
 |---|---|
-| 857–861 | ตรวจ `deviceId` ในคำสั่งต้องตรงกับบอร์ดนี้ (ป้องกันเป็นชั้น: แม้ ACL จะกันแล้ว แต่ถ้า topic ตั้งผิดหรือข้อความหลง บอร์ดจะไม่ล้างตัวเองผิดตัว ซึ่งเป็นความเสียหายที่ย้อนไม่ได้) |
-| 862 | ตั้งธง `unprovisionRequested` (ประกาศบรรทัด 145) แทนการเรียกตรง เพราะอยู่ใน `mqttClient.loop()` อยู่ ถ้า publish แล้ว `disconnect()` จากใน callback ของ PubSubClient เองจะเป็นการตัดการเชื่อมต่อที่ตัวเองกำลังใช้ประมวลผลข้อความอยู่ |
+| 864–868 | ตรวจ `deviceId` ในคำสั่งต้องตรงกับบอร์ดนี้ (ป้องกันเป็นชั้น: แม้ ACL จะกันแล้ว แต่ถ้า topic ตั้งผิดหรือข้อความหลง บอร์ดจะไม่ล้างตัวเองผิดตัว ซึ่งเป็นความเสียหายที่ย้อนไม่ได้) |
+| 869 | ตั้งธง `unprovisionRequested` (ประกาศบรรทัด 145) แทนการเรียกตรง เพราะอยู่ใน `mqttClient.loop()` อยู่ ถ้า publish แล้ว `disconnect()` จากใน callback ของ PubSubClient เองจะเป็นการตัดการเชื่อมต่อที่ตัวเองกำลังใช้ประมวลผลข้อความอยู่ |
 
-`loop()` บรรทัด 413 `if (unprovisionRequested) unprovisionAndRestart("removed from the app");` เรียกฟังก์ชัน (บรรทัด 884–912) ที่ทำเหมือนบอร์ดแอร์ แต่ต่างกันสามจุด: ล้างธงก่อน (บรรทัด 885), ล้าง retained แค่ `/status` (บอร์ดนี้ไม่มี `/state`), และล้าง NVS namespace เดียว `rmutt-occ` (ไม่มีสถานะแอร์และไม่มี `rmuttlog`)
+`loop()` บรรทัด 416 `if (unprovisionRequested) unprovisionAndRestart("removed from the app");` เรียกฟังก์ชัน (บรรทัด 920–948) ที่ทำเหมือนบอร์ดแอร์ แต่ต่างกันสามจุด: ล้างธงก่อน (บรรทัด 921), ล้าง retained แค่ `/status` (บอร์ดนี้ไม่มี `/state`), และล้าง NVS namespace เดียว `rmutt-occ` (ไม่มีสถานะแอร์และไม่มี `rmuttlog`)
 
 > [!WHY]
 > **ทำไมให้บอร์ดตอบก่อน แล้ว Backend จึงลบบัญชี MQTT:** ถ้า Backend ลบบัญชีก่อน Broker (Dynamic Security) จะตัดบอร์ดออกทันที คำสั่ง unprovision จะไปไม่ถึง ลำดับ "สั่ง → รอคำยืนยัน (ไม่เกิน 4 วินาที) → ลบบัญชี" ทำให้แน่ใจว่าบอร์ดที่ออนไลน์ได้รับคำสั่ง และการลบในฐานข้อมูลไม่ต้องรอบอร์ด (ถ้าบอร์ดไม่ตอบ Backend ก็ลบต่อตามปกติ ตามคอมเมนต์ใน `unprovisionDevice`)
@@ -1160,9 +1202,9 @@ void unprovisionAndRestart(const String &reason) {
 
 ### 1) `setup()` ของบอร์ดแอร์
 
-**ไฟล์ `firmware/rmutt_esp32_air/rmutt_esp32_air.ino` บรรทัด 426–436**
+**ไฟล์ `firmware/rmutt_esp32_air/rmutt_esp32_air.ino` บรรทัด 429–439**
 
-```cpp:426
+```cpp:429
 void setup() {
   Serial.begin(115200);
   pinMode(SETUP_BUTTON_PIN, INPUT_PULLUP);
@@ -1178,17 +1220,17 @@ void setup() {
 
 | บรรทัด | โค้ด | ความหมาย |
 |---|---|---|
-| 426 | `void setup() {` | ถูกเรียกครั้งเดียวหลังบูต/รีเซ็ต |
-| 427 | `Serial.begin(115200)` | เปิด UART0 (ผ่าน USB) ที่ 115200 baud ไว้พิมพ์ log ดูใน Serial Monitor |
-| 428 | `pinMode(SETUP_BUTTON_PIN, INPUT_PULLUP)` | ตั้ง GPIO0 เป็นขาเข้าพร้อมตัวต้านทาน pull-up ภายใน ปล่อยปุ่ม = อ่านได้ HIGH, กดปุ่ม (ต่อลง GND) = LOW ไม่ต้องใช้ตัวต้านทานภายนอก |
-| 429–431 | `pinMode(..., OUTPUT)` | ตั้งขา LED ทั้งสามเป็นขาออก |
-| 432–434 | `digitalWrite(..., LOW)` | ดับ LED ทั้งหมดก่อน เพราะสถานะขาตอนเพิ่งบูตไม่แน่นอน |
-| 435 | `delay(80)` | รอสั้น ๆ ให้ไฟนิ่งและ pull-up เสถียรก่อนอ่านปุ่ม |
-| 436 | `oledDisplay.begin()` | ตรวจว่ามีจอ OLED ต่ออยู่ไหม ถ้ามีก็เริ่มจอ ถ้าไม่มีก็ปิดส่วนจอแล้วทำงานต่อ (ดูหัวข้อ "จอ OLED 1.3 นิ้ว") เรียกตั้งแต่ต้นเพื่อให้หน้า SETUP MODE หรือ Connecting Wi-Fi ขึ้นได้ตั้งแต่ขั้นแรกของการบูต |
+| 429 | `void setup() {` | ถูกเรียกครั้งเดียวหลังบูต/รีเซ็ต |
+| 430 | `Serial.begin(115200)` | เปิด UART0 (ผ่าน USB) ที่ 115200 baud ไว้พิมพ์ log ดูใน Serial Monitor |
+| 431 | `pinMode(SETUP_BUTTON_PIN, INPUT_PULLUP)` | ตั้ง GPIO0 เป็นขาเข้าพร้อมตัวต้านทาน pull-up ภายใน ปล่อยปุ่ม = อ่านได้ HIGH, กดปุ่ม (ต่อลง GND) = LOW ไม่ต้องใช้ตัวต้านทานภายนอก |
+| 432–434 | `pinMode(..., OUTPUT)` | ตั้งขา LED ทั้งสามเป็นขาออก |
+| 435–437 | `digitalWrite(..., LOW)` | ดับ LED ทั้งหมดก่อน เพราะสถานะขาตอนเพิ่งบูตไม่แน่นอน |
+| 438 | `delay(80)` | รอสั้น ๆ ให้ไฟนิ่งและ pull-up เสถียรก่อนอ่านปุ่ม |
+| 439 | `oledDisplay.begin()` | ตรวจว่ามีจอ OLED ต่ออยู่ไหม ถ้ามีก็เริ่มจอ ถ้าไม่มีก็ปิดส่วนจอแล้วทำงานต่อ (ดูหัวข้อ "จอ OLED 1.3 นิ้ว") เรียกตั้งแต่ต้นเพื่อให้หน้า SETUP MODE หรือ Connecting Wi-Fi ขึ้นได้ตั้งแต่ขั้นแรกของการบูต |
 
-**บรรทัด 438–443 และ 454–460**
+**บรรทัด 441–446 และ 457–463**
 
-```cpp:438
+```cpp:441
   config.deviceId = createDeviceId();
   config.bleName = "RMUTT-AC-" + config.deviceId.substring(6);
   Serial.println();
@@ -1197,7 +1239,7 @@ void setup() {
   Serial.printf("Device ID: %s\n", config.deviceId.c_str());
 ```
 
-```cpp:454
+```cpp:457
   saijoAc.begin();
   initHistoryLog();
   loadConfig();
@@ -1209,18 +1251,18 @@ void setup() {
 
 | บรรทัด | โค้ด | ความหมาย |
 |---|---|---|
-| 438 | `config.deviceId = createDeviceId()` | ได้ `ESP32-XXXXXXXXXXXX` จาก eFuse MAC ของชิป ไม่ซ้ำกันและไม่ต้องตั้งเอง |
-| 439 | `config.bleName = "RMUTT-AC-" + config.deviceId.substring(6)` | ตัด 6 ตัวแรก (`ESP32-`) ออก เหลือ 12 หลัก ได้ชื่อ BLE ที่ผู้ใช้เห็นในแอป |
-| 442–443 | `Serial.printf("Firmware: %s\n", ...)` | พิมพ์เวอร์ชัน (ปัจจุบัน `2.5.1`) เป็นวิธียืนยันว่าแฟลชสำเร็จจริง |
-| 454 | `saijoAc.begin()` | เริ่มขา IR (`irsend_.begin()` ตั้งขา GPIO17 เป็นขาออก) |
-| 455 | `initHistoryLog()` | หา partition `rmuttlog`, อ่าน `hist_ack` จาก NVS, สแกนหาตำแหน่งเขียนและนับรายการค้างส่ง ทำก่อน `loadConfig` เพราะไม่ต้องใช้ค่า Wi-Fi |
-| 456–457 | `loadConfig(); loadAirState();` | อ่านค่าตั้งค่าและสถานะแอร์จาก NVS |
-| 458 | `mqttClient.setBufferSize(2048)` | ขยาย buffer ของ PubSubClient (ค่าปกติ 256 ไบต์ ไม่พอสำหรับ JSON ของ `/status` และ `/history`) |
-| 459 | `mqttClient.setCallback(mqttCallback)` | ลงทะเบียนฟังก์ชันที่ถูกเรียกเมื่อมีข้อความเข้า |
+| 441 | `config.deviceId = createDeviceId()` | ได้ `ESP32-XXXXXXXXXXXX` จาก eFuse MAC ของชิป ไม่ซ้ำกันและไม่ต้องตั้งเอง |
+| 442 | `config.bleName = "RMUTT-AC-" + config.deviceId.substring(6)` | ตัด 6 ตัวแรก (`ESP32-`) ออก เหลือ 12 หลัก ได้ชื่อ BLE ที่ผู้ใช้เห็นในแอป |
+| 445–446 | `Serial.printf("Firmware: %s\n", ...)` | พิมพ์เวอร์ชัน (ปัจจุบัน `2.5.2`) เป็นวิธียืนยันว่าแฟลชสำเร็จจริง |
+| 457 | `saijoAc.begin()` | เริ่มขา IR (`irsend_.begin()` ตั้งขา GPIO17 เป็นขาออก) |
+| 458 | `initHistoryLog()` | หา partition `rmuttlog`, อ่าน `hist_ack` จาก NVS, สแกนหาตำแหน่งเขียนและนับรายการค้างส่ง ทำก่อน `loadConfig` เพราะไม่ต้องใช้ค่า Wi-Fi |
+| 459–460 | `loadConfig(); loadAirState();` | อ่านค่าตั้งค่าและสถานะแอร์จาก NVS |
+| 461 | `mqttClient.setBufferSize(2048)` | ขยาย buffer ของ PubSubClient (ค่าปกติ 256 ไบต์ ไม่พอสำหรับ JSON ของ `/status` และ `/history`) |
+| 462 | `mqttClient.setCallback(mqttCallback)` | ลงทะเบียนฟังก์ชันที่ถูกเรียกเมื่อมีข้อความเข้า |
 
-**บรรทัด 461–475**
+**บรรทัด 464–478**
 
-```cpp:461
+```cpp:464
   const bool setupRequested = digitalRead(SETUP_BUTTON_PIN) == LOW;
   if (!config.configured || setupRequested) {
     enterBleRecovery(
@@ -1238,22 +1280,22 @@ void setup() {
 }
 ```
 
-- **บรรทัด 461:** อ่านปุ่มจริงเพียงครั้งเดียวที่นี่ LOW = ผู้ใช้กดค้างตอนรีเซ็ต
-- **บรรทัด 462–468:** ถ้ายังไม่เคยตั้งค่า หรือผู้ใช้ขอตั้งค่า เข้าโหมด BLE (`enterBleRecovery` ไม่ส่ง `retryWifi` จึงเป็น false = ไม่ลองต่อ Wi-Fi เบื้องหลัง และแก้ได้ทุกช่อง) และ `return` จาก `setup()` (แล้ว `loop()` จะทำงานต่อโดยอยู่ในโหมดกู้) ตัวเลือก `? :` เป็น ternary เลือกข้อความ log
-- **บรรทัด 470–473:** ต่อ Wi-Fi ด้วยค่าที่เก็บไว้ ถ้าไม่ได้ เข้า BLE recovery แบบ `retryWifi = true`
-- **บรรทัด 474:** ต่อ MQTT (ถ้าไม่สำเร็จจะลองใหม่ใน `loop()` ทุก 3 วินาที)
+- **บรรทัด 464:** อ่านปุ่มจริงเพียงครั้งเดียวที่นี่ LOW = ผู้ใช้กดค้างตอนรีเซ็ต
+- **บรรทัด 465–471:** ถ้ายังไม่เคยตั้งค่า หรือผู้ใช้ขอตั้งค่า เข้าโหมด BLE (`enterBleRecovery` ไม่ส่ง `retryWifi` จึงเป็น false = ไม่ลองต่อ Wi-Fi เบื้องหลัง และแก้ได้ทุกช่อง) และ `return` จาก `setup()` (แล้ว `loop()` จะทำงานต่อโดยอยู่ในโหมดกู้) ตัวเลือก `? :` เป็น ternary เลือกข้อความ log
+- **บรรทัด 473–476:** ต่อ Wi-Fi ด้วยค่าที่เก็บไว้ ถ้าไม่ได้ เข้า BLE recovery แบบ `retryWifi = true`
+- **บรรทัด 477:** ต่อ MQTT (ถ้าไม่สำเร็จจะลองใหม่ใน `loop()` ทุก 3 วินาที)
 
 > [!WHY]
 > อ่านปุ่มเฉพาะตอนบูตเพราะเป็นการตัดสินใจ "ครั้งเดียวว่าจะเข้าโหมดไหน" ไม่ต้องเสียเวลาตรวจปุ่มทุกรอบ `loop()` และกันการกดโดยไม่ตั้งใจระหว่างใช้งาน
 
 > [!WARN]
-> ข้อสังเกตจากการอ่านโค้ด (ไม่ได้ทดสอบกับบอร์ดจริง): ใน ESP32 ถ้า GPIO0 เป็น LOW ณ จังหวะที่ชิปพ้นจากการรีเซ็ต ROM bootloader จะเข้าโหมดดาวน์โหลดและไม่รันสเก็ตช์เลย ส่วนโค้ดนี้อ่านปุ่มที่บรรทัด 461 ซึ่งอยู่หลังขั้นตอนเริ่มต้นหลายอย่าง (เริ่ม flash/NVS, สแกนพาร์ติชันประวัติ) ดังนั้นในทางปฏิบัติให้ลองกดปุ่ม BOOT ค้างไว้ช่วงที่บอร์ดกำลังบูตหลังปล่อยปุ่มรีเซ็ต ถ้าบอร์ดเข้าโหมดดาวน์โหลดให้เปลี่ยนจังหวะการกด
+> ข้อสังเกตจากการอ่านโค้ด (ไม่ได้ทดสอบกับบอร์ดจริง): ใน ESP32 ถ้า GPIO0 เป็น LOW ณ จังหวะที่ชิปพ้นจากการรีเซ็ต ROM bootloader จะเข้าโหมดดาวน์โหลดและไม่รันสเก็ตช์เลย ส่วนโค้ดนี้อ่านปุ่มที่บรรทัด 464 ซึ่งอยู่หลังขั้นตอนเริ่มต้นหลายอย่าง (เริ่ม flash/NVS, สแกนพาร์ติชันประวัติ) ดังนั้นในทางปฏิบัติให้ลองกดปุ่ม BOOT ค้างไว้ช่วงที่บอร์ดกำลังบูตหลังปล่อยปุ่มรีเซ็ต ถ้าบอร์ดเข้าโหมดดาวน์โหลดให้เปลี่ยนจังหวะการกด
 
 ### 2) `loop()` ของบอร์ดแอร์
 
-**บรรทัด 477–496**
+**บรรทัด 480–499**
 
-```cpp:477
+```cpp:480
 void loop() {
   if (millis() - lastPzemReadAt >= PZEM_READ_INTERVAL_MS) {
     lastPzemReadAt = millis();
@@ -1276,14 +1318,14 @@ void loop() {
   }
 ```
 
-- **478–481:** แพทเทิร์น millis ตัวอย่างแรก: ถ้าผ่านมาครบ 2000 ms ตั้ง `lastPzemReadAt` ใหม่แล้วอ่าน PZEM ตรงนี้ไม่ใช้ `delay` จึงไม่บล็อกงานอื่น
-- **483:** `finalizeHistoryInterval()` เรียกทุกรอบ ข้างในกรองเองว่าถึงรอยต่อ 5 นาทีหรือยัง ใส่ไว้ **ก่อน** บล็อกเช็ก Wi-Fi/BLE เพื่อให้เก็บข้อมูลต่อแม้อยู่ในโหมดกู้
-- **484:** `updateStatusLeds()` อัปเดต LED ทุกรอบ (กระพริบ LED เหลืองต้องเรียกบ่อย)
-- **486–496:** ถ้าเปิด BLE ไว้ในโหมดออนไลน์ (`!bleBlocksNormalOperation`) และมีเวลาหมดอายุ (`onlineSetupExpiresAt != 0`) และถึงเวลาแล้ว และไม่มีแอปต่ออยู่ ให้หยุดประกาศ BLE การเปรียบเทียบ `static_cast<int32_t>(millis() - onlineSetupExpiresAt) >= 0` คือวิธีเทียบเวลาที่ปลอดภัยจากการที่ `millis()` วนรอบ (เป็น unsigned ลบกันแล้วแปลงเป็น signed)
+- **481–484:** แพทเทิร์น millis ตัวอย่างแรก: ถ้าผ่านมาครบ 2000 ms ตั้ง `lastPzemReadAt` ใหม่แล้วอ่าน PZEM ตรงนี้ไม่ใช้ `delay` จึงไม่บล็อกงานอื่น
+- **486:** `finalizeHistoryInterval()` เรียกทุกรอบ ข้างในกรองเองว่าถึงรอยต่อ 5 นาทีหรือยัง ใส่ไว้ **ก่อน** บล็อกเช็ก Wi-Fi/BLE เพื่อให้เก็บข้อมูลต่อแม้อยู่ในโหมดกู้
+- **487:** `updateStatusLeds()` อัปเดต LED ทุกรอบ (กระพริบ LED เหลืองต้องเรียกบ่อย)
+- **489–499:** ถ้าเปิด BLE ไว้ในโหมดออนไลน์ (`!bleBlocksNormalOperation`) และมีเวลาหมดอายุ (`onlineSetupExpiresAt != 0`) และถึงเวลาแล้ว และไม่มีแอปต่ออยู่ ให้หยุดประกาศ BLE การเปรียบเทียบ `static_cast<int32_t>(millis() - onlineSetupExpiresAt) >= 0` คือวิธีเทียบเวลาที่ปลอดภัยจากการที่ `millis()` วนรอบ (เป็น unsigned ลบกันแล้วแปลงเป็น signed)
 
-**บรรทัด 498–514**
+**บรรทัด 501–517**
 
-```cpp:498
+```cpp:501
   if (bleReadvertisePending &&
       static_cast<int32_t>(millis() - bleReadvertiseAt) >= 0) {
     bleReadvertisePending = false;
@@ -1303,14 +1345,14 @@ void loop() {
   }
 ```
 
-- **498–502:** ถ้ามีคำขอประกาศ BLE ใหม่ (ตั้งใน `onDisconnect`) และถึงเวลา → `startBleAdvertising()`
-- **504:** ถ้า callback ฝั่ง BLE รับ config ครบแล้ว (`configReady`) ค่อยประมวลผลที่นี่ใน loop ไม่ใช่ใน callback
-- **506–508:** ถ้าตั้งเวลารีสตาร์ตไว้ (หลังบันทึก config) และถึงเวลา → `ESP.restart()`
-- **510–514:** ถ้าอยู่โหมดกู้ (หรือยังไม่เคยตั้งค่า) ลองต่อ Wi-Fi เบื้องหลัง `delay(10)` แล้ว `return` ข้ามงานปกติที่เหลือทั้งหมด
+- **501–505:** ถ้ามีคำขอประกาศ BLE ใหม่ (ตั้งใน `onDisconnect`) และถึงเวลา → `startBleAdvertising()`
+- **507:** ถ้า callback ฝั่ง BLE รับ config ครบแล้ว (`configReady`) ค่อยประมวลผลที่นี่ใน loop ไม่ใช่ใน callback
+- **509–511:** ถ้าตั้งเวลารีสตาร์ตไว้ (หลังบันทึก config) และถึงเวลา → `ESP.restart()`
+- **513–517:** ถ้าอยู่โหมดกู้ (หรือยังไม่เคยตั้งค่า) ลองต่อ Wi-Fi เบื้องหลัง `delay(10)` แล้ว `return` ข้ามงานปกติที่เหลือทั้งหมด
 
-**บรรทัด 516–542**
+**บรรทัด 519–545**
 
-```cpp:516
+```cpp:519
   if (WiFi.status() != WL_CONNECTED) {
     if (!connectWifi()) {
       enterBleRecovery("Wi-Fi connection was lost", true);
@@ -1340,16 +1382,16 @@ void loop() {
   }
 ```
 
-- **516–521:** ถ้า Wi-Fi หลุด ลอง `connectWifi()` (บล็อกได้สูงสุด 20 วินาที) ถ้าไม่ได้ → เข้า BLE recovery แล้ว `return`
-- **522–526:** ถ้า MQTT ไม่ต่อ ลองต่อใหม่ แต่ห่างกันอย่างน้อย 3000 ms (`lastMqttReconnectAttempt`) เพื่อไม่ถล่ม broker และไม่บล็อก loop ติด ๆ กัน
-- **528:** `mqttClient.loop()` ให้ PubSubClient รับข้อความเข้า (เรียก `mqttCallback`) และส่ง keep-alive ต้องเรียกบ่อย ๆ
-- **529–535:** ถ้า Backend ตอบ ack ของ provisioning แล้ว (`provisionAckClearReady`) ส่ง payload ว่างแบบ retained ไปที่ `/provision-ack` เพื่อล้างข้อความ retained ที่ค้างอยู่ (กันไม่ให้ได้ ack เก่ากลับมาทุกครั้งที่ต่อใหม่) ล้างสำเร็จแล้วค่อยปิดธง
-- **536–539:** ยังมี token ค้าง (ยังไม่ถูก activate) → ส่ง `/provision` ซ้ำทุก 10 วินาที
-- **540–541:** ถ้ามี ack ข้อมูลย้อนหลังรออยู่ ให้ลบ flash ใน loop แล้วเรียก `processHistoryUpload()` ซึ่งตัดสินเองว่าถึงเวลาส่งหรือยัง
+- **519–524:** ถ้า Wi-Fi หลุด ลอง `connectWifi()` (บล็อกได้สูงสุด 20 วินาที) ถ้าไม่ได้ → เข้า BLE recovery แล้ว `return`
+- **525–529:** ถ้า MQTT ไม่ต่อ ลองต่อใหม่ แต่ห่างกันอย่างน้อย 3000 ms (`lastMqttReconnectAttempt`) เพื่อไม่ถล่ม broker และไม่บล็อก loop ติด ๆ กัน
+- **531:** `mqttClient.loop()` ให้ PubSubClient รับข้อความเข้า (เรียก `mqttCallback`) และส่ง keep-alive ต้องเรียกบ่อย ๆ
+- **532–538:** ถ้า Backend ตอบ ack ของ provisioning แล้ว (`provisionAckClearReady`) ส่ง payload ว่างแบบ retained ไปที่ `/provision-ack` เพื่อล้างข้อความ retained ที่ค้างอยู่ (กันไม่ให้ได้ ack เก่ากลับมาทุกครั้งที่ต่อใหม่) ล้างสำเร็จแล้วค่อยปิดธง
+- **539–542:** ยังมี token ค้าง (ยังไม่ถูก activate) → ส่ง `/provision` ซ้ำทุก 10 วินาที
+- **543–544:** ถ้ามี ack ข้อมูลย้อนหลังรออยู่ ให้ลบ flash ใน loop แล้วเรียก `processHistoryUpload()` ซึ่งตัดสินเองว่าถึงเวลาส่งหรือยัง
 
-**บรรทัด 544–555**
+**บรรทัด 547–558**
 
-```cpp:544
+```cpp:547
   if (mqttCommandReady) processMqttCommand();
   if (otaRequested) performOtaUpdate();
   processTimers();
@@ -1364,17 +1406,17 @@ void loop() {
 }
 ```
 
-- **544:** ถ้า callback ฝากคำสั่งไว้ (`mqttCommandReady`) ประมวลผลที่นี่
-- **545:** มีคำขอ OTA → `performOtaUpdate()` ซึ่งจะบล็อกนาน (ดาวน์โหลดไฟล์)
-- **546–547:** ตัวจับเวลาเปิด/ปิดที่ผู้ใช้สั่ง และตารางเปิด/ปิดรายวัน
-- **549–553:** ส่ง `/status` ถ้ามีคำขอ (`statusPublishRequested` เช่นสถานะแอร์เปลี่ยน) หรือครบ 10 วินาที
-- **554:** `delay(5)` ให้ CPU/FreeRTOS มีเวลาทำงานเบื้องหลัง (Wi-Fi stack ฯลฯ) และป้อน watchdog
+- **547:** ถ้า callback ฝากคำสั่งไว้ (`mqttCommandReady`) ประมวลผลที่นี่
+- **548:** มีคำขอ OTA → `performOtaUpdate()` ซึ่งจะบล็อกนาน (ดาวน์โหลดไฟล์)
+- **549–550:** ตัวจับเวลาเปิด/ปิดที่ผู้ใช้สั่ง และตารางเปิด/ปิดรายวัน
+- **552–556:** ส่ง `/status` ถ้ามีคำขอ (`statusPublishRequested` เช่นสถานะแอร์เปลี่ยน) หรือครบ 10 วินาที
+- **557:** `delay(5)` ให้ CPU/FreeRTOS มีเวลาทำงานเบื้องหลัง (Wi-Fi stack ฯลฯ) และป้อน watchdog
 
 ### 3) `connectMqtt()` และ `mqttCallback()`
 
-**บรรทัด 1055–1063 (เลือกตัวเชื่อมต่อ)**
+**บรรทัด 1058–1066 (เลือกตัวเชื่อมต่อ)**
 
-```cpp:1055
+```cpp:1058
   if (config.mqttTls) {
     if (!ensureClockSynced()) return;
     secureClient.setCACert(LETSENCRYPT_CA);
@@ -1386,13 +1428,13 @@ void loop() {
   mqttClient.setServer(config.mqttHost.c_str(), config.mqttPort);
 ```
 
-- **1055–1059:** ถ้าตั้งให้ใช้ TLS: ต้องรู้เวลาจริงก่อน (`ensureClockSynced()`) ไม่เช่นนั้นออกจากฟังก์ชัน (จะลองใหม่ในอีก 3 วินาที) แล้วฝังใบรับรอง `LETSENCRYPT_CA` ให้ `secureClient` ตั้ง timeout 15 วินาทีและสลับ PubSubClient ไปใช้ `secureClient`
-- **1060–1062:** ไม่ใช้ TLS ใช้ TCP ธรรมดา (`wifiClient`) ซึ่งใช้ในวง LAN ตอนพัฒนา
-- **1063:** ตั้ง host และ port ของ broker จากค่าที่ provisioning ไว้ (ค่าเริ่มต้น ts.net:8443) เปลี่ยนเส้นทางไป Funnel โดยไม่ต้องแก้เฟิร์มแวร์
+- **1058–1062:** ถ้าตั้งให้ใช้ TLS: ต้องรู้เวลาจริงก่อน (`ensureClockSynced()`) ไม่เช่นนั้นออกจากฟังก์ชัน (จะลองใหม่ในอีก 3 วินาที) แล้วฝังใบรับรอง `LETSENCRYPT_CA` ให้ `secureClient` ตั้ง timeout 15 วินาทีและสลับ PubSubClient ไปใช้ `secureClient`
+- **1063–1065:** ไม่ใช้ TLS ใช้ TCP ธรรมดา (`wifiClient`) ซึ่งใช้ในวง LAN ตอนพัฒนา
+- **1066:** ตั้ง host และ port ของ broker จากค่าที่ provisioning ไว้ (ค่าเริ่มต้น ts.net:8443) เปลี่ยนเส้นทางไป Funnel โดยไม่ต้องแก้เฟิร์มแวร์
 
-**บรรทัด 1064–1089 (LWT + connect)**
+**บรรทัด 1067–1092 (LWT + connect)**
 
-```cpp:1064
+```cpp:1067
   const String statusTopic = config.mqttTopic + "/status";
   const String clientId = "rmutt-" + config.deviceId;
   DynamicJsonDocument offline(96);
@@ -1421,15 +1463,15 @@ void loop() {
   }
 ```
 
-- **1064:** หัวข้อ `<topic>/status` ที่จะเป็นทั้งที่ประกาศสถานะปกติและที่ LWT
-- **1065:** client id = `"rmutt-"` + deviceId ต้องไม่ซ้ำกันในหมู่ client ของ broker (ถ้าซ้ำ broker จะตัดตัวเก่าออก) การใช้ MAC ทำให้ไม่ซ้ำ
-- **1066–1070:** สร้าง payload ของ LWT `{"online":false,"deviceId":"..."}` ด้วย ArduinoJson (`DynamicJsonDocument offline(96)` จองหน่วยความจำ 96 ไบต์บน heap)
-- **1073–1079:** ถ้าไม่มี username ใช้ `connect(clientId, willTopic, willQos=1, willRetain=true, willMessage)`
-- **1080–1089:** ถ้ามี username ใช้อีก overload ที่รับ `(clientId, username, password, willTopic, 1, true, willMessage)` (บัญชีนี้ Backend ออกให้ตอน provision ส่วนสิทธิ์ของแต่ละบัญชีควบคุมด้วย ACL ของ Mosquitto Dynamic Security ตามที่คอมเมนต์ใน `ota_update.h` อ้างถึง ดูบทเครือข่ายและเซิร์ฟเวอร์)
+- **1067:** หัวข้อ `<topic>/status` ที่จะเป็นทั้งที่ประกาศสถานะปกติและที่ LWT
+- **1068:** client id = `"rmutt-"` + deviceId ต้องไม่ซ้ำกันในหมู่ client ของ broker (ถ้าซ้ำ broker จะตัดตัวเก่าออก) การใช้ MAC ทำให้ไม่ซ้ำ
+- **1069–1073:** สร้าง payload ของ LWT `{"online":false,"deviceId":"..."}` ด้วย ArduinoJson (`DynamicJsonDocument offline(96)` จองหน่วยความจำ 96 ไบต์บน heap)
+- **1076–1082:** ถ้าไม่มี username ใช้ `connect(clientId, willTopic, willQos=1, willRetain=true, willMessage)`
+- **1083–1092:** ถ้ามี username ใช้อีก overload ที่รับ `(clientId, username, password, willTopic, 1, true, willMessage)` (บัญชีนี้ Backend ออกให้ตอน provision ส่วนสิทธิ์ของแต่ละบัญชีควบคุมด้วย ACL ของ Mosquitto Dynamic Security ตามที่คอมเมนต์ใน `ota_update.h` อ้างถึง ดูบทเครือข่ายและเซิร์ฟเวอร์)
 
-**ไฟล์ `rmutt_esp32_air.ino` บรรทัด 1090–1112**
+**ไฟล์ `rmutt_esp32_air.ino` บรรทัด 1093–1119**
 
-```cpp:1090
+```cpp:1093
   if (!connected) {
     Serial.printf("MQTT connection failed, state: %d\n", mqttClient.state());
     return;
@@ -1455,14 +1497,14 @@ void loop() {
 }
 ```
 
-- **1090–1093:** ถ้าต่อไม่ได้ พิมพ์ `mqttClient.state()` (รหัสตามตารางใน README: `-4` timeout, `-2` เชื่อมไม่ได้, `4` รหัสผิด, `5` ไม่ได้รับอนุญาต) แล้วกลับ
-- **1095–1098:** สมัครรับ 4 หัวข้อด้วย QoS 1 (อย่างน้อยหนึ่งครั้ง): `/command`, `/provision-ack`, `/schedule-status`, `/history-ack`
-- **1100–1104:** ตั้งเวลาเริ่มส่งข้อมูลย้อนหลังแบบ **สุ่ม** 5–45 วินาทีนับจากนี้ **ทำไม:** ถ้า router ดับทั้งอาคารแล้วกลับมา บอร์ดทุกตัวจะต่อ MQTT ได้พร้อมกัน ถ้าทุกตัวส่งทันทีจะถล่ม broker/Backend การสุ่มกระจายโหลด
-- **1109–1111:** ส่ง `/status`, `/state` และ token ทันทีที่ต่อได้ (ทำให้ข้อความ retained ของบอร์ดนี้สดเสมอหลังเชื่อมต่อใหม่ ซึ่งแทนที่ข้อความ LWT `online:false`)
+- **1093–1098:** ถ้าต่อไม่ได้ พิมพ์ `mqttClient.state()` (รหัสตามตารางใน README: `-4` timeout, `-2` เชื่อมไม่ได้, `4` รหัสผิด, `5` ไม่ได้รับอนุญาต) แล้วกลับ
+- **1102–1105:** สมัครรับ 4 หัวข้อด้วย QoS 1 (อย่างน้อยหนึ่งครั้ง): `/command`, `/provision-ack`, `/schedule-status`, `/history-ack`
+- **1107–1111:** ตั้งเวลาเริ่มส่งข้อมูลย้อนหลังแบบ **สุ่ม** 5–45 วินาทีนับจากนี้ **ทำไม:** ถ้า router ดับทั้งอาคารแล้วกลับมา บอร์ดทุกตัวจะต่อ MQTT ได้พร้อมกัน ถ้าทุกตัวส่งทันทีจะถล่ม broker/Backend การสุ่มกระจายโหลด
+- **1116–1118:** ส่ง `/status`, `/state` และ token ทันทีที่ต่อได้ (ทำให้ข้อความ retained ของบอร์ดนี้สดเสมอหลังเชื่อมต่อใหม่ ซึ่งแทนที่ข้อความ LWT `online:false`)
 
-**ฟังก์ชัน `mqttCallback` บรรทัด 1114–1133**
+**ฟังก์ชัน `mqttCallback` บรรทัด 1121–1140**
 
-```cpp:1114
+```cpp:1121
 void mqttCallback(char *topic, byte *payload, unsigned int length) {
   if (length == 0 || length > 2048) return;
   const String incomingTopic(topic);
@@ -1485,15 +1527,15 @@ void mqttCallback(char *topic, byte *payload, unsigned int length) {
   }
 ```
 
-- **1114:** ลายเซ็นที่ PubSubClient กำหนด: `topic` เป็นสตริง C, `payload` เป็นไบต์ **ไม่มี `\0` ปิดท้าย** จึงต้องส่ง `length` ให้ตัวแยก JSON
-- **1115:** ทิ้งข้อความว่างหรือใหญ่เกิน 2048 ไบต์
-- **1116:** แปลง `topic` เป็น `String` เพื่อใช้ `==` เทียบ
-- **1117–1133:** ถ้าเป็น `<topic>/schedule-status`: แยก JSON, อ่าน `classScheduleConfigured` (ห้องมีตารางเรียนในฐานข้อมูลหรือไม่) และ `withinClassSchedule` (ตอนนี้อยู่ในคาบเรียนหรือไม่) ตัวดำเนินการ `|` ของ ArduinoJson (`doc["x"] | false`) คือ "ถ้าไม่มีคีย์/ชนิดไม่ตรง ใช้ค่านี้แทน" จดเวลาที่ได้รับ (`classScheduleReceivedAt`) แล้วคำนวณ `outsideSchedule` และ LED ใหม่ทันที
+- **1121:** ลายเซ็นที่ PubSubClient กำหนด: `topic` เป็นสตริง C, `payload` เป็นไบต์ **ไม่มี `\0` ปิดท้าย** จึงต้องส่ง `length` ให้ตัวแยก JSON
+- **1122:** ทิ้งข้อความว่างหรือใหญ่เกิน 2048 ไบต์
+- **1123:** แปลง `topic` เป็น `String` เพื่อใช้ `==` เทียบ
+- **1124–1140:** ถ้าเป็น `<topic>/schedule-status`: แยก JSON, อ่าน `classScheduleConfigured` (ห้องมีตารางเรียนในฐานข้อมูลหรือไม่) และ `withinClassSchedule` (ตอนนี้อยู่ในคาบเรียนหรือไม่) ตัวดำเนินการ `|` ของ ArduinoJson (`doc["x"] | false`) คือ "ถ้าไม่มีคีย์/ชนิดไม่ตรง ใช้ค่านี้แทน" จดเวลาที่ได้รับ (`classScheduleReceivedAt`) แล้วคำนวณ `outsideSchedule` และ LED ใหม่ทันที
 - **หลักสำคัญ:** callback ทำงานเร็ว ๆ แล้วกลับ งานหนักถูกเลื่อนไปทำใน `loop()`
 
-**บรรทัด 1134–1165**
+**บรรทัด 1141–1172**
 
-```cpp:1134
+```cpp:1141
   if (incomingTopic == config.mqttTopic + "/history-ack") {
     // ลบข้อมูลใน flash ใช้เวลา จึงทำต่อใน loop ไม่ทำใน callback
     DynamicJsonDocument acknowledgement(256);
@@ -1505,7 +1547,7 @@ void mqttCallback(char *topic, byte *payload, unsigned int length) {
   }
 ```
 
-```cpp:1143
+```cpp:1150
   if (incomingTopic == config.mqttTopic + "/provision-ack") {
     DynamicJsonDocument acknowledgement(512);
     if (deserializeJson(acknowledgement, payload, length)) return;
@@ -1531,13 +1573,13 @@ void mqttCallback(char *topic, byte *payload, unsigned int length) {
 }
 ```
 
-- **1134–1142 (`/history-ack`):** อ่าน `upTo` (ts สูงสุดที่ Backend บันทึกแล้ว) เก็บเข้า `historyPendingAckTs` และตั้ง `historyAckReady` ส่วนการลบ flash ซึ่งช้า (หลายสิบ ms ต่อ sector) ให้ `loop()` ทำ ไม่ทำใน callback (คอมเมนต์บรรทัด 1135 บอกเหตุผล)
+- **1134–1142 (`/history-ack`):** อ่าน `upTo` (ts สูงสุดที่ Backend บันทึกแล้ว) เก็บเข้า `historyPendingAckTs` และตั้ง `historyAckReady` ส่วนการลบ flash ซึ่งช้า (หลายสิบ ms ต่อ sector) ให้ `loop()` ทำ ไม่ทำใน callback (คอมเมนต์บรรทัด 1142 บอกเหตุผล)
 - **1143–1157 (`/provision-ack`):** ถ้า `activated == true` และ token ที่ตอบกลับตรงกับ token ที่บอร์ดถืออยู่ → ลบ `prov_token` ออกจาก NVS, ล้างตัวแปร และตั้ง `provisionAckClearReady` เหตุผลที่ตรวจ token ซ้ำ: ป้องกัน ack ของ token ตัวอื่น/ตัวเก่า
 - **1158–1165 (`/command`):** ถ้าไม่ใช่หัวข้อ command ก็จบ ถ้าใช่ คัดลอก payload ทีละไบต์ต่อเป็น `String pendingMqttCommand` (เพราะ buffer ของ PubSubClient จะถูกทับด้วยข้อความถัดไป) แล้วตั้ง `mqttCommandReady` ให้ loop ไปทำต่อใน `processMqttCommand()`
 
-**ไฟล์ `rmutt_esp32_air.ino` — `processMqttCommand()` ส่วนที่ตัดสินประเภทคำสั่ง บรรทัด 1223–1251** (เพิ่ม `unprovision`)
+**ไฟล์ `rmutt_esp32_air.ino` — `processMqttCommand()` ส่วนที่ตัดสินประเภทคำสั่ง บรรทัด 1259–1287** (เพิ่ม `unprovision`)
 
-```cpp:1223
+```cpp:1259
   const String action = document["action"] | "";
   if (action == "enter_setup") {
     Serial.println("MQTT requested BLE setup mode");
@@ -1570,15 +1612,15 @@ void mqttCallback(char *topic, byte *payload, unsigned int length) {
 ```
 
 - มี action พิเศษ **3 แบบ** ถ้าไม่มี `action` ถือว่าเป็นคำสั่งสถานะแอร์ (`state` object) ซึ่งผ่านการตรวจช่วงอุณหภูมิ (Saijo 18–29 °C, ยี่ห้ออื่น 16–30 °C) และค่าที่รองรับของ Saijo ก่อนจะ `saveAirState()`, `sendCurrentIrState(&previousState)` และ `publishState(commandId)` เพื่อตอบกลับพร้อม `commandId` ให้ Backend จับคู่คำสั่งกับผลได้
-- `enter_setup` (1224–1228): เปิด BLE ให้ตั้งค่าใหม่ (เฉพาะแอดมินผ่าน Backend)
-- `unprovision` (1229–1239): Backend ส่งมาเมื่อแอดมินลบแอร์ในแอป บรรทัด 1232 อ่าน `deviceId` จากคำสั่ง (`| ""` = ถ้าไม่มีให้เป็นสตริงว่าง) บรรทัด 1233–1236 ถ้าไม่ตรงกับ `config.deviceId` ของบอร์ดนี้ให้พิมพ์ log แล้ว **ไม่ทำอะไร** บรรทัด 1237 ถ้าตรงจึงเรียก `unprovisionAndRestart()` (อธิบายเต็มในหัวข้อ "ล้างบอร์ดเมื่อถูกลบออกจากแอป (unprovision)" ด้านล่าง)
-- `ota` (1240–1251): ตรวจ URL ด้วย `otaUrlAllowed` (ถ้าไม่ผ่านบันทึก `lastOtaError = "url_rejected"`) แล้วตั้ง `pendingOtaUrl` + `otaRequested` ให้ loop ทำต่อ
+- `enter_setup` (1260–1264): เปิด BLE ให้ตั้งค่าใหม่ (เฉพาะแอดมินผ่าน Backend)
+- `unprovision` (1265–1275): Backend ส่งมาเมื่อแอดมินลบแอร์ในแอป บรรทัด 1268 อ่าน `deviceId` จากคำสั่ง (`| ""` = ถ้าไม่มีให้เป็นสตริงว่าง) บรรทัด 1269–1272 ถ้าไม่ตรงกับ `config.deviceId` ของบอร์ดนี้ให้พิมพ์ log แล้ว **ไม่ทำอะไร** บรรทัด 1273 ถ้าตรงจึงเรียก `unprovisionAndRestart()` (อธิบายเต็มในหัวข้อ "ล้างบอร์ดเมื่อถูกลบออกจากแอป (unprovision)" ด้านล่าง)
+- `ota` (1276–1287): ตรวจ URL ด้วย `otaUrlAllowed` (ถ้าไม่ผ่านบันทึก `lastOtaError = "url_rejected"`) แล้วตั้ง `pendingOtaUrl` + `otaRequested` ให้ loop ทำต่อ
 
 ### 4) การอ่าน PZEM และ hysteresis
 
-**บรรทัด 1635–1645 (อ่านและกรองค่าเสีย)**
+**บรรทัด 1671–1681 (อ่านและกรองค่าเสีย)**
 
-```cpp:1635
+```cpp:1671
 void readPowerMeter() {
   const float voltage = pzem.voltage();
   const float current = pzem.current();
@@ -1592,13 +1634,13 @@ void readPowerMeter() {
     }
 ```
 
-- **1636–1638:** เรียกไลบรารีอ่านแรงดัน กระแส กำลัง แต่ละฟังก์ชันคุย UART กับ PZEM หนึ่งรอบและคืน `float` หรือ `NaN` (Not a Number) ถ้าอ่านพลาด
-- **1639–1640:** ถือว่าใช้ได้เมื่อทั้งสามค่าไม่ใช่ NaN (`isnan`)
-- **1642–1645:** ถ้าไม่ได้ นับความล้มเหลวติดกัน (กันล้น `uint8_t` ด้วยการเทียบกับ `UINT8_MAX`) ถ้าล้มเหลวติดกันถึง `PZEM_FAILURE_LIMIT` (3) ก็ทำให้ `available`, `acRunning`, `outsideSchedule` เป็น false และตัวนับเป็น 0 (บรรทัด 1646–1655) แล้วขอส่ง status ถ้าสถานะเปลี่ยน และ `return`
+- **1672–1674:** เรียกไลบรารีอ่านแรงดัน กระแส กำลัง แต่ละฟังก์ชันคุย UART กับ PZEM หนึ่งรอบและคืน `float` หรือ `NaN` (Not a Number) ถ้าอ่านพลาด
+- **1675–1676:** ถือว่าใช้ได้เมื่อทั้งสามค่าไม่ใช่ NaN (`isnan`)
+- **1678–1681:** ถ้าไม่ได้ นับความล้มเหลวติดกัน (กันล้น `uint8_t` ด้วยการเทียบกับ `UINT8_MAX`) ถ้าล้มเหลวติดกันถึง `PZEM_FAILURE_LIMIT` (3) ก็ทำให้ `available`, `acRunning`, `outsideSchedule` เป็น false และตัวนับเป็น 0 (บรรทัด 1682–1691) แล้วขอส่ง status ถ้าสถานะเปลี่ยน และ `return`
 
-**บรรทัด 1660–1671 (บันทึกค่าที่อ่านได้)**
+**บรรทัด 1696–1707 (บันทึกค่าที่อ่านได้)**
 
-```cpp:1660
+```cpp:1696
   const bool previousAvailable = powerMeasurements.available;
   const bool previousRunning = powerMeasurements.acRunning;
   const bool previousOutsideSchedule = powerMeasurements.outsideSchedule;
@@ -1613,13 +1655,13 @@ void readPowerMeter() {
 
 ```
 
-- **1660–1662:** จำค่าเดิมไว้เทียบทีหลังว่า "มีอะไรเปลี่ยนไหม" เพื่อตัดสินว่าต้องส่ง status ทันทีหรือไม่
-- **1663–1664:** อ่านสำเร็จ → `available = true` และรีเซ็ตตัวนับความล้มเหลว
-- **1665–1671:** เก็บค่า หมายเหตุ: `energy()`, `frequency()`, `pf()` อ่านเพิ่มอีก 3 ครั้ง (รวม 6 ค่า)
+- **1696–1698:** จำค่าเดิมไว้เทียบทีหลังว่า "มีอะไรเปลี่ยนไหม" เพื่อตัดสินว่าต้องส่ง status ทันทีหรือไม่
+- **1699–1700:** อ่านสำเร็จ → `available = true` และรีเซ็ตตัวนับความล้มเหลว
+- **1701–1707:** เก็บค่า หมายเหตุ: `energy()`, `frequency()`, `pf()` อ่านเพิ่มอีก 3 ครั้ง (รวม 6 ค่า)
 
-**บรรทัด 1672–1693 (hysteresis)**
+**บรรทัด 1708–1729 (hysteresis)**
 
-```cpp:1672
+```cpp:1708
   if (powerWatts >= AC_RUNNING_ON_WATTS) {
     powerMeasurements.stoppedSamples = 0;
     if (powerMeasurements.runningSamples < AC_RUNNING_CONFIRM_SAMPLES) {
@@ -1644,18 +1686,18 @@ void readPowerMeter() {
   }
 ```
 
-- **1672–1673:** ถ้ากำลังไฟ ≥ 30 W (`AC_RUNNING_ON_WATTS`): ล้างตัวนับ "หยุด" (เพราะไม่ติดกันแล้ว)
-- **1674–1676:** เพิ่มตัวนับ "ทำงาน" จนถึงเพดาน 3 (ไม่ให้เพิ่มเกิน)
-- **1677–1679:** ถึง 3 ครั้งติดกัน (≈ 6 วินาที) จึงตั้ง `acRunning = true`
-- **1680–1687:** ถ้ากำลังไฟ ≤ 10 W (`AC_RUNNING_OFF_WATTS`): สลับกัน ล้างตัวนับ "ทำงาน" นับ "หยุด" ถึง 3 → `acRunning = false`
-- **1688–1693:** ค่าอยู่ระหว่าง 10 ถึง 30 W (**แถบ hysteresis**): ไม่เปลี่ยนสถานะ และเคลียร์ตัวนับทั้งสอง คือต้อง "ติดกัน" จริง ๆ
+- **1708–1709:** ถ้ากำลังไฟ ≥ 30 W (`AC_RUNNING_ON_WATTS`): ล้างตัวนับ "หยุด" (เพราะไม่ติดกันแล้ว)
+- **1710–1712:** เพิ่มตัวนับ "ทำงาน" จนถึงเพดาน 3 (ไม่ให้เพิ่มเกิน)
+- **1713–1715:** ถึง 3 ครั้งติดกัน (≈ 6 วินาที) จึงตั้ง `acRunning = true`
+- **1716–1723:** ถ้ากำลังไฟ ≤ 10 W (`AC_RUNNING_OFF_WATTS`): สลับกัน ล้างตัวนับ "ทำงาน" นับ "หยุด" ถึง 3 → `acRunning = false`
+- **1724–1729:** ค่าอยู่ระหว่าง 10 ถึง 30 W (**แถบ hysteresis**): ไม่เปลี่ยนสถานะ และเคลียร์ตัวนับทั้งสอง คือต้อง "ติดกัน" จริง ๆ
 
 > [!WHY]
 > คอมเพรสเซอร์แอร์ตัด-ต่อเป็นช่วง ๆ กำลังไฟตกจากหลายร้อยวัตต์เหลือแค่พัดลม (หลักสิบวัตต์) การตัดสินจากค่าเดียวจะเห็นแอร์ "ปิด" ทุกครั้งที่คอมเพรสเซอร์พัก และเกณฑ์ขึ้น/ลงที่ต่างกัน (30 และ 10) ป้องกันการกระพริบเมื่อกำลังไฟแกว่งรอบเกณฑ์เดียว การนับ 3 ครั้งติดกันป้องกันสัญญาณรบกวนครั้งเดียว ตรรกะนี้ทำที่บอร์ดเพราะบอร์ดเห็นทุกค่าทุก 2 วินาทีและมีตัวนับอยู่แล้ว ส่งค่าดิบทุกค่าขึ้นเซิร์ฟเวอร์จะเปลืองเครือข่ายและต้องเก็บ state ต่อบอร์ดฝั่งเซิร์ฟเวอร์
 
-**ไฟล์ `rmutt_esp32_air.ino` บรรทัด 1695–1703**
+**ไฟล์ `rmutt_esp32_air.ino` บรรทัด 1731–1739**
 
-```cpp:1695
+```cpp:1731
   powerMeasurements.outsideSchedule =
       powerMeasurements.acRunning && !isWithinAllowedSchedule();
   accumulateHistorySample();
@@ -1667,10 +1709,10 @@ void readPowerMeter() {
   }
 ```
 
-- **1695–1696:** `outsideSchedule` จริงเมื่อแอร์ทำงานจริง **และ** ตอนนี้ไม่อยู่ในเวลาที่อนุญาต (`isWithinAllowedSchedule()` เลือกระหว่างตารางเรียนจาก Backend ที่สดไม่เกิน 2 นาที กับตารางรายวันบนบอร์ด)
-- **1697:** สะสมค่าเข้าช่วง 5 นาทีของ offline history
-- **1698:** `oledDisplay.pushPower(powerWatts)` ส่งค่าวัตต์ให้จอ OLED เก็บไว้วาดกราฟ (ข้างใน `pushPower` เก็บจริงแค่ทุก 5 วินาที แม้เรียกทุก 2 วินาที)
-- **1699–1703:** ถ้าค่าที่ Backend ควรรู้เปลี่ยน (เพิ่งพร้อมใช้งาน/สถานะทำงานเปลี่ยน/นอกตารางเปลี่ยน) ขอส่ง status ทันทีแทนที่จะรอ 10 วินาที
+- **1731–1732:** `outsideSchedule` จริงเมื่อแอร์ทำงานจริง **และ** ตอนนี้ไม่อยู่ในเวลาที่อนุญาต (`isWithinAllowedSchedule()` เลือกระหว่างตารางเรียนจาก Backend ที่สดไม่เกิน 2 นาที กับตารางรายวันบนบอร์ด)
+- **1733:** สะสมค่าเข้าช่วง 5 นาทีของ offline history
+- **1734:** `oledDisplay.pushPower(powerWatts)` ส่งค่าวัตต์ให้จอ OLED เก็บไว้วาดกราฟ (ข้างใน `pushPower` เก็บจริงแค่ทุก 5 วินาที แม้เรียกทุก 2 วินาที)
+- **1735–1739:** ถ้าค่าที่ Backend ควรรู้เปลี่ยน (เพิ่งพร้อมใช้งาน/สถานะทำงานเปลี่ยน/นอกตารางเปลี่ยน) ขอส่ง status ทันทีแทนที่จะรอ 10 วินาที
 
 ### 5) การเข้ารหัสสัญญาณของ `SaijoDenkiAC`
 
@@ -1914,9 +1956,9 @@ inline bool historyRecordValid(const HistoryRecord &record) {
 
 ### 7) OTA: `ota_update.h` และ `performOtaUpdate()`
 
-**ไฟล์ `firmware/rmutt_esp32_air/ota_update.h` บรรทัด 24–39**
+**ไฟล์ `firmware/rmutt_esp32_air/ota_update.h` บรรทัด 25–40**
 
-```cpp:24
+```cpp:25
 constexpr size_t OTA_MAX_URL_LENGTH = 300;
 
 inline bool otaUrlAllowed(const String &url, const String &host) {
@@ -1937,23 +1979,47 @@ inline bool otaUrlAllowed(const String &url, const String &host) {
 
 | บรรทัด | โค้ด | ความหมาย |
 |---|---|---|
-| 24 | `OTA_MAX_URL_LENGTH = 300` | จำกัดความยาว URL กัน input ใหญ่ผิดปกติ |
-| 26 | `inline bool otaUrlAllowed(const String &url, const String &host)` | `inline` ให้นิยามในไฟล์ `.h` ได้โดยไม่ชนกันเมื่อถูก include หลายที่; `const String &` ส่งแบบอ้างอิง ไม่คัดลอก |
-| 27 | `if (host.isEmpty() ... url.length() > OTA_MAX_URL_LENGTH) return false` | (เชื่อมสองเงื่อนไขด้วย "หรือ") ไม่มี host หรือ URL ยาวเกิน 300 → ปฏิเสธ |
-| 28 | `prefix = "https://" + host + "/firmware/"` | URL ต้องขึ้นต้นด้วย **MQTT host เดิมของบอร์ด** (host เดียวกับที่บอร์ดเชื่อถืออยู่แล้ว) ตามด้วย `/firmware/` |
-| 29 | `if (!url.startsWith(prefix) ... !url.endsWith(".bin")) return false` | (เชื่อมด้วย "หรือ") ต้องขึ้นต้นตาม prefix และลงท้าย `.bin` |
-| 30 | `url.indexOf("..") >= 0` | ห้ามมี `..` กัน path traversal (ไต่ออกนอกโฟลเดอร์) |
-| 31–37 | วนตรวจทุกตัวอักษรหลัง prefix | อนุญาตเฉพาะ `A–Z a–z 0–9 . _ -` ตัดอักขระพิเศษ เช่น `/ ? # %` ที่อาจใช้หลบเลี่ยงการตรวจ |
-| 38 | `return true` | ผ่านทุกด่าน |
+| 25 | `OTA_MAX_URL_LENGTH = 300` | จำกัดความยาว URL กัน input ใหญ่ผิดปกติ |
+| 27 | `inline bool otaUrlAllowed(const String &url, const String &host)` | `inline` ให้นิยามในไฟล์ `.h` ได้โดยไม่ชนกันเมื่อถูก include หลายที่; `const String &` ส่งแบบอ้างอิง ไม่คัดลอก |
+| 28 | `if (host.isEmpty() ... url.length() > OTA_MAX_URL_LENGTH) return false` | (เชื่อมสองเงื่อนไขด้วย "หรือ") ไม่มี host หรือ URL ยาวเกิน 300 → ปฏิเสธ |
+| 29 | `prefix = "https://" + host + "/firmware/"` | URL ต้องขึ้นต้นด้วย **MQTT host เดิมของบอร์ด** (host เดียวกับที่บอร์ดเชื่อถืออยู่แล้ว) ตามด้วย `/firmware/` |
+| 30 | `if (!url.startsWith(prefix) ... !url.endsWith(".bin")) return false` | (เชื่อมด้วย "หรือ") ต้องขึ้นต้นตาม prefix และลงท้าย `.bin` |
+| 31 | `url.indexOf("..") >= 0` | ห้ามมี `..` กัน path traversal (ไต่ออกนอกโฟลเดอร์) |
+| 32–38 | วนตรวจทุกตัวอักษรหลัง prefix | อนุญาตเฉพาะ `A–Z a–z 0–9 . _ -` ตัดอักขระพิเศษ เช่น `/ ? # %` ที่อาจใช้หลบเลี่ยงการตรวจ |
+| 39 | `return true` | ผ่านทุกด่าน |
 
-**บรรทัด 41–68**
+**บรรทัด 42–57** (ด่านช่อง OTA และค่าคงที่ของการลองใหม่)
 
-```cpp:41
+```cpp:42
 inline bool otaPartitionAvailable() {
   return esp_ota_get_next_update_partition(nullptr) != nullptr;
 }
 
-// คืนข้อความว่างเมื่อสำเร็จ (ผู้เรียกต้องรีบูตเอง) หรือข้อความบอกสาเหตุที่ล้มเหลว
+// ล้มเหลวเพราะเครือข่าย (หลุดกลางทาง, อ่านไม่ทัน, ต่อเซิร์ฟเวอร์ไม่ได้) ลองใหม่ได้
+// ส่วนไฟล์ไม่มี/ผิดชนิด/ที่ไม่พอ ลองกี่ครั้งก็ไม่ผ่าน ไม่ต้องลองซ้ำ
+//   6         = UPDATE_ERROR_STREAM ("Stream Read Timeout") อ่านข้อมูลไม่ได้ 30 วินาที
+//   -1 ถึง -11 = HTTPClient ต่อไม่ได้ / การเชื่อมต่อหลุด / อ่านหมดเวลา
+inline bool otaErrorIsTransient(int code) {
+  return code == 6 || (code <= -1 && code >= -11);
+}
+
+constexpr uint8_t OTA_MAX_ATTEMPTS = 3;
+constexpr uint32_t OTA_RETRY_DELAY_MS = 5000;
+// เวลารอข้อมูลแต่ละช่วง (ค่าเดิมของไลบรารี 8 วินาที) เผื่อเน็ตผ่าน Tailscale สะดุด
+constexpr int OTA_HTTP_TIMEOUT_MS = 20000;
+```
+
+| บรรทัด | โค้ด | ความหมาย |
+|---|---|---|
+| 42–44 | `otaPartitionAvailable()` | `esp_ota_get_next_update_partition(nullptr)` คืนพาร์ติชันที่ใช้เขียนรอบถัดไป ถ้าเป็น `nullptr` แปลว่าตารางพาร์ติชันไม่มีช่อง OTA ที่สอง |
+| 46–52 | `otaErrorIsTransient(code)` | แยก "ล้มเพราะเครือข่าย" (รหัส 6 = `UPDATE_ERROR_STREAM` อ่านข้อมูลไม่ทัน, −1 ถึง −11 = HTTPClient ต่อไม่ได้/หลุด/หมดเวลา) ซึ่งลองใหม่แล้วอาจผ่าน ออกจาก "ล้มเพราะไฟล์" (ไม่มีไฟล์ ผิดชนิด ที่ไม่พอ) ซึ่งลองกี่ครั้งก็ไม่ผ่าน |
+| 54 | `OTA_MAX_ATTEMPTS = 3` | ลองดาวน์โหลดได้สูงสุด 3 ครั้ง |
+| 55 | `OTA_RETRY_DELAY_MS = 5000` | เว้น 5 วินาทีก่อนลองรอบถัดไป ให้เน็ตที่สะดุดได้ฟื้น |
+| 57 | `OTA_HTTP_TIMEOUT_MS = 20000` | รอข้อมูลแต่ละช่วงนานสุด 20 วินาที (ค่าเริ่มต้นของไลบรารีคือ 8 วินาที) เผื่อเส้นทางผ่าน Tailscale Funnel ช้าเป็นพัก ๆ |
+
+**บรรทัด 62–99** (`runHttpsOta`)
+
+```cpp:62
 inline String runHttpsOta(
     const String &url,
     const char *caCert,
@@ -1961,38 +2027,62 @@ inline String runHttpsOta(
   if (!otaPartitionAvailable()) {
     return "no_ota_partition: flash partitions.csv via USB once";
   }
-  WiFiClientSecure client;
-  client.setCACert(caCert);
-  httpUpdate.rebootOnUpdate(false);
-  httpUpdate.setFollowRedirects(HTTPC_DISABLE_FOLLOW_REDIRECTS);
-  const t_httpUpdate_return result =
-      httpUpdate.update(client, url, currentVersion);
-  switch (result) {
-    case HTTP_UPDATE_OK:
-      return "";
-    case HTTP_UPDATE_NO_UPDATES:
-      return "no_updates";
-    default:
-      return String("failed(") + httpUpdate.getLastError() + "): " +
-             httpUpdate.getLastErrorString();
+  String lastError;
+  for (uint8_t attempt = 1; attempt <= OTA_MAX_ATTEMPTS; attempt++) {
+    if (WiFi.status() != WL_CONNECTED) {
+      lastError = "wifi_lost";
+      break;
+    }
+    WiFiClientSecure client;
+    client.setCACert(caCert);
+    HTTPUpdate updater(OTA_HTTP_TIMEOUT_MS);
+    updater.rebootOnUpdate(false);
+    updater.setFollowRedirects(HTTPC_DISABLE_FOLLOW_REDIRECTS);
+    Serial.printf("OTA: attempt %u/%u\n", attempt, OTA_MAX_ATTEMPTS);
+    const t_httpUpdate_return result =
+        updater.update(client, url, currentVersion);
+    if (result == HTTP_UPDATE_OK) return "";
+    if (result == HTTP_UPDATE_NO_UPDATES) return "no_updates";
+
+    const int code = updater.getLastError();
+    lastError = String("failed(") + code + "): " +
+                updater.getLastErrorString();
+    Serial.printf("OTA: attempt %u failed: %s\n", attempt, lastError.c_str());
+    if (!otaErrorIsTransient(code)) break;
+    if (attempt < OTA_MAX_ATTEMPTS) {
+      client.stop();
+      delay(OTA_RETRY_DELAY_MS);
+    } else {
+      lastError += " (x" + String(OTA_MAX_ATTEMPTS) + ")";
+    }
   }
+  return lastError;
 }
 ```
 
 | บรรทัด | โค้ด | ความหมาย |
 |---|---|---|
-| 41–43 | `otaPartitionAvailable()` | `esp_ota_get_next_update_partition(nullptr)` คืนพาร์ติชันที่ใช้เขียนรอบถัดไป ถ้าเป็น `nullptr` แปลว่าตารางพาร์ติชันไม่มีช่อง OTA ที่สอง |
-| 46–49 | `runHttpsOta(url, caCert, currentVersion)` | คืน `String`: ว่าง = สำเร็จ ไม่ว่าง = ข้อความสาเหตุ (ผู้เรียกเป็นคนรีบูต) |
-| 50–52 | ไม่มีช่อง OTA | คืนข้อความให้แฟลช `partitions.csv` ผ่าน USB ก่อน |
-| 53–54 | `WiFiClientSecure client; client.setCACert(caCert)` | สร้างการเชื่อมต่อ TLS ที่ตรวจเซิร์ฟเวอร์กับใบรากที่ฝังไว้ (สร้างเป็นตัวแปรโลคัล หมดฟังก์ชันก็ถูกทำลายและคืนหน่วยความจำ) |
-| 55 | `httpUpdate.rebootOnUpdate(false)` | ไม่ให้ไลบรารีรีบูตเอง ให้ผู้เรียกควบคุม |
-| 56 | `setFollowRedirects(HTTPC_DISABLE_FOLLOW_REDIRECTS)` | ไม่ตาม redirect (กัน URL ที่ผ่านการตรวจถูกเด้งไปที่อื่น) |
-| 57–58 | `httpUpdate.update(client, url, currentVersion)` | ดาวน์โหลด `.bin` แล้วเขียนลงพาร์ติชัน OTA ที่ว่าง ส่งเวอร์ชันปัจจุบันไปในส่วนหัวของคำขอ ถ้าไฟล์สมบูรณ์ ไลบรารีตั้ง `otadata` ให้บูตจากช่องใหม่ |
-| 59–67 | `switch (result)` | `HTTP_UPDATE_OK` → `""`; `HTTP_UPDATE_NO_UPDATES` → `"no_updates"`; อย่างอื่น → `failed(รหัส): ข้อความ` |
+| 62–65 | `runHttpsOta(url, caCert, currentVersion)` | คืน `String`: ว่าง = สำเร็จ ไม่ว่าง = ข้อความสาเหตุ (ผู้เรียกเป็นคนรีบูต) |
+| 66–68 | ไม่มีช่อง OTA | คืนข้อความให้แฟลช `partitions.csv` ผ่าน USB ก่อน (ไม่ลองซ้ำ) |
+| 70 | `for (attempt = 1; attempt <= OTA_MAX_ATTEMPTS; ...)` | วนลองดาวน์โหลดใหม่ **ตั้งแต่ต้อง** ทุกรอบ ไฟล์ที่ได้ไม่ครบจะไม่ถูกใช้ บอร์ดรันเฟิร์มแวร์เดิมต่อจนกว่าจะได้ครบ |
+| 71–74 | `WiFi.status() != WL_CONNECTED` | Wi-Fi หลุดแล้ว ลองต่อไปก็ไม่มีประโยชน์ คืน `wifi_lost` |
+| 75–76 | `WiFiClientSecure client; client.setCACert(caCert)` | สร้างการเชื่อมต่อ TLS ใหม่ทุกรอบ ตรวจเซิร์ฟเวอร์กับใบรากที่ฝังไว้ (ตัวแปรโลคัลของรอบ หมดรอบก็คืนหน่วยความจำ) |
+| 77 | `HTTPUpdate updater(OTA_HTTP_TIMEOUT_MS)` | สร้างตัวอัปเดตของรอบนี้พร้อมเวลารอ 20 วินาที (ไม่ใช้ `httpUpdate` ตัวกลางของไลบรารี เพราะต้องตั้งเวลารอเอง) |
+| 78 | `updater.rebootOnUpdate(false)` | ไม่ให้ไลบรารีรีบูตเอง ให้ผู้เรียกควบคุม |
+| 79 | `setFollowRedirects(HTTPC_DISABLE_FOLLOW_REDIRECTS)` | ไม่ตาม redirect (กัน URL ที่ผ่านการตรวจถูกเด้งไปที่อื่น) |
+| 81–82 | `updater.update(client, url, currentVersion)` | ดาวน์โหลด `.bin` แล้วเขียนลงพาร์ติชัน OTA ที่ว่าง ถ้าไฟล์สมบูรณ์ ไลบรารีตั้ง `otadata` ให้บูตจากช่องใหม่ |
+| 83–84 | `HTTP_UPDATE_OK` / `HTTP_UPDATE_NO_UPDATES` | สำเร็จคืน `""`, ไม่มีอะไรใหม่คืน `"no_updates"` |
+| 86–89 | `getLastError()` | เก็บรหัสและข้อความของรอบนี้เป็น `failed(รหัส): ข้อความ` แล้วพิมพ์ลง Serial |
+| 90 | `if (!otaErrorIsTransient(code)) break;` | ล้มเพราะไฟล์ ไม่ลองซ้ำ |
+| 91–96 | ลองใหม่หรือจบ | ยังเหลือรอบ → ปิดการเชื่อมต่อ รอ 5 วินาที แล้ววนใหม่ ครบ 3 รอบแล้ว → ต่อท้ายข้อความด้วย ` (x3)` ให้รู้ว่าลองครบแล้ว |
+| 98 | `return lastError` | ข้อความนี้กลายเป็น `otaError` ใน `/status` ให้หน้าเว็บแสดง |
 
-**ไฟล์ `rmutt_esp32_air.ino` บรรทัด 1553–1579**
+> [!WHY]
+> **ทำไมลองใหม่เฉพาะความผิดพลาดของเครือข่าย** การดาวน์โหลดเฟิร์มแวร์ 1–2 MB ผ่าน Funnel อาจสะดุดกลางทางเป็นครั้งคราว (เห็นเป็น `Stream Read Timeout`) ลองใหม่อัตโนมัติ 3 ครั้งช่วยให้ไม่ต้องกดสั่งซ้ำจากหน้าเว็บ แต่ถ้าปัญหาคือไฟล์ (ไม่มีไฟล์ ผิดชนิด ช่องไม่พอ) ลองซ้ำก็เสียเวลาเปล่าและทำให้บอร์ดค้างอยู่ในโหมด OTA นานขึ้น จึงหยุดทันที
 
-```cpp:1553
+**ไฟล์ `rmutt_esp32_air.ino` บรรทัด 1589–1615**
+
+```cpp:1589
 void performOtaUpdate() {
   otaRequested = false;
   const String url = pendingOtaUrl;
@@ -2022,20 +2112,20 @@ void performOtaUpdate() {
 }
 ```
 
-- **1554–1556:** เคลียร์ธงทันที (กันทำซ้ำ) และย้าย URL ไปตัวแปรโลคัล
-- **1558–1562:** ต้องมีเวลาจริงก่อน มิฉะนั้นการตรวจวันหมดอายุของใบรับรองล้ม ถ้าไม่ได้บันทึก `clock_not_synced` ใน `lastOtaError` ซึ่งไปปรากฏในฟิลด์ `otaError` ของ `/status`
-- **1565–1566:** ปิดการเชื่อมต่อ MQTT (TLS) และ `secureClient.stop()` ก่อนดาวน์โหลด เพราะ RAM ของ ESP32 ไม่พอเปิด TLS สองชุดพร้อมกัน (คอมเมนต์ในโค้ด) ถ้า OTA ล้ม `loop()` จะต่อ MQTT ใหม่เอง (`lastMqttReconnectAttempt = 0` ที่บรรทัด 1578 ทำให้ลองต่อทันที)
-- **1568–1574:** เรียก `runHttpsOta` ถ้าว่าง (สำเร็จ) รอ 300 ms ให้ log ออก แล้ว `ESP.restart()` จะบูตเข้าเฟิร์มแวร์ใหม่
-- **1575–1578:** ล้มเหลว: เก็บข้อความ (ตัดไม่เกิน 100 ตัวอักษร) ใส่ `lastOtaError` ขอส่ง status และทำงานต่อด้วยเฟิร์มแวร์เดิม
+- **1590–1592:** เคลียร์ธงทันที (กันทำซ้ำ) และย้าย URL ไปตัวแปรโลคัล
+- **1594–1598:** ต้องมีเวลาจริงก่อน มิฉะนั้นการตรวจวันหมดอายุของใบรับรองล้ม ถ้าไม่ได้บันทึก `clock_not_synced` ใน `lastOtaError` ซึ่งไปปรากฏในฟิลด์ `otaError` ของ `/status`
+- **1601–1602:** ปิดการเชื่อมต่อ MQTT (TLS) และ `secureClient.stop()` ก่อนดาวน์โหลด เพราะ RAM ของ ESP32 ไม่พอเปิด TLS สองชุดพร้อมกัน (คอมเมนต์ในโค้ด) ถ้า OTA ล้ม `loop()` จะต่อ MQTT ใหม่เอง (`lastMqttReconnectAttempt = 0` ที่บรรทัด 1614 ทำให้ลองต่อทันที)
+- **1604–1610:** เรียก `runHttpsOta` ถ้าว่าง (สำเร็จ) รอ 300 ms ให้ log ออก แล้ว `ESP.restart()` จะบูตเข้าเฟิร์มแวร์ใหม่
+- **1611–1614:** ล้มเหลว: เก็บข้อความ (ตัดไม่เกิน 100 ตัวอักษร) ใส่ `lastOtaError` ขอส่ง status และทำงานต่อด้วยเฟิร์มแวร์เดิม
 
 > [!WHY]
 > **ป้องกันเฟิร์มแวร์ปลอมสามชั้น** (ตามคอมเมนต์ในหัวไฟล์ `ota_update.h`): (1) คำสั่ง OTA มาทาง `/command` ซึ่งตาม ACL ของ Mosquitto Dynamic Security มีแต่ Backend ที่ส่งได้ (2) URL ต้องอยู่ใต้ `https://<MQTT host>/firmware/` ชี้ไปเซิร์ฟเวอร์อื่นไม่ได้ (host นี้คือชื่อ ts.net ตามค่าเริ่มต้น ดาวน์โหลดผ่าน Funnel 443 → Caddy หรือชื่อ DuckDNS เมื่อต่อตรง) (3) การดาวน์โหลดตรวจใบรับรอง HTTPS กับใบรากที่ฝังไว้ ผลคือแม้ใครแอบส่งข้อความ OTA ได้ ก็บังคับให้บอร์ดโหลดจากเซิร์ฟเวอร์ของเราเท่านั้น และไฟล์ที่เสียระหว่างทางจะไม่ถูกสลับไปใช้ **ข้อจำกัดที่ควรรู้:** โค้ดไม่มีลายเซ็นดิจิทัลของไฟล์ .bin เอง และไม่ได้เขียนกลไกยืนยันหลังบูต/rollback อัตโนมัติ ความปลอดภัยจึงอยู่ที่ช่องทางและเซิร์ฟเวอร์
 
 ### 8) การตัดสินว่ามีคน: `updateOccupancy()`
 
-**ไฟล์ `firmware/rmutt_esp32_occupancy/rmutt_esp32_occupancy.ino` บรรทัด 975–996**
+**ไฟล์ `firmware/rmutt_esp32_occupancy/rmutt_esp32_occupancy.ino` บรรทัด 1011–1032**
 
-```cpp:975
+```cpp:1011
 void updateOccupancy() {
   const bool previousAvailable = radarAvailable;
   const bool previousOccupied = occupied;
@@ -2062,18 +2152,18 @@ void updateOccupancy() {
 
 | บรรทัด | โค้ด | ความหมาย |
 |---|---|---|
-| 976–977 | `previousAvailable`, `previousOccupied` | เก็บค่าก่อนหน้าเพื่อเทียบตอนท้ายว่า "เปลี่ยนไหม" |
-| 981–985 | `freshFrame = a && b && c && d` | มีเฟรมใหม่เมื่อ: เรดาร์เริ่มแล้ว, เปิด Engineering mode แล้ว, `radar.isConnected()` (ไลบรารีเพิ่งได้เฟรมจากเรดาร์ในช่วงสั้น ๆ ที่ผ่านมา) และ `engineeringRetrieved()` คืน true `&&` ลัดวงจร (short-circuit) ดังนั้น `engineeringRetrieved()` ซึ่ง "กินธงเฟรม" ถูกเรียกเฉพาะเมื่อสามข้อแรกจริง |
-| 986–987 | `if (freshFrame) { lastRadarDataAt = millis();` | จำเวลาที่ได้ข้อมูลล่าสุด |
-| 988 | `bool detected = false;` | สมมติว่าไม่มีคนก่อน |
-| 989 | `for (uint8_t gate = FIRST_GATE; gate <= LAST_GATE; gate++)` | วนเกต 0–8 (9 เกต) |
-| 990 | `radar.stationaryEnergyAtGate(gate) > STATIC_ENERGY_THRESHOLD` | ถามพลังงานนิ่ง (0–100) ของเกตนี้ เทียบ **มากกว่า** 15 |
-| 991–992 | `detected = true; break;` | เจอเกตเดียวก็พอ หยุดวนทันที |
-| 995 | `lastRadarDetected = detected;` | เก็บผลของเฟรมล่าสุด |
+| 1012–1013 | `previousAvailable`, `previousOccupied` | เก็บค่าก่อนหน้าเพื่อเทียบตอนท้ายว่า "เปลี่ยนไหม" |
+| 1017–1021 | `freshFrame = a && b && c && d` | มีเฟรมใหม่เมื่อ: เรดาร์เริ่มแล้ว, เปิด Engineering mode แล้ว, `radar.isConnected()` (ไลบรารีเพิ่งได้เฟรมจากเรดาร์ในช่วงสั้น ๆ ที่ผ่านมา) และ `engineeringRetrieved()` คืน true `&&` ลัดวงจร (short-circuit) ดังนั้น `engineeringRetrieved()` ซึ่ง "กินธงเฟรม" ถูกเรียกเฉพาะเมื่อสามข้อแรกจริง |
+| 1022–1023 | `if (freshFrame) { lastRadarDataAt = millis();` | จำเวลาที่ได้ข้อมูลล่าสุด |
+| 1024 | `bool detected = false;` | สมมติว่าไม่มีคนก่อน |
+| 1025 | `for (uint8_t gate = FIRST_GATE; gate <= LAST_GATE; gate++)` | วนเกต 0–8 (9 เกต) |
+| 1026 | `radar.stationaryEnergyAtGate(gate) > STATIC_ENERGY_THRESHOLD` | ถามพลังงานนิ่ง (0–100) ของเกตนี้ เทียบ **มากกว่า** 15 |
+| 1027–1028 | `detected = true; break;` | เจอเกตเดียวก็พอ หยุดวนทันที |
+| 1031 | `lastRadarDetected = detected;` | เก็บผลของเฟรมล่าสุด |
 
-**บรรทัด 998–1011**
+**บรรทัด 1034–1047**
 
-```cpp:998
+```cpp:1034
   radarAvailable =
       radarInitialised &&
       radarEngineeringEnabled &&
@@ -2092,9 +2182,9 @@ void updateOccupancy() {
 
 | บรรทัด | โค้ด | ความหมาย |
 |---|---|---|
-| 998–1002 | `radarAvailable = init && engineering && lastRadarDataAt != 0 && millis() - lastRadarDataAt < 3000` | เรดาร์ถือว่าพร้อมเมื่อมีเฟรมภายใน 3 วินาทีที่ผ่านมา `lastRadarDataAt != 0` กันกรณียังไม่เคยได้เฟรมเลย |
-| 1003 | `occupied = radarAvailable && lastRadarDetected` | **มีคน = เรดาร์พร้อม และเฟรมล่าสุดเห็นเกตที่เกินเกณฑ์** ถ้าเรดาร์ไม่พร้อม จะรายงาน `occupied = false` แต่แอปดูจาก `radarAvailable` จึงแสดง "ไม่พร้อม" ไม่ใช่ "ว่าง" |
-| 1004–1010 | `if (previousAvailable != ... ) { statusPublishRequested = true; Serial.printf(...) }` | เมื่อใดสองค่านี้เปลี่ยน ขอส่ง status ทันทีและพิมพ์ log เช่น `Room occupancy: occupied (radar available)` |
+| 1034–1038 | `radarAvailable = init && engineering && lastRadarDataAt != 0 && millis() - lastRadarDataAt < 3000` | เรดาร์ถือว่าพร้อมเมื่อมีเฟรมภายใน 3 วินาทีที่ผ่านมา `lastRadarDataAt != 0` กันกรณียังไม่เคยได้เฟรมเลย |
+| 1039 | `occupied = radarAvailable && lastRadarDetected` | **มีคน = เรดาร์พร้อม และเฟรมล่าสุดเห็นเกตที่เกินเกณฑ์** ถ้าเรดาร์ไม่พร้อม จะรายงาน `occupied = false` แต่แอปดูจาก `radarAvailable` จึงแสดง "ไม่พร้อม" ไม่ใช่ "ว่าง" |
+| 1040–1046 | `if (previousAvailable != ... ) { statusPublishRequested = true; Serial.printf(...) }` | เมื่อใดสองค่านี้เปลี่ยน ขอส่ง status ทันทีและพิมพ์ log เช่น `Room occupancy: occupied (radar available)` |
 
 > [!NOTE]
 > ฟังก์ชันนี้ถูกเรียกทุก 250 ms แต่เรดาร์ส่งเฟรมราว ๆ 10 ครั้งต่อวินาที จึงมีบางรอบที่ไม่มีเฟรมใหม่ รอบเหล่านั้น `freshFrame` เป็น false และฟังก์ชันใช้ค่าที่จำไว้ (`lastRadarDetected`) ต่อ การออกแบบนี้คือสิ่งที่ทำให้สถานะไม่กระพริบ
@@ -2213,13 +2303,13 @@ void updateOccupancy() {
 
 > [!ASK]
 > **ถาม: บอร์ดสายแอร์ต่างจากบอร์ด IR อย่างไร ทำไมไม่รวมเป็นเฟิร์มแวร์เดียว?**
-> ตอบ: บอร์ดสายแอร์ใช้แทนรีโมตติดผนังของ Daikin ส่งคำสั่งเข้าสายทุก 1 วินาทีใน task แยก และได้สถานะจริงกลับมา (สายตอบไหม คอมเพรสเซอร์ทำงานไหม) ส่วน IR ยิงครั้งเดียวไม่มีคำตอบ ทั้งไลบรารี ขา และวิธีส่งต่างกันมาก จึงแยกเป็นสเก็ตช์ `rmutt_esp32_air_wired` (2.5.2-slm8) แต่ใช้ส่วนร่วมชุดเดียวกัน (BLE, MQTT topic, PZEM, OTA, ข้อมูลย้อนหลัง, จอ OLED; ไฟล์ `.h` ส่วนร่วมคัดลอกมาทุกไบต์) แอปแยกสองแบบจาก `controlType` ใน BLE IDENTITY (`"ir"`/`"wired"`) รายละเอียดอยู่ในบท 19
+> ตอบ: บอร์ดสายแอร์ใช้แทนรีโมตติดผนังของ Daikin ส่งคำสั่งเข้าสายทุก 1 วินาทีใน task แยก และได้สถานะจริงกลับมา (สายตอบไหม คอมเพรสเซอร์ทำงานไหม) ส่วน IR ยิงครั้งเดียวไม่มีคำตอบ ทั้งไลบรารี ขา และวิธีส่งต่างกันมาก จึงแยกเป็นสเก็ตช์ `rmutt_esp32_air_wired` (2.5.5-slm8) แต่ใช้ส่วนร่วมชุดเดียวกัน (BLE, MQTT topic, PZEM, OTA, ข้อมูลย้อนหลัง, จอ OLED; ไฟล์ `.h` ส่วนร่วมคัดลอกมาทุกไบต์) แอปแยกสองแบบจาก `controlType` ใน BLE IDENTITY (`"ir"`/`"wired"`) รายละเอียดอยู่ในบท 19
 
 ## สรุปและเช็กลิสต์ความเข้าใจ
 
 ถ้าตอบข้อเหล่านี้ได้ แปลว่าเข้าใจบทนี้แล้ว
 
-- [ ] บอกได้ว่ามีเฟิร์มแวร์หลักกี่ตัว (สาม: บอร์ดแอร์ IR **2.5.1**, บอร์ดแอร์สายแอร์ **2.5.2-slm8**, บอร์ดตรวจจับคน **1.3.3**) ตัวไหนทำอะไร และคุยกับ Backend ผ่านอะไร (MQTT เท่านั้น; BLE ไว้ตั้งค่า)
+- [ ] บอกได้ว่ามีเฟิร์มแวร์หลักกี่ตัว (สาม: บอร์ดแอร์ IR **2.5.2**, บอร์ดแอร์สายแอร์ **2.5.5-slm8**, บอร์ดตรวจจับคน **1.3.9**) ตัวไหนทำอะไร และคุยกับ Backend ผ่านอะไร (MQTT เท่านั้น; BLE ไว้ตั้งค่า)
 - [ ] อธิบายความต่าง MCU กับคอมพิวเตอร์, `setup()`/`loop()`, `millis()` กับ `delay()` และยกตัวอย่างในโค้ดได้
 - [ ] บอกขา GPIO17/16/18/25/26/27/0 และ 21/22 (จอ OLED) ของบอร์ดแอร์ IR, ขาเพิ่มของบอร์ดสายแอร์ (33/35/34/4) และ GPIO32/33/0 ของบอร์ดตรวจจับคนได้ พร้อมบอกว่าต่อไขว้ TX/RX
 - [ ] อธิบาย 38 kHz, mark/space, 72 บิต ของ Saijo และทำไมใช้ตารางเฟรมสำเร็จรูป
@@ -2232,9 +2322,10 @@ void updateOccupancy() {
 - [ ] อธิบายกฎมีคน: static energy เกต 0–8 > 15, ไฟ LED เขียว/แดงของบอร์ดตรวจคนบอกอะไร, availability หมดเวลา 3 วินาที, ตรวจทุก 250 ms, ส่ง status เมื่อเปลี่ยนหรือทุก 10 วินาที
 - [ ] อธิบายความต่างของ `partitions.csv` สองไฟล์ (`rmuttlog` กับ `coredump`) และทำไม nvs offset เดิมทำให้ค่าไม่หาย
 - [ ] บอกหน้าที่ `reset.ino`, `ld2410_pinscan.ino`, `update-root-ca.ps1` และ `history_log_test.cpp`
-- [ ] รู้ว่าเลขรุ่นจริงอยู่ที่ `FIRMWARE_VERSION` ในไฟล์ `.ino` (2.5.1 / 2.5.2-slm8 / 1.3.3) และเครื่องมือวินิจฉัยเรดาร์คือ `ld2410_pinscan`
+- [ ] รู้ว่าเลขรุ่นจริงอยู่ที่ `FIRMWARE_VERSION` ในไฟล์ `.ino` (2.5.2 / 2.5.5-slm8 / 1.3.9) และเครื่องมือวินิจฉัยเรดาร์คือ `ld2410_pinscan`
 - [ ] อธิบายจอ OLED: SH1106 1.3" I2C ซอฟต์แวร์บน GPIO21/22, U8g2 full buffer, ตรวจจอด้วย pull-up/pull-down, วาดทุก 400 ms หรือเมื่อ `poke()`, หน้า SETUP / CONNECTING / NORMAL (แบบ 1 ตัวเลขใหญ่), กราฟ 64 จุดทุก 5 วินาที, พักจอเมื่อแอร์ปิดเกิน 10 นาที
 - [ ] อธิบายว่าทำไมจอไม่ทำให้ MQTT/IR สะดุด (`due()` ออกเร็ว, `getLocalTime(..., 0)` ไม่รอ, ผูกกับ `updateStatusLeds()` ที่ถูกเรียกแม้ระหว่างรอ Wi-Fi)
 - [ ] อธิบาย `build_opt.h`: แฟล็ก `-D` ใส่ทุกไฟล์รวมไลบรารี, ปิด HW I2C/SPI ของ U8g2 และ IR 28 ยี่ห้อ, ผล 98% ของช่องแอป, ข้อแลกเปลี่ยน
 - [ ] เล่าลำดับ unprovision: คำสั่ง `/command` → ตรวจ `deviceId` → ตอบ `unprovisioned:true` → ล้าง retained → disconnect ปกติ → ล้าง NVS (+ `rmuttlog`) → รีบูตเข้า BLE และบอกความต่างของบอร์ดตรวจจับคน (ตั้งธงใน callback แล้วทำใน `loop()`)
-- [ ] บอกได้ว่าบอร์ดสายแอร์ใช้ไฟล์ร่วมอะไรกับบอร์ด IR (คัดลอกทุกไบต์: `oled_display.h`, `oled_ui.h`, `history_log.h`, `ota_update.h`, `letsencrypt_ca.h`, `partitions.csv`) และไปอ่านรายละเอียดโปรโตคอลที่บท 19
+- [ ] อธิบายได้ว่าบอร์ดลองดาวน์โหลด OTA ใหม่เมื่อไร (เฉพาะข้อผิดพลาดของเครือข่าย สูงสุด 3 ครั้ง) และบอร์ดที่ถูกลบตอนออฟไลน์ล้างตัวเองได้อย่างไร (`checkMqttAccountRemoved`)
+- [ ] บอกได้ว่าบอร์ดสายแอร์ใช้ไฟล์ร่วมอะไรกับบอร์ด IR (คัดลอกมา: `oled_display.h` (หมุนจอ 180°), `oled_ui.h`, `history_log.h`, `ota_update.h`, `letsencrypt_ca.h`, `partitions.csv`) และไปอ่านรายละเอียดโปรโตคอลที่บท 19
