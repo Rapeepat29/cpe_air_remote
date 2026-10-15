@@ -168,6 +168,9 @@ void connectMqtt();
 void mqttCallback(char *topic, byte *payload, unsigned int length);
 void updateStatusLeds();
 void unprovisionAndRestart(const String &reason);
+void checkMqttAccountRemoved(int state);
+extern uint32_t mqttAuthRejectedSince;
+extern uint16_t mqttAuthRejectCount;
 void initialiseRadar();
 void updateOccupancy();
 void captureRadarRawBytes();
@@ -814,9 +817,13 @@ void connectMqtt() {
         willPayload.c_str());
   }
   if (!connected) {
-    Serial.printf("MQTT connection failed, state: %d\n", mqttClient.state());
+    const int state = mqttClient.state();
+    Serial.printf("MQTT connection failed, state: %d\n", state);
+    checkMqttAccountRemoved(state);
     return;
   }
+  mqttAuthRejectedSince = 0;
+  mqttAuthRejectCount = 0;
   mqttClient.subscribe((config.mqttTopic + "/command").c_str(), 1);
   mqttClient.subscribe((config.mqttTopic + "/provision-ack").c_str(), 1);
   Serial.println("MQTT connected");
@@ -873,6 +880,35 @@ void mqttCallback(char *topic, byte *payload, unsigned int length) {
     }
     pendingOtaUrl = url;
     otaRequested = true;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// บัญชี MQTT ถูกลบไปแล้ว (เช่น กดลบอุปกรณ์ในแอปตอนบอร์ดไม่ได้รับคำสั่ง unprovision)
+// Broker จะตอบว่ารหัสผิด/ไม่มีสิทธิ์ทุกครั้ง บอร์ดต่อ Wi-Fi ได้แต่ใช้งานไม่ได้และไม่เปิด BLE
+// ถ้าถูกปฏิเสธติดกันนานเกิน MQTT_AUTH_REJECT_RESET_MS ให้ล้างค่าทั้งหมด (รวม Wi-Fi)
+// แล้วรีบูตเข้าโหมดตั้งค่าผ่านบลูทูธ เหมือนได้รับคำสั่ง unprovision
+//   state 4 = MQTT_CONNECT_BAD_CREDENTIALS, 5 = MQTT_CONNECT_UNAUTHORIZED
+// เน็ตหลุด/ต่อ Broker ไม่ได้ (state ติดลบ) ไม่นับ และไม่รีเซ็ตตัวนับ
+// ---------------------------------------------------------------------------
+constexpr uint32_t MQTT_AUTH_REJECT_RESET_MS = 2UL * 60UL * 1000UL;
+constexpr uint16_t MQTT_AUTH_REJECT_MIN_COUNT = 10;
+uint32_t mqttAuthRejectedSince = 0;
+uint16_t mqttAuthRejectCount = 0;
+
+void checkMqttAccountRemoved(int state) {
+  if (state != 4 && state != 5) return;
+  if (mqttAuthRejectedSince == 0) mqttAuthRejectedSince = millis();
+  if (mqttAuthRejectCount < 0xFFFF) mqttAuthRejectCount++;
+  const uint32_t rejectedFor = millis() - mqttAuthRejectedSince;
+  Serial.printf(
+      "MQTT account rejected %u times for %lus (reset after %lus)\n",
+      mqttAuthRejectCount,
+      static_cast<unsigned long>(rejectedFor / 1000),
+      static_cast<unsigned long>(MQTT_AUTH_REJECT_RESET_MS / 1000));
+  if (rejectedFor >= MQTT_AUTH_REJECT_RESET_MS &&
+      mqttAuthRejectCount >= MQTT_AUTH_REJECT_MIN_COUNT) {
+    unprovisionAndRestart("MQTT account was removed (rejected by broker)");
   }
 }
 
