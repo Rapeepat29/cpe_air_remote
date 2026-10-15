@@ -37,11 +37,16 @@ function typeOf(definition) {
 // ชนิดที่ MariaDB รายงานจะมีรูปแบบต่างจากที่เขียนเล็กน้อย
 // (ENUM ใส่ช่องว่าง, TIMESTAMP/DATETIME ไม่มีวงเล็บ ฯลฯ) ให้ทำให้เทียบกันได้
 function normalise(type) {
-  return String(type).toLowerCase().replace(/\s+/g, '').replace(/"/g, "'");
+  return String(type)
+    .toLowerCase()
+    // INT(10) UNSIGNED เป็นแค่ความกว้างตอนแสดงผล ไม่ใช่ขนาดจริง
+    .replace(/^(tinyint|smallint|int|bigint)\(\d+\)/, '$1')
+    .replace(/\s+/g, '')
+    .replace(/"/g, "'");
 }
 
 // เฉพาะชนิดที่ตั้งใจเปลี่ยนเท่านั้น ไม่ยุ่งกับ INT/BIGINT/อื่น ๆ
-const managed = /^(varchar|char|decimal|enum|datetime|timestamp)\b/i;
+const managed = /^(varchar|char|decimal|enum|datetime|timestamp|tinyint|smallint|int|bigint)\b/i;
 
 async function main() {
   console.log(`ฐานข้อมูล: ${config.db.database} @ ${config.db.host}:${config.db.port}`);
