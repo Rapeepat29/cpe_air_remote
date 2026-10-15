@@ -34,6 +34,7 @@ import {
   state,
 } from '../store.js';
 import { toastError, toastOk } from '../ui.js';
+import { createCompare } from './overview-compare.js';
 
 const PERIODS = [
   { key: 'day', label: 'วันนี้' },
@@ -61,11 +62,25 @@ export default {
     // การดึงข้อมูลรอบถัดไปจะได้ไม่ลบช่องที่พิมพ์ค้างอยู่ทิ้ง
     const heroContent = el('div');
     const heroTabs = el('div', { class: 'tabbar', style: { marginTop: '14px' } });
-    const rangePanel = createRangePanel(() => renderHeroTabs(heroTabs, rangePanel));
+    // ปุ่มช่วงเวลากับแผงเลือกวันต้องรู้จักกัน (เปิดอันหนึ่งต้องปิดอีกอัน)
+    // จึงประกาศ compare ไว้ก่อนแล้วให้ทั้งสองอ้างถึงกันผ่านฟังก์ชัน
+    const redrawHero = () => {
+      renderHero(heroContent, compare);
+      renderHeroTabs(heroTabs, rangePanel, compare);
+    };
+    const rangePanel = createRangePanel(
+      () => renderHeroTabs(heroTabs, rangePanel, compare),
+      () => compare.leave(),
+    );
+    const compare = createCompare({
+      onChange: redrawHero,
+      onOpen: () => rangePanel.close(),
+    });
     const heroBox = el('div', { class: 'card hero-card' }, [
       heroContent,
       heroTabs,
       rangePanel.node,
+      compare.node,
     ]);
     const statBox = el('div', { class: 'stat-mini-grid' });
     const pulseBox = el('div', { class: 'card pulse-card' });
@@ -79,8 +94,9 @@ export default {
     ]);
 
     function update() {
-      renderHero(heroContent);
-      renderHeroTabs(heroTabs, rangePanel);
+      renderHero(heroContent, compare);
+      renderHeroTabs(heroTabs, rangePanel, compare);
+      compare.refreshIfStale();
       renderStats(statBox);
       renderPulse(pulseBox, context);
       renderAlerts(alertBox);
@@ -98,18 +114,21 @@ export default {
  * ปุ่มช่วงเวลา: วันนี้ / 7 วัน / 30 วัน / เลือกวัน
  * ถ้ากำลังดูช่วงที่เลือกเอง ปุ่มสุดท้ายจะบอกช่วงนั้นแทนคำว่า "เลือกวัน"
  */
-function renderHeroTabs(box, rangePanel) {
+function renderHeroTabs(box, rangePanel, compare) {
   const query = state.summaryQuery;
   const period = query.period ?? 'week';
-  const isCustom = period === 'custom' && query.from;
+  const comparing = compare.active;
+  const isCustom = !comparing && period === 'custom' && query.from;
 
   const presets = PERIODS.map((item) =>
     el('button', {
-      class: `tab small${item.key === period ? ' active' : ''}`,
+      class: `tab small${!comparing && item.key === period ? ' active' : ''}`,
       type: 'button',
       text: item.label,
       onclick: () => {
         rangePanel.close();
+        // กดช่วงสำเร็จรูป = กลับมาดูกราฟเดิม
+        compare.leave();
         // ช่วงสำเร็จรูปใช้ from เป็น "วันสุดท้าย" ของช่วง ต้องล้างค่าที่เลือกเองไว้ก่อน
         loaders.summary({ period: item.key, from: null, to: null });
       },
@@ -131,19 +150,36 @@ function renderHeroTabs(box, rangePanel) {
       type: 'button',
       title: 'เลือกช่วงวันที่ต้องการดูเอง',
       'aria-expanded': rangePanel.isOpen() ? 'true' : 'false',
-      onclick: () => rangePanel.toggle(),
+      onclick: () => {
+        compare.close();
+        rangePanel.toggle();
+      },
     },
     [svg(icons.calendar(14)), customLabel],
   );
 
-  replace(box, [...presets, customTab]);
+  const compareTab = el(
+    'button',
+    {
+      class:
+        `tab small${comparing ? ' active' : ''}` +
+        `${compare.isOpen() ? ' open' : ''}`,
+      type: 'button',
+      title: 'เปรียบเทียบกราฟสองวัน หรือสองช่วงวัน',
+      'aria-expanded': compare.isOpen() ? 'true' : 'false',
+      onclick: () => compare.toggle(),
+    },
+    [svg(icons.compare(14)), 'เปรียบเทียบ'],
+  );
+
+  replace(box, [...presets, customTab, compareTab]);
 }
 
 /**
  * แผงเลือกช่วงวันเอง (สร้างครั้งเดียวต่อการเปิดหน้า)
  * ช่องวันที่เป็น พ.ศ. พิมพ์ วว/ดด/ปปปป หรือกดปฏิทินก็ได้
  */
-function createRangePanel(onToggle) {
+function createRangePanel(onToggle, onApply = () => {}) {
   const today = isoDate();
   const fromInput = thaiDateInput({ name: 'overview-from', max: today });
   const toInput = thaiDateInput({ name: 'overview-to', max: today });
@@ -248,6 +284,7 @@ function createRangePanel(onToggle) {
       return;
     }
     close();
+    onApply();
     await loaders.summary({ period: 'custom', from, to });
     if (state.errors?.summary) toastError(state.errors.summary);
   }
@@ -255,7 +292,11 @@ function createRangePanel(onToggle) {
   return { node, isOpen, open, close, toggle };
 }
 
-function renderHero(box) {
+function renderHero(box, compare) {
+  if (compare.active) {
+    compare.renderHero(box);
+    return;
+  }
   const summary = state.summary;
   const period = state.summaryQuery.period ?? 'week';
 
