@@ -158,7 +158,7 @@
 
 <p>ข้อดีที่โปรเจคนี้ได้ใช้จริง:</p>
 <ol>
-<li><strong>บังคับโครงสร้าง</strong> — คอลัมน์ <code>voltage</code> เป็น <code>DECIMAL(8,2)</code> ใส่ข้อความไม่ได้ ข้อมูลขยะเข้าไม่ได้ตั้งแต่ชั้นฐานข้อมูล</li>
+<li><strong>บังคับโครงสร้าง</strong> — คอลัมน์ <code>voltage</code> เป็น <code>DECIMAL(4,1)</code> ใส่ข้อความไม่ได้ ข้อมูลขยะเข้าไม่ได้ตั้งแต่ชั้นฐานข้อมูล</li>
 <li><strong>บังคับความสัมพันธ์</strong> — สร้างแอร์ในห้องที่ไม่มีอยู่จริงไม่ได้ (foreign key)</li>
 <li><strong>Transaction</strong> — หลายคำสั่งสำเร็จพร้อมกันหรือยกเลิกพร้อมกัน ข้อมูลไม่ค้างครึ่ง ๆ กลาง ๆ</li>
 <li><strong>Query ยืดหยุ่น</strong> — รายงานค่าไฟจะรวมตามตึก/ห้อง/เครื่อง ช่วงวันไหนก็ได้ด้วย <code>GROUP BY</code> คำสั่งเดียว</li>
@@ -187,12 +187,12 @@
 <tr>
 <td><code>VARCHAR(n)</code></td>
 <td>ข้อความยาวไม่เกิน n ตัวอักษร เก็บเท่าที่ใช้จริง</td>
-<td><code>username VARCHAR(100)</code>, <code>room_number VARCHAR(20)</code></td>
+<td><code>username VARCHAR(30)</code>, <code>room_number VARCHAR(10)</code></td>
 </tr>
 <tr>
 <td><code>CHAR(n)</code></td>
 <td>ข้อความยาวตายตัว n ตัว</td>
-<td><code>id CHAR(36)</code> (UUID), <code>otp_hash CHAR(64)</code> (HMAC-SHA256 แบบ hex)</td>
+<td><code>id CHAR(36)</code> (UUID), <code>password_hash CHAR(60)</code> (bcrypt), <code>device_id CHAR(18)</code>, <code>otp_hash CHAR(64)</code> (HMAC-SHA256 แบบ hex)</td>
 </tr>
 <tr>
 <td><code>TINYINT UNSIGNED</code></td>
@@ -202,17 +202,17 @@
 <tr>
 <td><code>SMALLINT UNSIGNED</code></td>
 <td>จำนวนเต็ม 0–65535 ใช้ 2 ไบต์</td>
-<td><code>mqtt_port</code>, <code>room_index</code>, <code>history_pending</code></td>
+<td><code>mqtt_port</code>, <code>room_index</code>, <code>sample_count</code>, <code>runtime_seconds</code> (นับได้ไม่เกิน 3600 ต่อชั่วโมง)</td>
 </tr>
 <tr>
 <td><code>INT UNSIGNED</code></td>
 <td>จำนวนเต็ม 0–ประมาณ 4.29 พันล้าน</td>
-<td><code>sample_count</code>, <code>runtime_seconds</code></td>
+<td><code>token_version</code></td>
 </tr>
 <tr>
 <td><code>DECIMAL(p,s)</code></td>
 <td>ทศนิยมแบบแม่นยำ p หลักรวม มี s หลักหลังจุด</td>
-<td><code>voltage DECIMAL(8,2)</code>, <code>energy_kwh DECIMAL(12,3)</code></td>
+<td><code>voltage DECIMAL(4,1)</code>, <code>energy_kwh DECIMAL(10,3)</code></td>
 </tr>
 <tr>
 <td><code>BOOLEAN</code></td>
@@ -525,12 +525,12 @@ Transaction คือกลุ่มคำสั่งที่ต้อง "ส
 <h3 id="ตาราง-users--บัญชีผู้ใช้">ตาราง users — บัญชีผู้ใช้<a class="anchor" href="#ตาราง-users--บัญชีผู้ใช้">#</a></h3>
 <p>ไฟล์: <code>backend/database/schema.sql</code></p>
 <div class="code-block"><span class="code-lang">sql</span><div class="hl"><pre><span></span><code><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="k">IF</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">EXISTS</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="p">(</span>
-<span class="w">  </span><span class="n">username</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<span class="w">  </span><span class="n">password_hash</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">255</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<span class="w">  </span><span class="n">first_name</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">''</span><span class="p">,</span>
-<span class="w">  </span><span class="n">last_name</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">''</span><span class="p">,</span>
-<span class="w">  </span><span class="n">email</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">190</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<span class="w">  </span><span class="n">phone</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">  </span><span class="n">username</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">  </span><span class="n">password_hash</span><span class="w"> </span><span class="nb">CHAR</span><span class="p">(</span><span class="mi">60</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">  </span><span class="n">first_name</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">''</span><span class="p">,</span>
+<span class="w">  </span><span class="n">last_name</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">''</span><span class="p">,</span>
+<span class="w">  </span><span class="n">email</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">  </span><span class="n">phone</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
 <span class="w">  </span><span class="k">role</span><span class="w"> </span><span class="n">ENUM</span><span class="p">(</span><span class="s1">'admin'</span><span class="p">,</span><span class="w"> </span><span class="s1">'staff'</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">'staff'</span><span class="p">,</span>
 <span class="w">  </span><span class="n">is_active</span><span class="w"> </span><span class="nb">BOOLEAN</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">TRUE</span><span class="p">,</span>
 <span class="w">  </span><span class="n">token_version</span><span class="w"> </span><span class="nb">INT</span><span class="w"> </span><span class="n">UNSIGNED</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
@@ -551,7 +551,7 @@ Transaction คือกลุ่มคำสั่งที่ต้อง "ส
 <ol>
 <li><strong>บรรทัด 1</strong> — สร้างตาราง <code>users</code> ถ้ายังไม่มี</li>
 <li><strong>บรรทัด 2</strong> — <code>username</code> ชื่อเข้าระบบ เป็นคีย์หลัก (บรรทัด 16) <code>NOT NULL</code> เพราะคีย์หลักห้ามว่าง</li>
-<li><strong>บรรทัด 3</strong> — <code>password_hash</code> เก็บ <strong>ค่าแฮช bcrypt</strong> ไม่ใช่รหัสผ่านจริง (bcrypt ยาว 60 ตัว เผื่อไว้ 255 เผื่อเปลี่ยนอัลกอริทึมในอนาคต)</li>
+<li><strong>บรรทัด 3</strong> — <code>password_hash</code> เก็บ <strong>ค่าแฮช bcrypt</strong> ไม่ใช่รหัสผ่านจริง (bcrypt ยาว 60 ตัวเสมอ จึงใช้ <code>CHAR(60)</code> ตรงตัว)</li>
 <li><strong>บรรทัด 4–5</strong> — ชื่อ/นามสกุล <code>DEFAULT ''</code> เพื่อไม่ต้องจัดการ <code>NULL</code> ในโค้ด</li>
 <li><strong>บรรทัด 6</strong> — <code>email</code> ใช้รับ OTP ตอนลืมรหัสผ่าน และห้ามซ้ำ (บรรทัด 17)</li>
 <li><strong>บรรทัด 7</strong> — <code>phone</code> เป็น <code>NULL</code> ได้ (ไม่บังคับในระดับฐานข้อมูล)</li>
@@ -577,33 +577,33 @@ Transaction คือกลุ่มคำสั่งที่ต้อง "ส
 <tbody>
 <tr>
 <td><code>username</code></td>
-<td>VARCHAR(100) PK</td>
+<td>VARCHAR(30) PK</td>
 <td>ชื่อเข้าระบบ</td>
 <td>ไม่ซ้ำโดยธรรมชาติ ใช้เป็นคีย์ได้เลย อ่านง่ายเวลาเห็นใน <code>created_by</code></td>
 </tr>
 <tr>
 <td><code>password_hash</code></td>
-<td>VARCHAR(255)</td>
+<td>CHAR(60)</td>
 <td>แฮช bcrypt (cost 12)</td>
 <td>ถ้าฐานข้อมูลหลุด คนร้ายไม่ได้รหัสผ่านจริง</td>
 </tr>
 <tr>
 <td><code>first_name</code>, <code>last_name</code></td>
-<td>VARCHAR(100)</td>
+<td>VARCHAR(30)</td>
 <td>ชื่อ-นามสกุล</td>
 <td>ใช้แสดงผลและใส่ในอีเมล OTP</td>
 </tr>
 <tr>
 <td><code>email</code></td>
-<td>VARCHAR(190) UNIQUE</td>
+<td>VARCHAR(100) UNIQUE</td>
 <td>อีเมล</td>
 <td>ช่องทางส่ง OTP ต้องไม่ซ้ำ ไม่งั้นไม่รู้ว่าจะรีเซ็ตบัญชีไหน</td>
 </tr>
 <tr>
 <td><code>phone</code></td>
-<td>VARCHAR(30) NULL</td>
+<td>VARCHAR(10) NULL</td>
 <td>เบอร์โทร</td>
-<td>เก็บเป็นข้อความเพราะมีเลข 0 นำหน้าและเครื่องหมาย +</td>
+<td>เก็บเป็นข้อความเพราะมีเลข 0 นำหน้า เบอร์ไทยมี 9–10 หลักจึงใช้ <code>VARCHAR(10)</code> (ตัวเลขล้วน <code>normalizePhone</code> ตัดขีดและช่องว่างก่อนบันทึก)</td>
 </tr>
 <tr>
 <td><code>role</code></td>
@@ -643,8 +643,8 @@ Transaction คือกลุ่มคำสั่งที่ต้อง "ส
 </tr>
 </tbody>
 </table></div>
-<div class="callout why"><div class="callout-title">ทำไม</div><p><strong>ทำไมอีเมลยาว VARCHAR(190) ไม่ใช่ 255</strong>
-<code>utf8mb4</code> ใช้สูงสุด 4 ไบต์ต่อตัวอักษร 190 × 4 = 760 ไบต์ ซึ่งไม่เกินขีด 767 ไบต์ต่อคอลัมน์ใน index ของ InnoDB รูปแบบแถวรุ่นเก่า ส่วน 255 × 4 = 1020 ไบต์ อาจสร้าง UNIQUE index ไม่ได้บนบางเซิร์ฟเวอร์ ตัวเลข 190 จึงเป็นค่าปลอดภัยที่นิยมใช้</p></div>
+<div class="callout why"><div class="callout-title">ทำไม</div><p><strong>ทำไมไม่ตั้ง VARCHAR(255) ให้ทุกคอลัมน์</strong>
+ขนาดคอลัมน์ควรสะท้อนข้อมูลจริง เช่น เบอร์โทรไทยมีไม่เกิน 10 หลักจึงใช้ VARCHAR(10) แฮช bcrypt ยาว 60 ตัวเสมอจึงใช้ CHAR(60) รหัสบอร์ด ESP32-XXXXXXXXXXXX ยาว 18 ตัวจึงใช้ CHAR(18) ข้อดีคือฐานข้อมูลช่วยกันข้อมูลผิดรูปแบบที่ชั้นล่างสุด index เล็กลง และคนอ่านสคีมารู้ทันทีว่าช่องนั้นรับข้อมูลหน้าตาแบบไหน ส่วนข้อความที่ผู้ใช้พิมพ์เองและอาจยาวขึ้นในอนาคต เช่น <code>detail</code> และ <code>note</code> ยังเผื่อไว้ 255 ถ้าต้องปรับขนาดภายหลัง ใช้ <code>npm run db:migrate:types</code> (สคริปต์ <code>scripts/migrate-column-types.js</code>) ซึ่งอ่านชนิดจาก <code>schema.sql</code> แล้วปรับเฉพาะคอลัมน์ที่ไม่ตรง</p></div>
 
 <div class="callout why"><div class="callout-title">ทำไม</div><p><strong>token_version ทำงานอย่างไร</strong>
 JWT ที่ออกให้ตอนล็อกอินบรรจุ <code>ver: Number(user.token_version)</code> ไว้ (<code>routes/auth.js</code>) ทุกคำขอ <code>middleware/authenticate.js</code> อ่าน <code>token_version</code> ปัจจุบันจากฐานข้อมูลมาเทียบ ถ้าไม่ตรงก็ปฏิเสธ เมื่อเปลี่ยนรหัสผ่าน รีเซ็ตรหัส หรือแอดมินเปลี่ยนสิทธิ์ ระบบทำ <code>token_version = token_version + 1</code> ทำให้ token ทุกใบที่ออกไปก่อนหน้า "ตาย" ทันที โดยไม่ต้องเก็บรายการ token ที่ถูกเพิกถอน</p></div>
@@ -654,11 +654,11 @@ JWT ที่ออกให้ตอนล็อกอินบรรจุ <co
 <p>ไฟล์: <code>backend/database/schema.sql</code></p>
 <div class="code-block"><span class="code-lang">sql</span><div class="hl"><pre><span></span><code><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="k">IF</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">EXISTS</span><span class="w"> </span><span class="n">password_reset_otps</span><span class="w"> </span><span class="p">(</span>
 <span class="w">  </span><span class="n">id</span><span class="w"> </span><span class="nb">CHAR</span><span class="p">(</span><span class="mi">36</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<span class="w">  </span><span class="n">username</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">  </span><span class="n">username</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
 <span class="w">  </span><span class="n">otp_hash</span><span class="w"> </span><span class="nb">CHAR</span><span class="p">(</span><span class="mi">64</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
 <span class="w">  </span><span class="n">reset_token_hash</span><span class="w"> </span><span class="nb">CHAR</span><span class="p">(</span><span class="mi">64</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
 <span class="w">  </span><span class="n">expires_at</span><span class="w"> </span><span class="n">DATETIME</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<span class="w">  </span><span class="n">attempts</span><span class="w"> </span><span class="n">TINYINT</span><span class="w"> </span><span class="n">UNSIGNED</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">  </span><span class="n">attempts</span><span class="w"> </span><span class="nb">TINYINT</span><span class="w"> </span><span class="n">UNSIGNED</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
 <span class="w">  </span><span class="n">verified_at</span><span class="w"> </span><span class="n">DATETIME</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
 <span class="w">  </span><span class="n">used_at</span><span class="w"> </span><span class="n">DATETIME</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
 <span class="w">  </span><span class="n">created_at</span><span class="w"> </span><span class="n">DATETIME</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">CURRENT_TIMESTAMP</span><span class="p">,</span>
@@ -706,7 +706,7 @@ JWT ที่ออกให้ตอนล็อกอินบรรจุ <co
 </tr>
 <tr>
 <td><code>username</code></td>
-<td>VARCHAR(100) FK</td>
+<td>VARCHAR(30) FK</td>
 <td>ผู้ขอรีเซ็ต</td>
 <td>ผูกกับบัญชี</td>
 </tr>
@@ -758,12 +758,12 @@ JWT ที่ออกให้ตอนล็อกอินบรรจุ <co
 <h3 id="ตาราง-rooms--ห้อง">ตาราง rooms — ห้อง<a class="anchor" href="#ตาราง-rooms--ห้อง">#</a></h3>
 <p>ไฟล์: <code>backend/database/schema.sql</code></p>
 <div class="code-block"><span class="code-lang">sql</span><div class="hl"><pre><span></span><code><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="k">IF</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">EXISTS</span><span class="w"> </span><span class="n">rooms</span><span class="w"> </span><span class="p">(</span>
-<span class="w">  </span><span class="n">room_number</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<span class="w">  </span><span class="n">floor_number</span><span class="w"> </span><span class="n">TINYINT</span><span class="w"> </span><span class="n">UNSIGNED</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">  </span><span class="n">room_number</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">  </span><span class="n">floor_number</span><span class="w"> </span><span class="nb">TINYINT</span><span class="w"> </span><span class="n">UNSIGNED</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
 <span class="w">  </span><span class="n">room_index</span><span class="w"> </span><span class="nb">SMALLINT</span><span class="w"> </span><span class="n">UNSIGNED</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
-<span class="w">  </span><span class="n">room_type</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">'Classroom'</span><span class="p">,</span>
-<span class="w">  </span><span class="n">created_by</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<span class="w">  </span><span class="n">updated_by</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">  </span><span class="n">room_type</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">'Classroom'</span><span class="p">,</span>
+<span class="w">  </span><span class="n">created_by</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">  </span><span class="n">updated_by</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
 <span class="w">  </span><span class="n">created_at</span><span class="w"> </span><span class="n">DATETIME</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">CURRENT_TIMESTAMP</span><span class="p">,</span>
 <span class="w">  </span><span class="n">updated_at</span><span class="w"> </span><span class="n">DATETIME</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">CURRENT_TIMESTAMP</span>
 <span class="w">    </span><span class="k">ON</span><span class="w"> </span><span class="k">UPDATE</span><span class="w"> </span><span class="k">CURRENT_TIMESTAMP</span><span class="p">,</span>
@@ -777,7 +777,7 @@ JWT ที่ออกให้ตอนล็อกอินบรรจุ <co
 </div>
 
 <ol>
-<li><strong>บรรทัด 2</strong> — <code>room_number</code> เลขห้อง เช่น <code>'16302'</code> หรือ <code>'CL503'</code> เก็บเป็นข้อความเพราะมีตัวอักษรปน (รูปแบบที่โค้ดยอมรับคือ <code>/^[A-Z0-9][A-Z0-9_-]{1,19}$/</code> ยาวไม่เกิน 20 ตรงกับ <code>VARCHAR(20)</code>)</li>
+<li><strong>บรรทัด 2</strong> — <code>room_number</code> เลขห้อง เช่น <code>'16302'</code> หรือ <code>'CL503'</code> เก็บเป็นข้อความเพราะมีตัวอักษรปน (รูปแบบที่โค้ดยอมรับคือ <code>/^[A-Z0-9][A-Z0-9_-]{1,9}$/</code> ยาวไม่เกิน 10 ตรงกับ <code>VARCHAR(10)</code>)</li>
 <li><strong>บรรทัด 3</strong> — <code>floor_number</code> ชั้น ใช้จัดกลุ่มในหน้าแอป</li>
 <li><strong>บรรทัด 4</strong> — <code>room_index</code> ลำดับห้องในชั้น ใช้เรียงให้ตรงกับผังจริง</li>
 <li><strong>บรรทัด 5</strong> — <code>room_type</code> ประเภทห้อง (Classroom, Laboratory, ...)</li>
@@ -797,7 +797,7 @@ JWT ที่ออกให้ตอนล็อกอินบรรจุ <co
 <tbody>
 <tr>
 <td><code>room_number</code></td>
-<td>VARCHAR(20) PK</td>
+<td>VARCHAR(10) PK</td>
 <td>เลขห้อง</td>
 <td>คนใช้เลขห้องเรียกห้องอยู่แล้ว เป็นคีย์ธรรมชาติ</td>
 </tr>
@@ -815,13 +815,13 @@ JWT ที่ออกให้ตอนล็อกอินบรรจุ <co
 </tr>
 <tr>
 <td><code>room_type</code></td>
-<td>VARCHAR(100)</td>
+<td>VARCHAR(50)</td>
 <td>ประเภทห้อง</td>
 <td>เป็นข้อความอิสระ เพิ่มประเภทใหม่ได้โดยไม่แก้ schema</td>
 </tr>
 <tr>
 <td><code>created_by</code>, <code>updated_by</code></td>
-<td>VARCHAR(100)</td>
+<td>VARCHAR(30)</td>
 <td>ผู้สร้าง/แก้</td>
 <td>ตรวจย้อนหลัง</td>
 </tr>
@@ -844,15 +844,15 @@ JWT ที่ออกให้ตอนล็อกอินบรรจุ <co
 <p>ไฟล์: <code>backend/database/schema.sql</code></p>
 <div class="code-block"><span class="code-lang">sql</span><div class="hl"><pre><span></span><code><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="k">IF</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">EXISTS</span><span class="w"> </span><span class="n">class_schedules</span><span class="w"> </span><span class="p">(</span>
 <span class="w">  </span><span class="n">id</span><span class="w"> </span><span class="nb">CHAR</span><span class="p">(</span><span class="mi">36</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<span class="w">  </span><span class="n">room_number</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<span class="w">  </span><span class="n">day_of_week</span><span class="w"> </span><span class="n">TINYINT</span><span class="w"> </span><span class="n">UNSIGNED</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<span class="w">  </span><span class="n">subject_name</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">150</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<span class="w">  </span><span class="n">section_name</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">80</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">''</span><span class="p">,</span>
-<span class="w">  </span><span class="n">instructor</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">150</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">''</span><span class="p">,</span>
+<span class="w">  </span><span class="n">room_number</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">  </span><span class="n">day_of_week</span><span class="w"> </span><span class="nb">TINYINT</span><span class="w"> </span><span class="n">UNSIGNED</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">  </span><span class="n">subject_name</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">  </span><span class="n">section_name</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">''</span><span class="p">,</span>
+<span class="w">  </span><span class="n">instructor</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">''</span><span class="p">,</span>
 <span class="w">  </span><span class="n">start_time</span><span class="w"> </span><span class="k">TIME</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
 <span class="w">  </span><span class="n">end_time</span><span class="w"> </span><span class="k">TIME</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<span class="w">  </span><span class="n">created_by</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<span class="w">  </span><span class="n">updated_by</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">  </span><span class="n">created_by</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">  </span><span class="n">updated_by</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
 <span class="w">  </span><span class="n">created_at</span><span class="w"> </span><span class="n">DATETIME</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">CURRENT_TIMESTAMP</span><span class="p">,</span>
 <span class="w">  </span><span class="n">updated_at</span><span class="w"> </span><span class="n">DATETIME</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">CURRENT_TIMESTAMP</span>
 <span class="w">    </span><span class="k">ON</span><span class="w"> </span><span class="k">UPDATE</span><span class="w"> </span><span class="k">CURRENT_TIMESTAMP</span><span class="p">,</span>
@@ -899,7 +899,7 @@ JWT ที่ออกให้ตอนล็อกอินบรรจุ <co
 </tr>
 <tr>
 <td><code>room_number</code></td>
-<td>VARCHAR(20) FK</td>
+<td>VARCHAR(10) FK</td>
 <td>ห้อง</td>
 <td>ผูกกับ <code>rooms</code></td>
 </tr>
@@ -911,19 +911,19 @@ JWT ที่ออกให้ตอนล็อกอินบรรจุ <co
 </tr>
 <tr>
 <td><code>subject_name</code></td>
-<td>VARCHAR(150)</td>
+<td>VARCHAR(100)</td>
 <td>ชื่อวิชา</td>
 <td>แสดงผล และเป็นส่วนหนึ่งของ UNIQUE</td>
 </tr>
 <tr>
 <td><code>section_name</code></td>
-<td>VARCHAR(80)</td>
+<td>VARCHAR(30)</td>
 <td>กลุ่มเรียน</td>
 <td>เพิ่มทีหลังใน migration v1.8.0 จึงมี DEFAULT ''</td>
 </tr>
 <tr>
 <td><code>instructor</code></td>
-<td>VARCHAR(150)</td>
+<td>VARCHAR(100)</td>
 <td>ผู้สอน</td>
 <td>เหตุผลเดียวกัน</td>
 </tr>
@@ -949,16 +949,16 @@ JWT ที่ออกให้ตอนล็อกอินบรรจุ <co
 <p>ตารางที่ใหญ่ที่สุด เก็บทั้ง "ทะเบียนอุปกรณ์" "ค่าไฟล่าสุด" และ "สถานะระบบปิดแอร์อัตโนมัติ" แบ่งอ่านเป็นสามบล็อก</p>
 <p>ไฟล์: <code>backend/database/schema.sql</code> (บล็อกที่ 1: ทะเบียนและการเชื่อมต่อ)</p>
 <div class="code-block"><span class="code-lang">sql</span><div class="hl"><pre><span></span><code><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="k">IF</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">EXISTS</span><span class="w"> </span><span class="n">air_conditioners</span><span class="w"> </span><span class="p">(</span>
-<span class="w">  </span><span class="n">device_id</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<span class="w">  </span><span class="n">room_number</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<span class="w">  </span><span class="n">air_number</span><span class="w"> </span><span class="n">TINYINT</span><span class="w"> </span><span class="n">UNSIGNED</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<span class="w">  </span><span class="n">name</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">60</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<span class="w">  </span><span class="n">ble_name</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">40</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<span class="w">  </span><span class="n">protocol</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">40</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">'HAIER_AC160'</span><span class="p">,</span>
-<span class="w">  </span><span class="n">mqtt_topic</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">160</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">  </span><span class="n">device_id</span><span class="w"> </span><span class="nb">CHAR</span><span class="p">(</span><span class="mi">18</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">  </span><span class="n">room_number</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">  </span><span class="n">air_number</span><span class="w"> </span><span class="nb">TINYINT</span><span class="w"> </span><span class="n">UNSIGNED</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">  </span><span class="n">name</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">  </span><span class="n">ble_name</span><span class="w"> </span><span class="nb">CHAR</span><span class="p">(</span><span class="mi">21</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">  </span><span class="n">protocol</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">'HAIER_AC160'</span><span class="p">,</span>
+<span class="w">  </span><span class="n">mqtt_topic</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">64</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
 <span class="w">  </span><span class="n">mqtt_host</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">253</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
 <span class="w">  </span><span class="n">mqtt_port</span><span class="w"> </span><span class="nb">SMALLINT</span><span class="w"> </span><span class="n">UNSIGNED</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">1883</span><span class="p">,</span>
-<span class="w">  </span><span class="n">mqtt_username</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">  </span><span class="n">mqtt_username</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
 <span class="w">  </span><span class="n">provision_status</span><span class="w"> </span><span class="n">ENUM</span><span class="p">(</span>
 <span class="w">    </span><span class="s1">'reserved'</span><span class="p">,</span>
 <span class="w">    </span><span class="s1">'active'</span>
@@ -993,18 +993,18 @@ JWT ที่ออกให้ตอนล็อกอินบรรจุ <co
 
 <p>ไฟล์: <code>backend/database/schema.sql</code> (บล็อกที่ 2: ค่าไฟล่าสุดและระบบปิดแอร์อัตโนมัติ)</p>
 <div class="code-block"><span class="code-lang">sql</span><div class="hl"><pre><span></span><code><span class="w">  </span><span class="n">voltage</span><span class="w"> </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<span class="w">  </span><span class="n">current_amp</span><span class="w"> </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<span class="w">  </span><span class="n">power_watts</span><span class="w"> </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<span class="w">  </span><span class="n">energy_kwh</span><span class="w"> </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<span class="w">  </span><span class="n">frequency_hz</span><span class="w"> </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<span class="w">  </span><span class="n">power_factor</span><span class="w"> </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">  </span><span class="n">current_amp</span><span class="w"> </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">  </span><span class="n">power_watts</span><span class="w"> </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">  </span><span class="n">energy_kwh</span><span class="w"> </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">  </span><span class="n">frequency_hz</span><span class="w"> </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">  </span><span class="n">power_factor</span><span class="w"> </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
 <span class="w">  </span><span class="n">pzem_available</span><span class="w"> </span><span class="nb">BOOLEAN</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">FALSE</span><span class="p">,</span>
 <span class="w">  </span><span class="n">ac_running</span><span class="w"> </span><span class="nb">BOOLEAN</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">FALSE</span><span class="p">,</span>
 <span class="w">  </span><span class="n">outside_schedule</span><span class="w"> </span><span class="nb">BOOLEAN</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">FALSE</span><span class="p">,</span>
 <span class="w">  </span><span class="n">auto_off_enabled</span><span class="w"> </span><span class="nb">BOOLEAN</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">TRUE</span><span class="p">,</span>
 <span class="w">  </span><span class="n">auto_off_started_at</span><span class="w"> </span><span class="n">DATETIME</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
 <span class="w">  </span><span class="n">auto_off_deadline_at</span><span class="w"> </span><span class="n">DATETIME</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<span class="w">  </span><span class="n">auto_off_attempts</span><span class="w"> </span><span class="n">TINYINT</span><span class="w"> </span><span class="n">UNSIGNED</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">  </span><span class="n">auto_off_attempts</span><span class="w"> </span><span class="nb">TINYINT</span><span class="w"> </span><span class="n">UNSIGNED</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
 <span class="w">  </span><span class="n">auto_off_last_attempt_at</span><span class="w"> </span><span class="n">DATETIME</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
 <span class="w">  </span><span class="n">auto_off_in_class</span><span class="w"> </span><span class="nb">BOOLEAN</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">FALSE</span><span class="p">,</span>
 <span class="w">  </span><span class="n">firmware_version</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
@@ -1026,14 +1026,14 @@ JWT ที่ออกให้ตอนล็อกอินบรรจุ <co
 <p>ไฟล์: <code>backend/database/schema.sql</code> (บล็อกที่ 3: จุดต่อประวัติไฟฟ้าและคีย์)</p>
 <div class="code-block"><span class="code-lang">sql</span><div class="hl"><pre><span></span><code><span class="w">  </span><span class="c1">-- จุดต่อของประวัติไฟฟ้า: ตัวอย่างล่าสุดที่บันทึกลง energy_hourly แล้ว</span>
 <span class="w">  </span><span class="c1">-- ใช้ทั้งข้อมูลสดและข้อมูลย้อนหลังตอนเน็ตหลุด กันนับซ้ำหรือขาดช่วง</span>
-<span class="w">  </span><span class="n">energy_chain_kwh</span><span class="w"> </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">  </span><span class="n">energy_chain_kwh</span><span class="w"> </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
 <span class="w">  </span><span class="n">energy_chain_at</span><span class="w"> </span><span class="n">DATETIME</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
 <span class="w">  </span><span class="n">energy_chain_running</span><span class="w"> </span><span class="nb">BOOLEAN</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">FALSE</span><span class="p">,</span>
 <span class="w">  </span><span class="c1">-- จำนวนรายการย้อนหลังที่บอร์ดยังส่งไม่ครบ</span>
 <span class="w">  </span><span class="n">history_pending</span><span class="w"> </span><span class="nb">SMALLINT</span><span class="w"> </span><span class="n">UNSIGNED</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
 <span class="w">  </span><span class="n">last_seen_at</span><span class="w"> </span><span class="n">DATETIME</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<span class="w">  </span><span class="n">created_by</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<span class="w">  </span><span class="n">updated_by</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">  </span><span class="n">created_by</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">  </span><span class="n">updated_by</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
 <span class="w">  </span><span class="n">created_at</span><span class="w"> </span><span class="n">DATETIME</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">CURRENT_TIMESTAMP</span><span class="p">,</span>
 <span class="w">  </span><span class="n">updated_at</span><span class="w"> </span><span class="n">DATETIME</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">CURRENT_TIMESTAMP</span>
 <span class="w">    </span><span class="k">ON</span><span class="w"> </span><span class="k">UPDATE</span><span class="w"> </span><span class="k">CURRENT_TIMESTAMP</span><span class="p">,</span>
@@ -1076,13 +1076,13 @@ JWT ที่ออกให้ตอนล็อกอินบรรจุ <co
 <tbody>
 <tr>
 <td><code>device_id</code></td>
-<td>VARCHAR(32) PK</td>
+<td>CHAR(18) PK</td>
 <td>รหัสบอร์ด <code>ESP32-XXXXXXXXXXXX</code></td>
 <td>คงที่ตลอดอายุบอร์ด เป็นคีย์ธรรมชาติ</td>
 </tr>
 <tr>
 <td><code>room_number</code></td>
-<td>VARCHAR(20) FK</td>
+<td>VARCHAR(10) FK</td>
 <td>ห้อง</td>
 <td>ผูกกับ <code>rooms</code></td>
 </tr>
@@ -1094,25 +1094,25 @@ JWT ที่ออกให้ตอนล็อกอินบรรจุ <co
 </tr>
 <tr>
 <td><code>name</code></td>
-<td>VARCHAR(60)</td>
+<td>VARCHAR(50)</td>
 <td>ชื่อแสดงผล</td>
 <td>คนจำชื่อง่ายกว่ารหัส</td>
 </tr>
 <tr>
 <td><code>ble_name</code></td>
-<td>VARCHAR(40) UNIQUE</td>
+<td>CHAR(21) UNIQUE</td>
 <td>ชื่อ Bluetooth</td>
 <td>ใช้หาบอร์ดตอนตั้งค่า</td>
 </tr>
 <tr>
 <td><code>protocol</code></td>
-<td>VARCHAR(40)</td>
+<td>VARCHAR(20)</td>
 <td>โปรโตคอล IR</td>
 <td>รองรับแอร์ยี่ห้ออื่นในอนาคต</td>
 </tr>
 <tr>
 <td><code>mqtt_topic</code></td>
-<td>VARCHAR(160) UNIQUE</td>
+<td>VARCHAR(64) UNIQUE</td>
 <td>topic ของเครื่อง</td>
 <td>แยกช่องสื่อสารของแต่ละบอร์ด</td>
 </tr>
@@ -1227,28 +1227,28 @@ JWT ที่ออกให้ตอนล็อกอินบรรจุ <co
 <h3 id="ตาราง-occupancy_sensors--เซ็นเซอร์ตรวจจับคน-esp32--ld2410">ตาราง occupancy_sensors — เซ็นเซอร์ตรวจจับคน (ESP32 + LD2410)<a class="anchor" href="#ตาราง-occupancy_sensors--เซ็นเซอร์ตรวจจับคน-esp32--ld2410">#</a></h3>
 <p>ไฟล์: <code>backend/database/schema.sql</code></p>
 <div class="code-block"><span class="code-lang">sql</span><div class="hl"><pre><span></span><code><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="k">IF</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">EXISTS</span><span class="w"> </span><span class="n">occupancy_sensors</span><span class="w"> </span><span class="p">(</span>
-<span class="w">  </span><span class="n">device_id</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<span class="w">  </span><span class="n">room_number</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<span class="w">  </span><span class="n">ble_name</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">40</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<span class="w">  </span><span class="n">mqtt_topic</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">160</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">  </span><span class="n">device_id</span><span class="w"> </span><span class="nb">CHAR</span><span class="p">(</span><span class="mi">18</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">  </span><span class="n">room_number</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">  </span><span class="n">ble_name</span><span class="w"> </span><span class="nb">CHAR</span><span class="p">(</span><span class="mi">22</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">  </span><span class="n">mqtt_topic</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">64</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
 <span class="w">  </span><span class="n">mqtt_host</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">253</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
 <span class="w">  </span><span class="n">mqtt_port</span><span class="w"> </span><span class="nb">SMALLINT</span><span class="w"> </span><span class="n">UNSIGNED</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">1883</span><span class="p">,</span>
-<span class="w">  </span><span class="n">mqtt_username</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">  </span><span class="n">mqtt_username</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
 <span class="w">  </span><span class="n">provision_status</span><span class="w"> </span><span class="n">ENUM</span><span class="p">(</span>
 <span class="w">    </span><span class="s1">'reserved'</span><span class="p">,</span>
 <span class="w">    </span><span class="s1">'active'</span>
 <span class="w">  </span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">'reserved'</span><span class="p">,</span>
 <span class="w">  </span><span class="n">provisioning_token_hash</span><span class="w"> </span><span class="nb">CHAR</span><span class="p">(</span><span class="mi">64</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
 <span class="w">  </span><span class="n">provisioning_expires_at</span><span class="w"> </span><span class="n">DATETIME</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<span class="w">  </span><span class="n">static_threshold</span><span class="w"> </span><span class="n">TINYINT</span><span class="w"> </span><span class="n">UNSIGNED</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">25</span><span class="p">,</span>
+<span class="w">  </span><span class="n">static_threshold</span><span class="w"> </span><span class="nb">TINYINT</span><span class="w"> </span><span class="n">UNSIGNED</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">25</span><span class="p">,</span>
 <span class="w">  </span><span class="n">is_online</span><span class="w"> </span><span class="nb">BOOLEAN</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">FALSE</span><span class="p">,</span>
 <span class="w">  </span><span class="n">radar_available</span><span class="w"> </span><span class="nb">BOOLEAN</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">FALSE</span><span class="p">,</span>
 <span class="w">  </span><span class="n">is_occupied</span><span class="w"> </span><span class="nb">BOOLEAN</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">FALSE</span><span class="p">,</span>
 <span class="w">  </span><span class="n">firmware_version</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
 <span class="w">  </span><span class="n">ota_error</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">120</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
 <span class="w">  </span><span class="n">last_seen_at</span><span class="w"> </span><span class="n">DATETIME</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<span class="w">  </span><span class="n">created_by</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<span class="w">  </span><span class="n">updated_by</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">  </span><span class="n">created_by</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">  </span><span class="n">updated_by</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
 <span class="w">  </span><span class="n">created_at</span><span class="w"> </span><span class="n">DATETIME</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">CURRENT_TIMESTAMP</span><span class="p">,</span>
 <span class="w">  </span><span class="n">updated_at</span><span class="w"> </span><span class="n">DATETIME</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">CURRENT_TIMESTAMP</span>
 <span class="w">    </span><span class="k">ON</span><span class="w"> </span><span class="k">UPDATE</span><span class="w"> </span><span class="k">CURRENT_TIMESTAMP</span><span class="p">,</span>
@@ -1289,13 +1289,13 @@ JWT ที่ออกให้ตอนล็อกอินบรรจุ <co
 <tbody>
 <tr>
 <td><code>device_id</code></td>
-<td>VARCHAR(32) PK</td>
+<td>CHAR(18) PK</td>
 <td><code>OCC32-XXXXXXXXXXXX</code></td>
 <td>คีย์ธรรมชาติของบอร์ด</td>
 </tr>
 <tr>
 <td><code>room_number</code></td>
-<td>VARCHAR(20) FK UNIQUE</td>
+<td>VARCHAR(10) FK UNIQUE</td>
 <td>ห้อง</td>
 <td>หนึ่งห้องหนึ่งเซ็นเซอร์</td>
 </tr>
@@ -1361,13 +1361,13 @@ JWT ที่ออกให้ตอนล็อกอินบรรจุ <co
 <span class="w">    </span><span class="s1">'auto_off_succeeded'</span><span class="p">,</span>
 <span class="w">    </span><span class="s1">'auto_off_failed'</span>
 <span class="w">  </span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<span class="w">  </span><span class="n">room_number</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<span class="w">  </span><span class="n">device_id</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<span class="w">  </span><span class="n">device_name</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">60</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">''</span><span class="p">,</span>
+<span class="w">  </span><span class="n">room_number</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">  </span><span class="n">device_id</span><span class="w"> </span><span class="nb">CHAR</span><span class="p">(</span><span class="mi">18</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">  </span><span class="n">device_name</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">''</span><span class="p">,</span>
 <span class="w">  </span><span class="n">detail</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">255</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">''</span><span class="p">,</span>
 <span class="w">  </span><span class="n">status</span><span class="w"> </span><span class="n">ENUM</span><span class="p">(</span><span class="s1">'open'</span><span class="p">,</span><span class="w"> </span><span class="s1">'acknowledged'</span><span class="p">,</span><span class="w"> </span><span class="s1">'resolved'</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">'open'</span><span class="p">,</span>
 <span class="w">  </span><span class="n">acknowledged_at</span><span class="w"> </span><span class="n">DATETIME</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<span class="w">  </span><span class="n">acknowledged_by</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">  </span><span class="n">acknowledged_by</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
 <span class="w">  </span><span class="n">resolved_at</span><span class="w"> </span><span class="n">DATETIME</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
 <span class="w">  </span><span class="n">created_at</span><span class="w"> </span><span class="n">DATETIME</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">CURRENT_TIMESTAMP</span><span class="p">,</span>
 <span class="w">  </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="p">(</span><span class="n">id</span><span class="p">),</span>
@@ -1413,19 +1413,19 @@ JWT ที่ออกให้ตอนล็อกอินบรรจุ <co
 </tr>
 <tr>
 <td><code>room_number</code></td>
-<td>VARCHAR(20)</td>
+<td>VARCHAR(10)</td>
 <td>ห้อง</td>
 <td>ไม่มี FK เพื่อให้ประวัติอยู่ได้แม้ลบห้อง</td>
 </tr>
 <tr>
 <td><code>device_id</code></td>
-<td>VARCHAR(32) NULL</td>
+<td>CHAR(18) NULL</td>
 <td>เครื่อง</td>
 <td>อาจเป็นแจ้งเตือนระดับห้อง</td>
 </tr>
 <tr>
 <td><code>device_name</code></td>
-<td>VARCHAR(60)</td>
+<td>VARCHAR(50)</td>
 <td>ชื่อเครื่อง ณ ตอนนั้น</td>
 <td>สำเนาไว้ ไม่ต้อง JOIN และยังอ่านได้หลังลบเครื่อง</td>
 </tr>
@@ -1470,31 +1470,31 @@ JWT ที่ออกให้ตอนล็อกอินบรรจุ <co
 <div class="code-block"><span class="code-lang">sql</span><div class="hl"><pre><span></span><code><span class="c1">-- ถังเก็บค่าไฟรายชั่วโมงของแอร์แต่ละเครื่อง หนึ่งแถวคือหนึ่งเครื่องต่อหนึ่ง</span>
 <span class="c1">-- ชั่วโมงตามเวลาไทย เก็บเป็นผลรวมกับตัวนับ ค่าเฉลี่ยคำนวณตอนดึงรายงาน</span>
 <span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="k">IF</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">EXISTS</span><span class="w"> </span><span class="n">energy_hourly</span><span class="w"> </span><span class="p">(</span>
-<span class="w">  </span><span class="n">device_id</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">  </span><span class="n">device_id</span><span class="w"> </span><span class="nb">CHAR</span><span class="p">(</span><span class="mi">18</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
 <span class="w">  </span><span class="n">bucket_start</span><span class="w"> </span><span class="n">DATETIME</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<span class="w">  </span><span class="n">room_number</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<span class="w">  </span><span class="n">device_name</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">60</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">''</span><span class="p">,</span>
-<span class="w">  </span><span class="n">sample_count</span><span class="w"> </span><span class="nb">INT</span><span class="w"> </span><span class="n">UNSIGNED</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
-<span class="w">  </span><span class="n">pzem_samples</span><span class="w"> </span><span class="nb">INT</span><span class="w"> </span><span class="n">UNSIGNED</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
-<span class="w">  </span><span class="n">running_samples</span><span class="w"> </span><span class="nb">INT</span><span class="w"> </span><span class="n">UNSIGNED</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">  </span><span class="n">room_number</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">  </span><span class="n">device_name</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">''</span><span class="p">,</span>
+<span class="w">  </span><span class="n">sample_count</span><span class="w"> </span><span class="nb">SMALLINT</span><span class="w"> </span><span class="n">UNSIGNED</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">  </span><span class="n">pzem_samples</span><span class="w"> </span><span class="nb">SMALLINT</span><span class="w"> </span><span class="n">UNSIGNED</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">  </span><span class="n">running_samples</span><span class="w"> </span><span class="nb">SMALLINT</span><span class="w"> </span><span class="n">UNSIGNED</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
 <span class="w">  </span><span class="n">first_sample_at</span><span class="w"> </span><span class="n">DATETIME</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
 <span class="w">  </span><span class="n">last_sample_at</span><span class="w"> </span><span class="n">DATETIME</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<span class="w">  </span><span class="n">energy_start_kwh</span><span class="w"> </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<span class="w">  </span><span class="n">energy_end_kwh</span><span class="w"> </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<span class="w">  </span><span class="n">consumption_kwh</span><span class="w"> </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
-<span class="w">  </span><span class="n">voltage_sum</span><span class="w"> </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
-<span class="w">  </span><span class="n">voltage_min</span><span class="w"> </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<span class="w">  </span><span class="n">voltage_max</span><span class="w"> </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<span class="w">  </span><span class="n">current_sum</span><span class="w"> </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
-<span class="w">  </span><span class="n">current_min</span><span class="w"> </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<span class="w">  </span><span class="n">current_max</span><span class="w"> </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<span class="w">  </span><span class="n">power_sum</span><span class="w"> </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
-<span class="w">  </span><span class="n">power_min</span><span class="w"> </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<span class="w">  </span><span class="n">power_max</span><span class="w"> </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<span class="w">  </span><span class="n">power_factor_sum</span><span class="w"> </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
-<span class="w">  </span><span class="n">frequency_sum</span><span class="w"> </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
-<span class="w">  </span><span class="n">runtime_seconds</span><span class="w"> </span><span class="nb">INT</span><span class="w"> </span><span class="n">UNSIGNED</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
-<span class="w">  </span><span class="n">online_seconds</span><span class="w"> </span><span class="nb">INT</span><span class="w"> </span><span class="n">UNSIGNED</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">  </span><span class="n">energy_start_kwh</span><span class="w"> </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">  </span><span class="n">energy_end_kwh</span><span class="w"> </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">  </span><span class="n">consumption_kwh</span><span class="w"> </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">  </span><span class="n">voltage_sum</span><span class="w"> </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">  </span><span class="n">voltage_min</span><span class="w"> </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">  </span><span class="n">voltage_max</span><span class="w"> </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">  </span><span class="n">current_sum</span><span class="w"> </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">  </span><span class="n">current_min</span><span class="w"> </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">  </span><span class="n">current_max</span><span class="w"> </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">  </span><span class="n">power_sum</span><span class="w"> </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">  </span><span class="n">power_min</span><span class="w"> </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">  </span><span class="n">power_max</span><span class="w"> </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">  </span><span class="n">power_factor_sum</span><span class="w"> </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">  </span><span class="n">frequency_sum</span><span class="w"> </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">  </span><span class="n">runtime_seconds</span><span class="w"> </span><span class="nb">SMALLINT</span><span class="w"> </span><span class="n">UNSIGNED</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">  </span><span class="n">online_seconds</span><span class="w"> </span><span class="nb">SMALLINT</span><span class="w"> </span><span class="n">UNSIGNED</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
 <span class="w">  </span><span class="n">created_at</span><span class="w"> </span><span class="n">DATETIME</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">CURRENT_TIMESTAMP</span><span class="p">,</span>
 <span class="w">  </span><span class="n">updated_at</span><span class="w"> </span><span class="n">DATETIME</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">CURRENT_TIMESTAMP</span>
 <span class="w">    </span><span class="k">ON</span><span class="w"> </span><span class="k">UPDATE</span><span class="w"> </span><span class="k">CURRENT_TIMESTAMP</span><span class="p">,</span>
@@ -1517,7 +1517,7 @@ JWT ที่ออกให้ตอนล็อกอินบรรจุ <co
 <li><strong>บรรทัด 11–12</strong> — เวลาตัวอย่างแรก/สุดท้ายในถัง</li>
 <li><strong>บรรทัด 13–14</strong> — เลขมิเตอร์ต้นชั่วโมงและปลายชั่วโมง</li>
 <li><strong>บรรทัด 15</strong> — <code>consumption_kwh</code> พลังงานที่ใช้ในชั่วโมงนี้ (ผลรวมของผลต่างเลขมิเตอร์)</li>
-<li><strong>บรรทัด 16–24</strong> — สำหรับแรงดัน กระแส กำลังไฟ: เก็บ <code>_sum</code> (ผลรวม) <code>_min</code> <code>_max</code> ส่วนตัวประกอบกำลังและความถี่เก็บแค่ <code>_sum</code> ความกว้างของ <code>_sum</code> ใหญ่กว่าค่าเดี่ยว (เช่น <code>DECIMAL(16,2)</code> เทียบกับ <code>DECIMAL(8,2)</code>) เพราะต้องรับผลรวมหลายร้อยตัวอย่าง</li>
+<li><strong>บรรทัด 16–24</strong> — สำหรับแรงดัน กระแส กำลังไฟ: เก็บ <code>_sum</code> (ผลรวม) <code>_min</code> <code>_max</code> ส่วนตัวประกอบกำลังและความถี่เก็บแค่ <code>_sum</code> ความกว้างของ <code>_sum</code> ใหญ่กว่าค่าเดี่ยว (เช่น <code>DECIMAL(10,1)</code> เทียบกับ <code>DECIMAL(4,1)</code> ของแรงดัน) เพราะต้องรับผลรวมหลายร้อยตัวอย่าง</li>
 <li><strong>บรรทัด 27–28</strong> — <code>runtime_seconds</code> วินาทีที่แอร์ทำงาน, <code>online_seconds</code> วินาทีที่บอร์ดออนไลน์</li>
 <li><strong>บรรทัด 31</strong> — คีย์หลักผสม ทำให้ "เครื่องเดียวกัน ชั่วโมงเดียวกัน" มีได้แถวเดียว และเป็นเป้าของ upsert</li>
 <li><strong>บรรทัด 32</strong> — index ตามเวลาอย่างเดียว สำหรับรายงานระดับ "ทั้งตึก" ที่กรองแค่ช่วงวันที่</li>
@@ -1535,7 +1535,7 @@ JWT ที่ออกให้ตอนล็อกอินบรรจุ <co
 <tbody>
 <tr>
 <td><code>device_id</code></td>
-<td>VARCHAR(32) PK</td>
+<td>CHAR(18) PK</td>
 <td>เครื่อง</td>
 <td>ส่วนแรกของคีย์ผสม</td>
 </tr>
@@ -1547,31 +1547,31 @@ JWT ที่ออกให้ตอนล็อกอินบรรจุ <co
 </tr>
 <tr>
 <td><code>room_number</code></td>
-<td>VARCHAR(20)</td>
+<td>VARCHAR(10)</td>
 <td>ห้อง ณ ตอนบันทึก</td>
 <td>กรองรายงานตามห้องโดยไม่ JOIN</td>
 </tr>
 <tr>
 <td><code>device_name</code></td>
-<td>VARCHAR(60)</td>
+<td>VARCHAR(50)</td>
 <td>ชื่อเครื่อง ณ ตอนบันทึก</td>
 <td>ประวัติไม่เปลี่ยนตามการเปลี่ยนชื่อ</td>
 </tr>
 <tr>
 <td><code>sample_count</code></td>
-<td>INT UNSIGNED</td>
+<td>SMALLINT UNSIGNED</td>
 <td>จำนวนตัวอย่างทั้งหมด</td>
 <td>ตรวจคุณภาพข้อมูล</td>
 </tr>
 <tr>
 <td><code>pzem_samples</code></td>
-<td>INT UNSIGNED</td>
+<td>SMALLINT UNSIGNED</td>
 <td>ตัวอย่างที่ PZEM อ่านได้</td>
 <td>ตัวหารค่าเฉลี่ย</td>
 </tr>
 <tr>
 <td><code>running_samples</code></td>
-<td>INT UNSIGNED</td>
+<td>SMALLINT UNSIGNED</td>
 <td>ตัวอย่างที่แอร์ทำงาน</td>
 <td>สัดส่วนเวลาทำงาน</td>
 </tr>
@@ -1583,13 +1583,13 @@ JWT ที่ออกให้ตอนล็อกอินบรรจุ <co
 </tr>
 <tr>
 <td><code>energy_start_kwh</code>, <code>energy_end_kwh</code></td>
-<td>DECIMAL(12,3) NULL</td>
+<td>DECIMAL(10,3) NULL</td>
 <td>เลขมิเตอร์ต้น/ปลาย</td>
 <td>ตรวจสอบเทียบกับมิเตอร์จริง</td>
 </tr>
 <tr>
 <td><code>consumption_kwh</code></td>
-<td>DECIMAL(12,3)</td>
+<td>DECIMAL(10,3)</td>
 <td>kWh ที่ใช้</td>
 <td>ตัวเลขหลักของรายงานค่าไฟ</td>
 </tr>
@@ -1619,13 +1619,13 @@ JWT ที่ออกให้ตอนล็อกอินบรรจุ <co
 </tr>
 <tr>
 <td><code>runtime_seconds</code></td>
-<td>INT UNSIGNED</td>
+<td>SMALLINT UNSIGNED</td>
 <td>วินาทีที่แอร์ทำงาน</td>
 <td>วิเคราะห์พฤติกรรมการใช้</td>
 </tr>
 <tr>
 <td><code>online_seconds</code></td>
-<td>INT UNSIGNED</td>
+<td>SMALLINT UNSIGNED</td>
 <td>วินาทีที่ออนไลน์</td>
 <td>รู้ว่าข้อมูลครอบคลุมแค่ไหน</td>
 </tr>
@@ -1646,9 +1646,9 @@ JWT ที่ออกให้ตอนล็อกอินบรรจุ <co
 <span class="c1">-- ใช้เก็บของที่กระทบทั้งอาคาร เช่นสวิตช์รวมของระบบปิดแอร์อัตโนมัติ</span>
 <span class="c1">-- ต้องอยู่ที่นี่เพราะตัวที่ยิงคำสั่งปิดคือ Backend ไม่ใช่แอปบนมือถือ</span>
 <span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="k">IF</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">EXISTS</span><span class="w"> </span><span class="n">system_settings</span><span class="w"> </span><span class="p">(</span>
-<span class="w">  </span><span class="n">setting_key</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">64</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="p">,</span>
+<span class="w">  </span><span class="n">setting_key</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="p">,</span>
 <span class="w">  </span><span class="n">setting_value</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">255</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<span class="w">  </span><span class="n">updated_by</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">64</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">  </span><span class="n">updated_by</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
 <span class="w">  </span><span class="n">updated_at</span><span class="w"> </span><span class="k">TIMESTAMP</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">CURRENT_TIMESTAMP</span>
 <span class="w">    </span><span class="k">ON</span><span class="w"> </span><span class="k">UPDATE</span><span class="w"> </span><span class="k">CURRENT_TIMESTAMP</span>
 <span class="p">)</span><span class="w"> </span><span class="n">ENGINE</span><span class="o">=</span><span class="n">InnoDB</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">CHARSET</span><span class="o">=</span><span class="n">utf8mb4</span><span class="w"> </span><span class="k">COLLATE</span><span class="o">=</span><span class="n">utf8mb4_unicode_ci</span><span class="p">;</span>
@@ -1700,7 +1700,7 @@ JWT ที่ออกให้ตอนล็อกอินบรรจุ <co
 <tbody>
 <tr>
 <td><code>setting_key</code></td>
-<td>VARCHAR(64) PK</td>
+<td>VARCHAR(32) PK</td>
 <td>ชื่อค่าตั้ง</td>
 <td>เพิ่มค่าตั้งใหม่ได้โดยไม่ต้อง ALTER TABLE</td>
 </tr>
@@ -1712,7 +1712,7 @@ JWT ที่ออกให้ตอนล็อกอินบรรจุ <co
 </tr>
 <tr>
 <td><code>updated_by</code></td>
-<td>VARCHAR(64) NULL</td>
+<td>VARCHAR(30) NULL</td>
 <td>ผู้แก้</td>
 <td>ตรวจย้อนหลัง</td>
 </tr>
@@ -1731,10 +1731,10 @@ JWT ที่ออกให้ตอนล็อกอินบรรจุ <co
 <h3 id="ตาราง-academic_terms--ปฏิทินภาคเรียน">ตาราง academic_terms — ปฏิทินภาคเรียน<a class="anchor" href="#ตาราง-academic_terms--ปฏิทินภาคเรียน">#</a></h3>
 <p>ไฟล์: <code>backend/database/schema.sql</code></p>
 <div class="code-block"><span class="code-lang">sql</span><div class="hl"><pre><span></span><code><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="k">IF</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">EXISTS</span><span class="w"> </span><span class="n">academic_terms</span><span class="w"> </span><span class="p">(</span>
-<span class="w">  </span><span class="n">semester</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">  </span><span class="n">semester</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
 <span class="w">  </span><span class="n">start_date</span><span class="w"> </span><span class="nb">DATE</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
 <span class="w">  </span><span class="n">end_date</span><span class="w"> </span><span class="nb">DATE</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<span class="w">  </span><span class="n">updated_by</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">  </span><span class="n">updated_by</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
 <span class="w">  </span><span class="n">created_at</span><span class="w"> </span><span class="n">DATETIME</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">CURRENT_TIMESTAMP</span><span class="p">,</span>
 <span class="w">  </span><span class="n">updated_at</span><span class="w"> </span><span class="n">DATETIME</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">CURRENT_TIMESTAMP</span>
 <span class="w">    </span><span class="k">ON</span><span class="w"> </span><span class="k">UPDATE</span><span class="w"> </span><span class="k">CURRENT_TIMESTAMP</span><span class="p">,</span>
@@ -1764,7 +1764,7 @@ JWT ที่ออกให้ตอนล็อกอินบรรจุ <co
 <tbody>
 <tr>
 <td><code>semester</code></td>
-<td>VARCHAR(30) PK</td>
+<td>VARCHAR(6) PK</td>
 <td>ภาคเรียน</td>
 <td>คีย์ธรรมชาติ</td>
 </tr>
@@ -1776,7 +1776,7 @@ JWT ที่ออกให้ตอนล็อกอินบรรจุ <co
 </tr>
 <tr>
 <td><code>updated_by</code></td>
-<td>VARCHAR(100) NULL</td>
+<td>VARCHAR(30) NULL</td>
 <td>ผู้แก้</td>
 <td>ตรวจย้อนหลัง</td>
 </tr>
@@ -1793,18 +1793,18 @@ JWT ที่ออกให้ตอนล็อกอินบรรจุ <co
 <p>ไฟล์: <code>backend/database/schema.sql</code></p>
 <div class="code-block"><span class="code-lang">sql</span><div class="hl"><pre><span></span><code><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="k">IF</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">EXISTS</span><span class="w"> </span><span class="n">room_bookings</span><span class="w"> </span><span class="p">(</span>
 <span class="w">  </span><span class="n">id</span><span class="w"> </span><span class="nb">CHAR</span><span class="p">(</span><span class="mi">36</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<span class="w">  </span><span class="n">room_number</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<span class="w">  </span><span class="n">title</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">150</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<span class="w">  </span><span class="n">category</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">'other'</span><span class="p">,</span>
+<span class="w">  </span><span class="n">room_number</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">  </span><span class="n">title</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">  </span><span class="n">category</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">'other'</span><span class="p">,</span>
 <span class="w">  </span><span class="n">note</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">255</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">''</span><span class="p">,</span>
 <span class="w">  </span><span class="n">repeat_type</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">'once'</span><span class="p">,</span>
-<span class="w">  </span><span class="n">days_of_week</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">''</span><span class="p">,</span>
+<span class="w">  </span><span class="n">days_of_week</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">13</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">''</span><span class="p">,</span>
 <span class="w">  </span><span class="n">start_date</span><span class="w"> </span><span class="nb">DATE</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
 <span class="w">  </span><span class="n">end_date</span><span class="w"> </span><span class="nb">DATE</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
 <span class="w">  </span><span class="n">start_time</span><span class="w"> </span><span class="k">TIME</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
 <span class="w">  </span><span class="n">end_time</span><span class="w"> </span><span class="k">TIME</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<span class="w">  </span><span class="n">created_by</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<span class="w">  </span><span class="n">updated_by</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">  </span><span class="n">created_by</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">  </span><span class="n">updated_by</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
 <span class="w">  </span><span class="n">created_at</span><span class="w"> </span><span class="n">DATETIME</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">CURRENT_TIMESTAMP</span><span class="p">,</span>
 <span class="w">  </span><span class="n">updated_at</span><span class="w"> </span><span class="n">DATETIME</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">CURRENT_TIMESTAMP</span>
 <span class="w">    </span><span class="k">ON</span><span class="w"> </span><span class="k">UPDATE</span><span class="w"> </span><span class="k">CURRENT_TIMESTAMP</span><span class="p">,</span>
@@ -1850,19 +1850,19 @@ JWT ที่ออกให้ตอนล็อกอินบรรจุ <co
 </tr>
 <tr>
 <td><code>room_number</code></td>
-<td>VARCHAR(20) FK</td>
+<td>VARCHAR(10) FK</td>
 <td>ห้อง</td>
 <td>CASCADE</td>
 </tr>
 <tr>
 <td><code>title</code></td>
-<td>VARCHAR(150)</td>
+<td>VARCHAR(100)</td>
 <td>ชื่อกิจกรรม</td>
 <td>แสดงผล</td>
 </tr>
 <tr>
 <td><code>category</code></td>
-<td>VARCHAR(20)</td>
+<td>VARCHAR(10)</td>
 <td>ประเภท</td>
 <td>VARCHAR เพื่อเพิ่มประเภทได้ง่าย</td>
 </tr>
@@ -1880,7 +1880,7 @@ JWT ที่ออกให้ตอนล็อกอินบรรจุ <co
 </tr>
 <tr>
 <td><code>days_of_week</code></td>
-<td>VARCHAR(20)</td>
+<td>VARCHAR(13)</td>
 <td>เช่น <code>"1,3"</code></td>
 <td>ใช้กับ weekly เท่านั้น</td>
 </tr>

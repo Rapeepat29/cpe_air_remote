@@ -52,7 +52,7 @@
 
 ข้อดีที่โปรเจคนี้ได้ใช้จริง:
 
-1. **บังคับโครงสร้าง** — คอลัมน์ `voltage` เป็น `DECIMAL(8,2)` ใส่ข้อความไม่ได้ ข้อมูลขยะเข้าไม่ได้ตั้งแต่ชั้นฐานข้อมูล
+1. **บังคับโครงสร้าง** — คอลัมน์ `voltage` เป็น `DECIMAL(4,1)` ใส่ข้อความไม่ได้ ข้อมูลขยะเข้าไม่ได้ตั้งแต่ชั้นฐานข้อมูล
 2. **บังคับความสัมพันธ์** — สร้างแอร์ในห้องที่ไม่มีอยู่จริงไม่ได้ (foreign key)
 3. **Transaction** — หลายคำสั่งสำเร็จพร้อมกันหรือยกเลิกพร้อมกัน ข้อมูลไม่ค้างครึ่ง ๆ กลาง ๆ
 4. **Query ยืดหยุ่น** — รายงานค่าไฟจะรวมตามตึก/ห้อง/เครื่อง ช่วงวันไหนก็ได้ด้วย `GROUP BY` คำสั่งเดียว
@@ -78,11 +78,11 @@
 | ชนิด | ความหมาย | ตัวอย่างในโปรเจค |
 |---|---|---|
 | `VARCHAR(n)` | ข้อความยาวไม่เกิน n ตัวอักษร เก็บเท่าที่ใช้จริง | `username VARCHAR(30)`, `room_number VARCHAR(10)` |
-| `CHAR(n)` | ข้อความยาวตายตัว n ตัว | `id CHAR(36)` (UUID), `otp_hash CHAR(64)` (HMAC-SHA256 แบบ hex) |
+| `CHAR(n)` | ข้อความยาวตายตัว n ตัว | `id CHAR(36)` (UUID), `password_hash CHAR(60)` (bcrypt), `device_id CHAR(18)`, `otp_hash CHAR(64)` (HMAC-SHA256 แบบ hex) |
 | `TINYINT UNSIGNED` | จำนวนเต็ม 0–255 ใช้ 1 ไบต์ | `floor_number`, `air_number`, `attempts` |
-| `SMALLINT UNSIGNED` | จำนวนเต็ม 0–65535 ใช้ 2 ไบต์ | `mqtt_port`, `room_index`, `history_pending` |
-| `INT UNSIGNED` | จำนวนเต็ม 0–ประมาณ 4.29 พันล้าน | `sample_count`, `runtime_seconds` |
-| `DECIMAL(p,s)` | ทศนิยมแบบแม่นยำ p หลักรวม มี s หลักหลังจุด | `voltage DECIMAL(8,2)`, `energy_kwh DECIMAL(12,3)` |
+| `SMALLINT UNSIGNED` | จำนวนเต็ม 0–65535 ใช้ 2 ไบต์ | `mqtt_port`, `room_index`, `sample_count`, `runtime_seconds` (นับได้ไม่เกิน 3600 ต่อชั่วโมง) |
+| `INT UNSIGNED` | จำนวนเต็ม 0–ประมาณ 4.29 พันล้าน | `token_version` |
+| `DECIMAL(p,s)` | ทศนิยมแบบแม่นยำ p หลักรวม มี s หลักหลังจุด | `voltage DECIMAL(4,1)`, `energy_kwh DECIMAL(10,3)` |
 | `BOOLEAN` | ใน MariaDB คือ `TINYINT(1)` เก็บ 0/1 | `is_active`, `is_online` |
 | `ENUM(...)` | เลือกได้เฉพาะค่าในรายการ | `role ENUM('admin','staff')` |
 | `DATE` / `TIME` | วันที่อย่างเดียว / เวลาของวันอย่างเดียว | `start_date DATE`, `start_time TIME` |
@@ -307,12 +307,12 @@ updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 
 ```sql
 CREATE TABLE IF NOT EXISTS users (
-  username VARCHAR(100) NOT NULL,
-  password_hash VARCHAR(255) NOT NULL,
-  first_name VARCHAR(100) NOT NULL DEFAULT '',
-  last_name VARCHAR(100) NOT NULL DEFAULT '',
-  email VARCHAR(190) NOT NULL,
-  phone VARCHAR(30) NULL,
+  username VARCHAR(30) NOT NULL,
+  password_hash CHAR(60) NOT NULL,
+  first_name VARCHAR(30) NOT NULL DEFAULT '',
+  last_name VARCHAR(30) NOT NULL DEFAULT '',
+  email VARCHAR(100) NOT NULL,
+  phone VARCHAR(10) NULL,
   role ENUM('admin', 'staff') NOT NULL DEFAULT 'staff',
   is_active BOOLEAN NOT NULL DEFAULT TRUE,
   token_version INT UNSIGNED NOT NULL DEFAULT 0,
@@ -331,7 +331,7 @@ CREATE TABLE IF NOT EXISTS users (
 
 1. **บรรทัด 1** — สร้างตาราง `users` ถ้ายังไม่มี
 2. **บรรทัด 2** — `username` ชื่อเข้าระบบ เป็นคีย์หลัก (บรรทัด 16) `NOT NULL` เพราะคีย์หลักห้ามว่าง
-3. **บรรทัด 3** — `password_hash` เก็บ **ค่าแฮช bcrypt** ไม่ใช่รหัสผ่านจริง (bcrypt ยาว 60 ตัว เผื่อไว้ 255 เผื่อเปลี่ยนอัลกอริทึมในอนาคต)
+3. **บรรทัด 3** — `password_hash` เก็บ **ค่าแฮช bcrypt** ไม่ใช่รหัสผ่านจริง (bcrypt ยาว 60 ตัวเสมอ จึงใช้ `CHAR(60)` ตรงตัว)
 4. **บรรทัด 4–5** — ชื่อ/นามสกุล `DEFAULT ''` เพื่อไม่ต้องจัดการ `NULL` ในโค้ด
 5. **บรรทัด 6** — `email` ใช้รับ OTP ตอนลืมรหัสผ่าน และห้ามซ้ำ (บรรทัด 17)
 6. **บรรทัด 7** — `phone` เป็น `NULL` ได้ (ไม่บังคับในระดับฐานข้อมูล)
@@ -347,11 +347,11 @@ CREATE TABLE IF NOT EXISTS users (
 
 | คอลัมน์ | ชนิด | ความหมาย | ทำไม |
 |---|---|---|---|
-| `username` | VARCHAR(100) PK | ชื่อเข้าระบบ | ไม่ซ้ำโดยธรรมชาติ ใช้เป็นคีย์ได้เลย อ่านง่ายเวลาเห็นใน `created_by` |
-| `password_hash` | VARCHAR(255) | แฮช bcrypt (cost 12) | ถ้าฐานข้อมูลหลุด คนร้ายไม่ได้รหัสผ่านจริง |
-| `first_name`, `last_name` | VARCHAR(100) | ชื่อ-นามสกุล | ใช้แสดงผลและใส่ในอีเมล OTP |
-| `email` | VARCHAR(190) UNIQUE | อีเมล | ช่องทางส่ง OTP ต้องไม่ซ้ำ ไม่งั้นไม่รู้ว่าจะรีเซ็ตบัญชีไหน |
-| `phone` | VARCHAR(30) NULL | เบอร์โทร | เก็บเป็นข้อความเพราะมีเลข 0 นำหน้าและเครื่องหมาย + |
+| `username` | VARCHAR(30) PK | ชื่อเข้าระบบ | ไม่ซ้ำโดยธรรมชาติ ใช้เป็นคีย์ได้เลย อ่านง่ายเวลาเห็นใน `created_by` |
+| `password_hash` | CHAR(60) | แฮช bcrypt (cost 12) | ถ้าฐานข้อมูลหลุด คนร้ายไม่ได้รหัสผ่านจริง |
+| `first_name`, `last_name` | VARCHAR(30) | ชื่อ-นามสกุล | ใช้แสดงผลและใส่ในอีเมล OTP |
+| `email` | VARCHAR(100) UNIQUE | อีเมล | ช่องทางส่ง OTP ต้องไม่ซ้ำ ไม่งั้นไม่รู้ว่าจะรีเซ็ตบัญชีไหน |
+| `phone` | VARCHAR(10) NULL | เบอร์โทร | เก็บเป็นข้อความเพราะมีเลข 0 นำหน้า เบอร์ไทยมี 9–10 หลักจึงใช้ `VARCHAR(10)` (ตัวเลขล้วน `normalizePhone` ตัดขีดและช่องว่างก่อนบันทึก) |
 | `role` | ENUM | `admin`/`staff` | จำกัดค่าที่ระดับฐานข้อมูล |
 | `is_active` | BOOLEAN | บัญชีใช้งานได้หรือไม่ | ปิดบัญชีได้โดยไม่ทำลายประวัติ |
 | `token_version` | INT UNSIGNED | เวอร์ชันของ token | ทำให้ JWT เก่าหมดอายุทันทีเมื่อเปลี่ยนรหัส/สิทธิ์ |
@@ -360,8 +360,8 @@ CREATE TABLE IF NOT EXISTS users (
 | `created_at`, `updated_at` | DATETIME | เวลาสร้าง/แก้ | ฐานข้อมูลเติมให้เอง |
 
 > [!WHY]
-> **ทำไมอีเมลยาว VARCHAR(190) ไม่ใช่ 255**
-> `utf8mb4` ใช้สูงสุด 4 ไบต์ต่อตัวอักษร 190 × 4 = 760 ไบต์ ซึ่งไม่เกินขีด 767 ไบต์ต่อคอลัมน์ใน index ของ InnoDB รูปแบบแถวรุ่นเก่า ส่วน 255 × 4 = 1020 ไบต์ อาจสร้าง UNIQUE index ไม่ได้บนบางเซิร์ฟเวอร์ ตัวเลข 190 จึงเป็นค่าปลอดภัยที่นิยมใช้
+> **ทำไมไม่ตั้ง VARCHAR(255) ให้ทุกคอลัมน์**
+> ขนาดคอลัมน์ควรสะท้อนข้อมูลจริง เช่น เบอร์โทรไทยมีไม่เกิน 10 หลักจึงใช้ VARCHAR(10) แฮช bcrypt ยาว 60 ตัวเสมอจึงใช้ CHAR(60) รหัสบอร์ด ESP32-XXXXXXXXXXXX ยาว 18 ตัวจึงใช้ CHAR(18) ข้อดีคือฐานข้อมูลช่วยกันข้อมูลผิดรูปแบบที่ชั้นล่างสุด index เล็กลง และคนอ่านสคีมารู้ทันทีว่าช่องนั้นรับข้อมูลหน้าตาแบบไหน ส่วนข้อความที่ผู้ใช้พิมพ์เองและอาจยาวขึ้นในอนาคต เช่น `detail` และ `note` ยังเผื่อไว้ 255 ถ้าต้องปรับขนาดภายหลัง ใช้ `npm run db:migrate:types` (สคริปต์ `scripts/migrate-column-types.js`) ซึ่งอ่านชนิดจาก `schema.sql` แล้วปรับเฉพาะคอลัมน์ที่ไม่ตรง
 
 > [!WHY]
 > **token_version ทำงานอย่างไร**
@@ -376,7 +376,7 @@ CREATE TABLE IF NOT EXISTS users (
 ```sql
 CREATE TABLE IF NOT EXISTS password_reset_otps (
   id CHAR(36) NOT NULL,
-  username VARCHAR(100) NOT NULL,
+  username VARCHAR(30) NOT NULL,
   otp_hash CHAR(64) NOT NULL,
   reset_token_hash CHAR(64) NULL,
   expires_at DATETIME NOT NULL,
@@ -411,7 +411,7 @@ CREATE TABLE IF NOT EXISTS password_reset_otps (
 | คอลัมน์ | ชนิด | ความหมาย | ทำไม |
 |---|---|---|---|
 | `id` | CHAR(36) PK | รหัสคำขอ | UUID เดาไม่ได้ |
-| `username` | VARCHAR(100) FK | ผู้ขอรีเซ็ต | ผูกกับบัญชี |
+| `username` | VARCHAR(30) FK | ผู้ขอรีเซ็ต | ผูกกับบัญชี |
 | `otp_hash` | CHAR(64) | HMAC ของ OTP | ฐานข้อมูลหลุดก็ไม่รู้ OTP |
 | `reset_token_hash` | CHAR(64) NULL UNIQUE | HMAC ของ token ขั้นที่สอง | แยกขั้น "ยืนยัน OTP" กับ "ตั้งรหัสใหม่" |
 | `expires_at` | DATETIME | หมดอายุ | OTP อายุสั้นลดโอกาสเดา |
@@ -428,12 +428,12 @@ CREATE TABLE IF NOT EXISTS password_reset_otps (
 
 ```sql
 CREATE TABLE IF NOT EXISTS rooms (
-  room_number VARCHAR(20) NOT NULL,
+  room_number VARCHAR(10) NOT NULL,
   floor_number TINYINT UNSIGNED NOT NULL DEFAULT 0,
   room_index SMALLINT UNSIGNED NOT NULL DEFAULT 0,
-  room_type VARCHAR(100) NOT NULL DEFAULT 'Classroom',
-  created_by VARCHAR(100) NOT NULL,
-  updated_by VARCHAR(100) NOT NULL,
+  room_type VARCHAR(50) NOT NULL DEFAULT 'Classroom',
+  created_by VARCHAR(30) NOT NULL,
+  updated_by VARCHAR(30) NOT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
     ON UPDATE CURRENT_TIMESTAMP,
@@ -445,7 +445,7 @@ CREATE TABLE IF NOT EXISTS rooms (
   COLLATE=utf8mb4_unicode_ci;
 ```
 
-1. **บรรทัด 2** — `room_number` เลขห้อง เช่น `'16302'` หรือ `'CL503'` เก็บเป็นข้อความเพราะมีตัวอักษรปน (รูปแบบที่โค้ดยอมรับคือ `/^[A-Z0-9][A-Z0-9_-]{1,19}$/` ยาวไม่เกิน 20 ตรงกับ `VARCHAR(20)`)
+1. **บรรทัด 2** — `room_number` เลขห้อง เช่น `'16302'` หรือ `'CL503'` เก็บเป็นข้อความเพราะมีตัวอักษรปน (รูปแบบที่โค้ดยอมรับคือ `/^[A-Z0-9][A-Z0-9_-]{1,9}$/` ยาวไม่เกิน 10 ตรงกับ `VARCHAR(10)`)
 2. **บรรทัด 3** — `floor_number` ชั้น ใช้จัดกลุ่มในหน้าแอป
 3. **บรรทัด 4** — `room_index` ลำดับห้องในชั้น ใช้เรียงให้ตรงกับผังจริง
 4. **บรรทัด 5** — `room_type` ประเภทห้อง (Classroom, Laboratory, ...)
@@ -455,11 +455,11 @@ CREATE TABLE IF NOT EXISTS rooms (
 
 | คอลัมน์ | ชนิด | ความหมาย | ทำไม |
 |---|---|---|---|
-| `room_number` | VARCHAR(20) PK | เลขห้อง | คนใช้เลขห้องเรียกห้องอยู่แล้ว เป็นคีย์ธรรมชาติ |
+| `room_number` | VARCHAR(10) PK | เลขห้อง | คนใช้เลขห้องเรียกห้องอยู่แล้ว เป็นคีย์ธรรมชาติ |
 | `floor_number` | TINYINT UNSIGNED | ชั้น (0 = ไม่ระบุ/ห้องพิเศษ เช่น CL503) | ตึกไม่มีเกิน 255 ชั้น 1 ไบต์พอ |
 | `room_index` | SMALLINT UNSIGNED | ลำดับในชั้น | เรียงตามผัง ไม่ใช่ตามตัวอักษร |
-| `room_type` | VARCHAR(100) | ประเภทห้อง | เป็นข้อความอิสระ เพิ่มประเภทใหม่ได้โดยไม่แก้ schema |
-| `created_by`, `updated_by` | VARCHAR(100) | ผู้สร้าง/แก้ | ตรวจย้อนหลัง |
+| `room_type` | VARCHAR(50) | ประเภทห้อง | เป็นข้อความอิสระ เพิ่มประเภทใหม่ได้โดยไม่แก้ schema |
+| `created_by`, `updated_by` | VARCHAR(30) | ผู้สร้าง/แก้ | ตรวจย้อนหลัง |
 | `created_at`, `updated_at` | DATETIME | เวลา | อัตโนมัติ |
 
 > [!NOTE]
@@ -479,15 +479,15 @@ CREATE TABLE IF NOT EXISTS rooms (
 ```sql
 CREATE TABLE IF NOT EXISTS class_schedules (
   id CHAR(36) NOT NULL,
-  room_number VARCHAR(20) NOT NULL,
+  room_number VARCHAR(10) NOT NULL,
   day_of_week TINYINT UNSIGNED NOT NULL,
-  subject_name VARCHAR(150) NOT NULL,
-  section_name VARCHAR(80) NOT NULL DEFAULT '',
-  instructor VARCHAR(150) NOT NULL DEFAULT '',
+  subject_name VARCHAR(100) NOT NULL,
+  section_name VARCHAR(30) NOT NULL DEFAULT '',
+  instructor VARCHAR(100) NOT NULL DEFAULT '',
   start_time TIME NOT NULL,
   end_time TIME NOT NULL,
-  created_by VARCHAR(100) NOT NULL,
-  updated_by VARCHAR(100) NOT NULL,
+  created_by VARCHAR(30) NOT NULL,
+  updated_by VARCHAR(30) NOT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
     ON UPDATE CURRENT_TIMESTAMP,
@@ -517,11 +517,11 @@ CREATE TABLE IF NOT EXISTS class_schedules (
 | คอลัมน์ | ชนิด | ความหมาย | ทำไม |
 |---|---|---|---|
 | `id` | CHAR(36) PK | รหัสคาบ | ไม่มีค่าธรรมชาติที่ไม่ซ้ำ |
-| `room_number` | VARCHAR(20) FK | ห้อง | ผูกกับ `rooms` |
+| `room_number` | VARCHAR(10) FK | ห้อง | ผูกกับ `rooms` |
 | `day_of_week` | TINYINT UNSIGNED | วัน (0=อาทิตย์) | ตรงกับ `Date.getDay()` ของ JavaScript |
-| `subject_name` | VARCHAR(150) | ชื่อวิชา | แสดงผล และเป็นส่วนหนึ่งของ UNIQUE |
-| `section_name` | VARCHAR(80) | กลุ่มเรียน | เพิ่มทีหลังใน migration v1.8.0 จึงมี DEFAULT '' |
-| `instructor` | VARCHAR(150) | ผู้สอน | เหตุผลเดียวกัน |
+| `subject_name` | VARCHAR(100) | ชื่อวิชา | แสดงผล และเป็นส่วนหนึ่งของ UNIQUE |
+| `section_name` | VARCHAR(30) | กลุ่มเรียน | เพิ่มทีหลังใน migration v1.8.0 จึงมี DEFAULT '' |
+| `instructor` | VARCHAR(100) | ผู้สอน | เหตุผลเดียวกัน |
 | `start_time`, `end_time` | TIME | ช่วงเวลา | ซ้ำทุกสัปดาห์ |
 | `created_by`, `updated_by`, `created_at`, `updated_at` | | ข้อมูลตรวจสอบ | เหมือนตารางอื่น |
 
@@ -539,16 +539,16 @@ CREATE TABLE IF NOT EXISTS class_schedules (
 
 ```sql
 CREATE TABLE IF NOT EXISTS air_conditioners (
-  device_id VARCHAR(32) NOT NULL,
-  room_number VARCHAR(20) NOT NULL,
+  device_id CHAR(18) NOT NULL,
+  room_number VARCHAR(10) NOT NULL,
   air_number TINYINT UNSIGNED NOT NULL,
-  name VARCHAR(60) NOT NULL,
-  ble_name VARCHAR(40) NOT NULL,
-  protocol VARCHAR(40) NOT NULL DEFAULT 'HAIER_AC160',
-  mqtt_topic VARCHAR(160) NOT NULL,
+  name VARCHAR(50) NOT NULL,
+  ble_name CHAR(21) NOT NULL,
+  protocol VARCHAR(20) NOT NULL DEFAULT 'HAIER_AC160',
+  mqtt_topic VARCHAR(64) NOT NULL,
   mqtt_host VARCHAR(253) NOT NULL,
   mqtt_port SMALLINT UNSIGNED NOT NULL DEFAULT 1883,
-  mqtt_username VARCHAR(100) NULL,
+  mqtt_username VARCHAR(50) NULL,
   provision_status ENUM(
     'reserved',
     'active'
@@ -583,12 +583,12 @@ CREATE TABLE IF NOT EXISTS air_conditioners (
 ไฟล์: `backend/database/schema.sql` (บล็อกที่ 2: ค่าไฟล่าสุดและระบบปิดแอร์อัตโนมัติ)
 
 ```sql
-  voltage DECIMAL(8,2) NULL,
-  current_amp DECIMAL(8,3) NULL,
-  power_watts DECIMAL(10,2) NULL,
-  energy_kwh DECIMAL(12,3) NULL,
-  frequency_hz DECIMAL(6,2) NULL,
-  power_factor DECIMAL(5,3) NULL,
+  voltage DECIMAL(4,1) NULL,
+  current_amp DECIMAL(6,3) NULL,
+  power_watts DECIMAL(6,1) NULL,
+  energy_kwh DECIMAL(10,3) NULL,
+  frequency_hz DECIMAL(3,1) NULL,
+  power_factor DECIMAL(3,2) NULL,
   pzem_available BOOLEAN NOT NULL DEFAULT FALSE,
   ac_running BOOLEAN NOT NULL DEFAULT FALSE,
   outside_schedule BOOLEAN NOT NULL DEFAULT FALSE,
@@ -617,14 +617,14 @@ CREATE TABLE IF NOT EXISTS air_conditioners (
 ```sql
   -- จุดต่อของประวัติไฟฟ้า: ตัวอย่างล่าสุดที่บันทึกลง energy_hourly แล้ว
   -- ใช้ทั้งข้อมูลสดและข้อมูลย้อนหลังตอนเน็ตหลุด กันนับซ้ำหรือขาดช่วง
-  energy_chain_kwh DECIMAL(12,3) NULL,
+  energy_chain_kwh DECIMAL(10,3) NULL,
   energy_chain_at DATETIME NULL,
   energy_chain_running BOOLEAN NOT NULL DEFAULT FALSE,
   -- จำนวนรายการย้อนหลังที่บอร์ดยังส่งไม่ครบ
   history_pending SMALLINT UNSIGNED NOT NULL DEFAULT 0,
   last_seen_at DATETIME NULL,
-  created_by VARCHAR(100) NOT NULL,
-  updated_by VARCHAR(100) NOT NULL,
+  created_by VARCHAR(30) NOT NULL,
+  updated_by VARCHAR(30) NOT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
     ON UPDATE CURRENT_TIMESTAMP,
@@ -655,13 +655,13 @@ CREATE TABLE IF NOT EXISTS air_conditioners (
 
 | คอลัมน์ | ชนิด | ความหมาย | ทำไม |
 |---|---|---|---|
-| `device_id` | VARCHAR(32) PK | รหัสบอร์ด `ESP32-XXXXXXXXXXXX` | คงที่ตลอดอายุบอร์ด เป็นคีย์ธรรมชาติ |
-| `room_number` | VARCHAR(20) FK | ห้อง | ผูกกับ `rooms` |
+| `device_id` | CHAR(18) PK | รหัสบอร์ด `ESP32-XXXXXXXXXXXX` | คงที่ตลอดอายุบอร์ด เป็นคีย์ธรรมชาติ |
+| `room_number` | VARCHAR(10) FK | ห้อง | ผูกกับ `rooms` |
 | `air_number` | TINYINT UNSIGNED | เครื่องที่ n ในห้อง | ห้องหนึ่งมีแอร์ไม่กี่เครื่อง |
-| `name` | VARCHAR(60) | ชื่อแสดงผล | คนจำชื่อง่ายกว่ารหัส |
-| `ble_name` | VARCHAR(40) UNIQUE | ชื่อ Bluetooth | ใช้หาบอร์ดตอนตั้งค่า |
-| `protocol` | VARCHAR(40) | โปรโตคอล IR | รองรับแอร์ยี่ห้ออื่นในอนาคต |
-| `mqtt_topic` | VARCHAR(160) UNIQUE | topic ของเครื่อง | แยกช่องสื่อสารของแต่ละบอร์ด |
+| `name` | VARCHAR(50) | ชื่อแสดงผล | คนจำชื่อง่ายกว่ารหัส |
+| `ble_name` | CHAR(21) UNIQUE | ชื่อ Bluetooth | ใช้หาบอร์ดตอนตั้งค่า |
+| `protocol` | VARCHAR(20) | โปรโตคอล IR | รองรับแอร์ยี่ห้ออื่นในอนาคต |
+| `mqtt_topic` | VARCHAR(64) UNIQUE | topic ของเครื่อง | แยกช่องสื่อสารของแต่ละบอร์ด |
 | `mqtt_host`, `mqtt_port`, `mqtt_username` | | ข้อมูล broker และบัญชีของบอร์ด | ส่งให้บอร์ดตอน provisioning |
 | `provision_status` | ENUM | `reserved`/`active` | วงจรชีวิตอุปกรณ์ |
 | `provisioning_token_hash` | CHAR(64) NULL | แฮชของ token ยืนยันตัว | ไม่เก็บ token จริง |
@@ -692,13 +692,13 @@ CREATE TABLE IF NOT EXISTS air_conditioners (
 
 ```sql
 CREATE TABLE IF NOT EXISTS occupancy_sensors (
-  device_id VARCHAR(32) NOT NULL,
-  room_number VARCHAR(20) NOT NULL,
-  ble_name VARCHAR(40) NOT NULL,
-  mqtt_topic VARCHAR(160) NOT NULL,
+  device_id CHAR(18) NOT NULL,
+  room_number VARCHAR(10) NOT NULL,
+  ble_name CHAR(22) NOT NULL,
+  mqtt_topic VARCHAR(64) NOT NULL,
   mqtt_host VARCHAR(253) NOT NULL,
   mqtt_port SMALLINT UNSIGNED NOT NULL DEFAULT 1883,
-  mqtt_username VARCHAR(100) NULL,
+  mqtt_username VARCHAR(50) NULL,
   provision_status ENUM(
     'reserved',
     'active'
@@ -712,8 +712,8 @@ CREATE TABLE IF NOT EXISTS occupancy_sensors (
   firmware_version VARCHAR(20) NULL,
   ota_error VARCHAR(120) NULL,
   last_seen_at DATETIME NULL,
-  created_by VARCHAR(100) NOT NULL,
-  updated_by VARCHAR(100) NOT NULL,
+  created_by VARCHAR(30) NOT NULL,
+  updated_by VARCHAR(30) NOT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
     ON UPDATE CURRENT_TIMESTAMP,
@@ -743,8 +743,8 @@ CREATE TABLE IF NOT EXISTS occupancy_sensors (
 
 | คอลัมน์ | ชนิด | ความหมาย | ทำไม |
 |---|---|---|---|
-| `device_id` | VARCHAR(32) PK | `OCC32-XXXXXXXXXXXX` | คีย์ธรรมชาติของบอร์ด |
-| `room_number` | VARCHAR(20) FK UNIQUE | ห้อง | หนึ่งห้องหนึ่งเซ็นเซอร์ |
+| `device_id` | CHAR(18) PK | `OCC32-XXXXXXXXXXXX` | คีย์ธรรมชาติของบอร์ด |
+| `room_number` | VARCHAR(10) FK UNIQUE | ห้อง | หนึ่งห้องหนึ่งเซ็นเซอร์ |
 | `ble_name`, `mqtt_topic` | UNIQUE | ชื่อ BLE และ topic | ห้ามชนกัน |
 | `mqtt_host`, `mqtt_port`, `mqtt_username` | | ข้อมูล broker | ส่งให้บอร์ดตอน provisioning |
 | `provision_status`, `provisioning_token_hash`, `provisioning_expires_at` | | วงจรชีวิต/ยืนยันตัว | เหมือนแอร์ |
@@ -770,13 +770,13 @@ CREATE TABLE IF NOT EXISTS system_alerts (
     'auto_off_succeeded',
     'auto_off_failed'
   ) NOT NULL,
-  room_number VARCHAR(20) NOT NULL,
-  device_id VARCHAR(32) NULL,
-  device_name VARCHAR(60) NOT NULL DEFAULT '',
+  room_number VARCHAR(10) NOT NULL,
+  device_id CHAR(18) NULL,
+  device_name VARCHAR(50) NOT NULL DEFAULT '',
   detail VARCHAR(255) NOT NULL DEFAULT '',
   status ENUM('open', 'acknowledged', 'resolved') NOT NULL DEFAULT 'open',
   acknowledged_at DATETIME NULL,
-  acknowledged_by VARCHAR(100) NULL,
+  acknowledged_by VARCHAR(30) NULL,
   resolved_at DATETIME NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
@@ -800,9 +800,9 @@ CREATE TABLE IF NOT EXISTS system_alerts (
 |---|---|---|---|
 | `id` | CHAR(36) PK | รหัสแจ้งเตือน | UUID |
 | `kind` | ENUM | ชนิดเหตุการณ์ | แอปแปลภาษาเองได้ |
-| `room_number` | VARCHAR(20) | ห้อง | ไม่มี FK เพื่อให้ประวัติอยู่ได้แม้ลบห้อง |
-| `device_id` | VARCHAR(32) NULL | เครื่อง | อาจเป็นแจ้งเตือนระดับห้อง |
-| `device_name` | VARCHAR(60) | ชื่อเครื่อง ณ ตอนนั้น | สำเนาไว้ ไม่ต้อง JOIN และยังอ่านได้หลังลบเครื่อง |
+| `room_number` | VARCHAR(10) | ห้อง | ไม่มี FK เพื่อให้ประวัติอยู่ได้แม้ลบห้อง |
+| `device_id` | CHAR(18) NULL | เครื่อง | อาจเป็นแจ้งเตือนระดับห้อง |
+| `device_name` | VARCHAR(50) | ชื่อเครื่อง ณ ตอนนั้น | สำเนาไว้ ไม่ต้อง JOIN และยังอ่านได้หลังลบเครื่อง |
 | `detail` | VARCHAR(255) | รายละเอียด | ข้อมูลประกอบ |
 | `status` | ENUM | `open`/`acknowledged`/`resolved` | ติดตามการจัดการ |
 | `acknowledged_at`, `acknowledged_by` | NULL | การรับทราบ | รู้ว่าใครเห็นแล้ว |
@@ -823,31 +823,31 @@ CREATE TABLE IF NOT EXISTS system_alerts (
 -- ถังเก็บค่าไฟรายชั่วโมงของแอร์แต่ละเครื่อง หนึ่งแถวคือหนึ่งเครื่องต่อหนึ่ง
 -- ชั่วโมงตามเวลาไทย เก็บเป็นผลรวมกับตัวนับ ค่าเฉลี่ยคำนวณตอนดึงรายงาน
 CREATE TABLE IF NOT EXISTS energy_hourly (
-  device_id VARCHAR(32) NOT NULL,
+  device_id CHAR(18) NOT NULL,
   bucket_start DATETIME NOT NULL,
-  room_number VARCHAR(20) NOT NULL,
-  device_name VARCHAR(60) NOT NULL DEFAULT '',
-  sample_count INT UNSIGNED NOT NULL DEFAULT 0,
-  pzem_samples INT UNSIGNED NOT NULL DEFAULT 0,
-  running_samples INT UNSIGNED NOT NULL DEFAULT 0,
+  room_number VARCHAR(10) NOT NULL,
+  device_name VARCHAR(50) NOT NULL DEFAULT '',
+  sample_count SMALLINT UNSIGNED NOT NULL DEFAULT 0,
+  pzem_samples SMALLINT UNSIGNED NOT NULL DEFAULT 0,
+  running_samples SMALLINT UNSIGNED NOT NULL DEFAULT 0,
   first_sample_at DATETIME NULL,
   last_sample_at DATETIME NULL,
-  energy_start_kwh DECIMAL(12,3) NULL,
-  energy_end_kwh DECIMAL(12,3) NULL,
-  consumption_kwh DECIMAL(12,3) NOT NULL DEFAULT 0,
-  voltage_sum DECIMAL(16,2) NOT NULL DEFAULT 0,
-  voltage_min DECIMAL(8,2) NULL,
-  voltage_max DECIMAL(8,2) NULL,
-  current_sum DECIMAL(16,3) NOT NULL DEFAULT 0,
-  current_min DECIMAL(8,3) NULL,
-  current_max DECIMAL(8,3) NULL,
-  power_sum DECIMAL(18,2) NOT NULL DEFAULT 0,
-  power_min DECIMAL(10,2) NULL,
-  power_max DECIMAL(10,2) NULL,
-  power_factor_sum DECIMAL(14,3) NOT NULL DEFAULT 0,
-  frequency_sum DECIMAL(14,2) NOT NULL DEFAULT 0,
-  runtime_seconds INT UNSIGNED NOT NULL DEFAULT 0,
-  online_seconds INT UNSIGNED NOT NULL DEFAULT 0,
+  energy_start_kwh DECIMAL(10,3) NULL,
+  energy_end_kwh DECIMAL(10,3) NULL,
+  consumption_kwh DECIMAL(10,3) NOT NULL DEFAULT 0,
+  voltage_sum DECIMAL(10,1) NOT NULL DEFAULT 0,
+  voltage_min DECIMAL(4,1) NULL,
+  voltage_max DECIMAL(4,1) NULL,
+  current_sum DECIMAL(10,3) NOT NULL DEFAULT 0,
+  current_min DECIMAL(6,3) NULL,
+  current_max DECIMAL(6,3) NULL,
+  power_sum DECIMAL(12,1) NOT NULL DEFAULT 0,
+  power_min DECIMAL(6,1) NULL,
+  power_max DECIMAL(6,1) NULL,
+  power_factor_sum DECIMAL(8,2) NOT NULL DEFAULT 0,
+  frequency_sum DECIMAL(8,1) NOT NULL DEFAULT 0,
+  runtime_seconds SMALLINT UNSIGNED NOT NULL DEFAULT 0,
+  online_seconds SMALLINT UNSIGNED NOT NULL DEFAULT 0,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
     ON UPDATE CURRENT_TIMESTAMP,
@@ -868,7 +868,7 @@ CREATE TABLE IF NOT EXISTS energy_hourly (
 7. **บรรทัด 11–12** — เวลาตัวอย่างแรก/สุดท้ายในถัง
 8. **บรรทัด 13–14** — เลขมิเตอร์ต้นชั่วโมงและปลายชั่วโมง
 9. **บรรทัด 15** — `consumption_kwh` พลังงานที่ใช้ในชั่วโมงนี้ (ผลรวมของผลต่างเลขมิเตอร์)
-10. **บรรทัด 16–24** — สำหรับแรงดัน กระแส กำลังไฟ: เก็บ `_sum` (ผลรวม) `_min` `_max` ส่วนตัวประกอบกำลังและความถี่เก็บแค่ `_sum` ความกว้างของ `_sum` ใหญ่กว่าค่าเดี่ยว (เช่น `DECIMAL(16,2)` เทียบกับ `DECIMAL(8,2)`) เพราะต้องรับผลรวมหลายร้อยตัวอย่าง
+10. **บรรทัด 16–24** — สำหรับแรงดัน กระแส กำลังไฟ: เก็บ `_sum` (ผลรวม) `_min` `_max` ส่วนตัวประกอบกำลังและความถี่เก็บแค่ `_sum` ความกว้างของ `_sum` ใหญ่กว่าค่าเดี่ยว (เช่น `DECIMAL(10,1)` เทียบกับ `DECIMAL(4,1)` ของแรงดัน) เพราะต้องรับผลรวมหลายร้อยตัวอย่าง
 11. **บรรทัด 27–28** — `runtime_seconds` วินาทีที่แอร์ทำงาน, `online_seconds` วินาทีที่บอร์ดออนไลน์
 12. **บรรทัด 31** — คีย์หลักผสม ทำให้ "เครื่องเดียวกัน ชั่วโมงเดียวกัน" มีได้แถวเดียว และเป็นเป้าของ upsert
 13. **บรรทัด 32** — index ตามเวลาอย่างเดียว สำหรับรายงานระดับ "ทั้งตึก" ที่กรองแค่ช่วงวันที่
@@ -876,22 +876,22 @@ CREATE TABLE IF NOT EXISTS energy_hourly (
 
 | คอลัมน์ | ชนิด | ความหมาย | ทำไม |
 |---|---|---|---|
-| `device_id` | VARCHAR(32) PK | เครื่อง | ส่วนแรกของคีย์ผสม |
+| `device_id` | CHAR(18) PK | เครื่อง | ส่วนแรกของคีย์ผสม |
 | `bucket_start` | DATETIME PK | ต้นชั่วโมงเวลาไทย | ส่วนที่สองของคีย์ผสม |
-| `room_number` | VARCHAR(20) | ห้อง ณ ตอนบันทึก | กรองรายงานตามห้องโดยไม่ JOIN |
-| `device_name` | VARCHAR(60) | ชื่อเครื่อง ณ ตอนบันทึก | ประวัติไม่เปลี่ยนตามการเปลี่ยนชื่อ |
-| `sample_count` | INT UNSIGNED | จำนวนตัวอย่างทั้งหมด | ตรวจคุณภาพข้อมูล |
-| `pzem_samples` | INT UNSIGNED | ตัวอย่างที่ PZEM อ่านได้ | ตัวหารค่าเฉลี่ย |
-| `running_samples` | INT UNSIGNED | ตัวอย่างที่แอร์ทำงาน | สัดส่วนเวลาทำงาน |
+| `room_number` | VARCHAR(10) | ห้อง ณ ตอนบันทึก | กรองรายงานตามห้องโดยไม่ JOIN |
+| `device_name` | VARCHAR(50) | ชื่อเครื่อง ณ ตอนบันทึก | ประวัติไม่เปลี่ยนตามการเปลี่ยนชื่อ |
+| `sample_count` | SMALLINT UNSIGNED | จำนวนตัวอย่างทั้งหมด | ตรวจคุณภาพข้อมูล |
+| `pzem_samples` | SMALLINT UNSIGNED | ตัวอย่างที่ PZEM อ่านได้ | ตัวหารค่าเฉลี่ย |
+| `running_samples` | SMALLINT UNSIGNED | ตัวอย่างที่แอร์ทำงาน | สัดส่วนเวลาทำงาน |
 | `first_sample_at`, `last_sample_at` | DATETIME NULL | ขอบเวลาข้อมูล | ตัดสินเลขมิเตอร์ต้น/ปลาย |
-| `energy_start_kwh`, `energy_end_kwh` | DECIMAL(12,3) NULL | เลขมิเตอร์ต้น/ปลาย | ตรวจสอบเทียบกับมิเตอร์จริง |
-| `consumption_kwh` | DECIMAL(12,3) | kWh ที่ใช้ | ตัวเลขหลักของรายงานค่าไฟ |
+| `energy_start_kwh`, `energy_end_kwh` | DECIMAL(10,3) NULL | เลขมิเตอร์ต้น/ปลาย | ตรวจสอบเทียบกับมิเตอร์จริง |
+| `consumption_kwh` | DECIMAL(10,3) | kWh ที่ใช้ | ตัวเลขหลักของรายงานค่าไฟ |
 | `voltage_sum/min/max` | DECIMAL | แรงดัน | เฉลี่ย = sum / pzem_samples |
 | `current_sum/min/max` | DECIMAL | กระแส | เหมือนกัน |
 | `power_sum/min/max` | DECIMAL | กำลังไฟ | เหมือนกัน และดูค่าพีก |
 | `power_factor_sum`, `frequency_sum` | DECIMAL | ผลรวม PF, Hz | หาค่าเฉลี่ยได้ |
-| `runtime_seconds` | INT UNSIGNED | วินาทีที่แอร์ทำงาน | วิเคราะห์พฤติกรรมการใช้ |
-| `online_seconds` | INT UNSIGNED | วินาทีที่ออนไลน์ | รู้ว่าข้อมูลครอบคลุมแค่ไหน |
+| `runtime_seconds` | SMALLINT UNSIGNED | วินาทีที่แอร์ทำงาน | วิเคราะห์พฤติกรรมการใช้ |
+| `online_seconds` | SMALLINT UNSIGNED | วินาทีที่ออนไลน์ | รู้ว่าข้อมูลครอบคลุมแค่ไหน |
 | `created_at`, `updated_at` | DATETIME | เวลาสร้าง/แก้ถัง | อัตโนมัติ |
 
 **ใครอ่าน/เขียน:** `services/energy-recorder.js` (เขียนด้วย upsert และมี `purgeEnergyHistoryOlderThan` ไว้ลบข้อมูลเก่า แต่ไม่มีอะไรเรียกอัตโนมัติ), `utils/energy-history.js` (ฟังก์ชันบริสุทธิ์: คำนวณค่าที่จะบวกเข้าถัง และประกอบ SQL รายงาน), `routes/energy.js` (API รายงาน/ส่งออก Excel), `scripts/doctor.js` (สรุปจำนวนถัง)
@@ -908,9 +908,9 @@ CREATE TABLE IF NOT EXISTS energy_hourly (
 -- ใช้เก็บของที่กระทบทั้งอาคาร เช่นสวิตช์รวมของระบบปิดแอร์อัตโนมัติ
 -- ต้องอยู่ที่นี่เพราะตัวที่ยิงคำสั่งปิดคือ Backend ไม่ใช่แอปบนมือถือ
 CREATE TABLE IF NOT EXISTS system_settings (
-  setting_key VARCHAR(64) NOT NULL PRIMARY KEY,
+  setting_key VARCHAR(32) NOT NULL PRIMARY KEY,
   setting_value VARCHAR(255) NOT NULL,
-  updated_by VARCHAR(64) NULL,
+  updated_by VARCHAR(30) NULL,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
     ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -931,9 +931,9 @@ CREATE TABLE IF NOT EXISTS system_settings (
 
 | คอลัมน์ | ชนิด | ความหมาย | ทำไม |
 |---|---|---|---|
-| `setting_key` | VARCHAR(64) PK | ชื่อค่าตั้ง | เพิ่มค่าตั้งใหม่ได้โดยไม่ต้อง ALTER TABLE |
+| `setting_key` | VARCHAR(32) PK | ชื่อค่าตั้ง | เพิ่มค่าตั้งใหม่ได้โดยไม่ต้อง ALTER TABLE |
 | `setting_value` | VARCHAR(255) | ค่า (ข้อความ) | รูปแบบเดียวรับได้ทุกชนิด |
-| `updated_by` | VARCHAR(64) NULL | ผู้แก้ | ตรวจย้อนหลัง |
+| `updated_by` | VARCHAR(30) NULL | ผู้แก้ | ตรวจย้อนหลัง |
 | `updated_at` | TIMESTAMP | เวลาแก้ | อัตโนมัติ |
 
 > [!WHY]
@@ -948,10 +948,10 @@ CREATE TABLE IF NOT EXISTS system_settings (
 
 ```sql
 CREATE TABLE IF NOT EXISTS academic_terms (
-  semester VARCHAR(30) NOT NULL,
+  semester VARCHAR(6) NOT NULL,
   start_date DATE NOT NULL,
   end_date DATE NOT NULL,
-  updated_by VARCHAR(100) NULL,
+  updated_by VARCHAR(30) NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
     ON UPDATE CURRENT_TIMESTAMP,
@@ -970,9 +970,9 @@ CREATE TABLE IF NOT EXISTS academic_terms (
 
 | คอลัมน์ | ชนิด | ความหมาย | ทำไม |
 |---|---|---|---|
-| `semester` | VARCHAR(30) PK | ภาคเรียน | คีย์ธรรมชาติ |
+| `semester` | VARCHAR(6) PK | ภาคเรียน | คีย์ธรรมชาติ |
 | `start_date`, `end_date` | DATE | ช่วงภาคเรียน | ไม่ต้องการเวลา |
-| `updated_by` | VARCHAR(100) NULL | ผู้แก้ | ตรวจย้อนหลัง |
+| `updated_by` | VARCHAR(30) NULL | ผู้แก้ | ตรวจย้อนหลัง |
 | `created_at`, `updated_at` | DATETIME | เวลา | อัตโนมัติ |
 
 **ใครอ่าน/เขียน:** `services/academic-terms.js` (บันทึกด้วย `ON DUPLICATE KEY UPDATE` และพักค่าไว้ในหน่วยความจำ 15 วินาที `CACHE_TTL_MS = 15000` เพราะระบบปิดแอร์ถามทุก 10 วินาที)
@@ -984,18 +984,18 @@ CREATE TABLE IF NOT EXISTS academic_terms (
 ```sql
 CREATE TABLE IF NOT EXISTS room_bookings (
   id CHAR(36) NOT NULL,
-  room_number VARCHAR(20) NOT NULL,
-  title VARCHAR(150) NOT NULL,
-  category VARCHAR(20) NOT NULL DEFAULT 'other',
+  room_number VARCHAR(10) NOT NULL,
+  title VARCHAR(100) NOT NULL,
+  category VARCHAR(10) NOT NULL DEFAULT 'other',
   note VARCHAR(255) NOT NULL DEFAULT '',
   repeat_type VARCHAR(10) NOT NULL DEFAULT 'once',
-  days_of_week VARCHAR(20) NOT NULL DEFAULT '',
+  days_of_week VARCHAR(13) NOT NULL DEFAULT '',
   start_date DATE NOT NULL,
   end_date DATE NOT NULL,
   start_time TIME NOT NULL,
   end_time TIME NOT NULL,
-  created_by VARCHAR(100) NOT NULL,
-  updated_by VARCHAR(100) NOT NULL,
+  created_by VARCHAR(30) NOT NULL,
+  updated_by VARCHAR(30) NOT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
     ON UPDATE CURRENT_TIMESTAMP,
@@ -1025,12 +1025,12 @@ CREATE TABLE IF NOT EXISTS room_bookings (
 | คอลัมน์ | ชนิด | ความหมาย | ทำไม |
 |---|---|---|---|
 | `id` | CHAR(36) PK | รหัสการจอง | UUID |
-| `room_number` | VARCHAR(20) FK | ห้อง | CASCADE |
-| `title` | VARCHAR(150) | ชื่อกิจกรรม | แสดงผล |
-| `category` | VARCHAR(20) | ประเภท | VARCHAR เพื่อเพิ่มประเภทได้ง่าย |
+| `room_number` | VARCHAR(10) FK | ห้อง | CASCADE |
+| `title` | VARCHAR(100) | ชื่อกิจกรรม | แสดงผล |
+| `category` | VARCHAR(10) | ประเภท | VARCHAR เพื่อเพิ่มประเภทได้ง่าย |
 | `note` | VARCHAR(255) | หมายเหตุ | |
 | `repeat_type` | VARCHAR(10) | `once`/`daily`/`weekly` | รูปแบบการซ้ำ |
-| `days_of_week` | VARCHAR(20) | เช่น `"1,3"` | ใช้กับ weekly เท่านั้น |
+| `days_of_week` | VARCHAR(13) | เช่น `"1,3"` | ใช้กับ weekly เท่านั้น |
 | `start_date`, `end_date` | DATE | ช่วงวัน | การจองผูกกับวันที่จริงเสมอ (ต่างจากตารางเรียน) |
 | `start_time`, `end_time` | TIME | ช่วงเวลา | |
 | `created_by` … `updated_at` | | ข้อมูลตรวจสอบ | |
