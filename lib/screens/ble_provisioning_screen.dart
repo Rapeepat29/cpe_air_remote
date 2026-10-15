@@ -255,7 +255,7 @@ class _BleProvisioningScreenState extends State<BleProvisioningScreen> {
               const SizedBox(height: 10),
               TextFormField(
                 controller: _name,
-                maxLength: 60,
+                maxLength: 50,
                 decoration: InputDecoration(
                   labelText: context.tr('Air Conditioner Name'),
                 ),

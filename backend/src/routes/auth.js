@@ -55,7 +55,7 @@ authRouter.post(
   '/login',
   loginLimiter,
   asyncHandler(async (request, response) => {
-    const username = cleanString(request.body?.username, 100);
+    const username = cleanString(request.body?.username, 30);
     const password = typeof request.body?.password === 'string'
       ? request.body.password
       : '';
@@ -243,7 +243,7 @@ authRouter.post(
   '/forgot-password',
   resetLimiter,
   asyncHandler(async (request, response) => {
-    const identifier = cleanString(request.body?.identifier, 190);
+    const identifier = cleanString(request.body?.identifier, 100);
     if (!identifier) {
       throw new ApiError(400, 'กรุณากรอก Username หรือ Email');
     }

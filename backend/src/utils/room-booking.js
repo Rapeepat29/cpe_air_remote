@@ -13,7 +13,7 @@ export const MAX_SPAN_DAYS = 400;
 
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 const TIME_PATTERN = /^(?:[01]\d|2[0-3]):[0-5]\d$/;
-const ROOM_PATTERN = /^[A-Z0-9][A-Z0-9_-]{1,19}$/;
+const ROOM_PATTERN = /^[A-Z0-9][A-Z0-9_-]{1,9}$/;
 
 function text(value, max) {
   return String(value ?? '').trim().replace(/\s+/g, ' ').slice(0, max);
@@ -46,8 +46,8 @@ export function parseDays(value) {
 }
 
 export function validateBookingInput(body) {
-  const roomNumber = text(body?.roomNumber, 20).toUpperCase();
-  const title = text(body?.title, 150);
+  const roomNumber = text(body?.roomNumber, 10).toUpperCase();
+  const title = text(body?.title, 100);
   const category = BOOKING_CATEGORIES.includes(body?.category) ? body.category : 'other';
   const note = text(body?.note, 255);
   const repeatType = String(body?.repeatType ?? '').trim();

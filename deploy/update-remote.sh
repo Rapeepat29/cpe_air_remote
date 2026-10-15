@@ -89,6 +89,8 @@ docker compose exec -T backend node scripts/migrate-offline-history-v3150.js \
 # เอาคอลัมน์ rooms.is_active และสถานะ 'removed' ที่ไม่ใช้แล้วออก (ต้องรันหลัง backend รุ่นใหม่ขึ้น)
 docker compose exec -T backend node scripts/migrate-drop-unused.js \
   || fail 'migrate ลบส่วนที่ไม่ใช้ ไม่สำเร็จ'
+docker compose exec -T backend node scripts/migrate-column-types.js \
+  || fail 'migrate ชนิดข้อมูลคอลัมน์ ไม่สำเร็จ'
 docker compose exec -T backend node scripts/doctor.js --fix \
   || fail 'doctor ไม่สำเร็จ'
 # ใบรับรองของ MQTTS อาจถูกต่ออายุไปแล้วระหว่างที่ไม่ได้อัปเดต

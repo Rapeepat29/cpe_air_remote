@@ -857,7 +857,7 @@ class _RenameDialogState extends State<_RenameDialog> {
       content: TextField(
         controller: _controller,
         autofocus: true,
-        maxLength: 60,
+        maxLength: 50,
         textInputAction: TextInputAction.done,
         onSubmitted: (_) => _submit(),
         decoration: InputDecoration(

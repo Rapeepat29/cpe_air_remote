@@ -3,7 +3,7 @@ import { ApiError } from './http.js';
 export const STATIC_ENERGY_THRESHOLD = 25;
 
 const devicePattern = /^OCC32-[0-9A-F]{12}$/;
-const roomPattern = /^[A-Z0-9][A-Z0-9_-]{1,19}$/;
+const roomPattern = /^[A-Z0-9][A-Z0-9_-]{1,9}$/;
 
 export function validateOccupancyReservationInput(body) {
   const source = body && typeof body === 'object' ? body : {};

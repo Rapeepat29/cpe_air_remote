@@ -1,8 +1,9 @@
 import { ApiError } from './http.js';
 
-const usernamePattern = /^[A-Za-z0-9][A-Za-z0-9._-]{2,99}$/;
+const usernamePattern = /^[A-Za-z0-9][A-Za-z0-9._-]{2,29}$/;
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-const phonePattern = /^[0-9+()\- ]{6,30}$/;
+// เบอร์ไทย: มือถือ 10 หลัก (06/08/09) หรือเบอร์บ้าน 9 หลัก (02, 03x ...)
+const phonePattern = /^0\d{8,9}$/;
 const roles = new Set(['admin', 'staff']);
 
 export function publicUser(row) {
@@ -26,11 +27,11 @@ export function managedUser(row) {
 }
 
 export function validateUsername(value) {
-  const username = cleanString(value, 100);
+  const username = cleanString(value, 30);
   if (!usernamePattern.test(username)) {
     throw new ApiError(
       400,
-      'Username ต้องยาว 3–100 ตัว ใช้ได้เฉพาะ A–Z, 0–9, จุด, ขีดกลางและขีดล่าง',
+      'Username ต้องยาว 3–30 ตัว ใช้ได้เฉพาะ A–Z, 0–9, จุด, ขีดกลางและขีดล่าง',
     );
   }
   return username;
@@ -48,10 +49,10 @@ export function validateNewUserInput(body) {
   const source = body && typeof body === 'object' ? body : {};
   const username = validateUsername(source.username);
   const role = validateRole(source.role ?? 'staff');
-  const firstName = cleanString(source.firstName, 100);
-  const lastName = cleanString(source.lastName, 100);
-  const email = cleanString(source.email, 190).toLowerCase();
-  const phone = cleanString(source.phone, 30);
+  const firstName = cleanString(source.firstName, 50);
+  const lastName = cleanString(source.lastName, 50);
+  const email = cleanString(source.email, 100).toLowerCase();
+  const phone = normalizePhone(source.phone);
   const password = typeof source.password === 'string' ? source.password : '';
 
   if (firstName.length < 1) {
@@ -64,7 +65,7 @@ export function validateNewUserInput(body) {
     throw new ApiError(400, 'รูปแบบอีเมลไม่ถูกต้อง');
   }
   if (phone && !phonePattern.test(phone)) {
-    throw new ApiError(400, 'รูปแบบเบอร์โทรไม่ถูกต้อง');
+    throw new ApiError(400, 'เบอร์โทรต้องเป็นตัวเลข 9–10 หลัก ขึ้นต้นด้วย 0');
   }
 
   return {
@@ -104,10 +105,10 @@ export function validateUserUpdate(body) {
  */
 export function validateProfileUpdate(body) {
   const source = body && typeof body === 'object' ? body : {};
-  const firstName = cleanString(source.firstName, 100);
-  const lastName = cleanString(source.lastName, 100);
-  const email = cleanString(source.email, 190).toLowerCase();
-  const phone = cleanString(source.phone, 30);
+  const firstName = cleanString(source.firstName, 50);
+  const lastName = cleanString(source.lastName, 50);
+  const email = cleanString(source.email, 100).toLowerCase();
+  const phone = normalizePhone(source.phone);
 
   if (firstName.length < 1) {
     throw new ApiError(400, 'กรุณากรอกชื่อ');
@@ -119,10 +120,23 @@ export function validateProfileUpdate(body) {
     throw new ApiError(400, 'รูปแบบอีเมลไม่ถูกต้อง');
   }
   if (phone && !phonePattern.test(phone)) {
-    throw new ApiError(400, 'รูปแบบเบอร์โทรไม่ถูกต้อง');
+    throw new ApiError(400, 'เบอร์โทรต้องเป็นตัวเลข 9–10 หลัก ขึ้นต้นด้วย 0');
   }
 
   return { firstName, lastName, email, phone: phone || null };
+}
+
+/**
+ * แปลงเบอร์ที่พิมพ์มาให้เหลือแต่ตัวเลข เพื่อเก็บใน VARCHAR(10)
+ * เช่น `081-234-5678`, `081 234 5678`, `+66 81 234 5678` -> `0812345678`
+ */
+export function normalizePhone(value) {
+  if (typeof value !== 'string') return '';
+  const digits = value.replace(/[\s\-().]/g, '');
+  if (/^\+?66\d{8,9}$/.test(digits)) {
+    return `0${digits.replace(/^\+?66/, '')}`;
+  }
+  return digits.slice(0, 20);
 }
 
 function toIsoString(value) {

@@ -499,7 +499,7 @@ class _BookingEditorScreenState extends State<BookingEditorScreen> {
             TextField(
               key: const Key('booking-title-field'),
               controller: _title,
-              maxLength: 150,
+              maxLength: 100,
               enabled: !_busy,
               decoration: InputDecoration(
                 labelText: l10n(context, 'ใช้ห้องเพื่อ', 'Used for'),

@@ -1,7 +1,7 @@
 import { autoOffPhase, autoOffSecondsRemaining } from './auto-off.js';
 import { ApiError } from './http.js';
 
-const roomPattern = /^[A-Z0-9][A-Z0-9_-]{1,19}$/;
+const roomPattern = /^[A-Z0-9][A-Z0-9_-]{1,9}$/;
 const devicePattern = /^ESP32-[0-9A-F]{12}$/;
 const timePattern = /^(?:[01]\d|2[0-3]):[0-5]\d$/;
 
@@ -62,8 +62,8 @@ export function validateReservationInput(body) {
   if (airNumber == null || airNumber < 1 || airNumber > 6) {
     throw new ApiError(400, 'หมายเลขแอร์ต้องอยู่ระหว่าง 1–6');
   }
-  if (name.length < 1 || name.length > 60) {
-    throw new ApiError(400, 'ชื่อแอร์ต้องมีความยาว 1–60 ตัวอักษร');
+  if (name.length < 1 || name.length > 50) {
+    throw new ApiError(400, 'ชื่อแอร์ต้องมีความยาว 1–50 ตัวอักษร');
   }
   if (bleName !== `RMUTT-AC-${deviceId.slice(6)}`) {
     throw new ApiError(400, 'ชื่อ Bluetooth ไม่ตรงกับรหัส ESP32');

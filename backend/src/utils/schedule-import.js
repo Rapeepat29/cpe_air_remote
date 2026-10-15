@@ -5,7 +5,7 @@ import {
   readXlsxWorksheets,
 } from './xlsx-reader.js';
 
-const ROOM_PATTERN = /^[A-Z0-9][A-Z0-9_-]{1,19}$/;
+const ROOM_PATTERN = /^[A-Z0-9][A-Z0-9_-]{1,9}$/;
 const MAX_IMPORT_ROWS = 500;
 const DAY_CODES = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 const DAY_LOOKUP = new Map([
@@ -158,13 +158,13 @@ export function pickSemester(schedules) {
 }
 
 export function scheduleLabelForDatabase(schedule) {
-  const section = cleanOptionalText(schedule.section, 80);
+  const section = cleanOptionalText(schedule.section, 30);
   const label = section
     ? `${schedule.subjectName} · ${section}`
     : schedule.subjectName;
 
-  if (label.length > 150) {
-    return label.slice(0, 147).trimEnd() + '...';
+  if (label.length > 100) {
+    return label.slice(0, 97).trimEnd() + '...';
   }
   return label;
 }
@@ -421,14 +421,14 @@ function normalizeImportedSchedules(rawSchedules) {
     const startTime = normalizeTime(raw.startTime);
     const endTime = normalizeTime(raw.endTime);
     const schedule = {
-      semester: cleanOptionalText(raw.semester, 30),
-      roomNumber: cleanOptionalText(raw.roomNumber, 20).toUpperCase(),
+      semester: cleanOptionalText(raw.semester, 6),
+      roomNumber: cleanOptionalText(raw.roomNumber, 10).toUpperCase(),
       dayOfWeek,
       startTime,
       endTime,
-      subjectName: cleanOptionalText(raw.subjectName, 150),
-      section: cleanOptionalText(raw.section, 80),
-      instructor: cleanOptionalText(raw.instructor, 150),
+      subjectName: cleanOptionalText(raw.subjectName, 100),
+      section: cleanOptionalText(raw.section, 30),
+      instructor: cleanOptionalText(raw.instructor, 100),
     };
 
     const validated = validateScheduleInput({

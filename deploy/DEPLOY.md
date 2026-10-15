@@ -109,6 +109,7 @@ docker compose exec backend npm run db:init
 docker compose exec backend npm run db:migrate:settings
 docker compose exec backend npm run db:migrate:firmware
 docker compose exec backend npm run db:migrate:history
+docker compose exec backend npm run db:migrate:types   # ปรับชนิดคอลัมน์ให้พอดีกับข้อมูลจริง (รันซ้ำได้, --dry-run ดูก่อนได้)
 bash seed-admin.sh                             # สร้างแอดมิน แล้วลบรหัสออกจาก .env
 docker compose exec backend npm run db:doctor
 docker compose restart backend

@@ -1,7 +1,7 @@
 import { autoOffPhase, autoOffSecondsRemaining } from './auto-off.js';
 import { ApiError } from './http.js';
 
-const roomNumberPattern = /^[A-Z0-9][A-Z0-9_-]{1,19}$/;
+const roomNumberPattern = /^[A-Z0-9][A-Z0-9_-]{1,9}$/;
 
 export function validateRoomInput(body, { requireNumber = true } = {}) {
   const source = body && typeof body === 'object' ? body : {};
@@ -13,7 +13,7 @@ export function validateRoomInput(body, { requireNumber = true } = {}) {
   if (requireNumber && !roomNumberPattern.test(roomNumber)) {
     throw new ApiError(
       400,
-      'รหัสห้องต้องมี 2–20 ตัว และใช้เฉพาะ A–Z, 0–9, _ หรือ -',
+      'รหัสห้องต้องมี 2–10 ตัว และใช้เฉพาะ A–Z, 0–9, _ หรือ -',
     );
   }
   if (floorNumber == null || floorNumber < 0 || floorNumber > 99) {
@@ -25,8 +25,8 @@ export function validateRoomInput(body, { requireNumber = true } = {}) {
   if (roomIndex == null || roomIndex < 0 || roomIndex > 9999) {
     throw new ApiError(400, 'ลำดับห้องต้องอยู่ระหว่าง 0–9999');
   }
-  if (roomType.length < 1 || roomType.length > 100) {
-    throw new ApiError(400, 'ประเภทหรือชื่อห้องต้องมีความยาว 1–100 ตัวอักษร');
+  if (roomType.length < 1 || roomType.length > 50) {
+    throw new ApiError(400, 'ประเภทหรือชื่อห้องต้องมีความยาว 1–50 ตัวอักษร');
   }
 
   return {

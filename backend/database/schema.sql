@@ -1,10 +1,10 @@
 CREATE TABLE IF NOT EXISTS users (
-  username VARCHAR(100) NOT NULL,
-  password_hash VARCHAR(255) NOT NULL,
-  first_name VARCHAR(100) NOT NULL DEFAULT '',
-  last_name VARCHAR(100) NOT NULL DEFAULT '',
-  email VARCHAR(190) NOT NULL,
-  phone VARCHAR(30) NULL,
+  username VARCHAR(30) NOT NULL,
+  password_hash CHAR(60) NOT NULL,
+  first_name VARCHAR(50) NOT NULL DEFAULT '',
+  last_name VARCHAR(50) NOT NULL DEFAULT '',
+  email VARCHAR(100) NOT NULL,
+  phone VARCHAR(10) NULL,
   role ENUM('admin', 'staff') NOT NULL DEFAULT 'staff',
   is_active BOOLEAN NOT NULL DEFAULT TRUE,
   token_version INT UNSIGNED NOT NULL DEFAULT 0,
@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE TABLE IF NOT EXISTS password_reset_otps (
   id CHAR(36) NOT NULL,
-  username VARCHAR(100) NOT NULL,
+  username VARCHAR(30) NOT NULL,
   otp_hash CHAR(64) NOT NULL,
   reset_token_hash CHAR(64) NULL,
   expires_at DATETIME NOT NULL,
@@ -42,12 +42,12 @@ CREATE TABLE IF NOT EXISTS password_reset_otps (
   COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS rooms (
-  room_number VARCHAR(20) NOT NULL,
+  room_number VARCHAR(10) NOT NULL,
   floor_number TINYINT UNSIGNED NOT NULL DEFAULT 0,
   room_index SMALLINT UNSIGNED NOT NULL DEFAULT 0,
-  room_type VARCHAR(100) NOT NULL DEFAULT 'Classroom',
-  created_by VARCHAR(100) NOT NULL,
-  updated_by VARCHAR(100) NOT NULL,
+  room_type VARCHAR(50) NOT NULL DEFAULT 'Classroom',
+  created_by VARCHAR(30) NOT NULL,
+  updated_by VARCHAR(30) NOT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
     ON UPDATE CURRENT_TIMESTAMP,
@@ -60,15 +60,15 @@ CREATE TABLE IF NOT EXISTS rooms (
 
 CREATE TABLE IF NOT EXISTS class_schedules (
   id CHAR(36) NOT NULL,
-  room_number VARCHAR(20) NOT NULL,
+  room_number VARCHAR(10) NOT NULL,
   day_of_week TINYINT UNSIGNED NOT NULL,
-  subject_name VARCHAR(150) NOT NULL,
-  section_name VARCHAR(80) NOT NULL DEFAULT '',
-  instructor VARCHAR(150) NOT NULL DEFAULT '',
+  subject_name VARCHAR(100) NOT NULL,
+  section_name VARCHAR(30) NOT NULL DEFAULT '',
+  instructor VARCHAR(100) NOT NULL DEFAULT '',
   start_time TIME NOT NULL,
   end_time TIME NOT NULL,
-  created_by VARCHAR(100) NOT NULL,
-  updated_by VARCHAR(100) NOT NULL,
+  created_by VARCHAR(30) NOT NULL,
+  updated_by VARCHAR(30) NOT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
     ON UPDATE CURRENT_TIMESTAMP,
@@ -86,16 +86,16 @@ CREATE TABLE IF NOT EXISTS class_schedules (
   COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS air_conditioners (
-  device_id VARCHAR(32) NOT NULL,
-  room_number VARCHAR(20) NOT NULL,
+  device_id CHAR(18) NOT NULL,
+  room_number VARCHAR(10) NOT NULL,
   air_number TINYINT UNSIGNED NOT NULL,
-  name VARCHAR(60) NOT NULL,
-  ble_name VARCHAR(40) NOT NULL,
-  protocol VARCHAR(40) NOT NULL DEFAULT 'HAIER_AC160',
-  mqtt_topic VARCHAR(160) NOT NULL,
+  name VARCHAR(50) NOT NULL,
+  ble_name CHAR(21) NOT NULL,
+  protocol VARCHAR(20) NOT NULL DEFAULT 'HAIER_AC160',
+  mqtt_topic VARCHAR(64) NOT NULL,
   mqtt_host VARCHAR(253) NOT NULL,
   mqtt_port SMALLINT UNSIGNED NOT NULL DEFAULT 1883,
-  mqtt_username VARCHAR(100) NULL,
+  mqtt_username VARCHAR(50) NULL,
   provision_status ENUM(
     'reserved',
     'active'
@@ -106,12 +106,12 @@ CREATE TABLE IF NOT EXISTS air_conditioners (
   daily_off TIME NULL,
   is_online BOOLEAN NOT NULL DEFAULT FALSE,
   state_json LONGTEXT NULL,
-  voltage DECIMAL(8,2) NULL,
-  current_amp DECIMAL(8,3) NULL,
-  power_watts DECIMAL(10,2) NULL,
-  energy_kwh DECIMAL(12,3) NULL,
-  frequency_hz DECIMAL(6,2) NULL,
-  power_factor DECIMAL(5,3) NULL,
+  voltage DECIMAL(4,1) NULL,
+  current_amp DECIMAL(6,3) NULL,
+  power_watts DECIMAL(6,1) NULL,
+  energy_kwh DECIMAL(10,3) NULL,
+  frequency_hz DECIMAL(3,1) NULL,
+  power_factor DECIMAL(3,2) NULL,
   pzem_available BOOLEAN NOT NULL DEFAULT FALSE,
   ac_running BOOLEAN NOT NULL DEFAULT FALSE,
   outside_schedule BOOLEAN NOT NULL DEFAULT FALSE,
@@ -125,14 +125,14 @@ CREATE TABLE IF NOT EXISTS air_conditioners (
   ota_error VARCHAR(120) NULL,
   -- จุดต่อของประวัติไฟฟ้า: ตัวอย่างล่าสุดที่บันทึกลง energy_hourly แล้ว
   -- ใช้ทั้งข้อมูลสดและข้อมูลย้อนหลังตอนเน็ตหลุด กันนับซ้ำหรือขาดช่วง
-  energy_chain_kwh DECIMAL(12,3) NULL,
+  energy_chain_kwh DECIMAL(10,3) NULL,
   energy_chain_at DATETIME NULL,
   energy_chain_running BOOLEAN NOT NULL DEFAULT FALSE,
   -- จำนวนรายการย้อนหลังที่บอร์ดยังส่งไม่ครบ
   history_pending SMALLINT UNSIGNED NOT NULL DEFAULT 0,
   last_seen_at DATETIME NULL,
-  created_by VARCHAR(100) NOT NULL,
-  updated_by VARCHAR(100) NOT NULL,
+  created_by VARCHAR(30) NOT NULL,
+  updated_by VARCHAR(30) NOT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
     ON UPDATE CURRENT_TIMESTAMP,
@@ -151,13 +151,13 @@ CREATE TABLE IF NOT EXISTS air_conditioners (
   COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS occupancy_sensors (
-  device_id VARCHAR(32) NOT NULL,
-  room_number VARCHAR(20) NOT NULL,
-  ble_name VARCHAR(40) NOT NULL,
-  mqtt_topic VARCHAR(160) NOT NULL,
+  device_id CHAR(18) NOT NULL,
+  room_number VARCHAR(10) NOT NULL,
+  ble_name CHAR(22) NOT NULL,
+  mqtt_topic VARCHAR(64) NOT NULL,
   mqtt_host VARCHAR(253) NOT NULL,
   mqtt_port SMALLINT UNSIGNED NOT NULL DEFAULT 1883,
-  mqtt_username VARCHAR(100) NULL,
+  mqtt_username VARCHAR(50) NULL,
   provision_status ENUM(
     'reserved',
     'active'
@@ -171,8 +171,8 @@ CREATE TABLE IF NOT EXISTS occupancy_sensors (
   firmware_version VARCHAR(20) NULL,
   ota_error VARCHAR(120) NULL,
   last_seen_at DATETIME NULL,
-  created_by VARCHAR(100) NOT NULL,
-  updated_by VARCHAR(100) NOT NULL,
+  created_by VARCHAR(30) NOT NULL,
+  updated_by VARCHAR(30) NOT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
     ON UPDATE CURRENT_TIMESTAMP,
@@ -198,13 +198,13 @@ CREATE TABLE IF NOT EXISTS system_alerts (
     'auto_off_succeeded',
     'auto_off_failed'
   ) NOT NULL,
-  room_number VARCHAR(20) NOT NULL,
-  device_id VARCHAR(32) NULL,
-  device_name VARCHAR(60) NOT NULL DEFAULT '',
+  room_number VARCHAR(10) NOT NULL,
+  device_id CHAR(18) NULL,
+  device_name VARCHAR(50) NOT NULL DEFAULT '',
   detail VARCHAR(255) NOT NULL DEFAULT '',
   status ENUM('open', 'acknowledged', 'resolved') NOT NULL DEFAULT 'open',
   acknowledged_at DATETIME NULL,
-  acknowledged_by VARCHAR(100) NULL,
+  acknowledged_by VARCHAR(30) NULL,
   resolved_at DATETIME NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
@@ -217,27 +217,27 @@ CREATE TABLE IF NOT EXISTS system_alerts (
 -- ถังเก็บค่าไฟรายชั่วโมงของแอร์แต่ละเครื่อง หนึ่งแถวคือหนึ่งเครื่องต่อหนึ่ง
 -- ชั่วโมงตามเวลาไทย เก็บเป็นผลรวมกับตัวนับ ค่าเฉลี่ยคำนวณตอนดึงรายงาน
 CREATE TABLE IF NOT EXISTS energy_hourly (
-  device_id VARCHAR(32) NOT NULL,
+  device_id CHAR(18) NOT NULL,
   bucket_start DATETIME NOT NULL,
-  room_number VARCHAR(20) NOT NULL,
-  device_name VARCHAR(60) NOT NULL DEFAULT '',
+  room_number VARCHAR(10) NOT NULL,
+  device_name VARCHAR(50) NOT NULL DEFAULT '',
   sample_count INT UNSIGNED NOT NULL DEFAULT 0,
   pzem_samples INT UNSIGNED NOT NULL DEFAULT 0,
   running_samples INT UNSIGNED NOT NULL DEFAULT 0,
   first_sample_at DATETIME NULL,
   last_sample_at DATETIME NULL,
-  energy_start_kwh DECIMAL(12,3) NULL,
-  energy_end_kwh DECIMAL(12,3) NULL,
-  consumption_kwh DECIMAL(12,3) NOT NULL DEFAULT 0,
+  energy_start_kwh DECIMAL(10,3) NULL,
+  energy_end_kwh DECIMAL(10,3) NULL,
+  consumption_kwh DECIMAL(10,3) NOT NULL DEFAULT 0,
   voltage_sum DECIMAL(16,2) NOT NULL DEFAULT 0,
-  voltage_min DECIMAL(8,2) NULL,
-  voltage_max DECIMAL(8,2) NULL,
+  voltage_min DECIMAL(4,1) NULL,
+  voltage_max DECIMAL(4,1) NULL,
   current_sum DECIMAL(16,3) NOT NULL DEFAULT 0,
-  current_min DECIMAL(8,3) NULL,
-  current_max DECIMAL(8,3) NULL,
+  current_min DECIMAL(6,3) NULL,
+  current_max DECIMAL(6,3) NULL,
   power_sum DECIMAL(18,2) NOT NULL DEFAULT 0,
-  power_min DECIMAL(10,2) NULL,
-  power_max DECIMAL(10,2) NULL,
+  power_min DECIMAL(6,1) NULL,
+  power_max DECIMAL(6,1) NULL,
   power_factor_sum DECIMAL(14,3) NOT NULL DEFAULT 0,
   frequency_sum DECIMAL(14,2) NOT NULL DEFAULT 0,
   runtime_seconds INT UNSIGNED NOT NULL DEFAULT 0,
@@ -257,11 +257,12 @@ CREATE TABLE IF NOT EXISTS energy_hourly (
 -- ใช้เก็บของที่กระทบทั้งอาคาร เช่นสวิตช์รวมของระบบปิดแอร์อัตโนมัติ
 -- ต้องอยู่ที่นี่เพราะตัวที่ยิงคำสั่งปิดคือ Backend ไม่ใช่แอปบนมือถือ
 CREATE TABLE IF NOT EXISTS system_settings (
-  setting_key VARCHAR(64) NOT NULL PRIMARY KEY,
+  setting_key VARCHAR(32) NOT NULL,
   setting_value VARCHAR(255) NOT NULL,
-  updated_by VARCHAR(64) NULL,
-  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-    ON UPDATE CURRENT_TIMESTAMP
+  updated_by VARCHAR(30) NULL,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (setting_key)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ปฏิทินภาคเรียน: วันเปิด-ปิดของแต่ละเทอม เช่น 1/2569
@@ -271,10 +272,10 @@ CREATE TABLE IF NOT EXISTS system_settings (
 -- ทุกห้องอยู่นอกคาบ ห้องว่างช่วงปิดภาคจึงถูกปิดแอร์เร็ว (5 นาที) และมีแจ้งเตือน
 -- โดยไม่ต้องลบตารางทิ้ง ภาคเรียนที่ไม่ได้ตั้งวันไว้ ใช้ตารางได้ทุกวันเหมือนเดิม
 CREATE TABLE IF NOT EXISTS academic_terms (
-  semester VARCHAR(30) NOT NULL,
+  semester VARCHAR(6) NOT NULL,
   start_date DATE NOT NULL,
   end_date DATE NOT NULL,
-  updated_by VARCHAR(100) NULL,
+  updated_by VARCHAR(30) NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
     ON UPDATE CURRENT_TIMESTAMP,
@@ -294,18 +295,18 @@ CREATE TABLE IF NOT EXISTS academic_terms (
 -- และไม่แจ้งเตือน) แม้อยู่นอกภาคเรียน ลบห้องแล้วการจองของห้องนั้นหายไปด้วย
 CREATE TABLE IF NOT EXISTS room_bookings (
   id CHAR(36) NOT NULL,
-  room_number VARCHAR(20) NOT NULL,
-  title VARCHAR(150) NOT NULL,
-  category VARCHAR(20) NOT NULL DEFAULT 'other',
+  room_number VARCHAR(10) NOT NULL,
+  title VARCHAR(100) NOT NULL,
+  category VARCHAR(10) NOT NULL DEFAULT 'other',
   note VARCHAR(255) NOT NULL DEFAULT '',
   repeat_type VARCHAR(10) NOT NULL DEFAULT 'once',
-  days_of_week VARCHAR(20) NOT NULL DEFAULT '',
+  days_of_week VARCHAR(13) NOT NULL DEFAULT '',
   start_date DATE NOT NULL,
   end_date DATE NOT NULL,
   start_time TIME NOT NULL,
   end_time TIME NOT NULL,
-  created_by VARCHAR(100) NOT NULL,
-  updated_by VARCHAR(100) NOT NULL,
+  created_by VARCHAR(30) NOT NULL,
+  updated_by VARCHAR(30) NOT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
     ON UPDATE CURRENT_TIMESTAMP,

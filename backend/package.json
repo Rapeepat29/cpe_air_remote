@@ -27,7 +27,8 @@
     "test": "node --test",
     "db:migrate:firmware": "node scripts/migrate-firmware-v3140.js",
     "db:migrate:history": "node scripts/migrate-offline-history-v3150.js",
-    "db:migrate:cleanup": "node scripts/migrate-drop-unused.js"
+    "db:migrate:cleanup": "node scripts/migrate-drop-unused.js",
+    "db:migrate:types": "node scripts/migrate-column-types.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",

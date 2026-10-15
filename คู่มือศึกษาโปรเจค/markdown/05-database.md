@@ -77,7 +77,7 @@
 
 | ชนิด | ความหมาย | ตัวอย่างในโปรเจค |
 |---|---|---|
-| `VARCHAR(n)` | ข้อความยาวไม่เกิน n ตัวอักษร เก็บเท่าที่ใช้จริง | `username VARCHAR(100)`, `room_number VARCHAR(20)` |
+| `VARCHAR(n)` | ข้อความยาวไม่เกิน n ตัวอักษร เก็บเท่าที่ใช้จริง | `username VARCHAR(30)`, `room_number VARCHAR(10)` |
 | `CHAR(n)` | ข้อความยาวตายตัว n ตัว | `id CHAR(36)` (UUID), `otp_hash CHAR(64)` (HMAC-SHA256 แบบ hex) |
 | `TINYINT UNSIGNED` | จำนวนเต็ม 0–255 ใช้ 1 ไบต์ | `floor_number`, `air_number`, `attempts` |
 | `SMALLINT UNSIGNED` | จำนวนเต็ม 0–65535 ใช้ 2 ไบต์ | `mqtt_port`, `room_index`, `history_pending` |
