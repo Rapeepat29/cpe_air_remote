@@ -590,7 +590,7 @@ class _CreateUserSheetState extends State<_CreateUserSheet> {
                   child: TextField(
                     key: const Key('new-first-name-field'),
                     controller: _firstNameController,
-                    maxLength: 50,
+                    maxLength: 30,
                     decoration: InputDecoration(
                       labelText: context.tr('First name'),
                     ),
@@ -601,7 +601,7 @@ class _CreateUserSheetState extends State<_CreateUserSheet> {
                   child: TextField(
                     key: const Key('new-last-name-field'),
                     controller: _lastNameController,
-                    maxLength: 50,
+                    maxLength: 30,
                     decoration: InputDecoration(
                       labelText: context.tr('Last name'),
                     ),

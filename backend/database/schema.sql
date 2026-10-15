@@ -1,8 +1,8 @@
 CREATE TABLE IF NOT EXISTS users (
   username VARCHAR(30) NOT NULL,
   password_hash CHAR(60) NOT NULL,
-  first_name VARCHAR(50) NOT NULL DEFAULT '',
-  last_name VARCHAR(50) NOT NULL DEFAULT '',
+  first_name VARCHAR(30) NOT NULL DEFAULT '',
+  last_name VARCHAR(30) NOT NULL DEFAULT '',
   email VARCHAR(100) NOT NULL,
   phone VARCHAR(10) NULL,
   role ENUM('admin', 'staff') NOT NULL DEFAULT 'staff',

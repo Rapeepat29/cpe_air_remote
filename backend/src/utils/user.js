@@ -49,8 +49,8 @@ export function validateNewUserInput(body) {
   const source = body && typeof body === 'object' ? body : {};
   const username = validateUsername(source.username);
   const role = validateRole(source.role ?? 'staff');
-  const firstName = cleanString(source.firstName, 50);
-  const lastName = cleanString(source.lastName, 50);
+  const firstName = cleanString(source.firstName, 30);
+  const lastName = cleanString(source.lastName, 30);
   const email = cleanString(source.email, 100).toLowerCase();
   const phone = normalizePhone(source.phone);
   const password = typeof source.password === 'string' ? source.password : '';
@@ -105,8 +105,8 @@ export function validateUserUpdate(body) {
  */
 export function validateProfileUpdate(body) {
   const source = body && typeof body === 'object' ? body : {};
-  const firstName = cleanString(source.firstName, 50);
-  const lastName = cleanString(source.lastName, 50);
+  const firstName = cleanString(source.firstName, 30);
+  const lastName = cleanString(source.lastName, 30);
   const email = cleanString(source.email, 100).toLowerCase();
   const phone = normalizePhone(source.phone);
 
