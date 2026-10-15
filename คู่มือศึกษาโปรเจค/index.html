@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>คู่มือศึกษาโปรเจค RMUTT Save Energy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Chakra+Petch:wght@600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem('guide.theme');if(t)document.documentElement.dataset.theme=t;var f=localStorage.getItem('guide.font');if(f)document.documentElement.dataset.font=f;}catch(e){}</script>
+</head>
+<body class="home">
+<header class="topbar">
+  <button class="menu-btn" id="menuBtn" aria-label="เปิดเมนู">☰</button>
+  <a class="brand" href="index.html"><span class="brand-mark">⚡</span><span>คู่มือศึกษา <b>RMUTT Save Energy</b></span></a>
+  <div class="top-actions">
+    <button id="fontBtn" title="ขนาดตัวอักษร">ก<small>±</small></button>
+    <button id="themeBtn" title="สลับโหมดสว่าง/มืด">☾</button>
+  </div>
+</header>
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <input class="nav-search" id="navSearch" type="search" placeholder="ค้นหาบทหรือหัวข้อ…">
+    <div id="searchResults" class="search-results"></div>
+    <nav class="nav" id="nav">
+<a class="nav-home active" href="index.html">หน้าแรก</a>
+<div class="nav-part">ภาพรวม</div><ul>
+<li><a href="chapters/01-concept.html"><span class="num">1</span>แนวคิดและหลักการคิดของโปรเจค</a></li>
+<li><a href="chapters/02-roadmap.html"><span class="num">2</span>เริ่มจากอะไร และต้องเรียนรู้อะไรบ้าง</a></li>
+<li><a href="chapters/03-architecture-flows.html"><span class="num">3</span>สถาปัตยกรรมและเส้นทางของข้อมูล</a></li>
+</ul>
+<div class="nav-part">โครงสร้างพื้นฐาน</div><ul>
+<li><a href="chapters/04-network-server.html"><span class="num">4</span>เครือข่าย เซิร์ฟเวอร์ และ Tailscale</a></li>
+<li><a href="chapters/05-database.html"><span class="num">5</span>ฐานข้อมูล MariaDB</a></li>
+</ul>
+<div class="nav-part">เซิร์ฟเวอร์</div><ul>
+<li><a href="chapters/06-backend-api.html"><span class="num">6</span>Backend ตอนที่ 1: โครงหลัก ระบบสมาชิก และ REST API</a></li>
+<li><a href="chapters/07-backend-services.html"><span class="num">7</span>Backend ตอนที่ 2: งานเบื้องหลังและตรรกะหลักของระบบ</a></li>
+<li><a href="chapters/08-protocols.html"><span class="num">8</span>โปรโตคอลสื่อสาร: MQTT และ Bluetooth Low Energy</a></li>
+</ul>
+<div class="nav-part">อุปกรณ์และหน้าจอ</div><ul>
+<li><a href="chapters/09-firmware.html"><span class="num">9</span>เฟิร์มแวร์ ESP32: บอร์ดแอร์ (IR และสายแอร์) และบอร์ดตรวจจับคน</a></li>
+<li><a href="chapters/10-flutter-architecture.html"><span class="num">10</span>แอป Flutter ตอนที่ 1: โครงสร้าง ข้อมูล และ State</a></li>
+<li><a href="chapters/11-flutter-screens.html"><span class="num">11</span>แอป Flutter ตอนที่ 2: หน้าจอหลักและวิดเจ็ต</a></li>
+<li><a href="chapters/12-flutter-admin-screens.html"><span class="num">12</span>แอป Flutter ตอนที่ 3: หน้าจอผู้ดูแลระบบและการตั้งค่า</a></li>
+<li><a href="chapters/13-webapp.html"><span class="num">13</span>เว็บแอป: HTML, CSS และ JavaScript ล้วน</a></li>
+</ul>
+<div class="nav-part">ใช้งานจริง</div><ul>
+<li><a href="chapters/14-deploy-scripts-testing.html"><span class="num">14</span>การติดตั้งระบบ สคริปต์อัตโนมัติ และการทดสอบ</a></li>
+<li><a href="chapters/15-security.html"><span class="num">15</span>ความปลอดภัยทั้งระบบ</a></li>
+<li><a href="chapters/16-presentation-qa.html"><span class="num">16</span>เตรียมนำเสนอและคำถามที่อาจารย์มักถาม</a></li>
+</ul>
+<div class="nav-part">ภาคผนวก</div><ul>
+<li><a href="chapters/17-glossary.html"><span class="num">17</span>อภิธานศัพท์</a></li>
+<li><a href="chapters/18-file-map.html"><span class="num">18</span>แผนที่ไฟล์ทั้งโปรเจค</a></li>
+</ul>
+<div class="nav-part">งานที่กำลังพัฒนา</div><ul>
+<li><a href="chapters/19-daikin-slm8.html"><span class="num">19</span>แอร์ Daikin ผ่านสาย SLM8: จากการแกะโปรโตคอลถึงบอร์ดสายแอร์</a></li>
+</ul>
+<div class="nav-part">เจาะลึก</div><ul>
+<li><a href="chapters/20-database-design.html"><span class="num">20</span>เจาะลึกการออกแบบฐานข้อมูล</a></li>
+</ul>
+    </nav>
+  </aside>
+  <main class="content" id="content">
+<section class="hero">
+  <div class="kicker">คู่มือศึกษาโปรเจคฉบับสมบูรณ์</div>
+  <h1>RMUTT Save Energy</h1>
+  <p>ระบบควบคุมเครื่องปรับอากาศและวัดพลังงานไฟฟ้าอัจฉริยะ อาคาร 16 คณะวิศวกรรมศาสตร์ มทร.ธัญบุรี
+  คู่มือนี้อธิบายตั้งแต่แนวคิด เครือข่าย เซิร์ฟเวอร์ ฐานข้อมูล Backend โปรโตคอล เฟิร์มแวร์ แอปมือถือ เว็บแอป จนถึงการติดตั้งจริงและความปลอดภัย
+  ทุกไฟล์ในโปรเจคมีคำอธิบาย และโค้ดสำคัญถูกเจาะอธิบายทีละบรรทัด</p>
+  <div class="hero-stats">
+    <div><b>20</b><span>บทเรียน</span></div>
+    <div><b>~61,000</b><span>บรรทัดโค้ดที่อธิบาย</span></div>
+    <div><b>349</b><span>ไฟล์ในแผนที่ไฟล์</span></div>
+    <div><b>6</b><span>เทคโนโลยีหลัก</span></div>
+  </div>
+</section>
+
+<div class="callout note"><div class="callout-title">อัปเดตล่าสุด · 15 ต.ค. 2569 (ลบส่วนที่ไม่ใช้ออกจากฐานข้อมูล)</div>
+<p>หลังเขียนบท 20 ได้ลบสองส่วนที่โค้ดไม่ใช้แล้วออกจากฐานข้อมูลจริง (GitHub PR #8) และปรับคู่มือตาม:</p>
+<ul>
+<li><b>ลบคอลัมน์ <code>rooms.is_active</code></b> ไม่มีโค้ดไหนตั้งเป็น FALSE (ลบห้อง = <code>DELETE</code> จริง) เอาเงื่อนไขออกจาก query ทุกจุด index เปลี่ยนเป็น <code>idx_rooms_floor_order</code> (บท 5, 6, 20)</li>
+<li><b>ลบค่า <code>removed</code> ของ <code>provision_status</code></b> ถอดอุปกรณ์ = ลบแถว + <code>unprovision</code> ตอนนี้ ENUM เหลือ <code>reserved</code>/<code>active</code> ลบห้องไม่ต้องล้างแถว removed ก่อนแล้ว (บท 5, 6, 7, 8, 20)</li>
+<li><b>สคริปต์ใหม่ <code>migrate-drop-unused.js</code></b> (<code>npm run db:migrate:cleanup</code>, มี <code>--dry-run</code>) รันซ้ำได้ <code>update-remote.sh</code> เรียกให้เองหลัง Backend รุ่นใหม่ขึ้น (บท 5, 14, 18)</li>
+<li><b>วิธีอัปเดตเซิร์ฟเวอร์อย่างปลอดภัย</b>: สำรองด้วย <code>backup-db.sh</code> ก่อนเสมอ, วิธีเช็กทรัพยากรเซิร์ฟเวอร์ (RAM/ดิสก์/CPU/<code>docker stats</code>) และแก้ error "running scripts is disabled" ของ PowerShell (บท 14)</li>
+<li>แอปและบอร์ดไม่ต้อง build/แฟลชใหม่ เพราะ API ส่งข้อมูลรูปแบบเดิม · เทสต์ Backend 136 ผ่านทั้งหมด</li>
+</ul></div>
+
+<div class="callout note"><div class="callout-title">อัปเดตก่อนหน้า · 14 ต.ค. 2569 (บทใหม่ 20)</div>
+<ul>
+<li><b>บทใหม่ 20: เจาะลึกการออกแบบฐานข้อมูล</b> (ทำไม จำเป็นไหม ทำแบบอื่นได้ไหม) ทุกตารางทุกคอลัมน์ว่าทำไมออกแบบแบบนี้ จำเป็นแค่ไหน (ขาดไม่ได้ / ควรมี / ไว้ดู / เหลือจากรุ่นเก่า) ตรวจจากโค้ดจริงว่าคอลัมน์ไหนถูกอ่านไปตัดสินอะไร และทางเลือกอื่นพร้อมเหตุผลที่ไม่เลือก</li>
+<li>พบคอลัมน์ที่ไม่ได้ใช้แล้ว เช่น <code>rooms.is_active</code> และสถานะ <code>removed</code> ของอุปกรณ์ อธิบายไว้ในบทพร้อมวิธีตอบอาจารย์</li>
+</ul></div>
+
+<div class="callout note"><div class="callout-title">อัปเดตก่อนหน้า · 14 ต.ค. 2569 รอบค่ำ (ขึ้น GitHub + ตรวจกับโค้ด main ล่าสุด)</div>
+<p>คู่มือนี้อยู่บน GitHub แล้วที่โฟลเดอร์ <code>คู่มือศึกษาโปรเจค/</code> ของ repo ตรวจซ้ำกับโค้ดล่าสุดแล้วแก้ตามนี้:</p>
+<ul>
+<li><b>เวอร์ชันแอป</b> เป็น <code>3.16.0+32</code> (เดิมในคู่มือเขียน 3.13.1+31) ใน <code>pubspec.yaml</code> และ APK ที่ build บน GitHub (บท 10, 14, 18)</li>
+<li><b>เอกสารในโปรเจกต์ปรับตามโค้ดแล้ว</b> (<code>firmware/README.md</code>, <code>docs/study</code>, <code>docs/learn</code>, <code>docs/BLE_MQTT_PROTOCOL.md</code>) จึงลบหมายเหตุ "เอกสารเก่ากว่าโค้ด" ที่ไม่จริงแล้วออก และบอกว่าข้อใดยังเก่าอยู่ (บท 2, 8, 9, 10, 13)</li>
+<li>แผนที่ไฟล์เพิ่ม <code>docs/learn/</code>, <code>docs/study/</code> และโฟลเดอร์คู่มือนี้ รวม 348 รายการ (บท 18)</li>
+<li>เลขรุ่นเฟิร์มแวร์ยังตรงโค้ด: บอร์ด IR 2.5.1, บอร์ดสายแอร์ 2.5.2-slm8, บอร์ดตรวจคน 1.3.2</li>
+</ul></div>
+
+<div class="callout note"><div class="callout-title">อัปเดตก่อนหน้า · 14 ต.ค. 2569 (ตามโค้ด GitHub commit 11–14 ต.ค.)</div>
+<p>ปรับตามงาน 7 commit ล่าสุด อธิบายละเอียดพร้อมโค้ดจริงทีละบรรทัด:</p>
+<ul>
+<li><b>บอร์ดสายแอร์ Daikin ใช้งานได้จริง</b> (เฟิร์มแวร์ <code>rmutt_esp32_air_wired</code> 2.5.2-slm8) บท 19 เขียนใหม่ด้วยโค้ดจริงของ <code>DaikinSLM8.h</code>, <code>wired_bus.h</code> และไฟล์ .ino แทนโค้ดตัวอย่าง ส่งเฟรมใน FreeRTOS task แยก ป้อนอุณหภูมิห้องจาก DHT11 แผนภาพแก้ขาส่งเป็น GPIO33 (บท 19, 9)</li>
+<li><b>จอ OLED 1.3" ทั้งสองบอร์ด</b> และ <code>build_opt.h</code> ที่ทำให้เฟิร์มแวร์พอดีแฟลช (บท 9)</li>
+<li><b>ผู้ใช้เห็นว่าเป็น "Daikin · สายแอร์"</b> โปรโตคอล <code>DAIKIN_WIRED</code> ใน Backend ป้ายยี่ห้อ·วิธีควบคุม และซ่อนปุ่มที่แอร์ทำไม่ได้ (บท 6–8, 10–13)</li>
+<li><b>ลบอุปกรณ์แล้วล้างค่าในบอร์ดด้วย (unprovision)</b> (บท 6–9, 15)</li>
+<li><b>หน้าเฟิร์มแวร์บนเว็บ</b> อัปโหลดไฟล์และอัปเดตหลายบอร์ดแยกตามชนิด โฟลเดอร์ firmware เขียนได้ (บท 4, 7, 13, 14, 15)</li>
+<li>คำถามอาจารย์เพิ่มในทุกบทที่เกี่ยวข้องและบท 16 อีก 5 ข้อ อภิธานศัพท์เพิ่ม 13 คำ แผนที่ไฟล์ 345 รายการ</li>
+</ul></div>
+
+<div class="callout note"><div class="callout-title">อัปเดตก่อนหน้า · 10 ต.ค. 2569 (ตามโค้ด commit คืน 9 ต.ค. 21:35–23:20)</div>
+<p>ปรับตามงาน 5 commit ล่าสุด อธิบายละเอียดทีละบรรทัดในบทที่เกี่ยวข้อง:</p>
+<ul>
+<li><b>แอปมือถือจัดการตารางเรียนได้เหมือนเว็บแอป</b> ดูตามวันที่จริง เลื่อนทีละสัปดาห์ รวมคาบเรียนกับ<b>การใช้ห้อง</b> (ประชุม สอบ กิจกรรม ทำซ้ำได้) และ<b>ปฏิทินภาคเรียน</b> หน้าจอใหม่ <code>booking_editor_screen.dart</code>, <code>term_calendar_screen.dart</code> โมเดลใหม่ <code>room_calendar.dart</code> (บท 10, 11)</li>
+<li><b>นำเข้าตารางแบบ "เปลี่ยนภาคเรียน"</b> (<code>replaceAll</code>) ล้างตารางเดิมทุกห้องใน Transaction เดียว และดาวน์โหลดตารางเป็น CSV ได้บนมือถือ (บท 12) จุดที่เคยเขียนว่า "ยังไม่สอดคล้อง" สองข้อแก้แล้ว</li>
+<li><b>กราฟหน้าสถิติเปลี่ยนเป็นกราฟแท่ง</b> ป้ายเฉพาะแท่งสูงสุด แกนตัวเลขกลม เส้นเฉลี่ยรายวัน (บท 11)</li>
+<li><b>Build APK บน GitHub Actions</b> <code>build-android.yml</code> เซ็นด้วยกุญแจจาก GitHub Secrets (บท 14)</li>
+<li>คำถามอาจารย์เพิ่ม 5 ข้อ (บท 16) อภิธานศัพท์เพิ่ม 10 คำ (บท 17) แผนที่ไฟล์ 325 รายการ (บท 18)</li>
+</ul></div>
+
+<div class="callout note"><div class="callout-title">อัปเดตก่อนหน้า · 9 ต.ค. 2569 (ช่วงเย็น)</div>
+<p>เพิ่มเรื่องที่ทำเพิ่มเติมหลังวันที่ 5 ต.ค.:</p>
+<ul>
+<li><b>สถานะเปิด/ปิดแอร์อิงไฟจริงจาก PZEM</b> (<code>isPoweredOn</code>) เปิดแอร์ด้วยรีโมตจริง แอปและเว็บก็แสดงว่าเปิด และนับถอยหลังปิดอัตโนมัติถูกต้อง (บท 10, 11, 13, 16)</li>
+<li><b>CI อัตโนมัติ</b> <code>.github/workflows/test.yml</code> รัน <code>flutter analyze</code> และ <code>flutter test</code> ทุกครั้งที่ push (บท 14)</li>
+<li><b>บทใหม่ 19: แกะโปรโตคอลและควบคุมแอร์ Daikin ผ่านสาย SLM8</b> (งานที่กำลังพัฒนา) เล่า 8 ขั้นตั้งแต่ค้นคว้า ฟังสัญญาณ ถอด pulse-distance หา checksum แกะความหมายไบต์ คำนวณวงจร จนส่งเฟรมจาก ESP32 พร้อมแผนภาพ ตัวอย่างโค้ด แบบฝึกสร้างเฟรม และคำถามอาจารย์ 11 ข้อ</li>
+</ul></div>
+
+<div class="callout note"><div class="callout-title">อัปเดตก่อนหน้า · 8 ต.ค. 2569</div>
+<p>คู่มือปรับตามโค้ดเวอร์ชันล่าสุด (commit วันที่ 5 ต.ค. 20:06) เรื่องที่เปลี่ยน:</p>
+<ul>
+<li><b>บอร์ด ESP32 ต่อ MQTT ผ่าน Tailscale Funnel พอร์ต 8443</b> แทน duckdns:8883 บอร์ดจึงอยู่ Wi-Fi ไหนก็ได้ (บท 3, 4, 8, 9, 14, 15, 16)</li>
+<li><code>update-remote.sh</code> สร้าง container tailscale ใหม่ทุกครั้งที่อัปเดต เพื่อให้ใช้ <code>tailscale-serve.json</code> ตัวใหม่ (บท 14)</li>
+<li><code>backend.Dockerfile</code> เพิ่ม <code>chmod -R a+rX</code> แก้ปัญหา Cannot find module (บท 4, 14, 15)</li>
+<li>build iOS ระบุที่อยู่ API ได้ และใส่ไอคอนแอปอัตโนมัติ (บท 14)</li>
+</ul></div>
+
+<h2 class="part-title">เริ่มต้นตรงนี้</h2>
+<div class="start-box">
+  <a href="chapters/01-concept.html"><span class="step">ขั้นที่ 1</span><b>เข้าใจแนวคิด</b><span>ปัญหาที่แก้ ข้อจำกัด และเหตุผลของทุกการตัดสินใจ พร้อมโครงเล่าโปรเจค 2 นาที</span></a>
+  <a href="chapters/02-roadmap.html"><span class="step">ขั้นที่ 2</span><b>วางแผนการเรียน</b><span>เริ่มจากอะไร ต้องเรียนรู้อะไรบ้าง แยกตามหมวดพร้อมระดับความสำคัญ และแผน 2 สัปดาห์</span></a>
+  <a href="chapters/03-architecture-flows.html"><span class="step">ขั้นที่ 3</span><b>เห็นภาพทั้งระบบ</b><span>ใครคุยกับใคร และเส้นทางข้อมูล 7 แบบ ตั้งแต่กดปุ่มในแอปจนแอร์เปิด</span></a>
+</div>
+
+<h2 class="part-title">ภาพรวม</h2><div class="cards">
+<a class="card" href="chapters/01-concept.html"><div class="card-num">01</div><div class="card-title">แนวคิดและหลักการคิดของโปรเจค</div><div class="card-sub">ภาพรวม · ปัญหาที่โปรเจคนี้แก้ · สิ่งที่ระบบต้องทำได้ (Requirements) · ข้อจำกัดที่บังคับการออกแบบ (Constraints)</div></a>
+<a class="card" href="chapters/02-roadmap.html"><div class="card-num">02</div><div class="card-title">เริ่มจากอะไร และต้องเรียนรู้อะไรบ้าง</div><div class="card-sub">ภาพรวม · ขั้นที่ 0: เตรียมตัว (ครึ่งวัน) · ลำดับการอ่านคู่มือนี้ · วิธีอ่านโค้ดให้ไม่หลง</div></a>
+<a class="card" href="chapters/03-architecture-flows.html"><div class="card-num">03</div><div class="card-title">สถาปัตยกรรมและเส้นทางของข้อมูล</div><div class="card-sub">ภาพรวม · องค์ประกอบทั้งหมดของระบบ · เส้นทางที่ 1: ผู้ใช้กด &quot;เปิดแอร์ 25°C&quot; ในแอป · เส้นทางที่ 2: วัดไฟ → เก็บเป็นถังรายชั่วโมง → กราฟ</div></a>
+</div>
+<h2 class="part-title">โครงสร้างพื้นฐาน</h2><div class="cards">
+<a class="card" href="chapters/04-network-server.html"><div class="card-num">04</div><div class="card-title">เครือข่าย เซิร์ฟเวอร์ และ Tailscale</div><div class="card-sub">ภาพรวม · ความรู้ที่ต้องมีก่อนอ่านบทนี้ · สถานการณ์จริงของเซิร์ฟเวอร์ · Tailscale ในเชิงลึก</div></a>
+<a class="card" href="chapters/05-database.html"><div class="card-num">05</div><div class="card-title">ฐานข้อมูล MariaDB</div><div class="card-sub">ภาพรวม · โครงสร้างไฟล์ · ความรู้พื้นฐาน: ฐานข้อมูลเชิงสัมพันธ์ · SQL ที่ต้องรู้ (อธิบายผ่าน schema ของโปรเจค)</div></a>
+</div>
+<h2 class="part-title">เซิร์ฟเวอร์</h2><div class="cards">
+<a class="card" href="chapters/06-backend-api.html"><div class="card-num">06</div><div class="card-title">Backend ตอนที่ 1: โครงหลัก ระบบสมาชิก และ REST API</div><div class="card-sub">ภาพรวม · ความรู้ที่ต้องมีก่อนอ่านบทนี้ · โครงสร้างโฟลเดอร์ · ลำดับการเริ่มระบบ (startup sequence)</div></a>
+<a class="card" href="chapters/07-backend-services.html"><div class="card-num">07</div><div class="card-title">Backend ตอนที่ 2: งานเบื้องหลังและตรรกะหลักของระบบ</div><div class="card-sub">ภาพรวม · ความรู้ที่ต้องมีก่อนอ่านบทนี้ · โครงสร้างโฟลเดอร์ · อธิบายทีละไฟล์</div></a>
+<a class="card" href="chapters/08-protocols.html"><div class="card-num">08</div><div class="card-title">โปรโตคอลสื่อสาร: MQTT และ Bluetooth Low Energy</div><div class="card-sub">ภาพรวม · ความรู้ที่ต้องมีก่อนอ่านบทนี้ · ตัวตนอุปกรณ์ (Device Identity) · ตาราง Topic ทั้งหมด</div></a>
+</div>
+<h2 class="part-title">อุปกรณ์และหน้าจอ</h2><div class="cards">
+<a class="card" href="chapters/09-firmware.html"><div class="card-num">09</div><div class="card-title">เฟิร์มแวร์ ESP32: บอร์ดแอร์ (IR และสายแอร์) และบอร์ดตรวจจับคน</div><div class="card-sub">ภาพรวม · ความรู้ที่ต้องมีก่อนอ่านบทนี้ · โครงสร้างโฟลเดอร์ · ตารางขาของแต่ละบอร์ด</div></a>
+<a class="card" href="chapters/10-flutter-architecture.html"><div class="card-num">10</div><div class="card-title">แอป Flutter ตอนที่ 1: โครงสร้าง ข้อมูล และ State</div><div class="card-sub">ภาพรวม · ความรู้ที่ต้องมีก่อนอ่านบทนี้ · โครงสร้างโฟลเดอร์ · pubspec.yaml และแพ็กเกจที่ใช้</div></a>
+<a class="card" href="chapters/11-flutter-screens.html"><div class="card-num">11</div><div class="card-title">แอป Flutter ตอนที่ 2: หน้าจอหลักและวิดเจ็ต</div><div class="card-sub">ภาพรวม · โครงสร้างไฟล์ · พื้นฐาน Flutter ที่ต้องรู้ก่อน · หน้าเข้าสู่ระบบ (กลุ่ม auth)</div></a>
+<a class="card" href="chapters/12-flutter-admin-screens.html"><div class="card-num">12</div><div class="card-title">แอป Flutter ตอนที่ 3: หน้าจอผู้ดูแลระบบและการตั้งค่า</div><div class="card-sub">ภาพรวม · โครงสร้างไฟล์ · ความรู้พื้นฐาน Bluetooth Low Energy ที่ต้องรู้ก่อน · เส้นทาง Provisioning ทั้งหมด</div></a>
+<a class="card" href="chapters/13-webapp.html"><div class="card-num">13</div><div class="card-title">เว็บแอป: HTML, CSS และ JavaScript ล้วน</div><div class="card-sub">ภาพรวม · ความรู้ที่ต้องมีก่อนอ่านบทนี้ · โครงสร้างโฟลเดอร์ · อธิบายทีละไฟล์</div></a>
+</div>
+<h2 class="part-title">ใช้งานจริง</h2><div class="cards">
+<a class="card" href="chapters/14-deploy-scripts-testing.html"><div class="card-num">14</div><div class="card-title">การติดตั้งระบบ สคริปต์อัตโนมัติ และการทดสอบ</div><div class="card-sub">ภาพรวม · ความรู้ที่ต้องมีก่อนอ่านบทนี้ · โครงสร้างโฟลเดอร์ · สภาพแวดล้อมที่ 1: Local dev บน Windows</div></a>
+<a class="card" href="chapters/15-security.html"><div class="card-num">15</div><div class="card-title">ความปลอดภัยทั้งระบบ</div><div class="card-sub">ภาพรวม · ความรู้ที่ต้องมีก่อนอ่านบทนี้ · ชั้นที่ 1: การเปิดพอร์ตและเครือข่าย (network exposure) · ชั้นที่ 2: TLS ทุกเส้นทาง</div></a>
+<a class="card" href="chapters/16-presentation-qa.html"><div class="card-num">16</div><div class="card-title">เตรียมนำเสนอและคำถามที่อาจารย์มักถาม</div><div class="card-sub">ภาพรวม · ลำดับการนำเสนอแนะนำ (15–20 นาที) · สิ่งที่ควรเตรียมก่อนวันนำเสนอ · คำถามภาพรวมยอดนิยม</div></a>
+</div>
+<h2 class="part-title">ภาคผนวก</h2><div class="cards">
+<a class="card" href="chapters/17-glossary.html"><div class="card-num">17</div><div class="card-title">อภิธานศัพท์</div><div class="card-sub">เครือข่ายและอินเทอร์เน็ต · เซิร์ฟเวอร์และ DevOps · ความปลอดภัย · ฐานข้อมูล</div></a>
+<a class="card" href="chapters/18-file-map.html"><div class="card-num">18</div><div class="card-title">แผนที่ไฟล์ทั้งโปรเจค</div><div class="card-sub">เครือข่าย เซิร์ฟเวอร์ และ Docker · ฐานข้อมูลและสคริปต์ดูแลข้อมูล · Backend: โครงหลัก ระบบสมาชิก API และเทสต์ · Backend: services และ utils</div></a>
+</div>
+<h2 class="part-title">งานที่กำลังพัฒนา</h2><div class="cards">
+<a class="card" href="chapters/19-daikin-slm8.html"><div class="card-num">19</div><div class="card-title">แอร์ Daikin ผ่านสาย SLM8: จากการแกะโปรโตคอลถึงบอร์ดสายแอร์</div><div class="card-sub">ภาพรวม · ความรู้ที่ต้องมีก่อนอ่านบทนี้ · อุปกรณ์และเครื่องมือ · ขั้นที่ 1: ค้นคว้าก่อนลงมือ</div></a>
+</div>
+<h2 class="part-title">เจาะลึก</h2><div class="cards">
+<a class="card" href="chapters/20-database-design.html"><div class="card-num">20</div><div class="card-title">เจาะลึกการออกแบบฐานข้อมูล</div><div class="card-sub">วิธีอ่านบทนี้ · หลักคิดที่ใช้ทั้งฐานข้อมูล · ตาราง users — บัญชีผู้ใช้ · ตาราง password_reset_otps — OTP ลืมรหัสผ่าน</div></a>
+</div>
+
+<h2 class="part-title">วิธีใช้คู่มือนี้</h2>
+<div class="callout tip"><div class="callout-title">เคล็ดลับ</div>
+<p>กล่องสีแต่ละแบบมีความหมาย: <b>ทำไม</b> = เหตุผลการออกแบบ · <b>อาจารย์อาจถาม</b> = คำถามพร้อมคำตอบ · <b>ระวัง</b> = จุดที่มักเข้าใจผิด · <b>หมายเหตุ</b> = ข้อมูลเสริม
+ท้ายทุกบทมีเช็กลิสต์ความเข้าใจ ติ๊กได้และเบราว์เซอร์จะจำไว้ ปุ่ม ☾ มุมขวาบนสลับโหมดมืด ปุ่ม ก± ปรับขนาดตัวอักษร</p>
+<p>ถ้าเวลาน้อย ให้อ่านบท 1 → 3 → 4 (ส่วน Tailscale) → 7 (ส่วนปิดแอร์อัตโนมัติ) → 16 ก่อน</p>
+</div>
+
+  </main>
+  <aside class="toc"></aside>
+</div>
+<button class="to-top" id="toTop" aria-label="กลับขึ้นด้านบน">↑</button>
+<script src="assets/search.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>

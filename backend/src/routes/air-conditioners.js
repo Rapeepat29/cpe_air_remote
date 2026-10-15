@@ -11,6 +11,7 @@ import {
   publishAirCommand,
   publishEnterSetupMode,
   publishOtaCommand,
+  unprovisionDevice,
 } from '../services/mqtt.js';
 import {
   publicAirConditioner,
@@ -20,7 +21,12 @@ import {
 } from '../utils/air-conditioner.js';
 import { ApiError, asyncHandler } from '../utils/http.js';
 import { assertFirmwareFileExists } from './firmware.js';
-import { firmwareUrl, validateFirmwareFileName } from '../utils/firmware.js';
+import {
+  airFirmwareKind,
+  assertFirmwareKind,
+  firmwareUrl,
+  validateFirmwareFileName,
+} from '../utils/firmware.js';
 import { hashSecret } from '../utils/security.js';
 import {
   prepareDeviceCredentials,
@@ -46,7 +52,6 @@ airConditionersRouter.get(
               auto_off_in_class, firmware_version, ota_error,
               history_pending
          FROM air_conditioners
-        WHERE provision_status <> 'removed'
         ORDER BY room_number, air_number`,
     );
     response.json({
@@ -64,7 +69,7 @@ airConditionersRouter.post(
     const roomRows = await pool.query(
       `SELECT room_number
          FROM rooms
-        WHERE room_number = ? AND is_active = TRUE
+        WHERE room_number = ?
         LIMIT 1`,
       [input.roomNumber],
     );
@@ -347,7 +352,7 @@ airConditionersRouter.patch(
     const result = await pool.query(
       `UPDATE air_conditioners
           SET ${fields.join(', ')}
-        WHERE device_id = ? AND provision_status <> 'removed'`,
+        WHERE device_id = ?`,
       params,
     );
     if (Number(result.affectedRows) === 0) {
@@ -367,7 +372,7 @@ airConditionersRouter.post(
     const fileName = validateFirmwareFileName(request.body?.file);
     await assertFirmwareFileExists(fileName);
     const rows = await pool.query(
-      `SELECT provision_status, is_online, mqtt_host
+      `SELECT provision_status, is_online, mqtt_host, protocol
          FROM air_conditioners
         WHERE device_id = ?
         LIMIT 1`,
@@ -375,6 +380,7 @@ airConditionersRouter.post(
     );
     const row = rows[0];
     if (!row) throw new ApiError(404, 'ไม่พบเครื่องปรับอากาศนี้');
+    assertFirmwareKind(fileName, airFirmwareKind(row.protocol));
     if (row.provision_status !== 'active') {
       throw new ApiError(409, 'บอร์ดยังตั้งค่าและยืนยันผ่าน MQTT ไม่สำเร็จ');
     }
@@ -413,6 +419,8 @@ airConditionersRouter.delete(
       [deviceId],
     );
     const deletedRows = Number(result.affectedRows ?? 0);
+    // สั่งบอร์ดล้างค่าในตัวเองก่อนลบบัญชี MQTT (ลบบัญชีแล้วคำสั่งจะไปไม่ถึง)
+    const board = await unprovisionDevice('air', deviceId);
     const retainedTopicsCleared = await clearRetainedAirTopics(deviceId);
     const mqttAccountRemoved = await removeDeviceAccount(deviceId);
 
@@ -420,7 +428,8 @@ airConditionersRouter.delete(
       `[air] ลบ ${deviceId} โดย ${request.authUser.username}: `
         + `deletedRows=${deletedRows} `
         + `retainedTopicsCleared=${retainedTopicsCleared} `
-        + `mqttAccountRemoved=${mqttAccountRemoved}`,
+        + `mqttAccountRemoved=${mqttAccountRemoved} `
+        + `boardCleared=${board.acknowledged}`,
     );
 
     // ลบซ้ำถือว่าสำเร็จ เพื่อไม่ให้แอปค้างกับแถวที่หายไปแล้ว
@@ -430,6 +439,9 @@ airConditionersRouter.delete(
       deletedRows,
       retainedTopicsCleared,
       mqttAccountRemoved,
+      // true = บอร์ดยืนยันว่าล้างค่าแล้ว, false = บอร์ดออฟไลน์หรือไม่ตอบ
+      // (ต้องล้างที่ตัวบอร์ดเอง: อัปโหลด firmware/reset หรือตั้งค่าใหม่ผ่านบลูทูธ)
+      boardCleared: board.acknowledged,
     });
   }),
 );

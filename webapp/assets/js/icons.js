@@ -59,6 +59,15 @@ export const icons = {
       size,
     ),
 
+  // ชิปกับลูกศรขึ้น = อัปเดตเฟิร์มแวร์
+  firmware: (size = 16) =>
+    stroke(
+      '<rect x="4" y="9" width="12" height="12" rx="2"/>' +
+        '<path d="M7 9V6M13 9V6M4 13H1M4 17H1"/>' +
+        '<path d="M19 13V3M15.5 6.5 19 3l3.5 3.5"/>',
+      size,
+    ),
+
   chip: (size = 16) =>
     stroke(
       '<rect x="7" y="7" width="10" height="10" rx="2"/>' +

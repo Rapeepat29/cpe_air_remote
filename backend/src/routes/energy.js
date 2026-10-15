@@ -56,7 +56,6 @@ energyRouter.get(
               r.floor_number
          FROM air_conditioners a
          LEFT JOIN rooms r ON r.room_number = a.room_number
-        WHERE a.provision_status <> 'removed'
         ORDER BY a.room_number, a.air_number`,
     );
 
@@ -106,7 +105,6 @@ energyRouter.get(
                 WHERE h.device_id = a.device_id) AS bucket_count
          FROM air_conditioners a
          LEFT JOIN rooms r ON r.room_number = a.room_number
-        WHERE a.provision_status <> 'removed'
         ORDER BY r.floor_number, a.room_number, a.air_number`,
     );
 

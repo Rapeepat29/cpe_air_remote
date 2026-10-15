@@ -1,0 +1,1596 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>18. แผนที่ไฟล์ทั้งโปรเจค — คู่มือศึกษา RMUTT Save Energy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Chakra+Petch:wght@600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+<script>try{var t=localStorage.getItem('guide.theme');if(t)document.documentElement.dataset.theme=t;var f=localStorage.getItem('guide.font');if(f)document.documentElement.dataset.font=f;}catch(e){}</script>
+</head>
+<body>
+<header class="topbar">
+  <button class="menu-btn" id="menuBtn" aria-label="เปิดเมนู">☰</button>
+  <a class="brand" href="../index.html"><span class="brand-mark">⚡</span><span>คู่มือศึกษา <b>RMUTT Save Energy</b></span></a>
+  <div class="top-actions">
+    <button id="fontBtn" title="ขนาดตัวอักษร">ก<small>±</small></button>
+    <button id="themeBtn" title="สลับโหมดสว่าง/มืด">☾</button>
+  </div>
+</header>
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <input class="nav-search" id="navSearch" type="search" placeholder="ค้นหาบทหรือหัวข้อ…">
+    <div id="searchResults" class="search-results"></div>
+    <nav class="nav" id="nav">
+<a class="nav-home" href="../index.html">หน้าแรก</a>
+<div class="nav-part">ภาพรวม</div><ul>
+<li><a href="01-concept.html"><span class="num">1</span>แนวคิดและหลักการคิดของโปรเจค</a></li>
+<li><a href="02-roadmap.html"><span class="num">2</span>เริ่มจากอะไร และต้องเรียนรู้อะไรบ้าง</a></li>
+<li><a href="03-architecture-flows.html"><span class="num">3</span>สถาปัตยกรรมและเส้นทางของข้อมูล</a></li>
+</ul>
+<div class="nav-part">โครงสร้างพื้นฐาน</div><ul>
+<li><a href="04-network-server.html"><span class="num">4</span>เครือข่าย เซิร์ฟเวอร์ และ Tailscale</a></li>
+<li><a href="05-database.html"><span class="num">5</span>ฐานข้อมูล MariaDB</a></li>
+</ul>
+<div class="nav-part">เซิร์ฟเวอร์</div><ul>
+<li><a href="06-backend-api.html"><span class="num">6</span>Backend ตอนที่ 1: โครงหลัก ระบบสมาชิก และ REST API</a></li>
+<li><a href="07-backend-services.html"><span class="num">7</span>Backend ตอนที่ 2: งานเบื้องหลังและตรรกะหลักของระบบ</a></li>
+<li><a href="08-protocols.html"><span class="num">8</span>โปรโตคอลสื่อสาร: MQTT และ Bluetooth Low Energy</a></li>
+</ul>
+<div class="nav-part">อุปกรณ์และหน้าจอ</div><ul>
+<li><a href="09-firmware.html"><span class="num">9</span>เฟิร์มแวร์ ESP32: บอร์ดแอร์ (IR และสายแอร์) และบอร์ดตรวจจับคน</a></li>
+<li><a href="10-flutter-architecture.html"><span class="num">10</span>แอป Flutter ตอนที่ 1: โครงสร้าง ข้อมูล และ State</a></li>
+<li><a href="11-flutter-screens.html"><span class="num">11</span>แอป Flutter ตอนที่ 2: หน้าจอหลักและวิดเจ็ต</a></li>
+<li><a href="12-flutter-admin-screens.html"><span class="num">12</span>แอป Flutter ตอนที่ 3: หน้าจอผู้ดูแลระบบและการตั้งค่า</a></li>
+<li><a href="13-webapp.html"><span class="num">13</span>เว็บแอป: HTML, CSS และ JavaScript ล้วน</a></li>
+</ul>
+<div class="nav-part">ใช้งานจริง</div><ul>
+<li><a href="14-deploy-scripts-testing.html"><span class="num">14</span>การติดตั้งระบบ สคริปต์อัตโนมัติ และการทดสอบ</a></li>
+<li><a href="15-security.html"><span class="num">15</span>ความปลอดภัยทั้งระบบ</a></li>
+<li><a href="16-presentation-qa.html"><span class="num">16</span>เตรียมนำเสนอและคำถามที่อาจารย์มักถาม</a></li>
+</ul>
+<div class="nav-part">ภาคผนวก</div><ul>
+<li><a href="17-glossary.html"><span class="num">17</span>อภิธานศัพท์</a></li>
+<li><a class="active" href="18-file-map.html"><span class="num">18</span>แผนที่ไฟล์ทั้งโปรเจค</a></li>
+</ul>
+<div class="nav-part">งานที่กำลังพัฒนา</div><ul>
+<li><a href="19-daikin-slm8.html"><span class="num">19</span>แอร์ Daikin ผ่านสาย SLM8: จากการแกะโปรโตคอลถึงบอร์ดสายแอร์</a></li>
+</ul>
+<div class="nav-part">เจาะลึก</div><ul>
+<li><a href="20-database-design.html"><span class="num">20</span>เจาะลึกการออกแบบฐานข้อมูล</a></li>
+</ul>
+    </nav>
+  </aside>
+  <main class="content" id="content">
+<div class="chapter-head"><div class="kicker">บทที่ 18 · ภาคผนวก</div><h1>แผนที่ไฟล์ทั้งโปรเจค</h1></div>
+<p>บทนี้รวมคำอธิบายสั้น ๆ ของ <strong>ทุกไฟล์</strong> ในโปรเจค (ยกเว้นไฟล์ที่ระบบสร้างเอง เช่น <code>build/</code>, <code>node_modules/</code>, <code>.dart_tool/</code> และไฟล์ที่เก็บรหัสผ่านจริง) ใช้เป็นดัชนีเวลาอยากรู้ว่าไฟล์หนึ่งทำอะไร แล้วค่อยไปอ่านรายละเอียดในบทที่ระบุ</p>
+<div class="callout tip"><div class="callout-title">เคล็ดลับ</div><p>กด Ctrl+F ในเบราว์เซอร์แล้วพิมพ์ชื่อไฟล์ เพื่อหาไฟล์ที่ต้องการได้เร็วที่สุด</p></div>
+
+<h2 id="เครือข่าย-เซิร์ฟเวอร์-และ-docker">เครือข่าย เซิร์ฟเวอร์ และ Docker<a class="anchor" href="#เครือข่าย-เซิร์ฟเวอร์-และ-docker">#</a></h2>
+<p>รายละเอียดอยู่ในบทเครือข่าย เซิร์ฟเวอร์ และ Tailscale (15 รายการ)</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>ไฟล์</th>
+<th>หน้าที่</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>deploy/docker-compose.yml</code></td>
+<td>กำหนด 5 service ของเซิร์ฟเวอร์จริง (db, mqtt, backend, caddy, tailscale) พร้อมพอร์ต volume healthcheck และตัวแปรที่ส่งเข้าแต่ละกล่อง (<code>MQTT_DEVICE_URL</code> ค่าเริ่มต้นชี้ Funnel <code>ts.net:8443</code> ตั้งเป็น <code>mqtts://&lt;DOMAIN&gt;:8883</code> ใน <code>.env</code> ได้ และ tailscale <code>depends_on</code> ทั้ง caddy กับ mqtt) (14 ต.ค.) backend mount <code>./firmware</code> แบบเขียนได้ เพื่อรับไฟล์ที่อัปโหลดจากเว็บ</td>
+</tr>
+<tr>
+<td><code>deploy/Caddyfile</code></td>
+<td>กฎของ reverse proxy: ขอใบรับรอง DuckDNS ด้วย DNS-01, ส่ง /api/* ไป Backend, เสิร์ฟเว็บและไฟล์เฟิร์มแวร์, ใส่หัวความปลอดภัย และรับ Funnel ที่พอร์ต 8080</td>
+</tr>
+<tr>
+<td><code>deploy/caddy.Dockerfile</code></td>
+<td>build Caddy แบบ multi-stage ที่มีปลั๊กอิน DuckDNS สำหรับ DNS challenge</td>
+</tr>
+<tr>
+<td><code>deploy/backend.Dockerfile</code></td>
+<td>สูตร image ของ Backend (node:22-alpine, ติดตั้ง dependency production, ปรับสิทธิ์ซอร์สด้วย <code>chmod -R a+rX src scripts database</code> ก่อน <code>USER node</code> รันด้วย user node)</td>
+</tr>
+<tr>
+<td><code>deploy/tailscale-serve.json</code></td>
+<td>กฎของ Tailscale Serve/Funnel: พอร์ต 443 ถอด TLS แล้วส่งต่อ HTTP ไป caddy:8080 (เว็บ/API) และพอร์ต 8443 ถอด TLS (<code>TerminateTLS</code>) แล้วส่งต่อ TCP ดิบ (<code>TCPForward</code>) ไป mqtt:1883 (MQTT ของ ESP32) พร้อม <code>AllowFunnel</code> เปิดทั้งสองพอร์ตให้อินเทอร์เน็ต</td>
+</tr>
+<tr>
+<td><code>deploy/mosquitto/config/mosquitto.conf</code></td>
+<td>คอนฟิก Mosquitto จริง: Dynamic Security, listener 1883 ภายใน และ 8883 แบบ TLS 1.2 (1883 รับทั้ง Backend และ MQTT ที่กล่อง tailscale ส่งต่อมาจาก Funnel 8443)</td>
+</tr>
+<tr>
+<td><code>deploy/.env.example</code></td>
+<td>ตัวอย่างตัวแปรความลับและค่าตั้งของเซิร์ฟเวอร์ (init-env.sh สุ่มค่าจริงให้)</td>
+</tr>
+<tr>
+<td><code>deploy/server.config.example.json</code></td>
+<td>ตัวอย่างไฟล์ที่อยู่เซิร์ฟเวอร์ (host, user, port, domain) ให้สคริปต์ PowerShell บน Windows อ่าน</td>
+</tr>
+<tr>
+<td><code>deploy/SERVER_REQUIREMENTS.md</code></td>
+<td>สเปกเครื่องและรายการที่ต้องขอฝ่ายไอที (เขียนตามแผนเดิมที่ขอเปิดพอร์ต)</td>
+</tr>
+<tr>
+<td><code>deploy/DEPLOY.md</code></td>
+<td>คู่มือขั้นตอน deploy ขึ้นเซิร์ฟเวอร์ตั้งแต่ติดตั้งจนสร้างแอดมิน (บางส่วนเขียนตามแผน HTTP-01 เดิม) (14 ต.ค.) ขั้น <code>git pull</code> และหมายเหตุ PowerShell กับ cmd</td>
+</tr>
+<tr>
+<td><code>mqtt/docker-compose.yml</code></td>
+<td>รัน Mosquitto สำหรับพัฒนาบนเครื่องตัวเอง เปิดพอร์ต 1883 พร้อม healthcheck</td>
+</tr>
+<tr>
+<td><code>mqtt/config/mosquitto.conf</code></td>
+<td>คอนฟิก Broker สำหรับพัฒนา ใช้ password_file กับ acl_file และ listener 1883 ไม่เข้ารหัส</td>
+</tr>
+<tr>
+<td><code>mqtt/config/acl</code></td>
+<td>สิทธิ์ของผู้ใช้ rmutt_air ให้อ่านเขียน rmutt/ac/# และ rmutt/occupancy/# และอ่าน $SYS/#</td>
+</tr>
+<tr>
+<td><code>mqtt/.env.example</code></td>
+<td>ตัวอย่างชื่อและรหัสผ่าน MQTT ที่ setup_mqtt.ps1 สร้างให้</td>
+</tr>
+<tr>
+<td><code>mqtt/README.md</code></td>
+<td>วิธีติดตั้งและใช้ Broker สำหรับพัฒนาบน Windows (setup, start, test, stop, เปิด firewall)</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="ฐานข้อมูลและสคริปต์ดูแลข้อมูล">ฐานข้อมูลและสคริปต์ดูแลข้อมูล<a class="anchor" href="#ฐานข้อมูลและสคริปต์ดูแลข้อมูล">#</a></h2>
+<p>รายละเอียดอยู่ในบทฐานข้อมูล MariaDB (26 รายการ)</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>ไฟล์</th>
+<th>หน้าที่</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>backend/database/schema.sql</code></td>
+<td>นิยามโครงสร้างทั้ง 11 ตาราง พร้อม index, foreign key และข้อมูลเริ่มต้น (ห้อง ตารางเรียนตัวอย่าง ค่าตั้งระบบ) เป็นแหล่งความจริงของโครงสร้างฐานข้อมูล</td>
+</tr>
+<tr>
+<td><code>backend/src/db.js</code></td>
+<td>สร้าง Connection Pool ของ MariaDB แบบ lazy (<code>getPool</code>, <code>pool</code>) และมี <code>withTransaction</code> สำหรับ begin/commit/rollback</td>
+</tr>
+<tr>
+<td><code>backend/scripts/init-db.js</code></td>
+<td>รัน <code>schema.sql</code> ทั้งไฟล์ด้วย connection เดี่ยวที่เปิด <code>multipleStatements</code> (<code>npm run db:init</code>)</td>
+</tr>
+<tr>
+<td><code>backend/scripts/doctor.js</code></td>
+<td>ตรวจว่าฐานข้อมูลจริงขาดตารางหรือคอลัมน์ใดเมื่อเทียบกับ <code>schema.sql</code> และซ่อมด้วย <code>--fix</code> (<code>npm run db:doctor</code>)</td>
+</tr>
+<tr>
+<td><code>backend/scripts/seed-admin.js</code></td>
+<td>สร้างหรือรีเซ็ตบัญชีแอดมินด้วยรหัสผ่านแฮช bcrypt แบบ upsert และรับรหัสทาง stdin ได้ (<code>npm run seed:admin</code>)</td>
+</tr>
+<tr>
+<td><code>backend/scripts/migrate-user-primary-key.js</code></td>
+<td>เปลี่ยนคีย์หลักของ <code>users</code> จาก <code>id</code> เป็น <code>username</code>, ปรับ <code>role</code> เป็น ENUM และย้าย <code>password_reset_otps</code> ไปอ้าง <code>username</code> (<code>npm run db:migrate:username</code>)</td>
+</tr>
+<tr>
+<td><code>backend/scripts/migrate-class-schedules.js</code></td>
+<td>สร้างตาราง <code>class_schedules</code> และคาบเรียนตัวอย่าง 4 คาบ (<code>npm run db:migrate:schedules</code>)</td>
+</tr>
+<tr>
+<td><code>backend/scripts/migrate-air-conditioners.js</code></td>
+<td>สร้างตาราง <code>air_conditioners</code> รุ่นแรกและทำ <code>protocol</code> เป็นตัวพิมพ์ใหญ่ (<code>npm run db:migrate:air</code>)</td>
+</tr>
+<tr>
+<td><code>backend/scripts/migrate-pzem-v200.js</code></td>
+<td>เพิ่มคอลัมน์ PZEM 6 ตัว (<code>energy_kwh</code>, <code>frequency_hz</code>, <code>power_factor</code>, <code>pzem_available</code>, <code>ac_running</code>, <code>outside_schedule</code>) ให้ <code>air_conditioners</code> (<code>npm run db:migrate:pzem</code>)</td>
+</tr>
+<tr>
+<td><code>backend/scripts/migrate-rooms-v180.js</code></td>
+<td>สร้างตาราง <code>rooms</code> พร้อมห้องมาตรฐาน เติมห้องที่ถูกอ้างถึงแต่ยังไม่มี แล้วผูก foreign key จาก <code>class_schedules</code> และ <code>air_conditioners</code> (<code>npm run db:migrate:rooms</code>)</td>
+</tr>
+<tr>
+<td><code>backend/scripts/migrate-occupancy-v210.js</code></td>
+<td>สร้างตาราง <code>occupancy_sensors</code> พร้อม foreign key ไป <code>rooms</code> (<code>npm run db:migrate:occupancy</code>)</td>
+</tr>
+<tr>
+<td><code>backend/scripts/migrate-energy-history-v370.js</code></td>
+<td>สร้างตาราง <code>energy_hourly</code> เก็บค่าไฟรายชั่วโมง (<code>npm run db:migrate:energy</code>)</td>
+</tr>
+<tr>
+<td><code>backend/scripts/migrate-auto-off-v380.js</code></td>
+<td>เพิ่มคอลัมน์ <code>auto_off_*</code> ให้ <code>air_conditioners</code> และสร้างตาราง <code>system_alerts</code> (<code>npm run db:migrate:autooff</code>)</td>
+</tr>
+<tr>
+<td><code>backend/scripts/migrate-system-settings-v3100.js</code></td>
+<td>สร้างตาราง <code>system_settings</code> และค่าเริ่มต้น <code>auto_off_enabled</code>, <code>electricity_rate</code> ด้วย <code>INSERT IGNORE</code> (<code>npm run db:migrate:settings</code>)</td>
+</tr>
+<tr>
+<td><code>backend/scripts/migrate-firmware-v3140.js</code></td>
+<td>เพิ่มคอลัมน์ <code>firmware_version</code> และ <code>ota_error</code> ให้ทั้งตารางแอร์และตารางเซ็นเซอร์ (<code>npm run db:migrate:firmware</code>)</td>
+</tr>
+<tr>
+<td><code>backend/scripts/migrate-offline-history-v3150.js</code></td>
+<td>เพิ่มคอลัมน์จุดต่อประวัติไฟฟ้า (<code>energy_chain_*</code>) และ <code>history_pending</code> พร้อมตั้งจุดต่อเริ่มต้น (<code>npm run db:migrate:history</code>)</td>
+</tr>
+<tr>
+<td><code>backend/scripts/migrate-drop-unused.js</code></td>
+<td>(14 ต.ค.) เอา <code>rooms.is_active</code> และสถานะ <code>removed</code> ที่โค้ดไม่ใช้แล้วออกจากฐานข้อมูล รันซ้ำได้ มี <code>--dry-run</code> ถูกเรียกใน <code>update-remote.sh</code></td>
+</tr>
+<tr>
+<td><code>backend/scripts/migrate-legacy-user.js</code></td>
+<td>ย้ายผู้ใช้จากตารางเก่าเข้า <code>users</code> ใน transaction เดียวและแฮชรหัสผ่านที่ยังเป็นข้อความธรรมดา (<code>npm run migrate:legacy</code>)</td>
+</tr>
+<tr>
+<td><code>backend/scripts/convert-schedule-file.js</code></td>
+<td>แปลงไฟล์ตารางเรียน <code>.xlsx</code> เป็น CSV ด้วย <code>parseScheduleFile</code> โดยไม่แตะฐานข้อมูล (<code>npm run schedules:convert</code>)</td>
+</tr>
+<tr>
+<td><code>backend/src/utils/schema-doctor.js</code></td>
+<td>ฟังก์ชันบริสุทธิ์ (<code>parseSchemaTables</code>, <code>parseColumns</code>, <code>isAutoAddableColumn</code>, <code>diffTables</code>, <code>stripLineComments</code>) ที่แยก <code>schema.sql</code> เป็นตาราง/คอลัมน์และเทียบกับฐานข้อมูลจริง</td>
+</tr>
+<tr>
+<td><code>deploy/backup-db.sh</code></td>
+<td>สำรองฐานข้อมูลเป็น <code>.sql.gz</code> ทุกวัน (cron) ตรวจความสมบูรณ์ ลบไฟล์เก่า และ rsync สำเนาออกนอกเครื่อง</td>
+</tr>
+<tr>
+<td><code>deploy/db-view.sh</code></td>
+<td>เปิดดูข้อมูลบนเซิร์ฟเวอร์ผ่าน <code>docker compose exec</code> แบบสรุปทุกตาราง ดูทีละตาราง หรือรัน SQL เอง</td>
+</tr>
+<tr>
+<td><code>deploy/seed-admin.sh</code></td>
+<td>สร้างแอดมินแรกบนเซิร์ฟเวอร์โดยส่งรหัสผ่านทาง stdin ให้ <code>seed-admin.js</code> แล้วล้างรหัสออกจาก <code>.env</code></td>
+</tr>
+<tr>
+<td><code>db-tunnel.ps1</code></td>
+<td>เปิด SSH tunnel จากเครื่อง Windows (พอร์ต 3307) ไปยังฐานข้อมูลบนเซิร์ฟเวอร์ และคัดลอกรหัสผ่านใส่คลิปบอร์ดสำหรับ HeidiSQL</td>
+</tr>
+<tr>
+<td><code>examples/rmutt_class_schedules_1-2569.csv</code></td>
+<td>ไฟล์ตัวอย่างตารางเรียนภาค 1/2569 (คอลัมน์ <code>semester, room_code, day, start_time, end_time, subject, section, instructor, enabled</code>) สำหรับนำเข้าที่ <code>class_schedules</code></td>
+</tr>
+<tr>
+<td><code>examples/rmutt_class_schedules_1-2569_with_CL503.csv</code></td>
+<td>ไฟล์ตัวอย่างชุดเดียวกันที่เพิ่มคาบของห้องพิเศษ CL503</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="backend-โครงหลัก-ระบบสมาชิก-api-และเทสต์">Backend: โครงหลัก ระบบสมาชิก API และเทสต์<a class="anchor" href="#backend-โครงหลัก-ระบบสมาชิก-api-และเทสต์">#</a></h2>
+<p>รายละเอียดอยู่ในบท Backend ตอนที่ 1 (46 รายการ)</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>ไฟล์</th>
+<th>หน้าที่</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>backend/package.json</td>
+<td>ประกาศชื่อโปรเจค ES module, เวอร์ชัน Node ขั้นต่ำ (&gt;=20), สคริปต์ npm (start, dev, test, db:*) และไลบรารีที่ใช้</td>
+</tr>
+<tr>
+<td>backend/.env.example</td>
+<td>ตัวอย่างไฟล์ตั้งค่า environment variable ทั้งหมดของ Backend (DB, JWT, OTP, SMTP, MQTT) โดยใช้ค่าตัวอย่างแทนความลับจริง</td>
+</tr>
+<tr>
+<td>backend/.gitignore</td>
+<td>ห้าม Git เก็บ node_modules, .env, log และ coverage</td>
+</tr>
+<tr>
+<td>backend/.dockerignore</td>
+<td>กันไฟล์ความลับ (.env), test, log และ node_modules ไม่ให้ถูกคัดลอกเข้า Docker image ของ Backend</td>
+</tr>
+<tr>
+<td>backend/src/server.js</td>
+<td>จุดเริ่มต้นของโปรเซส: ตรวจ config, เริ่มบริการเบื้องหลัง (MQTT, auto-off), เปิดพอร์ต HTTP และปิดระบบอย่างเรียบร้อยเมื่อได้รับ SIGINT/SIGTERM</td>
+</tr>
+<tr>
+<td>backend/src/app.js</td>
+<td>สร้าง Express app: ใส่ helmet, CORS, JSON parser, route /api/health, ผูกทุก router เข้ากับ prefix /api/... และ error handler</td>
+</tr>
+<tr>
+<td>backend/src/config.js</td>
+<td>อ่าน environment variable มารวมเป็นอ็อบเจกต์ config พร้อมค่าเริ่มต้น และ assertServerConfig() ตรวจค่าที่ขาดหรือไม่ปลอดภัยก่อนเริ่มเซิร์ฟเวอร์</td>
+</tr>
+<tr>
+<td>backend/src/middleware/authenticate.js</td>
+<td>middleware ตรวจ JWT (Bearer) แล้วเทียบกับผู้ใช้และ token_version ในฐานข้อมูล ก่อนใส่ request.authUser</td>
+</tr>
+<tr>
+<td>backend/src/middleware/require-admin.js</td>
+<td>middleware ตรวจว่า request.authUser.role เป็น admin ไม่ใช่จะตอบ 403</td>
+</tr>
+<tr>
+<td>backend/src/routes/auth.js</td>
+<td>endpoint เข้าสู่ระบบ ดู/แก้โปรไฟล์ตัวเอง เปลี่ยนรหัสผ่าน และลืมรหัสผ่านด้วย OTP พร้อม rate limit</td>
+</tr>
+<tr>
+<td>backend/src/routes/public.js</td>
+<td>endpoint ที่ไม่ต้องล็อกอิน: ข้อมูลติดต่อแอดมิน (GET /api/public/admin-contact)</td>
+</tr>
+<tr>
+<td>backend/src/routes/users.js</td>
+<td>จัดการบัญชีผู้ใช้ (ดู เพิ่ม แก้สิทธิ์/สถานะ ลบ) เฉพาะแอดมิน และกันไม่ให้ระบบไม่เหลือแอดมิน</td>
+</tr>
+<tr>
+<td>backend/src/routes/rooms.js</td>
+<td>CRUD ห้อง: ดูรายการห้องพร้อมสถานะแอร์/เซ็นเซอร์/นับถอยหลัง, เพิ่ม แก้ ลบห้อง</td>
+</tr>
+<tr>
+<td>backend/src/routes/schedules.js</td>
+<td>ตารางเรียน: ดู เพิ่ม แก้ ลบ, นำเข้าจากไฟล์ Excel/CSV (preview + commit) และจัดการปฏิทินภาคเรียน</td>
+</tr>
+<tr>
+<td>backend/src/routes/bookings.js</td>
+<td>การใช้ห้องนอกตารางเรียน (ประชุม สอบ กิจกรรม) ดูได้ทุกคน เพิ่ม/แก้/ลบเฉพาะแอดมิน</td>
+</tr>
+<tr>
+<td>backend/src/routes/air-conditioners.js</td>
+<td>ดูรายการแอร์, จองอุปกรณ์ (reservation) ให้ ESP32, สั่งแอร์ผ่าน MQTT, เข้าโหมด setup, แก้ชื่อ/ปิดอัตโนมัติ, สั่ง OTA และลบ (13 ต.ค.) ลบแอร์แล้วสั่งบอร์ด <code>unprovision</code> ก่อนลบบัญชี MQTT ตอบ <code>boardCleared</code></td>
+</tr>
+<tr>
+<td>backend/src/routes/occupancy-sensors.js</td>
+<td>จัดการเซ็นเซอร์ตรวจจับคน (ESP32 + LD2410): ดู จองอุปกรณ์ เข้าโหมด setup สั่ง OTA และลบ (13 ต.ค.) ลบเซ็นเซอร์แล้วสั่งบอร์ด <code>unprovision</code> เช่นเดียวกับแอร์</td>
+</tr>
+<tr>
+<td>backend/src/routes/energy.js</td>
+<td>API ข้อมูลไฟฟ้า: ค่าสด (live), สรุปรายช่วง (summary), ประวัติ (history), ส่งออก Excel (export), รายการค่าที่เลือกได้ (metrics) และแหล่งข้อมูล (sources)</td>
+</tr>
+<tr>
+<td>backend/src/routes/firmware.js</td>
+<td>แสดงรายการไฟล์ .bin สำหรับ OTA ในโฟลเดอร์ firmware (แอดมินเท่านั้น) และฟังก์ชันตรวจว่าไฟล์มีจริง (14 ต.ค.) เพิ่มอัปโหลด <code>POST /api/firmware</code> (ไฟล์ดิบ + <code>X-File-Name</code>) และลบ <code>DELETE /api/firmware/:file</code> เฉพาะแอดมิน</td>
+</tr>
+<tr>
+<td>backend/src/routes/alerts.js</td>
+<td>ดูรายการแจ้งเตือนระบบและกด "รับทราบ" การแจ้งเตือน</td>
+</tr>
+<tr>
+<td>backend/src/routes/settings.js</td>
+<td>อ่านค่าตั้งระบบ (ทุกคนที่ล็อกอิน) และแก้สวิตช์ปิดแอร์อัตโนมัติ/อัตราค่าไฟ (แอดมิน)</td>
+</tr>
+<tr>
+<td>backend/src/utils/http.js</td>
+<td>ApiError, asyncHandler, notFoundHandler และ errorHandler ที่ทุก route ใช้ร่วมกัน</td>
+</tr>
+<tr>
+<td>backend/src/utils/security.js</td>
+<td>ฟังก์ชันความปลอดภัยแบบ pure: สร้าง OTP, reset token, HMAC hash, เทียบ hash แบบ timing-safe, ตรวจความยาวรหัสผ่านใหม่</td>
+</tr>
+<tr>
+<td>backend/src/utils/user.js</td>
+<td>ตรวจและทำความสะอาดข้อมูลผู้ใช้ (username, role, อีเมล, เบอร์) และแปลงแถวฐานข้อมูลเป็น JSON ที่ปลอดภัยส่งให้แอป</td>
+</tr>
+<tr>
+<td>backend/src/services/mailer.js</td>
+<td>ส่งอีเมล OTP ผ่าน nodemailer (SMTP) หรือพิมพ์ลงคอนโซลเมื่อ MAIL_MODE=console</td>
+</tr>
+<tr>
+<td>backend/test/air-conditioner.test.js</td>
+<td>ทดสอบ validation ของการจองแอร์ ชื่อโปรโตคอล IRac และคำสั่งแอร์ที่ส่งผ่าน MQTT (11 ต.ค.) เพิ่มเคส <code>DAIKIN_WIRED</code> (รวม 10 เทสต์)</td>
+</tr>
+<tr>
+<td>backend/test/auto-off.test.js</td>
+<td>ทดสอบตรรกะปิดแอร์อัตโนมัติ (นับถอยหลัง 5/15 นาที ยิงซ้ำ ยอมแพ้ ยกเลิกเมื่อมีคน)</td>
+</tr>
+<tr>
+<td>backend/test/energy-history.test.js</td>
+<td>ทดสอบการตัดถังรายชั่วโมงเวลาไทย การคำนวณผลต่างมิเตอร์ การสร้าง SQL แบบผูกพารามิเตอร์ และช่วงเวลาหน้าสรุป</td>
+</tr>
+<tr>
+<td>backend/test/firmware.test.js</td>
+<td>ทดสอบการตรวจชื่อไฟล์ .bin ที่ปลอดภัย การสร้าง URL ดาวน์โหลด และการเดาชนิดบอร์ดจากชื่อไฟล์ (14 ต.ค.) เพิ่มเคสชนิดไฟล์และเนื้อไฟล์ (รวม 7 เทสต์)</td>
+</tr>
+<tr>
+<td>backend/test/unprovision.test.js</td>
+<td>(ใหม่ 13 ต.ค.) ทดสอบรูปคำสั่ง unprovision และคำตอบที่นับได้/ไม่ได้ (2 เทสต์)</td>
+</tr>
+<tr>
+<td>backend/test/mqtt-accounts.test.js</td>
+<td>ทดสอบรหัสผ่าน MQTT ของบอร์ด, ACL ต่อ topic, คำสั่ง Dynamic Security และการตรวจ SMTP_FROM</td>
+</tr>
+<tr>
+<td>backend/test/mqtt-provisioning.test.js</td>
+<td>ทดสอบการเลือก URL/พอร์ต Broker ที่ส่งให้ ESP32 ตอน provisioning</td>
+</tr>
+<tr>
+<td>backend/test/mqtt.test.js</td>
+<td>ทดสอบว่า health ของ MQTT ไม่เปิดเผยรหัสผ่าน และรายการ retained topic ที่ต้องล้างเมื่อลบอุปกรณ์</td>
+</tr>
+<tr>
+<td>backend/test/occupancy-sensor.test.js</td>
+<td>ทดสอบ validation ของเซ็นเซอร์ LD2410 และการแปลงข้อมูลเซ็นเซอร์เป็น JSON สาธารณะ</td>
+</tr>
+<tr>
+<td>backend/test/offline-history.test.js</td>
+<td>ทดสอบการแปลงข้อมูลย้อนหลังที่บอร์ดเก็บไว้ตอนออฟไลน์กลับเป็นหน่วยจริงและลงถังชั่วโมง</td>
+</tr>
+<tr>
+<td>backend/test/profile-email.test.js</td>
+<td>ทดสอบ PATCH /api/auth/me แบบ end-to-end ด้วย pool ปลอม: เปลี่ยนอีเมลต้องใส่รหัสผ่านปัจจุบันที่ถูกต้อง</td>
+</tr>
+<tr>
+<td>backend/test/pzem-status.test.js</td>
+<td>ทดสอบการ normalize ค่า PZEM จากข้อความ status ของบอร์ด และการคำนวณคาบเรียนด้วยเวลา Asia/Bangkok</td>
+</tr>
+<tr>
+<td>backend/test/room-booking.test.js</td>
+<td>ทดสอบการนับวันที่เกิดขึ้นของการใช้ห้อง (ครั้งเดียว รายวัน รายสัปดาห์) และการตรวจ input</td>
+</tr>
+<tr>
+<td>backend/test/room.test.js</td>
+<td>ทดสอบ validation รหัสห้อง ค่าเริ่มต้นห้องตอนนำเข้า และการแปลงข้อมูลเซ็นเซอร์ในรายการห้อง</td>
+</tr>
+<tr>
+<td>backend/test/schedule-import.test.js</td>
+<td>ทดสอบการแปลงไฟล์ Excel/CSV ตารางเรียนเป็นรายการ การข้ามห้องที่ไม่มี และการตรวจคาบซ้อนกัน</td>
+</tr>
+<tr>
+<td>backend/test/schedule.test.js</td>
+<td>ทดสอบ validation ตารางเรียน, requireAdmin, การลบทั้งหมด, การสร้างห้องตอนนำเข้า และคำนวณภาคเรียน</td>
+</tr>
+<tr>
+<td>backend/test/schema-doctor.test.js</td>
+<td>ทดสอบตัวอ่าน schema.sql และการเปรียบเทียบตาราง/คอลัมน์ที่ขาดของ db:doctor</td>
+</tr>
+<tr>
+<td>backend/test/security.test.js</td>
+<td>ทดสอบ createOtp (6 หลัก), hashSecret/safeHashEquals และ isValidNewPassword (จำกัด 72 ไบต์)</td>
+</tr>
+<tr>
+<td>backend/test/user-management.test.js</td>
+<td>ทดสอบ managedUser, validateRole, validateUsername, validateNewUserInput และ validateUserUpdate</td>
+</tr>
+<tr>
+<td>backend/test/user.test.js</td>
+<td>ทดสอบ publicUser ไม่เปิดเผย id ภายใน และเบอร์ว่างกลายเป็นข้อความว่าง</td>
+</tr>
+<tr>
+<td>backend/test/xlsx-writer.test.js</td>
+<td>ทดสอบตัวสร้างไฟล์ .xlsx: โครงไฟล์ครบ ชนิดเซลล์ การ escape XML ชื่อแท็บ และชื่อคอลัมน์ AA</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="backend-services-และ-utils">Backend: services และ utils<a class="anchor" href="#backend-services-และ-utils">#</a></h2>
+<p>รายละเอียดอยู่ในบท Backend ตอนที่ 2 (25 รายการ)</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>ไฟล์</th>
+<th>หน้าที่</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>backend/src/services/mqtt.js</td>
+<td>ต่อ Mosquitto, subscribe topic ของบอร์ด, เขียนสถานะลงฐานข้อมูล, ส่งคำสั่ง/ack/schedule-status กลับไปหาบอร์ด และให้ผู้ฟังเหตุการณ์ (listener) กับระบบอื่น (11–13 ต.ค.) แก้โปรโตคอลเป็น <code>DAIKIN_WIRED</code> เมื่อบอร์ดรายงาน <code>controlMode: wired</code> และส่ง/รอคำตอบ <code>unprovision</code></td>
+</tr>
+<tr>
+<td>backend/src/services/mqtt-accounts.js</td>
+<td>สร้าง ซ่อม และลบบัญชี MQTT รายบอร์ดบน Mosquitto Dynamic Security ทุกครั้งที่ Backend ต่อ Broker ได้</td>
+</tr>
+<tr>
+<td>backend/src/services/auto-off.js</td>
+<td>ตัวคุมจังหวะปิดแอร์อัตโนมัติ (setInterval 10 วินาที + ผู้ฟัง status) อ่านสถานะ เรียกตัวตัดสินใจ แล้วสั่งปิดผ่าน MQTT และสร้างการแจ้งเตือน</td>
+</tr>
+<tr>
+<td>backend/src/services/energy-recorder.js</td>
+<td>บันทึกค่าไฟสดและข้อมูลย้อนหลังของบอร์ดลงตาราง energy_hourly (UPSERT รายชั่วโมง) โดยใช้ "จุดต่อ" และคิวต่อบอร์ดกันนับซ้ำ</td>
+</tr>
+<tr>
+<td>backend/src/services/alerts.js</td>
+<td>สร้างและปิดใบแจ้งเตือน system_alerts (ไม่สร้างซ้ำ) และแปลงแถวเป็น JSON ให้แอป</td>
+</tr>
+<tr>
+<td>backend/src/services/system-settings.js</td>
+<td>ค่าตั้งระดับอาคารในตาราง system_settings: สวิตช์รวมปิดแอร์อัตโนมัติ อัตราค่าไฟ (เริ่มต้น 4.50) และภาคเรียนของตาราง พร้อม cache 5 วินาที</td>
+</tr>
+<tr>
+<td>backend/src/services/academic-terms.js</td>
+<td>จัดการปฏิทินวันเปิด-ปิดภาคเรียน และให้ readActiveTermGate (cache 15 วินาที) บอกว่าตารางเรียนมีผลช่วงไหน</td>
+</tr>
+<tr>
+<td>backend/src/services/room-bookings.js</td>
+<td>อ่านการจองห้องที่ครอบคลุมวันนี้สำหรับระบบปิดแอร์และ MQTT</td>
+</tr>
+<tr>
+<td>backend/src/utils/auto-off.js</td>
+<td>ฟังก์ชันบริสุทธิ์ decideAutoOff และค่าคงที่ปิดแอร์ (300/900/20 วินาที, 5 ครั้ง) พร้อมตัวคำนวณวินาทีที่เหลือและ phase สำหรับแอป</td>
+</tr>
+<tr>
+<td>backend/src/utils/mqtt-accounts.js</td>
+<td>ฟังก์ชันบริสุทธิ์สร้างรหัสผ่าน HMAC, ACL และชุดคำสั่ง Dynamic Security ของบอร์ดแอร์/เซ็นเซอร์ และ Backend</td>
+</tr>
+<tr>
+<td>backend/src/utils/mqtt-topics.js</td>
+<td>รายชื่อส่วนท้าย topic แบบ retained และฟังก์ชันประกอบ topic เต็มที่ต้องล้างเมื่อถอดอุปกรณ์</td>
+</tr>
+<tr>
+<td>backend/src/utils/mqtt-provisioning.js</td>
+<td>แยก MQTT_URL เป็น host/port/TLS/username/password ที่ส่งให้บอร์ดตอนติดตั้ง</td>
+</tr>
+<tr>
+<td>backend/src/utils/energy-history.js</td>
+<td>ฟังก์ชันบริสุทธิ์ของระบบค่าไฟ: ผลต่างพลังงาน ถังรายชั่วโมงเวลาไทย ข้อมูลย้อนหลัง แคตตาล็อก 16 เมทริก SQL รายงานสองชั้น และช่วงเวลาสรุป</td>
+</tr>
+<tr>
+<td>backend/src/utils/xlsx-writer.js</td>
+<td>เขียนไฟล์ .xlsx เองด้วย fflate (ZIP + XML ขั้นต่ำ 6 ไฟล์, inlineStr, freeze หัวตาราง)</td>
+</tr>
+<tr>
+<td>backend/src/utils/xlsx-reader.js</td>
+<td>อ่านไฟล์ .xlsx (ชีต เซลล์ เซลล์ที่รวม) พร้อมด่านกัน ZIP bomb และ XML entity</td>
+</tr>
+<tr>
+<td>backend/src/utils/schedule-import.js</td>
+<td>แปลงไฟล์ Excel/CSV ตารางเรียนเป็นรายการคาบ ตรวจซ้ำ/ทับซ้อน สร้างคำเตือนและ CSV มาตรฐาน</td>
+</tr>
+<tr>
+<td>backend/src/utils/schedule.js</td>
+<td>ตรวจตัวกรองและข้อมูลคาบเรียน (ห้อง วัน เวลา ความยาวข้อความ) ใช้ร่วมกันทั้ง route และตัวนำเข้า</td>
+</tr>
+<tr>
+<td>backend/src/utils/class-schedule.js</td>
+<td>คำนวณว่าตอนนี้อยู่ในคาบเรียนหรือไม่ตามเวลา Asia/Bangkok รวมสถานะภาคเรียน (none/before/active/after)</td>
+</tr>
+<tr>
+<td>backend/src/utils/room-booking.js</td>
+<td>ตรวจข้อมูลการจองห้อง คำนวณวันที่เกิดขึ้น หาการจองที่กำลังใช้ และรวมกับผลตารางเรียน (withBookings)</td>
+</tr>
+<tr>
+<td>backend/src/utils/room.js</td>
+<td>ตรวจข้อมูลห้อง แปลงแถวห้องเป็น JSON (รวมนาฬิกาปิดแอร์) และเดาค่าห้องใหม่ตอนนำเข้าตาราง</td>
+</tr>
+<tr>
+<td>backend/src/utils/air-conditioner.js</td>
+<td>ตรวจข้อมูลจองบอร์ดแอร์และคำสั่งแอร์ (อุณหภูมิ โหมด protocol) และแปลงแถวแอร์เป็น JSON ให้แอป (11 ต.ค.) โปรโตคอล <code>DAIKIN_WIRED</code> ตรวจคำสั่งตามความสามารถรีโมตติดผนัง และ <code>controlType</code></td>
+</tr>
+<tr>
+<td>backend/src/utils/occupancy-sensor.js</td>
+<td>ตรวจข้อมูลเซ็นเซอร์ตรวจคน ปรับรูปข้อความสถานะ (occupied ต้องมี radarAvailable) และแปลงแถวเป็น JSON</td>
+</tr>
+<tr>
+<td>backend/src/utils/firmware.js</td>
+<td>ตรวจชื่อไฟล์ firmware (.bin) สร้าง URL ดาวน์โหลดสำหรับ OTA และเดาชนิดบอร์ดจากชื่อไฟล์ (14 ต.ค.) แยกชนิดไฟล์ air/wired/occupancy ตรวจไบต์แรก <code>0xE9</code> และขนาดไม่เกินช่อง OTA กันสั่งไฟล์ผิดชนิดให้บอร์ด</td>
+</tr>
+<tr>
+<td>backend/src/utils/unprovision.js</td>
+<td>(ใหม่ 13 ต.ค.) สร้างคำสั่ง <code>{"action":"unprovision"}</code> พร้อม <code>deviceId</code> ของบอร์ด และตรวจว่าคำตอบ "ล้างค่าแล้ว" มาจากบอร์ดตัวเดียวกัน (รอไม่เกิน 4 วินาที)</td>
+</tr>
+<tr>
+<td>backend/src/utils/schema-doctor.js</td>
+<td>อ่าน database/schema.sql แล้วเทียบกับฐานข้อมูลจริงเพื่อหาตารางและคอลัมน์ที่ขาด (ใช้กับ npm run db:doctor)</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="โปรโตคอล-broker-สำหรับพัฒนา-และเอกสาร-readme">โปรโตคอล Broker สำหรับพัฒนา และเอกสาร README<a class="anchor" href="#โปรโตคอล-broker-สำหรับพัฒนา-และเอกสาร-readme">#</a></h2>
+<p>รายละเอียดอยู่ในบทโปรโตคอลสื่อสาร (27 รายการ)</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>ไฟล์</th>
+<th>หน้าที่</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>docs/BLE_MQTT_PROTOCOL.md</code></td>
+<td>เอกสารสัญญาการสื่อสาร: ตัวตนอุปกรณ์ UUID ของ BLE GATT รูปแพ็กเก็ตตั้งค่า และ topic/payload ของ MQTT (11–13 ต.ค.) เพิ่ม <code>controlType</code>/<code>controlMode</code>, บอร์ดสายแอร์ และคำสั่ง <code>unprovision</code></td>
+</tr>
+<tr>
+<td><code>mqtt/setup_mqtt.ps1</code></td>
+<td>สคริปต์ตั้งค่า Broker สำหรับพัฒนา: หา LAN IP สร้างรหัสสุ่ม สร้าง password file กับ ACL เขียน <code>backend/.env</code> เปิด Docker และทดสอบ</td>
+</tr>
+<tr>
+<td><code>mqtt/start_mqtt.ps1</code></td>
+<td>เปิด Mosquitto container ที่ตั้งค่าไว้แล้วและแสดงสถานะ</td>
+</tr>
+<tr>
+<td><code>mqtt/stop_mqtt.ps1</code></td>
+<td>ปิด Mosquitto container ด้วย <code>docker compose down</code></td>
+</tr>
+<tr>
+<td><code>mqtt/test_mqtt.ps1</code></td>
+<td>ทดสอบว่า Broker พร้อมโดยรอ healthcheck แล้ว publish retained, subscribe รับกลับ และล้างข้อความทดสอบ</td>
+</tr>
+<tr>
+<td><code>mqtt/README.md</code></td>
+<td>คู่มือสั้นของโฟลเดอร์ Broker สำหรับพัฒนา: ขั้นตอนตั้งค่า คำสั่งใช้งาน และ firewall</td>
+</tr>
+<tr>
+<td><code>README.md</code></td>
+<td>คู่มือหลักของโปรเจกต์: ฟังก์ชัน โครงสร้าง วิธีตั้งค่า Broker/Backend/Flutter/Firmware และเงื่อนไขเปิด BLE</td>
+</tr>
+<tr>
+<td><code>RELEASE_NOTES.md</code></td>
+<td>บันทึกการเปลี่ยนแปลงรุ่นล่าสุด (ความปลอดภัย เว็บแอป ตารางเรียน ภาคเรียน) (14 ต.ค.) หน้าเฟิร์มแวร์บนเว็บ, บอร์ดสายแอร์ Daikin + จอ OLED</td>
+</tr>
+<tr>
+<td><code>docs/learn/</code></td>
+<td>บทเรียนพื้นฐาน 18 บท (00–17) ตั้งแต่ Terminal, Docker, MQTT, SQL จนถึงขึ้นเซิร์ฟเวอร์ และไฟล์ Excel แผนการอ่าน (14 ต.ค.) เพิ่มบอร์ดสายแอร์ Daikin จอ OLED และหน้าเฟิร์มแวร์บนเว็บ</td>
+</tr>
+<tr>
+<td><code>docs/study/</code></td>
+<td>บันทึกสรุป 9 บท (00–08) แยกตามส่วน: ภาพรวม ฐานข้อมูล Backend แอป เฟิร์มแวร์ MQTT/BLE ปิดแอร์อัตโนมัติ ค่าไฟ และการขึ้นเซิร์ฟเวอร์ (14 ต.ค.) ปรับเลขรุ่นให้ตรงโค้ด</td>
+</tr>
+<tr>
+<td><code>คู่มือศึกษาโปรเจค/</code></td>
+<td>คู่มือนี้ 20 บท: <code>index.html</code> หน้าแรก, <code>chapters/</code> ฉบับ HTML, <code>markdown/</code> ต้นฉบับ .md, <code>assets/</code> CSS/JS (ขึ้น GitHub 14 ต.ค. 2569)</td>
+</tr>
+<tr>
+<td><code>START_HERE.md</code></td>
+<td>คู่มือเริ่มต้นฉบับย่อ: เตรียมโปรแกรม ตั้งค่า MQTT และรันระบบ</td>
+</tr>
+<tr>
+<td><code>README_TH.txt</code></td>
+<td>บันทึกอัปเดต firmware 1.6.0: เมนู "ตั้งค่าบอร์ด" ส่ง <code>enter_setup</code> ผ่าน MQTT และแก้เพิ่มบอร์ดตัวที่สองบน Windows</td>
+</tr>
+<tr>
+<td><code>README_FIXED_MQTT_TH.txt</code></td>
+<td>แอป 3.3.8: ตัดช่อง MQTT ออกจากฟอร์ม ให้ Backend ส่งค่าจาก <code>backend/.env</code> ให้บอร์ดอัตโนมัติ</td>
+</tr>
+<tr>
+<td><code>README_MQTT_HOST_EDIT_TH.txt</code></td>
+<td>อัปเดตเก่าที่ทำให้ช่อง MQTT Host แก้ไขได้ และอธิบายว่าห้ามใช้ 127.0.0.1 กับบอร์ด</td>
+</tr>
+<tr>
+<td><code>README_WIFI_RECOVERY_TH.txt</code></td>
+<td>บอร์ดทดสอบ Wi-Fi ก่อนบันทึกลง NVS และเปิด BLE recovery เมื่อต่อ Wi-Fi ที่เก็บไว้ไม่ได้</td>
+</tr>
+<tr>
+<td><code>README_BLE_WINDOWS_GATT_FIX_TH.txt</code></td>
+<td>แก้ Windows เชื่อม BLE ได้แต่ค้นหา Service ไม่จบ (connect รอ GATT เสร็จก่อน ล็อก winrt 0.0.20)</td>
+</tr>
+<tr>
+<td><code>README_BLE_SECOND_DEVICE_FIX_TH.txt</code></td>
+<td>แก้ปัญหาเพิ่ม ESP32 ตัวที่สอง: Identity สั้นลงและแยกค่าตั้งเดิมไป characteristic ใหม่</td>
+</tr>
+<tr>
+<td><code>README_AUTO_CREATE_ROOMS_TH.txt</code></td>
+<td>นำเข้าตารางเรียนแล้วสร้างห้องที่ยังไม่มีให้อัตโนมัติใน transaction เดียว</td>
+</tr>
+<tr>
+<td><code>README_EXCEL_IMPORT_TH.txt</code></td>
+<td>นำเข้าตารางเรียนจาก Excel/CSV พร้อมหน้า Preview และการตรวจข้อมูล</td>
+</tr>
+<tr>
+<td><code>README_LD2410_OCCUPANCY_V210_TH.txt</code></td>
+<td>คู่มือบอร์ดตรวจคน ESP32 + HLK-LD2410: Engineering mode เกต 0–8 และเกณฑ์ตัดสินว่ามีคน</td>
+</tr>
+<tr>
+<td><code>README_PZEM_LED_V200_TH.txt</code></td>
+<td>เพิ่ม PZEM-004T วัดไฟจริง ไฟ LED บอกสถานะ และการตรวจตารางเรียนโดย Backend</td>
+</tr>
+<tr>
+<td><code>README_ROOM_MANAGEMENT_V180_TH.txt</code></td>
+<td>เพิ่มชื่ออาจารย์ในตาราง และให้ Admin จัดการห้อง (เพิ่ม แก้ ลบ ห้องพิเศษ)</td>
+</tr>
+<tr>
+<td><code>README_SAIJO_DENKI_TH.txt</code></td>
+<td>เพิ่มโปรโตคอลแอร์ Saijo Denki (<code>SAIJO_DENKI</code>) พร้อมไดรเวอร์ IR เฉพาะและคำสั่งที่รองรับ</td>
+</tr>
+<tr>
+<td><code>README_UI_V181_TH.txt</code></td>
+<td>ปรับหน้าควบคุม: ปุ่มจัดการห้องเป็นเฟือง การ์ดห้อง และตัวเลือกชั้น</td>
+</tr>
+<tr>
+<td><code>README_UI_V182_TH.txt</code></td>
+<td>ปรับหน้าตารางและหน้าควบคุม: แถบวันครบ 7 วันและชุดสีเขียวเดียวกัน</td>
+</tr>
+<tr>
+<td><code>README_UI_V183_TH.txt</code></td>
+<td>หน้าตารางเลือกวันปัจจุบันอัตโนมัติและแสดงวันที่จริง</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="เฟิร์มแวร์-esp32">เฟิร์มแวร์ ESP32<a class="anchor" href="#เฟิร์มแวร์-esp32">#</a></h2>
+<p>รายละเอียดอยู่ในบทเฟิร์มแวร์ ESP32 (31 รายการ)</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>ไฟล์</th>
+<th>หน้าที่</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>firmware/README.md</td>
+<td>คู่มือรวมของเฟิร์มแวร์ ESP32 ทั้งสองบอร์ด: ไลบรารี ขา GPIO ขั้นตอนตั้งค่า การกู้ Wi-Fi การต่อสายเรดาร์ การอ่าน log และตาราง MQTT state (ปรับ 11 ต.ค.; 14 ต.ค. แก้เลขรุ่นให้ตรงโค้ด 2.5.1 / 2.5.2-slm8 / 1.3.2 และเพิ่มหัวข้อ unprovision) ครอบคลุม 3 เฟิร์มแวร์ รวมบอร์ดสายแอร์ ไลบรารี U8g2/DHT ตารางขารวมจอ OLED GPIO21/22</td>
+</tr>
+<tr>
+<td>firmware/rmutt_esp32_air/rmutt_esp32_air.ino</td>
+<td>โปรแกรมหลักของบอร์ดแอร์ (ปัจจุบัน 2.5.1 เริ่มเขียนบทนี้ตอน 2.4.1): BLE provisioning, Wi-Fi/MQTT (TLS, LWT), ยิง IR สั่งแอร์, อ่าน PZEM และตัดสินว่าแอร์ทำงาน, LED, ตารางเวลา, OTA และเก็บ/ส่งข้อมูลย้อนหลังตอนเน็ตหลุด (2.5.1) เพิ่มจอ OLED, <code>controlType:"ir"</code> ใน BLE และคำสั่ง <code>unprovision</code> ล้างบอร์ด</td>
+</tr>
+<tr>
+<td>firmware/rmutt_esp32_air/SaijoDenkiAC.h</td>
+<td>ประกาศคลาส SaijoDenkiAC และ enum SaijoFan/SaijoSwing สำหรับไดรเวอร์ IR ของแอร์ Saijo Denki</td>
+</tr>
+<tr>
+<td>firmware/rmutt_esp32_air/SaijoDenkiAC.cpp</td>
+<td>ค่าเวลาสัญญาณ 38 kHz และตารางเฟรม 72 บิตที่จับจากรีโมตจริง พร้อมเมธอดส่งเปิด/ปิด โหมด อุณหภูมิ 18–29 พัดลม และสวิง ผ่าน IRsend::sendGeneric</td>
+</tr>
+<tr>
+<td>firmware/rmutt_esp32_air/history_log.h</td>
+<td>เทมเพลต HistoryLog ที่เก็บรายการไฟฟ้า 32 ไบต์ทุก 5 นาทีเป็น ring buffer บนพาร์ติชัน rmuttlog พร้อม checksum, ส่งเป็น batch, ack และลบเป็น sector</td>
+</tr>
+<tr>
+<td>firmware/rmutt_esp32_air/oled_display.h</td>
+<td>(ใหม่ 11 ต.ค.) คลาส <code>OledDisplay</code> ขับจอ OLED SH1106: ตรวจว่ามีจอ วาดทุก 400 ms หรือเมื่อ <code>poke()</code> เก็บกราฟวัตต์ พักจอเมื่อแอร์ปิดเกิน 10 นาที</td>
+</tr>
+<tr>
+<td>firmware/rmutt_esp32_air/oled_ui.h</td>
+<td>(ใหม่ 11 ต.ค.) ฟังก์ชันวาดหน้าจอ 128×64 (<code>OledData</code>, หน้าหลัก, SETUP/CONNECTING/ALERT) ใช้ร่วมกับบอร์ดสายแอร์</td>
+</tr>
+<tr>
+<td>firmware/rmutt_esp32_air/build_opt.h</td>
+<td>(ใหม่ 11 ต.ค.) แฟล็กคอมไพเลอร์ปิด I2C/SPI ฮาร์ดแวร์ของ U8g2 และโปรโตคอล IR 28 ยี่ห้อที่ไม่ใช้ ให้เฟิร์มแวร์ที่มีจอพอดีแฟลช (98%)</td>
+</tr>
+<tr>
+<td>firmware/rmutt_esp32_air/README_OLED_TH.md</td>
+<td>(ใหม่ 11 ต.ค.) คู่มือต่อจอ OLED หน้าจอที่แสดง ไลบรารี U8g2 และเหตุผลของ <code>build_opt.h</code></td>
+</tr>
+<tr>
+<td>firmware/rmutt_esp32_air_wired/rmutt_esp32_air_wired.ino</td>
+<td>(ใหม่ 11 ต.ค.) เฟิร์มแวร์บอร์ดสายแอร์ Daikin 2.5.2-slm8 สั่งแอร์ทางสาย SLM8 + DHT11 รายงานสถานะจากแอร์ BLE/MQTT/PZEM/OTA เหมือนบอร์ด IR (บท 19)</td>
+</tr>
+<tr>
+<td>firmware/rmutt_esp32_air_wired/DaikinSLM8.h</td>
+<td>(ใหม่ 11 ต.ค.) โปรโตคอลสาย SLM8: สร้าง/อ่านเฟรม checksum ตัวรับ Rx (interrupt + ring buffer) ตัวส่ง Tx และ Controller</td>
+</tr>
+<tr>
+<td>firmware/rmutt_esp32_air_wired/wired_bus.h</td>
+<td>(ใหม่ 11 ต.ค.) รัน Controller ใน FreeRTOS task แยก (core 1, priority 3) พร้อม mutex ส่งเฟรมทุก 1 วินาที</td>
+</tr>
+<tr>
+<td>firmware/rmutt_esp32_air_wired/README_WIRED_TH.md</td>
+<td>(ใหม่ 11 ต.ค.) วิธีต่อสาย ไลบรารี ขั้นทดสอบหลังแฟลช และค่าที่ปรับได้ของบอร์ดสายแอร์</td>
+</tr>
+<tr>
+<td>firmware/rmutt_esp32_air_wired/build_opt.h</td>
+<td>(ใหม่ 11 ต.ค.) ปิดไดรเวอร์ I2C/SPI ฮาร์ดแวร์ที่ U8g2 ไม่ใช้ เพื่อประหยัดแฟลช</td>
+</tr>
+<tr>
+<td>firmware/rmutt_esp32_air_wired/partitions.csv</td>
+<td>(ใหม่ 11 ต.ค.) แบ่งแฟลช 4MB เป็น 2 ช่องแอป (OTA) + rmuttlog 64KB เหมือนบอร์ด IR</td>
+</tr>
+<tr>
+<td>firmware/rmutt_esp32_air_wired/history_log.h</td>
+<td>(ใหม่ 11 ต.ค.) สำเนาเดียวกับบอร์ด IR: เก็บข้อมูลไฟย้อนหลังใน flash</td>
+</tr>
+<tr>
+<td>firmware/rmutt_esp32_air_wired/ota_update.h</td>
+<td>(ใหม่ 11 ต.ค.) สำเนาเดียวกับบอร์ด IR: อัปเดตเฟิร์มแวร์ผ่าน HTTPS</td>
+</tr>
+<tr>
+<td>firmware/rmutt_esp32_air_wired/letsencrypt_ca.h</td>
+<td>(ใหม่ 11 ต.ค.) สำเนาเดียวกับบอร์ด IR: ใบรับรอง CA ของ Let's Encrypt</td>
+</tr>
+<tr>
+<td>firmware/rmutt_esp32_air_wired/oled_display.h</td>
+<td>(ใหม่ 11 ต.ค.) สำเนาเดียวกับบอร์ด IR: ตัวขับจอ OLED</td>
+</tr>
+<tr>
+<td>firmware/rmutt_esp32_air_wired/oled_ui.h</td>
+<td>(ใหม่ 11 ต.ค.) สำเนาเดียวกับบอร์ด IR: หน้าจอ OLED</td>
+</tr>
+<tr>
+<td>firmware/rmutt_esp32_air/ota_update.h</td>
+<td>ตรวจ URL ที่อนุญาตและดาวน์โหลดเฟิร์มแวร์ใหม่ผ่าน HTTPS (ตรวจใบรับรองกับใบรากที่ฝังไว้) เขียนลงช่อง OTA ที่ว่าง</td>
+</tr>
+<tr>
+<td>firmware/rmutt_esp32_air/letsencrypt_ca.h</td>
+<td>ใบรับรองราก Let's Encrypt (ISRG Root X1 และ X2) ที่ฝังในเฟิร์มแวร์เพื่อตรวจ MQTTS และ OTA สร้างโดย update-root-ca.ps1</td>
+</tr>
+<tr>
+<td>firmware/rmutt_esp32_air/partitions.csv</td>
+<td>ตารางพาร์ติชัน flash 4 MB ของบอร์ดแอร์: nvs, otadata, app0, app1 (OTA) และ rmuttlog 64 KB สำหรับข้อมูลย้อนหลัง</td>
+</tr>
+<tr>
+<td>firmware/rmutt_esp32_occupancy/rmutt_esp32_occupancy.ino</td>
+<td>โปรแกรมหลักของบอร์ดตรวจจับคน (v1.3.1): อ่านเรดาร์ LD2410 ใน Engineering mode, ตัดสินมีคนเมื่อ static energy เกต 0–8 มากกว่า 25, ส่งสถานะผ่าน MQTT, BLE provisioning และ OTA (1.3.2) เพิ่มคำสั่ง <code>unprovision</code> ล้าง NVS แล้วรีบูตเข้า BLE</td>
+</tr>
+<tr>
+<td>firmware/rmutt_esp32_occupancy/ota_update.h</td>
+<td>ไฟล์ OTA เหมือนของบอร์ดแอร์ทุกไบต์ ใช้ตรวจ URL และอัปเดตเฟิร์มแวร์ผ่าน HTTPS</td>
+</tr>
+<tr>
+<td>firmware/rmutt_esp32_occupancy/letsencrypt_ca.h</td>
+<td>ใบรับรองรากชุดเดียวกับบอร์ดแอร์ สำหรับ MQTTS และ OTA ของบอร์ดตรวจจับคน</td>
+</tr>
+<tr>
+<td>firmware/rmutt_esp32_occupancy/partitions.csv</td>
+<td>ตารางพาร์ติชัน flash 4 MB ของบอร์ดตรวจจับคน: nvs, otadata, app0, app1 และ coredump</td>
+</tr>
+<tr>
+<td>firmware/ld2410_pinscan/ld2410_pinscan.ino</td>
+<td>เครื่องมือสแกนขา GPIO ทีละขาเพื่อหาว่าขาไหนรับสัญญาณ UART จาก LD2410 และตรวจหัวเฟรมที่ baud 256000/115200/57600</td>
+</tr>
+<tr>
+<td>firmware/reset/reset.ino</td>
+<td>สเก็ตช์ล้างค่าที่จำไว้ทั้งหมด (NVS และ Wi-Fi) เพื่อ factory reset บอร์ด</td>
+</tr>
+<tr>
+<td>firmware/tests/history_log_test.cpp</td>
+<td>เทสต์บนคอมพิวเตอร์สำหรับ history_log.h โดยจำลอง NOR flash ทดสอบการเก็บ ส่ง ack รีบูตกลางทาง การวนทับ และขยะในพาร์ติชัน</td>
+</tr>
+<tr>
+<td>firmware/update-root-ca.ps1</td>
+<td>สคริปต์ PowerShell ดาวน์โหลดใบรับรองราก Let's Encrypt แล้วสร้าง letsencrypt_ca.h ให้ทั้งสองบอร์ด</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="แอป-flutter-โครงสร้าง-ข้อมูล-state-และเทสต์">แอป Flutter: โครงสร้าง ข้อมูล State และเทสต์<a class="anchor" href="#แอป-flutter-โครงสร้าง-ข้อมูล-state-และเทสต์">#</a></h2>
+<p>รายละเอียดอยู่ในบทแอป Flutter ตอนที่ 1 (83 รายการ)</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>ไฟล์</th>
+<th>หน้าที่</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>pubspec.yaml</td>
+<td>ประกาศชื่อ เวอร์ชัน (3.16.0+32) SDK แพ็กเกจที่ใช้ ฟอนต์ ChakraPetch และ assets ของแอป Flutter</td>
+</tr>
+<tr>
+<td>analysis_options.yaml</td>
+<td>ตั้งกฎ lint ของ Dart (flutter_lints + avoid_print + prefer_const)</td>
+</tr>
+<tr>
+<td>lib/main.dart</td>
+<td>จุดเริ่มแอป สร้าง AuthController/AppSettingsController และ Service ทุกตัว ครอบ MaterialApp แล้วสลับ loading/login/AppShell ตามสถานะล็อกอิน</td>
+</tr>
+<tr>
+<td>lib/config/api_config.dart</td>
+<td>เก็บ URL ของ Backend (ค่าเริ่มต้น Tailscale ts.net, override ด้วย --dart-define=API_BASE_URL)</td>
+</tr>
+<tr>
+<td>lib/data/mock_data.dart</td>
+<td>สร้างรายการห้องตั้งต้น 21 ห้อง (3 ชั้น x 7) เป็นโครงเปล่าให้ Controller เติมข้อมูลจริงจาก Backend</td>
+</tr>
+<tr>
+<td>lib/models/admin_contact.dart</td>
+<td>โมเดลชื่อและเบอร์ติดต่อแอดมินที่แสดงในหน้า login</td>
+</tr>
+<tr>
+<td>lib/models/air_conditioner.dart</td>
+<td>โมเดลแอร์หนึ่งเครื่อง (สถานะสั่งงาน ค่า PZEM ปิดอัตโนมัติ) พร้อม enum โหมด/ลม/สวิง และกฎตามโปรโตคอล (Saijo Denki) (11 ต.ค.) ยี่ห้อ/วิธีควบคุม (<code>DAIKIN_WIRED</code>), getter <code>supportsXxx</code> และ <code>normalizeForProtocol()</code></td>
+</tr>
+<tr>
+<td>lib/models/auth_user.dart</td>
+<td>โมเดลผู้ใช้ที่ล็อกอินอยู่ (username ชื่อ อีเมล role)</td>
+</tr>
+<tr>
+<td>lib/models/class_schedule.dart</td>
+<td>โมเดลคาบเรียนหนึ่งคาบ พร้อมฟังก์ชันตรวจเวลาทับกัน</td>
+</tr>
+<tr>
+<td>lib/models/energy_data.dart</td>
+<td>โมเดลทั้งหมดฝั่งพลังงาน: ค่าไฟสด ตัวเลือกรายงาน แถวประวัติ EnergyQuery สรุปรายช่วง และไฟล์ Excel ที่ดาวน์โหลด</td>
+</tr>
+<tr>
+<td>lib/models/managed_user.dart</td>
+<td>โมเดลผู้ใช้ในหน้าจัดการผู้ใช้ของแอดมิน (role, isActive, วันที่ล็อกอินล่าสุด)</td>
+</tr>
+<tr>
+<td>lib/models/provisioning.dart</td>
+<td>โมเดลสำหรับตั้งค่า ESP32 ผ่าน BLE: อุปกรณ์ที่สแกนเจอ Wi-Fi ที่ ESP32 เห็น identity ใบจอง และ JSON ที่เขียนลงบอร์ด (11 ต.ค.) อ่าน <code>controlType</code>/<code>brand</code> จาก identity ของบอร์ด</td>
+</tr>
+<tr>
+<td>lib/models/remembered_login.dart</td>
+<td>โมเดลชื่อผู้ใช้ที่จำไว้ในเครื่อง (ช่องรหัสผ่านเว้นว่างเสมอ)</td>
+</tr>
+<tr>
+<td>lib/models/room.dart</td>
+<td>โมเดลห้อง รวมรายการแอร์ในห้อง เซนเซอร์คนในห้อง และนาฬิกาปิดอัตโนมัติ</td>
+</tr>
+<tr>
+<td>lib/models/schedule_import.dart</td>
+<td>โมเดลพรีวิวและผลลัพธ์การนำเข้าตารางเรียนจาก Excel พร้อม <code>replaceAll</code> (เปลี่ยนภาคเรียน ล้างตารางเดิมทุกห้อง เพิ่ม 9 ต.ค.)</td>
+</tr>
+<tr>
+<td>lib/models/room_calendar.dart</td>
+<td>(ใหม่ 9 ต.ค.) ปฏิทินการใช้ห้อง: ตัวช่วยวันที่ <code>yyyy-MM-dd</code>, <code>RoomBooking</code> (วันเดียว/ทุกวัน/ทุกสัปดาห์) + นับจำนวนครั้ง, <code>AcademicTerm</code>/<code>AcademicCalendar</code> ภาคเรียน, <code>TimetableInfo</code>, <code>ScheduleBundle</code> และ <code>schedulesToCsv</code></td>
+</tr>
+<tr>
+<td>lib/models/system_alert.dart</td>
+<td>โมเดลการแจ้งเตือนของระบบและ enum ชนิดแจ้งเตือน SystemAlertKind</td>
+</tr>
+<tr>
+<td>lib/services/air_conditioner_repository.dart</td>
+<td>สัญญา (abstract interface) ของการดึง/สั่ง/จอง/เปลี่ยนชื่อ/ลบแอร์</td>
+</tr>
+<tr>
+<td>lib/services/air_conditioner_service.dart</td>
+<td>ตัวจริงที่ยิง HTTP ไป /air-conditioners ของ Backend</td>
+</tr>
+<tr>
+<td>lib/services/alert_notifier.dart</td>
+<td>สัญญาตัวเด้งแจ้งเตือนของเครื่อง + NoopAlertNotifier + ฟังก์ชัน describeAlert สร้างข้อความตามภาษา</td>
+</tr>
+<tr>
+<td>lib/services/alert_repository.dart</td>
+<td>สัญญาดึงและรับทราบการแจ้งเตือนของระบบ</td>
+</tr>
+<tr>
+<td>lib/services/alert_service.dart</td>
+<td>ตัวจริงที่ยิง GET /alerts และ POST /alerts/:id/acknowledge</td>
+</tr>
+<tr>
+<td>lib/services/auth_repository.dart</td>
+<td>สัญญาทั้งหมดเรื่องบัญชี: restoreSession, login, logout, ลืมรหัสผ่าน, แก้โปรไฟล์, เปลี่ยนรหัส</td>
+</tr>
+<tr>
+<td>lib/services/auth_service.dart</td>
+<td>ตัวจริงของ Auth: เก็บ token ใน secure storage ยิง /auth/* และนิยาม ApiException ที่ทุก Service ใช้ร่วม</td>
+</tr>
+<tr>
+<td>lib/services/ble_provisioning_service.dart</td>
+<td>คุย BLE กับ ESP32 ด้วย flutter_blue_plus: สแกน อ่าน identity สแกน Wi-Fi และส่ง config เป็นก้อน ๆ</td>
+</tr>
+<tr>
+<td>lib/services/energy_repository.dart</td>
+<td>สัญญาข้อมูลพลังงาน: metrics, live, sources, summary, history, export</td>
+</tr>
+<tr>
+<td>lib/services/energy_service.dart</td>
+<td>ตัวจริงที่ยิง /energy/* รวมถึงดาวน์โหลดไฟล์ Excel เป็น bytes</td>
+</tr>
+<tr>
+<td>lib/services/occupancy_sensor_repository.dart</td>
+<td>สัญญาจอง/ตั้งค่า/ลบเซนเซอร์คนในห้อง</td>
+</tr>
+<tr>
+<td>lib/services/occupancy_sensor_service.dart</td>
+<td>ตัวจริงที่ยิง /occupancy-sensors/*</td>
+</tr>
+<tr>
+<td>lib/services/room_repository.dart</td>
+<td>สัญญา CRUD ห้อง</td>
+</tr>
+<tr>
+<td>lib/services/room_service.dart</td>
+<td>ตัวจริงที่ยิง /rooms (ตัวอย่างต้นแบบของชั้น Service)</td>
+</tr>
+<tr>
+<td>lib/services/schedule_repository.dart</td>
+<td>สัญญา CRUD ตารางเรียน นำเข้าไฟล์ Excel และ (9 ต.ค.) ปฏิทินภาคเรียนกับการใช้ห้อง</td>
+</tr>
+<tr>
+<td>lib/services/schedule_service.dart</td>
+<td>ตัวจริงที่ยิง /schedules/* รวมอัปโหลดไฟล์ดิบเพื่อพรีวิว และ (9 ต.ค.) /schedules/terms, /bookings</td>
+</tr>
+<tr>
+<td>lib/services/system_settings_repository.dart</td>
+<td>นิยาม SystemSettings และสัญญาอ่าน/เขียนค่าตั้งระดับระบบ (สวิตช์ปิดแอร์อัตโนมัติรวม)</td>
+</tr>
+<tr>
+<td>lib/services/system_settings_service.dart</td>
+<td>ตัวจริงที่ยิง GET /settings และ PATCH /settings/auto-off</td>
+</tr>
+<tr>
+<td>lib/services/user_repository.dart</td>
+<td>สัญญา CRUD ผู้ใช้สำหรับแอดมิน</td>
+</tr>
+<tr>
+<td>lib/services/user_service.dart</td>
+<td>ตัวจริงที่ยิง /users</td>
+</tr>
+<tr>
+<td>lib/controllers/air_conditioner_controller.dart</td>
+<td>ดึงแอร์ทุก 10 วินาที แจกเข้าห้อง ส่งคำสั่ง เปลี่ยนชื่อ ลบ</td>
+</tr>
+<tr>
+<td>lib/controllers/app_settings_controller.dart</td>
+<td>ค่าตั้งของเครื่อง (ธีม ภาษา ขนาดตัวอักษร ค่าไฟต่อหน่วย การแจ้งเตือน) พร้อม AppSettingsStore เก็บใน secure storage</td>
+</tr>
+<tr>
+<td>lib/controllers/auth_controller.dart</td>
+<td>สถานะล็อกอิน (loading/signedOut/signedIn) และผู้ใช้ปัจจุบัน</td>
+</tr>
+<tr>
+<td>lib/controllers/dashboard_controller.dart</td>
+<td>สรุปพลังงานหน้าหลัก/สถิติ + รายการแจ้งเตือน รีเฟรชทุก 30 วินาที และตรวจใบใหม่</td>
+</tr>
+<tr>
+<td>lib/controllers/energy_controller.dart</td>
+<td>ค่าไฟสด (รอบ 2/5/10/30/60 วินาที) แคตตาล็อกรายงาน พรีวิว และส่งออก Excel</td>
+</tr>
+<tr>
+<td>lib/controllers/room_controller.dart</td>
+<td>รายการห้อง รีโหลดทุก 10 วินาที และ CRUD ห้อง</td>
+</tr>
+<tr>
+<td>lib/controllers/schedule_controller.dart</td>
+<td>รายการตารางเรียน CRUD นำเข้า ตรวจเวลาทับกัน และ (9 ต.ค.) ภาคเรียนของตาราง ปฏิทินภาคเรียน การใช้ห้องรายสัปดาห์ <code>classesOn</code>/<code>bookingsOn</code></td>
+</tr>
+<tr>
+<td>lib/controllers/system_settings_controller.dart</td>
+<td>ค่าตั้งระดับระบบจากเซิร์ฟเวอร์ แบบ optimistic update แล้วถอยกลับถ้าล้มเหลว</td>
+</tr>
+<tr>
+<td>lib/controllers/user_controller.dart</td>
+<td>รายการผู้ใช้ของแอดมิน เปลี่ยน role/สถานะ สร้าง ลบ และเรียงลำดับ</td>
+</tr>
+<tr>
+<td>lib/utils/alert_preferences.dart</td>
+<td>AlertChannels/AlertPreferences ค่าตั้งแจ้งเตือนรายชนิด (encode/decode JSON) และ freshAlerts</td>
+</tr>
+<tr>
+<td>lib/utils/file_saver.dart</td>
+<td>บันทึกไฟล์ Excel หรือ CSV (เลือกนามสกุลได้ตั้งแต่ 9 ต.ค.): Android/iOS ผ่านเมนูแชร์ Windows ผ่านกล่อง Save As</td>
+</tr>
+<tr>
+<td>lib/utils/number_format.dart</td>
+<td>จัดรูปตัวเลข: formatDecimal คั่นหลักพัน และ formatEnergy เลือกหน่วย Wh/kWh/MWh อัตโนมัติ</td>
+</tr>
+<tr>
+<td>lib/utils/thai_date.dart</td>
+<td>จัดวันที่ (พ.ศ./ค.ศ.) แปลงข้อความวันที่ และปฏิทินเลือกวันของแอปเอง รวม <code>formatWeekdayShort</code> ชื่อวันย่อใต้กราฟ</td>
+</tr>
+<tr>
+<td>lib/localization/app_localizations.dart</td>
+<td>ตัวแปลไทย/อังกฤษแบบ map ข้อความ + regex และ delegate ของ Flutter (11 ต.ค.) คำแปลใหม่ของยี่ห้อ/วิธีควบคุม</td>
+</tr>
+<tr>
+<td>lib/localization/localized_material.dart</td>
+<td>re-export Material แต่แทนที่ Text ด้วยตัวที่แปลข้อความอัตโนมัติ</td>
+</tr>
+<tr>
+<td>lib/theme/app_theme.dart</td>
+<td>สีแบรนด์ 4 ธีม (ขาว/เทา/ดำ/เขียว) + ตามเครื่อง ผ่าน AppColors, AppPalette และ AppTheme</td>
+</tr>
+<tr>
+<td>web/index.html</td>
+<td>หน้าเว็บเปล่าของ Flutter Web (flutter build web) ไม่ใช่เว็บแอปที่ใช้งานจริง</td>
+</tr>
+<tr>
+<td>web/manifest.json</td>
+<td>manifest ของ Flutter Web (ชื่อแอป สีธีม)</td>
+</tr>
+<tr>
+<td>android/app/build.gradle.kts</td>
+<td>ตั้ง applicationId, namespace, Java 17 และการเซ็น release ด้วย key.properties</td>
+</tr>
+<tr>
+<td>android/build.gradle.kts</td>
+<td>ตั้ง repository และย้ายโฟลเดอร์ build ของโปรเจกต์ Android</td>
+</tr>
+<tr>
+<td>android/settings.gradle.kts</td>
+<td>โหลด Flutter SDK และกำหนดเวอร์ชัน plugin (AGP 9.0.1, Kotlin 2.3.20)</td>
+</tr>
+<tr>
+<td>android/gradle.properties</td>
+<td>ตั้งหน่วยความจำ Gradle และแฟลก AndroidX/newDsl</td>
+</tr>
+<tr>
+<td>android/app/src/main/AndroidManifest.xml</td>
+<td>ประกาศสิทธิ์ INTERNET/Bluetooth/Location และ MainActivity ของแอป</td>
+</tr>
+<tr>
+<td>android/app/src/main/kotlin/.../MainActivity.kt</td>
+<td>ไม่มีในสำเนาที่ให้มา (ปกติ flutter สร้าง FlutterActivity เปล่า)</td>
+</tr>
+<tr>
+<td>test/app_localizations_test.dart</td>
+<td>ทดสอบตัวแปลไทย/อังกฤษและข้อความผิดพลาดจาก Backend</td>
+</tr>
+<tr>
+<td>test/app_preferences_test.dart</td>
+<td>ทดสอบธีม ขนาดตัวอักษร AlertPreferences freshAlerts และการจำค่าตั้งด้วย store ปลอม</td>
+</tr>
+<tr>
+<td>test/auto_off_countdown_test.dart</td>
+<td>ทดสอบวิดเจ็ตนับถอยหลังปิดอัตโนมัติ formatCountdown และฟิลด์ปิดอัตโนมัติของ Room</td>
+</tr>
+<tr>
+<td>test/ble_identity_test.dart</td>
+<td>ทดสอบการอ่าน BleDeviceIdentity ของเฟิร์มแวร์ 1.6 (identity สั้น + settings แยก)</td>
+</tr>
+<tr>
+<td>test/class_schedule_test.dart</td>
+<td>ทดสอบ timesOverlap และการแปลง JSON ของคาบเรียน</td>
+</tr>
+<tr>
+<td>test/daikin_wired_support_test.dart</td>
+<td>(ใหม่ 11 ต.ค.) ข้อจำกัดของแอร์ <code>DAIKIN_WIRED</code> ยี่ห้อ/วิธีควบคุมของแอร์ IR และ identity BLE แบบสายแอร์ (3 เทสต์)</td>
+</tr>
+<tr>
+<td>test/energy_database_test.dart</td>
+<td>ทดสอบหน้า ฐานข้อมูล (ค่าไฟสด โหมดสรุป/รายเครื่อง พรีวิว) ด้วย repository ปลอม</td>
+</tr>
+<tr>
+<td>test/energy_format_test.dart</td>
+<td>ทดสอบ formatEnergy และ energyScaleReference</td>
+</tr>
+<tr>
+<td>test/energy_usage_chart_test.dart</td>
+<td>ทดสอบกราฟแท่งพลังงาน 14 เคส: พิกัดแท่ง <code>niceScaleMax</code> ป้ายแกนนอน และการแตะ</td>
+</tr>
+<tr>
+<td>test/mock_data_test.dart</td>
+<td>ทดสอบ MockData ว่ามี 21 ห้อง 3 ชั้น</td>
+</tr>
+<tr>
+<td>test/number_format_test.dart</td>
+<td>ทดสอบ formatDecimal</td>
+</tr>
+<tr>
+<td>test/occupancy_status_test.dart</td>
+<td>ทดสอบการอ่านสถานะเซนเซอร์คนในห้องและ identity แบบ occupancy</td>
+</tr>
+<tr>
+<td>test/pzem_status_test.dart</td>
+<td>ทดสอบ 5 กรณีว่าสถานะ "กำลังทำงาน" มาจาก PZEM ไม่ใช่คำสั่ง IR รวมถึง <code>isPoweredOn</code> เป็นจริงเมื่อเปิดแอร์ด้วยรีโมตจริง (PZEM เห็นกระแส) และปิดแล้ว <code>isRunning</code> กลับเป็น false</td>
+</tr>
+<tr>
+<td>test/room_calendar_test.dart</td>
+<td>(ใหม่ 9 ต.ค.) ทดสอบตัวช่วยวันที่ การจองห้องแบบต่าง ๆ ภาคเรียน และ CSV ตารางเรียน 11 เคส</td>
+</tr>
+<tr>
+<td>test/saijo_denki_support_test.dart</td>
+<td>ทดสอบข้อจำกัดของโปรโตคอล Saijo Denki เทียบกับ Haier</td>
+</tr>
+<tr>
+<td>test/schedule_date_test.dart</td>
+<td>ทดสอบการแปลงวันในสัปดาห์เป็นดัชนีตารางเรียน (เริ่มวันอาทิตย์)</td>
+</tr>
+<tr>
+<td>test/schedule_import_test.dart</td>
+<td>ทดสอบพรีวิว/คอมมิตนำเข้าตารางและห้องใหม่</td>
+</tr>
+<tr>
+<td>test/system_settings_test.dart</td>
+<td>ทดสอบ SystemSettingsController (optimistic update, ถอยกลับ, กันกดซ้ำ)</td>
+</tr>
+<tr>
+<td>test/thai_date_test.dart</td>
+<td>ทดสอบวันที่ พ.ศ./ค.ศ. และ parseNumericDate</td>
+</tr>
+<tr>
+<td>test/user_management_test.dart</td>
+<td>ทดสอบ ManagedUser และ UserController</td>
+</tr>
+<tr>
+<td>test/widget_test.dart</td>
+<td>ทดสอบทั้งแอป (9 ต.ค. เพิ่มขั้นเพิ่มการใช้ห้อง): ล็อกอิน จำชื่อผู้ใช้ สลับภาษา/ธีม ค่าไฟ เพิ่มตารางเรียน เพิ่มห้อง CL503</td>
+</tr>
+<tr>
+<td>test/wifi_network_candidate_test.dart</td>
+<td>ทดสอบ WifiNetworkCandidate, identity ที่ ESP32 ส่ง และ JSON BLE ของใบจอง</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="แอป-flutter-หน้าจอและวิดเจ็ต">แอป Flutter: หน้าจอและวิดเจ็ต<a class="anchor" href="#แอป-flutter-หน้าจอและวิดเจ็ต">#</a></h2>
+<p>รายละเอียดอยู่ในบทแอป Flutter ตอนที่ 2–3 (36 รายการ)</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>ไฟล์</th>
+<th>หน้าที่</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>lib/screens/app_shell.dart</td>
+<td>โครงหลักหลังล็อกอิน: สร้างและเป็นเจ้าของ Controller ทุกตัว มี NavigationBar สลับหน้า และเด้งแจ้งเตือนใบใหม่</td>
+</tr>
+<tr>
+<td>lib/screens/home_screen.dart</td>
+<td>หน้าหลัก: การ์ดพลังงานตามช่วงเวลา แจ้งเตือนระบบ และสรุปห้อง</td>
+</tr>
+<tr>
+<td>lib/screens/analytics_screen.dart</td>
+<td>หน้าสถิติ: กราฟและอันดับการใช้ไฟรายห้อง/รายเครื่อง</td>
+</tr>
+<tr>
+<td>lib/screens/rooms_screen.dart</td>
+<td>หน้าเลือกห้องที่ต้องการควบคุม แบ่งตามชั้น</td>
+</tr>
+<tr>
+<td>lib/screens/room_control_screen.dart</td>
+<td>หน้าควบคุมแอร์ทุกเครื่องในห้องหนึ่งห้อง</td>
+</tr>
+<tr>
+<td>lib/screens/schedule_screen.dart</td>
+<td>หน้าตารางเรียนตามวันที่จริง เลื่อนทีละสัปดาห์ รวมคาบเรียนกับการใช้ห้อง สถานะภาคเรียน และดาวน์โหลด CSV (ขยาย 9 ต.ค.)</td>
+</tr>
+<tr>
+<td>lib/screens/booking_editor_screen.dart</td>
+<td>(ใหม่ 9 ต.ค.) ฟอร์มเพิ่ม/แก้การใช้ห้อง ทำซ้ำวันเดียว/ทุกวัน/ทุกสัปดาห์/ในตารางเรียน พร้อมสรุปจำนวนครั้ง</td>
+</tr>
+<tr>
+<td>lib/screens/term_calendar_screen.dart</td>
+<td>(ใหม่ 9 ต.ค.) ปฏิทินภาคเรียน เพิ่ม/แก้/ลบวันเปิด–ปิดของแต่ละเทอม</td>
+</tr>
+<tr>
+<td>lib/screens/schedule_management_screen.dart</td>
+<td>หน้าแอดมินเพิ่ม/แก้/ลบคาบเรียน</td>
+</tr>
+<tr>
+<td>lib/screens/schedule_import_screen.dart</td>
+<td>หน้านำเข้าตารางเรียนจาก Excel พร้อมพรีวิวและเลือกภาคเรียน</td>
+</tr>
+<tr>
+<td>lib/screens/room_management_screen.dart</td>
+<td>หน้าแอดมินเพิ่ม/แก้/ลบห้อง และเข้าไปเพิ่มแอร์/เซนเซอร์</td>
+</tr>
+<tr>
+<td>lib/screens/ble_provisioning_screen.dart</td>
+<td>ตัวช่วยตั้งค่า ESP32 ของแอร์ผ่าน BLE ทีละขั้น (11 ต.ค.) แสดงชนิดบอร์ดและล็อกยี่ห้อเมื่อเป็นบอร์ดสายแอร์</td>
+</tr>
+<tr>
+<td>lib/screens/occupancy_provisioning_screen.dart</td>
+<td>ตัวช่วยตั้งค่า ESP32 ของเซนเซอร์คนในห้อง (LD2410) ผ่าน BLE</td>
+</tr>
+<tr>
+<td>lib/screens/energy_database_screen.dart</td>
+<td>หน้า ฐานข้อมูล: ค่าไฟสดและการเลือกเงื่อนไขส่งออกรายงาน Excel</td>
+</tr>
+<tr>
+<td>lib/screens/electricity_rate_screen.dart</td>
+<td>หน้าตั้งอัตราค่าไฟต่อหน่วย</td>
+</tr>
+<tr>
+<td>lib/screens/user_management_screen.dart</td>
+<td>หน้าแอดมินจัดการผู้ใช้</td>
+</tr>
+<tr>
+<td>lib/screens/profile_screen.dart</td>
+<td>หน้าโปรไฟล์และทางเข้าเมนูต่าง ๆ</td>
+</tr>
+<tr>
+<td>lib/screens/account_settings_screen.dart</td>
+<td>หน้าแก้ข้อมูลบัญชีและเปลี่ยนรหัสผ่าน</td>
+</tr>
+<tr>
+<td>lib/screens/application_settings_screen.dart</td>
+<td>หน้าตั้งค่าแอป: ธีม ภาษา ขนาดตัวอักษร และค่าระบบ</td>
+</tr>
+<tr>
+<td>lib/screens/notification_settings_screen.dart</td>
+<td>หน้าตั้งค่าการแจ้งเตือนแยกตามชนิด</td>
+</tr>
+<tr>
+<td>lib/screens/auth/auth_loading_screen.dart</td>
+<td>หน้าโหลดตอนกำลังตรวจ token ที่เก็บไว้</td>
+</tr>
+<tr>
+<td>lib/screens/auth/login_screen.dart</td>
+<td>หน้าเข้าสู่ระบบ จำชื่อผู้ใช้ และแผ่นติดต่อแอดมิน</td>
+</tr>
+<tr>
+<td>lib/screens/auth/forgot_password_screen.dart</td>
+<td>หน้าลืมรหัสผ่านแบบขั้นตอน (ขอ OTP, ยืนยัน, ตั้งรหัสใหม่)</td>
+</tr>
+<tr>
+<td>lib/widgets/air_control_card.dart</td>
+<td>การ์ดควบคุมแอร์หนึ่งเครื่อง (เปิดปิด อุณหภูมิ โหมด ค่าไฟ) (11 ต.ค.) แสดงป้าย <code>AirControlBadge</code></td>
+</tr>
+<tr>
+<td>lib/widgets/air_control_badge.dart</td>
+<td>(ใหม่ 11 ต.ค.) ป้ายยี่ห้อ·วิธีควบคุมแอร์ เช่น "Daikin · สายแอร์" / "Haier · รีโมต IR" ใช้ในการ์ดแอร์และรีโมตเต็ม</td>
+</tr>
+<tr>
+<td>lib/widgets/auto_off_countdown.dart</td>
+<td>วิดเจ็ตนับถอยหลังก่อนระบบปิดแอร์อัตโนมัติ</td>
+</tr>
+<tr>
+<td>lib/widgets/brand_mark.dart</td>
+<td>โลโก้ RMUTT Save Energy วาดด้วยโค้ด</td>
+</tr>
+<tr>
+<td>lib/widgets/energy_usage_chart.dart</td>
+<td>กราฟแท่งการใช้พลังงาน (เปลี่ยนจากกราฟเส้น 9 ต.ค.) ป้ายเฉพาะแท่งสูงสุด แกนตัวเลขกลม เส้นเฉลี่ยรายวัน แตะ/ลากดูค่าได้</td>
+</tr>
+<tr>
+<td>lib/widgets/floor_selector.dart</td>
+<td>ตัวเลือกชั้น</td>
+</tr>
+<tr>
+<td>lib/widgets/full_remote_sheet.dart</td>
+<td>แผ่นรีโมตเต็มรูปแบบของแอร์ (11 ต.ค.) ซ่อนปุ่มที่แอร์เครื่องนั้นทำไม่ได้ และมีป้ายยี่ห้อ·วิธีควบคุม</td>
+</tr>
+<tr>
+<td>lib/widgets/period_selector.dart</td>
+<td>ตัวเลือกช่วงเวลา วัน/สัปดาห์/เดือน/กำหนดเอง</td>
+</tr>
+<tr>
+<td>lib/widgets/section_title.dart</td>
+<td>หัวข้อส่วนที่ใช้ซ้ำ</td>
+</tr>
+<tr>
+<td>lib/widgets/status_pill.dart</td>
+<td>ป้ายสถานะทรงเม็ดยา</td>
+</tr>
+<tr>
+<td>lib/widgets/weekday_selector.dart</td>
+<td>ตัวเลือกวันในสัปดาห์</td>
+</tr>
+<tr>
+<td>lib/widgets/auth/auth_background.dart</td>
+<td>พื้นหลังและโลโก้ชื่อแอปของหน้า login/ลืมรหัส</td>
+</tr>
+<tr>
+<td>lib/widgets/auth/auth_text_field.dart</td>
+<td>ช่องกรอกข้อความสไตล์หน้า auth</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="เว็บแอป">เว็บแอป<a class="anchor" href="#เว็บแอป">#</a></h2>
+<p>รายละเอียดอยู่ในบทเว็บแอป (38 รายการ)</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>ไฟล์</th>
+<th>หน้าที่</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>webapp/index.html</td>
+<td>เปลือกของเว็บแอป (แถบข้าง แถบบน พื้นที่เนื้อหา ลิ้นชักรีโมต) โหลด CSS 4 ไฟล์และ main.js แบบ module โดยไม่มี JavaScript ฝังในหน้า</td>
+</tr>
+<tr>
+<td>webapp/status.html</td>
+<td>หน้าสถานะเบา ๆ ที่ไม่ต้องล็อกอิน แสดงว่า API และ MQTT Broker ปกติหรือไม่</td>
+</tr>
+<tr>
+<td>webapp/site.webmanifest</td>
+<td>ไฟล์ PWA บอกชื่อ ไอคอน สีธีม และโหมด standalone เมื่อติดตั้งเว็บลงหน้าจอหลัก</td>
+</tr>
+<tr>
+<td>webapp/README.md</td>
+<td>เอกสารของเว็บแอป: เหตุผลการออกแบบ โครงไฟล์ ฟีเจอร์ต่อหน้า การพัฒนาบนเครื่องและการ deploy</td>
+</tr>
+<tr>
+<td>webapp/<em>.png, webapp/favicon.</em>, webapp/assets/brand/*.svg</td>
+<td>ไอคอนแอป favicon apple-touch-icon และโลโก้ SVG ที่ index.html และ manifest อ้างถึง (ไม่อยู่ในสำเนาโค้ดที่ใช้เขียนบทนี้)</td>
+</tr>
+<tr>
+<td>webapp/assets/css/tokens.css</td>
+<td>ตัวแปร CSS ทั้งหมด: สี 4 ธีม (gray/white/black/green) ขนาดตัวอักษร ระยะ และตัวคูณขนาดตัวอักษรของผู้ใช้</td>
+</tr>
+<tr>
+<td>webapp/assets/css/base.css</td>
+<td>reset โครงหน้า แถบข้าง แถบบน แถบเมนูล่างบนมือถือ และ media query ย่อจอ</td>
+</tr>
+<tr>
+<td>webapp/assets/css/components.css</td>
+<td>ชิ้นส่วนที่ใช้ซ้ำ: การ์ด ปุ่ม ฟอร์ม ตาราง สวิตช์ ลิ้นชัก modal toast ช่องวันที่ พ.ศ.</td>
+</tr>
+<tr>
+<td>webapp/assets/css/views.css</td>
+<td>สไตล์เฉพาะของแต่ละหน้า เช่น ภาพรวม Building Pulse ห้อง ตารางเรียน นำเข้าตาราง ผู้ใช้ ตั้งค่า (14 ต.ค.) สไตล์หน้าเฟิร์มแวร์และชิปยี่ห้อ</td>
+</tr>
+<tr>
+<td>webapp/assets/js/main.js</td>
+<td>จุดเริ่มของเว็บ: ใส่ธีมและขนาดตัวอักษรก่อนวาด เริ่มนาฬิกา แล้วเรียก startApp</td>
+</tr>
+<tr>
+<td>webapp/assets/js/app.js</td>
+<td>ตัวประกอบร่าง: ตรวจล็อกอิน วาดเมนูและแถบบน สลับหน้าตาม hash (#/rooms) และจัดการลิ้นชักรีโมตแอร์ (14 ต.ค.) เส้นทาง/เมนู "เฟิร์มแวร์" (แอดมิน)</td>
+</tr>
+<tr>
+<td>webapp/assets/js/auth.js</td>
+<td>หน้าเข้าสู่ระบบและขั้นตอนลืมรหัสผ่าน 3 ขั้น (ขอ OTP ยืนยัน OTP ตั้งรหัสใหม่)</td>
+</tr>
+<tr>
+<td>webapp/assets/js/config.js</td>
+<td>API_BASE (รับ ?api= เฉพาะ localhost) คีย์ localStorage ช่วงเวลา polling และชื่ออาคาร</td>
+</tr>
+<tr>
+<td>webapp/assets/js/api.js</td>
+<td>ชั้นเดียวที่เรียก fetch: แนบ Bearer token จัดการ 401 แปลง error เป็น ApiError และรวม method ของทุก endpoint (14 ต.ค.) ฟังก์ชันอัปโหลด/ลบไฟล์เฟิร์มแวร์</td>
+</tr>
+<tr>
+<td>webapp/assets/js/store.js</td>
+<td>state กลาง subscribe/emit ตัวโหลดข้อมูลแต่ละชุด และ polling ตามช่วงใน config.js</td>
+</tr>
+<tr>
+<td>webapp/assets/js/format.js</td>
+<td>ฟังก์ชันจัดรูปแบบตัวเลข หน่วยพลังงาน วันที่ไทย พ.ศ. เวลา และคำอธิบายการแจ้งเตือน (11 ต.ค.) ป้ายยี่ห้อ/วิธีควบคุมและความสามารถของแอร์</td>
+</tr>
+<tr>
+<td>webapp/assets/js/thai-date-input.js</td>
+<td>ช่องวันที่ที่พิมพ์และแสดงเป็น พ.ศ. มีปฏิทินป๊อปอัป แต่ .value ยังเป็น YYYY-MM-DD</td>
+</tr>
+<tr>
+<td>webapp/assets/js/theme.js</td>
+<td>ธีมสี gray/white/black/green/auto เก็บใน localStorage ตั้ง data-palette และจุดเลือกธีมบนแถบบน</td>
+</tr>
+<tr>
+<td>webapp/assets/js/prefs.js</td>
+<td>ขนาดตัวอักษร (ปกติ/ใหญ่/ใหญ่มาก) เก็บใน localStorage ตั้ง data-text บน html</td>
+</tr>
+<tr>
+<td>webapp/assets/js/charts.js</td>
+<td>วาดกราฟเส้นพื้นที่แบบ SVG พร้อมป้ายค่าและ tooltip แถบอันดับ สี heat ของ Building Pulse และกล่องตัวเลข</td>
+</tr>
+<tr>
+<td>webapp/assets/js/icons.js</td>
+<td>ไอคอน SVG ชุดหลักที่เขียนเอง ไม่พึ่ง CDN (14 ต.ค.) ไอคอนเมนูเฟิร์มแวร์</td>
+</tr>
+<tr>
+<td>webapp/assets/js/icons-ui.js</td>
+<td>ไอคอน SVG ชุดเสริม (ค้นหา อัปโหลด เมนูล่าง ฯลฯ) แยกไฟล์เพื่อเลี่ยงปัญหาแคชไฟล์เก่า</td>
+</tr>
+<tr>
+<td>webapp/assets/js/ui.js</td>
+<td>toast modal ฟอร์มจากรายการช่อง กล่องยืนยัน และ withBusy ที่ทุกหน้าใช้ร่วมกัน</td>
+</tr>
+<tr>
+<td>webapp/assets/js/dom.js</td>
+<td>ตัวช่วยสร้าง DOM ปลอดภัย (el, append, replace, toggle ฯลฯ) ใส่ข้อความด้วย textContent กัน XSS</td>
+</tr>
+<tr>
+<td>webapp/assets/js/status.js</td>
+<td>สคริปต์ของ status.html เรียก /api/health ทุก 15 วินาทีแล้วแสดงสถานะ</td>
+</tr>
+<tr>
+<td>webapp/assets/js/views/overview.js</td>
+<td>หน้าภาพรวม: ค่าไฟรวมและกราฟ ตัวเลข 4 ช่อง Building Pulse การแจ้งเตือนล่าสุด และ 5 ห้องที่ใช้ไฟมากสุด</td>
+</tr>
+<tr>
+<td>webapp/assets/js/views/rooms.js</td>
+<td>หน้าห้อง: การ์ดห้อง ตัวกรอง นับถอยหลังปิดอัตโนมัติ และรีโมตแอร์ในลิ้นชัก (ส่งคำสั่งผ่าน API) (11 ต.ค.) ชิปยี่ห้อ/วิธีควบคุม และปุ่มตามความสามารถของเครื่อง</td>
+</tr>
+<tr>
+<td>webapp/assets/js/views/energy.js</td>
+<td>หน้าข้อมูลไฟฟ้า: ตัวกรองหลายแบบ กราฟ ตารางย้อนหลัง และส่งออกไฟล์ Excel</td>
+</tr>
+<tr>
+<td>webapp/assets/js/views/schedule.js</td>
+<td>หน้าตารางเรียนและการใช้ห้องรายวัน เลื่อนทีละสัปดาห์ แอดมินแก้ไข นำเข้า และล้างตารางได้</td>
+</tr>
+<tr>
+<td>webapp/assets/js/views/schedule-import.js</td>
+<td>กล่องนำเข้าตารางเรียนจาก Excel/CSV 3 ขั้น (เลือกไฟล์ ตรวจตัวอย่าง ยืนยัน) พร้อมส่งออก CSV</td>
+</tr>
+<tr>
+<td>webapp/assets/js/views/term-calendar.js</td>
+<td>ปฏิทินภาคเรียน: แสดงและแก้วันเปิด-ปิดของแต่ละเทอม (แก้ได้เฉพาะแอดมิน)</td>
+</tr>
+<tr>
+<td>webapp/assets/js/views/booking-form.js</td>
+<td>ฟอร์มเพิ่มการใช้ห้องที่มีวันที่ (วันเดียว ทุกวัน ทุกสัปดาห์) หรือเพิ่มเป็นคาบในตารางเรียน</td>
+</tr>
+<tr>
+<td>webapp/assets/js/views/alerts.js</td>
+<td>หน้าการแจ้งเตือนทั้งหมด กรองตามสถานะและห้อง กดรับทราบได้</td>
+</tr>
+<tr>
+<td>webapp/assets/js/views/rates.js</td>
+<td>หน้าอัตราค่าไฟต่อ kWh พร้อมตัวอย่างการคำนวณ (แอดมินแก้ได้)</td>
+</tr>
+<tr>
+<td>webapp/assets/js/views/devices.js</td>
+<td>หน้าห้องและอุปกรณ์ (แอดมินเท่านั้น): จัดการห้อง จองช่องบอร์ดแอร์และเซ็นเซอร์ อัปเดตเฟิร์มแวร์ ถอดอุปกรณ์ (11 ต.ค.) ตัวเลือกจอง "Daikin · สายแอร์"</td>
+</tr>
+<tr>
+<td>webapp/assets/js/views/firmware.js</td>
+<td>(ใหม่ 14 ต.ค.) หน้าเฟิร์มแวร์ (แอดมิน): 3 แท็บตามชนิดบอร์ด อัปโหลด .bin (ถามรุ่นถ้าชื่อไม่มี) ตารางบอร์ดที่ยังเก่า อัปเดตหลายบอร์ด ติดตามผลจนรายงานรุ่นใหม่หรือครบ 5 นาที</td>
+</tr>
+<tr>
+<td>webapp/assets/js/views/users.js</td>
+<td>หน้าผู้ใช้งาน (แอดมินเท่านั้น): เพิ่ม เปลี่ยนสิทธิ์ เปิด-ปิด และลบบัญชี</td>
+</tr>
+<tr>
+<td>webapp/assets/js/views/settings.js</td>
+<td>หน้าตั้งค่า: ธีมและขนาดตัวอักษร สวิตช์ปิดแอร์อัตโนมัติรวม ข้อมูลบัญชี สถานะเชื่อมต่อ และออกจากระบบ</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="สคริปต์ติดตั้ง-สร้างแอป-และ-ci">สคริปต์ติดตั้ง สร้างแอป และ CI<a class="anchor" href="#สคริปต์ติดตั้ง-สร้างแอป-และ-ci">#</a></h2>
+<p>รายละเอียดอยู่ในบทการติดตั้งระบบและการทดสอบ (22 รายการ)</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>ไฟล์</th>
+<th>หน้าที่</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>run_all.ps1</td>
+<td>สคริปต์เดียวเปิดระบบฝั่งเครื่อง Windows ทั้งชุด (Docker, MariaDB, migrate, ตั้ง MQTT_URL, Mosquitto, Backend, Flutter) หรือโหมด -Server เพื่อตรวจเซิร์ฟเวอร์จริงแล้วเปิดแอป</td>
+</tr>
+<tr>
+<td>check_system.ps1</td>
+<td>ตรวจเร็ว 3 ขั้น: Mosquitto healthy, Backend /api/health ตอบ ok, Backend เชื่อม MQTT แล้ว</td>
+</tr>
+<tr>
+<td>diagnose.ps1</td>
+<td>ตรวจ 7 ขั้นหาสาเหตุที่ ESP32 ไม่ขึ้นในแอป (Docker, IP ไม่ตรง, health, doctor, firewall 1883, log broker, ดักฟัง rmutt/#)</td>
+</tr>
+<tr>
+<td>db-tunnel.ps1</td>
+<td>เปิดอุโมงค์ SSH พอร์ต 3307 ไปฐานข้อมูลบนเซิร์ฟเวอร์ และก๊อปรหัส DB ใส่คลิปบอร์ดสำหรับ HeidiSQL</td>
+</tr>
+<tr>
+<td>build-apk.ps1</td>
+<td>สร้างโฟลเดอร์ android (ถ้าไม่มี), เติมสิทธิ์ใน AndroidManifest, แล้ว flutter build apk พร้อม --dart-define=API_BASE_URL</td>
+</tr>
+<tr>
+<td>BUILD-ANDROID.bat</td>
+<td>ไฟล์ดับเบิลคลิกบน Windows: สร้าง keystore ถ้ายังไม่มี แล้วเรียก build-apk.ps1 และเปิดโฟลเดอร์ผลลัพธ์</td>
+</tr>
+<tr>
+<td>create-keystore.ps1</td>
+<td>สร้างกุญแจเซ็น APK (.jks) ด้วย keytool และเขียน android/key.properties ครั้งเดียวในชีวิตโปรเจกต์</td>
+</tr>
+<tr>
+<td>change-keystore-password.ps1</td>
+<td>เปลี่ยนรหัสผ่านของ keystore เดิม (กุญแจไม่เปลี่ยน) พร้อมสำรองและย้อนกลับเมื่อพลาด</td>
+</tr>
+<tr>
+<td>deploy/setup-vps.sh</td>
+<td>ติดตั้งเครื่อง Ubuntu ใหม่: อัปเดตระบบ, Docker, swap, เวลา/NTP, firewall (เลือกได้), โครงโฟลเดอร์ /opt/rmutt, cron (14 ต.ค.) สร้างโฟลเดอร์ firmware เป็นของ uid 1000</td>
+</tr>
+<tr>
+<td>deploy/init-env.sh</td>
+<td>สร้าง /opt/rmutt/.env พร้อมรหัสสุ่ม และสร้างไฟล์บัญชี MQTT Dynamic Security ของ Backend</td>
+</tr>
+<tr>
+<td>deploy/update-remote.sh</td>
+<td>สคริปต์ที่รันบนเซิร์ฟเวอร์ตอนอัปเดต: build backend, migrate, reload Caddy, สร้างกล่อง tailscale ใหม่ (<code>up -d --force-recreate tailscale</code>) ให้ <code>tailscale-serve.json</code> ใหม่มีผล, ตรวจ health และเส้นทางสำคัญ (14 ต.ค.) ตรวจและ <code>chown 1000:1000</code> โฟลเดอร์ firmware ทุกครั้งที่อัปเดต</td>
+</tr>
+<tr>
+<td>deploy/update-server.ps1</td>
+<td>สั่งจาก Windows: อัปโหลด backend + ไฟล์ตั้งค่า + เว็บแอป แล้วสั่ง update-remote.sh ผ่าน SSH</td>
+</tr>
+<tr>
+<td>deploy/upload.ps1</td>
+<td>อัปโหลดชุด deploy, เว็บแอป และซอร์ส backend ขึ้นเซิร์ฟเวอร์ครั้งแรก (หรือ -BackendOnly)</td>
+</tr>
+<tr>
+<td>deploy/deploy-web.ps1</td>
+<td>อัปโหลดเฉพาะโฟลเดอร์ webapp ขึ้น /opt/rmutt/www โดยไม่ build/ไม่รีสตาร์ท</td>
+</tr>
+<tr>
+<td>deploy/ServerConfig.ps1</td>
+<td>ฟังก์ชัน Get-RmuttServer อ่าน deploy/server.config.json ให้สคริปต์ทุกตัวใช้ host/user/port/domain ร่วมกัน</td>
+</tr>
+<tr>
+<td>deploy/sync-mqtt-cert.sh</td>
+<td>ก๊อปใบรับรอง TLS ที่ Caddy ขอไว้ให้ Mosquitto (8883) แล้วส่ง SIGHUP เมื่อใบเปลี่ยน; cron เรียกทุกวัน 03:10</td>
+</tr>
+<tr>
+<td>deploy/fix-mqtt-permissions.sh</td>
+<td>แก้เจ้าของ/สิทธิ์ไฟล์ของ Mosquitto (uid 1883) เมื่อคอนเทนเนอร์ rmutt-mqtt วน Restarting</td>
+</tr>
+<tr>
+<td>.github/workflows/test.yml</td>
+<td>GitHub Actions (เพิ่ม 9 ต.ค. 2569) รันอัตโนมัติทุกครั้งที่ push หรือเปิด pull request: ติดตั้ง Flutter แล้วรัน <code>flutter analyze</code> และ <code>flutter test</code> เพื่อจับโค้ดพังก่อนรวมเข้า main</td>
+</tr>
+<tr>
+<td>.github/workflows/build-android.yml</td>
+<td>(ใหม่ 9 ต.ค.) GitHub Actions build APK บน Ubuntu เมื่อกดรันเอง รับ <code>api_base_url</code> ติดตั้ง Java 17 (<code>setup-java@v5</code>) + Flutter เซ็นด้วยกุญแจจาก Secrets (<code>ANDROID_KEYSTORE_BASE64</code>, <code>ANDROID_KEY_PASSWORD</code>) หรือ debug key แล้วต่อท้ายชื่อ <code>-DEBUG-KEY</code> เก็บ APK เป็น artifact 14 วัน</td>
+</tr>
+<tr>
+<td>.github/workflows/build-ios.yml</td>
+<td>GitHub Actions ที่ build แอป iOS (.ipa ไม่เซ็น) บนเครื่อง macOS เมื่อกดรันเอง รับ input <code>api_base_url</code> (ค่าเริ่มต้นที่อยู่ ts.net) ส่งผ่าน env เข้า <code>--dart-define=API_BASE_URL</code> และมีขั้นแทนไอคอน Flutter ด้วยโลโก้ RMUTT Energy ผ่าน <code>sips</code></td>
+</tr>
+<tr>
+<td>.gitignore</td>
+<td>กำหนดไฟล์ที่ไม่ส่งขึ้น git: ความลับ (.env, key.properties, *.jks, server.config.json), build, ข้อมูล broker</td>
+</tr>
+<tr>
+<td>.vscode/settings.json</td>
+<td>ตั้งค่า VS Code ของผู้เขียน (cmake.sourceDirectory ชี้โฟลเดอร์ windows) ไม่เกี่ยวกับการทำงานของระบบ</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="สรุป">สรุป<a class="anchor" href="#สรุป">#</a></h2>
+<p>รวมทั้งหมด 349 รายการ ครอบคลุมโค้ดและไฟล์ตั้งค่าทุกส่วนของโปรเจค</p><nav class="pager"><a class="prev" href="17-glossary.html"><span>← บทก่อนหน้า</span>17. อภิธานศัพท์</a><a class="next" href="19-daikin-slm8.html"><span>บทถัดไป →</span>19. แอร์ Daikin ผ่านสาย SLM8: จากการแกะโปรโตคอลถึงบอร์ดสายแอร์</a></nav>
+  </main>
+  <aside class="toc"><div class="toc-title">ในบทนี้</div><ul><li><a href="#เครือข่าย-เซิร์ฟเวอร์-และ-docker">เครือข่าย เซิร์ฟเวอร์ และ Docker</a></li><li><a href="#ฐานข้อมูลและสคริปต์ดูแลข้อมูล">ฐานข้อมูลและสคริปต์ดูแลข้อมูล</a></li><li><a href="#backend-โครงหลัก-ระบบสมาชิก-api-และเทสต์">Backend: โครงหลัก ระบบสมาชิก API และเทสต์</a></li><li><a href="#backend-services-และ-utils">Backend: services และ utils</a></li><li><a href="#โปรโตคอล-broker-สำหรับพัฒนา-และเอกสาร-readme">โปรโตคอล Broker สำหรับพัฒนา และเอกสาร README</a></li><li><a href="#เฟิร์มแวร์-esp32">เฟิร์มแวร์ ESP32</a></li><li><a href="#แอป-flutter-โครงสร้าง-ข้อมูล-state-และเทสต์">แอป Flutter: โครงสร้าง ข้อมูล State และเทสต์</a></li><li><a href="#แอป-flutter-หน้าจอและวิดเจ็ต">แอป Flutter: หน้าจอและวิดเจ็ต</a></li><li><a href="#เว็บแอป">เว็บแอป</a></li><li><a href="#สคริปต์ติดตั้ง-สร้างแอป-และ-ci">สคริปต์ติดตั้ง สร้างแอป และ CI</a></li><li><a href="#สรุป">สรุป</a></li></ul></aside>
+</div>
+<button class="to-top" id="toTop" aria-label="กลับขึ้นด้านบน">↑</button>
+<script src="../assets/search.js"></script>
+<script src="../assets/app.js"></script>
+</body>
+</html>

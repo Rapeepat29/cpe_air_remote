@@ -1,7 +1,7 @@
 # 03 · แอปมือถือ (Flutter)
 
-โค้ดอยู่ที่ `lib/` รันได้ทั้ง **Android** และ **Windows**
-เวอร์ชันปัจจุบัน `3.12.0+29`
+โค้ดอยู่ที่ `lib/` รันได้ทั้ง **Android** และ **Windows** (มี workflow build iOS ด้วย)
+เวอร์ชันปัจจุบัน `3.16.0+32` (อัปเดต 14 ต.ค. 2569)
 
 ---
 
@@ -38,7 +38,7 @@ class AlertService implements AlertRepository { ... }
 **ได้อะไร**
 
 1. **เทสต์ได้โดยไม่ต้องมีเซิร์ฟเวอร์** — ใส่ `_MemoryAlertRepository` ที่คืน
-   ข้อมูลตายตัวเข้าไปแทน เทสต์วิดเจ็ตทั้ง 89 เคสจึงรันได้โดยไม่ต่อเน็ต
+   ข้อมูลตายตัวเข้าไปแทน เทสต์ทั้ง 122 เคสจึงรันได้โดยไม่ต่อเน็ต
 2. **เปลี่ยนวิธีดึงข้อมูลได้โดยไม่แตะ UI** — ถ้าวันหนึ่งย้ายจาก REST ไป
    GraphQL หรือเพิ่ม cache ก็เขียน class ใหม่ที่ implement สัญญาเดิม
 3. **UI ไม่รู้จัก HTTP เลย** ไม่มี `http.get()` ในไฟล์หน้าจอสักไฟล์
@@ -309,12 +309,67 @@ Text('${context.tr('Estimated cost')}: ${context.tr('THB')} $cost')
 | หน้าหลัก | `home_screen.dart` | ยอดรวมค่าไฟ + การ์ดแจ้งเตือน |
 | รายการห้อง | `rooms_screen.dart` | นาฬิกานับถอยหลังบนการ์ดห้อง |
 | ควบคุมแอร์ | `room_control_screen.dart` | รีโมตเต็มรูปแบบ + ค่าไฟสด |
-| สถิติ | `analytics_screen.dart` | กราฟที่แตะดูรายจุดได้ |
+| สถิติ | `analytics_screen.dart` | กราฟแท่งที่แตะดูรายแท่งได้ |
 | ฐานข้อมูลค่าไฟ | `energy_database_screen.dart` | 1,300 บรรทัด ค่าไฟสด + ส่งออก Excel |
 | ตั้งค่า | `application_settings_screen.dart` | ธีม ภาษา ขนาดตัวอักษร สวิตช์ระบบ |
 | แจ้งเตือน | `notification_settings_screen.dart` | สวิตช์แยกตามชนิด |
+| ตารางเรียน / การใช้ห้อง | `schedule_screen.dart` | ดูตามวันที่จริง เลื่อนทีละสัปดาห์ (อัปเดต 14 ต.ค. 2569) |
+| เพิ่ม/แก้การใช้ห้อง | `booking_editor_screen.dart` | ประชุม สอบ กิจกรรม คาบเรียน ทำซ้ำได้ |
+| ปฏิทินภาคเรียน | `term_calendar_screen.dart` | วันเปิด–ปิดของแต่ละเทอม |
+| นำเข้าตารางเรียน | `schedule_import_screen.dart` | Excel/CSV เลือก "เปลี่ยนภาคเรียน" ได้ |
+
+### สถานะเปิด-ปิดจริง `isPoweredOn` (อัปเดต 14 ต.ค. 2569)
+
+`AirConditioner.isOn` คือ **คำสั่งล่าสุดที่ระบบส่งไป** ถ้ามีคนเปิดแอร์ด้วยรีโมตจริง
+ค่านี้ยังเป็น `false` ทั้งที่แอร์กินไฟอยู่ ตั้งแต่ 9 ต.ค. จึงมี
+
+```dart
+bool get isPoweredOn => isOn || (pzemAvailable && isRunning);
+```
+
+คือเชื่อ PZEM ด้วย (เฟิร์มแวร์ยืนยันว่าแอร์ทำงาน ≥30 W ติดกัน 3 ครั้ง)
+การ์ดแอร์ สรุปห้อง และรีโมตเต็มรูปแบบใช้ค่านี้ และคำสั่งถัดไปเริ่มจากสถานะจริง
+กดปรับอุณหภูมิตอนแอร์เปิดด้วยรีโมตจึงไม่เผลอสั่งปิด ส่วนตอนสั่งปิด
+`copyStateFrom` ตั้ง `isRunning = false` ให้หน้าจอขึ้นว่าปิดทันทีโดยไม่ต้องรอ PZEM
+เว็บแอปใช้กติกาเดียวกัน เทสต์อยู่ใน `test/pzem_status_test.dart`
+
+### บอร์ดสายแอร์ `DAIKIN_WIRED` (อัปเดต 14 ต.ค. 2569)
+
+`lib/models/air_conditioner.dart` มีค่าคงที่ `daikinWiredProtocol = 'DAIKIN_WIRED'`
+และ getter `isWired` เมื่อเป็นบอร์ดสายแอร์ ฟังก์ชันที่ใช้ได้ถูกจำกัดตามที่แอร์รับได้ทางสาย:
+`supportedModes` เหลือ Cool/Dry/Fan, `supportedFanSpeeds` ไม่มี Turbo,
+`supportsEco/Turbo/Quiet/Clean/HorizontalSwing/DisplayLight` เป็น `false`
+และ Sleep ใช้ไม่ได้ในโหมด Dry รีโมตเต็มรูปแบบจึงซ่อนปุ่มที่แอร์ทำไม่ได้
+
+`widgets/air_control_badge.dart` แสดงป้ายยี่ห้อ·วิธีควบคุม เช่น
+**Daikin · สายแอร์** (สีฟ้า ไอคอนสาย) หรือ **Haier · รีโมต IR** (สีเทา)
+บนการ์ดแอร์และรีโมตเต็ม ส่วน `ble_provisioning_screen.dart` อ่าน
+`controlType` จาก identity บลูทูธ ถ้าเป็น `wired` จะล็อกยี่ห้อเป็น Daikin · สายแอร์
+และจองด้วยโปรโตคอล `DAIKIN_WIRED` เทสต์อยู่ใน `test/daikin_wired_support_test.dart`
+
+### ตารางเรียน การใช้ห้อง และปฏิทินภาคเรียน (อัปเดต 14 ต.ค. 2569)
+
+ตั้งแต่ 9 ต.ค. แอปมือถือจัดการตารางได้เหมือนเว็บแอป (แอดมินแก้ได้ ผู้ใช้ทั่วไปดูได้)
+
+- **การใช้ห้องนอกตารางเรียน** (`/api/bookings`) ประชุม สอบ กิจกรรม คาบเรียน
+  ทำซ้ำได้ วันเดียว / ทุกวัน / ทุกสัปดาห์ / ในตารางเรียนภาคนี้
+  ระหว่างเวลาที่ใช้ห้อง ระบบปิดแอร์ถือว่าห้องอยู่ในคาบ (รอ 15 นาที ไม่แจ้งเตือน)
+- **ปฏิทินภาคเรียน** (`/api/schedules/terms`) วันเปิด–ปิดของแต่ละเทอม
+  นอกช่วงนั้น Backend ถือว่าทุกห้องอยู่นอกคาบ จึงไม่ต้องล้างตารางตอนปิดภาค
+- **นำเข้าไฟล์** เลือก "เปลี่ยนภาคเรียน" (`replaceAll`) ล้างตารางเดิม **ทุกห้อง**
+  ก่อนนำเข้า และดาวน์โหลดตารางเป็น CSV ได้
+
+ตรรกะวันที่และการทำซ้ำอยู่ใน `lib/models/room_calendar.dart` เขียนให้ตรงกับ
+Backend (`backend/src/utils/room-booking.js`) และเว็บแอป (`booking-form.js`)
+ผลสามฝั่งจึงตรงกัน วันที่ทุกตัวเป็นข้อความ `yyyy-MM-dd` เพื่อไม่โดนผลของเขตเวลา
+เทสต์อยู่ใน `test/room_calendar_test.dart`
 
 ### กราฟค่าไฟ — `widgets/energy_usage_chart.dart`
+
+(อัปเดต 14 ต.ค. 2569) ตั้งแต่ 9 ต.ค. เปลี่ยนจาก **กราฟเส้นเป็นกราฟแท่ง** หนึ่งแท่งต่อ
+ชั่วโมงหรือวัน ป้ายตัวเลขเฉพาะแท่งสูงสุด ค่าอื่นแตะเพื่อดู ช่วงที่เป็น 0 เหลือขีดจาง
+แกนตั้งตัวเลขกลม 3 ระดับ (`niceScaleMax`) ป้ายแกนนอนทุก 6 ชม. / ชื่อวัน / ทุก 7 วัน
+และรายวันตั้งแต่ 7 วันมีเส้นประค่าเฉลี่ยต่อวัน
 
 จุดที่ออกแบบมาแล้วมีเหตุผล
 
@@ -322,16 +377,19 @@ Text('${context.tr('Estimated cost')}: ${context.tr('THB')} $cost')
 
 ```dart
 abstract final class EnergyChartGeometry {
-  static const double left = 18;
-  static const double top = 24;
-  static const double bottom = 28;
+  static const double left = 30;
+  static const double top = 22;
+  static const double bottom = 22;
+  static const double right = 4;
+  static double barWidth(Size size, int count) { ... }
+  static int? indexAt(double dx, Size size, int count) { ... }
   static List<Offset> resolve(Size size, List<double> values) { ... }
 }
 ```
 
-ทั้งตัววาด (`CustomPainter`) และตัวรับสัมผัส (หาจุดที่ใกล้ที่สุด)
-ใช้ฟังก์ชันนี้ตัวเดียวกัน **ถ้าคำนวณแยกกัน จุดที่แตะได้จะเลื่อนจากจุดที่เห็น
-ทันทีที่มีคนแก้ระยะขอบ** ซึ่งเป็นบั๊กที่หายากมาก
+ทั้งตัววาด (`CustomPainter`) และตัวรับสัมผัส (`indexAt` หาแท่งจากตำแหน่งที่แตะ
+คิดทั้งช่อง ไม่ต้องแตะโดนตัวแท่งพอดี) ใช้สูตรเดียวกัน **ถ้าคำนวณแยกกัน แท่งที่แตะได้
+จะเลื่อนจากแท่งที่เห็นทันทีที่มีคนแก้ระยะขอบ** ซึ่งเป็นบั๊กที่หายากมาก
 
 **หน่วยร่วมของทั้งชุด**
 
@@ -346,14 +404,13 @@ formatEnergy(value, scaleReference: reference)
 **การเว้นระยะป้ายคิดจากความกว้างจริง**
 
 ```dart
-final spacing = points[1].dx - points.first.dx;
-final needed = widest + 8;
-final step = spacing <= 0
-    ? points.length
-    : (spacing >= needed ? 1 : (needed / spacing).ceil());
+// ป้ายชนกันก็ข้ามตัวหลังไป ไม่ซ้อนทับจนอ่านไม่ออก
+if (x < lastRight + 4) continue;
+painter.paint(canvas, Offset(x, size.height - 15));
+lastRight = x + painter.width;
 ```
 
-ไม่ได้เดาจากจำนวนจุด แต่วัดความกว้างของป้ายที่ยาวที่สุดจริง ๆ
+ไม่ได้เดาจากจำนวนแท่ง แต่วัดความกว้างของป้ายที่วาดจริงแล้วข้ามป้ายที่จะชน
 ภาษาไทยกับตัวเลขยาวไม่เท่ากัน การเดาจึงผิดได้ง่าย
 
 **`shouldRepaint` เทียบทีละสมาชิก**
@@ -418,11 +475,15 @@ flutter analyze
 flutter test
 ```
 
-**89 เคส** กระจายอยู่ใน
+**122 เคส ใน 22 ไฟล์** (นับ 14 ต.ค. 2569) ไฟล์หลัก ๆ
 
 | ไฟล์ | ทดสอบอะไร |
 |---|---|
-| `widget_test.dart` | เส้นทางหลักทั้งแอป ล็อกอิน → หน้าหลัก → สลับภาษา |
+| `widget_test.dart` | เส้นทางหลักทั้งแอป ล็อกอิน → หน้าหลัก → สลับภาษา → เพิ่มการใช้ห้อง |
+| `energy_usage_chart_test.dart` | พิกัดแท่ง ป้ายแกน `niceScaleMax` |
+| `room_calendar_test.dart` | วันที่ การทำซ้ำ ภาคเรียน CSV |
+| `pzem_status_test.dart` | `isPoweredOn` เชื่อ PZEM |
+| `daikin_wired_support_test.dart` | ฟังก์ชันที่บอร์ดสายแอร์ใช้ได้ |
 | `energy_database_test.dart` | หน้าฐานข้อมูลค่าไฟและตัวเลือกส่งออก |
 | `app_preferences_test.dart` | ขนาดตัวอักษรและสวิตช์แจ้งเตือน |
 | `system_settings_test.dart` | สวิตช์รวมและการถอยกลับเมื่อเซิร์ฟเวอร์ปฏิเสธ |
@@ -460,3 +521,11 @@ child: Material(
 เพราะ `ListTile` วาดพื้นหลังและเอฟเฟกต์กดลงบน `Material` ที่ใกล้ที่สุด
 ถ้ากล่องที่มีสีอยู่ระหว่างกลาง เอฟเฟกต์จะถูกบัง
 `MaterialType.transparency` ให้ `Material` โดยไม่เพิ่มสีทับ
+
+### รันบน GitHub อัตโนมัติ (อัปเดต 14 ต.ค. 2569)
+
+`.github/workflows/test.yml` รัน `flutter analyze` และ `flutter test` ทุกครั้งที่ push
+ไฟล์ใน `lib/`, `test/`, `pubspec.*` (บน Ubuntu) ผิดพลาดแสดงเป็น annotation
+ในหน้า Summary ส่วน `build-android.yml` สร้าง APK (เซ็นด้วยกุญแจจาก Secrets
+หรือ debug key ถ้ายังไม่ตั้ง) และ `build-ios.yml` สร้าง .ipa ที่ยังไม่เซ็น
+สองตัวหลังรันเมื่อกด Run workflow ในแท็บ Actions เท่านั้น

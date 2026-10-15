@@ -10,10 +10,15 @@ import {
   clearRetainedOccupancyTopics,
   publishEnterOccupancySetupMode,
   publishOtaCommand,
+  unprovisionDevice,
 } from '../services/mqtt.js';
 import { ApiError, asyncHandler } from '../utils/http.js';
 import { assertFirmwareFileExists } from './firmware.js';
-import { firmwareUrl, validateFirmwareFileName } from '../utils/firmware.js';
+import {
+  assertFirmwareKind,
+  firmwareUrl,
+  validateFirmwareFileName,
+} from '../utils/firmware.js';
 import { resolveMqttProvisioningSettings } from '../utils/mqtt-provisioning.js';
 import {
   publicOccupancySensor,
@@ -39,7 +44,6 @@ occupancySensorsRouter.get(
               provision_status, is_online, radar_available, is_occupied,
               static_threshold, last_seen_at, firmware_version, ota_error
          FROM occupancy_sensors
-        WHERE provision_status <> 'removed'
         ORDER BY room_number, device_id`,
     );
     response.json({
@@ -57,7 +61,7 @@ occupancySensorsRouter.post(
     const roomRows = await pool.query(
       `SELECT room_number
          FROM rooms
-        WHERE room_number = ? AND is_active = TRUE
+        WHERE room_number = ?
         LIMIT 1`,
       [input.roomNumber],
     );
@@ -244,6 +248,7 @@ occupancySensorsRouter.post(
   asyncHandler(async (request, response) => {
     const deviceId = validateOccupancyDeviceId(request.params.deviceId);
     const fileName = validateFirmwareFileName(request.body?.file);
+    assertFirmwareKind(fileName, 'occupancy');
     await assertFirmwareFileExists(fileName);
     const rows = await pool.query(
       `SELECT provision_status, is_online, mqtt_host
@@ -292,15 +297,17 @@ occupancySensorsRouter.delete(
       [deviceId],
     );
     const deletedRows = Number(result.affectedRows ?? 0);
-    const retainedTopicsCleared =
-      await clearRetainedOccupancyTopics(deviceId);
+    // สั่งบอร์ดล้างค่าในตัวเองก่อนลบบัญชี MQTT (ลบบัญชีแล้วคำสั่งจะไปไม่ถึง)
+    const board = await unprovisionDevice('occupancy', deviceId);
+    const retainedTopicsCleared = await clearRetainedOccupancyTopics(deviceId);
     const mqttAccountRemoved = await removeDeviceAccount(deviceId);
 
     console.log(
       `[occupancy] ลบ ${deviceId} โดย ${request.authUser.username}: `
         + `deletedRows=${deletedRows} `
         + `retainedTopicsCleared=${retainedTopicsCleared} `
-        + `mqttAccountRemoved=${mqttAccountRemoved}`,
+        + `mqttAccountRemoved=${mqttAccountRemoved} `
+        + `boardCleared=${board.acknowledged}`,
     );
 
     // ลบซ้ำถือว่าสำเร็จ เพื่อไม่ให้แอปค้างกับแถวที่หายไปแล้ว
@@ -310,6 +317,9 @@ occupancySensorsRouter.delete(
       deletedRows,
       retainedTopicsCleared,
       mqttAccountRemoved,
+      // true = บอร์ดยืนยันว่าล้างค่าแล้ว, false = บอร์ดออฟไลน์หรือไม่ตอบ
+      // (ต้องล้างที่ตัวบอร์ดเอง: อัปโหลด firmware/reset หรือตั้งค่าใหม่ผ่านบลูทูธ)
+      boardCleared: board.acknowledged,
     });
   }),
 );

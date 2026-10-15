@@ -82,8 +82,7 @@ test('multi-line and parenthesised column types are read as one column', () => {
   device_id VARCHAR(32) NOT NULL,
   provision_status ENUM(
     'reserved',
-    'active',
-    'removed'
+    'active'
   ) NOT NULL DEFAULT 'reserved',
   power_factor DECIMAL(5,3) NULL,
   PRIMARY KEY (device_id),

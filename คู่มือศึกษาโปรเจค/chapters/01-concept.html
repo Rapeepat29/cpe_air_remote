@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>1. แนวคิดและหลักการคิดของโปรเจค — คู่มือศึกษา RMUTT Save Energy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Chakra+Petch:wght@600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+<script>try{var t=localStorage.getItem('guide.theme');if(t)document.documentElement.dataset.theme=t;var f=localStorage.getItem('guide.font');if(f)document.documentElement.dataset.font=f;}catch(e){}</script>
+</head>
+<body>
+<header class="topbar">
+  <button class="menu-btn" id="menuBtn" aria-label="เปิดเมนู">☰</button>
+  <a class="brand" href="../index.html"><span class="brand-mark">⚡</span><span>คู่มือศึกษา <b>RMUTT Save Energy</b></span></a>
+  <div class="top-actions">
+    <button id="fontBtn" title="ขนาดตัวอักษร">ก<small>±</small></button>
+    <button id="themeBtn" title="สลับโหมดสว่าง/มืด">☾</button>
+  </div>
+</header>
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <input class="nav-search" id="navSearch" type="search" placeholder="ค้นหาบทหรือหัวข้อ…">
+    <div id="searchResults" class="search-results"></div>
+    <nav class="nav" id="nav">
+<a class="nav-home" href="../index.html">หน้าแรก</a>
+<div class="nav-part">ภาพรวม</div><ul>
+<li><a class="active" href="01-concept.html"><span class="num">1</span>แนวคิดและหลักการคิดของโปรเจค</a></li>
+<li><a href="02-roadmap.html"><span class="num">2</span>เริ่มจากอะไร และต้องเรียนรู้อะไรบ้าง</a></li>
+<li><a href="03-architecture-flows.html"><span class="num">3</span>สถาปัตยกรรมและเส้นทางของข้อมูล</a></li>
+</ul>
+<div class="nav-part">โครงสร้างพื้นฐาน</div><ul>
+<li><a href="04-network-server.html"><span class="num">4</span>เครือข่าย เซิร์ฟเวอร์ และ Tailscale</a></li>
+<li><a href="05-database.html"><span class="num">5</span>ฐานข้อมูล MariaDB</a></li>
+</ul>
+<div class="nav-part">เซิร์ฟเวอร์</div><ul>
+<li><a href="06-backend-api.html"><span class="num">6</span>Backend ตอนที่ 1: โครงหลัก ระบบสมาชิก และ REST API</a></li>
+<li><a href="07-backend-services.html"><span class="num">7</span>Backend ตอนที่ 2: งานเบื้องหลังและตรรกะหลักของระบบ</a></li>
+<li><a href="08-protocols.html"><span class="num">8</span>โปรโตคอลสื่อสาร: MQTT และ Bluetooth Low Energy</a></li>
+</ul>
+<div class="nav-part">อุปกรณ์และหน้าจอ</div><ul>
+<li><a href="09-firmware.html"><span class="num">9</span>เฟิร์มแวร์ ESP32: บอร์ดแอร์ (IR และสายแอร์) และบอร์ดตรวจจับคน</a></li>
+<li><a href="10-flutter-architecture.html"><span class="num">10</span>แอป Flutter ตอนที่ 1: โครงสร้าง ข้อมูล และ State</a></li>
+<li><a href="11-flutter-screens.html"><span class="num">11</span>แอป Flutter ตอนที่ 2: หน้าจอหลักและวิดเจ็ต</a></li>
+<li><a href="12-flutter-admin-screens.html"><span class="num">12</span>แอป Flutter ตอนที่ 3: หน้าจอผู้ดูแลระบบและการตั้งค่า</a></li>
+<li><a href="13-webapp.html"><span class="num">13</span>เว็บแอป: HTML, CSS และ JavaScript ล้วน</a></li>
+</ul>
+<div class="nav-part">ใช้งานจริง</div><ul>
+<li><a href="14-deploy-scripts-testing.html"><span class="num">14</span>การติดตั้งระบบ สคริปต์อัตโนมัติ และการทดสอบ</a></li>
+<li><a href="15-security.html"><span class="num">15</span>ความปลอดภัยทั้งระบบ</a></li>
+<li><a href="16-presentation-qa.html"><span class="num">16</span>เตรียมนำเสนอและคำถามที่อาจารย์มักถาม</a></li>
+</ul>
+<div class="nav-part">ภาคผนวก</div><ul>
+<li><a href="17-glossary.html"><span class="num">17</span>อภิธานศัพท์</a></li>
+<li><a href="18-file-map.html"><span class="num">18</span>แผนที่ไฟล์ทั้งโปรเจค</a></li>
+</ul>
+<div class="nav-part">งานที่กำลังพัฒนา</div><ul>
+<li><a href="19-daikin-slm8.html"><span class="num">19</span>แอร์ Daikin ผ่านสาย SLM8: จากการแกะโปรโตคอลถึงบอร์ดสายแอร์</a></li>
+</ul>
+<div class="nav-part">เจาะลึก</div><ul>
+<li><a href="20-database-design.html"><span class="num">20</span>เจาะลึกการออกแบบฐานข้อมูล</a></li>
+</ul>
+    </nav>
+  </aside>
+  <main class="content" id="content">
+<div class="chapter-head"><div class="kicker">บทที่ 1 · ภาพรวม</div><h1>แนวคิดและหลักการคิดของโปรเจค</h1></div>
+<h2 id="ภาพรวม">ภาพรวม<a class="anchor" href="#ภาพรวม">#</a></h2>
+<p>บทนี้ยังไม่พูดถึงโค้ดเลย แต่ตอบคำถามที่อาจารย์มักถามเป็นข้อแรก: <strong>"โปรเจคนี้แก้ปัญหาอะไร และทำไมออกแบบมาแบบนี้"</strong>
+ถ้าตอบบทนี้ได้คล่อง บทที่เหลือจะเป็นแค่รายละเอียดว่า "แต่ละส่วนทำงานยังไง"</p>
+<p>วิธีคิดของโปรเจคนี้เรียงเป็นลำดับ ซึ่งควรใช้เป็นโครงตอนเล่าให้อาจารย์ฟังด้วย:</p>
+<div class="code-block"><div class="hl"><pre><span></span><code>ปัญหาจริง  →  สิ่งที่ระบบต้องทำได้ (requirement)  →  ข้อจำกัด (constraint)
+     →  แบ่งระบบเป็นส่วน ๆ  →  เลือกเครื่องมือแต่ละส่วน  →  ทำให้ใช้งานจริงได้ (deploy, ความปลอดภัย, ทดสอบ)
+</code></pre></div>
+</div>
+
+<h2 id="ปัญหาที่โปรเจคนี้แก้">ปัญหาที่โปรเจคนี้แก้<a class="anchor" href="#ปัญหาที่โปรเจคนี้แก้">#</a></h2>
+<p>อาคาร 16 คณะวิศวกรรมศาสตร์ มทร.ธัญบุรี มีห้องเรียนและห้องปฏิบัติการราว 20 กว่าห้อง (ข้อมูลตั้งต้นใน <code>schema.sql</code> สร้างไว้ 22 ห้อง) แต่ละห้องมีเครื่องปรับอากาศ ปัญหาที่เกิดขึ้นจริงมี 3 ข้อ</p>
+<ol>
+<li><strong>แอร์ถูกเปิดทิ้งตอนไม่มีคน</strong> คนสุดท้ายออกจากห้องแล้วลืมปิด ไฟฟ้าเสียไปทั้งคืนหรือทั้งวันหยุด</li>
+<li><strong>ไม่รู้ว่าห้องไหนใช้ไฟเท่าไร</strong> มีแต่บิลรวมทั้งอาคาร ไม่รู้ว่าควรเริ่มแก้ที่ห้องไหน</li>
+<li><strong>ไม่มีคนเดินตรวจได้ตลอดเวลา</strong> อาคารมีหลายชั้น และคนดูแลมีจำกัด</li>
+</ol>
+<div class="callout why"><div class="callout-title">ทำไม</div><p>ปัญหาทั้งสามข้อเชื่อมกัน: ถ้าแค่ "ปิดอัตโนมัติ" แต่ไม่ "วัดไฟ" ก็พิสูจน์ไม่ได้ว่าประหยัดจริง ถ้าแค่ "วัดไฟ" แต่สั่งปิดไม่ได้ ก็ได้แค่รู้ว่าเสียไฟ ระบบจึงต้องทำ <strong>วัด + รู้ว่ามีคนไหม + สั่งได้ + ดูย้อนหลังได้</strong> พร้อมกัน</p></div>
+
+<h2 id="สิ่งที่ระบบต้องทำได้-requirements">สิ่งที่ระบบต้องทำได้ (Requirements)<a class="anchor" href="#สิ่งที่ระบบต้องทำได้-requirements">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>ข้อ</th>
+<th>ความต้องการ</th>
+<th>ส่วนที่ทำหน้าที่นี้</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>R1</td>
+<td>สั่งเปิด/ปิด/ปรับอุณหภูมิแอร์ได้จากมือถือและเว็บ ทั้งในและนอกมหาวิทยาลัย</td>
+<td>แอป Flutter, เว็บแอป, Backend, MQTT, บอร์ด ESP32 (ยิง IR)</td>
+</tr>
+<tr>
+<td>R2</td>
+<td>วัดพลังงานไฟฟ้าของแอร์ทีละเครื่อง</td>
+<td>เซนเซอร์ PZEM-004T บนบอร์ดแอร์</td>
+</tr>
+<tr>
+<td>R3</td>
+<td>รู้ว่าในห้องมีคนอยู่หรือไม่</td>
+<td>เรดาร์ HLK-LD2410 บนบอร์ดตรวจจับคน</td>
+</tr>
+<tr>
+<td>R4</td>
+<td>ปิดแอร์เองเมื่อห้องว่างนานพอ โดยไม่ปิดตอนมีเรียน</td>
+<td>บริการ auto-off ใน Backend + ตารางเรียน</td>
+</tr>
+<tr>
+<td>R5</td>
+<td>เก็บประวัติค่าไฟ ดูเป็นรายชั่วโมง/วัน/เดือน และส่งออก Excel</td>
+<td>ตาราง <code>energy_hourly</code>, หน้าพลังงาน, ไฟล์ export</td>
+</tr>
+<tr>
+<td>R6</td>
+<td>มีผู้ใช้หลายคน แยกสิทธิ์ผู้ดูแล (admin) กับเจ้าหน้าที่ (staff)</td>
+<td>ระบบสมาชิก JWT, ตาราง <code>users</code></td>
+</tr>
+<tr>
+<td>R7</td>
+<td>ติดตั้งบอร์ดใหม่ได้ง่ายโดยไม่ต้องแก้โค้ด</td>
+<td>การตั้งค่าผ่าน Bluetooth (provisioning)</td>
+</tr>
+<tr>
+<td>R8</td>
+<td>ข้อมูลไม่หายเมื่อเน็ตหลุดหรือไฟดับ</td>
+<td>NVS, บันทึกย้อนหลังในบอร์ด (history log), ฐานข้อมูล + สำรองรายวัน</td>
+</tr>
+<tr>
+<td>R9</td>
+<td>ปลอดภัย: คนนอกสั่งแอร์ไม่ได้ ดักฟังไม่ได้</td>
+<td>HTTPS/MQTTS, บัญชี MQTT รายบอร์ด, rate limit, เปิดพอร์ตให้น้อยที่สุด</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="ข้อจำกัดที่บังคับการออกแบบ-constraints">ข้อจำกัดที่บังคับการออกแบบ (Constraints)<a class="anchor" href="#ข้อจำกัดที่บังคับการออกแบบ-constraints">#</a></h2>
+<p>ข้อจำกัดเหล่านี้คือ "เหตุผลจริง" ของหลายการตัดสินใจ ควรจำให้ได้</p>
+<ul>
+<li><strong>เซิร์ฟเวอร์อยู่ในเครือข่ายภายในมหาวิทยาลัย</strong> ใช้ IP ส่วนตัว <code>10.x.x.x</code> และ firewall ไม่ให้อินเทอร์เน็ตต่อเข้ามา → จึงต้องใช้ <strong>Tailscale Funnel</strong> เป็นทางเข้าจากภายนอก ทั้งของแอป/เว็บ (พอร์ต 443) และของบอร์ด ESP32 (MQTT พอร์ต 8443) และขอใบรับรอง HTTPS แบบ <strong>DNS-01 ผ่าน DuckDNS</strong> (รายละเอียดในบทเครือข่าย)</li>
+<li><strong>แอร์เป็นรุ่นธรรมดา</strong> ไม่มี Wi-Fi สั่งได้ทางรีโมตอินฟราเรดอย่างเดียว → จึงต้องมีบอร์ดยิง IR เลียนแบบรีโมต</li>
+<li><strong>งบประมาณจำกัด</strong> ต้องติดตั้งหลายสิบห้อง → ใช้ ESP32 ราคาหลักร้อยแทน Raspberry Pi</li>
+<li><strong>ตำแหน่งติดตั้งต่างกัน</strong> ตัวยิง IR ต้องเห็นตาแอร์ เซนเซอร์วัดไฟต้องคล้องสายไฟของแอร์ เรดาร์ต้องมองเห็นทั้งห้อง → จึงแยกเป็น <strong>2 บอร์ด</strong> (บอร์ดแอร์ 1 ตัวต่อแอร์ 1 เครื่อง, บอร์ดตรวจจับคน 1 ตัวต่อห้อง)</li>
+<li><strong>ผู้ใช้ไม่ใช่โปรแกรมเมอร์</strong> การติดตั้งบอร์ดต้องทำผ่านแอปได้ ไม่ต้องแก้โค้ดหรือเสียบสาย</li>
+</ul>
+<h2 id="การแบ่งระบบเป็นส่วน-ๆ">การแบ่งระบบเป็นส่วน ๆ<a class="anchor" href="#การแบ่งระบบเป็นส่วน-ๆ">#</a></h2>
+<figure><img alt="สถาปัตยกรรมระบบ" src="img/01-architecture.svg" /></figure>
+<div class="code-block"><div class="hl"><pre><span></span><code>  ผู้ใช้ (มือถือ / คอมพิวเตอร์)
+        │  HTTPS (REST API + JWT)
+        ▼
+  ┌──────────────────────── เซิร์ฟเวอร์ (Docker) ────────────────────────┐
+  │  Caddy (ประตูหน้า, HTTPS)  →  Backend Node.js  →  MariaDB (ฐานข้อมูล)  │
+  │                                   │                                   │
+  │                                   ▼ MQTT                              │
+  │                            Mosquitto (Broker)                         │
+  └───────────────────────────────────┬───────────────────────────────────┘
+                                      │ MQTTS ผ่าน Tailscale Funnel พอร์ต 8443
+                                      │ (หรือต่อตรง 8883 ถ้าอยู่ใน Wi-Fi มหาวิทยาลัย)
+                 ┌────────────────────┴────────────────────┐
+                 ▼                                         ▼
+        บอร์ดแอร์ ESP32                            บอร์ดตรวจจับคน ESP32
+        ├─ ยิง IR → แอร์                            └─ อ่านเรดาร์ LD2410
+        └─ อ่าน PZEM → วัดไฟ
+</code></pre></div>
+</div>
+
+<p>ระบบมี 6 ส่วนหลัก แต่ละส่วนมีหน้าที่ชัดเจนเพียงอย่างเดียว</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>ส่วน</th>
+<th>หน้าที่เดียวที่ต้องทำให้ดี</th>
+<th>ทำไมแยกออกมา</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>แอป Flutter</strong></td>
+<td>หน้าจอสำหรับมือถือ/Windows และตั้งค่าบอร์ดผ่าน Bluetooth</td>
+<td>มือถือเท่านั้นที่มี Bluetooth ไว้ตั้งค่าบอร์ดตอนติดตั้ง</td>
+</tr>
+<tr>
+<td><strong>เว็บแอป</strong></td>
+<td>หน้าจอสำหรับเบราว์เซอร์ ไม่ต้องติดตั้งอะไร</td>
+<td>ผู้ดูแลใช้คอมพิวเตอร์ทำงานจัดการข้อมูลเยอะ ๆ ได้สะดวกกว่า</td>
+</tr>
+<tr>
+<td><strong>Backend (Node.js)</strong></td>
+<td>"สมอง" กลาง: ตรวจสิทธิ์ เก็บข้อมูล ตัดสินใจปิดแอร์</td>
+<td>เป็นที่เดียวที่เห็นข้อมูลทุกฝั่งพร้อมกัน และทำงานตลอดเวลา</td>
+</tr>
+<tr>
+<td><strong>MariaDB</strong></td>
+<td>ความจำถาวร</td>
+<td>ข้อมูลมีความสัมพันธ์ชัดเจน ต้องบังคับความถูกต้องด้วย key</td>
+</tr>
+<tr>
+<td><strong>Mosquitto (MQTT Broker)</strong></td>
+<td>ไปรษณีย์ส่งข้อความระหว่าง Backend กับบอร์ด</td>
+<td>บอร์ดต้องรับคำสั่งได้ทันทีโดยไม่ต้องถามซ้ำ ๆ</td>
+</tr>
+<tr>
+<td><strong>ESP32 สองแบบ</strong></td>
+<td>แขนขาและประสาทสัมผัส: ยิง IR, วัดไฟ, ตรวจคน</td>
+<td>ฮาร์ดแวร์ต้องอยู่หน้างาน</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="การตัดสินใจสำคัญและเหตุผล">การตัดสินใจสำคัญและเหตุผล<a class="anchor" href="#การตัดสินใจสำคัญและเหตุผล">#</a></h2>
+<p>นี่คือหัวใจของ "หลักการคิด" ทุกข้อมีรูปแบบ <strong>ทางเลือก → เลือกอะไร → เพราะอะไร</strong></p>
+<h3 id="1-ตรรกะปิดแอร์อัตโนมัติอยู่ที่-backend-ไม่ใช่ที่แอปหรือบอร์ด">1. ตรรกะปิดแอร์อัตโนมัติอยู่ที่ Backend ไม่ใช่ที่แอปหรือบอร์ด<a class="anchor" href="#1-ตรรกะปิดแอร์อัตโนมัติอยู่ที่-backend-ไม่ใช่ที่แอปหรือบอร์ด">#</a></h3>
+<ul>
+<li>ถ้าอยู่ในแอป: ปิดแอปแล้วระบบตาย</li>
+<li>ถ้าอยู่ในบอร์ด: บอร์ดแอร์ไม่รู้ว่ามีคนไหม บอร์ดเรดาร์ไม่รู้ว่าแอร์เปิดอยู่ไหม และไม่มีใครรู้ตารางเรียน</li>
+<li><strong>Backend เห็นครบทั้ง 3 อย่าง</strong> (สถานะแอร์ + มีคนไหม + ตารางเรียน) และรันตลอด 24 ชั่วโมง จึงเป็นที่ที่ควรตัดสินใจ</li>
+</ul>
+<h3 id="2-ใช้-mqtt-คุยกับบอร์ด-ไม่ใช้-http">2. ใช้ MQTT คุยกับบอร์ด ไม่ใช้ HTTP<a class="anchor" href="#2-ใช้-mqtt-คุยกับบอร์ด-ไม่ใช้-http">#</a></h3>
+<ul>
+<li>ถ้าใช้ HTTP บอร์ดต้องถามเซิร์ฟเวอร์ซ้ำทุกไม่กี่วินาทีว่า "มีคำสั่งไหม" (polling) ช้าและเปลือง</li>
+<li>MQTT เปิดการเชื่อมต่อค้างไว้ เซิร์ฟเวอร์ส่งคำสั่งลงไปได้ทันที</li>
+<li>ได้ความสามารถพิเศษฟรี: <strong>retained message</strong> (ข้อความล่าสุดค้างไว้ให้คนที่ต่อเข้ามาทีหลัง) และ <strong>Last Will</strong> (บอร์ดหลุด Broker ประกาศว่าออฟไลน์แทนให้)</li>
+</ul>
+<h3 id="3-bluetooth-ใช้ครั้งเดียวตอนติดตั้ง">3. Bluetooth ใช้ครั้งเดียวตอนติดตั้ง<a class="anchor" href="#3-bluetooth-ใช้ครั้งเดียวตอนติดตั้ง">#</a></h3>
+<ul>
+<li>บอร์ดใหม่ยังไม่รู้จัก Wi-Fi จึงยังต่อเน็ตไม่ได้ ช่องทางเดียวที่คุยได้คือ Bluetooth</li>
+<li>แอปส่งชื่อ Wi-Fi, รหัส, ที่อยู่ Broker และบัญชี MQTT ให้บอร์ดทาง BLE บอร์ดเก็บไว้ใน <strong>NVS</strong> (หน่วยความจำที่ไม่หายเมื่อไฟดับ)</li>
+<li>หลังจากนั้นบอร์ดคุยผ่าน Wi-Fi + MQTT ตลอด เพราะ BLE ไปได้แค่ราว 10 เมตร</li>
+</ul>
+<h3 id="4-ระบุตัวบอร์ดด้วย-mac-address">4. ระบุตัวบอร์ดด้วย MAC address<a class="anchor" href="#4-ระบุตัวบอร์ดด้วย-mac-address">#</a></h3>
+<ul>
+<li>รหัสบอร์ดเป็น <code>ESP32-&lt;MAC 12 หลัก&gt;</code> และ <code>OCC32-&lt;MAC&gt;</code> มาจากชิปโดยตรง</li>
+<li>ไม่ซ้ำกันแน่นอนตั้งแต่โรงงาน จึงไม่ต้องมีคนคอยจดว่าเลขไหนใช้ไปแล้ว</li>
+</ul>
+<h3 id="5-เก็บค่าไฟเป็น-ถังรายชั่วโมง">5. เก็บค่าไฟเป็น "ถังรายชั่วโมง"<a class="anchor" href="#5-เก็บค่าไฟเป็น-ถังรายชั่วโมง">#</a></h3>
+<ul>
+<li>ถ้าเก็บทุกค่าที่บอร์ดส่งมา (ทุก 10 วินาที × หลายสิบเครื่อง) ข้อมูลจะเพิ่มหลายแสนแถวต่อวัน</li>
+<li>ระบบเก็บ <strong>ผลต่าง</strong> ของมิเตอร์สะสมรวมลงถัง 1 แถวต่อเครื่องต่อชั่วโมง (<code>energy_hourly</code>) ได้ข้อมูลเล็ก สรุปเร็ว และยังละเอียดพอสำหรับรายงาน</li>
+</ul>
+<h3 id="6-ฐานข้อมูลเชิงสัมพันธ์-mariadb-ไม่ใช่-nosql">6. ฐานข้อมูลเชิงสัมพันธ์ (MariaDB) ไม่ใช่ NoSQL<a class="anchor" href="#6-ฐานข้อมูลเชิงสัมพันธ์-mariadb-ไม่ใช่-nosql">#</a></h3>
+<ul>
+<li>กติกา "แอร์ต้องอยู่ในห้องที่มีจริง" หรือ "ห้องหนึ่งมีเซนเซอร์ได้ตัวเดียว" เขียนเป็น <code>FOREIGN KEY</code> / <code>UNIQUE</code> ได้ตรง ๆ</li>
+<li>ฐานข้อมูลปฏิเสธข้อมูลผิดให้เอง แม้โค้ดจะพลาด</li>
+</ul>
+<h3 id="7-flutter-ตัวเดียวได้ทั้ง-android-และ-windows--เว็บแอปแยก">7. Flutter ตัวเดียวได้ทั้ง Android และ Windows + เว็บแอปแยก<a class="anchor" href="#7-flutter-ตัวเดียวได้ทั้ง-android-และ-windows--เว็บแอปแยก">#</a></h3>
+<ul>
+<li>Flutter: โค้ดชุดเดียว และใช้ Bluetooth ได้ทั้งสองแพลตฟอร์ม (<code>flutter_blue_plus</code>)</li>
+<li>เว็บแอปเขียนด้วย HTML/CSS/JavaScript ล้วน ไม่ใช้ framework จึงโหลดเร็ว ไม่ต้อง build ไม่ต้องติดตั้ง ใช้จากคอมพิวเตอร์เครื่องไหนก็ได้</li>
+</ul>
+<h3 id="8-deploy-ด้วย-docker--caddy--tailscale">8. Deploy ด้วย Docker + Caddy + Tailscale<a class="anchor" href="#8-deploy-ด้วย-docker--caddy--tailscale">#</a></h3>
+<ul>
+<li><strong>Docker</strong>: ทุกส่วนรันในกล่องของตัวเอง ติดตั้งเหมือนกันทุกครั้ง ย้ายเครื่องง่าย</li>
+<li><strong>Caddy</strong>: ประตูหน้าเดียว จัดการ HTTPS ให้อัตโนมัติ ส่ง <code>/api</code> ไป Backend ส่วนที่เหลือเสิร์ฟเว็บ</li>
+<li><strong>Tailscale Funnel</strong>: เปิดให้มือถือนอกมหาวิทยาลัยเข้าถึงเว็บและ API ได้ <strong>โดยไม่ต้องขอเปิดพอร์ตขาเข้าบน firewall</strong> เพราะกล่อง tailscale เป็นฝ่าย "ต่อออก" ไปหาเซิร์ฟเวอร์ของ Tailscale เอง เปิดออกไป 2 จุด คือ Caddy (เว็บ + API ที่พอร์ต 443) และ Mosquitto (MQTT ของบอร์ดที่พอร์ต 8443 ซึ่งบังคับ TLS และรหัสผ่านรายบอร์ด) ส่วนฐานข้อมูลและ SSH ไม่ถูกเปิด บอร์ดจึงติดตั้งที่ไหนก็ได้ที่มีอินเทอร์เน็ต ไม่จำเป็นต้องอยู่ใน Wi-Fi ของมหาวิทยาลัย</li>
+</ul>
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> ทำไมไม่ให้แอปคุยกับบอร์ดตรง ๆ ไปเลย ง่ายกว่าไหม?</p>
+<p><strong>ตอบ:</strong> ง่ายกว่าตอนทดลองครับ แต่ใช้จริงไม่ได้ 3 ข้อ: (1) ใช้นอกอาคารไม่ได้เพราะ BLE ไปได้ไม่ไกล และบอร์ดอยู่ในเครือข่ายภายใน (2) การปิดอัตโนมัติจะทำงานเฉพาะตอนเปิดแอป (3) ไม่มีที่เก็บประวัติรวม เปลี่ยนมือถือข้อมูลก็หาย จึงต้องมี Backend อยู่ตรงกลาง</p></div>
+
+<h2 id="หลักการออกแบบซอฟต์แวร์ที่ใช้ทั้งโปรเจค">หลักการออกแบบซอฟต์แวร์ที่ใช้ทั้งโปรเจค<a class="anchor" href="#หลักการออกแบบซอฟต์แวร์ที่ใช้ทั้งโปรเจค">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>หลักการ</th>
+<th>ความหมาย</th>
+<th>ตัวอย่างในโปรเจค</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Separation of concerns</td>
+<td>แต่ละส่วนรับผิดชอบเรื่องเดียว</td>
+<td>แอป/เว็บ = หน้าจอ, Backend = ตรรกะ, บอร์ด = ฮาร์ดแวร์</td>
+</tr>
+<tr>
+<td>Single source of truth</td>
+<td>ข้อมูลจริงมีที่เดียว</td>
+<td>สถานะทุกอย่างอยู่ใน MariaDB ผ่าน Backend ส่วนแอปกับเว็บแค่ดึงมาแสดง</td>
+</tr>
+<tr>
+<td>Pure function แยกจาก side effect</td>
+<td>ตรรกะยาก ๆ เขียนเป็นฟังก์ชันที่รับค่าเข้า-คืนค่าออก ไม่แตะ DB/เครือข่าย</td>
+<td><code>backend/src/utils/auto-off.js</code> ตัดสินใจปิดแอร์ ทดสอบได้โดยไม่ต้องมี DB</td>
+</tr>
+<tr>
+<td>Fail-safe</td>
+<td>เมื่อข้อมูลไม่แน่นอน ให้เลือกทางที่ไม่ทำความเสียหาย</td>
+<td>ถ้าเรดาร์ไม่พร้อมหรือ PZEM อ่านไม่ได้ จะ <strong>ไม่</strong> ปิดแอร์</td>
+</tr>
+<tr>
+<td>Defense in depth</td>
+<td>ป้องกันหลายชั้น</td>
+<td>HTTPS + JWT + ตรวจสิทธิ์ทุกคำขอ + rate limit + บัญชี MQTT รายบอร์ด</td>
+</tr>
+<tr>
+<td>Least privilege</td>
+<td>ให้สิทธิ์น้อยที่สุดเท่าที่จำเป็น</td>
+<td>บอร์ดเห็นเฉพาะ topic ของตัวเอง, Backend ไม่ใช้ root ของ DB</td>
+</tr>
+<tr>
+<td>Idempotency</td>
+<td>ทำซ้ำแล้วผลเหมือนเดิม</td>
+<td>ส่งข้อมูลย้อนหลังซ้ำไม่ทำให้ค่าไฟนับซ้ำ, สคริปต์ migration รันซ้ำได้</td>
+</tr>
+<tr>
+<td>Automation</td>
+<td>งานที่ทำซ้ำต้องเป็นสคริปต์</td>
+<td><code>update-server.ps1</code>, <code>init-env.sh</code>, <code>run_all.ps1</code></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="เล่าโปรเจคให้อาจารย์ฟังใน-2-นาที">เล่าโปรเจคให้อาจารย์ฟังใน 2 นาที<a class="anchor" href="#เล่าโปรเจคให้อาจารย์ฟังใน-2-นาที">#</a></h2>
+<p>ใช้โครงนี้ได้เลย (ปรับคำพูดตามสไตล์ตัวเอง):</p>
+<ol>
+<li><strong>ปัญหา:</strong> "อาคาร 16 มีแอร์หลายสิบเครื่อง ถูกเปิดทิ้งตอนไม่มีคนบ่อย และไม่มีใครรู้ว่าห้องไหนกินไฟเท่าไร"</li>
+<li><strong>แนวคิด:</strong> "เลยทำระบบที่ วัดไฟรายเครื่อง รู้ว่ามีคนไหม สั่งแอร์ได้จากมือถือ และปิดเองเมื่อห้องว่าง"</li>
+<li><strong>ฮาร์ดแวร์:</strong> "ใช้ ESP32 สองแบบ ตัวหนึ่งยิง IR สั่งแอร์และวัดไฟด้วย PZEM อีกตัวใช้เรดาร์ LD2410 ตรวจว่ามีคน"</li>
+<li><strong>ซอฟต์แวร์:</strong> "บอร์ดคุยกับเซิร์ฟเวอร์ด้วย MQTT เซิร์ฟเวอร์เป็น Node.js เก็บข้อมูลใน MariaDB ผู้ใช้ใช้ผ่านแอป Flutter หรือเว็บ"</li>
+<li><strong>จุดเด่น:</strong> "ตรรกะปิดอัตโนมัติอยู่ที่เซิร์ฟเวอร์ ดูตารางเรียนประกอบ ถ้าไม่แน่ใจจะไม่ปิด ตั้งค่าบอร์ดใหม่ผ่าน Bluetooth ได้ในแอป และเก็บค่าไฟย้อนหลังได้แม้เน็ตหลุด"</li>
+<li><strong>การใช้งานจริง:</strong> "รันบนเซิร์ฟเวอร์มหาวิทยาลัยด้วย Docker ใช้ Tailscale Funnel ให้เข้าจากข้างนอกได้โดยไม่ต้องเปิดพอร์ต firewall"</li>
+</ol>
+<h2 id="คำถามที่อาจารย์อาจถาม">คำถามที่อาจารย์อาจถาม<a class="anchor" href="#คำถามที่อาจารย์อาจถาม">#</a></h2>
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> ถ้าเซิร์ฟเวอร์ล่ม แอร์ยังใช้ได้ไหม?</p>
+<p><strong>ตอบ:</strong> ใช้ได้ครับ รีโมตเดิมยังกดได้ตามปกติ เพราะบอร์ดแค่ยิง IR เพิ่ม ไม่ได้ตัดไฟแอร์ สิ่งที่หายไปชั่วคราวคือการสั่งจากแอปและการปิดอัตโนมัติ ส่วนข้อมูลค่าไฟบอร์ดแอร์เก็บไว้ในตัวเองได้ประมาณ 7 วัน แล้วส่งย้อนหลังเมื่อต่อได้</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> จะรู้ได้ยังไงว่าแอร์ปิดจริงหลังยิง IR?</p>
+<p><strong>ตอบ:</strong> ดูจากกำลังไฟที่ PZEM วัดได้ครับ ถ้ากำลังไฟลดลงต่ำกว่าเกณฑ์ติดกันหลายครั้ง แปลว่าแอร์หยุดจริง ถ้ายังไม่ลด ระบบจะยิงซ้ำทุก 20 วินาที สูงสุด 5 ครั้ง แล้วสร้างการแจ้งเตือนถ้ายังไม่สำเร็จ</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> ทำไมต้องมีบอร์ด 2 ตัว รวมเป็นตัวเดียวไม่ได้เหรอ?</p>
+<p><strong>ตอบ:</strong> ตำแหน่งติดตั้งต่างกันครับ ตัวยิง IR ต้องเห็นตาแอร์ PZEM ต้องคล้องสายไฟของแอร์ ส่วนเรดาร์ต้องมองเห็นทั้งห้อง และห้องที่มีแอร์ 2 เครื่องต้องมีบอร์ดแอร์ 2 ตัวแต่ใช้เรดาร์ตัวเดียว</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> ปิดแอร์ตอนนักศึกษายังนั่งเรียนอยู่ได้ไหม?</p>
+<p><strong>ตอบ:</strong> ออกแบบมากันไว้หลายชั้นครับ ในคาบเรียนต้องห้องว่างนาน 900 วินาที (15 นาที) นอกคาบ 300 วินาที (5 นาที) และถ้าเรดาร์ออฟไลน์หรืออ่านไม่ได้ ระบบจะไม่ปิด นอกจากนี้เปิด/ปิดฟีเจอร์ได้รายเครื่อง ตอนเริ่มใช้แนะนำให้นำร่องแค่ 2–3 ห้องก่อน</p></div>
+
+<h2 id="สรุปและเช็กลิสต์ความเข้าใจ">สรุปและเช็กลิสต์ความเข้าใจ<a class="anchor" href="#สรุปและเช็กลิสต์ความเข้าใจ">#</a></h2>
+<ul>
+<li class="check"><input type="checkbox"> บอกปัญหา 3 ข้อของอาคารได้</li>
+<li class="check"><input type="checkbox"> บอก requirement หลักได้อย่างน้อย 6 ข้อ และรู้ว่าส่วนไหนรับผิดชอบ</li>
+<li class="check"><input type="checkbox"> อธิบายได้ว่าทำไมตรรกะปิดแอร์อยู่ที่ Backend</li>
+<li class="check"><input type="checkbox"> อธิบายได้ว่าทำไมใช้ MQTT กับบอร์ด แต่ใช้ HTTP กับแอป/เว็บ</li>
+<li class="check"><input type="checkbox"> อธิบายได้ว่า Bluetooth ใช้ตอนไหน และทำไมใช้แค่ครั้งเดียว</li>
+<li class="check"><input type="checkbox"> อธิบายได้ว่าทำไมต้องใช้ Tailscale (เซิร์ฟเวอร์อยู่หลัง firewall มหาวิทยาลัย)</li>
+<li class="check"><input type="checkbox"> เล่าโปรเจคครบใน 2 นาทีโดยไม่ต้องดูโน้ต</li>
+</ul><nav class="pager"><a class="prev" href="../index.html"><span>← กลับ</span>หน้าแรก</a><a class="next" href="02-roadmap.html"><span>บทถัดไป →</span>2. เริ่มจากอะไร และต้องเรียนรู้อะไรบ้าง</a></nav>
+  </main>
+  <aside class="toc"><div class="toc-title">ในบทนี้</div><ul><li><a href="#ภาพรวม">ภาพรวม</a></li><li><a href="#ปัญหาที่โปรเจคนี้แก้">ปัญหาที่โปรเจคนี้แก้</a></li><li><a href="#สิ่งที่ระบบต้องทำได้-requirements">สิ่งที่ระบบต้องทำได้ (Requirements)</a></li><li><a href="#ข้อจำกัดที่บังคับการออกแบบ-constraints">ข้อจำกัดที่บังคับการออกแบบ (Constraints)</a></li><li><a href="#การแบ่งระบบเป็นส่วน-ๆ">การแบ่งระบบเป็นส่วน ๆ</a></li><li><a href="#การตัดสินใจสำคัญและเหตุผล">การตัดสินใจสำคัญและเหตุผล</a></li><li><a href="#หลักการออกแบบซอฟต์แวร์ที่ใช้ทั้งโปรเจค">หลักการออกแบบซอฟต์แวร์ที่ใช้ทั้งโปรเจค</a></li><li><a href="#เล่าโปรเจคให้อาจารย์ฟังใน-2-นาที">เล่าโปรเจคให้อาจารย์ฟังใน 2 นาที</a></li><li><a href="#คำถามที่อาจารย์อาจถาม">คำถามที่อาจารย์อาจถาม</a></li><li><a href="#สรุปและเช็กลิสต์ความเข้าใจ">สรุปและเช็กลิสต์ความเข้าใจ</a></li></ul></aside>
+</div>
+<button class="to-top" id="toTop" aria-label="กลับขึ้นด้านบน">↑</button>
+<script src="../assets/search.js"></script>
+<script src="../assets/app.js"></script>
+</body>
+</html>

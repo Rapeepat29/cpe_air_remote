@@ -37,6 +37,7 @@ import schedule from './views/schedule.js';
 import alerts from './views/alerts.js';
 import rates from './views/rates.js';
 import devices from './views/devices.js';
+import firmware from './views/firmware.js';
 import users from './views/users.js';
 import settings from './views/settings.js';
 
@@ -48,6 +49,7 @@ const VIEWS = [
   { key: 'alerts', icon: 'bell', group: 'main', module: alerts },
   { key: 'rates', icon: 'coin', group: 'main', module: rates },
   { key: 'devices', icon: 'chip', group: 'system', module: devices },
+  { key: 'firmware', icon: 'firmware', group: 'system', module: firmware },
   { key: 'users', icon: 'users', group: 'system', module: users },
   { key: 'settings', icon: 'gear', group: 'system', module: settings },
 ];
@@ -73,6 +75,7 @@ const NAV_LABELS = {
   alerts: 'การแจ้งเตือน',
   rates: 'อัตราค่าไฟ',
   devices: 'ห้องและอุปกรณ์',
+  firmware: 'เฟิร์มแวร์',
   users: 'ผู้ใช้งาน',
   settings: 'ตั้งค่า',
 };

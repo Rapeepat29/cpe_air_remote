@@ -2652,3 +2652,246 @@ table.data td.wrap {
     display: inline;
   }
 }
+
+/* ---------- หน้าเฟิร์มแวร์ ----------
+   แท็บแยกชนิดบอร์ด (แอร์ IR / สายแอร์ / เซ็นเซอร์) แต่ละแท็บมี
+   การ์ดไฟล์ + ช่องอัปโหลด แล้วตารางบอร์ด และแถบอัปเดตหลายบอร์ดที่ค้างด้านล่าง */
+.fw-head {
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.fw-panel {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.fw-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+  align-items: stretch;
+}
+
+.fw-grid .drop-zone {
+  justify-content: center;
+  min-height: 170px;
+}
+
+.drop-zone.busy {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.fw-badge {
+  font-size: var(--fs-2xs);
+  font-weight: 600;
+  line-height: 1.4;
+  padding: 2px 9px;
+  border-radius: 100px;
+  white-space: nowrap;
+}
+
+.fw-badge.warn {
+  color: var(--warn);
+  background: var(--warn-soft);
+}
+
+.fw-badge.ok {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+/* แท็บที่เลือกพื้นเป็นสีเน้น ป้ายข้างในต้องอ่านออกบนพื้นนั้น */
+.tab.active .fw-badge {
+  color: var(--on-accent);
+  background: rgba(0, 0, 0, 0.14);
+}
+
+.fw-files {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.fw-file {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  color: var(--text-mid);
+}
+
+.fw-file > .grow {
+  min-width: 0;
+}
+
+.fw-file .list-sub {
+  overflow-wrap: anywhere;
+}
+
+.fw-file.latest {
+  color: var(--text-hi);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-dim);
+}
+
+.fw-version {
+  font-size: var(--fs-md);
+  font-weight: 600;
+}
+
+.fw-table td,
+.fw-table th {
+  vertical-align: middle;
+}
+
+.fw-table .fw-check {
+  width: 44px;
+  text-align: center;
+}
+
+.fw-table input[type='checkbox'] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent-strong);
+}
+
+.fw-table .fw-act {
+  text-align: right;
+}
+
+.fw-name {
+  font-weight: 600;
+}
+
+.fw-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: 100px;
+}
+
+.fw-state::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.fw-state.on {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.fw-state.off {
+  color: var(--text-mid);
+  background: var(--neutral-soft);
+}
+
+.fw-state.off::before {
+  background: transparent;
+  border: 1.5px solid currentColor;
+}
+
+.fw-updating {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--fs-xs);
+  color: var(--info);
+}
+
+.fw-spinner {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid var(--info-soft);
+  border-top-color: var(--info);
+  animation: fw-spin 0.9s linear infinite;
+}
+
+@keyframes fw-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fw-spinner {
+    animation: none;
+  }
+}
+
+/* แถบอัปเดตหลายบอร์ด ค้างไว้ล่างจอ (เหนือแถบเมนูล่างของมือถือ) */
+.fw-bar {
+  position: sticky;
+  bottom: calc(var(--bottom-nav-h) + 12px);
+  z-index: 5;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--accent-dim);
+  background: var(--panel-raised);
+  box-shadow: var(--shadow-drop);
+  font-size: var(--fs-sm);
+}
+
+/* มือถือ: ตารางบอร์ดกลายเป็นการ์ดเรียงลงมา ไม่ต้องเลื่อนข้าง
+   ช่องเลือกซ้าย · ชื่อ รุ่น สถานะ ซ้อนกลาง · ปุ่มอัปเดตขวา */
+@media (max-width: 620px) {
+  .fw-table,
+  .fw-table tbody {
+    display: block;
+    white-space: normal;
+  }
+
+  .fw-table thead {
+    display: none;
+  }
+
+  .fw-table tr {
+    display: grid;
+    grid-template-columns: 32px minmax(0, 1fr) auto;
+    gap: 4px 10px;
+    padding: 12px;
+    border-top: 1px solid var(--hairline-soft);
+  }
+
+  .fw-table tbody tr:first-child {
+    border-top: none;
+  }
+
+  table.data.fw-table td {
+    display: block;
+    padding: 0;
+    border: none;
+    background: none !important;
+    grid-column: 2;
+  }
+
+  table.data.fw-table td.fw-check {
+    grid-column: 1;
+    grid-row: 1 / span 3;
+    width: auto;
+    text-align: left;
+  }
+
+  table.data.fw-table td.fw-act {
+    grid-column: 3;
+    grid-row: 1 / span 3;
+    align-self: center;
+  }
+}

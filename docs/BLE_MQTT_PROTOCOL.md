@@ -24,13 +24,13 @@ The identity characteristic returns:
 {
   "deviceId": "ESP32-AABBCCDDEEFF",
   "bleName": "RMUTT-AC-AABBCCDDEEFF",
-  "firmwareVersion": "1.0.0",
+  "firmwareVersion": "2.5.1",
   "configured": false,
   "controlType": "ir"
 }
 ```
 
-`controlType` (firmware 2.5.0+) tells the app how the board drives the A/C:
+`controlType` (IR firmware 2.5.0+, every wired firmware) tells the app how the board drives the A/C:
 `"ir"` for `rmutt_esp32_air`, `"wired"` for `rmutt_esp32_air_wired`. Older
 boards omit it and are treated as `"ir"`. A wired board also sends
 `"brand": "Daikin"`; the app then locks the brand field to *Daikin · Wired*
@@ -122,9 +122,48 @@ Topic: `rmutt/ac/<deviceId>/command`
 ```
 
 The device publishes the applied IR state to `/state`, availability and PZEM
-measurements to `/status`, and its one-time token to `/provision`.
+measurements to `/status`, and its one-time token to `/provision`. From
+firmware 2.4.0 it also sends energy records saved while offline to `/history`
+(10 per message) and deletes them after the Backend answers on `/history-ack`.
 
-Firmware 2.0 status example:
+### Other command actions
+
+The same topic (and `rmutt/occupancy/<deviceId>/command` for occupancy boards)
+also carries action messages instead of `state`. All are sent with QoS 1 and
+never retained:
+
+| `action` | Extra fields | Board does |
+|---|---|---|
+| `enter_setup` | — | Reopens BLE setup mode (online reconfiguration) |
+| `ota` | `url` | Downloads the `.bin` over HTTPS and restarts; failures are reported as `otaError` in `/status` |
+| `unprovision` | `deviceId` | See below (A/C 2.5.1, wired 2.5.2-slm8, occupancy 1.3.2+) |
+
+### Unprovision (device removed from the app)
+
+Sent by the backend to `<prefix>/<deviceId>/command` on both A/C and occupancy
+boards (A/C 2.5.1, wired 2.5.2-slm8, occupancy 1.3.2 and later). Never retained.
+
+```json
+{ "version": 1, "commandId": "UUID", "sentAt": "ISO-8601",
+  "action": "unprovision", "deviceId": "ESP32-AABBCCDDEEFF" }
+```
+
+The board ignores it unless `deviceId` is its own. Otherwise it publishes one
+non-retained acknowledgement to `/status`, clears its own retained `/status`
+(and `/state` on A/C boards), disconnects cleanly, erases its NVS settings
+(plus the offline-history partition on A/C boards) and restarts into BLE setup:
+
+```json
+{ "deviceId": "ESP32-AABBCCDDEEFF", "online": false, "unprovisioned": true }
+```
+
+The backend waits up to 4 s for this acknowledgement before it clears the
+retained topics and deletes the device's MQTT account.
+
+Firmware 2.0 status example (later firmware also sends `firmwareVersion`,
+`otaError` after a failed OTA, `roomNumber`, `airNumber`, `ip`, `rssi`,
+`scheduleConfigured`, `classScheduleConfigured` and, from 2.4.0,
+`historyPending`):
 
 ```json
 {
@@ -204,7 +243,7 @@ Topic layout for `OCC32-AABBCCDDEEFF`:
 - Status/LWT: `rmutt/occupancy/OCC32-AABBCCDDEEFF/status`
 - Provisioning: `rmutt/occupancy/OCC32-AABBCCDDEEFF/provision`
 - Provisioning ACK: `rmutt/occupancy/OCC32-AABBCCDDEEFF/provision-ack`
-- Online setup command: `rmutt/occupancy/OCC32-AABBCCDDEEFF/command`
+- Command (`enter_setup`, `ota`, `unprovision`): `rmutt/occupancy/OCC32-AABBCCDDEEFF/command`
 
 Status example:
 
@@ -212,6 +251,7 @@ Status example:
 {
   "online": true,
   "deviceId": "OCC32-AABBCCDDEEFF",
+  "firmwareVersion": "1.3.2",
   "roomNumber": "16203",
   "radarAvailable": true,
   "occupied": true,

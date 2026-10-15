@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1140" height="880" viewBox="0 0 1140 880" font-family="Sarabun, Tahoma, 'Leelawadee UI', sans-serif">
+  <defs>
+    <marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#66766E"/>
+    </marker>
+    <marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#DC4C5C"/>
+    </marker>
+    <marker id="a3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#0D7A4B"/>
+    </marker>
+  </defs>
+  <rect width="1140" height="880" fill="#FFFFFF"/>
+
+  <text x="36" y="42" font-size="21" font-weight="700" fill="#17241D">decideAutoOff() · ลำดับด่านตรวจ</text>
+  <text x="36" y="66" font-size="12.5" fill="#66766E">ด่านที่กันความเสียหายร้ายแรงต้องมาก่อน · เมื่อไม่แน่ใจ ให้ไม่ปิด</text>
+
+  <!-- start -->
+  <rect x="420" y="92" width="300" height="44" rx="22" fill="#17241D"/>
+  <text x="570" y="120" font-size="14" font-weight="700" fill="#FFFFFF" text-anchor="middle">เริ่มประเมินแอร์หนึ่งเครื่อง</text>
+  <path d="M570,136 L570,164" stroke="#66766E" stroke-width="2" marker-end="url(#a1)"/>
+
+  <!-- gate 1 -->
+  <rect x="360" y="166" width="420" height="66" rx="10" fill="#FCE8EB" stroke="#DC4C5C" stroke-width="2"/>
+  <text x="570" y="190" font-size="13.5" font-weight="700" fill="#DC4C5C" text-anchor="middle">ด่าน 1 · เซ็นเซอร์เชื่อถือได้ไหม</text>
+  <text x="570" y="210" font-size="11.5" fill="#17241D" text-anchor="middle">hasSensor &amp;&amp; online &amp;&amp; radarAvailable</text>
+  <text x="570" y="226" font-size="11" fill="#66766E" text-anchor="middle">และ autoOffEnabled ของเครื่องนี้</text>
+  <path d="M780,199 L900,199" stroke="#DC4C5C" stroke-width="2" marker-end="url(#a2)"/>
+  <rect x="904" y="176" width="212" height="46" rx="8" fill="#FFFFFF" stroke="#DC4C5C" stroke-width="1.5"/>
+  <text x="916" y="195" font-size="11.5" font-weight="700" fill="#DC4C5C">ขาดข้อใดข้อหนึ่ง</text>
+  <text x="916" y="213" font-size="11" fill="#17241D">idle / cancel — ห้ามปิดเด็ดขาด</text>
+  <path d="M570,232 L570,258" stroke="#66766E" stroke-width="2" marker-end="url(#a1)"/>
+
+  <!-- gate 2 -->
+  <rect x="360" y="260" width="420" height="56" rx="10" fill="#FFF0DC" stroke="#C97A1B" stroke-width="2"/>
+  <text x="570" y="284" font-size="13.5" font-weight="700" fill="#C97A1B" text-anchor="middle">ด่าน 2 · PZEM อ่านค่าได้ไหม</text>
+  <text x="570" y="304" font-size="11" fill="#66766E" text-anchor="middle">ถ้าอ่านไม่ได้ จะไม่มีวันรู้ว่าปิดสำเร็จหรือไม่</text>
+  <path d="M780,288 L900,288" stroke="#C97A1B" stroke-width="2" marker-end="url(#a2)"/>
+  <rect x="904" y="270" width="212" height="36" rx="8" fill="#FFFFFF" stroke="#C97A1B" stroke-width="1.5"/>
+  <text x="916" y="293" font-size="11" fill="#17241D">อ่านไม่ได้ → idle / cancel</text>
+  <path d="M570,316 L570,342" stroke="#66766E" stroke-width="2" marker-end="url(#a1)"/>
+
+  <!-- gate 3 -->
+  <rect x="360" y="344" width="420" height="56" rx="10" fill="#EAF1F9" stroke="#4678B8" stroke-width="2"/>
+  <text x="570" y="368" font-size="13.5" font-weight="700" fill="#4678B8" text-anchor="middle">ด่าน 3 · มีคนอยู่ในห้องไหม</text>
+  <text x="570" y="388" font-size="11" fill="#66766E" text-anchor="middle">มีคน → cancel ทันที ไม่ใช่หยุดนับไว้</text>
+  <path d="M780,372 L900,372" stroke="#4678B8" stroke-width="2" marker-end="url(#a2)"/>
+  <rect x="904" y="354" width="212" height="36" rx="8" fill="#FFFFFF" stroke="#4678B8" stroke-width="1.5"/>
+  <text x="916" y="377" font-size="11" fill="#17241D">มีคน → cancel (เริ่มใหม่ทีหลัง)</text>
+  <path d="M570,400 L570,426" stroke="#66766E" stroke-width="2" marker-end="url(#a1)"/>
+
+  <!-- gate 4 -->
+  <rect x="330" y="428" width="480" height="80" rx="10" fill="#E3F3E9" stroke="#0D7A4B" stroke-width="2"/>
+  <text x="570" y="452" font-size="13.5" font-weight="700" fill="#0D7A4B" text-anchor="middle">ด่าน 4 · แอร์ทำงานอยู่ไหม (acRunning)</text>
+  <text x="570" y="474" font-size="11.5" fill="#17241D" text-anchor="middle">ไม่ทำงาน + เคยยิงไปแล้ว (attempts &gt; 0) → succeeded</text>
+  <text x="570" y="494" font-size="11.5" fill="#66766E" text-anchor="middle">ไม่ทำงาน + ยังไม่เคยยิง → cancel (คนปิดเอง ไม่ใช่ผลงานเรา)</text>
+  <path d="M570,508 L570,536" stroke="#0D7A4B" stroke-width="2.5" marker-end="url(#a3)"/>
+
+  <!-- state -->
+  <rect x="330" y="538" width="480" height="40" rx="8" fill="#0D7A4B"/>
+  <text x="570" y="564" font-size="13" font-weight="700" fill="#FFFFFF" text-anchor="middle">แอร์ทำงานอยู่ · ห้องว่าง · เซ็นเซอร์เชื่อถือได้</text>
+  <path d="M570,578 L570,604" stroke="#0D7A4B" stroke-width="2.5" marker-end="url(#a3)"/>
+
+  <!-- counting -->
+  <rect x="120" y="606" width="400" height="96" rx="10" fill="#FFFFFF" stroke="#0D7A4B" stroke-width="2"/>
+  <text x="320" y="630" font-size="13" font-weight="700" fill="#0D7A4B" text-anchor="middle">ยังไม่ได้นับ → start</text>
+  <text x="320" y="652" font-size="11.5" fill="#17241D" text-anchor="middle">นอกคาบเรียน 300 วินาที · ในคาบเรียน 900 วินาที</text>
+  <text x="320" y="672" font-size="11" fill="#66766E" text-anchor="middle">เขียน deadline_at ลง DB ครั้งเดียว</text>
+  <text x="320" y="690" font-size="11" fill="#66766E" text-anchor="middle">ไม่เก็บ "เหลืออีกกี่วินาที" เพราะต้องเขียนทุกวินาที</text>
+
+  <rect x="560" y="606" width="400" height="96" rx="10" fill="#FFFFFF" stroke="#C97A1B" stroke-width="2"/>
+  <text x="760" y="630" font-size="13" font-weight="700" fill="#C97A1B" text-anchor="middle">กำลังนับอยู่ → wait</text>
+  <text x="760" y="652" font-size="11.5" fill="#17241D" text-anchor="middle">ยังไม่ครบกำหนด ก็แค่รอ</text>
+  <text x="760" y="672" font-size="11" fill="#66766E" text-anchor="middle">แอปเดินนาฬิกาเองจาก deadline</text>
+  <text x="760" y="690" font-size="11" fill="#66766E" text-anchor="middle">ไม่ต้องยิงถามเซิร์ฟเวอร์ทุกวินาที</text>
+
+  <path d="M760,702 L760,730" stroke="#C97A1B" stroke-width="2.5" marker-end="url(#a2)"/>
+
+  <!-- fire -->
+  <rect x="560" y="732" width="400" height="118" rx="10" fill="#FCE8EB" stroke="#DC4C5C" stroke-width="2"/>
+  <text x="760" y="756" font-size="13" font-weight="700" fill="#DC4C5C" text-anchor="middle">ครบกำหนด → fire (ยิง IR ปิด)</text>
+  <text x="760" y="778" font-size="11.5" fill="#17241D" text-anchor="middle">ยิงซ้ำทุก 20 วินาที สูงสุด 5 ครั้ง</text>
+  <text x="760" y="798" font-size="11" fill="#66766E" text-anchor="middle">IR ไม่มีการตอบรับ ต้องดูกำลังไฟว่าตกไหม</text>
+  <text x="760" y="818" font-size="11" fill="#66766E" text-anchor="middle">20 วินาที = เวลาที่แอร์ตอบสนอง + PZEM ยืนยัน 3 รอบ</text>
+  <text x="760" y="838" font-size="11" fill="#DC4C5C" text-anchor="middle">ครบ 5 ครั้งยังไม่ดับ → giveUp + แจ้งเตือนให้คนไปดู</text>
+
+  <!-- master switch note -->
+  <rect x="36" y="732" width="480" height="118" rx="10" fill="#F5F8F6" stroke="#D7E2DB" stroke-width="1.5"/>
+  <text x="52" y="756" font-size="13" font-weight="700" fill="#17241D">สวิตช์รวมของแอดมิน (v3.11.0)</text>
+  <text x="52" y="778" font-size="11.5" fill="#17241D">เช็คก่อนด่าน 1 ทั้งหมด ปิดแล้วหยุดทั้งอาคารทันที</text>
+  <text x="52" y="798" font-size="11.5" fill="#DC4C5C">และต้องล้างนาฬิกาที่ค้างอยู่ทุกเครื่องด้วย</text>
+  <text x="52" y="816" font-size="11" fill="#66766E">ถ้าไม่ล้าง แอปจะโชว์เวลาที่ไม่มีวันยิงจริง ซึ่งหลอกตา</text>
+  <text x="52" y="836" font-size="11" fill="#66766E">UPDATE มีเงื่อนไข deadline IS NOT NULL กันเขียน DB เปล่า</text>
+</svg>

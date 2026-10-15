@@ -3,6 +3,11 @@ RMUTT ESP32 Air Controller 1.6.0 - แก้เพิ่มอุปกรณ์
 
 ชุดนี้ใช้แตกทับโปรเจกต์ cpe_air_remote ชุดปัจจุบัน
 
+หมายเหตุ (ต.ค. 2569): ไฟล์นี้เป็นบันทึกของรุ่น 1.6.0 เก็บไว้เป็นประวัติ
+รุ่นปัจจุบัน: แอป 3.16.0+32, เฟิร์มแวร์แอร์ IR 2.5.1, สายแอร์ Daikin 2.5.2-slm8,
+เซ็นเซอร์ LD2410 1.3.2 วิธีติดตั้งปัจจุบันดู START_HERE.md, README.md และ deploy/DEPLOY.md
+ค่า MQTT ทั้งหมดมาจาก Backend แล้ว ไม่ต้องกรอก MQTT Host ในแอป และไม่ต้องใช้ --dart-define=MQTT_DEFAULT_HOST
+
 ความสามารถ
 -----------
 - เปลี่ยนเมนูเป็น "ตั้งค่าบอร์ด"
@@ -27,7 +32,7 @@ RMUTT ESP32 Air Controller 1.6.0 - แก้เพิ่มอุปกรณ์
 3. เปิด firmware/rmutt_esp32_air/rmutt_esp32_air.ino
 4. อัปโหลดลง ESP32:
    Board: ESP32 Dev Module
-   Partition Scheme: Huge APP
+   Partition Scheme: No FS 4MB (2MB APP x2)  (เฟิร์มแวร์ปัจจุบันใช้ partitions.csv ในโฟลเดอร์สเก็ตช์)
    Upload Speed: 115200
 5. ตั้ง backend/.env ให้ MQTT_URL ชี้ไป Broker ที่ใช้งานจริง เช่น:
    MQTT_URL=mqtt://192.168.1.153:1883

@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>16. เตรียมนำเสนอและคำถามที่อาจารย์มักถาม — คู่มือศึกษา RMUTT Save Energy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Chakra+Petch:wght@600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+<script>try{var t=localStorage.getItem('guide.theme');if(t)document.documentElement.dataset.theme=t;var f=localStorage.getItem('guide.font');if(f)document.documentElement.dataset.font=f;}catch(e){}</script>
+</head>
+<body>
+<header class="topbar">
+  <button class="menu-btn" id="menuBtn" aria-label="เปิดเมนู">☰</button>
+  <a class="brand" href="../index.html"><span class="brand-mark">⚡</span><span>คู่มือศึกษา <b>RMUTT Save Energy</b></span></a>
+  <div class="top-actions">
+    <button id="fontBtn" title="ขนาดตัวอักษร">ก<small>±</small></button>
+    <button id="themeBtn" title="สลับโหมดสว่าง/มืด">☾</button>
+  </div>
+</header>
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <input class="nav-search" id="navSearch" type="search" placeholder="ค้นหาบทหรือหัวข้อ…">
+    <div id="searchResults" class="search-results"></div>
+    <nav class="nav" id="nav">
+<a class="nav-home" href="../index.html">หน้าแรก</a>
+<div class="nav-part">ภาพรวม</div><ul>
+<li><a href="01-concept.html"><span class="num">1</span>แนวคิดและหลักการคิดของโปรเจค</a></li>
+<li><a href="02-roadmap.html"><span class="num">2</span>เริ่มจากอะไร และต้องเรียนรู้อะไรบ้าง</a></li>
+<li><a href="03-architecture-flows.html"><span class="num">3</span>สถาปัตยกรรมและเส้นทางของข้อมูล</a></li>
+</ul>
+<div class="nav-part">โครงสร้างพื้นฐาน</div><ul>
+<li><a href="04-network-server.html"><span class="num">4</span>เครือข่าย เซิร์ฟเวอร์ และ Tailscale</a></li>
+<li><a href="05-database.html"><span class="num">5</span>ฐานข้อมูล MariaDB</a></li>
+</ul>
+<div class="nav-part">เซิร์ฟเวอร์</div><ul>
+<li><a href="06-backend-api.html"><span class="num">6</span>Backend ตอนที่ 1: โครงหลัก ระบบสมาชิก และ REST API</a></li>
+<li><a href="07-backend-services.html"><span class="num">7</span>Backend ตอนที่ 2: งานเบื้องหลังและตรรกะหลักของระบบ</a></li>
+<li><a href="08-protocols.html"><span class="num">8</span>โปรโตคอลสื่อสาร: MQTT และ Bluetooth Low Energy</a></li>
+</ul>
+<div class="nav-part">อุปกรณ์และหน้าจอ</div><ul>
+<li><a href="09-firmware.html"><span class="num">9</span>เฟิร์มแวร์ ESP32: บอร์ดแอร์ (IR และสายแอร์) และบอร์ดตรวจจับคน</a></li>
+<li><a href="10-flutter-architecture.html"><span class="num">10</span>แอป Flutter ตอนที่ 1: โครงสร้าง ข้อมูล และ State</a></li>
+<li><a href="11-flutter-screens.html"><span class="num">11</span>แอป Flutter ตอนที่ 2: หน้าจอหลักและวิดเจ็ต</a></li>
+<li><a href="12-flutter-admin-screens.html"><span class="num">12</span>แอป Flutter ตอนที่ 3: หน้าจอผู้ดูแลระบบและการตั้งค่า</a></li>
+<li><a href="13-webapp.html"><span class="num">13</span>เว็บแอป: HTML, CSS และ JavaScript ล้วน</a></li>
+</ul>
+<div class="nav-part">ใช้งานจริง</div><ul>
+<li><a href="14-deploy-scripts-testing.html"><span class="num">14</span>การติดตั้งระบบ สคริปต์อัตโนมัติ และการทดสอบ</a></li>
+<li><a href="15-security.html"><span class="num">15</span>ความปลอดภัยทั้งระบบ</a></li>
+<li><a class="active" href="16-presentation-qa.html"><span class="num">16</span>เตรียมนำเสนอและคำถามที่อาจารย์มักถาม</a></li>
+</ul>
+<div class="nav-part">ภาคผนวก</div><ul>
+<li><a href="17-glossary.html"><span class="num">17</span>อภิธานศัพท์</a></li>
+<li><a href="18-file-map.html"><span class="num">18</span>แผนที่ไฟล์ทั้งโปรเจค</a></li>
+</ul>
+<div class="nav-part">งานที่กำลังพัฒนา</div><ul>
+<li><a href="19-daikin-slm8.html"><span class="num">19</span>แอร์ Daikin ผ่านสาย SLM8: จากการแกะโปรโตคอลถึงบอร์ดสายแอร์</a></li>
+</ul>
+<div class="nav-part">เจาะลึก</div><ul>
+<li><a href="20-database-design.html"><span class="num">20</span>เจาะลึกการออกแบบฐานข้อมูล</a></li>
+</ul>
+    </nav>
+  </aside>
+  <main class="content" id="content">
+<div class="chapter-head"><div class="kicker">บทที่ 16 · ใช้งานจริง</div><h1>เตรียมนำเสนอและคำถามที่อาจารย์มักถาม</h1></div>
+<h2 id="ภาพรวม">ภาพรวม<a class="anchor" href="#ภาพรวม">#</a></h2>
+<p>บทนี้รวบรวมสิ่งที่ต้องใช้ตอนไปอธิบายให้อาจารย์ฟัง: <strong>ลำดับการนำเสนอ</strong>, <strong>สิ่งที่ควรเตรียมสาธิต</strong>, <strong>คำถามยอดนิยมพร้อมคำตอบ</strong> และ <strong>ข้อจำกัดที่ควรพูดเองก่อนถูกถาม</strong>
+คำถามท้ายแต่ละบท (กล่อง "อาจารย์อาจถาม") เป็นคำถามเชิงลึกของส่วนนั้น ส่วนบทนี้เป็นคำถามภาพรวมที่เจอบ่อยที่สุด</p>
+<h2 id="ลำดับการนำเสนอแนะนำ-1520-นาที">ลำดับการนำเสนอแนะนำ (15–20 นาที)<a class="anchor" href="#ลำดับการนำเสนอแนะนำ-1520-นาที">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>ช่วง</th>
+<th>เนื้อหา</th>
+<th>เวลา</th>
+<th>อ้างอิงบท</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>ปัญหาของอาคาร และเป้าหมายของระบบ</td>
+<td>2 นาที</td>
+<td>แนวคิด</td>
+</tr>
+<tr>
+<td>2</td>
+<td>ภาพรวมสถาปัตยกรรม (วาดหรือแสดงแผนภาพ)</td>
+<td>3 นาที</td>
+<td>สถาปัตยกรรม</td>
+</tr>
+<tr>
+<td>3</td>
+<td>ฮาร์ดแวร์: บอร์ดแอร์ (IR + PZEM) และบอร์ดตรวจคน (LD2410)</td>
+<td>2 นาที</td>
+<td>เฟิร์มแวร์</td>
+</tr>
+<tr>
+<td>4</td>
+<td>สาธิต: ล็อกอิน → ดูห้อง → สั่งแอร์ → ดูกราฟค่าไฟ</td>
+<td>4 นาที</td>
+<td>Flutter / เว็บ</td>
+</tr>
+<tr>
+<td>5</td>
+<td>จุดเด่น: ปิดแอร์อัตโนมัติ (ด่านตรวจ + ตารางเรียน + fail-safe)</td>
+<td>3 นาที</td>
+<td>Backend ตอนที่ 2</td>
+</tr>
+<tr>
+<td>6</td>
+<td>การใช้งานจริง: Docker, Caddy, Tailscale Funnel, ความปลอดภัย</td>
+<td>3 นาที</td>
+<td>เครือข่าย, ความปลอดภัย</td>
+</tr>
+<tr>
+<td>7</td>
+<td>ข้อจำกัดและสิ่งที่จะพัฒนาต่อ</td>
+<td>1–2 นาที</td>
+<td>บทนี้</td>
+</tr>
+</tbody>
+</table></div>
+<div class="callout tip"><div class="callout-title">เคล็ดลับ</div><p>เตรียมแผนสำรองเผื่อสาธิตสดไม่ได้ (เน็ตห้องประชุมล่ม, บอร์ดไม่ออนไลน์) เช่น อัดวิดีโอหน้าจอการสั่งแอร์และกราฟไว้ล่วงหน้า และแคปหน้าจอ <code>/api/health</code> ที่ได้ <code>"connected":true</code></p></div>
+
+<h2 id="สิ่งที่ควรเตรียมก่อนวันนำเสนอ">สิ่งที่ควรเตรียมก่อนวันนำเสนอ<a class="anchor" href="#สิ่งที่ควรเตรียมก่อนวันนำเสนอ">#</a></h2>
+<ul>
+<li class="check"><input type="checkbox"> แผนภาพสถาปัตยกรรม (ใช้ <code>img/01-architecture.svg</code> หรือวาดเอง)</li>
+<li class="check"><input type="checkbox"> บัญชีทดลอง 2 แบบ: admin และ staff เพื่อแสดงว่าสิทธิ์ต่างกัน</li>
+<li class="check"><input type="checkbox"> บอร์ดจริงอย่างน้อย 1 ชุด หรือวิดีโอการทำงาน</li>
+<li class="check"><input type="checkbox"> ไฟล์ Excel ค่าไฟที่ส่งออกจากระบบ 1 ไฟล์</li>
+<li class="check"><input type="checkbox"> ตัวเลขสำคัญจากบทสถาปัตยกรรม (จดใส่โน้ตเล็ก ๆ)</li>
+<li class="check"><input type="checkbox"> เปิดหน้าโค้ดสำคัญเตรียมไว้: <code>utils/auto-off.js</code>, <code>services/mqtt.js</code>, <code>deploy/docker-compose.yml</code>, <code>firmware/rmutt_esp32_air/rmutt_esp32_air.ino</code> (ฟังก์ชัน <code>loop()</code>)</li>
+</ul>
+<h2 id="คำถามภาพรวมยอดนิยม">คำถามภาพรวมยอดนิยม<a class="anchor" href="#คำถามภาพรวมยอดนิยม">#</a></h2>
+<h3 id="หมวดแนวคิดและการออกแบบ">หมวดแนวคิดและการออกแบบ<a class="anchor" href="#หมวดแนวคิดและการออกแบบ">#</a></h3>
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> โปรเจคนี้ต่างจากปลั๊กอัจฉริยะหรือรีโมต Wi-Fi ที่ขายทั่วไปอย่างไร?</p>
+<p><strong>ตอบ:</strong> ของทั่วไปทำได้แค่สั่งเปิดปิดทีละเครื่อง แต่ระบบนี้รวม 3 อย่างไว้ในที่เดียว: วัดไฟรายเครื่องเก็บย้อนหลัง, รู้ว่ามีคนในห้องด้วยเรดาร์, และตัดสินใจปิดเองโดยดูตารางเรียนของมหาวิทยาลัย อีกทั้งข้อมูลอยู่บนเซิร์ฟเวอร์ของมหาวิทยาลัยเอง ไม่ต้องพึ่ง cloud ของบริษัท</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> ทำไมไม่ใช้แพลตฟอร์ม IoT สำเร็จรูป เช่น Blynk หรือ Home Assistant?</p>
+<p><strong>ตอบ:</strong> ต้องการตรรกะเฉพาะของมหาวิทยาลัย คือตารางเรียน ภาคเรียน การจองห้อง และสิทธิ์ผู้ใช้หลายระดับ ซึ่งแพลตฟอร์มสำเร็จรูปทำได้ยากหรือต้องเสียค่าบริการ อีกทั้งต้องการเก็บข้อมูลไว้ในเซิร์ฟเวอร์ของมหาวิทยาลัย และได้เรียนรู้การออกแบบระบบเต็มวงจร</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> ทำไมใช้ Bluetooth ตั้งค่า แทนการให้บอร์ดเปิด Wi-Fi hotspot?</p>
+<p><strong>ตอบ:</strong> BLE ไม่ทำให้มือถือหลุดจากเน็ตที่ใช้อยู่ แอปจึงคุยกับ Backend เพื่อจองช่องและรับบัญชี MQTT ได้ในเวลาเดียวกับที่คุยกับบอร์ด และบอร์ดสแกนรายชื่อ Wi-Fi ส่งให้เลือกได้เลย ผู้ใช้กรอกแค่รหัส Wi-Fi</p></div>
+
+<h3 id="หมวดเครือข่ายและเซิร์ฟเวอร์">หมวดเครือข่ายและเซิร์ฟเวอร์<a class="anchor" href="#หมวดเครือข่ายและเซิร์ฟเวอร์">#</a></h3>
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> ทำไมต้องใช้ Tailscale?</p>
+<p><strong>ตอบ:</strong> เซิร์ฟเวอร์อยู่ในเครือข่ายภายในมหาวิทยาลัย ใช้ IP ส่วนตัว 10.x และ firewall ไม่ให้อินเทอร์เน็ตต่อเข้ามา ถ้าไม่มี Tailscale แอปจะใช้ได้แค่ในอาคาร Tailscale Funnel ให้กล่อง tailscale บนเซิร์ฟเวอร์ "ต่อออก" ไปหาเครือข่ายของ Tailscale แล้วคนจากอินเทอร์เน็ตเข้ามาที่ชื่อ <code>*.ts.net</code> ได้ด้วย HTTPS โดย <strong>ไม่ต้องขอเปิดพอร์ตขาเข้า</strong> Funnel เปิดออกไปแค่ 2 จุด คือพอร์ต 443 ไป Caddy (เว็บ + API) และพอร์ต 8443 ไป Mosquitto ให้บอร์ด ESP32 ต่อ MQTT ส่วนฐานข้อมูลและ SSH ไม่ถูกเปิดออกไป ปิดได้ทันทีด้วย <code>docker compose stop tailscale</code></p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> แล้วทำไมไม่ขอฝ่ายไอทีเปิดพอร์ต หรือเช่า VPS?</p>
+<p><strong>ตอบ:</strong> เปิดพอร์ตต้องผ่านการอนุมัติและเพิ่มความเสี่ยงต่อเครือข่ายมหาวิทยาลัย ส่วน VPS มีค่าใช้จ่ายรายเดือน และบอร์ด ESP32 ในอาคารต้องวิ่งออกอินเทอร์เน็ตไปหาเซิร์ฟเวอร์ข้างนอก Tailscale Funnel ใช้ฟรีสำหรับขนาดนี้ ตั้งค่าเป็นไฟล์เดียว (<code>tailscale-serve.json</code>) ถ้าวันหนึ่งมหาวิทยาลัยให้โดเมนและเปิดพอร์ตได้ ก็เปลี่ยนได้โดยไม่ต้องแก้โค้ดแอปมากนัก แค่ build ใหม่ด้วย <code>--dart-define=API_BASE_URL</code></p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> บอร์ด ESP32 ผ่าน Tailscale ด้วยไหม?</p>
+<p><strong>ตอบ:</strong> ผ่านครับ (เปลี่ยนเมื่อ 5 ต.ค.) เดิมบอร์ดต่อ <code>rmutt-energy.duckdns.org:8883</code> แต่โดเมนนั้นชี้ไป IP ภายในมหาวิทยาลัย บอร์ดที่ต่อ Wi-Fi นอกเครือข่ายมหาวิทยาลัยจึงหา Broker ไม่เจอ ตอนนี้ค่าเริ่มต้นคือ <code>mqtts://rmutt-energy.tailb292b4.ts.net:8443</code> กล่อง tailscale ถอด TLS ด้วยใบรับรอง ts.net (ออกโดย Let's Encrypt จึงใช้ root CA เดิมในเฟิร์มแวร์ได้) แล้วส่งต่อเป็น MQTT ธรรมดาไป <code>mqtt:1883</code> ภายใน Docker โดย Mosquitto ยังตรวจ username/password รายบอร์ดเหมือนเดิม ถ้าบอร์ดอยู่ในมหาวิทยาลัยก็ยังเลือกต่อตรง 8883 ได้ โดยตั้ง <code>MQTT_DEVICE_URL</code> ใน <code>.env</code></p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> HTTPS ได้ใบรับรองมาจากไหน ในเมื่อเซิร์ฟเวอร์อยู่หลัง firewall?</p>
+<p><strong>ตอบ:</strong> ใช้ Let's Encrypt แบบ DNS-01 ครับ Caddy พิสูจน์ความเป็นเจ้าของโดเมนโดยเขียน TXT record ที่ DuckDNS แทนการให้ Let's Encrypt เข้ามาที่พอร์ต 80 ซึ่งเข้าไม่ได้ จากนั้นสคริปต์ <code>sync-mqtt-cert.sh</code> คัดลอกใบเดียวกันให้ Mosquitto ใช้กับพอร์ต 8883 ทุกวัน</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> ทำไมใช้ Docker?</p>
+<p><strong>ตอบ:</strong> ทุกส่วน (DB, Broker, Backend, Caddy, Tailscale) รันในกล่องของตัวเองด้วยเวอร์ชันที่กำหนดไว้ ติดตั้งเครื่องใหม่ได้ด้วยไม่กี่คำสั่ง ไม่มีปัญหา "เครื่องผมรันได้" และควบคุมได้ว่าพอร์ตไหนเปิดออกนอกเครื่อง เช่น MariaDB ผูกไว้ที่ <code>127.0.0.1:3306</code> เท่านั้น</p></div>
+
+<h3 id="หมวด-backend-และข้อมูล">หมวด Backend และข้อมูล<a class="anchor" href="#หมวด-backend-และข้อมูล">#</a></h3>
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> JWT คืออะไร ทำไมใช้แทน session?</p>
+<p><strong>ตอบ:</strong> JWT คือ token ที่มีข้อมูลผู้ใช้และลายเซ็นของเซิร์ฟเวอร์ แอปมือถือส่งมาใน Header ทุกคำขอ เซิร์ฟเวอร์ตรวจลายเซ็นได้เองโดยไม่ต้องเก็บ session เหมาะกับทั้งแอปและเว็บ ระบบนี้ตั้งอายุ 8 ชั่วโมง และเพิ่ม <code>token_version</code> เพื่อเพิกถอน token เก่าทั้งหมดของผู้ใช้ทันทีเมื่อเปลี่ยนรหัสผ่านหรือถูกระงับ</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> เก็บรหัสผ่านอย่างไร?</p>
+<p><strong>ตอบ:</strong> ไม่เก็บรหัสจริงครับ เก็บค่า hash จาก bcrypt (cost 12) ซึ่งย้อนกลับไม่ได้และช้าโดยตั้งใจเพื่อกันการเดารหัส ตอนล็อกอินที่ไม่มีชื่อผู้ใช้ ระบบยังเทียบกับ hash หลอกเพื่อให้ใช้เวลาเท่ากัน คนร้ายจึงเดาไม่ได้ว่าชื่อไหนมีอยู่จริง และล็อกอินผิดได้ 10 ครั้งต่อ 15 นาทีต่อ IP</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> ค่าไฟคำนวณอย่างไร แม่นแค่ไหน?</p>
+<p><strong>ตอบ:</strong> PZEM วัดพลังงานสะสม (kWh) ที่สายไฟของแอร์โดยตรง Backend เอาผลต่างระหว่างค่าล่าสุดกับค่าก่อนหน้ารวมลงถังรายชั่วโมง แล้วคูณอัตราค่าไฟ (ค่าเริ่มต้น 4.50 บาท/หน่วย แอดมินแก้ได้) ความแม่นขึ้นกับ PZEM-004T ซึ่งใช้วัดพลังงานทั่วไปได้ดี แต่ยังเป็นค่าประมาณ ไม่ใช่มิเตอร์ของการไฟฟ้า</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> ข้อมูลจะโตแค่ไหน ฐานข้อมูลรับไหวไหม?</p>
+<p><strong>ตอบ:</strong> ค่าไฟเก็บเป็น 1 แถวต่อเครื่องต่อชั่วโมง แอร์ 40 เครื่องได้ราว 960 แถวต่อวัน หรือราว 350,000 แถวต่อปี MariaDB รับได้สบาย ถ้าเก็บทุกค่าที่บอร์ดส่งมาทุก 10 วินาทีจะเป็นหลายแสนแถวต่อวัน จึงเลือกเก็บเป็นถังรายชั่วโมง</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> ทดสอบระบบอย่างไร?</p>
+<p><strong>ตอบ:</strong> มีเทสต์อัตโนมัติ 3 ชุด: Backend ประมาณ 126 เทสต์ใน 20 ไฟล์ (<code>node --test</code>) แอป Flutter ประมาณ 119 เทสต์ใน 21 ไฟล์ (<code>flutter test</code> และ GitHub Actions รันให้อัตโนมัติทุกครั้งที่ push) และเทสต์ ring buffer ของเฟิร์มแวร์ที่คอมไพล์รันบน PC ได้ (2,099 checks) ตรรกะที่ยากที่สุดอย่าง auto-off ถูกเขียนเป็นฟังก์ชันบริสุทธิ์ จึงทดสอบได้ทุกกรณีโดยไม่ต้องมีฐานข้อมูลหรือบอร์ดจริง ส่วนการทดสอบกับฮาร์ดแวร์ทำด้วยมือ และแนะนำให้นำร่องปิดอัตโนมัติ 2–3 ห้องก่อน</p></div>
+
+<h3 id="หมวดฮาร์ดแวร์">หมวดฮาร์ดแวร์<a class="anchor" href="#หมวดฮาร์ดแวร์">#</a></h3>
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> รู้ได้อย่างไรว่าห้องมีคน คนนั่งนิ่ง ๆ เรดาร์จับได้ไหม?</p>
+<p><strong>ตอบ:</strong> LD2410 เป็นเรดาร์ mmWave ที่แยกค่าเป้าหมายเคลื่อนที่กับเป้าหมายนิ่งได้ (จับการหายใจหรือการขยับเล็กน้อยได้) ระบบใช้ค่า static energy: ถ้าเกตใดเกตหนึ่งในเกต 0–8 มีค่าเกิน 25 ถือว่ามีคน เกณฑ์นี้ยังต้องปรับตามห้องจริง จึงมีการนับถอยหลัง 5–15 นาทีก่อนปิด และเริ่มใช้แบบนำร่อง</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> รองรับแอร์ยี่ห้อไหนบ้าง?</p>
+<p><strong>ตอบ:</strong> ใช้ไลบรารี IRremoteESP8266 ซึ่งรองรับโปรโตคอลแอร์หลายสิบยี่ห้อ เลือกได้ตอนตั้งค่า และเขียนคลาส <code>SaijoDenkiAC</code> เพิ่มเองสำหรับแอร์ Saijo Denki ที่ไลบรารีไม่รองรับ โดยเก็บเฟรม IR จากรีโมตจริงไว้เป็นตาราง</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> อัปเดตเฟิร์มแวร์บอร์ดหลายสิบตัวทำอย่างไร?</p>
+<p><strong>ตอบ:</strong> ใช้ OTA ครับ วางไฟล์ <code>.bin</code> บนเซิร์ฟเวอร์ กดอัปเดตจากเว็บ บอร์ดดาวน์โหลดผ่าน HTTPS ลงช่องแอปสำรอง (ตารางพาร์ติชันมีสองช่อง) แล้วรีบูต ถ้าดาวน์โหลดไม่สำเร็จ บอร์ดยังใช้เวอร์ชันเดิมต่อ</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> ถ้ามีคนเปิดแอร์ด้วยรีโมตปกติ ไม่ได้กดจากแอป ระบบรู้ไหม?</p>
+<p><strong>ตอบ:</strong> รู้ครับ แต่ก่อนแอปดูแค่คำสั่งสุดท้ายที่ส่งไป (<code>isOn</code>) จึงแสดงว่าปิดอยู่ทั้งที่แอร์ทำงาน ตอนนี้แก้ให้ใช้ <code>isPoweredOn</code> = <code>isOn || (pzemAvailable &amp;&amp; isRunning)</code> คือถ้าบอร์ดมี PZEM และวัดกระแสได้ว่าแอร์กินไฟอยู่ ก็ถือว่าเปิด ทั้งแอป เว็บ และตัวนับถอยหลังปิดอัตโนมัติใช้ค่านี้ร่วมกัน ข้อจำกัดคือต้องมี PZEM ต่ออยู่ ถ้าไม่มีก็ยังรู้ได้จากคำสั่งในแอปเท่านั้น</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> แอร์ที่ไม่มีตัวรับ IR หรือใช้รีโมตแบบมีสาย (เช่น Daikin) จะควบคุมอย่างไร?</p>
+<p><strong>ตอบ:</strong> ใช้บอร์ดสายแอร์ (บท 19) ต่อ ESP32 เข้ากับสายรีโมต SLM8 ของ Daikin โดยตรง ใช้วงจรแบ่งแรงดันลดสัญญาณลงให้ขา GPIO อ่านได้ ถอดรหัสเฟรม 8 ไบต์ที่มี checksum แล้วส่งเฟรมกลับผ่านไดโอดหรือทรานซิสเตอร์ ตั้งแต่ 11 ต.ค. มีเฟิร์มแวร์จริง <code>rmutt_esp32_air_wired</code> (2.5.2-slm8) ต่อเข้าระบบเดียวกับบอร์ด IR แล้ว ผู้ใช้เห็นเป็น "Daikin · สายแอร์"</p></div>
+
+<h3 id="หมวดแอปมือถือและตารางเรียน-อัปเดต-9-ตค-2569">หมวดแอปมือถือและตารางเรียน (อัปเดต 9 ต.ค. 2569)<a class="anchor" href="#หมวดแอปมือถือและตารางเรียน-อัปเดต-9-ตค-2569">#</a></h3>
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> ช่วงปิดเทอม ตารางเรียนยังมีคาบวันพุธอยู่ ระบบจะรอ 15 นาทีก่อนปิดแอร์ทุกวันพุธหรือเปล่า?</p>
+<p><strong>ตอบ:</strong> ไม่ครับ ผู้ดูแลตั้ง "ปฏิทินภาคเรียน" ไว้ (วันเปิด–ปิดของแต่ละเทอม เช่น 1/2569) ตารางเรียนมีผลเฉพาะระหว่างวันเปิดถึงวันปิด นอกช่วงนั้นทุกห้องถือว่าว่าง รอแค่ 5 นาทีแล้วปิด และแจ้งเตือนถ้ามีคนเปิดแอร์ใช้ จึงไม่ต้องจำไปล้างตารางตอนปิดเทอม และนำเข้าตารางเทอมหน้าไว้ล่วงหน้าได้ แอปมือถือแสดงสถานะนี้ให้เห็น (ป้าย "กำลังเปิดภาค / ยังไม่เปิดภาค / ปิดภาคแล้ว" และกล่องส้มเมื่อดูวันที่อยู่นอกภาค)</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> ถ้ามีประชุมหรือสอบนอกตารางเรียน ระบบจะปิดแอร์ระหว่างประชุมไหม?</p>
+<p><strong>ตอบ:</strong> ไม่ ถ้าผู้ดูแลบันทึก "การใช้ห้อง" ไว้ (ตาราง <code>room_bookings</code>) ทำซ้ำได้ วันเดียว ทุกวัน หรือทุกสัปดาห์ ระหว่างเวลานั้นระบบปิดแอร์ถือว่าห้องอยู่ในคาบ คือรอ 15 นาทีถ้าห้องว่าง และไม่แจ้งเตือนว่าใช้แอร์นอกคาบ ตั้งแต่ 9 ต.ค. ทำได้ทั้งในเว็บและแอปมือถือ ฟอร์มสรุปจำนวนครั้งให้ก่อนบันทึก (เช่น "ทุกวันพุธ ... รวม 13 ครั้ง") และยกเลิกการจองประจำแบบ "หยุดตั้งแต่วันนี้" ได้โดยไม่ลบประวัติครั้งก่อน</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> ขึ้นเทอมใหม่ นำเข้าไฟล์ตารางใหม่แล้ว ห้องที่เทอมนี้ไม่มีเรียนจะค้างตารางเก่าไหม?</p>
+<p><strong>ตอบ:</strong> ถ้านำเข้าแบบ "แทนที่เฉพาะห้องในไฟล์" จะค้างครับ จึงมีโหมด "เปลี่ยนภาคเรียน" (<code>replaceAll</code>) ที่ล้างตารางทุกห้องก่อนนำเข้าใน Transaction เดียวของฐานข้อมูล หน้านำเข้าจะเตือนเองว่า "อีก N ห้องมีตารางอยู่แต่ไม่อยู่ในไฟล์" ถ้าชื่อภาคเรียนในไฟล์ต่างจากในระบบจะเลือก "เปลี่ยนภาคเรียน" ไว้ให้ ถ้าไม่แน่ใจจะบังคับให้ผู้ใช้เลือกเองก่อนกดนำเข้า เพราะการล้างผิดย้อนกลับยาก</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> กราฟในหน้าสถิติอ่านอย่างไร ทำไมเป็นกราฟแท่ง?</p>
+<p><strong>ตอบ:</strong> หนึ่งแท่งคือพลังงานที่ใช้ในหนึ่งชั่วโมง (ดู "วันนี้") หรือหนึ่งวัน (7/30 วัน) เป็นค่าสะสมต่อช่วงที่แยกจากกัน กราฟแท่งจึงสื่อตรงกว่ากราฟเส้น ป้ายตัวเลขมีแค่แท่งสูงสุด แท่งอื่นแตะดูค่าและค่าไฟได้ ช่วงที่ไม่ใช้ไฟเป็นขีดจาง แกนตั้งปัดเป็นตัวเลขกลม และถ้าดูรายวันตั้งแต่ 7 วันจะมีเส้นประค่าเฉลี่ยต่อวัน ทุกแท่งใช้หน่วยเดียวกัน (Wh/kWh/MWh ตามค่าสูงสุด) เพื่อเทียบกันได้ตรง</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> แจกแอป Android ให้คนอื่นอย่างไร ถ้าเครื่องไม่มี Flutter?</p>
+<p><strong>ตอบ:</strong> ใช้ GitHub Actions <code>build-android.yml</code> กดรันในเว็บ GitHub ระบบติดตั้ง Java และ Flutter บนเครื่อง Linux ของ GitHub แล้ว build APK ที่เซ็นด้วยกุญแจจาก GitHub Secrets ให้ดาวน์โหลด กุญแจต้องเป็นตัวเดิมเสมอ เพราะ Android ยอมให้อัปเดตทับเฉพาะแอปที่ลายเซ็นตรงกัน</p></div>
+
+<h3 id="หมวดบอร์ดสายแอร์-จอ-oled-และการดูแลอุปกรณ์-อัปเดต-14-ตค-2569">หมวดบอร์ดสายแอร์ จอ OLED และการดูแลอุปกรณ์ (อัปเดต 14 ต.ค. 2569)<a class="anchor" href="#หมวดบอร์ดสายแอร์-จอ-oled-และการดูแลอุปกรณ์-อัปเดต-14-ตค-2569">#</a></h3>
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> ระบบรู้ได้อย่างไรว่าแอร์เครื่องนี้คุมด้วยสาย ไม่ใช่ IR และทำไมบางเครื่องมีปุ่มในแอปน้อยกว่า?</p>
+<p><strong>ตอบ:</strong> บอร์ดบอกเองตอนตั้งค่าผ่านบลูทูธ (<code>controlType: wired</code>) และใน MQTT status (<code>controlMode: wired</code>) Backend ตั้งโปรโตคอลเป็น <code>DAIKIN_WIRED</code> ให้อัตโนมัติ แอปและเว็บแสดงป้าย "Daikin · สายแอร์" บอร์ดสายแอร์ทำได้เท่าที่รีโมตติดผนังทำได้ (เช่น ไม่มี Turbo/Quiet) โมเดลในแอปจึงมี getter <code>supportsXxx</code> ให้หน้าจอซ่อนปุ่มที่ทำไม่ได้ และ Backend ก็ตรวจคำสั่งซ้ำอีกชั้น</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> บอร์ดสายแอร์ต้องส่งเฟรมทุก 1 วินาที ถ้า Wi-Fi หลุดหรือกำลังอัปเดตจะส่งทันไหม และรีบูตแล้วแอร์ดับไหม?</p>
+<p><strong>ตอบ:</strong> ทัน เพราะการส่งเฟรมอยู่ใน FreeRTOS task แยก (core 1 priority 3) ไม่ได้อยู่ใน <code>loop()</code> ที่อาจค้างตอนต่อ Wi-Fi หรือ TLS รีบูตแล้วแอร์ไม่ดับ เพราะสถานะแอร์บันทึกใน NVS และส่งตั้งแต่เฟรมแรกก่อนต่อ Wi-Fi บอร์ดยังป้อนอุณหภูมิห้องจาก DHT11 ให้แอร์ และรายงานว่าสายแอร์ตอบหรือไม่ และคอมเพรสเซอร์ทำงานไหม</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> ลบอุปกรณ์ในแอปแล้ว บอร์ดยังจำ Wi-Fi และรหัส MQTT อยู่ไหม?</p>
+<p><strong>ตอบ:</strong> ถ้าบอร์ดออนไลน์ไม่จำครับ (เพิ่ม 13 ต.ค.) Backend ส่งคำสั่ง <code>unprovision</code> ที่ระบุ <code>deviceId</code> ไปก่อนลบบัญชี MQTT บอร์ดตรวจว่าเป็นของตัวเอง ตอบว่าล้างแล้ว ล้าง NVS แล้วรีบูตเข้าโหมดตั้งค่าบลูทูธ API ตอบ <code>boardCleared: true</code> ถ้าบอร์ดออฟไลน์ได้ <code>false</code> บอร์ดยังเก็บค่าเดิมแต่ต่อ Broker ไม่ได้แล้วเพราะบัญชีถูกลบ คำสั่งนี้ไม่ส่งแบบ retained เพราะ Device ID มาจาก MAC ถ้าค้างบน Broker บอร์ดตัวเดิมที่เพิ่มกลับมาจะล้างตัวเองซ้ำ</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> อัปเดตเฟิร์มแวร์หลายสิบบอร์ดทำอย่างไร และกันไฟล์ผิดอย่างไร?</p>
+<p><strong>ตอบ:</strong> (เพิ่ม 14 ต.ค.) แอดมินเข้าเมนู "เฟิร์มแวร์" ในเว็บ แยกแท็บตามชนิดบอร์ด (แอร์ IR / สายแอร์ Daikin / เซ็นเซอร์ LD2410) ลากไฟล์ .bin มาวาง ถ้าชื่อไม่มีเลขรุ่นเว็บถามให้ ตารางบอกว่าบอร์ดไหนยังเก่า เลือกหลายตัวแล้วสั่งพร้อมกัน หน้าเว็บรอจนบอร์ดรายงานรุ่นใหม่ หรือแจ้งล้มเหลวเมื่อเกิน 5 นาที Backend ตรวจหลายด่าน: เป็นแอดมิน ชื่อไฟล์ห้ามมี <code>..</code> ชนิดตรงแท็บ ไบต์แรกเป็น <code>0xE9</code> (โปรแกรม ESP32) ขนาดไม่เกินช่อง OTA และตอนสั่งต้องเป็นไฟล์ชนิดเดียวกับบอร์ด ข้อจำกัดคือยังไม่มีการเซ็นไฟล์ (code signing)</p></div>
+
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> ใส่จอ OLED แล้วบอร์ดช้าลงหรือแฟลชไม่พอไหม?</p>
+<p><strong>ตอบ:</strong> ไม่ช้า จอวาดจริงแค่ทุก 400 ms หรือทันทีหลังสั่งแอร์ ไม่มีจอก็ข้ามส่วนจอเอง และจอแค่อ่านสถานะ เสียก็ไม่กระทบการควบคุม เรื่องแฟลช ใช้ <code>build_opt.h</code> ปิดโปรโตคอล IR 28 ยี่ห้อที่แอปไม่ใช้และใช้ I2C แบบซอฟต์แวร์ ทำให้เฟิร์มแวร์ที่มีจอใช้แฟลช 98% ของช่องแอป จอพักเองเมื่อแอร์ปิดเกิน 10 นาทีเพื่อกันจอ OLED เสื่อม (burn-in)</p></div>
+
+<h2 id="ข้อจำกัดที่ควรพูดเองก่อนถูกถาม">ข้อจำกัดที่ควรพูดเองก่อนถูกถาม<a class="anchor" href="#ข้อจำกัดที่ควรพูดเองก่อนถูกถาม">#</a></h2>
+<p>การยอมรับข้อจำกัดอย่างตรงไปตรงมา และบอกได้ว่าจะแก้อย่างไร ทำให้ดูเข้าใจระบบจริง จุดเหล่านี้มาจากการอ่านโค้ด (รายละเอียดในบทความปลอดภัยและท้ายบทอื่น ๆ)</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>ข้อจำกัด</th>
+<th>ผลกระทบ</th>
+<th>แนวทางพัฒนาต่อ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>เซิร์ฟเวอร์เครื่องเดียว</td>
+<td>ล่มแล้วสั่งจากแอปและ auto-off ไม่ได้ชั่วคราว</td>
+<td>เครื่องสำรอง, snapshot VM, monitor <code>/api/health</code></td>
+</tr>
+<tr>
+<td>เกณฑ์เรดาร์ (&gt; 25) ยังไม่ได้ปรับตามห้องจริง</td>
+<td>อาจมองว่าห้องว่างทั้งที่มีคนนั่งนิ่ง</td>
+<td>เก็บข้อมูลแล้วปรับเกณฑ์รายห้อง, นำร่องก่อน</td>
+</tr>
+<tr>
+<td>IR ส่งทางเดียว</td>
+<td>รู้ผลจากกำลังไฟเท่านั้น</td>
+<td>ใช้ PZEM ยืนยัน (ทำอยู่แล้ว)</td>
+</tr>
+<tr>
+<td>OTA ไม่มีการเซ็นไฟล์และไม่มี rollback อัตโนมัติ</td>
+<td>ถ้าไฟล์ผิดอาจต้องแฟลชผ่าน USB</td>
+<td>เปิด secure boot / signed OTA</td>
+</tr>
+<tr>
+<td>BLE ตอนตั้งค่าไม่มีการจับคู่เข้ารหัส</td>
+<td>คนอยู่ใกล้ช่วงตั้งค่าอาจดักข้อมูลได้</td>
+<td>จำกัดเวลาเปิด (มีแล้ว 5 นาที), เพิ่ม pairing</td>
+</tr>
+<tr>
+<td>staff สั่งแอร์ได้ทุกเครื่อง</td>
+<td>ไม่มีการจำกัดรายห้อง</td>
+<td>เพิ่มสิทธิ์รายห้อง/รายชั้น</td>
+</tr>
+<tr>
+<td>แอปยังไม่มีแจ้งเตือนแบบ push</td>
+<td>ต้องเปิดแอปเพื่อดูการแจ้งเตือน</td>
+<td>ต่อ <code>AlertNotifier</code> / Firebase Cloud Messaging</td>
+</tr>
+<tr>
+<td>Broker เปิดให้อินเทอร์เน็ตเข้าถึงผ่าน Funnel 8443</td>
+<td>มีคนลองเดารหัส MQTT ได้ (ไม่มี rate limit ชั้น MQTT)</td>
+<td>รหัสบอร์ดสุ่มยาวจาก HMAC อยู่แล้ว ถ้าบอร์ดอยู่ในมหาวิทยาลัยหมดให้กลับไปใช้ 8883 ตรง</td>
+</tr>
+<tr>
+<td>ใช้ Tailscale Funnel ซึ่งเป็นบริการภายนอก</td>
+<td>ถ้า Tailscale มีปัญหา ใช้จากนอกอาคารไม่ได้ และบอร์ดที่ตั้งค่าให้ต่อผ่าน ts.net จะส่งข้อมูลไม่ได้ (บอร์ดแอร์เก็บค่าไฟไว้ในตัวได้ราว 7 วัน)</td>
+<td>ขอโดเมนและพอร์ตจากมหาวิทยาลัยในอนาคต</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="เทคนิคตอบคำถามที่ไม่รู้คำตอบ">เทคนิคตอบคำถามที่ไม่รู้คำตอบ<a class="anchor" href="#เทคนิคตอบคำถามที่ไม่รู้คำตอบ">#</a></h2>
+<ol>
+<li>ยอมรับตรง ๆ ว่า "ส่วนนี้ยังไม่ได้ทดสอบ/ยังไม่ได้ทำ"</li>
+<li>บอกว่าในโค้ดส่วนนั้นอยู่ไฟล์ไหน และทำงานคร่าว ๆ อย่างไร</li>
+<li>เสนอแนวทางที่จะไปตรวจสอบหรือพัฒนาต่อ</li>
+<li>อย่าเดาตัวเลข ถ้าจำไม่ได้ให้บอกว่าอยู่ในไฟล์ไหนแล้วเปิดดูได้</li>
+</ol>
+<h2 id="สรุปและเช็กลิสต์ความเข้าใจ">สรุปและเช็กลิสต์ความเข้าใจ<a class="anchor" href="#สรุปและเช็กลิสต์ความเข้าใจ">#</a></h2>
+<ul>
+<li class="check"><input type="checkbox"> ซ้อมนำเสนอครบตามลำดับในเวลา 15–20 นาที</li>
+<li class="check"><input type="checkbox"> ตอบคำถามในบทนี้ได้โดยไม่ต้องอ่าน</li>
+<li class="check"><input type="checkbox"> ตอบคำถามท้ายบทเครือข่าย (Tailscale) และบท Backend ตอนที่ 2 (auto-off) ได้</li>
+<li class="check"><input type="checkbox"> พูดข้อจำกัดอย่างน้อย 3 ข้อพร้อมแนวทางพัฒนาได้</li>
+<li class="check"><input type="checkbox"> มีแผนสำรองถ้าสาธิตสดไม่ได้</li>
+</ul><nav class="pager"><a class="prev" href="15-security.html"><span>← บทก่อนหน้า</span>15. ความปลอดภัยทั้งระบบ</a><a class="next" href="17-glossary.html"><span>บทถัดไป →</span>17. อภิธานศัพท์</a></nav>
+  </main>
+  <aside class="toc"><div class="toc-title">ในบทนี้</div><ul><li><a href="#ภาพรวม">ภาพรวม</a></li><li><a href="#ลำดับการนำเสนอแนะนำ-1520-นาที">ลำดับการนำเสนอแนะนำ (15–20 นาที)</a></li><li><a href="#สิ่งที่ควรเตรียมก่อนวันนำเสนอ">สิ่งที่ควรเตรียมก่อนวันนำเสนอ</a></li><li><a href="#คำถามภาพรวมยอดนิยม">คำถามภาพรวมยอดนิยม</a></li><li><a href="#ข้อจำกัดที่ควรพูดเองก่อนถูกถาม">ข้อจำกัดที่ควรพูดเองก่อนถูกถาม</a></li><li><a href="#เทคนิคตอบคำถามที่ไม่รู้คำตอบ">เทคนิคตอบคำถามที่ไม่รู้คำตอบ</a></li><li><a href="#สรุปและเช็กลิสต์ความเข้าใจ">สรุปและเช็กลิสต์ความเข้าใจ</a></li></ul></aside>
+</div>
+<button class="to-top" id="toTop" aria-label="กลับขึ้นด้านบน">↑</button>
+<script src="../assets/search.js"></script>
+<script src="../assets/app.js"></script>
+</body>
+</html>

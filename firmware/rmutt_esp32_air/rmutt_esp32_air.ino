@@ -65,7 +65,7 @@ constexpr uint8_t AC_RUNNING_CONFIRM_SAMPLES = 3;
 constexpr uint8_t PZEM_FAILURE_LIMIT = 3;
 constexpr size_t MAX_CONFIG_BYTES = 4096;
 constexpr uint32_t NTP_SYNC_TIMEOUT_MS = 15000;
-constexpr char FIRMWARE_VERSION[] = "2.5.0";
+constexpr char FIRMWARE_VERSION[] = "2.5.1";
 constexpr char SAIJO_DENKI_PROTOCOL[] = "SAIJO_DENKI";
 // ข้อมูลย้อนหลังตอนเน็ตหลุด: ส่งทีละ 10 รายการ รอ Backend ตอบก่อนส่งชุดถัดไป
 constexpr uint8_t HISTORY_PARTITION_SUBTYPE = 0x40;
@@ -271,6 +271,7 @@ bool connectWifiCredentials(
 void connectMqtt();
 void mqttCallback(char *topic, byte *payload, unsigned int length);
 void processMqttCommand();
+void unprovisionAndRestart(const String &reason);
 void performOtaUpdate();
 void initHistoryLog();
 void accumulateHistorySample();
@@ -1163,6 +1164,50 @@ void mqttCallback(char *topic, byte *payload, unsigned int length) {
   mqttCommandReady = true;
 }
 
+// ---------------------------------------------------------------------------
+// ล้างบอร์ดเมื่อถูกลบออกจากแอป (คำสั่ง {"action":"unprovision"})
+// ลบค่าทั้งหมดใน NVS (Wi-Fi, MQTT, ห้อง, สถานะแอร์) และข้อมูลย้อนหลังใน flash
+// แล้วรีบูต บอร์ดกลับเป็นสภาพเหมือนใหม่ รอตั้งค่าผ่านบลูทูธ
+// Device ID ไม่เปลี่ยน เพราะสร้างจาก eFuse MAC ไม่ได้เก็บใน NVS
+// แอร์ไม่ถูกสั่งอะไรเพิ่ม (IR ส่งครั้งเดียว) ค้างอยู่ในสถานะล่าสุด
+// ---------------------------------------------------------------------------
+void unprovisionAndRestart(const String &reason) {
+  Serial.printf("Unprovision: %s - clearing all saved settings\n", reason.c_str());
+  if (mqttClient.connected()) {
+    // ตอบ Backend ว่าล้างค่าแล้ว (Backend รอคำตอบนี้ก่อนลบบัญชี MQTT ของบอร์ด)
+    DynamicJsonDocument ack(128);
+    ack["deviceId"] = config.deviceId;
+    ack["online"] = false;
+    ack["unprovisioned"] = true;
+    String ackPayload;
+    serializeJson(ack, ackPayload);
+    const String statusTopic = config.mqttTopic + "/status";
+    mqttClient.publish(statusTopic.c_str(), ackPayload.c_str(), false);
+    // ล้าง retained ของตัวเอง แล้วตัดการเชื่อมต่อแบบปกติ
+    // (ตัดแบบปกติ Broker จะไม่ส่ง Last Will "online:false" กลับมาค้างเป็น retained)
+    mqttClient.publish(statusTopic.c_str(), "", true);
+    mqttClient.publish((config.mqttTopic + "/state").c_str(), "", true);
+    mqttClient.loop();
+    delay(300);
+    mqttClient.disconnect();
+  }
+
+  preferences.begin("rmutt-air", false);
+  preferences.clear();
+  preferences.end();
+  preferences.begin("rmutt-state", false);
+  preferences.clear();   // สถานะแอร์ + hist_ack
+  preferences.end();
+
+  if (historyFlash.partition != nullptr) {
+    esp_partition_erase_range(historyFlash.partition, 0, historyFlash.partition->size);
+  }
+
+  Serial.println("Unprovision: done, restarting into BLE setup mode");
+  delay(300);
+  ESP.restart();
+}
+
 void processMqttCommand() {
   mqttCommandReady = false;
   DynamicJsonDocument document(2048);
@@ -1179,6 +1224,17 @@ void processMqttCommand() {
   if (action == "enter_setup") {
     Serial.println("MQTT requested BLE setup mode");
     enterBleReconfiguration("Flutter app requested reconfiguration");
+    return;
+  }
+  if (action == "unprovision") {
+    // Backend ส่งมาเมื่อแอดมินกดลบอุปกรณ์ในแอป
+    // ตรวจ deviceId ซ้ำอีกชั้น กันข้อความหลงมาผิด topic
+    const String target = document["deviceId"] | "";
+    if (target != config.deviceId) {
+      Serial.printf("Unprovision ignored: deviceId '%s' is not this board\n", target.c_str());
+      return;
+    }
+    unprovisionAndRestart("removed from the app");
     return;
   }
   if (action == "ota") {
