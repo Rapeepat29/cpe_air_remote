@@ -55,21 +55,19 @@
 <li><a href="17-glossary.html"><span class="num">17</span>อภิธานศัพท์</a></li>
 <li><a href="18-file-map.html"><span class="num">18</span>แผนที่ไฟล์ทั้งโปรเจค</a></li>
 </ul>
-<div class="nav-part">งานที่กำลังพัฒนา</div><ul>
-<li><a class="active" href="19-daikin-slm8.html"><span class="num">19</span>แอร์ Daikin ผ่านสาย SLM8: จากการแกะโปรโตคอลถึงบอร์ดสายแอร์</a></li>
-</ul>
 <div class="nav-part">เจาะลึก</div><ul>
+<li><a class="active" href="19-daikin-slm8.html"><span class="num">19</span>แอร์ Daikin ผ่านสาย SLM8: จากการแกะโปรโตคอลถึงบอร์ดสายแอร์</a></li>
 <li><a href="20-database-design.html"><span class="num">20</span>เจาะลึกการออกแบบฐานข้อมูล</a></li>
 </ul>
     </nav>
   </aside>
   <main class="content" id="content">
-<div class="chapter-head"><div class="kicker">บทที่ 19 · งานที่กำลังพัฒนา</div><h1>แอร์ Daikin ผ่านสาย SLM8: จากการแกะโปรโตคอลถึงบอร์ดสายแอร์</h1></div>
+<div class="chapter-head"><div class="kicker">บทที่ 19 · เจาะลึก</div><h1>แอร์ Daikin ผ่านสาย SLM8: จากการแกะโปรโตคอลถึงบอร์ดสายแอร์</h1></div>
 <h2 id="ภาพรวม">ภาพรวม<a class="anchor" href="#ภาพรวม">#</a></h2>
 <p>แอร์ห้องหนึ่งไม่ได้ใช้รีโมตอินฟราเรด แต่ใช้ <strong>แผงควบคุมติดผนังแบบมีสาย (wired controller) รุ่น SLM8</strong> ของ Daikin ซึ่งต่อกับแอร์ด้วยสาย 4 เส้น โปรโตคอลบนสายนี้เป็นของผู้ผลิตโดยเฉพาะและไม่มีเอกสารเผยแพร่ บทนี้เล่าว่าเราแกะมันได้อย่างไรทีละขั้น ตั้งแต่ไม่รู้อะไรเลย จนรู้รูปแบบสัญญาณ โครงสร้างเฟรม สูตร checksum ความหมายของคำสั่ง ให้ ESP32 ส่งเฟรมออกสายได้ แล้วจบที่ <strong>บอร์ดสายแอร์ตัวจริง</strong> <code>firmware/rmutt_esp32_air_wired/</code> ที่ใช้แทนรีโมตติดผนังและต่อเข้าระบบเดียวกับบอร์ด IR</p>
 <p><strong>ที่มา:</strong> โปรเจค RMUTT Save Energy ควบคุมแอร์ผ่านแอปด้วย IR อยู่แล้ว (บทเฟิร์มแวร์ ESP32) แต่แอร์ห้องนี้ใช้ panel แบบมีสาย จึงต้องหาวิธีคุยกับแอร์ผ่านสายแทน</p>
 <p><strong>เป้าหมาย:</strong> ให้ ESP32 ส่งคำสั่ง (เปิด/ปิด อุณหภูมิ โหมด พัดลม สวิง) และอ่านสถานะจากแอร์ได้เหมือน panel โดยผู้ใช้สั่งผ่านแอปและเว็บเหมือนแอร์ IR ทุกเครื่อง</p>
-<p><strong>สถานะ ณ วันที่ 14 ต.ค. 2569</strong> (เปลี่ยน 14 ต.ค. 2569 — ฉบับก่อนเป็นสถานะวันที่ 9 ต.ค.)</p>
+<p><strong>สถานะปัจจุบัน</strong></p>
 <div class="table-wrap"><table>
 <thead>
 <tr>
@@ -84,7 +82,7 @@
 </tr>
 <tr>
 <td>ESP32 ส่งเฟรมออกสายได้ถูกต้อง</td>
-<td>✅ ยืนยันด้วย echo และบันทึกรูปคลื่น (9 ต.ค.)</td>
+<td>✅ ยืนยันด้วย echo และบันทึกรูปคลื่น</td>
 </tr>
 <tr>
 <td>ESP32 อ่านเฟรมสถานะจากแอร์</td>
@@ -92,11 +90,11 @@
 </tr>
 <tr>
 <td>โค้ดเข้า repository</td>
-<td>✅ <code>DaikinSLM8.h</code>, <code>wired_bus.h</code>, <code>rmutt_esp32_air_wired.ino</code> (เพิ่ม 11 ต.ค. 2569, commit <code>a5a227f</code>)</td>
+<td>✅ <code>DaikinSLM8.h</code>, <code>wired_bus.h</code>, <code>rmutt_esp32_air_wired.ino</code></td>
 </tr>
 <tr>
 <td>เฟิร์มแวร์บอร์ดสายแอร์</td>
-<td>✅ รุ่น <code>2.5.1-slm8</code> (11 ต.ค.) ปัจจุบัน <code>2.5.2-slm8</code> (13 ต.ค. เพิ่มคำสั่ง <code>unprovision</code>)</td>
+<td>✅ รุ่น <code>2.5.2-slm8</code> (รองรับคำสั่ง <code>unprovision</code>)</td>
 </tr>
 <tr>
 <td>ส่งเฟรมทุก 1 วินาทีใน FreeRTOS task แยก</td>
@@ -108,7 +106,7 @@
 </tr>
 <tr>
 <td>อุณหภูมิห้องให้แอร์</td>
-<td>✅ DHT11 ที่ GPIO4 แทนเทอร์มิสเตอร์ของ panel (เดิมใช้ค่าคงที่ 28°C)</td>
+<td>✅ DHT11 ที่ GPIO4 แทนเทอร์มิสเตอร์ของ panel</td>
 </tr>
 <tr>
 <td>รายงานสถานะจากแอร์</td>
@@ -136,7 +134,7 @@
 </tr>
 </tbody>
 </table></div>
-<div class="callout note"><div class="callout-title">หมายเหตุ</div><p>(เปลี่ยน 14 ต.ค. 2569) ฉบับก่อนของบทนี้เขียนว่าโค้ดยังไม่อยู่ใน repository และโค้ดที่ยกเป็น "ตัวอย่างอธิบายหลักการ" ตอนนี้โค้ดจริงเข้ามาแล้ว ทุกบล็อกโค้ดในบทนี้ที่มีเลขบรรทัดจึงเป็นโค้ดจริงจากไฟล์ใน repository ส่วนเรื่องเล่าการแกะโปรโตคอล (ขั้นที่ 1–8) ยังมาจากบันทึกการทดลอง <code>slm8_protocol_notes_TH.md</code> (8–9 ต.ค.) และโปรแกรมทดลอง <code>slm8_*.ino</code> ซึ่ง <strong>ยังไม่อยู่ใน repository</strong> จุดไหนที่โค้ดจริงต่างจากบันทึกเดิม บทนี้เขียนกำกับไว้ว่า "เปลี่ยน"</p></div>
+<div class="callout note"><div class="callout-title">หมายเหตุ</div><p>ทุกบล็อกโค้ดในบทนี้ที่มีเลขบรรทัดเป็นโค้ดจริงจากไฟล์ใน repository ส่วนเรื่องเล่าการแกะโปรโตคอล (ขั้นที่ 1–8) มาจากบันทึกการทดลอง <code>slm8_protocol_notes_TH.md</code> และโปรแกรมทดลอง <code>slm8_*.ino</code> ซึ่ง <strong>ไม่อยู่ใน repository</strong> จุดไหนที่โค้ดจริงต่างจากที่ใช้ตอนทดลอง บทนี้เขียนบอกไว้</p></div>
 
 <h3 id="ไฟล์ในโฟลเดอร์-firmwarermutt_esp32_air_wired">ไฟล์ในโฟลเดอร์ <code>firmware/rmutt_esp32_air_wired/</code><a class="anchor" href="#ไฟล์ในโฟลเดอร์-firmwarermutt_esp32_air_wired">#</a></h3>
 <div class="table-wrap"><table>
@@ -348,7 +346,7 @@ IR ส่งได้ทางเดียว ระบบไม่มีทา�
 <td>4</td>
 <td><code>DaikinSLM8.h</code></td>
 <td>รวมการรับส่งไว้ที่เดียว</td>
-<td>ไลบรารีที่โปรแกรมหลังจากนี้ใช้ร่วมกัน (<strong>อยู่ใน repository แล้ว</strong> 11 ต.ค.)</td>
+<td>ไลบรารีที่โปรแกรมหลังจากนี้ใช้ร่วมกัน (<strong>อยู่ใน repository</strong>)</td>
 </tr>
 <tr>
 <td>5</td>
@@ -372,7 +370,7 @@ IR ส่งได้ทางเดียว ระบบไม่มีทา�
 <td>8</td>
 <td><code>wired_bus.h</code> + <code>rmutt_esp32_air_wired.ino</code></td>
 <td>ใช้งานจริงร่วมกับแอปได้ไหม</td>
-<td>บอร์ดสายแอร์ <code>2.5.1-slm8</code> (เพิ่ม 11 ต.ค. 2569)</td>
+<td>บอร์ดสายแอร์ <code>2.5.1-slm8</code></td>
 </tr>
 </tbody>
 </table></div>
@@ -580,7 +578,7 @@ A: 20 00 25 02 02 00 02*F0*         ← ~4 วินาทีต่อมา บ
 </tbody>
 </table></div>
 <h3 id="วิธีถอดในโค้ด">วิธีถอดในโค้ด<a class="anchor" href="#วิธีถอดในโค้ด">#</a></h3>
-<p>กติกาที่ใช้ถอดจริงใน <code>DaikinSLM8.h</code> (เปลี่ยน 14 ต.ค. 2569 — ฉบับก่อนเขียนเกณฑ์แบบหยาบ "HIGH สั้นกว่า 650 µs = 0" ตามบันทึก ตัวเลขด้านล่างคือค่าจริงในโค้ด)</p>
+<p>กติกาที่ใช้ถอดจริงใน <code>DaikinSLM8.h</code> (บันทึกการทดลองใช้เกณฑ์แบบหยาบ "HIGH สั้นกว่า 650 µs = 0" ตัวเลขด้านล่างคือค่าจริงในโค้ด)</p>
 <ol>
 <li>ตั้ง interrupt ทุกขอบสัญญาณ (ทั้งขาขึ้นและขาลง) เก็บ "ระดับ + ความยาว" ของช่วงที่เพิ่งจบลง ring buffer</li>
 <li>ช่วงสั้นกว่า 80 µs ถือเป็นสัญญาณรบกวน รวมเข้ากับช่วงข้างเคียง</li>
@@ -743,7 +741,7 @@ A: 20 00 25 02 02 00 02*F0*         ← ~4 วินาทีต่อมา บ
 </tr>
 </tbody>
 </table></div>
-<div class="callout warn"><div class="callout-title">ระวัง</div><p><strong>บั๊กเฟรมขาด (59 บิต, 11 บิต) ในรอบที่ 4 แก้อย่างไรในโค้ดจริง</strong> (เปลี่ยน 14 ต.ค. 2569) ฉบับก่อนแนะนำให้ปิด interrupt (<code>noInterrupts()</code>) ตอนคัดลอกข้อมูล แต่โค้ดจริงใช้วิธีที่ไม่ต้องปิด interrupt เลย คือ (1) ISR คำนวณความยาวช่วงให้เสร็จในตัวเอง (2) ส่งข้อมูลผ่าน ring buffer ที่ ISR เขียนฝั่ง <code>head_</code> อย่างเดียว และ <code>poll()</code> อ่านฝั่ง <code>tail_</code> อย่างเดียว (ผู้ผลิตหนึ่ง ผู้บริโภคหนึ่ง จึงไม่ชนกัน) (3) อ่าน <code>lastEdge_</code> ก่อน <code>micros()</code> ข้อดีคือไม่มีช่วงที่ interrupt ถูกปิด ขอบสัญญาณจึงไม่หาย</p></div>
+<div class="callout warn"><div class="callout-title">ระวัง</div><p><strong>บั๊กเฟรมขาด (59 บิต, 11 บิต) ในรอบที่ 4 แก้อย่างไรในโค้ดจริง</strong> วิธีที่ตรงที่สุดคือปิด interrupt (<code>noInterrupts()</code>) ตอนคัดลอกข้อมูล แต่โค้ดจริงใช้วิธีที่ไม่ต้องปิด interrupt เลย คือ (1) ISR คำนวณความยาวช่วงให้เสร็จในตัวเอง (2) ส่งข้อมูลผ่าน ring buffer ที่ ISR เขียนฝั่ง <code>head_</code> อย่างเดียว และ <code>poll()</code> อ่านฝั่ง <code>tail_</code> อย่างเดียว (ผู้ผลิตหนึ่ง ผู้บริโภคหนึ่ง จึงไม่ชนกัน) (3) อ่าน <code>lastEdge_</code> ก่อน <code>micros()</code> ข้อดีคือไม่มีช่วงที่ interrupt ถูกปิด ขอบสัญญาณจึงไม่หาย</p></div>
 
 <p>ต่อมาคือตัวกรองสัญญาณรบกวนและ state machine (เครื่องสถานะ: ตัวแปรที่จำว่าตอนนี้อยู่ขั้นไหน IDLE → HDR → BITS)</p>
 <p><strong>ไฟล์ <code>firmware/rmutt_esp32_air_wired/DaikinSLM8.h</code> บรรทัด 134–162</strong></p>
@@ -1265,7 +1263,7 @@ b7 = (s mod 16) &lt;&lt; 4          ← ผลอยู่ใน nibble บน, 
 
 <p>ในโค้ดใช้ AND กับ "หน้ากาก" (mask) เพื่อดูบิตเดียว เช่น <code>if (frame[3] &amp; 0x10)</code> = ปิดอยู่ และใช้ OR เพื่อตั้งบิต เช่น <code>frame[6] |= 0x02</code> = เปิด SLEEP ใช้ AND กับ NOT เพื่อล้างบิต เช่น <code>frame[6] &amp;= ~0x02</code> = ปิด SLEEP</p>
 <h3 id="ตารางความหมายกลายเป็นโค้ด-settings-buildframe-parsepanelframe">ตารางความหมายกลายเป็นโค้ด: <code>Settings</code>, <code>buildFrame()</code>, <code>parsePanelFrame()</code><a class="anchor" href="#ตารางความหมายกลายเป็นโค้ด-settings-buildframe-parsepanelframe">#</a></h3>
-<p>ทุกแถวในตารางเฟรม A ข้างบนกลายเป็นค่าคงที่และฟังก์ชันใน <code>DaikinSLM8.h</code> (เพิ่ม 11 ต.ค. 2569)</p>
+<p>ทุกแถวในตารางเฟรม A ข้างบนกลายเป็นค่าคงที่และฟังก์ชันใน <code>DaikinSLM8.h</code></p>
 <p><strong>ไฟล์ <code>firmware/rmutt_esp32_air_wired/DaikinSLM8.h</code> บรรทัด 27–43</strong></p>
 <div class="code-block"><span class="code-lang">cpp</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">27</span>
 <span class="normal">28</span>
@@ -1510,7 +1508,7 @@ b7 = (s mod 16) &lt;&lt; 4          ← ผลอยู่ใน nibble บน, 
 </table></div>
 <p>แต่ละสายส่งทางเดียว (simplex) สองเส้นรวมกันเป็นการสื่อสารสองทางพร้อมกัน (full duplex) ไม่มีสายนาฬิกาแยก ตัวรับจับจังหวะจาก header ของแต่ละเฟรมเอง (asynchronous)</p>
 <figure><img alt="การต่อ ESP32 เข้ากับสาย SLM8" src="img/08-slm8-wiring.svg" /></figure>
-<div class="callout note"><div class="callout-title">หมายเหตุ</div><p>(ปรับรูป 14 ต.ค. 2569) ขาส่งในรูปเป็น <strong>GPIO33</strong> ตามบอร์ดจริงแล้ว ช่วงทดลองวันที่ 9 ต.ค. ใช้ GPIO25 แต่ในเฟิร์มแวร์ของแอป GPIO25 เป็นไฟ LED สีเขียว (<code>GREEN_LED_PIN = 25</code>) ถ้าใช้ขาเดียวกัน ทุกครั้งที่ไฟ LED เปลี่ยน สายคำสั่งของแอร์จะถูกดึงลงด้วย ชื่อตัวเลือกกลับขั้วในโค้ดจริงคือ <code>BUS_TX_INVERT</code> ตารางขาทั้งหมดของบอร์ดจริงอยู่ในหัวข้อ "เฟิร์มแวร์บอร์ดสายแอร์"</p></div>
+<div class="callout note"><div class="callout-title">หมายเหตุ</div><p>ขาส่งในรูปเป็น <strong>GPIO33</strong> ตามบอร์ดจริง ช่วงทดลองใช้ GPIO25 แต่ในเฟิร์มแวร์ของแอป GPIO25 เป็นไฟ LED สีเขียว (<code>GREEN_LED_PIN = 25</code>) ถ้าใช้ขาเดียวกัน ทุกครั้งที่ไฟ LED เปลี่ยน สายคำสั่งของแอร์จะถูกดึงลงด้วย ชื่อตัวเลือกกลับขั้วในโค้ดจริงคือ <code>BUS_TX_INVERT</code> ตารางขาทั้งหมดของบอร์ดจริงอยู่ในหัวข้อ "เฟิร์มแวร์บอร์ดสายแอร์"</p></div>
 
 <div class="callout why"><div class="callout-title">ทำไม</div><p><strong>ทำไมผู้ผลิตใช้ open collector</strong> ถ้าสองฝั่งต่อสายเดียวกันแล้วฝั่งหนึ่งดันไฟ HIGH ขณะอีกฝั่งดึง LOW พร้อมกัน จะเกิดกระแสลัดวงจรจนชิปเสีย แต่ open collector มีแต่ "ดึงลง" ต่อให้ส่งชนกันก็แค่ได้ LOW ไม่มีอะไรพัง และยังต่อกับอุปกรณ์ที่ใช้ไฟคนละระดับได้ง่าย</p></div>
 
@@ -1595,7 +1593,7 @@ b7 = (s mod 16) &lt;&lt; 4          ← ผลอยู่ใน nibble บน, 
 <p>ESP32 ส่งเฟรมที่ถูกต้องออกสายได้แล้ว ยืนยันด้วยรูปคลื่นจริง ส่วนที่เหลือคือยืนยันว่าแอร์ทำตามคำสั่ง</p>
 <h3 id="วงจรส่ง">วงจรส่ง<a class="anchor" href="#วงจรส่ง">#</a></h3>
 <p>ESP32 ใช้ไฟ 3.3 V ต่อเข้าสาย 5 V ตรงไม่ได้ จึงต้องทำตัวเป็น open collector เหมือน panel</p>
-<p>(เปลี่ยน 11 ต.ค. 2569) ช่วงทดลองใช้ GPIO25 เป็นขาส่ง บอร์ดจริงย้ายมา <strong>GPIO33</strong> (<code>BUS_TX_PIN</code>) เพราะ GPIO25 เป็นไฟ LED เขียวของเฟิร์มแวร์แอป และชื่อตัวเลือกกลับขั้วในโค้ดจริงคือ <code>BUS_TX_INVERT</code> (ส่งเข้าไปเป็นพารามิเตอร์ <code>invert</code> ของ <code>Tx::begin</code>)</p>
+<p>ช่วงทดลองใช้ GPIO25 เป็นขาส่ง บอร์ดจริงใช้ <strong>GPIO33</strong> (<code>BUS_TX_PIN</code>) เพราะ GPIO25 เป็นไฟ LED เขียวของเฟิร์มแวร์แอป และชื่อตัวเลือกกลับขั้วในโค้ดจริงคือ <code>BUS_TX_INVERT</code> (ส่งเข้าไปเป็นพารามิเตอร์ <code>invert</code> ของ <code>Tx::begin</code>)</p>
 <div class="table-wrap"><table>
 <thead>
 <tr>
@@ -1629,7 +1627,7 @@ b7 = (s mod 16) &lt;&lt; 4          ← ผลอยู่ใน nibble บน, 
 <li>สรุป: "ESP32 HIGH = สาย LOW" กลับขั้วจากแบบไดโอด โค้ดจึงต้องมีตัวเลือก <code>BUS_TX_INVERT</code></li>
 </ul>
 <h3 id="การจับเวลาตอนส่ง-นับเวลาแบบสะสม-คลาส-tx">การจับเวลาตอนส่ง: นับเวลาแบบสะสม (คลาส <code>Tx</code>)<a class="anchor" href="#การจับเวลาตอนส่ง-นับเวลาแบบสะสม-คลาส-tx">#</a></h3>
-<p>โค้ดส่งใช้นาฬิกา <code>esp_timer</code> และนับเวลาแบบ <strong>สะสม (absolute)</strong> คือคำนวณ "เวลาเป้าหมาย" ของทุกขอบจากจุดเริ่มเดียว แทนการสั่ง "รอ 375 µs" ต่อกันไปเรื่อย ๆ (ฉบับก่อนของบทนี้เป็นโค้ดตัวอย่าง ตอนนี้เป็นโค้ดจริง)</p>
+<p>โค้ดส่งใช้นาฬิกา <code>esp_timer</code> และนับเวลาแบบ <strong>สะสม (absolute)</strong> คือคำนวณ "เวลาเป้าหมาย" ของทุกขอบจากจุดเริ่มเดียว แทนการสั่ง "รอ 375 µs" ต่อกันไปเรื่อย ๆ</p>
 <p><strong>ไฟล์ <code>firmware/rmutt_esp32_air_wired/DaikinSLM8.h</code> บรรทัด 193–224</strong></p>
 <div class="code-block"><span class="code-lang">cpp</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">193</span>
 <span class="normal">194</span>
@@ -1747,7 +1745,7 @@ b7 = (s mod 16) &lt;&lt; 4          ← ผลอยู่ใน nibble บน, 
 
 <div class="callout note"><div class="callout-title">หมายเหตุ</div><p><strong>ความยาวเฟรมจริง</strong> เฟรม <code>25 00 28 02 08 00 10 C0</code> มีบิต 1 อยู่ 11 บิต ใช้ 3.55 + 53 × 0.745 + 11 × 1.295 + 18.375 ≈ 75.7 ms ถ้ามีบิต 1 มากขึ้นก็ยาวขึ้น (คอมเมนต์ในโค้ดเขียนคร่าว ๆ ว่า ~85 ms) สูงสุดตามทฤษฎีราว 105 ms ถ้าทั้ง 64 บิตเป็น 1</p></div>
 
-<div class="callout warn"><div class="callout-title">ระวัง</div><p><strong>busy-wait ยังอยู่ แต่ย้ายไปอยู่ใน task แยก</strong> (เปลี่ยน 11 ต.ค. 2569) ฉบับก่อนเสนอสองทาง: ใช้ฮาร์ดแวร์สร้างพัลส์ RMT หรือแยกเป็น task โค้ดจริงเลือก <strong>task แยก</strong> (<code>wired_bus.h</code>) โดยยังรอแบบวนลูปเหมือนเดิม และวาง task ไว้ <strong>core 1 เดียวกับ <code>loop()</code></strong> ที่ priority สูงกว่า (ไม่ใช่ "core อีกตัว" ตามที่เคยเสนอ) ระหว่างส่ง 1 เฟรม <code>loop()</code> จึงหยุดรอราว 75–105 ms ทุกวินาที ส่วน Wi-Fi ของ ESP32 รันบน core 0 จึงไม่สะดุด รายละเอียดอยู่ในหัวข้อ <code>wired_bus.h</code> ด้านล่าง ข้อดีของทางนี้คือใช้ <code>Tx</code> เดิมที่พิสูจน์แล้วด้วยรูปคลื่น ไม่ต้องเขียนตัวส่งใหม่ด้วย RMT แล้วต้องทดสอบซ้ำ</p></div>
+<div class="callout warn"><div class="callout-title">ระวัง</div><p><strong>busy-wait อยู่ใน task แยก</strong> ทางเลือกมีสองทาง: ใช้ฮาร์ดแวร์สร้างพัลส์ RMT หรือแยกเป็น task โค้ดจริงเลือก <strong>task แยก</strong> (<code>wired_bus.h</code>) โดยยังรอแบบวนลูป และวาง task ไว้ <strong>core 1 เดียวกับ <code>loop()</code></strong> ที่ priority สูงกว่า (ไม่ใช่ core 0) ระหว่างส่ง 1 เฟรม <code>loop()</code> จึงหยุดรอราว 75–105 ms ทุกวินาที ส่วน Wi-Fi ของ ESP32 รันบน core 0 จึงไม่สะดุด รายละเอียดอยู่ในหัวข้อ <code>wired_bus.h</code> ด้านล่าง ข้อดีของทางนี้คือใช้ <code>Tx</code> เดิมที่พิสูจน์แล้วด้วยรูปคลื่น ไม่ต้องเขียนตัวส่งใหม่ด้วย RMT แล้วต้องทดสอบซ้ำ</p></div>
 
 <h3 id="เทคนิคตรวจสอบ-3-ชั้น">เทคนิคตรวจสอบ 3 ชั้น<a class="anchor" href="#เทคนิคตรวจสอบ-3-ชั้น">#</a></h3>
 <ol>
@@ -1755,11 +1753,11 @@ b7 = (s mod 16) &lt;&lt; 4          ← ผลอยู่ใน nibble บน, 
 <li><strong>Echo</strong> ESP32 อ่านสัญญาณที่ตัวเองส่งกลับมาทางขา GPIO34 แล้วเทียบทุกไบต์กับที่ตั้งใจส่ง นับ <code>ok</code> / <code>bad</code></li>
 <li><strong>บันทึกรูปคลื่น</strong> (<code>slm8_scope</code>) ส่ง 1 เฟรมแล้วเก็บทุกขอบสัญญาณบนทั้งสองสายนาน 1.5 วินาที ใช้หาสาเหตุเวลาสองชั้นแรกบอกว่ามีปัญหา</li>
 </ol>
-<div class="callout why"><div class="callout-title">ทำไม</div><p><strong>ทำไมต้องหลายชั้น</strong> แต่ละชั้นตอบคำถามต่างกัน ชั้นที่ 1 ถามว่า "สายพร้อมไหม" ชั้นที่ 2 ถามว่า "สิ่งที่ส่งออกไปถูกไหม" ชั้นที่ 3 ถามว่า "บนสายเกิดอะไรขึ้นจริง ๆ" ถ้ามีแค่ echo จะรู้ว่าส่งถูก แต่ไม่รู้ว่าส่งไปผิดเส้น ซึ่งเป็นปัญหาที่เจอจริงในวันที่ 9 ต.ค.</p></div>
+<div class="callout why"><div class="callout-title">ทำไม</div><p><strong>ทำไมต้องหลายชั้น</strong> แต่ละชั้นตอบคำถามต่างกัน ชั้นที่ 1 ถามว่า "สายพร้อมไหม" ชั้นที่ 2 ถามว่า "สิ่งที่ส่งออกไปถูกไหม" ชั้นที่ 3 ถามว่า "บนสายเกิดอะไรขึ้นจริง ๆ" ถ้ามีแค่ echo จะรู้ว่าส่งถูก แต่ไม่รู้ว่าส่งไปผิดเส้น ซึ่งเป็นปัญหาที่เจอจริงในการทดลอง</p></div>
 
-<div class="callout note"><div class="callout-title">หมายเหตุ</div><p>(เพิ่ม 14 ต.ค. 2569) ในเฟิร์มแวร์บอร์ดสายแอร์ เหลือเพียงชั้นที่ 2 คือ echo (<code>WiredBus</code> นับ <code>echoOk</code> / <code>echoBad</code> แต่ยังไม่ส่งขึ้น MQTT) ชั้นที่ 1 ถูกแทนด้วยการดูว่า "แอร์ส่งเฟรมสถานะที่ผ่าน checksum มาภายใน 3 วินาทีไหม" (<code>busOk</code>) และจอ OLED ขึ้นหน้าเตือนถ้าแอร์ไม่ตอบเกิน 15 วินาที ส่วนชั้นที่ 3 ยังเป็นโปรแกรมทดลองแยก ไม่อยู่ใน repository</p></div>
+<div class="callout note"><div class="callout-title">หมายเหตุ</div><p>ในเฟิร์มแวร์บอร์ดสายแอร์ เหลือเพียงชั้นที่ 2 คือ echo (<code>WiredBus</code> นับ <code>echoOk</code> / <code>echoBad</code> แต่ยังไม่ส่งขึ้น MQTT) ชั้นที่ 1 ถูกแทนด้วยการดูว่า "แอร์ส่งเฟรมสถานะที่ผ่าน checksum มาภายใน 3 วินาทีไหม" (<code>busOk</code>) และจอ OLED ขึ้นหน้าเตือนถ้าแอร์ไม่ตอบเกิน 15 วินาที ส่วนชั้นที่ 3 ยังเป็นโปรแกรมทดลองแยก ไม่อยู่ใน repository</p></div>
 
-<h3 id="ผลบันทึกรูปคลื่น-9-ตค">ผลบันทึกรูปคลื่น (9 ต.ค.)<a class="anchor" href="#ผลบันทึกรูปคลื่น-9-ตค">#</a></h3>
+<h3 id="ผลบันทึกรูปคลื่น">ผลบันทึกรูปคลื่น<a class="anchor" href="#ผลบันทึกรูปคลื่น">#</a></h3>
 <div class="table-wrap"><table>
 <thead>
 <tr>
@@ -1805,7 +1803,7 @@ b7 = (s mod 16) &lt;&lt; 4          ← ผลอยู่ใน nibble บน, 
 <li class="check"><input type="checkbox"> ไบต์แรกของเฟรมแอร์เปลี่ยนจาก <code>30</code> เป็นอุณหภูมิห้องที่ ESP32 ส่งไป (<code>28</code>) ซึ่งพิสูจน์ว่าแอร์ "ได้ยิน" ESP32</li>
 <li class="check"><input type="checkbox"> สั่ง <code>on</code> แล้วแอร์เปิด บานสวิงขยับ</li>
 </ul>
-<div class="callout note"><div class="callout-title">หมายเหตุ</div><p>(เพิ่ม 14 ต.ค. 2569) รายการนี้เขียนสำหรับโปรแกรมทดลอง <code>slm8_control</code> ถ้าใช้บอร์ดสายแอร์ตัวจริง ให้ดูตาม "ทดสอบหลังแฟลช" ใน <code>README_WIRED_TH.md</code> แทน: Serial ต้องขึ้น <code>Aircon bus: TX GPIO33 (1N4148), RX GPIO35, echo GPIO34</code> → จอ OLED ป้าย <code>BUS</code> ทึบ (แอร์ตอบ) → กดเปิดในแอปแล้ว Serial ขึ้น <code>Wired sent: power=ON ...</code> และแอร์ติด → ผ่านไปสักพักจอขึ้น <code>COMP ON</code> ข้อที่ 3 ข้างบน (แอร์ "ได้ยิน" ESP32) ดูได้จาก MQTT status: <code>unitRoomTemperature</code> (ไบต์ 0 ของเฟรมแอร์) ควรเท่ากับค่า <code>roomTemperature</code> ปัดเศษ ซึ่งคือค่าที่ ESP32 ส่งให้แอร์ ใน repository ยังไม่มีบันทึกผลการทดสอบข้อนี้กับแอร์จริง</p></div>
+<div class="callout note"><div class="callout-title">หมายเหตุ</div><p>รายการนี้เขียนสำหรับโปรแกรมทดลอง <code>slm8_control</code> ถ้าใช้บอร์ดสายแอร์ตัวจริง ให้ดูตาม "ทดสอบหลังแฟลช" ใน <code>README_WIRED_TH.md</code> แทน: Serial ต้องขึ้น <code>Aircon bus: TX GPIO33 (1N4148), RX GPIO35, echo GPIO34</code> → จอ OLED ป้าย <code>BUS</code> ทึบ (แอร์ตอบ) → กดเปิดในแอปแล้ว Serial ขึ้น <code>Wired sent: power=ON ...</code> และแอร์ติด → ผ่านไปสักพักจอขึ้น <code>COMP ON</code> ข้อที่ 3 ข้างบน (แอร์ "ได้ยิน" ESP32) ดูได้จาก MQTT status: <code>unitRoomTemperature</code> (ไบต์ 0 ของเฟรมแอร์) ควรเท่ากับค่า <code>roomTemperature</code> ปัดเศษ ซึ่งคือค่าที่ ESP32 ส่งให้แอร์ ใน repository ยังไม่มีบันทึกผลการทดสอบข้อนี้กับแอร์จริง</p></div>
 
 <h2 id="ฝึกสร้างเฟรมเอง">ฝึกสร้างเฟรมเอง<a class="anchor" href="#ฝึกสร้างเฟรมเอง">#</a></h2>
 <p>ลองประกอบเฟรมคำสั่งจากความต้องการ ทำทีละไบต์ แล้วคำนวณ checksum</p>
@@ -1932,7 +1930,7 @@ b7 = (s mod 16) &lt;&lt; 4          ← ผลอยู่ใน nibble บน, 
 </tr>
 </tbody>
 </table></div>
-<h2 id="ขั้นที่-9-คลาส-controller--ส่งตามจังหวะ-จำค่า-อ่านสถานะ-เพิ่ม-11-ตค-2569">ขั้นที่ 9: คลาส <code>Controller</code> — ส่งตามจังหวะ จำค่า อ่านสถานะ (เพิ่ม 11 ต.ค. 2569)<a class="anchor" href="#ขั้นที่-9-คลาส-controller--ส่งตามจังหวะ-จำค่า-อ่านสถานะ-เพิ่ม-11-ตค-2569">#</a></h2>
+<h2 id="ขั้นที่-9-คลาส-controller--ส่งตามจังหวะ-จำค่า-อ่านสถานะ">ขั้นที่ 9: คลาส <code>Controller</code> — ส่งตามจังหวะ จำค่า อ่านสถานะ<a class="anchor" href="#ขั้นที่-9-คลาส-controller--ส่งตามจังหวะ-จำค่า-อ่านสถานะ">#</a></h2>
 <p><code>Rx</code> กับ <code>Tx</code> แค่รับและส่งเฟรมทีละเฟรม คลาส <code>Controller</code> ใน <code>DaikinSLM8.h</code> เป็นตัวที่ทำหน้าที่ "แทน panel" จริง ๆ คือ ส่งเฟรมทุก 1 วินาที จำค่าที่ผู้ใช้สั่ง ตั้งแฟล็กคำสั่งใหม่ เลือกอุณหภูมิห้องที่จะส่ง และอ่านเฟรมสถานะของแอร์</p>
 <p>ออกแบบไว้ 2 แบบการต่อ (topology) ตามคอมเมนต์หัวไฟล์ บรรทัด 14–19</p>
 <div class="table-wrap"><table>
@@ -2220,11 +2218,11 @@ b7 = (s mod 16) &lt;&lt; 4          ← ผลอยู่ใน nibble บน, 
 </tr>
 </tbody>
 </table></div>
-<div class="callout note"><div class="callout-title">หมายเหตุ</div><p><strong>อุณหภูมิห้องที่ส่งให้แอร์ เปลี่ยนจากบันทึกเดิม</strong> (เปลี่ยน 11 ต.ค. 2569) ช่วงทดลองส่งค่าคงที่ 28°C ทุกเฟรม โค้ดจริงใช้ค่าจาก DHT11 ผ่าน <code>setRoomTemp()</code> และใช้ 26°C เฉพาะช่วงแรกหลังบูตที่ DHT11 ยังอ่านไม่ได้ (ค่าเริ่มของ <code>extRoomC_</code> และ <code>panelRoomC_</code> บรรทัด 314) ทำไมสำคัญ: แอร์ใช้ค่านี้แทนเซนเซอร์ใน panel ตัดสินว่าห้องเย็นพอแล้วหรือยัง ถ้าส่งค่าคงที่ แอร์จะไม่เคยตัดคอมเพรสเซอร์ตามอุณหภูมิจริง</p></div>
+<div class="callout note"><div class="callout-title">หมายเหตุ</div><p><strong>อุณหภูมิห้องที่ส่งให้แอร์</strong> ช่วงทดลองส่งค่าคงที่ 28°C ทุกเฟรม โค้ดจริงใช้ค่าจาก DHT11 ผ่าน <code>setRoomTemp()</code> และใช้ 26°C เฉพาะช่วงแรกหลังบูตที่ DHT11 ยังอ่านไม่ได้ (ค่าเริ่มของ <code>extRoomC_</code> และ <code>panelRoomC_</code> บรรทัด 314) ทำไมสำคัญ: แอร์ใช้ค่านี้แทนเซนเซอร์ใน panel ตัดสินว่าห้องเย็นพอแล้วหรือยัง ถ้าส่งค่าคงที่ แอร์จะไม่เคยตัดคอมเพรสเซอร์ตามอุณหภูมิจริง</p></div>
 
-<div class="callout warn"><div class="callout-title">ระวัง</div><p><strong>ข้อสังเกตจากการอ่านโค้ด:</strong> ตัวรับไม่ได้ตรวจว่าไบต์ 1 เป็น <code>C4</code> (บรรทัด 245–250 รับทุกเฟรมที่ผ่าน checksum) ถ้าต่อสายผิดเส้นแบบวันที่ 9 ต.ค. ขารับสถานะจะได้ยินเฟรมของ ESP32 เอง <code>busOk</code> จะเป็น true ทั้งที่แอร์ไม่ได้ตอบ และบิตคอมเพรสเซอร์จะอ่านจากบิตพัดลมของเราเอง (<code>FAN_3 = 0x01</code>) วิธีเช็กด้วยตาคือดู <code>unitRoomTemperature</code>: ถ้าเป็นค่าเดียวกับอุณหภูมิตั้ง (ไบต์ 0 ของเฟรมเรา) แทนที่จะเป็นอุณหภูมิห้อง แปลว่ารับเฟรมตัวเอง ถ้าจะแก้ในโค้ด เพิ่มเงื่อนไข <code>f[1] == 0xC4</code> ก่อนเชื่อเฟรม</p></div>
+<div class="callout warn"><div class="callout-title">ระวัง</div><p><strong>ข้อสังเกตจากการอ่านโค้ด:</strong> ตัวรับไม่ได้ตรวจว่าไบต์ 1 เป็น <code>C4</code> (บรรทัด 245–250 รับทุกเฟรมที่ผ่าน checksum) ถ้าต่อสายผิดเส้นแบบที่เจอในการทดลอง ขารับสถานะจะได้ยินเฟรมของ ESP32 เอง <code>busOk</code> จะเป็น true ทั้งที่แอร์ไม่ได้ตอบ และบิตคอมเพรสเซอร์จะอ่านจากบิตพัดลมของเราเอง (<code>FAN_3 = 0x01</code>) วิธีเช็กด้วยตาคือดู <code>unitRoomTemperature</code>: ถ้าเป็นค่าเดียวกับอุณหภูมิตั้ง (ไบต์ 0 ของเฟรมเรา) แทนที่จะเป็นอุณหภูมิห้อง แปลว่ารับเฟรมตัวเอง ถ้าจะแก้ในโค้ด เพิ่มเงื่อนไข <code>f[1] == 0xC4</code> ก่อนเชื่อเฟรม</p></div>
 
-<h2 id="ขั้นที่-10-wired_bush--ส่งเฟรมใน-freertos-task-แยก-เพิ่ม-11-ตค-2569">ขั้นที่ 10: <code>wired_bus.h</code> — ส่งเฟรมใน FreeRTOS task แยก (เพิ่ม 11 ต.ค. 2569)<a class="anchor" href="#ขั้นที่-10-wired_bush--ส่งเฟรมใน-freertos-task-แยก-เพิ่ม-11-ตค-2569">#</a></h2>
+<h2 id="ขั้นที่-10-wired_bush--ส่งเฟรมใน-freertos-task-แยก">ขั้นที่ 10: <code>wired_bus.h</code> — ส่งเฟรมใน FreeRTOS task แยก<a class="anchor" href="#ขั้นที่-10-wired_bush--ส่งเฟรมใน-freertos-task-แยก">#</a></h2>
 <p><strong>ปัญหา:</strong> <code>Controller::loop()</code> ต้องถูกเรียกถี่ ๆ ตลอดเวลา แต่ <code>loop()</code> หลักของเฟิร์มแวร์มีช่วงค้างนาน เช่น ต่อ Wi-Fi ได้ถึง 20 วินาที (<code>WIFI_TIMEOUT_MS</code>), ต่อ MQTT แบบ TLS, ดาวน์โหลด OTA, อ่าน PZEM ถ้าวาง <code>ctl_.loop()</code> ไว้ใน <code>loop()</code> หลัก แอร์จะไม่ได้เฟรมเป็นสิบวินาที</p>
 <p><strong>ทางแก้:</strong> สร้าง <strong>FreeRTOS task</strong> (งานที่ระบบปฏิบัติการเล็ก ๆ ใน ESP32 สลับให้รันเหมือนอีกโปรแกรมหนึ่ง) แยกให้สายแอร์โดยเฉพาะ ให้ priority สูงกว่า <code>loop()</code> ระบบจะหยุด <code>loop()</code> ทันทีที่ task นี้ต้องทำงาน</p>
 <p><strong>ไฟล์ <code>firmware/rmutt_esp32_air_wired/wired_bus.h</code> บรรทัด 15–34</strong></p>
@@ -2466,11 +2464,11 @@ b7 = (s mod 16) &lt;&lt; 4          ← ผลอยู่ใน nibble บน, 
 </tr>
 </tbody>
 </table></div>
-<div class="callout note"><div class="callout-title">หมายเหตุ</div><p><strong>ทำไมยังใช้ busy-wait ไม่ใช่ RMT</strong> ฉบับก่อนของบทนี้เสนอ RMT (ฮาร์ดแวร์สร้างพัลส์ของ ESP32) โค้ดจริงเลือกเก็บ <code>Tx</code> เดิมไว้แล้วแก้ปัญหาด้วย task แทน ข้อดี: ตัวส่งเหมือนตัวที่วัดรูปคลื่นมาแล้วทุกบิต ไม่ต้องพิสูจน์ใหม่ ข้อเสีย: core 1 ไม่ว่างราว 8–10% ของเวลา ถ้าวันหนึ่ง <code>loop()</code> ต้องการเวลาแม่นกว่านี้ ค่อยย้ายไป RMT</p></div>
+<div class="callout note"><div class="callout-title">หมายเหตุ</div><p><strong>ทำไมใช้ busy-wait ไม่ใช่ RMT</strong> RMT (ฮาร์ดแวร์สร้างพัลส์ของ ESP32) ก็ทำได้ แต่โค้ดจริงเลือกเก็บ <code>Tx</code> ที่ใช้ตอนทดลองไว้แล้วแก้ปัญหาด้วย task แทน ข้อดี: ตัวส่งเหมือนตัวที่วัดรูปคลื่นมาแล้วทุกบิต ไม่ต้องพิสูจน์ใหม่ ข้อเสีย: core 1 ไม่ว่างราว 8–10% ของเวลา ถ้าวันหนึ่ง <code>loop()</code> ต้องการเวลาแม่นกว่านี้ ค่อยย้ายไป RMT</p></div>
 
-<h2 id="เฟิร์มแวร์บอร์ดสายแอร์-rmutt_esp32_air_wiredino-เพิ่ม-11-ตค-2569">เฟิร์มแวร์บอร์ดสายแอร์ <code>rmutt_esp32_air_wired.ino</code> (เพิ่ม 11 ต.ค. 2569)<a class="anchor" href="#เฟิร์มแวร์บอร์ดสายแอร์-rmutt_esp32_air_wiredino-เพิ่ม-11-ตค-2569">#</a></h2>
+<h2 id="เฟิร์มแวร์บอร์ดสายแอร์-rmutt_esp32_air_wiredino">เฟิร์มแวร์บอร์ดสายแอร์ <code>rmutt_esp32_air_wired.ino</code><a class="anchor" href="#เฟิร์มแวร์บอร์ดสายแอร์-rmutt_esp32_air_wiredino">#</a></h2>
 <p>เฟิร์มแวร์นี้ <strong>แตกมาจากบอร์ด IR</strong> (<code>rmutt_esp32_air</code>) แล้วเปลี่ยนเฉพาะส่วนที่ต่าง ทุกอย่างที่เหลือ (BLE ตั้งค่า, MQTT topic, PZEM, ตารางเวลา, Timer, OTA, ข้อมูลย้อนหลัง, LED, จอ OLED) เหมือนบอร์ด IR ทุกบรรทัด จึงอธิบายละเอียดในบทเฟิร์มแวร์แล้ว หัวข้อนี้เล่าเฉพาะส่วนที่บอร์ดสายแอร์ต่าง</p>
-<div class="callout why"><div class="callout-title">ทำไม</div><p><strong>ทำไมแตกเป็นไฟล์ใหม่ ไม่ใส่ <code>#if</code> ในไฟล์เดียว</strong> ส่วนที่ต่างมีไม่ถึง 300 บรรทัดจาก ~2000 บรรทัด (เทียบด้วย <code>diff</code>) แต่ต้องใช้ไลบรารีคนละชุด (บอร์ดสายแอร์ไม่มี IRremoteESP8266 แต่มี DHT) และบอร์ด IR แฟลชเกือบเต็มแล้ว การแยกไฟล์ทำให้ไฟล์ IR ไม่เสี่ยงพังจากงานใหม่ ข้อเสียคือแก้บั๊กส่วนที่เหมือนกันต้องแก้สองที่ (เช่นคำสั่ง <code>unprovision</code> ที่เพิ่มทั้งสองบอร์ดพร้อมกัน 13 ต.ค.)</p></div>
+<div class="callout why"><div class="callout-title">ทำไม</div><p><strong>ทำไมแตกเป็นไฟล์ใหม่ ไม่ใส่ <code>#if</code> ในไฟล์เดียว</strong> ส่วนที่ต่างมีไม่ถึง 300 บรรทัดจาก ~2000 บรรทัด (เทียบด้วย <code>diff</code>) แต่ต้องใช้ไลบรารีคนละชุด (บอร์ดสายแอร์ไม่มี IRremoteESP8266 แต่มี DHT) และบอร์ด IR แฟลชเกือบเต็มแล้ว การแยกไฟล์ทำให้ไฟล์ IR ไม่เสี่ยงพังจากงานใหม่ ข้อเสียคือแก้บั๊กส่วนที่เหมือนกันต้องแก้สองที่ (เช่นคำสั่ง <code>unprovision</code> ที่ต้องมีทั้งสองบอร์ด)</p></div>
 
 <h3 id="โครงสร้างรวม">โครงสร้างรวม<a class="anchor" href="#โครงสร้างรวม">#</a></h3>
 <div class="table-wrap"><table>
@@ -2588,7 +2586,7 @@ b7 = (s mod 16) &lt;&lt; 4          ← ผลอยู่ใน nibble บน, 
 </tr>
 <tr>
 <td>78</td>
-<td>เวอร์ชัน <code>2.5.2-slm8</code> ส่วน <code>-slm8</code> ทำให้แยกจากเวอร์ชันบอร์ด IR ได้ทันที (รุ่นแรก 11 ต.ค. คือ <code>2.5.1-slm8</code>)</td>
+<td>เวอร์ชัน <code>2.5.2-slm8</code> ส่วน <code>-slm8</code> ทำให้แยกจากเวอร์ชันบอร์ด IR ได้ทันที</td>
 </tr>
 <tr>
 <td>80–82</td>
@@ -2644,12 +2642,12 @@ b7 = (s mod 16) &lt;&lt; 4          ← ผลอยู่ใน nibble บน, 
 <tr>
 <td>GPIO18 / GPIO14</td>
 <td>PZEM TX / RX (<code>PZEM_RX_PIN</code> / <code>PZEM_TX_PIN</code>)</td>
-<td><strong>ไม่เหมือนบอร์ด IR แล้ว</strong> ย้ายจาก 16/18 เมื่อ 15 ต.ค. 2569</td>
+<td><strong>ไม่เหมือนบอร์ด IR</strong> (บอร์ด IR ใช้ 16/18)</td>
 </tr>
 <tr>
 <td>GPIO25 / 26 / 23</td>
 <td>LED เขียว / แดง / เหลือง</td>
-<td>เหลืองย้ายจาก 27 เป็น 23 (15 ต.ค. 2569) เขียว/แดงเหมือนบอร์ด IR</td>
+<td>เหลืองเป็น 23 (บอร์ด IR ใช้ 27) เขียว/แดงเหมือนบอร์ด IR</td>
 </tr>
 <tr>
 <td>GPIO0</td>
@@ -3071,7 +3069,7 @@ b7 = (s mod 16) &lt;&lt; 4          ← ผลอยู่ใน nibble บน, 
 <th>ช่อง JSON</th>
 <th>มาจาก</th>
 <th>ความหมาย</th>
-<th>ใครอ่าน (14 ต.ค.)</th>
+<th>ใครอ่าน</th>
 </tr>
 </thead>
 <tbody>
@@ -3277,7 +3275,7 @@ b7 = (s mod 16) &lt;&lt; 4          ← ผลอยู่ใน nibble บน, 
 <td><code>setRoomTemp()</code> ข้าม NaN, <code>roomForUnit()</code></td>
 </tr>
 <tr>
-<td>ลบอุปกรณ์ในแอป (2.5.2-slm8, 13 ต.ค.)</td>
+<td>ลบอุปกรณ์ในแอป</td>
 <td>ล้าง NVS ทั้งหมดรวมสถานะแอร์ แล้วรีบูต หลังรีบูตจึงส่งเฟรม <strong>ปิด</strong> ทางสาย</td>
 <td><code>unprovisionAndRestart()</code> (ดูบทเฟิร์มแวร์)</td>
 </tr>
@@ -3391,12 +3389,12 @@ b7 = (s mod 16) &lt;&lt; 4          ← ผลอยู่ใน nibble บน, 
 <td>ระบุสายตามหน้าที่ ไม่ใช่ตามสี</td>
 </tr>
 <tr>
-<td>ขาส่ง GPIO25 ชนกับ LED เขียว (11 ต.ค.)</td>
+<td>ขาส่ง GPIO25 ชนกับ LED เขียว</td>
 <td>โปรแกรมทดลองเลือกขาโดยไม่ดูเฟิร์มแวร์หลัก</td>
 <td>ตรวจตารางขาของทั้งระบบก่อนรวมโค้ด ย้ายไป GPIO33</td>
 </tr>
 <tr>
-<td>linker ฟ้อง <code>dangerous relocation: l32r</code> (11 ต.ค.)</td>
+<td>linker ฟ้อง <code>dangerous relocation: l32r</code></td>
 <td>ISR แบบ <code>IRAM_ATTR</code> เขียนเป็น <code>inline</code> ในไฟล์ <code>.h</code></td>
 <td>ย้าย ISR ออกนอกคลาสเป็น <code>static</code> (<code>DaikinSLM8.h</code> บรรทัด 86–88)</td>
 </tr>
@@ -3412,10 +3410,9 @@ b7 = (s mod 16) &lt;&lt; 4          ← ผลอยู่ใน nibble บน, 
 </tr>
 </tbody>
 </table></div>
-<h2 id="การรวมเข้ากับระบบหลัก-ทำแล้ว-11-ตค-2569">การรวมเข้ากับระบบหลัก (ทำแล้ว 11 ต.ค. 2569)<a class="anchor" href="#การรวมเข้ากับระบบหลัก-ทำแล้ว-11-ตค-2569">#</a></h2>
-<p>(เปลี่ยน 14 ต.ค. 2569) ฉบับก่อนหัวข้อนี้ชื่อ "จะรวมเข้ากับระบบหลักอย่างไร (แผน)" ตอนนี้รวมเสร็จแล้วใน commit <code>a5a227f</code> แต่ทำต่างจากแผนเดิมในบางจุด</p>
-<h3 id="แผนเดิมกับสิ่งที่ทำจริง">แผนเดิมกับสิ่งที่ทำจริง<a class="anchor" href="#แผนเดิมกับสิ่งที่ทำจริง">#</a></h3>
-<p>แผนเดิมคือเพิ่มทางแยกต้นฟังก์ชันส่ง IR ในเฟิร์มแวร์ <code>rmutt_esp32_air</code> แบบเดียวกับที่ทำให้ Saijo Denki (ฉบับก่อนอ้างบรรทัด 1271 ตอนนี้ฟังก์ชันย้ายไปบรรทัด 1335 เพราะไฟล์ IR มีโค้ดเพิ่ม)</p>
+<h2 id="การรวมเข้ากับระบบหลัก">การรวมเข้ากับระบบหลัก<a class="anchor" href="#การรวมเข้ากับระบบหลัก">#</a></h2>
+<h3 id="ทางเลือกที่พิจารณากับสิ่งที่ใช้จริง">ทางเลือกที่พิจารณากับสิ่งที่ใช้จริง<a class="anchor" href="#ทางเลือกที่พิจารณากับสิ่งที่ใช้จริง">#</a></h3>
+<p>ทางเลือกแรกที่ง่ายที่สุดคือเพิ่มทางแยกต้นฟังก์ชันส่ง IR ในเฟิร์มแวร์ <code>rmutt_esp32_air</code> แบบเดียวกับที่ทำให้ Saijo Denki</p>
 <p><strong>ไฟล์ <code>firmware/rmutt_esp32_air/rmutt_esp32_air.ino</code> บรรทัด 1335–1339</strong></p>
 <div class="code-block"><span class="code-lang">cpp</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1335</span>
 <span class="normal">1336</span>
@@ -3433,9 +3430,9 @@ b7 = (s mod 16) &lt;&lt; 4          ← ผลอยู่ใน nibble บน, 
 <thead>
 <tr>
 <th>เรื่อง</th>
-<th>แผนเดิม (9 ต.ค.)</th>
-<th>ที่ทำจริง (11 ต.ค.)</th>
-<th>ทำไมเปลี่ยน</th>
+<th>ทางเลือกที่พิจารณา</th>
+<th>ที่ใช้จริง</th>
+<th>เหตุผล</th>
 </tr>
 </thead>
 <tbody>
@@ -3473,7 +3470,7 @@ b7 = (s mod 16) &lt;&lt; 4          ← ผลอยู่ใน nibble บน, 
 <td>สถานะกลับ</td>
 <td>เพิ่มฟิลด์ใน <code>publishStatus()</code></td>
 <td>เพิ่ม <code>controlMode</code>, <code>airBrand</code>, <code>busOk</code>, <code>compressorRunning</code>, <code>unitRoomTemperature</code>, <code>roomTemperature</code></td>
-<td>ตามแผน</td>
+<td>—</td>
 </tr>
 <tr>
 <td>ใช้บิตคอมเพรสเซอร์ในระบบปิดแอร์อัตโนมัติ</td>
@@ -3483,8 +3480,8 @@ b7 = (s mod 16) &lt;&lt; 4          ← ผลอยู่ใน nibble บน, 
 </tr>
 </tbody>
 </table></div>
-<p>หลักการในแผนเดิมยังเป็นจริง: แอป, Backend, MQTT topic และรูปแบบ <code>AirState</code> เหมือนเดิมทุกอย่าง ที่ต่างคือ "ตัวส่ง" ปลายทาง ซึ่งตอนนี้กลายเป็นทั้งไฟล์เฟิร์มแวร์แทนที่จะเป็นแค่ทางแยก</p>
-<div class="callout why"><div class="callout-title">ทำไม</div><p><strong>ทำไมยังซ่อนส่วนที่ต่างไว้หลังอินเทอร์เฟซเดียว</strong> ส่วนอื่นของระบบทั้งหมด (แอป, Backend, MQTT topic, รูปแบบคำสั่ง <code>AirState</code>) ไม่ต้องรู้เลยว่าแอร์เครื่องนี้คุยด้วย IR หรือสาย ต่างกันแค่ "ตัวส่ง" ปลายทางในเฟิร์มแวร์ และข้อมูลความสามารถ (<code>controlType</code>) ที่ใช้ซ่อนปุ่ม หลักนี้คือการซ่อนส่วนที่ต่างกันไว้หลังอินเทอร์เฟซเดียว เหมือนที่ <code>IRac</code> ทำให้แอร์หลายยี่ห้อใช้คำสั่งชุดเดียวกัน ข้อพิสูจน์คือไม่ต้อง migrate ฐานข้อมูลเลย คอลัมน์ <code>protocol</code> เดิมเก็บ <code>DAIKIN_WIRED</code> ได้ทันที</p></div>
+<p>แอป, Backend, MQTT topic และรูปแบบ <code>AirState</code> ใช้ร่วมกับบอร์ด IR ทุกอย่าง ที่ต่างคือ "ตัวส่ง" ปลายทาง ซึ่งเป็นทั้งไฟล์เฟิร์มแวร์แยก ไม่ใช่แค่ทางแยกในไฟล์เดียว</p>
+<div class="callout why"><div class="callout-title">ทำไม</div><p><strong>ทำไมซ่อนส่วนที่ต่างไว้หลังอินเทอร์เฟซเดียว</strong> ส่วนอื่นของระบบทั้งหมด (แอป, Backend, MQTT topic, รูปแบบคำสั่ง <code>AirState</code>) ไม่ต้องรู้เลยว่าแอร์เครื่องนี้คุยด้วย IR หรือสาย ต่างกันแค่ "ตัวส่ง" ปลายทางในเฟิร์มแวร์ และข้อมูลความสามารถ (<code>controlType</code>) ที่ใช้ซ่อนปุ่ม หลักนี้คือการซ่อนส่วนที่ต่างกันไว้หลังอินเทอร์เฟซเดียว เหมือนที่ <code>IRac</code> ทำให้แอร์หลายยี่ห้อใช้คำสั่งชุดเดียวกัน ข้อพิสูจน์คือไม่ต้อง migrate ฐานข้อมูลเลย คอลัมน์ <code>protocol</code> ที่มีอยู่เก็บ <code>DAIKIN_WIRED</code> ได้ทันที</p></div>
 
 <h3 id="ฝั่ง-backend-ดูบทที่-6-backend-ตอนที่-1-และบทที่-7-backend-ตอนที่-2">ฝั่ง Backend (ดูบทที่ 6 Backend ตอนที่ 1 และบทที่ 7 Backend ตอนที่ 2)<a class="anchor" href="#ฝั่ง-backend-ดูบทที่-6-backend-ตอนที่-1-และบทที่-7-backend-ตอนที่-2">#</a></h3>
 <p><strong>ไฟล์ <code>backend/src/utils/air-conditioner.js</code> บรรทัด 157–171</strong></p>
@@ -3561,7 +3558,7 @@ b7 = (s mod 16) &lt;&lt; 4          ← ผลอยู่ใน nibble บน, 
 </tr>
 <tr>
 <td><code>utils/firmware.js</code></td>
-<td>ไฟล์ชื่อมี <code>wired</code> หรือ <code>slm8</code> = เฟิร์มแวร์สายแอร์ บอร์ด <code>DAIKIN_WIRED</code> สั่ง OTA ได้เฉพาะไฟล์ชนิดนี้ (เพิ่ม 14 ต.ค. 2569)</td>
+<td>ไฟล์ชื่อมี <code>wired</code> หรือ <code>slm8</code> = เฟิร์มแวร์สายแอร์ บอร์ด <code>DAIKIN_WIRED</code> สั่ง OTA ได้เฉพาะไฟล์ชนิดนี้</td>
 </tr>
 </tbody>
 </table></div>
@@ -3592,7 +3589,7 @@ b7 = (s mod 16) &lt;&lt; 4          ← ผลอยู่ใน nibble บน, 
 </tr>
 <tr>
 <td>เว็บ เมนูเฟิร์มแวร์ (แอดมิน)</td>
-<td>แท็บ "สายแอร์ Daikin" แยกจาก "แอร์ IR" (เพิ่ม 14 ต.ค. 2569)</td>
+<td>แท็บ "สายแอร์ Daikin" แยกจาก "แอร์ IR"</td>
 <td>ดูบทเว็บแอป</td>
 </tr>
 </tbody>
@@ -3607,13 +3604,10 @@ b7 = (s mod 16) &lt;&lt; 4          ← ผลอยู่ใน nibble บน, 
 <li>ตลอดเวลา task สายแอร์ส่งเฟรมทุกวินาทีและอ่านเฟรมแอร์ ผลขึ้นจอ OLED และ status</li>
 </ol>
 <h2 id="งานต่อ">งานต่อ<a class="anchor" href="#งานต่อ">#</a></h2>
-<p>(เปลี่ยน 14 ต.ค. 2569) ข้อที่ทำแล้วติ๊กไว้ ข้อใหม่มาจากการอ่านโค้ดจริงและ <code>README_WIRED_TH.md</code></p>
+<p>สิ่งที่ยังไม่ได้ทำ (มาจากการอ่านโค้ดจริงและ <code>README_WIRED_TH.md</code>)</p>
 <ul>
 <li class="check"><input type="checkbox"> ยืนยันกับแอร์จริงตามขั้น "ทดสอบหลังแฟลช" ใน <code>README_WIRED_TH.md</code> และบันทึกผลไว้ใน repository (แอร์เปิด/ปิดตามแอป, <code>unitRoomTemperature</code> เท่ากับค่าที่ส่ง, <code>COMP ON</code>)</li>
-<li class="check"><input type="checkbox" checked> <strong>ทำแล้ว:</strong> เพิ่มเซนเซอร์อุณหภูมิห้อง → ใช้ DHT11 ที่ GPIO4 แล้ว (ยังต้องเทียบเทอร์โมมิเตอร์แล้วตั้ง <code>ROOM_TEMP_OFFSET_C</code>)</li>
-<li class="check"><input type="checkbox" checked> <strong>ทำแล้ว:</strong> เปลี่ยนการรอแบบวนลูปเป็น RMT หรือ task แยก → ใช้ task แยกบน core 1 priority 3</li>
-<li class="check"><input type="checkbox" checked> <strong>ทำแล้ว:</strong> รวมเข้าระบบผ่าน MQTT แทน IR → ทำเป็นเฟิร์มแวร์แยก <code>rmutt_esp32_air_wired</code> + โปรโตคอล <code>DAIKIN_WIRED</code></li>
-<li class="check"><input type="checkbox" checked> <strong>ทำแล้ว:</strong> เพิ่มโค้ด SLM8 เข้า repository → <code>DaikinSLM8.h</code>, <code>wired_bus.h</code> เข้าแล้ว (โปรแกรมทดลอง <code>slm8_*.ino</code> ยังไม่เข้า)</li>
+<li class="check"><input type="checkbox"> เทียบ DHT11 กับเทอร์โมมิเตอร์แล้วตั้ง <code>ROOM_TEMP_OFFSET_C</code></li>
 <li class="check"><input type="checkbox"> ทดสอบว่าแอร์ต้องการแฟล็กคำสั่งใหม่จริงไหม และแอร์ทำอะไรเมื่อเฟรมหยุด (บอร์ดดับ)</li>
 <li class="check"><input type="checkbox"> ตรวจไบต์ 1 = <code>C4</code> ก่อนเชื่อเฟรมสถานะ กัน <code>busOk</code> ผิดเมื่อต่อสายสลับ</li>
 <li class="check"><input type="checkbox"> ให้ <code>quietWindow()</code> ถูกเรียกทุกรอบ <code>loop()</code> ช่วงเงียบจะตรงจังหวะหลังเฟรมจริง</li>
@@ -3723,7 +3717,7 @@ b7 = (s mod 16) &lt;&lt; 4          ← ผลอยู่ใน nibble บน, 
 <p><strong>ตอบ:</strong> เพราะตัวดึงขึ้นในแอร์มีความต้านทานสูงราว 21k–56k ตัวแบ่ง 30k ดึงกระแสจนแรงดันบนสายตกเหลือ 1.4–2.9 V (loading effect) เปลี่ยนเป็น 100k/200k โหลดน้อยลง 10 เท่า สายคำสั่งเหลือราว 4.2 V เข้าขาราว 2.8 V ยังเกินเกณฑ์ HIGH ของ ESP32 ค่า pull-up คำนวณย้อนกลับจากแรงดันที่วัดได้ด้วยสูตรตัวแบ่งแรงดัน</p></div>
 
 <div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> ทำไมแอร์ไม่ทำตามคำสั่ง ทั้งที่ ESP32 ส่งถูก?</p>
-<p><strong>ตอบ:</strong> บันทึกรูปคลื่นแล้วเห็นเฟรมของ ESP32 กับเฟรมของแอร์อยู่บนสายเดียวกัน แปลว่าวงจรส่งต่ออยู่กับสายที่แอร์ใช้พูด ไม่ใช่สายที่แอร์ฟัง สาเหตุคือสีสายในเคเบิลไม่ตรงกับป้ายบน panel ต้องระบุสายตามหน้าที่ด้วยการฟังสัญญาณ ขั้นต่อไปคือย้ายวงจรส่งไปอีกเส้นแล้วดูว่าไบต์แรกของเฟรมแอร์เปลี่ยนจาก <code>30</code> เป็น <code>28</code> (เพิ่ม 14 ต.ค. 2569) ในบอร์ดจริงดูเรื่องเดียวกันได้จาก MQTT status: <code>unitRoomTemperature</code> ต้องเท่ากับ <code>roomTemperature</code> ปัดเศษ</p></div>
+<p><strong>ตอบ:</strong> บันทึกรูปคลื่นแล้วเห็นเฟรมของ ESP32 กับเฟรมของแอร์อยู่บนสายเดียวกัน แปลว่าวงจรส่งต่ออยู่กับสายที่แอร์ใช้พูด ไม่ใช่สายที่แอร์ฟัง สาเหตุคือสีสายในเคเบิลไม่ตรงกับป้ายบน panel ต้องระบุสายตามหน้าที่ด้วยการฟังสัญญาณ ขั้นต่อไปคือย้ายวงจรส่งไปอีกเส้นแล้วดูว่าไบต์แรกของเฟรมแอร์เปลี่ยนจาก <code>30</code> เป็น <code>28</code> ในบอร์ดจริงดูเรื่องเดียวกันได้จาก MQTT status: <code>unitRoomTemperature</code> ต้องเท่ากับ <code>roomTemperature</code> ปัดเศษ</p></div>
 
 <div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> ได้อะไรเพิ่มจากการใช้สายแทน IR และมีข้อเสียอะไร?</p>
 <p><strong>ตอบ:</strong> ได้การสื่อสารสองทาง รู้ว่าคำสั่งถึงแอร์จริง รู้ว่าคอมเพรสเซอร์ทำงานไหม (เฟรมแอร์ไบต์ 4 บิต <code>01</code>) ไม่ต้องติดตั้งตัวยิงให้มองเห็นตาแอร์ ข้อเสียคือใช้ได้เฉพาะแอร์ที่มีสายแบบนี้ ต้องเข้าถึงสายในผนัง ต้องส่งเฟรมต่อเนื่องทุกวินาที และต้องหาอุณหภูมิห้องส่งให้แอร์เองแทนเทอร์มิสเตอร์ของ panel (บอร์ดจริงใช้ DHT11) และฟังก์ชันน้อยกว่า IR เพราะทำได้เท่าที่ panel ทำได้</p></div>
@@ -3731,19 +3725,19 @@ b7 = (s mod 16) &lt;&lt; 4          ← ผลอยู่ใน nibble บน, 
 <div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> ทดลองกับแอร์จริงแบบนี้เสี่ยงทำแอร์เสียไหม?</p>
 <p><strong>ตอบ:</strong> ลดความเสี่ยงหลายชั้น: ฟังอย่างเดียวก่อนเสมอ ใช้ขารับที่ส่งออกไม่ได้ ไม่ต่อสาย +5 V ตรวจสายก่อนส่ง และส่งแบบ open collector ซึ่งเป็นวิธีเดียวกับที่ panel ใช้ ไม่ได้แก้เฟิร์มแวร์ของแอร์ ถ้าถอด ESP32 ออกแล้วต่อ panel กลับ แอร์ก็ทำงานเหมือนเดิม และควรขออนุญาตผู้ดูแลอาคารก่อนทดลองกับแอร์จริงทุกครั้ง</p></div>
 
-<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> (เพิ่ม 14 ต.ค. 2569) ทำไมต้องแยกการส่งเฟรมเป็น FreeRTOS task ทำใน <code>loop()</code> ไม่ได้หรือ?</p>
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> ทำไมต้องแยกการส่งเฟรมเป็น FreeRTOS task ทำใน <code>loop()</code> ไม่ได้หรือ?</p>
 <p><strong>ตอบ:</strong> สายแอร์ต้องได้เฟรมทุก 1 วินาทีตลอดเวลาเหมือน panel แต่ <code>loop()</code> มีช่วงค้างนาน เช่น ต่อ Wi-Fi ได้ถึง 20 วินาที ต่อ MQTT แบบ TLS หรือดาวน์โหลด OTA ถ้าส่งใน <code>loop()</code> แอร์จะขาดเฟรมเป็นสิบวินาที <code>wired_bus.h</code> จึงสร้าง task บน core 1 priority 3 (สูงกว่า <code>loop()</code> ที่เป็น 1) ถึงเวลาส่งเมื่อไรระบบแทรก <code>loop()</code> ทันที ใช้ mutex กันสองงานแตะ <code>Controller</code> พร้อมกัน และไม่ไปอยู่ core 0 เพราะ core 0 ดูแล Wi-Fi ถ้าถูกบล็อก 80 ms ทุกวินาทีอาจหลุด</p></div>
 
-<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> (เพิ่ม 14 ต.ค. 2569) ถ้าบอร์ดรีบูตระหว่างแอร์ทำงาน แอร์จะดับไหม?</p>
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> ถ้าบอร์ดรีบูตระหว่างแอร์ทำงาน แอร์จะดับไหม?</p>
 <p><strong>ตอบ:</strong> ไม่ดับ ทุกคำสั่งถูกบันทึกลง NVS (<code>saveAirState()</code>) ตอนบูต <code>setup()</code> โหลดค่ากลับ ปรับด้วย <code>normalizeAirState()</code> แล้วส่งให้ <code>wiredBus.begin()</code> เป็นค่าเริ่มต้นตั้งแต่ก่อนต่อ Wi-Fi เฟรมแรกจึงเป็นค่าเดิม แอร์ไม่รู้ว่าบอร์ดรีบูต ยกเว้นกรณีลบอุปกรณ์ในแอป (2.5.2-slm8) ที่ล้าง NVS ทั้งหมด หลังรีบูตบอร์ดจึงส่ง "ปิด"</p></div>
 
-<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> (เพิ่ม 14 ต.ค. 2569) แอร์รู้อุณหภูมิห้องได้อย่างไร ในเมื่อถอด panel ที่มีเซนเซอร์ออกไปแล้ว?</p>
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> แอร์รู้อุณหภูมิห้องได้อย่างไร ในเมื่อถอด panel ที่มีเซนเซอร์ออกไปแล้ว?</p>
 <p><strong>ตอบ:</strong> บอร์ดอ่าน DHT11 ที่ GPIO4 ทุก 5 วินาที บวกค่าชดเชย <code>ROOM_TEMP_OFFSET_C</code> แล้วส่งให้ <code>Controller</code> ปัดเป็นจำนวนเต็มใส่ไบต์ 2 ของทุกเฟรมแทนเทอร์มิสเตอร์ TH1 ของ panel แอร์ใช้ค่านี้ตัดสินว่าจะเดินคอมเพรสเซอร์ไหม ถ้า DHT11 อ่านพลาดใช้ค่าดีล่าสุด ถ้ายังไม่เคยอ่านได้ใช้ 26°C ช่วงทดลองเคยส่งค่าคงที่ 28°C ซึ่งทำให้แอร์ตัดคอมเพรสเซอร์ตามห้องจริงไม่ได้</p></div>
 
-<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> (เพิ่ม 14 ต.ค. 2569) ผู้ใช้กด Turbo หรือโหมด Heat ในแอปกับแอร์เครื่องนี้ จะเกิดอะไรขึ้น?</p>
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> ผู้ใช้กด Turbo หรือโหมด Heat ในแอปกับแอร์เครื่องนี้ จะเกิดอะไรขึ้น?</p>
 <p><strong>ตอบ:</strong> ปกติแอปและเว็บซ่อนปุ่มเหล่านั้นอยู่แล้ว (<code>controlType = wired</code>) และ Backend ปฏิเสธคำสั่งที่ <code>DAIKIN_WIRED</code> ทำไม่ได้ ถ้ายังหลุดมาถึงบอร์ด (เช่นแอปรุ่นเก่า) <code>normalizeAirState()</code> ปรับให้ใกล้ที่สุด: Heat/Auto คงโหมดเดิม, พัดลม Turbo เป็น High, Eco/Quiet/Clean ปิด แล้วส่ง <code>state</code> ที่ปรับแล้วกลับ แอปจึงแสดงสิ่งที่แอร์ทำจริง ไม่ใช่สิ่งที่ผู้ใช้กด</p></div>
 
-<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> (เพิ่ม 14 ต.ค. 2569) รู้ได้อย่างไรว่าสายแอร์ยังต่ออยู่ และงานนี้ยังมีอะไรที่ยังไม่ได้พิสูจน์?</p>
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> รู้ได้อย่างไรว่าสายแอร์ยังต่ออยู่ และงานนี้ยังมีอะไรที่ยังไม่ได้พิสูจน์?</p>
 <p><strong>ตอบ:</strong> แอร์ส่งเฟรมสถานะเองทุกวินาที ถ้าได้เฟรมที่ผ่าน checksum ภายใน 3 วินาที <code>busOk = true</code> ถ้าเกิน 15 วินาทีหลังบูตยังไม่ได้ จอ OLED สลับขึ้นหน้าเตือน "AIRCON BUS / No reply from unit" ส่วนที่ยังไม่พิสูจน์คือ ใน repository ยังไม่มีบันทึกผลทดสอบว่าแอร์ทำตามคำสั่งจากบอร์ดจริงหลังย้ายสายส่ง ยังไม่รู้ว่าแอร์ต้องการแฟล็กคำสั่งใหม่จริงไหม แอร์ทำอะไรเมื่อเฟรมหยุด และ Backend ยังไม่ได้ใช้ <code>busOk</code> / <code>compressorRunning</code> นอกจากนี้ตัวรับยังไม่ตรวจไบต์ <code>C4</code> ถ้าต่อสายสลับ <code>busOk</code> อาจเป็น true ผิด ๆ</p></div>
 
 <h2 id="สรุปและเช็กลิสต์ความเข้าใจ">สรุปและเช็กลิสต์ความเข้าใจ<a class="anchor" href="#สรุปและเช็กลิสต์ความเข้าใจ">#</a></h2>
@@ -3759,18 +3753,18 @@ b7 = (s mod 16) &lt;&lt; 4          ← ผลอยู่ใน nibble บน, 
 <li class="check"><input type="checkbox"> คำนวณ pull-up ย้อนกลับจากแรงดันที่วัดได้ และอธิบาย loading effect ได้</li>
 <li class="check"><input type="checkbox"> อธิบายการทำงานของไดโอดและทรานซิสเตอร์ในวงจรส่ง และทำไมต้องมี <code>BUS_TX_INVERT</code> (ในบันทึกเดิมชื่อ <code>TX_INVERT</code>)</li>
 <li class="check"><input type="checkbox"> อธิบายการนับเวลาแบบสะสมใน <code>Tx::seg()</code> และการตรวจ 3 ชั้นได้</li>
-<li class="check"><input type="checkbox"> บอกสาเหตุที่แอร์ไม่รับคำสั่งในการทดลอง 9 ต.ค. และวิธีเช็กในบอร์ดจริงด้วย <code>unitRoomTemperature</code></li>
-<li class="check"><input type="checkbox"> (เพิ่ม 14 ต.ค. 2569) อธิบายตัวรับ <code>Rx</code> ได้: ISR จดเวลาลง ring buffer, <code>rawPulse()</code> กรอง glitch &lt; 80 µs, <code>pulse()</code> เป็น state machine IDLE → HDR → BITS พร้อมเกณฑ์จริง (บิต 0 = HIGH 200–600 µs, บิต 1 = 650–1400 µs)</li>
-<li class="check"><input type="checkbox"> (เพิ่ม 14 ต.ค. 2569) อธิบาย <code>Controller::loop()</code> ได้: ส่งทุก 1000 ms, แฟล็กคำสั่งใหม่ 4 เฟรม, <code>roomForUnit()</code> เลือก DHT11 / 26°C, <code>unitAlive()</code> 3 วินาที</li>
-<li class="check"><input type="checkbox"> (เพิ่ม 14 ต.ค. 2569) บอกได้ว่าทำไม <code>wired_bus.h</code> ใช้ task บน core 1 priority 3 พร้อม mutex และ <code>vTaskDelay(5 ms)</code></li>
-<li class="check"><input type="checkbox"> (เพิ่ม 14 ต.ค. 2569) เล่าเส้นทางคำสั่งจากแอปถึงเฟรมได้: Backend ตรวจ <code>DAIKIN_WIRED</code> → MQTT <code>command</code> → <code>normalizeAirState()</code> → <code>saveAirState()</code> → <code>wiredBus.apply()</code> → <code>publishState()</code></li>
-<li class="check"><input type="checkbox"> (เพิ่ม 14 ต.ค. 2569) บอกช่องที่บอร์ดสายแอร์เพิ่มใน status ได้ครบ 6 ช่อง และบอกได้ว่า Backend ใช้แค่ <code>controlMode</code></li>
-<li class="check"><input type="checkbox"> (เพิ่ม 14 ต.ค. 2569) บอกตารางขาบอร์ดสายแอร์ได้ (GPIO33 ส่ง, GPIO35 รับ, GPIO34 echo, GPIO4 DHT11) และทำไมย้ายขาส่งจาก GPIO25</li>
-<li class="check"><input type="checkbox"> (เพิ่ม 14 ต.ค. 2569) อธิบายได้ว่าทำไมรีบูตแล้วแอร์ไม่ดับ และบอร์ดบอกตัวเองว่าเป็น "Daikin · สายแอร์" อย่างไรทั้งทาง BLE และ MQTT</li>
-<li class="check"><input type="checkbox"> (เพิ่ม 14 ต.ค. 2569) บอกได้ว่าอะไรยังไม่ได้พิสูจน์กับแอร์จริง และงานต่อที่เหลือ</li>
+<li class="check"><input type="checkbox"> บอกสาเหตุที่แอร์ไม่รับคำสั่งในการทดลอง และวิธีเช็กในบอร์ดจริงด้วย <code>unitRoomTemperature</code></li>
+<li class="check"><input type="checkbox"> อธิบายตัวรับ <code>Rx</code> ได้: ISR จดเวลาลง ring buffer, <code>rawPulse()</code> กรอง glitch &lt; 80 µs, <code>pulse()</code> เป็น state machine IDLE → HDR → BITS พร้อมเกณฑ์จริง (บิต 0 = HIGH 200–600 µs, บิต 1 = 650–1400 µs)</li>
+<li class="check"><input type="checkbox"> อธิบาย <code>Controller::loop()</code> ได้: ส่งทุก 1000 ms, แฟล็กคำสั่งใหม่ 4 เฟรม, <code>roomForUnit()</code> เลือก DHT11 / 26°C, <code>unitAlive()</code> 3 วินาที</li>
+<li class="check"><input type="checkbox"> บอกได้ว่าทำไม <code>wired_bus.h</code> ใช้ task บน core 1 priority 3 พร้อม mutex และ <code>vTaskDelay(5 ms)</code></li>
+<li class="check"><input type="checkbox"> เล่าเส้นทางคำสั่งจากแอปถึงเฟรมได้: Backend ตรวจ <code>DAIKIN_WIRED</code> → MQTT <code>command</code> → <code>normalizeAirState()</code> → <code>saveAirState()</code> → <code>wiredBus.apply()</code> → <code>publishState()</code></li>
+<li class="check"><input type="checkbox"> บอกช่องที่บอร์ดสายแอร์เพิ่มใน status ได้ครบ 6 ช่อง และบอกได้ว่า Backend ใช้แค่ <code>controlMode</code></li>
+<li class="check"><input type="checkbox"> บอกตารางขาบอร์ดสายแอร์ได้ (GPIO33 ส่ง, GPIO35 รับ, GPIO34 echo, GPIO4 DHT11) และทำไมย้ายขาส่งจาก GPIO25</li>
+<li class="check"><input type="checkbox"> อธิบายได้ว่าทำไมรีบูตแล้วแอร์ไม่ดับ และบอร์ดบอกตัวเองว่าเป็น "Daikin · สายแอร์" อย่างไรทั้งทาง BLE และ MQTT</li>
+<li class="check"><input type="checkbox"> บอกได้ว่าอะไรยังไม่ได้พิสูจน์กับแอร์จริง และงานต่อที่เหลือ</li>
 </ul><nav class="pager"><a class="prev" href="18-file-map.html"><span>← บทก่อนหน้า</span>18. แผนที่ไฟล์ทั้งโปรเจค</a><a class="next" href="20-database-design.html"><span>บทถัดไป →</span>20. เจาะลึกการออกแบบฐานข้อมูล</a></nav>
   </main>
-  <aside class="toc"><div class="toc-title">ในบทนี้</div><ul><li><a href="#ภาพรวม">ภาพรวม</a></li><li><a href="#ความรู้ที่ต้องมีก่อนอ่านบทนี้">ความรู้ที่ต้องมีก่อนอ่านบทนี้</a></li><li><a href="#อุปกรณ์และเครื่องมือ">อุปกรณ์และเครื่องมือ</a></li><li><a href="#ขั้นที่-1-ค้นคว้าก่อนลงมือ">ขั้นที่ 1: ค้นคว้าก่อนลงมือ</a></li><li><a href="#ขั้นที่-2-ฟังสัญญาณ">ขั้นที่ 2: ฟังสัญญาณ</a></li><li><a href="#ขั้นที่-3-การเข้ารหัสระดับบิต-pulse-distance">ขั้นที่ 3: การเข้ารหัสระดับบิต (pulse-distance)</a></li><li><a href="#ขั้นที่-4-โครงสร้างเฟรม">ขั้นที่ 4: โครงสร้างเฟรม</a></li><li><a href="#ขั้นที่-5-หาสูตร-checksum">ขั้นที่ 5: หาสูตร checksum</a></li><li><a href="#ขั้นที่-6-แกะความหมายของแต่ละไบต์">ขั้นที่ 6: แกะความหมายของแต่ละไบต์</a></li><li><a href="#ขั้นที่-7-ชั้นกายภาพ-สัญญาณไฟฟ้าบนสาย">ขั้นที่ 7: ชั้นกายภาพ (สัญญาณไฟฟ้าบนสาย)</a></li><li><a href="#ขั้นที่-8-ส่งสัญญาณจาก-esp32-และการทดสอบ">ขั้นที่ 8: ส่งสัญญาณจาก ESP32 และการทดสอบ</a></li><li><a href="#ฝึกสร้างเฟรมเอง">ฝึกสร้างเฟรมเอง</a></li><li><a href="#บัตรสรุปโปรโตคอล">บัตรสรุปโปรโตคอล</a></li><li><a href="#ขั้นที่-9-คลาส-controller--ส่งตามจังหวะ-จำค่า-อ่านสถานะ-เพิ่ม-11-ตค-2569">ขั้นที่ 9: คลาส Controller — ส่งตามจังหวะ จำค่า อ่านสถานะ (เพิ่ม 11 ต.ค. 2569)</a></li><li><a href="#ขั้นที่-10-wired_bush--ส่งเฟรมใน-freertos-task-แยก-เพิ่ม-11-ตค-2569">ขั้นที่ 10: wired_bus.h — ส่งเฟรมใน FreeRTOS task แยก (เพิ่ม 11 ต.ค. 2569)</a></li><li><a href="#เฟิร์มแวร์บอร์ดสายแอร์-rmutt_esp32_air_wiredino-เพิ่ม-11-ตค-2569">เฟิร์มแวร์บอร์ดสายแอร์ rmutt_esp32_air_wired.ino (เพิ่ม 11 ต.ค. 2569)</a></li><li><a href="#ปัญหาที่เจอและบทเรียน">ปัญหาที่เจอและบทเรียน</a></li><li><a href="#การรวมเข้ากับระบบหลัก-ทำแล้ว-11-ตค-2569">การรวมเข้ากับระบบหลัก (ทำแล้ว 11 ต.ค. 2569)</a></li><li><a href="#งานต่อ">งานต่อ</a></li><li><a href="#หลักการทำงานที่ใช้ในส่วนนี้">หลักการทำงานที่ใช้ในส่วนนี้</a></li><li><a href="#คำถามที่อาจารย์อาจถาม">คำถามที่อาจารย์อาจถาม</a></li><li><a href="#สรุปและเช็กลิสต์ความเข้าใจ">สรุปและเช็กลิสต์ความเข้าใจ</a></li></ul></aside>
+  <aside class="toc"><div class="toc-title">ในบทนี้</div><ul><li><a href="#ภาพรวม">ภาพรวม</a></li><li><a href="#ความรู้ที่ต้องมีก่อนอ่านบทนี้">ความรู้ที่ต้องมีก่อนอ่านบทนี้</a></li><li><a href="#อุปกรณ์และเครื่องมือ">อุปกรณ์และเครื่องมือ</a></li><li><a href="#ขั้นที่-1-ค้นคว้าก่อนลงมือ">ขั้นที่ 1: ค้นคว้าก่อนลงมือ</a></li><li><a href="#ขั้นที่-2-ฟังสัญญาณ">ขั้นที่ 2: ฟังสัญญาณ</a></li><li><a href="#ขั้นที่-3-การเข้ารหัสระดับบิต-pulse-distance">ขั้นที่ 3: การเข้ารหัสระดับบิต (pulse-distance)</a></li><li><a href="#ขั้นที่-4-โครงสร้างเฟรม">ขั้นที่ 4: โครงสร้างเฟรม</a></li><li><a href="#ขั้นที่-5-หาสูตร-checksum">ขั้นที่ 5: หาสูตร checksum</a></li><li><a href="#ขั้นที่-6-แกะความหมายของแต่ละไบต์">ขั้นที่ 6: แกะความหมายของแต่ละไบต์</a></li><li><a href="#ขั้นที่-7-ชั้นกายภาพ-สัญญาณไฟฟ้าบนสาย">ขั้นที่ 7: ชั้นกายภาพ (สัญญาณไฟฟ้าบนสาย)</a></li><li><a href="#ขั้นที่-8-ส่งสัญญาณจาก-esp32-และการทดสอบ">ขั้นที่ 8: ส่งสัญญาณจาก ESP32 และการทดสอบ</a></li><li><a href="#ฝึกสร้างเฟรมเอง">ฝึกสร้างเฟรมเอง</a></li><li><a href="#บัตรสรุปโปรโตคอล">บัตรสรุปโปรโตคอล</a></li><li><a href="#ขั้นที่-9-คลาส-controller--ส่งตามจังหวะ-จำค่า-อ่านสถานะ">ขั้นที่ 9: คลาส Controller — ส่งตามจังหวะ จำค่า อ่านสถานะ</a></li><li><a href="#ขั้นที่-10-wired_bush--ส่งเฟรมใน-freertos-task-แยก">ขั้นที่ 10: wired_bus.h — ส่งเฟรมใน FreeRTOS task แยก</a></li><li><a href="#เฟิร์มแวร์บอร์ดสายแอร์-rmutt_esp32_air_wiredino">เฟิร์มแวร์บอร์ดสายแอร์ rmutt_esp32_air_wired.ino</a></li><li><a href="#ปัญหาที่เจอและบทเรียน">ปัญหาที่เจอและบทเรียน</a></li><li><a href="#การรวมเข้ากับระบบหลัก">การรวมเข้ากับระบบหลัก</a></li><li><a href="#งานต่อ">งานต่อ</a></li><li><a href="#หลักการทำงานที่ใช้ในส่วนนี้">หลักการทำงานที่ใช้ในส่วนนี้</a></li><li><a href="#คำถามที่อาจารย์อาจถาม">คำถามที่อาจารย์อาจถาม</a></li><li><a href="#สรุปและเช็กลิสต์ความเข้าใจ">สรุปและเช็กลิสต์ความเข้าใจ</a></li></ul></aside>
 </div>
 <button class="to-top" id="toTop" aria-label="กลับขึ้นด้านบน">↑</button>
 <script src="../assets/search.js"></script>

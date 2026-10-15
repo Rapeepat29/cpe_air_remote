@@ -54,9 +54,9 @@ cpe_air_remote/
 ├── create-keystore.ps1       # สร้างกุญแจเซ็น APK (ครั้งเดียว)
 ├── change-keystore-password.ps1  # เปลี่ยนรหัสกุญแจ
 ├── .gitignore  .vscode/settings.json
-├── .github/workflows/build-android.yml # build APK บน Linux ของ GitHub (กดรันเอง, เพิ่ม 9 ต.ค.)
+├── .github/workflows/build-android.yml # build APK บน Linux ของ GitHub (กดรันเอง)
 ├── .github/workflows/build-ios.yml   # build iOS บน macOS (กดรันเอง)
-├── .github/workflows/test.yml        # flutter analyze + flutter test ทุกครั้งที่ push (เพิ่ม 9 ต.ค.)
+├── .github/workflows/test.yml        # flutter analyze + flutter test ทุกครั้งที่ push
 ├── mqtt/                     # broker สำหรับ local (setup_mqtt.ps1, test_mqtt.ps1 ...)
 ├── backend/{test,scripts}    # test ของ Backend (node --test) + migration/doctor
 ├── test/                     # test ของ Flutter (flutter test)
@@ -139,9 +139,9 @@ cron (root): 02:30 backup-db.sh   03:10 sync-mqtt-cert.sh
 
 **ทำไมลำดับนี้:** `.env` ต้องมีก่อน compose (ตัวแปร `DOMAIN` ฯลฯ) · Caddy ต้องขอใบรับรองก่อน เพราะ Mosquitto อ่านไฟล์ใบรับรองตอนสตาร์ท (ไม่มีไฟล์ = ล้ม) · ตารางต้องมีก่อนสร้างแอดมิน
 
-**ครั้งต่อไปที่แก้โค้ด:** `git pull` แล้ว `.\deploy\update-server.ps1` คำสั่งเดียว (อธิบายต่อด้านล่าง ต้องรันใน **PowerShell** ถ้าเป็น Command Prompt ที่บรรทัดขึ้นต้น `C:\...>` ไม่มี `PS` การพิมพ์ชื่อไฟล์ `.ps1` จะเปิด Notepad แทน ให้ใช้ `powershell -ExecutionPolicy Bypass -File .\deploy\update-server.ps1` ตาม `DEPLOY.md` ที่เพิ่มเมื่อ 11 ต.ค. 2569) · แก้แต่หน้าเว็บ: `.\deploy\deploy-web.ps1` · แล้วจึง `.\build-apk.ps1` ถ้าต้องแจกแอปรุ่นใหม่
+**ครั้งต่อไปที่แก้โค้ด:** `git pull` แล้ว `.\deploy\update-server.ps1` คำสั่งเดียว (อธิบายต่อด้านล่าง ต้องรันใน **PowerShell** ถ้าเป็น Command Prompt ที่บรรทัดขึ้นต้น `C:\...>` ไม่มี `PS` การพิมพ์ชื่อไฟล์ `.ps1` จะเปิด Notepad แทน ให้ใช้ `powershell -ExecutionPolicy Bypass -File .\deploy\update-server.ps1` ตาม `DEPLOY.md`) · แก้แต่หน้าเว็บ: `.\deploy\deploy-web.ps1` · แล้วจึง `.\build-apk.ps1` ถ้าต้องแจกแอปรุ่นใหม่
 
-**ไฟล์เฟิร์มแวร์ OTA (เปลี่ยน 14 ต.ค. 2569):** บอร์ดอัปเดตตัวเองผ่าน Wi-Fi จากไฟล์ `.bin` ที่อยู่ใน `/opt/rmutt/firmware` (Caddy เสิร์ฟที่ `/firmware/*` แบบอ่านอย่างเดียว ส่วน Backend mount โฟลเดอร์เดียวกันที่ `/firmware` แบบ **เขียนได้** ผ่าน `FIRMWARE_DIR` เพื่อรับไฟล์ที่อัปโหลดจากเว็บ) ขั้นตอนตาม `deploy/DEPLOY.md`:
+**ไฟล์เฟิร์มแวร์ OTA:** บอร์ดอัปเดตตัวเองผ่าน Wi-Fi จากไฟล์ `.bin` ที่อยู่ใน `/opt/rmutt/firmware` (Caddy เสิร์ฟที่ `/firmware/*` แบบอ่านอย่างเดียว ส่วน Backend mount โฟลเดอร์เดียวกันที่ `/firmware` แบบ **เขียนได้** ผ่าน `FIRMWARE_DIR` เพื่อรับไฟล์ที่อัปโหลดจากเว็บ) ขั้นตอนตาม `deploy/DEPLOY.md`:
 
 1. Arduino IDE → **Sketch → Export Compiled Binary** ได้ `<สเก็ตช์>.ino.bin` (ใช้ไฟล์นี้เท่านั้น ไม่ใช่ `.merged.bin` ที่ขึ้นต้นด้วย bootloader ซึ่ง OTA ใช้ไม่ได้)
 2. เว็บแอป → เมนู **เฟิร์มแวร์** → เลือกแท็บชนิดบอร์ด (**แอร์ IR** / **สายแอร์ Daikin** / **เซ็นเซอร์ LD2410**) แล้วลากไฟล์มาวาง ถ้าชื่อไฟล์ยังไม่มีเลขรุ่น เว็บถามรุ่นแล้วตั้งชื่อเป็น `<สเก็ตช์>-<รุ่น>.bin` ให้
@@ -209,7 +209,7 @@ cron (root): 02:30 backup-db.sh   03:10 sync-mqtt-cert.sh
 
 #### `deploy/update-server.ps1` (133 บรรทัด) และ `deploy/update-remote.sh` (179 บรรทัด)
 
-คู่ "ผู้สั่ง/ผู้ทำ" สำหรับอัปเดตทุกครั้งหลังแก้โค้ด (เจาะโค้ดด้านล่าง) พารามิเตอร์ `-Server`, `-User`, `-SkipUpload` (รันขั้นบนเซิร์ฟเวอร์ซ้ำอย่างเดียว), `-SkipWeb` (ไม่อัปโหลดเว็บ) ขั้น 5 ของ `update-remote.sh` โหลด Caddyfile ใหม่ **และสร้างกล่อง `tailscale` ใหม่** เพื่อให้ `tailscale-serve.json` (เว็บ 443 + MQTT 8443) ที่เพิ่งอัปโหลดมีผล ก่อนขั้น 1 (เพิ่ม 14 ต.ค. 2569) ตรวจว่าโฟลเดอร์ `firmware` เป็นของ uid 1000 ถ้าไม่ใช่จะ `chown` ให้ (ไม่ได้ก็แค่เตือน)
+คู่ "ผู้สั่ง/ผู้ทำ" สำหรับอัปเดตทุกครั้งหลังแก้โค้ด (เจาะโค้ดด้านล่าง) พารามิเตอร์ `-Server`, `-User`, `-SkipUpload` (รันขั้นบนเซิร์ฟเวอร์ซ้ำอย่างเดียว), `-SkipWeb` (ไม่อัปโหลดเว็บ) ขั้น 5 ของ `update-remote.sh` โหลด Caddyfile ใหม่ **และสร้างกล่อง `tailscale` ใหม่** เพื่อให้ `tailscale-serve.json` (เว็บ 443 + MQTT 8443) ที่เพิ่งอัปโหลดมีผล ก่อนขั้น 1 ตรวจว่าโฟลเดอร์ `firmware` เป็นของ uid 1000 ถ้าไม่ใช่จะ `chown` ให้ (ไม่ได้ก็แค่เตือน)
 
 #### `deploy/deploy-web.ps1` (56 บรรทัด)
 
@@ -219,7 +219,7 @@ cron (root): 02:30 backup-db.sh   03:10 sync-mqtt-cert.sh
 
 #### `deploy/setup-vps.sh` (116 บรรทัด)
 
-ติดตั้งเครื่องใหม่ครั้งเดียว 7 ขั้น (เจาะโค้ดด้านล่าง) พารามิเตอร์ `--firewall` (ตั้ง ufw เอง) ขั้น 6 ตั้งเจ้าของโฟลเดอร์ `firmware` เป็น uid 1000 ด้วย (เพิ่ม 14 ต.ค. 2569)
+ติดตั้งเครื่องใหม่ครั้งเดียว 7 ขั้น (เจาะโค้ดด้านล่าง) พารามิเตอร์ `--firewall` (ตั้ง ufw เอง) ขั้น 6 ตั้งเจ้าของโฟลเดอร์ `firmware` เป็น uid 1000 ด้วย
 
 #### `deploy/init-env.sh` (157 บรรทัด)
 
@@ -241,7 +241,7 @@ cron (root): 02:30 backup-db.sh   03:10 sync-mqtt-cert.sh
 
 ### กลุ่ม F: GitHub Actions, git และ editor
 
-#### `.github/workflows/test.yml` (36 บรรทัด, เพิ่ม 9 ต.ค. 2569)
+#### `.github/workflows/test.yml` (36 บรรทัด)
 
 ระบบทดสอบอัตโนมัติ (CI = Continuous Integration) ของแอป Flutter ทุกครั้งที่ push โค้ดขึ้น GitHub และไฟล์ที่เปลี่ยนอยู่ใน `lib/**`, `test/**`, `pubspec.yaml`, `pubspec.lock` หรือตัว workflow เอง GitHub จะรันให้บนเครื่อง Linux (`ubuntu-latest`) ซึ่งไม่กินโควตานาทีแพงแบบ macOS กดรันเองก็ได้ (`workflow_dispatch`)
 
@@ -285,14 +285,14 @@ jobs:
 | 19 | `flutter pub get` ติดตั้งแพ็กเกจตาม `pubspec.lock` |
 | 21–27 | `flutter analyze` ตรวจโค้ดแบบไม่ต้องรัน (static analysis) ตามกฎใน `analysis_options.yaml` ข้อความระดับ info/warning ไม่ทำให้ล้ม แต่ error ทำให้ล้ม `tee` เก็บผลลงไฟล์พร้อมแสดงบนจอ ถ้าล้มจะส่ง 40 บรรทัดสุดท้ายเป็น `::error::` (annotation ที่ GitHub แสดงในหน้า Summary) และส่ง warning 20 รายการแรกเป็น `::warning::` |
 | 23 | `set -o pipefail` ให้คำสั่งทั้งท่อ (pipe) ล้มเมื่อ `flutter analyze` ล้ม ไม่งั้น `tee` ที่สำเร็จจะกลบผลล้มเหลว |
-| 27 | `\|\| true` ท้ายบรรทัด ทำให้ไม่ล้มเมื่อไม่มี warning เลย (`grep` ไม่เจออะไรจะคืนค่าผิดพลาด) — แก้ใน commit ล่าสุดวันที่ 9 ต.ค. |
+| 27 | `\|\| true` ท้ายบรรทัด ทำให้ไม่ล้มเมื่อไม่มี warning เลย (`grep` ไม่เจออะไรจะคืนค่าผิดพลาด) |
 | 28–29 | `if: always()` รันเทสต์ต่อแม้ขั้น analyze ล้ม จะได้เห็นผลทั้งสองอย่างในรอบเดียว |
 | 31–35 | `flutter test --reporter expanded` แสดงชื่อเทสต์ทีละตัว ถ้าล้มดึงบรรทัดที่มี `Expected:`/`Actual:`/`Error:` มาเป็น annotation |
 
 > [!WHY]
-> เดิมการทดสอบต้องรันเองบนเครื่อง ซึ่งลืมได้ CI ทำให้ทุกการแก้ถูกตรวจอัตโนมัติ ถ้าใครแก้แล้วทำของเดิมพัง จะเห็นเครื่องหมาย ✗ สีแดงบน GitHub ทันที ตัวอย่างจริง: commit วันที่ 9 ต.ค. ที่เปลี่ยนวันที่บนกราฟเป็นแบบไทย ทำให้ `energy_usage_chart_test.dart` ที่ยังคาดรูปแบบวันที่แบบเดิมล้ม CI จับได้ แล้วจึงแก้เทสต์ให้คาดวันที่แบบไทย
+> ถ้าการทดสอบต้องรันเองบนเครื่อง ก็ลืมได้ CI ทำให้ทุกการแก้ถูกตรวจอัตโนมัติ ถ้าใครแก้แล้วทำของเดิมพัง จะเห็นเครื่องหมาย ✗ สีแดงบน GitHub ทันที เช่น ถ้าเปลี่ยนรูปแบบวันที่บนกราฟแล้วลืมแก้ `energy_usage_chart_test.dart` CI จะจับได้
 
-#### `.github/workflows/build-android.yml` (82 บรรทัด, เพิ่ม 9 ต.ค. 2569)
+#### `.github/workflows/build-android.yml` (82 บรรทัด)
 
 Workflow ชื่อ "Build Android (APK)" สร้างไฟล์ติดตั้ง Android บนเครื่อง Linux ของ GitHub **โดยไม่ต้องลง Flutter หรือ Android SDK ในเครื่องตัวเอง** ทำงานคู่กับ `build-apk.ps1` (สคริปต์เดิมที่ build บนเครื่อง Windows) ไม่ได้มาแทน คอมเมนต์หัวไฟล์อธิบายวิธีใช้: แท็บ Actions → "Build Android (APK)" → Run workflow
 
@@ -362,7 +362,7 @@ jobs:
 
 | บรรทัด | อธิบาย |
 |---|---|
-| 30–34 | Gradle ของ Android ต้องใช้ Java ติดตั้ง JDK 17 ของ Temurin (Eclipse) commit `ffd129c` อัปเดต `setup-java` จาก v4 เป็น **v5** |
+| 30–34 | Gradle ของ Android ต้องใช้ Java ติดตั้ง JDK 17 ของ Temurin (Eclipse) ด้วย `actions/setup-java@v5` |
 | 36–40 | ติดตั้ง Flutter รุ่น stable และเปิด cache ให้รอบหน้าเร็วขึ้น |
 | 43–45 | ดึงความลับจาก **GitHub Secrets** มาเป็นตัวแปรสภาพแวดล้อม (ไม่เขียนลงไฟล์ workflow ที่ทุกคนเห็น) |
 | 47 | `-n` = "ไม่ว่าง" ตั้ง Secrets ครบทั้งสองตัวจึงใช้กุญแจจริง |
@@ -570,7 +570,7 @@ chmod 644 "$CRON_FILE"
 
 - **86** `{a,b,c}` คือ brace expansion ของ bash ขยายเป็นหลายพาธในคำสั่งเดียว (`mkdir -p` = สร้างพ่อแม่ให้และไม่ error ถ้ามีแล้ว)
 - **87–89** เจ้าของทั้งหมดเป็นผู้ใช้ แต่ `mosquitto/data` และ `certs` เป็นของ uid 1883 เพราะ Mosquitto ในคอนเทนเนอร์รันเป็น uid นั้น ถ้าไม่ตรง Mosquitto อ่านไฟล์ไม่ได้ → วน Restarting (อาการที่ `fix-mqtt-permissions.sh` แก้)
-- **90–91** (เพิ่ม 14 ต.ค. 2569) โฟลเดอร์ `firmware` เป็นของ uid 1000 = user `node` ในคอนเทนเนอร์ backend หลักคิดเดียวกับ Mosquitto: คอนเทนเนอร์เขียนไฟล์ลง bind mount ด้วย uid ของตัวเอง ถ้าโฟลเดอร์เป็นของผู้ใช้คนอื่นและสิทธิ์ `755` user `node` จะเขียนไม่ได้ ไม่ใช้ `-R` เพราะต้องการแค่สิทธิ์สร้างไฟล์ในโฟลเดอร์ ไฟล์เก่าที่ `scp` มายังเป็นของผู้ใช้เดิมได้ (Caddy แค่อ่าน) ทางเลือกอื่นคือ `chmod 777` ซึ่งให้ทุกคนบนเครื่องเขียนได้ หลวมเกินไป
+- **90–91** โฟลเดอร์ `firmware` เป็นของ uid 1000 = user `node` ในคอนเทนเนอร์ backend หลักคิดเดียวกับ Mosquitto: คอนเทนเนอร์เขียนไฟล์ลง bind mount ด้วย uid ของตัวเอง ถ้าโฟลเดอร์เป็นของผู้ใช้คนอื่นและสิทธิ์ `755` user `node` จะเขียนไม่ได้ ไม่ใช้ `-R` เพราะต้องการแค่สิทธิ์สร้างไฟล์ในโฟลเดอร์ ไฟล์เก่าที่ `scp` มายังเป็นของผู้ใช้เดิมได้ (Caddy แค่อ่าน) ทางเลือกอื่นคือ `chmod 777` ซึ่งให้ทุกคนบนเครื่องเขียนได้ หลวมเกินไป
 - **92–93** `750` = เจ้าของทำได้ทุกอย่าง กลุ่มอ่านได้ คนอื่นไม่ได้เลย, `backups` เป็น `700` เฉพาะเจ้าของ เพราะไฟล์สำรองมีข้อมูลผู้ใช้
 - **98–108** เขียน cron: `>> ไฟล์ 2>&1` ต่อท้าย log และรวม stderr ไว้ด้วย ตรวจย้อนหลังได้ที่ `/var/log/rmutt-cert.log` และ `/var/log/rmutt-backup.log` ใบรับรองของ Caddy ต่ออายุเองทุก ~60 วัน ถ้าไม่ก๊อปให้ Mosquitto ใบเก่าหมดอายุแล้ว **บอร์ด ESP32 ทุกตัวต่อ MQTT ไม่ได้พร้อมกัน** จึงให้ cron ตรวจทุกวัน (ไม่รอ 60 วัน เพราะวันที่ต่ออายุเดาไม่ได้)
 - สคริปต์ใน cron อ้างไฟล์ `$APP_DIR/sync-mqtt-cert.sh` และ `backup-db.sh` ซึ่ง `upload.ps1` ส่งขึ้นมาแล้วตั้งแต่ขั้น 1
@@ -755,7 +755,7 @@ fi
 
 ฟังก์ชันนี้ลองตรวจไฟล์ 3 วิธีตามลำดับ เพราะโฟลเดอร์ `mosquitto/data` เป็นของ uid 1883 สิทธิ์ 700 ผู้ใช้ทั่วไป "มองไม่เห็น" ไฟล์ข้างใน `[ -f ]` จึงตอบ "ไม่มี" ทั้งที่มี: (1) ตรงๆ (2) ถามผ่านคอนเทนเนอร์ `rmutt-mqtt` (3) `sudo -n` (`-n` = ห้ามถามรหัส จะไม่ค้าง) ถ้าทุกทางตรวจไม่ได้เพราะไม่มีสิทธิ์ ก็ **ไม่สรุปว่าไม่มี** (คืน 0 พร้อมเตือน) หลักคิด: ตรวจผิดว่า "ไม่มี" จะบล็อกการอัปเดตโดยไม่จำเป็น `return 0` = จริง (สำเร็จ) ของ bash บรรทัด 37–43 ตรวจต่อว่า `.env` มี `MQTT_DEVICE_SECRET` (`grep -q '^...=.\+'` = มีค่าอย่างน้อย 1 ตัว) และเตือนถ้ายังเป็น `.env` รุ่นเก่า (ไม่มี `DB_ROOT_PASSWORD`)
 
-**บรรทัด 44–49 (เจ้าของโฟลเดอร์ firmware, เพิ่ม 14 ต.ค. 2569)**
+**บรรทัด 44–49 (เจ้าของโฟลเดอร์ firmware)**
 
 ```bash:44
 mkdir -p firmware backups
@@ -769,7 +769,7 @@ fi
 - **44** `mkdir -p` สร้างโฟลเดอร์ถ้ายังไม่มี (เครื่องที่ติดตั้งก่อนมีฟีเจอร์นี้ก็มีอยู่แล้ว ไม่ error)
 - **46** `stat -c %u firmware` พิมพ์ **เลข uid** ของเจ้าของโฟลเดอร์ ถ้าเป็น 1000 อยู่แล้วข้ามทั้งก้อน (idempotent ไม่ต้อง sudo ทุกครั้ง)
 - **47–48** ลองสามทางเรียงกัน: `chown` ตรง ๆ (ได้ถ้ารันเป็น root) → `sudo -n chown` (`-n` = ห้ามถามรหัส สคริปต์นี้รันผ่าน SSH แบบไม่มี terminal ถ้า sudo ต้องถามรหัสจะค้าง จึงให้ล้มทันทีแทน) → ถ้าไม่ได้ทั้งคู่ **แค่เตือน** พร้อมคำสั่งแก้ ไม่ `fail` เพราะการอัปเดต Backend ยังทำต่อได้ เสียแค่ปุ่มอัปโหลดในเว็บ `2>/dev/null` ซ่อนข้อความ error ของความพยายามที่ล้ม ให้เหลือแต่คำเตือนที่อ่านง่าย
-- **ทำไมต้องมีทั้งใน `setup-vps.sh` และที่นี่:** เครื่องที่ติดตั้งไว้ก่อน 14 ต.ค. 2569 จะไม่รัน `setup-vps.sh` อีก โฟลเดอร์ยังเป็นของผู้ใช้เดิม และ `docker-compose.yml` เพิ่งเปลี่ยน mount ของ Backend จาก `./firmware:/firmware:ro` เป็น `./firmware:/firmware` การอัปเดตครั้งแรกหลังดึงโค้ดใหม่จึงต้องแก้สิทธิ์ให้เอง
+- **ทำไมต้องมีทั้งใน `setup-vps.sh` และที่นี่:** `setup-vps.sh` รันครั้งเดียวตอนติดตั้งเครื่องใหม่ ถ้าโฟลเดอร์ firmware ถูกสร้างหรือเปลี่ยนเจ้าของทีหลัง (เช่นก๊อปไฟล์ด้วย `sudo`) Backend จะเขียนไม่ได้ `update-remote.sh` จึงตรวจและแก้สิทธิ์ให้ทุกครั้งที่อัปเดต
 
 **บรรทัด 62–74 (build + รอ) ของ `deploy/update-remote.sh`**
 
@@ -824,7 +824,7 @@ docker compose restart backend || fail 'รีสตาร์ทไม่สำ�
 รัน migration 6 ตัวตามลำดับ (`energy-history-v370`, `auto-off-v380`, `system-settings-v3100`, `firmware-v3140`, `offline-history-v3150`, `drop-unused`) แล้ว `doctor.js --fix` (เทียบกับ `database/schema.sql` และเติมตาราง/คอลัมน์ที่ขาด) **หัวใจคือ idempotent** ทุกสคริปต์ตรวจก่อนว่ามีอยู่แล้วหรือยัง จึงรันซ้ำทุกครั้งได้ ไม่ต้องจำว่ารอบนี้ต้องรันตัวไหน `-T` จำเป็นเพราะ SSH แบบสั่งคำสั่งเดียวไม่มี terminal บรรทัด 95 ก๊อปใบรับรองเผื่อต่ออายุระหว่างนั้น (ล้มเหลวได้เพราะไม่ใช่ root จึงแค่เตือน) บรรทัด 98 รีสตาร์ทให้ Backend รู้จักตารางใหม่
 
 > [!WARN]
-> **สำรองฐานข้อมูลเองก่อนอัปเดตทุกครั้ง** `update-remote.sh` ไม่ได้สำรองให้ก่อน migrate ส่วน backup อัตโนมัติรันแค่ตอนตี 2:30 ปกติ migration ทุกตัวแค่ "เพิ่ม" ตาราง/คอลัมน์ ถ้าพลาดก็ไม่เสียข้อมูล แต่ `migrate-drop-unused.js` (14 ต.ค. 2569) **ลบ** คอลัมน์และแถวจริง จึงควร ssh เข้าเครื่องแล้วรัน `cd /opt/rmutt && bash backup-db.sh` ก่อน แล้วตรวจว่าไฟล์ครบด้วย `zcat backups/<ไฟล์ล่าสุด>.sql.gz | grep -c "CREATE TABLE"` (ควรได้อย่างน้อย 11 ตามจำนวนตารางใน `schema.sql`) ถ้ามีปัญหาหลังอัปเดต กู้คืนได้ตามหัวข้อ "สำรองข้อมูล" ด้านล่าง
+> **สำรองฐานข้อมูลเองก่อนอัปเดตทุกครั้ง** `update-remote.sh` ไม่ได้สำรองให้ก่อน migrate ส่วน backup อัตโนมัติรันแค่ตอนตี 2:30 ปกติ migration ทุกตัวแค่ "เพิ่ม" ตาราง/คอลัมน์ ถ้าพลาดก็ไม่เสียข้อมูล แต่ `migrate-drop-unused.js` **ลบ** คอลัมน์และแถวจริง จึงควร ssh เข้าเครื่องแล้วรัน `cd /opt/rmutt && bash backup-db.sh` ก่อน แล้วตรวจว่าไฟล์ครบด้วย `zcat backups/<ไฟล์ล่าสุด>.sql.gz | grep -c "CREATE TABLE"` (ควรได้อย่างน้อย 11 ตามจำนวนตารางใน `schema.sql`) ถ้ามีปัญหาหลังอัปเดต กู้คืนได้ตามหัวข้อ "สำรองข้อมูล" ด้านล่าง
 
 **บรรทัด 111–123 (ขั้น 5: โหลด Caddy ใหม่ และสร้างกล่อง tailscale ใหม่) ของ `deploy/update-remote.sh`**
 
@@ -844,7 +844,7 @@ if docker compose ps --services 2>/dev/null | grep -qx tailscale; then
 fi
 ```
 
-- **112–115** เดิมของขั้นนี้: ให้ Caddy ขึ้น แล้ว `caddy reload` อ่าน `Caddyfile` ใหม่โดยไม่ตัดการเชื่อมต่อ ถ้าล้มเหลวแค่เตือน (`&& ... || ...` เป็นรูปแบบ "สำเร็จพิมพ์อย่างหนึ่ง ล้มพิมพ์อีกอย่าง" ไม่ใช้ `fail` เพราะไม่ควรหยุดทั้งสคริปต์)
+- **112–115** ส่วนแรกของขั้นนี้: ให้ Caddy ขึ้น แล้ว `caddy reload` อ่าน `Caddyfile` ใหม่โดยไม่ตัดการเชื่อมต่อ ถ้าล้มเหลวแค่เตือน (`&& ... || ...` เป็นรูปแบบ "สำเร็จพิมพ์อย่างหนึ่ง ล้มพิมพ์อีกอย่าง" ไม่ใช้ `fail` เพราะไม่ควรหยุดทั้งสคริปต์)
 - **117–118** เหตุผลของขั้นใหม่: `update-server.ps1` อัปโหลด `tailscale-serve.json` ทับเป็นไฟล์ใหม่ แต่ container tailscale ที่รันอยู่ยังเห็นไฟล์เก่า (bind mount ของไฟล์เดี่ยวผูกกับตัวไฟล์เดิม แบบเดียวกับปัญหา inode ของโฟลเดอร์ `www` ในบทนี้) ถ้าแค่ `restart` กฎใหม่ (เช่นพอร์ต 8443 ของ MQTT) จะไม่มีผล จึงต้องสร้างกล่องใหม่ สถานะล็อกอินอยู่ในโฟลเดอร์ `./tailscale/state` (bind mount ของโฟลเดอร์ จึงอยู่รอด) ชื่อ ts.net จึงไม่เปลี่ยนและไม่ต้องล็อกอินใหม่
 - **119** `docker compose ps --services` พิมพ์ชื่อ service ของ compose นี้ `grep -qx tailscale` (`-q` เงียบ, `-x` ต้องตรงทั้งบรรทัด) ใช้เป็นเงื่อนไข ทำเฉพาะเมื่อมี service ชื่อ `tailscale` กัน compose รุ่นเก่าที่ยังไม่มีกล่องนี้
 - **120–122** `up -d --force-recreate tailscale` สร้างกล่องนี้ใหม่ทั้งที่ config ไม่เปลี่ยน (เฉพาะกล่องนี้ ไม่แตะ db/mqtt/backend) ผลเป็นข้อความ "เว็บ 443 + MQTT 8443" ถ้าล้มเหลวแค่เตือน เพราะ Backend อัปเดตเสร็จไปแล้ว การสร้างใหม่ทำให้ Funnel หลุดช่วงสั้น ๆ ระหว่างกล่องเริ่มใหม่
@@ -1215,7 +1215,7 @@ docker stats --no-stream # CPU/RAM ของแต่ละกล่อง (db �
 docker system df         # พื้นที่ที่ image/volume/cache ของ Docker ใช้
 ```
 
-**อ่านค่าอย่างไร:** load average ต่ำกว่าจำนวน core = CPU ว่าง, `available` ของ RAM สำคัญกว่า `free` (Linux เอา RAM ว่างไปทำ cache แล้วคืนให้เมื่อโปรแกรมต้องการ), Swap ที่แทบไม่ถูกใช้แปลว่า RAM ไม่ตึง ตัวอย่างจากเครื่องจริง 14 ต.ค. 2569: RAM 3.8 GiB ใช้ 870 MiB (available 3.0 GiB), ดิสก์ 30 GB ใช้ 40%, 2 core load 0.58 แปลว่ายังเหลือมาก ถ้าดิสก์ใกล้เต็ม ลบได้อย่างปลอดภัยด้วย `docker image prune -f` และ `docker builder prune -f` แต่ **ห้าม** `docker volume prune` เพราะฐานข้อมูลอยู่ใน volume
+**อ่านค่าอย่างไร:** load average ต่ำกว่าจำนวน core = CPU ว่าง, `available` ของ RAM สำคัญกว่า `free` (Linux เอา RAM ว่างไปทำ cache แล้วคืนให้เมื่อโปรแกรมต้องการ), Swap ที่แทบไม่ถูกใช้แปลว่า RAM ไม่ตึง ตัวอย่างจากเครื่องจริงของโปรเจกต์: RAM 3.8 GiB ใช้ 870 MiB (available 3.0 GiB), ดิสก์ 30 GB ใช้ 40%, 2 core load 0.58 แปลว่ายังเหลือมาก ถ้าดิสก์ใกล้เต็ม ลบได้อย่างปลอดภัยด้วย `docker image prune -f` และ `docker builder prune -f` แต่ **ห้าม** `docker volume prune` เพราะฐานข้อมูลอยู่ใน volume
 
 ### ดู log และสถานะ
 
@@ -1243,8 +1243,8 @@ tail /var/log/rmutt-cert.log           # ผลก๊อปใบรับรอ
 | บอร์ดที่ตั้งให้ต่อ `ts.net:8443` ต่อ MQTT ไม่ได้ (เว็บผ่าน ts.net ยังเข้าได้) | `tailscale-serve.json` ใหม่ยังไม่มีผล (กล่อง tailscale ยังอ่านไฟล์เก่า) หรือไม่มีบรรทัด `:8443` ใน `AllowFunnel` | `docker compose up -d --force-recreate tailscale` (`update-remote.sh` ทำให้เองในขั้น 5) แล้วดู `docker compose logs --tail 40 tailscale` |
 | `init-env.sh` ใหม่แล้ว Backend ต่อ DB ไม่ได้ | รหัส DB ใหม่ใช้กับฐานข้อมูลที่สร้างไปแล้วไม่ได้ (MariaDB ตั้ง user ครั้งเดียว) | คืน `.env` จากไฟล์ `.env.bak-*` หรือแก้ `.env` เอง |
 | `docker: permission denied` | ผู้ใช้ยังไม่อยู่กลุ่ม docker (หรือยังไม่ล็อกอินใหม่) | ออกจาก SSH แล้วเข้าใหม่ |
-| อัปโหลดเฟิร์มแวร์จากเว็บแล้วขึ้น "Backend เขียนโฟลเดอร์ firmware ไม่ได้" (เพิ่ม 14 ต.ค. 2569) | โฟลเดอร์ `/opt/rmutt/firmware` ไม่ใช่ของ uid 1000 หรือ `docker-compose.yml` บนเครื่องยังเป็น `:ro` | `sudo chown 1000:1000 /opt/rmutt/firmware` แล้วอัปเดตด้วย `update-server.ps1` (สคริปต์แก้สิทธิ์ให้เองถ้าทำได้) |
-| `update-server.ps1` / `npm` ขึ้น `cannot be loaded because running scripts is disabled on this system` (เพิ่ม 15 ต.ค. 2569) | Windows ตั้ง Execution Policy ไม่ให้รันสคริปต์ `.ps1` (ค่าเริ่มต้น) หรือเคยตั้งแบบ `-Scope Process` ซึ่งหายเมื่อปิดหน้าต่าง | ตั้งครั้งเดียวต่อบัญชี: `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` หรือเฉพาะครั้งนั้น: `powershell -ExecutionPolicy Bypass -File .\update-server.ps1` |
+| อัปโหลดเฟิร์มแวร์จากเว็บแล้วขึ้น "Backend เขียนโฟลเดอร์ firmware ไม่ได้" | โฟลเดอร์ `/opt/rmutt/firmware` ไม่ใช่ของ uid 1000 หรือ `docker-compose.yml` บนเครื่องยังเป็น `:ro` | `sudo chown 1000:1000 /opt/rmutt/firmware` แล้วอัปเดตด้วย `update-server.ps1` (สคริปต์แก้สิทธิ์ให้เองถ้าทำได้) |
+| `update-server.ps1` / `npm` ขึ้น `cannot be loaded because running scripts is disabled on this system` | Windows ตั้ง Execution Policy ไม่ให้รันสคริปต์ `.ps1` (ค่าเริ่มต้น) หรือเคยตั้งแบบ `-Scope Process` ซึ่งหายเมื่อปิดหน้าต่าง | ตั้งครั้งเดียวต่อบัญชี: `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` หรือเฉพาะครั้งนั้น: `powershell -ExecutionPolicy Bypass -File .\update-server.ps1` |
 | พิมพ์ `.\deploy\update-server.ps1` แล้วเปิด Notepad | รันใน Command Prompt ไม่ใช่ PowerShell | `powershell -ExecutionPolicy Bypass -File .\deploy\update-server.ps1` หรือเปิด PowerShell |
 | API ตอบ 404 ที่เส้นทางใหม่ | ยังไม่ได้อัปเดตโค้ดบนเซิร์ฟเวอร์ | `.\deploy\update-server.ps1` (ตรวจ 401/404 ท้ายสคริปต์) |
 | local: ESP32 ไม่ขึ้นในแอป | IP เครื่องเปลี่ยน / Firewall ปิดพอร์ต 1883 / ACL ขาด | `.\diagnose.ps1` แล้วอ่านทีละขั้น, `.\run_all.ps1` ซ่อม `MQTT_URL` และ ACL |
@@ -1267,7 +1267,7 @@ tail /var/log/rmutt-cert.log           # ผลก๊อปใบรับรอ
 
 ### Backend: `npm test` = `node --test`
 
-`package.json` กำหนด `"test": "node --test"` Node จะค้นหาไฟล์ `*.test.js` ใน `test/` แล้วรันแต่ละไฟล์เป็นกระบวนการแยก (ไฟล์หนึ่งพังไม่ลากไฟล์อื่น) มี **21 ไฟล์ รวม 136 เทสต์** (นับบรรทัดที่ขึ้นต้นด้วย `test(` ในแต่ละไฟล์; เดิม 20 ไฟล์ 126 เทสต์ เพิ่ม `unprovision.test.js` 2 เทสต์ เมื่อ 13 ต.ค. 2569 และเทสต์ใน `air-conditioner` +4 กับ `firmware` +4 เมื่อ 11–14 ต.ค. 2569) รูปแบบ:
+`package.json` กำหนด `"test": "node --test"` Node จะค้นหาไฟล์ `*.test.js` ใน `test/` แล้วรันแต่ละไฟล์เป็นกระบวนการแยก (ไฟล์หนึ่งพังไม่ลากไฟล์อื่น) มี **21 ไฟล์ รวม 136 เทสต์** (นับบรรทัดที่ขึ้นต้นด้วย `test(` ในแต่ละไฟล์) รูปแบบ:
 
 ```js
 import assert from 'node:assert/strict';
@@ -1286,17 +1286,17 @@ test('OTP always contains exactly six digits', () => {
 |---|---|---|
 | ความปลอดภัย/ผู้ใช้ | `security` (3), `user` (2), `user-management` (7), `profile-email` (4) | OTP 6 หลัก, แฮชแบบเทียบเวลาคงที่, ความยาวรหัสผ่านตามขีดจำกัด bcrypt, กฎการจัดการผู้ใช้, อีเมล |
 | ห้อง/ตารางเรียน | `room` (4), `room-booking` (5), `schedule` (11), `schedule-import` (9), `xlsx-writer` (6) | ตรรกะห้อง การจองห้อง ตารางเรียน นำเข้า Excel และเขียนไฟล์ xlsx |
-| แอร์/เซ็นเซอร์ | `air-conditioner` (10), `pzem-status` (4), `occupancy-sensor` (5), `auto-off` (15) | คำสั่งแอร์ สถานะ PZEM เซ็นเซอร์ตรวจคน และการตัดสินใจปิดแอร์อัตโนมัติ (ชุดใหญ่สุดเพราะผิดแล้วกระทบการใช้งานจริง) + (เพิ่ม 11 ต.ค. 2569) โปรโตคอล `DAIKIN_WIRED`: คำสั่งที่รีโมตติดผนังทำไม่ได้ถูกปฏิเสธ/ปิด, `controlType`, อ่าน `controlMode: wired` จาก status |
+| แอร์/เซ็นเซอร์ | `air-conditioner` (10), `pzem-status` (4), `occupancy-sensor` (5), `auto-off` (15) | คำสั่งแอร์ สถานะ PZEM เซ็นเซอร์ตรวจคน และการตัดสินใจปิดแอร์อัตโนมัติ (ชุดใหญ่สุดเพราะผิดแล้วกระทบการใช้งานจริง) + โปรโตคอล `DAIKIN_WIRED`: คำสั่งที่รีโมตติดผนังทำไม่ได้ถูกปฏิเสธ/ปิด, `controlType`, อ่าน `controlMode: wired` จาก status |
 | พลังงาน/ประวัติ | `energy-history` (17), `offline-history` (4) | สรุปค่าไฟรายชั่วโมง/วัน และรับข้อมูลที่บอร์ดเก็บตอนเน็ตหลุด |
-| MQTT/เฟิร์มแวร์ | `mqtt` (3), `mqtt-accounts` (7), `mqtt-provisioning` (5), `firmware` (7), `unprovision` (2) | topic และข้อความ, บัญชี dynsec ต่อบอร์ด, provisioning, ชื่อไฟล์ OTA + (เพิ่ม 14 ต.ค. 2569) แยกชนิดไฟล์ `air`/`wired`/`occupancy`, ห้ามสั่งไฟล์ผิดชนิด, อ่าน/เทียบรุ่นจากชื่อไฟล์, ตรวจไบต์ `0xE9` และขนาดไม่เกินช่อง OTA + (เพิ่ม 13 ต.ค. 2569) รูปคำสั่ง `unprovision` และนับเป็นคำตอบเฉพาะ `unprovisioned === true` ของบอร์ดตัวเดียวกัน |
+| MQTT/เฟิร์มแวร์ | `mqtt` (3), `mqtt-accounts` (7), `mqtt-provisioning` (5), `firmware` (7), `unprovision` (2) | topic และข้อความ, บัญชี dynsec ต่อบอร์ด, provisioning, ชื่อไฟล์ OTA + แยกชนิดไฟล์ `air`/`wired`/`occupancy`, ห้ามสั่งไฟล์ผิดชนิด, อ่าน/เทียบรุ่นจากชื่อไฟล์, ตรวจไบต์ `0xE9` และขนาดไม่เกินช่อง OTA + รูปคำสั่ง `unprovision` และนับเป็นคำตอบเฉพาะ `unprovisioned === true` ของบอร์ดตัวเดียวกัน |
 | ฐานข้อมูล | `schema-doctor` (6) | ตัววิเคราะห์ `schema.sql` ของ doctor (ทุกตารางถูก parse, หาคอลัมน์ที่ขาด) โดยอ่านไฟล์ schema จริง ไม่ต้องต่อ DB |
 
 > [!NOTE]
-> จำนวนเทสต์นับจากข้อความ `test(` ในไฟล์ ตัวเลขจริงตอนรันอาจต่างเล็กน้อย ตอนผู้เขียนลองรัน `node --test` บนสำเนาที่ **ยังไม่ได้ `npm ci`** 8 ไฟล์ import แพ็กเกจ (เช่น `fflate`) ไม่ได้จึงล้มตั้งแต่โหลด ส่วนอีก 12 ไฟล์ผ่านรวม 79 เทสต์ ดังนั้นต้อง `npm ci` ก่อนเสมอ ผลที่ถูกต้องคือ `fail 0` (14 ต.ค. 2569: รัน `node --test test/unprovision.test.js test/firmware.test.js test/air-conditioner.test.js` สามไฟล์ที่เปลี่ยนรอบนี้ได้ `tests 19`, `pass 19`, `fail 0` ทั้งสามไฟล์ไม่ต้องใช้แพ็กเกจภายนอก)
+> จำนวนเทสต์นับจากข้อความ `test(` ในไฟล์ ตัวเลขจริงตอนรันอาจต่างเล็กน้อย ตอนผู้เขียนลองรัน `node --test` บนสำเนาที่ **ยังไม่ได้ `npm ci`** 8 ไฟล์ import แพ็กเกจ (เช่น `fflate`) ไม่ได้จึงล้มตั้งแต่โหลด ส่วนอีก 12 ไฟล์ผ่านรวม 79 เทสต์ ดังนั้นต้อง `npm ci` ก่อนเสมอ ผลที่ถูกต้องคือ `fail 0` (รัน `node --test test/unprovision.test.js test/firmware.test.js test/air-conditioner.test.js` สามไฟล์ที่เปลี่ยนรอบนี้ได้ `tests 19`, `pass 19`, `fail 0` ทั้งสามไฟล์ไม่ต้องใช้แพ็กเกจภายนอก)
 
 ### แอป Flutter: `flutter test`
 
-มี **21 ไฟล์ ประมาณ 119 เทสต์** ใน `test/` (9 ต.ค. เพิ่ม `room_calendar_test.dart` 11 เทสต์ และ `energy_usage_chart_test.dart` จาก 9 เป็น 14) (นับ `test(` และ `testWidgets(`) เทสต์ส่วนใหญ่เป็นตรรกะล้วนไม่ต้องเปิดหน้าจอ ตัวอย่างพื้นที่ที่ครอบคลุม:
+มี **22 ไฟล์ 122 เทสต์** ใน `test/` (นับ `test(` และ `testWidgets(`) เทสต์ส่วนใหญ่เป็นตรรกะล้วนไม่ต้องเปิดหน้าจอ ตัวอย่างพื้นที่ที่ครอบคลุม:
 
 | พื้นที่ | ไฟล์ | ตรวจอะไร |
 |---|---|---|
@@ -1305,7 +1305,7 @@ test('OTP always contains exactly six digits', () => {
 | ตารางเรียน | `class_schedule_test`, `schedule_date_test`, `schedule_import_test`, `room_calendar_test` | ตรรกะตารางและวันที่ นำเข้าตาราง การใช้ห้อง (วันเดียว/รายวัน/รายสัปดาห์) ภาคเรียน และ CSV |
 | ภาษา/รูปแบบ | `app_localizations_test`, `thai_date_test`, `number_format_test` | แปลภาษา วันที่ไทย (พ.ศ.) รูปแบบตัวเลข |
 | ตั้งค่า/ผู้ใช้ | `app_preferences_test`, `system_settings_test`, `user_management_test` | ค่าที่จำในเครื่อง ตั้งค่าระบบ จัดการผู้ใช้ |
-| บลูทูธ/Wi-Fi | `ble_identity_test`, `wifi_network_candidate_test`, `saijo_denki_support_test` | ระบุตัวบอร์ดจากชื่อ BLE เลือกเครือข่าย Wi-Fi รองรับรุ่นแอร์ |
+| บลูทูธ/Wi-Fi/ยี่ห้อแอร์ | `ble_identity_test`, `wifi_network_candidate_test`, `saijo_denki_support_test`, `daikin_wired_support_test` | ระบุตัวบอร์ดจากชื่อ BLE เลือกเครือข่าย Wi-Fi รองรับรุ่นแอร์ |
 | อื่น ๆ | `mock_data_test`, `widget_test` | ข้อมูลจำลอง และทดสอบ widget พื้นฐาน |
 
 `--dart-define` ไม่เกี่ยวกับ `flutter test` (ค่าเริ่มต้นของ `API_BASE_URL` ใช้ในโค้ด)
@@ -1340,7 +1340,7 @@ g++ -std=c++17 -I../rmutt_esp32_air history_log_test.cpp -o t && ./t
 - **ยืนยันก่อนทำสิ่งที่ย้อนไม่ได้** — `init-env.sh` ถามพิมพ์ `yes` สองด่านและสำรอง `.env` ก่อนเสมอ, `change-keystore-password.ps1` สำรอง `.jks` แล้วคืนให้เมื่อพลาด, `seed-admin.sh` เตือนว่ารันซ้ำ = รีเซ็ตรหัส
 - **Single source of truth ของค่าตั้ง** — `ServerConfig.ps1` + `server.config.json` ให้ทุกสคริปต์ Windows ใช้ host/user/port/domain ร่วมกัน แก้ที่เดียว และไฟล์นั้นไม่ขึ้น git
 - **ความลับไม่เข้า git และไม่ค้างเป็นข้อความธรรมดา** — `.gitignore`, รหัสสุ่มจาก `openssl`, `chmod 600 .env`, `seed-admin.sh` ส่งรหัสทาง stdin แล้วล้างจาก `.env`, `db-tunnel.ps1` ส่งรหัส DB ทางคลิปบอร์ด ไม่พิมพ์ขึ้นจอ
-- **Least privilege (สิทธิ์น้อยที่สุดที่ใช้ได้)** — Backend ใช้ DB user `rmutt_app` ไม่ใช่ root, Mosquitto เป็น uid 1883, DB ผูกกับ 127.0.0.1, แต่ละบอร์ดมีบัญชี MQTT ของตัวเอง, โฟลเดอร์ `firmware` ให้ uid 1000 เขียนได้เฉพาะโฟลเดอร์นั้น (ไม่ใช่ `chmod 777` และ Caddy ยัง mount แบบ `:ro`) (เพิ่ม 14 ต.ค. 2569)
+- **Least privilege (สิทธิ์น้อยที่สุดที่ใช้ได้)** — Backend ใช้ DB user `rmutt_app` ไม่ใช่ root, Mosquitto เป็น uid 1883, DB ผูกกับ 127.0.0.1, แต่ละบอร์ดมีบัญชี MQTT ของตัวเอง, โฟลเดอร์ `firmware` ให้ uid 1000 เขียนได้เฉพาะโฟลเดอร์นั้น (ไม่ใช่ `chmod 777` และ Caddy ยัง mount แบบ `:ro`)
 - **Deadline loop (รอแบบมีเวลาหมด)** — `run_all.ps1` รอ DB/broker/health, `update-remote.sh` รอ backend 40×2 วินาที แทนการ `sleep` ตายตัว
 - **ตรวจผลจริงหลัง deploy (smoke test)** — `update-remote.sh` ยิง `/api/health`, 4 เส้นทางต้องได้ 401, หน้าเว็บต้อง 200 และมี "RMUTT" แล้วค่อยบอกว่าสำเร็จ
 - **Orchestrator/worker แยกเครื่อง** — Windows (`update-server.ps1`) เตรียมไฟล์และสั่งงาน, Ubuntu (`update-remote.sh`) ทำงานจริง เพราะ bash/Docker อยู่ที่เซิร์ฟเวอร์ และการรันบนเครื่องเดียวกับข้อมูลลดปัญหาเครือข่ายกลางทาง
@@ -1382,11 +1382,11 @@ g++ -std=c++17 -I../rmutt_esp32_air history_log_test.cpp -o t && ./t
 
 > [!ASK]
 > **ถาม:** ไม่มีเครื่องที่ลง Flutter จะสร้างไฟล์ APK ได้อย่างไร?
-> **ตอบ:** ใช้ `build-android.yml` บน GitHub Actions (เพิ่ม 9 ต.ค.) กดรันในแท็บ Actions กรอกที่อยู่ API แล้วเครื่อง Ubuntu ของ GitHub ติดตั้ง Java 17 + Flutter, build APK แบบ release และให้ดาวน์โหลดเป็น artifact 14 วัน กุญแจเซ็นเก็บใน GitHub Secrets เป็น base64 ไม่อยู่ใน repo ถ้ายังไม่ตั้ง Secrets จะเซ็นด้วย debug key และชื่อไฟล์ลงท้าย `-DEBUG-KEY` ใช้ทดสอบได้แต่ห้ามแจก เพราะอัปเดตทับด้วยไฟล์ที่เซ็นกุญแจจริงไม่ได้
+> **ตอบ:** ใช้ `build-android.yml` บน GitHub Actions กดรันในแท็บ Actions กรอกที่อยู่ API แล้วเครื่อง Ubuntu ของ GitHub ติดตั้ง Java 17 + Flutter, build APK แบบ release และให้ดาวน์โหลดเป็น artifact 14 วัน กุญแจเซ็นเก็บใน GitHub Secrets เป็น base64 ไม่อยู่ใน repo ถ้ายังไม่ตั้ง Secrets จะเซ็นด้วย debug key และชื่อไฟล์ลงท้าย `-DEBUG-KEY` ใช้ทดสอบได้แต่ห้ามแจก เพราะอัปเดตทับด้วยไฟล์ที่เซ็นกุญแจจริงไม่ได้
 
 > [!ASK]
 > **ถาม:** ทดสอบอะไรบ้าง ครอบคลุมแค่ไหน?
-> **ตอบ:** Backend 21 ไฟล์ 136 เทสต์ด้วย `node --test` (ความปลอดภัย ตารางเรียน นำเข้า Excel ปิดแอร์อัตโนมัติ ประวัติพลังงาน บัญชี MQTT schema doctor และตั้งแต่ 13–14 ต.ค. 2569 คำสั่งล้างค่าบอร์ด การตรวจไฟล์เฟิร์มแวร์ และกติกาแอร์สาย `DAIKIN_WIRED`) Flutter 21 ไฟล์ประมาณ 119 เทสต์ด้วย `flutter test` (รูปแบบพลังงาน กราฟ วันที่ไทย ตาราง การใช้ห้อง ภาคเรียน ตั้งค่า BLE) และตั้งแต่ 9 ต.ค. GitHub Actions รัน `flutter analyze` + `flutter test` ให้ทุกครั้งที่ push และเฟิร์มแวร์มีเทสต์ที่คอมไพล์รันบนคอมสำหรับตัวเก็บประวัติใน flash (2,099 checks) ส่วนที่ไม่ครอบคลุมคือการต่อระบบจริงทั้งชุด ซึ่งตรวจด้วย smoke test ใน `update-remote.sh`, `check_system.ps1` และ `diagnose.ps1`
+> **ตอบ:** Backend 21 ไฟล์ 136 เทสต์ด้วย `node --test` (ความปลอดภัย ตารางเรียน นำเข้า Excel ปิดแอร์อัตโนมัติ ประวัติพลังงาน บัญชี MQTT schema doctor คำสั่งล้างค่าบอร์ด การตรวจไฟล์เฟิร์มแวร์ และกติกาแอร์สาย `DAIKIN_WIRED`) Flutter 22 ไฟล์ 122 เทสต์ด้วย `flutter test` (รูปแบบพลังงาน กราฟ วันที่ไทย ตาราง การใช้ห้อง ภาคเรียน ตั้งค่า BLE ฟังก์ชันของแอร์สาย) และ GitHub Actions รัน `flutter analyze` + `flutter test` ให้ทุกครั้งที่ push และเฟิร์มแวร์มีเทสต์ที่คอมไพล์รันบนคอมสำหรับตัวเก็บประวัติใน flash (2,099 checks) ส่วนที่ไม่ครอบคลุมคือการต่อระบบจริงทั้งชุด ซึ่งตรวจด้วย smoke test ใน `update-remote.sh`, `check_system.ps1` และ `diagnose.ps1`
 
 > [!ASK]
 > **ถาม:** ถ้าเซิร์ฟเวอร์พังหมด กู้ข้อมูลอย่างไร?
@@ -1394,7 +1394,7 @@ g++ -std=c++17 -I../rmutt_esp32_air history_log_test.cpp -o t && ./t
 
 > [!ASK]
 > **ถาม:** หลังเพิ่มหน้าอัปโหลดเฟิร์มแวร์ ทำไมต้องแก้ `docker-compose.yml` และสคริปต์ deploy ด้วย?
-> **ตอบ:** (เพิ่ม 14 ต.ค. 2569) เดิม Backend mount โฟลเดอร์ firmware แบบอ่านอย่างเดียว (`./firmware:/firmware:ro`) เพราะแค่แสดงรายการไฟล์ พออัปโหลดจากเว็บได้ Backend ต้องเขียนไฟล์ จึงเอา `:ro` ออก แต่แค่นั้นยังไม่พอ เพราะ Backend รันเป็น user `node` (uid 1000) ในคอนเทนเนอร์ ส่วนโฟลเดอร์บนเครื่องเป็นของผู้ดูแล สิทธิ์ไฟล์ของ Linux ดูที่ uid จึงต้อง `chown 1000:1000` ทั้งใน `setup-vps.sh` (เครื่องใหม่) และ `update-remote.sh` (เครื่องเดิมที่อัปเดต) ฝั่ง Caddy ยังอ่านอย่างเดียวเหมือนเดิม เพราะแค่เสิร์ฟไฟล์ให้บอร์ดดาวน์โหลด
+> **ตอบ:** Backend ต้องเขียนไฟล์ที่อัปโหลดจากเว็บ จึง mount โฟลเดอร์ firmware แบบไม่มี `:ro` แต่แค่นั้นยังไม่พอ เพราะ Backend รันเป็น user `node` (uid 1000) ในคอนเทนเนอร์ ส่วนโฟลเดอร์บนเครื่องเป็นของผู้ดูแล สิทธิ์ไฟล์ของ Linux ดูที่ uid จึงต้อง `chown 1000:1000` ทั้งใน `setup-vps.sh` (เครื่องใหม่) และ `update-remote.sh` (ทุกครั้งที่อัปเดต) ฝั่ง Caddy mount แบบอ่านอย่างเดียว เพราะแค่เสิร์ฟไฟล์ให้บอร์ดดาวน์โหลด
 
 > [!ASK]
 > **ถาม:** ถ้าอัปโหลดเฟิร์มแวร์จากเว็บแล้วขึ้นว่า "Backend เขียนโฟลเดอร์ firmware ไม่ได้" จะแก้อย่างไร?
@@ -1417,6 +1417,6 @@ g++ -std=c++17 -I../rmutt_esp32_air history_log_test.cpp -o t && ./t
 - [ ] ระบุได้ว่าอะไรอยู่ใน `.gitignore` และทำไม (ความลับ, กุญแจ, ข้อมูล broker, ค่าเซิร์ฟเวอร์)
 - [ ] บอกวิธีรันทดสอบทั้งสามชั้น (`npm test`, `flutter test`, `g++ ... && ./t`) และตอบได้ว่าแต่ละชั้นทดสอบอะไร
 - [ ] ตรวจระบบจริงหลัง deploy ด้วย `/api/health` ได้ และรู้ว่าต้องเห็นอะไร (`status ok`, `connected true`, `deviceAuth dynsec`)
-- [ ] อธิบายขั้นตอนอัปเดตเฟิร์มแวร์แบบใหม่ (Export Compiled Binary → หน้าเฟิร์มแวร์ในเว็บ เลือกแท็บชนิดบอร์ด → อัปโหลด → สั่งอัปเดต) และกติกาชื่อไฟล์ `occ` / `wired`/`slm8` / นอกนั้น (เพิ่ม 14 ต.ค. 2569)
+- [ ] อธิบายขั้นตอนอัปเดตเฟิร์มแวร์แบบใหม่ (Export Compiled Binary → หน้าเฟิร์มแวร์ในเว็บ เลือกแท็บชนิดบอร์ด → อัปโหลด → สั่งอัปเดต) และกติกาชื่อไฟล์ `occ` / `wired`/`slm8` / นอกนั้น
 - [ ] บอกได้ว่าทำไมโฟลเดอร์ `/opt/rmutt/firmware` ต้องเป็นของ uid 1000 และสคริปต์ไหนตั้งให้ (`setup-vps.sh` บรรทัด 90–91, `update-remote.sh` บรรทัด 44–49)
-- [ ] บอกจำนวนเทสต์ Backend ปัจจุบัน (21 ไฟล์ 136 เทสต์) และเทสต์ที่เพิ่มรอบล่าสุด (`unprovision` 2, `firmware` +4, `air-conditioner` +4)
+- [ ] บอกจำนวนเทสต์ Backend (21 ไฟล์ 136 เทสต์) และ Flutter (22 ไฟล์ 122 เทสต์) และยกตัวอย่างสิ่งที่ทดสอบ เช่น `unprovision`, การตรวจไฟล์เฟิร์มแวร์, กติกาแอร์สาย

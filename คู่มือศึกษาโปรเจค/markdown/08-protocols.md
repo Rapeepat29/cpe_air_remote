@@ -87,7 +87,7 @@
 - แอปใช้คำนำหน้าชื่อ BLE แยกชนิด: สแกนหา `RMUTT-AC-` (ค่าเริ่มต้นของ `scan()`) หรือ `RMUTT-OCC-`
 - ฐานข้อมูล: หนึ่งแถวของแอร์ = หนึ่ง `(roomNumber, airNumber)` เซ็นเซอร์ตรวจคนหนึ่งตัวต่อหนึ่งห้อง
 - MAC ไม่ใช่ความลับ (พิมพ์บนบอร์ดและประกาศผ่าน BLE) จึงต้องมี token พิสูจน์ตัวตนตอน provisioning (ดูหัวข้อ provisioning)
-- **บอร์ดสายแอร์ Daikin** (`firmware/rmutt_esp32_air_wired/`, เพิ่ม 11 ต.ค. 2569) ใช้รูปแบบเดียวกับบอร์ดแอร์ IR ทุกอย่าง (`ESP32-<MAC>`, `RMUTT-AC-…`, `rmutt-ESP32-…`, prefix `rmutt/ac`) เพราะในมุม MQTT มันคือ "บอร์ดคุมแอร์" เหมือนกัน ต่างแค่วิธีสั่งแอร์ (ต่อสายแทนรีโมตติดผนัง แทนการยิง IR) ระบบแยกสองรุ่นด้วยฟิลด์ `controlType` ใน Identity ของ BLE และ `controlMode` ใน `status` (ดูด้านล่าง) ไม่ได้แยกด้วยชื่อ จึงไม่ต้องแก้ ACL, regex หรือ topic เลย
+- **บอร์ดสายแอร์ Daikin** (`firmware/rmutt_esp32_air_wired/`) ใช้รูปแบบเดียวกับบอร์ดแอร์ IR ทุกอย่าง (`ESP32-<MAC>`, `RMUTT-AC-…`, `rmutt-ESP32-…`, prefix `rmutt/ac`) เพราะในมุม MQTT มันคือ "บอร์ดคุมแอร์" เหมือนกัน ต่างแค่วิธีสั่งแอร์ (ต่อสายแทนรีโมตติดผนัง แทนการยิง IR) ระบบแยกสองรุ่นด้วยฟิลด์ `controlType` ใน Identity ของ BLE และ `controlMode` ใน `status` (ดูด้านล่าง) ไม่ได้แยกด้วยชื่อ จึงไม่ต้องแก้ ACL, regex หรือ topic เลย
 
 ## ตาราง Topic ทั้งหมด
 
@@ -97,7 +97,7 @@
 
 | suffix | ทิศทาง | Retained | QoS | ใครส่ง / ใครรับ | เนื้อหาหลัก |
 |---|---|---|---|---|---|
-| `command` | Backend → บอร์ด | ไม่ | 1 | Backend `publishAirCommand` / บอร์ด `mqttCallback` | `state` (สั่งแอร์) หรือ `action` = `enter_setup`, `ota`, `unprovision` (เพิ่ม 13 ต.ค. 2569) |
+| `command` | Backend → บอร์ด | ไม่ | 1 | Backend `publishAirCommand` / บอร์ด `mqttCallback` | `state` (สั่งแอร์) หรือ `action` = `enter_setup`, `ota`, `unprovision` |
 | `state` | บอร์ด → Backend | **ใช่** | 0 | บอร์ด `publishState` / Backend อัปเดต `state_json` | สถานะ IR ที่ใช้อยู่ + `commandId` ที่ตอบรับ |
 | `status` | บอร์ด → Backend | **ใช่** (ยกเว้นคำตอบ unprovision) | 0 (LWT = 1) | บอร์ด `publishStatus` ทุก 10 วินาที / Backend `handleAirStatus` | online, PZEM, ค่าไฟ, เวอร์ชัน, `historyPending` บอร์ดสายแอร์มี `controlMode` ฯลฯ เพิ่ม และคำตอบ `{"unprovisioned":true}` (ไม่ retained) |
 | `provision` | บอร์ด → Backend | **ใช่** | 0 | บอร์ด `publishProvisioningToken` ทุก 10 วินาที จนได้ ack | `token`, `deviceId`, `roomNumber`, `airNumber` |
@@ -107,7 +107,7 @@
 | `history-ack` | Backend → บอร์ด | ไม่ | 1 | Backend `handleAirHistory` | `upTo`, `stored`, `skipped` |
 
 > [!NOTE]
-> `docs/BLE_MQTT_PROTOCOL.md` (ปรับ 14 ต.ค. 2569) อธิบาย `history` และ `history-ack` แล้ว (เพิ่มในเฟิร์มแวร์ 2.4.0: ส่งค่าที่เก็บไว้ตอนเน็ตหลุดครั้งละ 10 รายการ แล้วลบเมื่อ Backend ตอบ) ส่วน "retained/QoS" ของ `state` และ `status` เอกสารไม่ได้ระบุ ค่าในตารางนี้อ่านจากโค้ดจริง (`mqttClient.publish(topic, payload, true)` = retained) เอกสารเพิ่มฟิลด์ `controlType` ของ Identity และฟิลด์ `status` ของบอร์ดสายแอร์ (11 ต.ค. 2569) และหัวข้อ "Unprovision" (13 ต.ค. 2569) แล้ว (ตรงกับที่อธิบายในบทนี้)
+> `docs/BLE_MQTT_PROTOCOL.md` อธิบาย `history` และ `history-ack` แล้ว (เพิ่มในเฟิร์มแวร์ 2.4.0: ส่งค่าที่เก็บไว้ตอนเน็ตหลุดครั้งละ 10 รายการ แล้วลบเมื่อ Backend ตอบ) ส่วน "retained/QoS" ของ `state` และ `status` เอกสารไม่ได้ระบุ ค่าในตารางนี้อ่านจากโค้ดจริง (`mqttClient.publish(topic, payload, true)` = retained) เอกสารเพิ่มฟิลด์ `controlType` ของ Identity และฟิลด์ `status` ของบอร์ดสายแอร์ และหัวข้อ "Unprovision" แล้ว (ตรงกับที่อธิบายในบทนี้)
 
 **ตัวอย่าง `command` (สั่งแอร์)** — Backend สร้างใน `publishAirCommand`
 
@@ -130,7 +130,7 @@
 
 **คำสั่งแบบ action** (ไม่มี `state`): `{"version":1,"commandId":"…","sentAt":"…","action":"enter_setup"}` และ `{"version":1,…,"action":"ota","url":"https://<host>/firmware/<ไฟล์>.bin"}`
 
-**คำสั่ง `unprovision`** (เพิ่ม 13 ต.ค. 2569) Backend สร้างด้วย `buildUnprovisionCommand` ใน `utils/unprovision.js` ตอนแอดมินลบอุปกรณ์ ใช้กับทั้งบอร์ดแอร์ (IR 2.5.1, สายแอร์ 2.5.2-slm8) และบอร์ดตรวจคน (1.3.2) ขึ้นไป
+**คำสั่ง `unprovision`** Backend สร้างด้วย `buildUnprovisionCommand` ใน `utils/unprovision.js` ตอนแอดมินลบอุปกรณ์ ใช้กับทั้งบอร์ดแอร์ (IR 2.5.1, สายแอร์ 2.5.2-slm8) และบอร์ดตรวจคน (1.3.2) ขึ้นไป
 
 ```json
 { "version": 1, "commandId": "UUID", "sentAt": "2026-10-13T12:00:00.000Z",
@@ -187,7 +187,7 @@ Backend เก็บเฉพาะ `message.state ?? message` ลงคอล�
 }
 ```
 
-**ฟิลด์เพิ่มของบอร์ดสายแอร์** (`rmutt_esp32_air_wired`, เพิ่ม 11 ต.ค. 2569) บอร์ดส่งทุกฟิลด์ข้างบนเหมือนเดิม แล้วต่อท้ายด้วย
+**ฟิลด์เพิ่มของบอร์ดสายแอร์** (`rmutt_esp32_air_wired`) บอร์ดส่งทุกฟิลด์ข้างบนเหมือนบอร์ด IR แล้วต่อท้ายด้วย
 
 ```json
 {
@@ -259,7 +259,7 @@ Backend ใช้ `controlMode` ทำสองอย่าง (ฟังก์�
 | `status` | บอร์ด → Backend | **ใช่** (LWT ก็ retained, QoS 1) | 0 (LWT = 1) | online, radarAvailable, occupied |
 | `provision` | บอร์ด → Backend | **ใช่** | 0 | `token`, `deviceId`, `roomNumber` |
 | `provision-ack` | Backend → บอร์ด | **ใช่** | 1 | `activated`, `token` |
-| `command` | Backend → บอร์ด | ไม่ | 1 | `action` = `enter_setup`, `ota` หรือ `unprovision` (เพิ่ม 13 ต.ค. 2569) |
+| `command` | Backend → บอร์ด | ไม่ | 1 | `action` = `enter_setup`, `ota` หรือ `unprovision` |
 
 บอร์ดตรวจคน **ไม่มี** `state`, `history`, `schedule-status` เพราะไม่ควบคุมอะไรและไม่ต้องรู้ตารางเรียน
 
@@ -323,7 +323,7 @@ Status characteristic มี descriptor `BLE2902` (CCCD) ซึ่งเป็�
 { "deviceId": "ESP32-AABBCCDDEEFF", "bleName": "RMUTT-AC-AABBCCDDEEFF", "firmwareVersion": "2.4.1", "configured": false }
 ```
 
-ตั้งแต่เฟิร์มแวร์ 2.5.0 (เพิ่ม 11 ต.ค. 2569) Identity มี `"controlType"` เพิ่ม: บอร์ด IR ส่ง `"ir"` บอร์ดสายแอร์ส่ง `"wired"` พร้อม `"brand": "Daikin"` บอร์ดรุ่นเก่าที่ไม่ส่งฟิลด์นี้ แอปถือว่าเป็น `"ir"` ถ้าเป็น `wired` แอปล็อกช่องยี่ห้อเป็น *Daikin · สายแอร์* และจองแอร์ด้วย protocol `DAIKIN_WIRED` แทนการให้เลือกโปรโตคอล IR (ฝั่งบอร์ดสายแอร์เองก็บันทึก `DAIKIN_WIRED` เสมอไม่ว่าแอปส่งโปรโตคอลอะไรมา กันแอปรุ่นเก่าส่งชื่อ IR) ทำไมใส่ใน Identity: แอปอ่าน Identity เป็นอย่างแรกหลังต่อ BLE จึงรู้ชนิดบอร์ดก่อนแสดงฟอร์ม และ Identity ต้องเล็ก (256 ไบต์) จึงเพิ่มแค่สองฟิลด์สั้น ๆ
+ตั้งแต่เฟิร์มแวร์ 2.5.0 Identity มี `"controlType"` เพิ่ม: บอร์ด IR ส่ง `"ir"` บอร์ดสายแอร์ส่ง `"wired"` พร้อม `"brand": "Daikin"` บอร์ดรุ่นเก่าที่ไม่ส่งฟิลด์นี้ แอปถือว่าเป็น `"ir"` ถ้าเป็น `wired` แอปล็อกช่องยี่ห้อเป็น *Daikin · สายแอร์* และจองแอร์ด้วย protocol `DAIKIN_WIRED` แทนการให้เลือกโปรโตคอล IR (ฝั่งบอร์ดสายแอร์เองก็บันทึก `DAIKIN_WIRED` เสมอไม่ว่าแอปส่งโปรโตคอลอะไรมา กันแอปรุ่นเก่าส่งชื่อ IR) ทำไมใส่ใน Identity: แอปอ่าน Identity เป็นอย่างแรกหลังต่อ BLE จึงรู้ชนิดบอร์ดก่อนแสดงฟอร์ม และ Identity ต้องเล็ก (256 ไบต์) จึงเพิ่มแค่สองฟิลด์สั้น ๆ
 
 ถ้าตั้งค่าแล้ว (`configured: true`) จะมี `roomNumber` และ `airNumber` เพิ่ม บอร์ดตรวจคนมี `"deviceType": "occupancy"` ด้วย (แอปใช้ตรวจว่าชื่อ BLE กับ Device ID ตรงกัน กัน spoof)
 
@@ -489,11 +489,11 @@ JSON ตั้งค่าถูกแปลงเป็น UTF-8 แล้ว�
 
 - **BOOT + RESET**: ไม่ลบอะไร แค่บังคับเข้าโหมด BLE ให้ตั้งค่าใหม่ได้ทุกช่อง
 - **ล้าง NVS จริง**: แฟลชสเก็ตช์ `firmware/reset/reset.ino` (เรียก `nvs_flash_erase()` ลบทุกค่าที่บันทึก, `WiFi.disconnect(true, true)`, แล้ว `nvs_flash_init()`) จากนั้นแฟลชเฟิร์มแวร์จริงกลับ บอร์ดจะ "ยังไม่ตั้งค่า" และเปิด BLE เอง
-- **ลบอุปกรณ์ออกจากระบบ**: `DELETE /api/air-conditioners/:deviceId` ลบแถวใน DB → **สั่งบอร์ดล้างค่าตัวเอง (`unprovision`) แล้วรอคำตอบ ≤ 4 วินาที** (เพิ่ม 13 ต.ค. 2569) → **ล้าง retained** ทั้ง 6 topic (`AIR_RETAINED_SUFFIXES` ใน `utils/mqtt-topics.js`) → ลบบัญชี MQTT ของบอร์ด ถ้าบอร์ดออนไลน์ ผลจะเหมือนแฟลช `reset.ino` แต่ทำจากแอปได้เลย (หัวข้อถัดไป)
+- **ลบอุปกรณ์ออกจากระบบ**: `DELETE /api/air-conditioners/:deviceId` ลบแถวใน DB → **สั่งบอร์ดล้างค่าตัวเอง (`unprovision`) แล้วรอคำตอบ ≤ 4 วินาที** → **ล้าง retained** ทั้ง 6 topic (`AIR_RETAINED_SUFFIXES` ใน `utils/mqtt-topics.js`) → ลบบัญชี MQTT ของบอร์ด ถ้าบอร์ดออนไลน์ ผลจะเหมือนแฟลช `reset.ino` แต่ทำจากแอปได้เลย (หัวข้อถัดไป)
 
-### ลบอุปกรณ์ในแอป → ล้างค่าในบอร์ด (unprovision) (เพิ่ม 13 ต.ค. 2569)
+### ลบอุปกรณ์ในแอป → ล้างค่าในบอร์ด (unprovision)
 
-**ปัญหาเดิม:** ก่อนหน้านี้การลบอุปกรณ์ทำแค่ฝั่งเซิร์ฟเวอร์ (ลบแถว ล้าง retained ลบบัญชี MQTT) ตัวบอร์ดยังเก็บรหัส Wi-Fi, ที่อยู่ Broker, username/password MQTT และเลขห้องไว้ใน NVS ครบ และยังพยายามต่อ Broker ทุก 3 วินาทีไปเรื่อย ๆ ผลเสีย: (1) บอร์ดที่ถอดไปทิ้งหรือย้ายไปที่อื่นยังพกรหัส Wi-Fi ของคณะไปด้วย (2) ในโหมด `shared` ที่ทุกบอร์ดใช้บัญชีเดียวกัน การลบบัญชีรายบอร์ดไม่มีผล บอร์ดที่ถูกลบยังต่อและส่งข้อมูลได้ (3) จะเอาบอร์ดไปใช้ห้องอื่นต้องไปกด BOOT + RESET หรือแฟลช `reset.ino` ที่ตัวบอร์ด
+**ทำไมต้องมี:** ถ้าการลบอุปกรณ์ทำแค่ฝั่งเซิร์ฟเวอร์ (ลบแถว ล้าง retained ลบบัญชี MQTT) ตัวบอร์ดจะยังเก็บรหัส Wi-Fi, ที่อยู่ Broker, username/password MQTT และเลขห้องไว้ใน NVS ครบ และพยายามต่อ Broker ทุก 3 วินาทีไปเรื่อย ๆ ผลเสีย: (1) บอร์ดที่ถอดไปทิ้งหรือย้ายไปที่อื่นยังพกรหัส Wi-Fi ของคณะไปด้วย (2) ในโหมด `shared` ที่ทุกบอร์ดใช้บัญชีเดียวกัน การลบบัญชีรายบอร์ดไม่มีผล บอร์ดที่ถูกลบยังต่อและส่งข้อมูลได้ (3) จะเอาบอร์ดไปใช้ห้องอื่นต้องไปกด BOOT + RESET หรือแฟลช `reset.ino` ที่ตัวบอร์ด
 
 **ลำดับทั้งหมด** (แอร์และเซ็นเซอร์เหมือนกัน ต่างแค่ prefix ของ topic):
 
@@ -551,14 +551,14 @@ DELETE /api/...  ───► 1. DELETE แถวในฐานข้อมู�
 
 ### OTA (อัปเดตเฟิร์มแวร์ผ่าน Wi-Fi)
 
-1. แอดมินเลือกไฟล์ `.bin` บนเซิร์ฟเวอร์ (ตั้งแต่ 14 ต.ค. 2569 อัปโหลดจากหน้า **เฟิร์มแวร์** ในเว็บได้ด้วย `POST /api/firmware` ไม่ต้อง `scp`) → `POST /api/air-conditioners/:deviceId/ota` (หรือ `/api/occupancy-sensors/:deviceId/ota`) ตรวจว่า **ชนิดไฟล์ตรงกับชนิดบอร์ด** (`assertFirmwareKind`: ชื่อมี `occ` = เซ็นเซอร์, มี `wired`/`slm8` = สายแอร์ ใช้กับแอร์ที่ protocol `DAIKIN_WIRED`, นอกนั้น = แอร์ IR ผิดตอบ 400) ตรวจว่าบอร์ด `active` และ **online** → Backend สร้าง URL `https://<mqtt_host>/firmware/<ชื่อไฟล์>` (`firmwareUrl`) → `publishOtaCommand` ส่ง `{"action":"ota","url":…}` ไป `/command` → ตอบ 202
+1. แอดมินเลือกไฟล์ `.bin` บนเซิร์ฟเวอร์ (อัปโหลดจากหน้า **เฟิร์มแวร์** ในเว็บด้วย `POST /api/firmware`) → `POST /api/air-conditioners/:deviceId/ota` (หรือ `/api/occupancy-sensors/:deviceId/ota`) ตรวจว่า **ชนิดไฟล์ตรงกับชนิดบอร์ด** (`assertFirmwareKind`: ชื่อมี `occ` = เซ็นเซอร์, มี `wired`/`slm8` = สายแอร์ ใช้กับแอร์ที่ protocol `DAIKIN_WIRED`, นอกนั้น = แอร์ IR ผิดตอบ 400) ตรวจว่าบอร์ด `active` และ **online** → Backend สร้าง URL `https://<mqtt_host>/firmware/<ชื่อไฟล์>` (`firmwareUrl`) → `publishOtaCommand` ส่ง `{"action":"ota","url":…}` ไป `/command` → ตอบ 202
 2. บอร์ดเช็ก `otaUrlAllowed(url, config.mqttHost)`: ต้องขึ้นต้น `https://<MQTT host เดิมของบอร์ด>/firmware/`, ลงท้าย `.bin`, ยาวไม่เกิน 300, ไม่มี `..`, ตัวอักษรชื่อไฟล์จำกัด ไม่ผ่านจะตั้ง `otaError = "url_rejected"` ใน status
 3. `performOtaUpdate()` sync เวลา, **ตัด MQTT ก่อน** (หน่วยความจำไม่พอเปิด TLS สองชุดพร้อมกัน), ดาวน์โหลดผ่าน HTTPS ตรวจใบรับรองกับใบราก, สำเร็จ → รีสตาร์ต ล้มเหลว → ใช้เฟิร์มแวร์เดิมต่อ รายงาน `otaError` และ `firmwareVersion` ใน `status` ซึ่ง Backend เก็บผ่าน `recordFirmwareStatus`
 
 > [!WHY]
 > ป้องกันเฟิร์มแวร์ปลอม 3 ชั้น: (1) คำสั่งมาจาก topic `command` ที่มีแต่ Backend ส่งได้ตาม ACL (2) URL ชี้ได้เฉพาะเซิร์ฟเวอร์เดียวกับ MQTT ของบอร์ดเอง (3) ตรวจใบรับรอง HTTPS
 >
-> ทำไมต้องตรวจชนิดไฟล์ (เพิ่ม 14 ต.ค. 2569): โปรโตคอล OTA ไม่มีฟิลด์ "ชนิดบอร์ด" บอร์ดรับไฟล์ `.bin` อะไรก็ได้ที่ URL ผ่านเงื่อนไข ถ้าสั่งไฟล์ของบอร์ด IR ให้บอร์ดสายแอร์ (ชิปเดียวกัน ESP32) มันจะติดตั้งได้สำเร็จแล้วรีบูตเป็นโปรแกรมผิดชนิด ขาที่ต่อก็ผิด จึงต้องกันไว้ที่ Backend ซึ่งรู้ทั้งชื่อไฟล์และ protocol ของบอร์ด
+> ทำไมต้องตรวจชนิดไฟล์: โปรโตคอล OTA ไม่มีฟิลด์ "ชนิดบอร์ด" บอร์ดรับไฟล์ `.bin` อะไรก็ได้ที่ URL ผ่านเงื่อนไข ถ้าสั่งไฟล์ของบอร์ด IR ให้บอร์ดสายแอร์ (ชิปเดียวกัน ESP32) มันจะติดตั้งได้สำเร็จแล้วรีบูตเป็นโปรแกรมผิดชนิด ขาที่ต่อก็ผิด จึงต้องกันไว้ที่ Backend ซึ่งรู้ทั้งชื่อไฟล์และ protocol ของบอร์ด
 
 ## Broker แบบพัฒนา เทียบกับแบบใช้งานจริง
 
@@ -847,7 +847,7 @@ void mqttCallback(char *topic, byte *payload, unsigned int length) {
 
 **ทำไมใช้ธง `configReady` แล้วให้ `loop()` เรียก `processPendingConfig()`**: การประมวลผลต้องทดสอบ Wi-Fi (นานถึง 15 วินาที), เขียน NVS, ซึ่งทำใน callback ของ BLE ไม่ได้ (callback รันบน task ของ BLE stack การบล็อกนานทำให้การเชื่อมต่อหลุด/หมดเวลา) แพทเทิร์นเดียวกับ MQTT ข้างบน และผลลัพธ์ส่งกลับทาง Notify (`notifyBle`) ซึ่งแอปรอได้สูงสุด 40 วินาที
 
-### 5) เฟิร์มแวร์: ล้างค่าเมื่อถูกลบออกจากแอป — `unprovisionAndRestart()` (เพิ่ม 13 ต.ค. 2569)
+### 5) เฟิร์มแวร์: ล้างค่าเมื่อถูกลบออกจากแอป — `unprovisionAndRestart()`
 
 **ไฟล์ `firmware/rmutt_esp32_air/rmutt_esp32_air.ino` บรรทัด 1229–1239** (กิ่ง `unprovision` ใน `processMqttCommand`)
 
@@ -937,7 +937,7 @@ void unprovisionAndRestart(const String &reason) {
 - **สัญญาร่วม (shared contract) เขียนซ้ำในหลายที่โดยต้องตรงกัน**: UUID ซ้ำใน `.ino` สองไฟล์และ `ble_provisioning_service.dart`; ชื่อ topic ใน `.ino`, `services/mqtt.js`, `utils/mqtt-accounts.js` (ACL) ไม่มี codegen ดังนั้นไฟล์ `docs/BLE_MQTT_PROTOCOL.md` เป็นศูนย์กลางอ้างอิงและเวลาเพิ่ม topic ต้องแก้ครบทั้งสามที่ (รวม ACL ไม่งั้นถูกปฏิเสธเงียบ)
 - **Callback ฝากของ แล้ว loop ทำงาน** (`mqttCallback`, `ConfigCallbacks`, `WifiScanCallbacks` เป็นข้อยกเว้นเพราะเบา) เหตุผลคือกันบล็อก stack ของไลบรารี
 - **Retained = "สถานะล่าสุด", ไม่ retained = "คำสั่งครั้งเดียว"**: `state`/`status`/`provision`/`schedule-status` retained เพราะผู้มาทีหลังต้องเห็นค่าล่าสุด; `command`/`history` ไม่ retained เพราะการเล่นซ้ำจะเป็นอันตราย (เปิดแอร์ซ้ำ นับพลังงานซ้ำ)
-- **สั่งก่อนเพิกถอน (notify before revoke)** (`unprovision`, เพิ่ม 13 ต.ค. 2569): ส่งคำสั่งล้างค่าและรอคำตอบ (มี timeout 4 วินาที) ก่อนลบบัญชี MQTT เพราะหลังเพิกถอนสิทธิ์แล้วจะคุยกับบอร์ดไม่ได้อีก และ timeout ทำให้การลบไม่ค้างเมื่อบอร์ดออฟไลน์ คำสั่งทำลายข้อมูลแบบนี้ไม่ retained และใส่ `deviceId` ซ้ำในเนื้อข้อความให้บอร์ดตรวจ
+- **สั่งก่อนเพิกถอน (notify before revoke)** (`unprovision`): ส่งคำสั่งล้างค่าและรอคำตอบ (มี timeout 4 วินาที) ก่อนลบบัญชี MQTT เพราะหลังเพิกถอนสิทธิ์แล้วจะคุยกับบอร์ดไม่ได้อีก และ timeout ทำให้การลบไม่ค้างเมื่อบอร์ดออฟไลน์ คำสั่งทำลายข้อมูลแบบนี้ไม่ retained และใส่ `deviceId` ซ้ำในเนื้อข้อความให้บอร์ดตรวจ
 - **เพิ่มฟิลด์ได้โดยไม่ทำให้ใครพัง (backward-compatible fields)**: `controlType` ใน Identity, `controlMode`/`busOk` ฯลฯ ใน `status` ฝ่ายที่ไม่รู้จักแค่ไม่อ่าน ฝ่ายที่รู้จักใช้ค่าเริ่มต้นเมื่อไม่มีฟิลด์ (ไม่มี `controlType` = `ir`)
 - **Ack-then-delete** (`history-ack`, `provision-ack`): ผู้ส่งเก็บข้อมูลจนกว่าผู้รับยืนยัน ทำให้ไม่มีข้อมูลหาย และส่งซ้ำได้โดยผู้รับต้องทน duplicate (idempotent) Backend ข้ามรายการที่เคยบันทึก
 - **Least privilege (สิทธิ์น้อยที่สุด)**: ACL รายอุปกรณ์ (`deviceAcls`) ให้เห็นเฉพาะ topic ตัวเอง
@@ -991,7 +991,7 @@ void unprovisionAndRestart(const String &reason) {
 
 > [!ASK]
 > **ลบแอร์ในแอปแล้ว บอร์ดยังจำรหัส Wi-Fi อยู่ไหม?**
-> ถ้าบอร์ดออนไลน์ตอนลบ ไม่จำครับ (ตั้งแต่ 13 ต.ค. 2569) Backend ส่ง `{"action":"unprovision","deviceId":…}` ไปที่ `command` ก่อนลบบัญชี MQTT บอร์ดตรวจว่า `deviceId` เป็นของตัวเอง ตอบ `{"unprovisioned":true}` ทาง `status` ล้าง retained ของตัวเอง ตัดการเชื่อมต่อแบบปกติ แล้ว `preferences.clear()` ลบ Wi-Fi, MQTT, ห้องใน NVS และรีบูตเข้าโหมดตั้งค่า BLE API ตอบ `boardCleared: true` ถ้าบอร์ดออฟไลน์ คำสั่งไปไม่ถึง (ไม่ได้ส่งแบบ retained) API ตอบ `boardCleared: false` บอร์ดยังเก็บค่าเดิมแต่ต่อ Broker ไม่ได้แล้วเพราะบัญชีถูกลบ ต้องไปล้างที่ตัวบอร์ด
+> ถ้าบอร์ดออนไลน์ตอนลบ ไม่จำครับ Backend ส่ง `{"action":"unprovision","deviceId":…}` ไปที่ `command` ก่อนลบบัญชี MQTT บอร์ดตรวจว่า `deviceId` เป็นของตัวเอง ตอบ `{"unprovisioned":true}` ทาง `status` ล้าง retained ของตัวเอง ตัดการเชื่อมต่อแบบปกติ แล้ว `preferences.clear()` ลบ Wi-Fi, MQTT, ห้องใน NVS และรีบูตเข้าโหมดตั้งค่า BLE API ตอบ `boardCleared: true` ถ้าบอร์ดออฟไลน์ คำสั่งไปไม่ถึง (ไม่ได้ส่งแบบ retained) API ตอบ `boardCleared: false` บอร์ดยังเก็บค่าเดิมแต่ต่อ Broker ไม่ได้แล้วเพราะบัญชีถูกลบ ต้องไปล้างที่ตัวบอร์ด
 
 > [!ASK]
 > **ทำไมคำสั่ง unprovision ไม่ส่งแบบ retained จะได้ถึงบอร์ดที่ออฟไลน์ตอนกลับมา?**
@@ -1024,7 +1024,7 @@ void unprovisionAndRestart(const String &reason) {
 - [ ] อธิบาย offline history + ack และ OTA (3 ชั้นป้องกัน)
 - [ ] เปรียบเทียบ Broker แบบพัฒนา (บัญชีเดียว 1883) กับแบบใช้งานจริง (Dynamic Security รายอุปกรณ์ + TLS ผ่าน Funnel 8443 หรือ 8883 ตรง)
 - [ ] อธิบายเหตุผลที่ `mqttCallback` และ `ConfigCallbacks::onWrite` ไม่ประมวลผลหนัก ๆ เองทันที
-- [ ] เล่าลำดับ unprovision ได้ครบ (ลบแถว → ส่ง `unprovision` → รอคำตอบ ≤ 4 วินาที → ล้าง retained → ลบบัญชี MQTT) และบอกได้ว่าทำไมต้องส่งก่อนลบบัญชี (เพิ่ม 13 ต.ค. 2569)
+- [ ] เล่าลำดับ unprovision ได้ครบ (ลบแถว → ส่ง `unprovision` → รอคำตอบ ≤ 4 วินาที → ล้าง retained → ลบบัญชี MQTT) และบอกได้ว่าทำไมต้องส่งก่อนลบบัญชี
 - [ ] บอกได้ว่าบอร์ดทำอะไรบ้างเมื่อได้ `unprovision` (ตรวจ `deviceId`, ตอบไม่ retained, ล้าง retained ตัวเอง, disconnect ปกติเพื่อไม่เกิด Last Will, ล้าง NVS, รีบูต) และผลเมื่อบอร์ดออฟไลน์ (`boardCleared: false`)
 - [ ] บอกฟิลด์ที่แยกบอร์ดสายแอร์ (`controlType` ใน Identity, `controlMode` ใน status, `controlType` ใน REST) และกติกาคำสั่งของ `DAIKIN_WIRED` ได้
 - [ ] อธิบายว่าทำไม OTA ต้องตรวจชนิดไฟล์ตรงชนิดบอร์ดที่ Backend

@@ -55,10 +55,8 @@
 <li><a href="17-glossary.html"><span class="num">17</span>อภิธานศัพท์</a></li>
 <li><a href="18-file-map.html"><span class="num">18</span>แผนที่ไฟล์ทั้งโปรเจค</a></li>
 </ul>
-<div class="nav-part">งานที่กำลังพัฒนา</div><ul>
-<li><a href="19-daikin-slm8.html"><span class="num">19</span>แอร์ Daikin ผ่านสาย SLM8: จากการแกะโปรโตคอลถึงบอร์ดสายแอร์</a></li>
-</ul>
 <div class="nav-part">เจาะลึก</div><ul>
+<li><a href="19-daikin-slm8.html"><span class="num">19</span>แอร์ Daikin ผ่านสาย SLM8: จากการแกะโปรโตคอลถึงบอร์ดสายแอร์</a></li>
 <li><a href="20-database-design.html"><span class="num">20</span>เจาะลึกการออกแบบฐานข้อมูล</a></li>
 </ul>
     </nav>
@@ -66,7 +64,7 @@
   <main class="content" id="content">
 <div class="chapter-head"><div class="kicker">บทที่ 9 · อุปกรณ์และหน้าจอ</div><h1>เฟิร์มแวร์ ESP32: บอร์ดแอร์ (IR และสายแอร์) และบอร์ดตรวจจับคน</h1></div>
 <h2 id="ภาพรวม">ภาพรวม<a class="anchor" href="#ภาพรวม">#</a></h2>
-<p>เฟิร์มแวร์ (firmware) คือโปรแกรมที่ฝังอยู่ในชิปไมโครคอนโทรลเลอร์ ทำงานทันทีที่จ่ายไฟและไม่มีระบบปฏิบัติการแบบคอมพิวเตอร์ครอบอยู่ โปรเจคนี้มีเฟิร์มแวร์หลัก <strong>สามตัวแยกกัน</strong> อยู่ในโฟลเดอร์ <code>firmware/</code> (เดิมมีสองตัว บอร์ดสายแอร์เพิ่มเมื่อ 11 ต.ค. 2569) ทั้งหมดใช้ ESP32 และเขียนด้วย Arduino framework (ภาษา C++):</p>
+<p>เฟิร์มแวร์ (firmware) คือโปรแกรมที่ฝังอยู่ในชิปไมโครคอนโทรลเลอร์ ทำงานทันทีที่จ่ายไฟและไม่มีระบบปฏิบัติการแบบคอมพิวเตอร์ครอบอยู่ โปรเจคนี้มีเฟิร์มแวร์หลัก <strong>สามตัวแยกกัน</strong> อยู่ในโฟลเดอร์ <code>firmware/</code> ทั้งหมดใช้ ESP32 และเขียนด้วย Arduino framework (ภาษา C++):</p>
 <div class="table-wrap"><table>
 <thead>
 <tr>
@@ -84,7 +82,7 @@
 <td>หนึ่งบอร์ดต่อแอร์หนึ่งเครื่อง: ยิง IR สั่งแอร์เหมือนรีโมตมือถือ, วัดไฟด้วย PZEM-004T, รายงานสถานะ, เก็บข้อมูลไฟฟ้าตอนเน็ตหลุด, แสดงผลบนจอ OLED</td>
 </tr>
 <tr>
-<td>บอร์ดแอร์สายแอร์ (เพิ่ม 11 ต.ค. 2569)</td>
+<td>บอร์ดแอร์สายแอร์</td>
 <td><code>rmutt_esp32_air_wired/rmutt_esp32_air_wired.ino</code></td>
 <td><strong>2.5.2-slm8</strong></td>
 <td>ใช้ <strong>แทนรีโมตติดผนัง Daikin</strong> ที่ถอดออก: สั่งแอร์ผ่านสายของรีโมตติดผนัง (โปรโตคอล SLM8) แทน IR, ได้สถานะจริงจากแอร์ (สายตอบไหม คอมเพรสเซอร์ทำงานไหม), วัดอุณหภูมิห้องด้วย DHT11 ส่วน BLE/MQTT/PZEM/OTA/ข้อมูลย้อนหลังเหมือนบอร์ด IR</td>
@@ -97,7 +95,6 @@
 </tr>
 </tbody>
 </table></div>
-<p>ประวัติเวอร์ชันล่าสุด: บอร์ด IR 2.4.1 → <strong>2.5.0</strong> (11 ต.ค. 2569 เพิ่มจอ OLED และ <code>controlType:"ir"</code> ใน BLE) → <strong>2.5.1</strong> (13 ต.ค. 2569 เพิ่มคำสั่ง <code>unprovision</code>), บอร์ดสายแอร์ 2.5.1-slm8 (11 ต.ค.) → <strong>2.5.2-slm8</strong> (13 ต.ค. เพิ่ม <code>unprovision</code>), บอร์ดตรวจจับคน 1.3.1 → 1.3.2 (13 ต.ค. เพิ่ม <code>unprovision</code>) → <strong>1.3.3</strong> (15 ต.ค. 2569 เพิ่ม LED เขียว/แดง และลดเกณฑ์มีคนจาก 25 เป็น 15) และบอร์ดสายแอร์ย้ายขา PZEM/LED เหลือง (15 ต.ค. 2569 commit "update pin") โดยไม่ได้ขึ้นเลขรุ่น</p>
 <p>นอกจากนี้มีสเก็ตช์เครื่องมือเล็ก ๆ อีกสองตัว (<code>reset/reset.ino</code> ล้างค่าที่จำไว้ และ <code>ld2410_pinscan/ld2410_pinscan.ino</code> หาขาที่เรดาร์ส่งข้อมูลมา) กับโค้ดทดสอบ <code>tests/history_log_test.cpp</code> ที่รันบนคอมพิวเตอร์ได้โดยไม่ต้องมีบอร์ด</p>
 <p>ในภาพรวมของระบบ บอร์ดเหล่านี้เป็น "มือและตา" ของระบบ: บอร์ดแอร์ (ทั้งรุ่น IR และรุ่นสายแอร์) เป็นมือ (สั่งแอร์) และตาที่เห็นไฟฟ้า (วัดกำลังไฟ) ส่วนบอร์ดตรวจจับคนเป็นตาที่เห็นว่าห้องมีคนหรือไม่ ทุกตัวคุยกับ Backend ผ่าน MQTT broker (Mosquitto) เท่านั้น ไม่ได้คุยกับ Backend ตรง ๆ และไม่มี HTTP server ในบอร์ด ส่วน BLE (Bluetooth Low Energy) ใช้เฉพาะตอน "ตั้งค่าครั้งแรกหรือตั้งค่าใหม่" จากแอป Flutter</p>
 <div class="code-block"><div class="hl"><pre><span></span><code> แอป Flutter ──BLE (ตั้งค่า Wi-Fi/MQTT ครั้งแรก)──┐
@@ -113,7 +110,7 @@
 
 <div class="callout note"><div class="callout-title">หมายเหตุ</div><p>หัวข้อ MQTT (topic), รูปแบบ JSON และตาราง BLE characteristic แบบเต็มอยู่ใน <strong>บทโปรโตคอลสื่อสาร</strong> บทนี้อธิบายเฉพาะ "ฝั่งเฟิร์มแวร์ทำอะไรกับมัน" และอ้างค่าที่เห็นในโค้ดจริงเท่านั้น</p></div>
 
-<div class="callout warn"><div class="callout-title">ระวัง</div><p>(อัปเดต 14 ต.ค. 2569) เอกสารในโปรเจกต์ปรับเลขรุ่นให้ตรงโค้ดแล้ว: <code>firmware/README.md</code>, <code>docs/study/04-esp32-firmware.md</code> และหมายเหตุบนสุดของ <code>README_OLED_TH.md</code> / <code>README_WIRED_TH.md</code> เขียน <strong>2.5.1</strong> (บอร์ด IR), <strong>2.5.2-slm8</strong> (บอร์ดสายแอร์) และ <strong>1.3.2</strong> (บอร์ดตรวจคน ตอนนี้โค้ดเป็น 1.3.3 แล้ว เอกสารเหล่านี้ยังไม่ได้แก้) และ <code>docs/study/04</code> บอกแล้วว่า <code>ld2410_probe/</code> ไม่มีในโฟลเดอร์ (เหลือ <code>ld2410_pinscan/</code>) ส่วนหัวเรื่องของ <code>README_OLED_TH.md</code> ยังเป็น "2.5.0" เพราะเป็นบันทึกของรุ่นที่เพิ่มจอ ถ้าเลขรุ่นในเอกสารใดไม่ตรง ให้เชื่อค่า <code>FIRMWARE_VERSION</code> ในไฟล์ <code>.ino</code></p></div>
+<div class="callout warn"><div class="callout-title">ระวัง</div><p>เอกสารอื่นในโปรเจกต์บางจุดยังไม่ตรงกับโค้ด: <code>firmware/README.md</code> เขียนบอร์ดตรวจคนเป็น 1.3.2 (โค้ดคือ <strong>1.3.3</strong>) และยังเขียนขา PZEM/LED เหลืองของบอร์ดสายแอร์เป็น 16/18/27 (โค้ดคือ <strong>18/14/23</strong>) เช่นเดียวกับ <code>README_WIRED_TH.md</code> ส่วนหัวเรื่องของ <code>README_OLED_TH.md</code> เป็น "2.5.0" เพราะเป็นบันทึกของรุ่นที่เพิ่มจอ ถ้าเอกสารใดไม่ตรง ให้เชื่อค่าในไฟล์ <code>.ino</code> (<code>FIRMWARE_VERSION</code> และค่าคงที่ <code>*_PIN</code>)</p></div>
 
 <h2 id="ความรู้ที่ต้องมีก่อนอ่านบทนี้">ความรู้ที่ต้องมีก่อนอ่านบทนี้<a class="anchor" href="#ความรู้ที่ต้องมีก่อนอ่านบทนี้">#</a></h2>
 <h3 id="ไมโครคอนโทรลเลอร์-mcu-ต่างจากคอมพิวเตอร์อย่างไร">ไมโครคอนโทรลเลอร์ (MCU) ต่างจากคอมพิวเตอร์อย่างไร<a class="anchor" href="#ไมโครคอนโทรลเลอร์-mcu-ต่างจากคอมพิวเตอร์อย่างไร">#</a></h3>
@@ -145,11 +142,11 @@
 <p><strong>NTP</strong> (Network Time Protocol) ขอเวลาจริงจากอินเทอร์เน็ต (<code>pool.ntp.org</code>, <code>time.google.com</code>) ESP32 ไม่มีนาฬิกาที่เดินตอนไฟดับ เริ่มบูตมาเวลาคือปี 1970 โค้ดตั้ง <code>configTime(7 * 3600, 0, ...)</code> คือเขตเวลา UTC+7 (ไทย) ไม่มีเวลาออมแสง และถือว่าเวลาถูกต้องเมื่อ <code>time(nullptr) &gt;= 1700000000</code> (ราว พ.ย. 2023 เป็นต้นไป)</p>
 <h3 id="watchdog">Watchdog<a class="anchor" href="#watchdog">#</a></h3>
 <p>watchdog timer คือตัวจับเวลาฮาร์ดแวร์ที่รีเซ็ตชิปถ้าโปรแกรมไม่ยอม "ป้อน" มันเป็นระยะ (กันโปรแกรมค้าง) <strong>โค้ดโปรเจคนี้ไม่ได้เรียก watchdog เอง</strong> อาศัยตัวที่ Arduino core/FreeRTOS ตั้งไว้ให้ ซึ่งป้อนให้อัตโนมัติในทุกรอบ <code>loop()</code> และตอนเรียก <code>delay()</code> เหตุผลที่ทั้งโค้ดไม่บล็อกนาน ๆ ก็เพื่อไม่ให้ชนกับกลไกนี้ด้วย (การรอ Wi-Fi ใช้ลูป <code>delay(50)</code> สั้น ๆ พร้อม timeout)</p>
-<h3 id="i2c-และจอ-oled-sh1106-เพิ่ม-11-ตค-2569">I2C และจอ OLED SH1106 (เพิ่ม 11 ต.ค. 2569)<a class="anchor" href="#i2c-และจอ-oled-sh1106-เพิ่ม-11-ตค-2569">#</a></h3>
+<h3 id="i2c-และจอ-oled-sh1106">I2C และจอ OLED SH1106<a class="anchor" href="#i2c-และจอ-oled-sh1106">#</a></h3>
 <p><strong>I2C</strong> คือบัสสื่อสารสองเส้น SDA (ข้อมูล) และ SCL (สัญญาณนาฬิกา) ต่ออุปกรณ์หลายตัวบนสายคู่เดียวกันได้ โมดูลจอมักมีตัวต้านทาน <strong>pull-up</strong> ดึงสายทั้งสองขึ้น 3.3 V ไว้ <strong>OLED</strong> คือจอที่แต่ละพิกเซลเปล่งแสงเอง (ไม่มีไฟหลังจอ) จอที่ใช้คือ 1.3 นิ้ว 128×64 พิกเซล ชิปควบคุม <strong>SH1106</strong> ข้อเสียของ OLED คือถ้าแสดงภาพเดิมนาน ๆ พิกเซลจะ "เบิร์น" (เสื่อมไม่เท่ากันจนเห็นเงาค้าง) โค้ดจึงมีโหมดพักจอ</p>
-<h3 id="freertos-task-และ-mutex-เพิ่ม-11-ตค-2569">FreeRTOS task และ mutex (เพิ่ม 11 ต.ค. 2569)<a class="anchor" href="#freertos-task-และ-mutex-เพิ่ม-11-ตค-2569">#</a></h3>
+<h3 id="freertos-task-และ-mutex">FreeRTOS task และ mutex<a class="anchor" href="#freertos-task-และ-mutex">#</a></h3>
 <p>ใต้ Arduino มี FreeRTOS ซึ่งรันได้หลาย <strong>task</strong> (งานที่สลับกันใช้ CPU) <code>loop()</code> เองก็เป็น task หนึ่ง (priority 1 บน core 1) ถ้าสร้าง task ใหม่ด้วย <code>xTaskCreatePinnedToCore</code> ที่ priority สูงกว่า task นั้นจะได้ CPU ก่อนเสมอเมื่อพร้อมทำงาน แม้ <code>loop()</code> กำลังค้างรอ Wi-Fi อยู่ เมื่อสอง task ใช้ตัวแปรเดียวกันต้องมี <strong>mutex</strong> (กุญแจ) <code>xSemaphoreTake</code> = ขอกุญแจ, <code>xSemaphoreGive</code> = คืนกุญแจ ทำให้มีแค่ task เดียวที่อ่าน/เขียนข้อมูลชุดนั้นในเวลาหนึ่ง บอร์ดสายแอร์ใช้ task แยกส่งเฟรมเข้าสายแอร์</p>
-<h3 id="สายรีโมตติดผนัง-wired-controller-bus-ของแอร์-daikin-เพิ่ม-11-ตค-2569">สายรีโมตติดผนัง (wired controller bus) ของแอร์ Daikin (เพิ่ม 11 ต.ค. 2569)<a class="anchor" href="#สายรีโมตติดผนัง-wired-controller-bus-ของแอร์-daikin-เพิ่ม-11-ตค-2569">#</a></h3>
+<h3 id="สายรีโมตติดผนัง-wired-controller-bus-ของแอร์-daikin">สายรีโมตติดผนัง (wired controller bus) ของแอร์ Daikin<a class="anchor" href="#สายรีโมตติดผนัง-wired-controller-bus-ของแอร์-daikin">#</a></h3>
 <p>แอร์บางรุ่นมีรีโมตติดผนัง (wall panel) ต่อกับเครื่องในห้องด้วยสาย รีโมตส่ง "เฟรม" คำสั่ง (เปิด/ปิด อุณหภูมิ โหมด พัดลม และอุณหภูมิห้องที่เซนเซอร์ในรีโมตวัดได้) <strong>ทุก 1 วินาที</strong> ทางสายเส้นหนึ่ง และแอร์ตอบสถานะกลับทางอีกเส้นหนึ่ง ต่างจาก IR ที่ส่งครั้งเดียวและไม่มีคำตอบ ทีมถอดรหัสโปรโตคอลนี้ (เรียกว่า SLM8 ตามรุ่นรีโมต) แล้วให้ ESP32 ทำหน้าที่แทนรีโมตผนัง รายละเอียดจังหวะพัลส์ checksum และความหมายแต่ละไบต์อยู่ใน <strong>บทโปรโตคอลสายแอร์ Daikin SLM8 (บทที่ 19)</strong> บทนี้อธิบายเฉพาะว่าเฟิร์มแวร์หลักใช้มันอย่างไร</p>
 <h3 id="ไลบรารีและเวอร์ชัน">ไลบรารีและเวอร์ชัน<a class="anchor" href="#ไลบรารีและเวอร์ชัน">#</a></h3>
 <div class="table-wrap"><table>
@@ -188,7 +185,7 @@
 </tr>
 <tr>
 <td>U8g2 (olikraus)</td>
-<td>ไม่ระบุ (บอร์ดแอร์ทั้งสองรุ่น, เพิ่ม 11 ต.ค. 2569)</td>
+<td>ไม่ระบุ (บอร์ดแอร์ทั้งสองรุ่น)</td>
 <td>วาดจอ OLED SH1106 128×64</td>
 </tr>
 <tr>
@@ -214,11 +211,11 @@
 │   ├── ota_update.h                   # อัปเดตเฟิร์มแวร์ผ่าน HTTPS
 │   ├── letsencrypt_ca.h               # ใบรับรองราก ISRG X1 + X2 (สร้างโดยสคริปต์)
 │   ├── partitions.csv                 # ตารางพาร์ติชัน (มี rmuttlog)
-│   ├── oled_display.h                 # (ใหม่ 11 ต.ค.) ตัวขับจอ OLED: ตรวจว่ามีจอ, จังหวะวาด, พักจอ
+│   ├── oled_display.h                 # ตัวขับจอ OLED: ตรวจว่ามีจอ, จังหวะวาด, พักจอ
 │   ├── oled_ui.h                      # (ใหม่) ฟังก์ชันวาดหน้าจอ 5 แบบ + หน้าพิเศษ
 │   ├── build_opt.h                    # (ใหม่) แฟล็กคอมไพเลอร์ ปิดส่วนที่ไม่ใช้ให้โปรแกรมพอดีแฟลช
 │   └── README_OLED_TH.md              # (ใหม่) วิธีต่อจอและเหตุผลของ build_opt.h
-├── rmutt_esp32_air_wired/             # (ใหม่ 11 ต.ค.) บอร์ดแอร์รุ่นสายแอร์ Daikin
+├── rmutt_esp32_air_wired/             # บอร์ดแอร์รุ่นสายแอร์ Daikin
 │   ├── rmutt_esp32_air_wired.ino      # โปรแกรมหลัก 2,031 บรรทัด (2.5.2-slm8) แตกมาจากรุ่น IR
 │   ├── DaikinSLM8.h                   # โปรโตคอลสายแอร์ SLM8 (รับ/ส่งเฟรม) อธิบายในบทที่ 19
 │   ├── wired_bus.h                    # ห่อ DaikinSLM8 ให้รันใน FreeRTOS task แยก + mutex
@@ -307,18 +304,18 @@
 <td><code>kSda</code> (ใน <code>oled_display.h</code>)</td>
 <td>I2C SDA</td>
 <td>ขา SDA ของจอ OLED</td>
-<td>(เพิ่ม 11 ต.ค. 2569) จอ VCC → 3V3, GND → GND ไม่ต่อจอก็ได้</td>
+<td>จอ VCC → 3V3, GND → GND ไม่ต่อจอก็ได้</td>
 </tr>
 <tr>
 <td>22</td>
 <td><code>kScl</code> (ใน <code>oled_display.h</code>)</td>
 <td>I2C SCL</td>
 <td>ขา SCL/SCK ของจอ OLED</td>
-<td>(เพิ่ม 11 ต.ค. 2569)</td>
+<td></td>
 </tr>
 </tbody>
 </table></div>
-<h3 id="บอร์ดแอร์สายแอร์-บรรทัด-4660-ของ-rmutt_esp32_air_wiredino-เพิ่ม-11-ตค-2569-ย้ายขา-15-ตค-2569">บอร์ดแอร์สายแอร์ (บรรทัด 46–60 ของ <code>rmutt_esp32_air_wired.ino</code>, เพิ่ม 11 ต.ค. 2569, ย้ายขา 15 ต.ค. 2569)<a class="anchor" href="#บอร์ดแอร์สายแอร์-บรรทัด-4660-ของ-rmutt_esp32_air_wiredino-เพิ่ม-11-ตค-2569-ย้ายขา-15-ตค-2569">#</a></h3>
+<h3 id="บอร์ดแอร์สายแอร์-บรรทัด-4660-ของ-rmutt_esp32_air_wiredino">บอร์ดแอร์สายแอร์ (บรรทัด 46–60 ของ <code>rmutt_esp32_air_wired.ino</code>)<a class="anchor" href="#บอร์ดแอร์สายแอร์-บรรทัด-4660-ของ-rmutt_esp32_air_wiredino">#</a></h3>
 <div class="table-wrap"><table>
 <thead>
 <tr>
@@ -370,21 +367,21 @@
 <td><code>PZEM_RX_PIN</code></td>
 <td>เข้า (RX ของ Serial2)</td>
 <td><strong>TX ของ PZEM</strong></td>
-<td><strong>ต่างจากบอร์ด IR</strong> (เดิม 16, ย้าย 15 ต.ค. 2569)</td>
+<td><strong>ต่างจากบอร์ด IR</strong> (บอร์ด IR ใช้ 16)</td>
 </tr>
 <tr>
 <td>14</td>
 <td><code>PZEM_TX_PIN</code></td>
 <td>ออก (TX ของ Serial2)</td>
 <td><strong>RX ของ PZEM</strong></td>
-<td><strong>ต่างจากบอร์ด IR</strong> (เดิม 18, ย้าย 15 ต.ค. 2569)</td>
+<td><strong>ต่างจากบอร์ด IR</strong> (บอร์ด IR ใช้ 18)</td>
 </tr>
 <tr>
 <td>25 / 26 / 23</td>
 <td>LED เขียว / แดง / เหลือง</td>
 <td>ออก</td>
 <td>LED</td>
-<td>เขียว/แดงเหมือนบอร์ด IR ส่วนเหลืองย้ายจาก 27 เป็น <strong>23</strong> (15 ต.ค. 2569)</td>
+<td>เขียว/แดงเหมือนบอร์ด IR ส่วนเหลืองเป็น <strong>23</strong> (บอร์ด IR ใช้ 27)</td>
 </tr>
 <tr>
 <td>0</td>
@@ -402,9 +399,9 @@
 </tr>
 </tbody>
 </table></div>
-<div class="callout warn"><div class="callout-title">ระวัง</div><p><strong>ขา PZEM และ LED เหลืองของบอร์ดสายแอร์ไม่เหมือนบอร์ด IR แล้ว</strong> (commit "update pin" 15 ต.ค. 2569) PZEM ย้ายเป็น RX=GPIO18 / TX=GPIO14 และ LED เหลืองเป็น GPIO23 แต่เลขรุ่นยังเป็น <code>2.5.2-slm8</code> เหมือนเดิม บอร์ดที่แฟลชก่อนวันนี้ยังใช้ขาเก่า (16/18/27) ถ้าบัดกรีสายตามขาใหม่ต้องแฟลชเฟิร์มแวร์ใหม่ด้วย และ <code>firmware/README.md</code> กับ <code>README_WIRED_TH.md</code> ยังเขียนขาเก่าอยู่ ให้เชื่อค่าในไฟล์ <code>.ino</code></p></div>
+<div class="callout warn"><div class="callout-title">ระวัง</div><p><strong>ขา PZEM และ LED เหลืองของบอร์ดสายแอร์ไม่เหมือนบอร์ด IR</strong> PZEM อยู่ที่ RX=GPIO18 / TX=GPIO14 และ LED เหลืองที่ GPIO23 ถ้าต่อสายตามบอร์ด IR (16/18/27) PZEM จะอ่านไม่ได้ เลขรุ่นของเฟิร์มแวร์นี้ (<code>2.5.2-slm8</code>) ไม่ได้ขยับตอนย้ายขา บอร์ดที่แฟลชไว้นานแล้วอาจยังเป็นขาชุดเก่า ถ้าไม่แน่ใจให้แฟลชใหม่จากโค้ดปัจจุบัน และ <code>firmware/README.md</code> กับ <code>README_WIRED_TH.md</code> ยังเขียนขาชุดเก่าอยู่ ให้เชื่อค่าในไฟล์ <code>.ino</code></p></div>
 
-<p>บอร์ดนี้ <strong>ไม่มี GPIO17 (IR)</strong> และขาส่งของสายแอร์ย้ายมาจาก GPIO25 เป็น GPIO33 เพราะ GPIO25 เป็น LED เขียวของเฟิร์มแวร์แอปอยู่แล้ว (ตาม <code>README_WIRED_TH.md</code>) ตาราง Pins ใน <code>firmware/README.md</code> ถูกแก้ (11 ต.ค. 2569) จากรายการธรรมดาเป็นตารางสองคอลัมน์เทียบบอร์ด IR กับบอร์ดสายแอร์</p>
+<p>บอร์ดนี้ <strong>ไม่มี GPIO17 (IR)</strong> และขาส่งของสายแอร์ย้ายมาจาก GPIO25 เป็น GPIO33 เพราะ GPIO25 เป็น LED เขียวของเฟิร์มแวร์แอปอยู่แล้ว (ตาม <code>README_WIRED_TH.md</code>) ตาราง Pins ใน <code>firmware/README.md</code> ถูกแก้ จากรายการธรรมดาเป็นตารางสองคอลัมน์เทียบบอร์ด IR กับบอร์ดสายแอร์</p>
 <div class="callout why"><div class="callout-title">ทำไม</div><p><strong>ทำไมใช้ GPIO34/35 เป็นขารับ:</strong> สองขานี้ของ ESP32 เป็น "ขาเข้าอย่างเดียว" (ไม่มีวงจรขาออก) จึงเหมาะกับการรับสัญญาณจากภายนอกที่ไม่ต้องการให้ ESP32 เผลอขับกลับ และใช้ตัวแบ่งแรงดันเพราะสายของแอร์ค้างอยู่ราว 4.7–4.9 V (วัดจริงตามบันทึก <code>claude/slm8_protocol_notes_TH.md</code> ในโปรเจค) ต่อตรงเข้าขา 3.3 V จะเสี่ยงขาเสีย ตัวแบ่ง 100k/200k ลดเหลือราว 2/3 (≈3.2 V) ที่ต้องใช้ค่าสูงถึงหลักแสนโอห์มเพราะตัวดึงขึ้น (pull-up) ในแอร์อ่อนมาก (ประมาณ 20k–60k) ถ้าใช้ 10k/20k ตามบันทึกเดียวกัน แรงดันตกเหลือ 1.4–2.9 V จน ESP32 อ่านเป็น LOW ตลอด</p></div>
 
 <h3 id="บอร์ดตรวจจับคน-บรรทัด-3040-ของ-rmutt_esp32_occupancyino">บอร์ดตรวจจับคน (บรรทัด 30–40 ของ <code>rmutt_esp32_occupancy.ino</code>)<a class="anchor" href="#บอร์ดตรวจจับคน-บรรทัด-3040-ของ-rmutt_esp32_occupancyino">#</a></h3>
@@ -445,14 +442,14 @@
 <td><code>GREEN_LED_PIN</code></td>
 <td>ออก</td>
 <td>LED เขียว ผ่านตัวต้านทาน 220–330 Ω ลง GND</td>
-<td>(เพิ่ม 15 ต.ค. 2569, 1.3.3) สถานะการเชื่อมต่อ</td>
+<td>สถานะการเชื่อมต่อ</td>
 </tr>
 <tr>
 <td>26</td>
 <td><code>RED_LED_PIN</code></td>
 <td>ออก</td>
 <td>LED แดง ผ่านตัวต้านทาน 220–330 Ω ลง GND</td>
-<td>(เพิ่ม 15 ต.ค. 2569, 1.3.3) มีคนในห้อง</td>
+<td>มีคนในห้อง</td>
 </tr>
 <tr>
 <td>—</td>
@@ -464,7 +461,7 @@
 </tbody>
 </table></div>
 <p>UART1 เปิดที่ 256000 baud, <code>SERIAL_8N1</code> (8 บิตข้อมูล ไม่มี parity 1 stop bit) บอร์ดนี้ไม่มีการต่อไฟ AC</p>
-<p><strong>ไฟ LED ของบอร์ดตรวจคน</strong> (เพิ่มในเฟิร์มแวร์ 1.3.3, ฟังก์ชัน <code>updateStatusLeds()</code> บรรทัด 1149–1162)</p>
+<p><strong>ไฟ LED ของบอร์ดตรวจคน</strong> (ฟังก์ชัน <code>updateStatusLeds()</code> บรรทัด 1149–1162)</p>
 <div class="table-wrap"><table>
 <thead>
 <tr>
@@ -496,12 +493,12 @@
 </tr>
 </tbody>
 </table></div>
-<div class="callout why"><div class="callout-title">ทำไม</div><p><strong>ทำไมต้องเรียก <code>updateStatusLeds()</code> ในลูปรอ Wi-Fi และ NTP ด้วย:</strong> <code>connectWifiCredentials()</code> รอได้นานถึง 20 วินาที และ <code>ensureClockSynced()</code> นานถึง 15 วินาที ระหว่างนั้น <code>loop()</code> ไม่ได้วน ถ้าเรียกแค่ใน <code>loop()</code> ไฟเขียวจะค้างนิ่งแทนที่จะกระพริบ เวอร์ชันนี้จึงตั้งธง <code>connectionInProgress</code> แล้วเรียก <code>updateStatusLeds()</code> ทุก 20 ms ภายในลูปรอ (ลูป NTP เดิม <code>delay(200)</code> ถูกแตกเป็น 10 × 20 ms ด้วยเหตุผลเดียวกัน)</p></div>
+<div class="callout why"><div class="callout-title">ทำไม</div><p><strong>ทำไมต้องเรียก <code>updateStatusLeds()</code> ในลูปรอ Wi-Fi และ NTP ด้วย:</strong> <code>connectWifiCredentials()</code> รอได้นานถึง 20 วินาที และ <code>ensureClockSynced()</code> นานถึง 15 วินาที ระหว่างนั้น <code>loop()</code> ไม่ได้วน ถ้าเรียกแค่ใน <code>loop()</code> ไฟเขียวจะค้างนิ่งแทนที่จะกระพริบ โค้ดจึงตั้งธง <code>connectionInProgress</code> แล้วเรียก <code>updateStatusLeds()</code> ทุก 20 ms ภายในลูปรอ (ลูปรอ NTP แบ่งการรอเป็น 10 × 20 ms ต่อรอบด้วยเหตุผลเดียวกัน)</p></div>
 
 <h2 id="อธิบายทีละไฟล์">อธิบายทีละไฟล์<a class="anchor" href="#อธิบายทีละไฟล์">#</a></h2>
 <h3 id="firmwarermutt_esp32_airrmutt_esp32_airino-บอร์ดแอร์-ir-2032-บรรทัด-เวอร์ชัน-251"><code>firmware/rmutt_esp32_air/rmutt_esp32_air.ino</code> (บอร์ดแอร์ IR 2,032 บรรทัด, เวอร์ชัน 2.5.1)<a class="anchor" href="#firmwarermutt_esp32_airrmutt_esp32_airino-บอร์ดแอร์-ir-2032-บรรทัด-เวอร์ชัน-251">#</a></h3>
 <p>ไฟล์เดียวที่เป็นหัวใจของบอร์ดแอร์ IR เรียงตามลำดับในไฟล์ได้ดังนี้ (เลขในวงเล็บคือบรรทัดของเวอร์ชันปัจจุบัน หลังเพิ่มจอ OLED และ unprovision เลขบรรทัดเลื่อนจากเดิมราว 6–67 บรรทัด)</p>
-<p><strong>1) หัวไฟล์และ include (1–41)</strong> — คอมเมนต์สรุปความสามารถ (มีบรรทัด 10 เพิ่มว่า "OLED 1.3\" SH1106 I2C (GPIO21 SDA / GPIO22 SCL)") แล้ว include ไลบรารี BLE (<code>BLEDevice</code>, <code>BLEServer</code>, <code>BLE2902</code>...), <code>IRac</code>/<code>IRremoteESP8266</code>, <code>PZEM004Tv30</code>, <code>Preferences</code>, <code>PubSubClient</code>, <code>WiFiClientSecure</code>, และไฟล์ของโปรเจค <code>SaijoDenkiAC.h</code>, <code>letsencrypt_ca.h</code>, <code>ota_update.h</code>, <code>history_log.h</code> และ <code>oled_display.h</code> (บรรทัด 38, เพิ่ม 11 ต.ค. 2569)</p>
+<p><strong>1) หัวไฟล์และ include (1–41)</strong> — คอมเมนต์สรุปความสามารถ (มีบรรทัด 10 เพิ่มว่า "OLED 1.3\" SH1106 I2C (GPIO21 SDA / GPIO22 SCL)") แล้ว include ไลบรารี BLE (<code>BLEDevice</code>, <code>BLEServer</code>, <code>BLE2902</code>...), <code>IRac</code>/<code>IRremoteESP8266</code>, <code>PZEM004Tv30</code>, <code>Preferences</code>, <code>PubSubClient</code>, <code>WiFiClientSecure</code>, และไฟล์ของโปรเจค <code>SaijoDenkiAC.h</code>, <code>letsencrypt_ca.h</code>, <code>ota_update.h</code>, <code>history_log.h</code> และ <code>oled_display.h</code> (บรรทัด 38)</p>
 <p><strong>2) ค่าคงที่ (43–91)</strong> ใช้ <code>constexpr</code> (ค่าที่คอมไพเลอร์รู้ตอนคอมไพล์ ไม่กินที่ใน RAM) ตั้งชื่อลงท้าย <code>_MS</code> ทุกค่าที่เป็นเวลา ตารางสรุปอยู่ด้านล่าง</p>
 <div class="table-wrap"><table>
 <thead>
@@ -620,13 +617,13 @@
 <tr>
 <td><code>FIRMWARE_VERSION</code> (บรรทัด 68)</td>
 <td><code>"2.5.1"</code></td>
-<td>เวอร์ชันที่บอร์ดรายงานใน BLE IDENTITY และ <code>/status</code> (แก้ 13 ต.ค. 2569 จาก 2.4.1 → 2.5.0 → 2.5.1)</td>
+<td>เวอร์ชันที่บอร์ดรายงานใน BLE IDENTITY และ <code>/status</code></td>
 </tr>
 </tbody>
 </table></div>
 <p>UUID 6 ตัว (<code>SERVICE_UUID</code> ลงท้าย <code>0001</code> ... <code>SETTINGS_UUID</code> ลงท้าย <code>0006</code>, ขึ้นต้น <code>7b57</code>) คือ service และ characteristic ของ BLE ที่แอปต้องรู้ ตารางหน้าที่ของแต่ละตัวอยู่ใน <strong>บทโปรโตคอลสื่อสาร</strong></p>
 <p><strong>3) โครงสร้างข้อมูล (93–144)</strong> — <code>DeviceConfig</code> (ค่าที่ได้จากการตั้งค่า: ห้อง เลขแอร์ โปรโตคอล IR Wi-Fi MQTT token เวลาเปิด/ปิดรายวัน), <code>AirState</code> (สถานะแอร์ที่ "เชื่อว่าเป็น": power, temperature, mode, fanSpeed, verticalSwing, eco, turbo ... timerOn/OffMinutes), <code>PowerMeasurements</code> (ค่าที่ PZEM อ่านได้ + <code>acRunning</code> + ตัวนับ <code>runningSamples/stoppedSamples/failedSamples</code>) การรวมค่าเป็น <code>struct</code> ทำให้ส่งต่อและบันทึกได้ง่าย แทนที่จะมีตัวแปรลอยหลายสิบตัว</p>
-<p><strong>4) ตัวแปรโกลบอล (146–248)</strong> — อ็อบเจกต์หลัก: <code>preferences</code>, <code>wifiClient</code> (TCP ธรรมดา), <code>secureClient</code> (TCP + TLS), <code>mqttClient</code> (PubSubClient เริ่มด้วย <code>wifiClient</code> แล้วสลับเป็น <code>secureClient</code> ตอนต่อ), <code>irAc</code> (<code>IRac</code> ตัวกลางของ IRremoteESP8266), <code>saijoAc</code>, <code>pzem(Serial2, 16, 18)</code>, ตัวแปร <code>config</code>, <code>airState</code>, <code>powerMeasurements</code> และ (เพิ่ม 11 ต.ค. 2569) <code>oledDisplay</code> (อ็อบเจกต์จอ, บรรทัด 158) กับ <code>oledReason</code> (ข้อความเหตุผลที่เข้าโหมดตั้งค่า ไว้แสดงบนจอ, บรรทัด 159)
+<p><strong>4) ตัวแปรโกลบอล (146–248)</strong> — อ็อบเจกต์หลัก: <code>preferences</code>, <code>wifiClient</code> (TCP ธรรมดา), <code>secureClient</code> (TCP + TLS), <code>mqttClient</code> (PubSubClient เริ่มด้วย <code>wifiClient</code> แล้วสลับเป็น <code>secureClient</code> ตอนต่อ), <code>irAc</code> (<code>IRac</code> ตัวกลางของ IRremoteESP8266), <code>saijoAc</code>, <code>pzem(Serial2, 16, 18)</code>, ตัวแปร <code>config</code>, <code>airState</code>, <code>powerMeasurements</code> และ <code>oledDisplay</code> (อ็อบเจกต์จอ, บรรทัด 158) กับ <code>oledReason</code> (ข้อความเหตุผลที่เข้าโหมดตั้งค่า ไว้แสดงบนจอ, บรรทัด 159)
 ถัดมาคือ <code>PartitionFlash</code> (ตัวห่อ API พาร์ติชัน flash ให้ <code>HistoryLog</code> ใช้) และ <code>HistoryInterval</code> (ตัวสะสมค่าในช่วง 5 นาที) กับกลุ่มตัวแปรสถานะ BLE (<code>bleClientConnected</code>, <code>bleBlocksNormalOperation</code>, <code>bleWifiOnlyMode</code>...) และ flag สื่อสารระหว่าง callback กับลูป (<code>mqttCommandReady</code>, <code>otaRequested</code>, <code>historyAckReady</code>, <code>configReady</code>)</p>
 <p><strong>5) Forward declaration (250–293)</strong> — ประกาศชื่อฟังก์ชันล่วงหน้า เพื่อให้เรียกใช้ก่อนที่จะนิยามได้ (C++ ต้องรู้จักชื่อก่อนใช้) เพิ่ม <code>unprovisionAndRestart</code> (บรรทัด 274) และ <code>refreshOled</code> (บรรทัด 290)</p>
 <p><strong>6) คลาส callback ของ BLE (295–424)</strong>
@@ -655,10 +652,10 @@
 </tbody>
 </table></div>
 <p>แยก namespace เพราะ "ค่าตั้งค่า" เปลี่ยนนาน ๆ ครั้ง ส่วน "สถานะแอร์" เขียนบ่อย การจำสถานะแอร์ไว้ทำให้บูตใหม่ (เช่นไฟดับ) แล้วบอร์ดยังรู้ว่าล่าสุดสั่งอะไรไป (ตัวจับเวลา timerOn/Off <strong>ไม่ถูกเก็บ</strong> จึงหายเมื่อรีบูต)</p>
-<p><strong>10) BLE server (673–776)</strong> — <code>startBleProvisioning()</code> สร้าง BLE server ครั้งเดียว (<code>BLEDevice::init(config.bleName)</code> ชื่อ <code>RMUTT-AC-</code> + 12 หลักท้ายของ Device ID) สร้าง service + 5 characteristic: <code>CONFIG</code> (WRITE), <code>STATUS</code> (READ+NOTIFY พร้อม descriptor <code>BLE2902</code> เพื่อให้แอปสมัครรับแจ้งเตือน), <code>IDENTITY</code> (READ), <code>SETTINGS</code> (READ), <code>WIFI_SCAN</code> (READ) (แก้ 11 ต.ค. 2569) บรรทัด 710 ใส่ <code>identity["controlType"] = "ir"</code> ลงใน IDENTITY ให้แอปรู้ว่าเป็นบอร์ด IR (แยกจากบอร์ดสายแอร์ที่ส่ง <code>"wired"</code>) ตั้งใจให้ <code>IDENTITY</code> สั้น (ไม่เกิน 256 ไบต์ของ JSON buffer) เพราะ Windows ที่ MTU ปกติอ่านค่าใหญ่ไม่ได้ ค่าตั้งค่าเดิมจึงแยกไปอยู่ใน <code>SETTINGS</code> <code>startBleAdvertising()</code> หยุด-หน่วง 80 ms-เริ่มประกาศใหม่ ไม่ทำถ้ามีแอปต่ออยู่</p>
+<p><strong>10) BLE server (673–776)</strong> — <code>startBleProvisioning()</code> สร้าง BLE server ครั้งเดียว (<code>BLEDevice::init(config.bleName)</code> ชื่อ <code>RMUTT-AC-</code> + 12 หลักท้ายของ Device ID) สร้าง service + 5 characteristic: <code>CONFIG</code> (WRITE), <code>STATUS</code> (READ+NOTIFY พร้อม descriptor <code>BLE2902</code> เพื่อให้แอปสมัครรับแจ้งเตือน), <code>IDENTITY</code> (READ), <code>SETTINGS</code> (READ), <code>WIFI_SCAN</code> (READ) บรรทัด 710 ใส่ <code>identity["controlType"] = "ir"</code> ลงใน IDENTITY ให้แอปรู้ว่าเป็นบอร์ด IR (แยกจากบอร์ดสายแอร์ที่ส่ง <code>"wired"</code>) ตั้งใจให้ <code>IDENTITY</code> สั้น (ไม่เกิน 256 ไบต์ของ JSON buffer) เพราะ Windows ที่ MTU ปกติอ่านค่าใหญ่ไม่ได้ ค่าตั้งค่าเดิมจึงแยกไปอยู่ใน <code>SETTINGS</code> <code>startBleAdvertising()</code> หยุด-หน่วง 80 ms-เริ่มประกาศใหม่ ไม่ทำถ้ามีแอปต่ออยู่</p>
 <p><strong>11) โหมดกู้และตั้งค่า (778–966)</strong>
-- <code>enterBleRecovery(reason, retryWifi)</code> — (เพิ่ม 11 ต.ค. 2569) บรรทัด 813 เก็บ <code>reason</code> ไม่เกิน 25 ตัวอักษรลง <code>oledReason</code> ให้หน้า SETUP MODE บนจอแสดงว่าทำไมเข้าโหมดนี้ (จอกว้าง 128 พิกเซล ฟอนต์ 5×7 ใส่ได้ราว 25 ตัว) จากนั้นตั้ง <code>bleBlocksNormalOperation = true</code> (หยุดงานปกติ), ถ้า <code>retryWifi</code> ตั้ง <code>wifiRecoveryActive</code>, ตัด MQTT/Wi-Fi แล้วเปิด BLE ใช้เมื่อ: ยังไม่เคยตั้งค่า, กด BOOT ตอนบูต, ต่อ Wi-Fi เดิมไม่ได้ตอนบูต, หรือ Wi-Fi หลุดระหว่างใช้งาน
-- <code>attemptWifiRecovery()</code> — ในโหมดกู้ที่เกิดจาก Wi-Fi ลองต่อ Wi-Fi เดิมซ้ำทุก 30 วินาที (ครั้งละ 8 วินาที) ไม่ลองถ้ามีแอปต่อ BLE อยู่หรือกำลังจะรีสตาร์ต ถ้าต่อได้ก็ปิด BLE กลับไปทำงานปกติเอง (<code>connectMqtt()</code>) <strong>ทำไม:</strong> เดิมต้องมีคนเดินไปกด BOOT+RESET ทุกครั้งที่ router รีบูต
+- <code>enterBleRecovery(reason, retryWifi)</code> — บรรทัด 813 เก็บ <code>reason</code> ไม่เกิน 25 ตัวอักษรลง <code>oledReason</code> ให้หน้า SETUP MODE บนจอแสดงว่าทำไมเข้าโหมดนี้ (จอกว้าง 128 พิกเซล ฟอนต์ 5×7 ใส่ได้ราว 25 ตัว) จากนั้นตั้ง <code>bleBlocksNormalOperation = true</code> (หยุดงานปกติ), ถ้า <code>retryWifi</code> ตั้ง <code>wifiRecoveryActive</code>, ตัด MQTT/Wi-Fi แล้วเปิด BLE ใช้เมื่อ: ยังไม่เคยตั้งค่า, กด BOOT ตอนบูต, ต่อ Wi-Fi เดิมไม่ได้ตอนบูต, หรือ Wi-Fi หลุดระหว่างใช้งาน
+- <code>attemptWifiRecovery()</code> — ในโหมดกู้ที่เกิดจาก Wi-Fi ลองต่อ Wi-Fi เดิมซ้ำทุก 30 วินาที (ครั้งละ 8 วินาที) ไม่ลองถ้ามีแอปต่อ BLE อยู่หรือกำลังจะรีสตาร์ต ถ้าต่อได้ก็ปิด BLE กลับไปทำงานปกติเอง (<code>connectMqtt()</code>) <strong>ทำไม:</strong> ถ้าไม่มีกลไกนี้ ต้องมีคนเดินไปกด BOOT+RESET ทุกครั้งที่ router รีบูต
 - <code>enterBleReconfiguration()</code> — ถูกเรียกเมื่อ Backend ส่ง <code>{"action":"enter_setup"}</code> ทาง MQTT บอร์ดยังออนไลน์อยู่ และเปิด BLE ไว้ 5 นาที (<code>ONLINE_SETUP_WINDOW_MS</code>) โดยค่าเดิมยังใช้งานต่อจนกว่าจะกดบันทึก
 - <code>keepsServerAssignment()</code> — คืน <code>true</code> ถ้าการตั้งค่าใหม่ "ไม่แตะ" ห้อง เลขแอร์ และ MQTT ทุกตัว ใช้กับ <code>bleWifiOnlyMode</code> (ดูด้านล่าง)
 - <code>processPendingConfig()</code> — ถูกเรียกจาก <code>loop()</code> เมื่อ <code>configReady</code> อ่าน JSON → สร้าง <code>DeviceConfig incoming</code> → ตรวจความถูกต้อง (Device ID ตรงกับบอร์ดนี้, ห้องถูกรูปแบบ, <code>airNumber</code> 1–6, มีชื่อแอร์, มี token, มี SSID, <strong>รหัส Wi-Fi ≥ 8 ตัว</strong>, มี MQTT host/topic, โปรโตคอลรองรับ) → ถ้าอยู่ใน Wi-Fi-only mode ต้อง <code>keepsServerAssignment</code> → <strong>ทดสอบต่อ Wi-Fi ด้วยรหัสใหม่ก่อน</strong> (<code>connectWifiCredentials</code> 15 วินาที) ถ้าไม่ผ่านก็ไม่บันทึก แจ้งแอปว่า <code>wifi_connection_failed</code> แล้วกู้ค่าเดิมกลับ ถ้าผ่านจึง <code>saveConfig</code> แล้วแจ้ง <code>config_saved</code> และตั้ง <code>restartAt = millis() + 1500</code> ให้รีสตาร์ต
@@ -666,14 +663,14 @@
 <div class="callout why"><div class="callout-title">ทำไม</div><p><strong>ทำไมต้องมี Wi-Fi-only mode:</strong> ถ้าบอร์ดเข้าโหมดตั้งค่า BLE เพราะ Wi-Fi หลุด ใครก็ตามที่ยืนใกล้บอร์ดสามารถต่อ BLE ได้ หากยอมให้เปลี่ยนห้องหรือ MQTT server ได้ คนแปลกหน้าจะชี้บอร์ดไปหา broker ของตัวเองแล้วสั่งแอร์ห้องนั้นได้ จึงล็อกให้แก้ได้เฉพาะ Wi-Fi ถ้าจะเปลี่ยนห้อง/เซิร์ฟเวอร์ต้องกด BOOT ค้างตอนรีเซ็ต (ต้องเข้าถึงตัวบอร์ด) หรือให้แอดมินส่ง <code>enter_setup</code> จาก Backend (<code>bleWifiOnlyMode = false</code>)</p></div>
 
 <p><strong>12) Wi-Fi และเวลา (980–1047)</strong> — <code>connectWifi()</code> เรียก <code>connectWifiCredentials(ssid, password, timeoutMs)</code> ซึ่งตั้ง <code>WIFI_STA</code>, <code>WiFi.begin</code>, วนรอด้วย <code>delay(50)</code> จนต่อได้หรือครบเวลา ระหว่างรอเรียก <code>updateStatusLeds()</code> ให้ LED เหลืองกระพริบ ถ้า <code>WL_CONNECT_FAILED</code> หรือ <code>WL_NO_SSID_AVAIL</code> ออกทันที เมื่อต่อสำเร็จครั้งแรกจะเรียก <code>configTime(7 * 3600, 0, "pool.ntp.org", "time.nist.gov")</code> เริ่มซิงก์เวลาแบบไม่รอ ส่วน <code>ensureClockSynced()</code> เป็นตัวที่ "รอจริง" (สูงสุด 15 วินาที ใช้ <code>time.google.com</code>) เรียกก่อนต่อ MQTT แบบ TLS และก่อน OTA</p>
-<p><strong>13) MQTT (1049–1333)</strong> — <code>connectMqtt()</code>, <code>mqttCallback()</code>, <code>unprovisionAndRestart()</code> (บรรทัด 1167–1209, เพิ่ม 13 ต.ค. 2569), <code>processMqttCommand()</code> (เริ่มบรรทัด 1211) ดูหัวข้อเจาะโค้ด ตารางด้านล่าง และหัวข้อ "ล้างบอร์ดเมื่อถูกลบออกจากแอป (unprovision)"</p>
+<p><strong>13) MQTT (1049–1333)</strong> — <code>connectMqtt()</code>, <code>mqttCallback()</code>, <code>unprovisionAndRestart()</code> (บรรทัด 1167–1209), <code>processMqttCommand()</code> (เริ่มบรรทัด 1211) ดูหัวข้อเจาะโค้ด ตารางด้านล่าง และหัวข้อ "ล้างบอร์ดเมื่อถูกลบออกจากแอป (unprovision)"</p>
 <p><strong>14) ส่ง IR (1335–1452)</strong> — <code>sendCurrentIrState()</code> ทางทั่วไปผ่าน <code>IRac</code> และ <code>sendSaijoCurrentIrState()</code> ทางไดรเวอร์ของเรา (ดูส่วน IR ด้านล่าง)</p>
-<p><strong>15) publish (1454–1549)</strong> — <code>publishStatus()</code> สร้าง JSON ของ <code>/status</code> (online, deviceId, firmwareVersion, otaError ถ้ามี, roomNumber, airNumber, ip, rssi, pzemAvailable, acRunning, outsideSchedule, scheduleConfigured, classScheduleConfigured, <strong>historyPending</strong>, และ voltage/current/powerWatts/energyKwh/frequencyHz/powerFactor ถ้า PZEM พร้อม ไม่พร้อมก็ส่ง <code>null</code>) ส่งแบบ retained (<code>publish(..., true)</code>) <code>publishState()</code> (เริ่มบรรทัด 1499) เรียก <code>oledDisplay.poke()</code> ก่อน (บรรทัด 1500, เพิ่ม 11 ต.ค. 2569) ให้จอวาดค่าใหม่ทันทีที่สถานะแอร์เปลี่ยน แล้วส่ง <code>/state</code> (สถานะแอร์ + <code>commandId</code> ถ้ามี) retained <code>publishProvisioningToken()</code> ส่ง <code>/provision</code> ทุก 10 วินาทีจนกว่า Backend จะตอบ ack</p>
+<p><strong>15) publish (1454–1549)</strong> — <code>publishStatus()</code> สร้าง JSON ของ <code>/status</code> (online, deviceId, firmwareVersion, otaError ถ้ามี, roomNumber, airNumber, ip, rssi, pzemAvailable, acRunning, outsideSchedule, scheduleConfigured, classScheduleConfigured, <strong>historyPending</strong>, และ voltage/current/powerWatts/energyKwh/frequencyHz/powerFactor ถ้า PZEM พร้อม ไม่พร้อมก็ส่ง <code>null</code>) ส่งแบบ retained (<code>publish(..., true)</code>) <code>publishState()</code> (เริ่มบรรทัด 1499) เรียก <code>oledDisplay.poke()</code> ก่อน (บรรทัด 1500) ให้จอวาดค่าใหม่ทันทีที่สถานะแอร์เปลี่ยน แล้วส่ง <code>/state</code> (สถานะแอร์ + <code>commandId</code> ถ้ามี) retained <code>publishProvisioningToken()</code> ส่ง <code>/provision</code> ทุก 10 วินาทีจนกว่า Backend จะตอบ ack</p>
 <p><strong>16) OTA (1551–1579)</strong> — <code>performOtaUpdate()</code> ดูหัวข้อเจาะโค้ดคู่กับ <code>ota_update.h</code></p>
 <p><strong>17) ตัวจับเวลา (1581–1633)</strong> — <code>processTimers()</code> ตัวตั้งเวลาเปิด/ปิดที่ผู้ใช้สั่งจากแอป (คิดจาก <code>millis()</code> + นาที × 60000) และ <code>processDailySchedule()</code> เปิด/ปิดตามเวลา <code>dailyOn</code>/<code>dailyOff</code> รูปแบบ <code>"HH:MM"</code> ที่ตั้งตอน BLE: ใช้ <code>getLocalTime</code> (ต้องมี NTP) ตรวจครั้งเดียวต่อนาที (<code>lastScheduleMinute</code>) เมื่อเวลาตรงก็ยิง IR และ <code>publishState()</code></p>
 <p><strong>18) PZEM, LED, ตาราง (1635–1775)</strong> — <code>readPowerMeter()</code> (เจาะโค้ด, บรรทัด 1698 เพิ่ม <code>oledDisplay.pushPower(powerWatts)</code>), <code>updateStatusLeds()</code> (ตาราง LED ด้านล่าง, บรรทัด 1735 เพิ่ม <code>refreshOled()</code> ท้ายฟังก์ชัน จอจึงถูกอัปเดตทุกรอบ <code>loop()</code> เพราะ <code>updateStatusLeds()</code> ถูกเรียกทุกรอบอยู่แล้ว), <code>isWithinConfiguredSchedule()</code> (ตรวจ "อยู่ในช่วง dailyOn–dailyOff หรือไม่" รองรับช่วงข้ามเที่ยงคืนเช่น 22:00–06:00, ถ้าตั้งไม่ครบหรือไม่รู้เวลาให้ถือว่า "อยู่ในช่วง" เพื่อไม่กล่าวหาผู้ใช้ผิด), <code>isWithinAllowedSchedule()</code> (ถ้าผลตารางเรียนจาก Backend ยังสด ≤ 2 นาทีและห้องมีตารางเรียน ใช้ <code>withinClassSchedule</code> ไม่งั้นถอยไปใช้ตารางรายวันบนบอร์ด), <code>parseMinutesOfDay()</code> (แปลง <code>"HH:MM"</code> เป็นนาทีของวัน)</p>
 <p><strong>19) ข้อมูลย้อนหลัง (1777–1981)</strong> — <code>initHistoryLog</code>, <code>accumulateHistorySample</code>, <code>finalizeHistoryInterval</code>, <code>processHistoryUpload</code>, <code>applyHistoryAck</code> (ดูหัวข้อ "ข้อมูลย้อนหลังตอนเน็ตหลุด")</p>
-<p><strong>20) จอ OLED (1983–2032, เพิ่ม 11 ต.ค. 2569)</strong> — <code>refreshOled()</code> รวบรวมค่าจาก <code>config</code>, <code>airState</code>, <code>powerMeasurements</code>, Wi-Fi/MQTT และนาฬิกา ใส่ <code>OledData</code> แล้วเลือกหน้าจอ SETUP / CONNECTING / NORMAL (ดูหัวข้อ "จอ OLED 1.3 นิ้ว")</p>
+<p><strong>20) จอ OLED (1983–2032)</strong> — <code>refreshOled()</code> รวบรวมค่าจาก <code>config</code>, <code>airState</code>, <code>powerMeasurements</code>, Wi-Fi/MQTT และนาฬิกา ใส่ <code>OledData</code> แล้วเลือกหน้าจอ SETUP / CONNECTING / NORMAL (ดูหัวข้อ "จอ OLED 1.3 นิ้ว")</p>
 <h3 id="ลำดับงานใน-loop-ของบอร์ดแอร์">ลำดับงานใน <code>loop()</code> ของบอร์ดแอร์<a class="anchor" href="#ลำดับงานใน-loop-ของบอร์ดแอร์">#</a></h3>
 <div class="table-wrap"><table>
 <thead>
@@ -797,11 +794,11 @@
 </tr>
 <tr>
 <td>publish</td>
-<td><code>/status</code> (retained), <code>/state</code> (retained), <code>/provision</code> (retained), <code>/history</code> (ไม่ retained) และ (เพิ่ม 13 ต.ค. 2569) คำตอบ unprovision <code>{"deviceId":...,"online":false,"unprovisioned":true}</code> ที่ <code>/status</code> แบบ <strong>ไม่</strong> retained ตามด้วย payload ว่าง retained ที่ <code>/status</code> และ <code>/state</code> เพื่อล้างของตัวเอง</td>
+<td><code>/status</code> (retained), <code>/state</code> (retained), <code>/provision</code> (retained), <code>/history</code> (ไม่ retained) และ คำตอบ unprovision <code>{"deviceId":...,"online":false,"unprovisioned":true}</code> ที่ <code>/status</code> แบบ <strong>ไม่</strong> retained ตามด้วย payload ว่าง retained ที่ <code>/status</code> และ <code>/state</code> เพื่อล้างของตัวเอง</td>
 </tr>
 <tr>
 <td>action ที่รับทาง <code>/command</code></td>
-<td><code>enter_setup</code>, <code>unprovision</code> (เพิ่ม 13 ต.ค. 2569), <code>ota</code> หรือไม่มี <code>action</code> = คำสั่งสถานะแอร์</td>
+<td><code>enter_setup</code>, <code>unprovision</code>, <code>ota</code> หรือไม่มี <code>action</code> = คำสั่งสถานะแอร์</td>
 </tr>
 <tr>
 <td>buffer</td>
@@ -888,14 +885,14 @@
 <li>เรียกใช้โดย <code>rmutt_esp32_air.ino</code> (<code>saijoAc</code> ตัวเดียวชื่อ global) ผ่าน <code>sendSaijoCurrentIrState</code></li>
 <li><strong>ทำไมแยกเป็นไฟล์ของตัวเอง:</strong> ตัดความรู้เรื่องโปรโตคอลที่เฉพาะเจาะจงออกจากตรรกะ MQTT/BLE ใน <code>.ino</code> และใส่ไว้ข้าง <code>.ino</code> เพื่อไม่ต้องให้ผู้ติดตั้งลงไลบรารีเพิ่ม</li>
 </ul>
-<h3 id="firmwarermutt_esp32_airoled_displayh-ใหม่-11-ตค-2569-126-บรรทัด"><code>firmware/rmutt_esp32_air/oled_display.h</code> (ใหม่ 11 ต.ค. 2569, 126 บรรทัด)<a class="anchor" href="#firmwarermutt_esp32_airoled_displayh-ใหม่-11-ตค-2569-126-บรรทัด">#</a></h3>
+<h3 id="firmwarermutt_esp32_airoled_displayh-126-บรรทัด"><code>firmware/rmutt_esp32_air/oled_display.h</code> (126 บรรทัด)<a class="anchor" href="#firmwarermutt_esp32_airoled_displayh-126-บรรทัด">#</a></h3>
 <p>คลาส <code>OledDisplay</code> ตัวเดียว เป็น "ตัวขับจอ" ที่ห่อไลบรารี U8g2 ไว้ หน้าที่: ตรวจว่ามีจอต่ออยู่ไหม (<code>begin()</code>), จำกัดจังหวะวาดไม่ให้ถี่เกิน 400 ms (<code>due()</code>, <code>show()</code>), สั่งวาดใหม่ทันทีเมื่อสถานะแอร์เปลี่ยน (<code>poke()</code>), เก็บค่ากำลังไฟย้อนหลัง 64 จุดไว้วาดกราฟ (<code>pushPower()</code>), และพักจอเมื่อแอร์ปิดนาน (<code>saver()</code>) ค่าที่ปรับได้อยู่ต้นไฟล์เป็น <code>#define</code> ที่ห่อด้วย <code>#ifndef</code> (ตั้งทับได้จากภายนอก): <code>OLED_LAYOUT</code> (1–5, ตอนนี้ 1), <code>OLED_ROTATE_180</code> (false), <code>OLED_CONTRAST</code> (160), <code>OLED_SAVER_AFTER_MS</code> (10 นาที)</p>
 <ul>
 <li><strong>ใครเรียก:</strong> <code>rmutt_esp32_air.ino</code> สร้าง <code>OledDisplay oledDisplay;</code> (บรรทัด 158) แล้วเรียก <code>begin()</code> ใน <code>setup()</code>, <code>poke()</code> ใน <code>publishState()</code>, <code>pushPower()</code> ใน <code>readPowerMeter()</code>, <code>due()</code>/<code>show()</code> ใน <code>refreshOled()</code></li>
 <li><strong>เรียกใคร:</strong> <code>U8g2lib.h</code> และฟังก์ชันวาดใน <code>oled_ui.h</code></li>
 <li><strong>ทำไมแยกจาก <code>oled_ui.h</code>:</strong> ไฟล์นี้รู้เรื่อง "ฮาร์ดแวร์และเวลา" (ขา, millis, ความถี่วาด, พักจอ) ส่วน <code>oled_ui.h</code> รู้แค่ "วาดอะไรตรงไหน" แยกแบบนี้จะเปลี่ยนหน้าจอโดยไม่แตะตรรกะจังหวะ หรือย้ายไปจอรุ่นอื่นโดยไม่แตะหน้าจอก็ได้ บอร์ดสายแอร์ใช้สำเนาที่เหมือนกันทุกไบต์</li>
 </ul>
-<h3 id="firmwarermutt_esp32_airoled_uih-ใหม่-11-ตค-2569-382-บรรทัด"><code>firmware/rmutt_esp32_air/oled_ui.h</code> (ใหม่ 11 ต.ค. 2569, 382 บรรทัด)<a class="anchor" href="#firmwarermutt_esp32_airoled_uih-ใหม่-11-ตค-2569-382-บรรทัด">#</a></h3>
+<h3 id="firmwarermutt_esp32_airoled_uih-382-บรรทัด"><code>firmware/rmutt_esp32_air/oled_ui.h</code> (382 บรรทัด)<a class="anchor" href="#firmwarermutt_esp32_airoled_uih-382-บรรทัด">#</a></h3>
 <p>รวมฟังก์ชันวาดทั้งหมดใน <code>namespace oled</code> (กันชื่อชนกับโค้ดส่วนอื่น) ทุกฟังก์ชันเป็น <code>inline</code> และ <strong>วาดลงบัฟเฟอร์ของ U8g2 อย่างเดียว</strong> ไม่ส่งไปจอเอง (คอมเมนต์บรรทัด 4: ผู้เรียกเป็นคน <code>clearBuffer()</code>/<code>sendBuffer()</code>)</p>
 <div class="table-wrap"><table>
 <thead>
@@ -957,14 +954,14 @@
 <li><strong>ใครเรียก:</strong> <code>oled_display.h</code> เท่านั้น (เลือกแบบด้วย <code>#if OLED_LAYOUT</code>)</li>
 <li><strong>ทำไมมี 5 แบบแต่ใช้แบบเดียว:</strong> ทีมออกแบบไว้ให้เลือกตอนติดตั้ง แต่ <code>#if</code> ทำให้คอมไพเลอร์ใส่เฉพาะแบบที่เลือกลงเฟิร์มแวร์ แบบอื่นไม่กินแฟลช (ฟอนต์แต่ละขนาดกินแฟลชหลาย KB) <code>README_OLED_TH.md</code> เตือนว่าแบบอื่นอาจทำให้เกินแฟลช ต้องลองคอมไพล์ก่อน</li>
 </ul>
-<h3 id="firmwarermutt_esp32_airbuild_opth-ใหม่-11-ตค-2569-1-บรรทัด"><code>firmware/rmutt_esp32_air/build_opt.h</code> (ใหม่ 11 ต.ค. 2569, 1 บรรทัด)<a class="anchor" href="#firmwarermutt_esp32_airbuild_opth-ใหม่-11-ตค-2569-1-บรรทัด">#</a></h3>
+<h3 id="firmwarermutt_esp32_airbuild_opth-1-บรรทัด"><code>firmware/rmutt_esp32_air/build_opt.h</code> (1 บรรทัด)<a class="anchor" href="#firmwarermutt_esp32_airbuild_opth-1-บรรทัด">#</a></h3>
 <p>ไม่ใช่ไฟล์ C++ แม้นามสกุลจะเป็น <code>.h</code> แต่เป็น <strong>รายการแฟล็กคอมไพเลอร์</strong> (<code>-D...</code>) ที่ Arduino-ESP32 core อ่านแล้วส่งให้คอมไพเลอร์ตอนคอมไพล์ <strong>ทุกไฟล์</strong> รวมถึงไลบรารี ใช้ปิดไดรเวอร์ I2C/SPI ฮาร์ดแวร์ของ U8g2 และปิดโปรโตคอล IR 28 ยี่ห้อที่แอปไม่มีให้เลือก เพื่อให้เฟิร์มแวร์ที่เพิ่มจอแล้วยังพอดีช่องแอป 1,984 KB อธิบายละเอียดในหัวข้อ "<code>build_opt.h</code>: ทำให้เฟิร์มแวร์พอดีแฟลช" บอร์ดสายแอร์มี <code>build_opt.h</code> ของตัวเองที่สั้นกว่า (มีแค่ <code>-DU8X8_NO_HW_I2C -DU8X8_NO_HW_SPI</code> เพราะไม่มี IRremoteESP8266 ให้ปิด)</p>
-<h3 id="firmwarermutt_esp32_airreadme_oled_thmd-ใหม่-11-ตค-2569"><code>firmware/rmutt_esp32_air/README_OLED_TH.md</code> (ใหม่ 11 ต.ค. 2569)<a class="anchor" href="#firmwarermutt_esp32_airreadme_oled_thmd-ใหม่-11-ตค-2569">#</a></h3>
-<p>คู่มือภาษาไทยของจอ: ตารางต่อสาย 4 เส้น, หน้าจอแบบ 1 แสดงอะไรบ้าง, ไลบรารีที่ต้องเพิ่ม (U8g2 by olikraus), เหตุผลของ <code>build_opt.h</code> พร้อมรายชื่อยี่ห้อ IR ที่ปิด/ที่ยังอยู่, ผลคอมไพล์ (ESP32 core 3.0.7: <strong>2,001,365 ไบต์ (98%)</strong> เทียบกับรุ่นเดิมที่ไม่มีจอ 2,007,985 ไบต์) และตารางค่าที่ปรับได้ใน <code>oled_display.h</code> <strong>ข้อสังเกต:</strong> หัวไฟล์เขียน "rmutt_esp32_air 2.5.0" แต่โค้ดปัจจุบันเป็น 2.5.1 แล้ว (เพิ่ม unprovision 13 ต.ค. 2569)</p>
+<h3 id="firmwarermutt_esp32_airreadme_oled_thmd"><code>firmware/rmutt_esp32_air/README_OLED_TH.md</code><a class="anchor" href="#firmwarermutt_esp32_airreadme_oled_thmd">#</a></h3>
+<p>คู่มือภาษาไทยของจอ: ตารางต่อสาย 4 เส้น, หน้าจอแบบ 1 แสดงอะไรบ้าง, ไลบรารีที่ต้องเพิ่ม (U8g2 by olikraus), เหตุผลของ <code>build_opt.h</code> พร้อมรายชื่อยี่ห้อ IR ที่ปิด/ที่ยังอยู่, ผลคอมไพล์ (ESP32 core 3.0.7: <strong>2,001,365 ไบต์ (98%)</strong> แม้เพิ่มโค้ดจอ ขนาดรวมยังเล็กกว่าตอนไม่มีจอ 2,007,985 ไบต์ เพราะ <code>build_opt.h</code> ปิดยี่ห้อ IR ที่ไม่ใช้) และตารางค่าที่ปรับได้ใน <code>oled_display.h</code> หัวไฟล์เขียน "rmutt_esp32_air 2.5.0" (รุ่นที่เพิ่มจอ) โค้ดปัจจุบันคือ 2.5.1</p>
 <h3 id="firmwarermutt_esp32_airhistory_logh"><code>firmware/rmutt_esp32_air/history_log.h</code><a class="anchor" href="#firmwarermutt_esp32_airhistory_logh">#</a></h3>
 <p>ที่เก็บข้อมูลแบบ ring buffer บนพาร์ติชัน <code>rmuttlog</code> เป็นเทมเพลต <code>HistoryLog&lt;Storage&gt;</code> ที่ไม่รู้จักฮาร์ดแวร์ ผู้ใช้ส่ง "ตัวเก็บข้อมูล" ที่มีเมธอด <code>size/read/write/eraseSector</code> เข้ามา บนบอร์ดจริงคือ <code>PartitionFlash</code> ในไฟล์ <code>.ino</code> และบนคอมพิวเตอร์คือ <code>FakeFlash</code> ใน <code>tests/history_log_test.cpp</code> ฟังก์ชันสำคัญ: <code>HistoryLog::begin/append/nextBatch/acknowledge</code>, <code>historyChecksum</code>, <code>historyRecordValid</code>, <code>historyRecordBlank</code> รายละเอียดทีละบรรทัดอยู่ในหัวข้อเจาะโค้ด</p>
 <h3 id="firmwarermutt_esp32_airota_updateh-และ-firmwarermutt_esp32_occupancyota_updateh-และ-rmutt_esp32_air_wiredota_updateh"><code>firmware/rmutt_esp32_air/ota_update.h</code> และ <code>firmware/rmutt_esp32_occupancy/ota_update.h</code> (และ <code>rmutt_esp32_air_wired/ota_update.h</code>)<a class="anchor" href="#firmwarermutt_esp32_airota_updateh-และ-firmwarermutt_esp32_occupancyota_updateh-และ-rmutt_esp32_air_wiredota_updateh">#</a></h3>
-<p>สามไฟล์ <strong>เนื้อหาเหมือนกัน</strong> (ตรวจด้วย <code>diff</code>; สำเนาในโฟลเดอร์บอร์ดสายแอร์เพิ่ม 11 ต.ค. 2569; ตั้งแต่ 15 ต.ค. 2569 สำเนาของบอร์ดตรวจคนมีช่องว่างเกินท้าย <code>#include &lt;esp_ota_ops.h&gt;</code> บรรทัด 22 ซึ่งไม่มีผลกับโปรแกรม) ฟังก์ชัน: <code>otaUrlAllowed(url, host)</code> ตรวจ URL, <code>otaPartitionAvailable()</code> เช็กว่ามีช่องแอปว่าง, <code>runHttpsOta(url, caCert, currentVersion)</code> ดาวน์โหลดและเขียน flash เรียกใช้จาก <code>performOtaUpdate()</code> ของทุกบอร์ด ทำไมคัดลอกแทนที่จะแชร์ไฟล์: Arduino IDE คอมไพล์เฉพาะไฟล์ในโฟลเดอร์สเก็ตช์ของตัวเอง การแชร์ข้ามโฟลเดอร์ต้องทำเป็นไลบรารีซึ่งยุ่งกับผู้ติดตั้งกว่า (ข้อแลกเปลี่ยนคือถ้าแก้ต้องแก้ทุกสำเนา ตอนนี้มีสามที่)</p>
+<p>สามไฟล์ <strong>เนื้อหาเหมือนกัน</strong> (ตรวจด้วย <code>diff</code>; สำเนาของบอร์ดตรวจคนต่างแค่ช่องว่างเกินท้าย <code>#include &lt;esp_ota_ops.h&gt;</code> บรรทัด 22 ซึ่งไม่มีผลกับโปรแกรม) ฟังก์ชัน: <code>otaUrlAllowed(url, host)</code> ตรวจ URL, <code>otaPartitionAvailable()</code> เช็กว่ามีช่องแอปว่าง, <code>runHttpsOta(url, caCert, currentVersion)</code> ดาวน์โหลดและเขียน flash เรียกใช้จาก <code>performOtaUpdate()</code> ของทุกบอร์ด ทำไมคัดลอกแทนที่จะแชร์ไฟล์: Arduino IDE คอมไพล์เฉพาะไฟล์ในโฟลเดอร์สเก็ตช์ของตัวเอง การแชร์ข้ามโฟลเดอร์ต้องทำเป็นไลบรารีซึ่งยุ่งกับผู้ติดตั้งกว่า (ข้อแลกเปลี่ยนคือถ้าแก้ต้องแก้ทุกสำเนา ตอนนี้มีสามที่)</p>
 <h3 id="firmwarermutt_esp32_airletsencrypt_cah-และ-firmwarermutt_esp32_occupancyletsencrypt_cah-และ-rmutt_esp32_air_wiredletsencrypt_cah"><code>firmware/rmutt_esp32_air/letsencrypt_ca.h</code> และ <code>firmware/rmutt_esp32_occupancy/letsencrypt_ca.h</code> (และ <code>rmutt_esp32_air_wired/letsencrypt_ca.h</code>)<a class="anchor" href="#firmwarermutt_esp32_airletsencrypt_cah-และ-firmwarermutt_esp32_occupancyletsencrypt_cah-และ-rmutt_esp32_air_wiredletsencrypt_cah">#</a></h3>
 <p>ประกาศ <code>static const char LETSENCRYPT_CA[] PROGMEM = R"EOF(...)EOF";</code> เป็นข้อความ PEM ของใบรับรองรากสองใบต่อกัน: <strong>ISRG Root X1</strong> (สาย RSA หมดอายุ 2035-06-04) และ <strong>ISRG Root X2</strong> (สาย ECDSA หมดอายุ 2040-09-17) ตามคอมเมนต์หัวไฟล์ ใส่ทั้งสองเพราะ Let's Encrypt ออกใบรับรองได้ทั้งสองสาย ถ้ามีใบเดียวแล้วเซิร์ฟเวอร์เปลี่ยนสาย บอร์ดทุกตัวจะต่อไม่ได้ <code>PROGMEM</code> คือเก็บไว้ใน flash ไม่ใช่ RAM <code>R"EOF(...)EOF"</code> เป็น raw string literal ของ C++ (ไม่ต้อง escape ขึ้นบรรทัดใหม่) ไฟล์นี้ <strong>สร้างโดยสคริปต์</strong> <code>update-root-ca.ps1</code> ห้ามแก้มือ ทุกบอร์ดได้ไฟล์เหมือนกัน (สำเนาในบอร์ดสายแอร์ตรงกับของบอร์ด IR ทุกไบต์) ใบรากชุดนี้ตรวจผ่านทั้งใบ ts.net (Funnel 8443) และใบ DuckDNS (8883) เพราะทั้งคู่ออกโดย Let's Encrypt</p>
 <h3 id="firmwarermutt_esp32_airpartitionscsv-และ-firmwarermutt_esp32_occupancypartitionscsv"><code>firmware/rmutt_esp32_air/partitions.csv</code> และ <code>firmware/rmutt_esp32_occupancy/partitions.csv</code><a class="anchor" href="#firmwarermutt_esp32_airpartitionscsv-และ-firmwarermutt_esp32_occupancypartitionscsv">#</a></h3>
@@ -983,7 +980,7 @@
 <tr>
 <td>ค่าคงที่เรดาร์และ LED</td>
 <td>30–62</td>
-<td><code>RADAR_RX_PIN=32</code>, <code>RADAR_TX_PIN=33</code>, <code>RADAR_BAUD=256000</code>, <code>GREEN_LED_PIN=25</code>, <code>RED_LED_PIN=26</code>, <code>LED_BLINK_INTERVAL_MS=400</code>, <code>STATIC_ENERGY_THRESHOLD=15</code> (1.3.2 และก่อนหน้า = 25), <code>FIRST_GATE=0</code>, <code>LAST_GATE=8</code>, <code>PRESENCE_READ_INTERVAL_MS=250</code>, <code>STATUS_INTERVAL_MS=10000</code>, <code>RADAR_RETRY_INTERVAL_MS=10000</code>, <code>DIAGNOSTIC_INTERVAL_MS=10000</code>, <code>RADAR_DATA_TIMEOUT_MS=3000</code>, <code>MAX_CONFIG_BYTES=3072</code></td>
+<td><code>RADAR_RX_PIN=32</code>, <code>RADAR_TX_PIN=33</code>, <code>RADAR_BAUD=256000</code>, <code>GREEN_LED_PIN=25</code>, <code>RED_LED_PIN=26</code>, <code>LED_BLINK_INTERVAL_MS=400</code>, <code>STATIC_ENERGY_THRESHOLD=15</code>, <code>FIRST_GATE=0</code>, <code>LAST_GATE=8</code>, <code>PRESENCE_READ_INTERVAL_MS=250</code>, <code>STATUS_INTERVAL_MS=10000</code>, <code>RADAR_RETRY_INTERVAL_MS=10000</code>, <code>DIAGNOSTIC_INTERVAL_MS=10000</code>, <code>RADAR_DATA_TIMEOUT_MS=3000</code>, <code>MAX_CONFIG_BYTES=3072</code></td>
 </tr>
 <tr>
 <td><code>DeviceConfig</code></td>
@@ -1033,24 +1030,24 @@
 <tr>
 <td><code>mqttCallback()</code></td>
 <td>828–877</td>
-<td>จัดการ <code>provision-ack</code>, <code>enter_setup</code>, <code>unprovision</code> (เพิ่ม 13 ต.ค. 2569, บรรทัด 853–864 ตั้งธง <code>unprovisionRequested</code>), <code>ota</code> (ไม่มี <code>schedule-status</code>/<code>history-ack</code>)</td>
+<td>จัดการ <code>provision-ack</code>, <code>enter_setup</code>, <code>unprovision</code> (บรรทัด 853–864 ตั้งธง <code>unprovisionRequested</code>), <code>ota</code> (ไม่มี <code>schedule-status</code>/<code>history-ack</code>)</td>
 </tr>
 <tr>
 <td><code>unprovisionAndRestart()</code></td>
 <td>884–912</td>
-<td>(เพิ่ม 13 ต.ค. 2569) ตอบ Backend, ล้าง retained <code>/status</code>, ล้าง NVS namespace <code>"rmutt-occ"</code> แล้วรีบูต เรียกจาก <code>loop()</code> บรรทัด 413</td>
+<td>ตอบ Backend, ล้าง retained <code>/status</code>, ล้าง NVS namespace <code>"rmutt-occ"</code> แล้วรีบูต เรียกจาก <code>loop()</code> บรรทัด 413</td>
 </tr>
 <tr>
 <td><code>updateStatusLeds()</code></td>
 <td>1149–1162</td>
-<td>(เพิ่ม 15 ต.ค. 2569, 1.3.3) ไฟเขียวบอกการเชื่อมต่อ ไฟแดงบอกมีคน เรียกจาก <code>loop()</code> และจากลูปรอ Wi-Fi/NTP</td>
+<td>ไฟเขียวบอกการเชื่อมต่อ ไฟแดงบอกมีคน เรียกจาก <code>loop()</code> และจากลูปรอ Wi-Fi/NTP</td>
 </tr>
 </tbody>
 </table></div>
 <p>ในโหมดต่อ Wi-Fi <code>connectWifiCredentials()</code> ของบอร์ดนี้เรียก <code>radar.read()</code> ระหว่างรอ (บรรทัด 733) เพื่อไม่ให้ buffer UART ของเรดาร์ล้นขณะรอ Wi-Fi นาน</p>
-<p>บอร์ดนี้ <strong>ไม่อ่านค่าไฟ ไม่ยิง IR ไม่เก็บข้อมูลย้อนหลัง</strong> (LED มีสองดวงตั้งแต่ 1.3.3) <code>loop()</code> ของบอร์ดนี้: ลองเริ่มเรดาร์ใหม่ทุก 10 วินาทีถ้ายังไม่พร้อม, <code>radar.read()</code> ถ้า background task ไม่ได้ทำงาน, พิมพ์ diag ทุก 10 วินาที, <code>updateOccupancy()</code> ทุก 250 ms, <code>updateStatusLeds()</code> ทุกรอบ, จากนั้นงาน BLE/Wi-Fi/MQTT เหมือนบอร์ดแอร์ และ <code>publishStatus()</code> เมื่อผลเปลี่ยนหรือครบ 10 วินาที</p>
-<h3 id="firmwarermutt_esp32_air_wired-เฟิร์มแวร์ตัวที่สาม-บอร์ดแอร์สายแอร์-daikin-slm8-เพิ่ม-11-ตค-2569"><code>firmware/rmutt_esp32_air_wired/</code> (เฟิร์มแวร์ตัวที่สาม: บอร์ดแอร์สายแอร์ Daikin SLM8, เพิ่ม 11 ต.ค. 2569)<a class="anchor" href="#firmwarermutt_esp32_air_wired-เฟิร์มแวร์ตัวที่สาม-บอร์ดแอร์สายแอร์-daikin-slm8-เพิ่ม-11-ตค-2569">#</a></h3>
-<p><strong>คืออะไร:</strong> เฟิร์มแวร์บอร์ดแอร์อีกรุ่นที่ใช้ <strong>แทนรีโมตติดผนังของแอร์ Daikin</strong> ที่ถอดออก ESP32 ต่อกับสายรีโมตผนังโดยตรง แล้วส่งเฟรมคำสั่งตามโปรโตคอลที่ทีมถอดรหัสเอง (เรียกว่า SLM8 ตามรุ่นรีโมต) ทุก 1 วินาที และอ่านเฟรมสถานะที่แอร์ตอบกลับ เวอร์ชันในโค้ดคือ <strong><code>2.5.2-slm8</code></strong> (บรรทัด 78; ออกครั้งแรกเป็น 2.5.1-slm8 เมื่อ 11 ต.ค. แล้วขึ้น 2.5.2-slm8 เมื่อ 13 ต.ค. 2569 ตอนเพิ่ม unprovision; <code>firmware/README.md</code> และ <code>README_WIRED_TH.md</code> ยังเขียน 2.5.1-slm8)</p>
+<p>บอร์ดนี้ <strong>ไม่อ่านค่าไฟ ไม่ยิง IR ไม่เก็บข้อมูลย้อนหลัง</strong> (มี LED สองดวง) <code>loop()</code> ของบอร์ดนี้: ลองเริ่มเรดาร์ใหม่ทุก 10 วินาทีถ้ายังไม่พร้อม, <code>radar.read()</code> ถ้า background task ไม่ได้ทำงาน, พิมพ์ diag ทุก 10 วินาที, <code>updateOccupancy()</code> ทุก 250 ms, <code>updateStatusLeds()</code> ทุกรอบ, จากนั้นงาน BLE/Wi-Fi/MQTT เหมือนบอร์ดแอร์ และ <code>publishStatus()</code> เมื่อผลเปลี่ยนหรือครบ 10 วินาที</p>
+<h3 id="firmwarermutt_esp32_air_wired-เฟิร์มแวร์ตัวที่สาม-บอร์ดแอร์สายแอร์-daikin-slm8"><code>firmware/rmutt_esp32_air_wired/</code> (เฟิร์มแวร์ตัวที่สาม: บอร์ดแอร์สายแอร์ Daikin SLM8)<a class="anchor" href="#firmwarermutt_esp32_air_wired-เฟิร์มแวร์ตัวที่สาม-บอร์ดแอร์สายแอร์-daikin-slm8">#</a></h3>
+<p><strong>คืออะไร:</strong> เฟิร์มแวร์บอร์ดแอร์อีกรุ่นที่ใช้ <strong>แทนรีโมตติดผนังของแอร์ Daikin</strong> ที่ถอดออก ESP32 ต่อกับสายรีโมตผนังโดยตรง แล้วส่งเฟรมคำสั่งตามโปรโตคอลที่ทีมถอดรหัสเอง (เรียกว่า SLM8 ตามรุ่นรีโมต) ทุก 1 วินาที และอ่านเฟรมสถานะที่แอร์ตอบกลับ เวอร์ชันในโค้ดคือ <strong><code>2.5.2-slm8</code></strong> (บรรทัด 78)</p>
 <p><strong>ต่างจากบอร์ด IR อย่างไร (สรุป):</strong></p>
 <div class="table-wrap"><table>
 <thead>
@@ -1103,20 +1100,20 @@
 </tr>
 </tbody>
 </table></div>
-<p><strong>ไฟล์ในโฟลเดอร์:</strong> ไฟล์ที่ <strong>คัดลอกมาเหมือนบอร์ด IR ทุกไบต์</strong> (ตรวจด้วย <code>cmp</code> 14 ต.ค. 2569) คือ <code>oled_display.h</code>, <code>oled_ui.h</code>, <code>history_log.h</code>, <code>ota_update.h</code>, <code>letsencrypt_ca.h</code>, <code>partitions.csv</code> ไฟล์ที่ <strong>มีเฉพาะบอร์ดนี้</strong> คือ <code>rmutt_esp32_air_wired.ino</code> (2,031 บรรทัด แตกมาจาก <code>.ino</code> ของบอร์ด IR จึงมี BLE/MQTT/PZEM/LED/OTA/ข้อมูลย้อนหลัง/unprovision ชุดเดียวกัน), <code>DaikinSLM8.h</code> (321 บรรทัด: ประกอบ/ถอดเฟรม SLM8), <code>wired_bus.h</code> (102 บรรทัด: task + mutex), <code>README_WIRED_TH.md</code> ส่วน <code>build_opt.h</code> มีแต่ไม่เหมือนกัน (ปิดแค่ I2C/SPI ฮาร์ดแวร์)</p>
+<p><strong>ไฟล์ในโฟลเดอร์:</strong> ไฟล์ที่ <strong>คัดลอกมาเหมือนบอร์ด IR ทุกไบต์</strong> (ตรวจด้วย <code>cmp</code>) คือ <code>oled_display.h</code>, <code>oled_ui.h</code>, <code>history_log.h</code>, <code>ota_update.h</code>, <code>letsencrypt_ca.h</code>, <code>partitions.csv</code> ไฟล์ที่ <strong>มีเฉพาะบอร์ดนี้</strong> คือ <code>rmutt_esp32_air_wired.ino</code> (2,031 บรรทัด แตกมาจาก <code>.ino</code> ของบอร์ด IR จึงมี BLE/MQTT/PZEM/LED/OTA/ข้อมูลย้อนหลัง/unprovision ชุดเดียวกัน), <code>DaikinSLM8.h</code> (321 บรรทัด: ประกอบ/ถอดเฟรม SLM8), <code>wired_bus.h</code> (102 บรรทัด: task + mutex), <code>README_WIRED_TH.md</code> ส่วน <code>build_opt.h</code> มีแต่ไม่เหมือนกัน (ปิดแค่ I2C/SPI ฮาร์ดแวร์)</p>
 <p><strong>ทำไมทำเป็นสเก็ตช์แยก ไม่ใส่ <code>#if</code> ในไฟล์เดียว:</strong> สองรุ่นต่างกันทั้งไลบรารี (IR กับ DHT) ขา (GPIO17 กับ GPIO33/34/35/4) และวิธีส่งคำสั่ง (ครั้งเดียว กับส่งซ้ำทุกวินาทีใน task แยก) ถ้ารวมไฟล์เดียวจะมี <code>#if</code> กระจายทั่ว 2,000 บรรทัด อ่านยากและเสี่ยงทำบอร์ด IR ที่ใช้งานอยู่พัง ข้อแลกเปลี่ยนคือแก้ส่วนร่วม (เช่น unprovision) ต้องแก้สองที่ ซึ่งเกิดขึ้นจริงในคอมมิต <code>1f09946</code></p>
 <div class="callout note"><div class="callout-title">หมายเหตุ</div><p>บทนี้อธิบายเฉพาะว่าบอร์ดสายแอร์ "อยู่ตรงไหนในชุดเฟิร์มแวร์" และใช้ส่วนร่วมอะไรบ้าง รายละเอียดโปรโตคอล SLM8 (จังหวะพัลส์ ความหมายแต่ละไบต์ checksum), วงจรต่อสาย, <code>DaikinSLM8.h</code>, <code>wired_bus.h</code> และการทำงานของ task แยก อยู่ใน <strong>บท 19 (โปรโตคอลสายแอร์ Daikin SLM8)</strong></p></div>
 
 <h3 id="firmwareresetresetino"><code>firmware/reset/reset.ino</code><a class="anchor" href="#firmwareresetresetino">#</a></h3>
-<p>สเก็ตช์สั้น ๆ (35 บรรทัด) สำหรับ factory reset: <code>nvs_flash_erase()</code> ล้าง NVS ทั้งหมด, <code>WiFi.disconnect(true, true)</code> ลบ Wi-Fi ที่จำไว้ (ทั้ง <code>wifioff</code> และ <code>eraseap</code> เป็น true), <code>nvs_flash_init()</code> เริ่ม NVS ใหม่ <code>loop()</code> ว่าง ใช้เมื่อจะย้ายบอร์ดไปห้องอื่นหรือล้างค่าที่ค้าง (ตั้งแต่ 13 ต.ค. 2569 ถ้าบอร์ดออนไลน์อยู่ การกดลบอุปกรณ์ในแอปจะสั่ง <code>unprovision</code> ให้บอร์ดล้างตัวเองได้โดยไม่ต้องเสียบสาย <code>reset.ino</code> จึงเหลือไว้ใช้กับบอร์ดที่ออฟไลน์หรือไม่ตอบ) <strong>ไม่แตะพาร์ติชัน <code>rmuttlog</code></strong> (ข้อมูลย้อนหลังในนั้นยังอยู่ แต่ <code>hist_ack</code> ใน NVS หายไป ทำให้ <code>ackedTs = 0</code>)</p>
+<p>สเก็ตช์สั้น ๆ (35 บรรทัด) สำหรับ factory reset: <code>nvs_flash_erase()</code> ล้าง NVS ทั้งหมด, <code>WiFi.disconnect(true, true)</code> ลบ Wi-Fi ที่จำไว้ (ทั้ง <code>wifioff</code> และ <code>eraseap</code> เป็น true), <code>nvs_flash_init()</code> เริ่ม NVS ใหม่ <code>loop()</code> ว่าง ใช้กับบอร์ดที่ออฟไลน์หรือไม่ตอบ (ถ้าบอร์ดออนไลน์อยู่ การกดลบอุปกรณ์ในแอปจะสั่ง <code>unprovision</code> ให้บอร์ดล้างตัวเองได้โดยไม่ต้องเสียบสาย) <strong>ไม่แตะพาร์ติชัน <code>rmuttlog</code></strong> (ข้อมูลย้อนหลังในนั้นยังอยู่ แต่ <code>hist_ack</code> ใน NVS หายไป ทำให้ <code>ackedTs = 0</code>)</p>
 <h3 id="firmwareld2410_pinscanld2410_pinscanino"><code>firmware/ld2410_pinscan/ld2410_pinscan.ino</code><a class="anchor" href="#firmwareld2410_pinscanld2410_pinscanino">#</a></h3>
 <p>เครื่องมือวินิจฉัยเมื่อเรดาร์ไม่ส่งข้อมูลเลย (0 ไบต์) ดูรายละเอียดหัวข้อ "เครื่องมือ: <code>ld2410_pinscan</code> และ <code>reset</code>"</p>
 <h3 id="firmwaretestshistory_log_testcpp"><code>firmware/tests/history_log_test.cpp</code><a class="anchor" href="#firmwaretestshistory_log_testcpp">#</a></h3>
 <p>โปรแกรม C++ ธรรมดา (มี <code>main</code>) ทดสอบ <code>history_log.h</code> บนคอมพิวเตอร์ ดูหัวข้อ "ทดสอบบนคอมพิวเตอร์"</p>
 <h3 id="firmwareupdate-root-caps1"><code>firmware/update-root-ca.ps1</code><a class="anchor" href="#firmwareupdate-root-caps1">#</a></h3>
-<p>PowerShell สร้าง <code>letsencrypt_ca.h</code> ให้ทั้งสองบอร์ด: รับพารามิเตอร์ <code>-Urls</code> (ค่าเริ่มต้น <code>https://letsencrypt.org/certs/isrgrootx1.pem</code> และ <code>.../isrg-root-x2.pem</code>) ดาวน์โหลดด้วย <code>Invoke-WebRequest</code> ตรวจว่ามี <code>-----BEGIN CERTIFICATE-----</code> จริง รวมเป็นข้อความเดียว สร้างเนื้อหา header (<code>#pragma once</code> + <code>static const char LETSENCRYPT_CA[] PROGMEM = R"EOF(...)EOF";</code>) แล้วเขียนทับใน <code>rmutt_esp32_air/</code> และ <code>rmutt_esp32_occupancy/</code> (เขียนเป็น UTF-8 ไม่มี BOM, ใช้ LF) <strong>ข้อสังเกต (ณ 14 ต.ค. 2569):</strong> รายการโฟลเดอร์ปลายทางในสคริปต์ (บรรทัด 19–20) ยังไม่มี <code>rmutt_esp32_air_wired/</code> ถ้ารันสคริปต์ต้องคัดลอก <code>letsencrypt_ca.h</code> ไปโฟลเดอร์บอร์ดสายแอร์เองด้วย ใช้เมื่อเซิร์ฟเวอร์เปลี่ยนผู้ออกใบรับรอง (ส่ง <code>-Urls</code> เป็นใบรากของผู้ออกใหม่) หลังรันต้องอัปโหลดเฟิร์มแวร์ใหม่ <code>$ErrorActionPreference = 'Stop'</code> ทำให้สคริปต์หยุดทันทีเมื่อมีข้อผิดพลาด</p>
+<p>PowerShell สร้าง <code>letsencrypt_ca.h</code> ให้ทั้งสองบอร์ด: รับพารามิเตอร์ <code>-Urls</code> (ค่าเริ่มต้น <code>https://letsencrypt.org/certs/isrgrootx1.pem</code> และ <code>.../isrg-root-x2.pem</code>) ดาวน์โหลดด้วย <code>Invoke-WebRequest</code> ตรวจว่ามี <code>-----BEGIN CERTIFICATE-----</code> จริง รวมเป็นข้อความเดียว สร้างเนื้อหา header (<code>#pragma once</code> + <code>static const char LETSENCRYPT_CA[] PROGMEM = R"EOF(...)EOF";</code>) แล้วเขียนทับใน <code>rmutt_esp32_air/</code> และ <code>rmutt_esp32_occupancy/</code> (เขียนเป็น UTF-8 ไม่มี BOM, ใช้ LF) <strong>ข้อสังเกต:</strong> รายการโฟลเดอร์ปลายทางในสคริปต์ (บรรทัด 19–20) ยังไม่มี <code>rmutt_esp32_air_wired/</code> ถ้ารันสคริปต์ต้องคัดลอก <code>letsencrypt_ca.h</code> ไปโฟลเดอร์บอร์ดสายแอร์เองด้วย ใช้เมื่อเซิร์ฟเวอร์เปลี่ยนผู้ออกใบรับรอง (ส่ง <code>-Urls</code> เป็นใบรากของผู้ออกใหม่) หลังรันต้องอัปโหลดเฟิร์มแวร์ใหม่ <code>$ErrorActionPreference = 'Stop'</code> ทำให้สคริปต์หยุดทันทีเมื่อมีข้อผิดพลาด</p>
 <h3 id="firmwarereadmemd"><code>firmware/README.md</code><a class="anchor" href="#firmwarereadmemd">#</a></h3>
-<p>คู่มือรวม: รายการไลบรารี ขา การตั้งค่า (setup flow) การกู้ Wi-Fi ตัวอย่าง log การต่อสายเรดาร์ ตารางรหัส MQTT state ของ PubSubClient (<code>-4</code> timeout, <code>-2</code> เชื่อมไม่ได้, <code>4</code> รหัสผิด, <code>5</code> ไม่ได้รับอนุญาต) และคำอธิบาย <code>[diag]</code> (แก้ 11 ต.ค. 2569) เพิ่มย่อหน้าต้นไฟล์ว่ามีบอร์ดแอร์ <strong>สองรุ่น</strong> (<code>rmutt_esp32_air</code> ควบคุมด้วย IR และ <code>rmutt_esp32_air_wired</code> ควบคุมผ่านสายรีโมตผนัง Daikin, แอปแสดงยี่ห้อ <strong>Daikin · Wired</strong> <code>DAIKIN_WIRED</code>), บอกว่าทั้งสองรุ่นต้องใช้ไลบรารี <strong>U8g2</strong> สำหรับจอ OLED (รุ่นสายแอร์ใช้ DHT sensor library เพิ่มและไม่ใช้ IRremoteESP8266) และเตือนว่า <strong>ห้ามลบ <code>build_opt.h</code></strong> ไม่เช่นนั้นสเก็ตช์ IR จะใหญ่เกินแฟลช ส่วน Pins เปลี่ยนจากรายการธรรมดาเป็นตารางเทียบสองบอร์ด (เพิ่มแถว GPIO21/22 ของจอ และ GPIO33/35/34/4 ของบอร์ดสายแอร์) พร้อมหมายเหตุว่าจอ VCC → 3V3, GND → GND, ไม่มีจอก็ทำงานได้ (Serial พิมพ์ <code>OLED: not found on GPIO21/22 (display disabled)</code>) ใช้ประกอบบทนี้ได้ แต่ตัวเลขเวอร์ชันในตาราง (2.5.0, 2.5.1-slm8) เก่ากว่าโค้ดหนึ่งขั้น (โค้ดเป็น 2.5.1 และ 2.5.2-slm8 หลังเพิ่ม unprovision)</p>
+<p>คู่มือรวม: รายการไลบรารี ขา การตั้งค่า (setup flow) การกู้ Wi-Fi ตัวอย่าง log การต่อสายเรดาร์ ตารางรหัส MQTT state ของ PubSubClient (<code>-4</code> timeout, <code>-2</code> เชื่อมไม่ได้, <code>4</code> รหัสผิด, <code>5</code> ไม่ได้รับอนุญาต) และคำอธิบาย <code>[diag]</code> ย่อหน้าต้นไฟล์บอกว่ามีบอร์ดแอร์ <strong>สองรุ่น</strong> (<code>rmutt_esp32_air</code> ควบคุมด้วย IR และ <code>rmutt_esp32_air_wired</code> ควบคุมผ่านสายรีโมตผนัง Daikin, แอปแสดงยี่ห้อ <strong>Daikin · Wired</strong> <code>DAIKIN_WIRED</code>), บอกว่าทั้งสองรุ่นต้องใช้ไลบรารี <strong>U8g2</strong> สำหรับจอ OLED (รุ่นสายแอร์ใช้ DHT sensor library เพิ่มและไม่ใช้ IRremoteESP8266) และเตือนว่า <strong>ห้ามลบ <code>build_opt.h</code></strong> ไม่เช่นนั้นสเก็ตช์ IR จะใหญ่เกินแฟลช ส่วน Pins เป็นตารางเทียบสองบอร์ด (รวม GPIO21/22 ของจอ และ GPIO33/35/34/4 ของบอร์ดสายแอร์) พร้อมหมายเหตุว่าจอ VCC → 3V3, GND → GND, ไม่มีจอก็ทำงานได้ (Serial พิมพ์ <code>OLED: not found on GPIO21/22 (display disabled)</code>) ใช้ประกอบบทนี้ได้ แต่ตารางขายังเขียนว่าบอร์ดสายแอร์ใช้ PZEM 16/18 และ LED เหลือง 27 เหมือนบอร์ด IR ซึ่งไม่ตรงโค้ด (โค้ดคือ 18/14 และ 23)</p>
 <h2 id="บอร์ดตรวจจับคน-การอ่านเรดาร์และการตัดสินใจ">บอร์ดตรวจจับคน: การอ่านเรดาร์และการตัดสินใจ<a class="anchor" href="#บอร์ดตรวจจับคน-การอ่านเรดาร์และการตัดสินใจ">#</a></h2>
 <h3 id="ลำดับตั้งแต่บูตถึงส่งสถานะ">ลำดับตั้งแต่บูตถึงส่งสถานะ<a class="anchor" href="#ลำดับตั้งแต่บูตถึงส่งสถานะ">#</a></h3>
 <ol>
@@ -1132,7 +1129,7 @@ occupied       = radarAvailable AND (มีเกตใดใน 0..8 ที่ 
 </div>
 
 <ul>
-<li><strong>เกณฑ์:</strong> <code>STATIC_ENERGY_THRESHOLD = 15</code> (มากกว่า 15 เท่านั้น ค่าเท่ากับ 15 = ว่าง) เปลี่ยนจาก 25 ในเฟิร์มแวร์ 1.3.3 (15 ต.ค. 2569) เกณฑ์ต่ำลง = ไวขึ้น จับคนนั่งนิ่งที่สัญญาณอ่อนได้มากขึ้น แต่ก็มีโอกาสนับสิ่งที่ไม่ใช่คน (เช่นพัดลมหรือม่านที่ขยับ) เป็นคนมากขึ้น ค่านี้เป็นค่าคงที่ในเฟิร์มแวร์ ค่า <code>staticThreshold</code> ที่ Backend ส่งมาตอนตั้งค่าบอร์ดไม่ได้ใช้ และ Backend/แอปยังแสดง 25 อยู่</li>
+<li><strong>เกณฑ์:</strong> <code>STATIC_ENERGY_THRESHOLD = 15</code> (มากกว่า 15 เท่านั้น ค่าเท่ากับ 15 = ว่าง) เกณฑ์ยิ่งต่ำยิ่งไว จับคนนั่งนิ่งที่สัญญาณอ่อนได้มากขึ้น แต่ก็มีโอกาสนับสิ่งที่ไม่ใช่คน (เช่นพัดลมหรือม่านที่ขยับ) เป็นคนมากขึ้น ค่านี้เป็นค่าคงที่ในเฟิร์มแวร์ ค่า <code>staticThreshold</code> ที่ Backend ส่งมาตอนตั้งค่าบอร์ดไม่ได้ใช้ และ Backend/แอปแสดงเป็น 25 ซึ่งไม่ตรงกับบอร์ด</li>
 <li><strong>เกต:</strong> 0 ถึง 8 (<code>FIRST_GATE</code>, <code>LAST_GATE</code>) ใช้เฉพาะ static energy ส่วน moving energy ระยะเป้าหมาย และค่าอื่นของ LD2410 ถูกทิ้งหมด</li>
 <li><strong>ไม่มี hold time/ดีบาวซ์ในเฟิร์มแวร์:</strong> ผลเปลี่ยนตามเฟรมล่าสุดทันที ไม่มีการหน่วง "ยังถือว่ามีคนอีก N นาที" ในบอร์ดนี้ การหน่วงก่อนสั่งปิดแอร์ไปอยู่ฝั่ง Backend (ดูบทระบบปิดแอร์อัตโนมัติ)</li>
 <li><strong>หมดเวลาข้อมูล:</strong> <code>RADAR_DATA_TIMEOUT_MS = 3000</code> เรดาร์ส่งราว 10 เฟรมต่อวินาที (ตาม README) ถ้าเงียบ 3 วินาทีถือว่าเรดาร์เสีย → <code>radarAvailable = false</code> → <code>occupied = false</code> และแอปแสดง "Sensor unavailable" แทน "ว่าง"</li>
@@ -1351,7 +1348,7 @@ coredump, data, coredump,0x3F0000,0x10000,
 <p>ขนาดพาร์ติชัน 64 KB ÷ 4096 = 16 sector, 4096 ÷ 32 = 128 รายการต่อ sector → 2,048 รายการ × 5 นาที ≈ 7.1 วัน ถ้าเต็มจะทับ sector ที่เก่าที่สุดทีละ sector (128 รายการ)</p>
 <div class="callout why"><div class="callout-title">ทำไม</div><p><strong>ทำไมต้องเขียนเป็น sector และ "ลบก่อนเขียน":</strong> flash แบบ NOR เขียนได้เฉพาะเปลี่ยนบิตจาก 1 เป็น 0 จะคืนเป็น 1 ได้ต้อง "erase" ทั้ง sector (4096 ไบต์) ซึ่งช้าและมีอายุการลบจำกัด (หลักแสนครั้ง) การเขียนรายการ 32 ไบต์ต่อกันไปเรื่อย ๆ แล้วลบทีละ sector ตอนที่ส่งครบ/ต้องทับ ทำให้ลบน้อยครั้งและกระจายการสึกหรอทั่วพาร์ติชัน แทนที่จะลบทุกครั้งที่เขียนหนึ่งรายการ</p></div>
 
-<h2 id="จอ-oled-13-นิ้ว-เพิ่ม-11-ตค-2569">จอ OLED 1.3 นิ้ว (เพิ่ม 11 ต.ค. 2569)<a class="anchor" href="#จอ-oled-13-นิ้ว-เพิ่ม-11-ตค-2569">#</a></h2>
+<h2 id="จอ-oled-13-นิ้ว">จอ OLED 1.3 นิ้ว<a class="anchor" href="#จอ-oled-13-นิ้ว">#</a></h2>
 <p>ตั้งแต่บอร์ด IR 2.5.0 (และบอร์ดสายแอร์) บอร์ดแอร์มีจอเล็ก ๆ ให้คนที่อยู่หน้าบอร์ด (ช่างหรือเจ้าหน้าที่) เห็นสถานะได้ทันทีโดยไม่ต้องเปิดแอปหรือเสียบสาย USB ดู Serial Monitor เช่น บอร์ดอยู่ห้องไหน แอร์ถูกสั่งเป็นกี่องศา Wi-Fi/MQTT ต่ออยู่ไหม กินไฟกี่วัตต์ หรือกำลังรอตั้งค่าผ่านบลูทูธด้วยชื่ออะไร</p>
 <h3 id="ฮาร์ดแวร์และไลบรารี">ฮาร์ดแวร์และไลบรารี<a class="anchor" href="#ฮาร์ดแวร์และไลบรารี">#</a></h3>
 <div class="table-wrap"><table>
@@ -2058,7 +2055,7 @@ y 63    │ 845 W   [OUT OF CLASS]               │  แถบล่าง: ว
 </tbody>
 </table></div>
 <p>ไม่มีการแก้ BLE/MQTT/IR/PZEM/OTA/ข้อมูลย้อนหลังเพื่อจอ (ตาม <code>README_OLED_TH.md</code>) จอเป็น "ผู้อ่าน" สถานะเท่านั้น ไม่เคยเปลี่ยนสถานะของระบบ ถ้าจอเสียหรือถอดออก การควบคุมแอร์ไม่ได้รับผลกระทบ</p>
-<h2 id="build_opth-ทำให้เฟิร์มแวร์พอดีแฟลช-เพิ่ม-11-ตค-2569"><code>build_opt.h</code>: ทำให้เฟิร์มแวร์พอดีแฟลช (เพิ่ม 11 ต.ค. 2569)<a class="anchor" href="#build_opth-ทำให้เฟิร์มแวร์พอดีแฟลช-เพิ่ม-11-ตค-2569">#</a></h2>
+<h2 id="build_opth-ทำให้เฟิร์มแวร์พอดีแฟลช"><code>build_opt.h</code>: ทำให้เฟิร์มแวร์พอดีแฟลช<a class="anchor" href="#build_opth-ทำให้เฟิร์มแวร์พอดีแฟลช">#</a></h2>
 <h3 id="ปัญหา">ปัญหา<a class="anchor" href="#ปัญหา">#</a></h3>
 <p>ช่องแอปแต่ละช่องใน <code>partitions.csv</code> มีขนาด <code>0x1F0000</code> = 2,031,616 ไบต์ (ต้องมีสองช่องเพื่อ OTA) ตาม <code>README_OLED_TH.md</code> เฟิร์มแวร์ IR 2.4.1 ก่อนเพิ่มจอใช้ไปแล้ว <strong>98.8%</strong> (2,007,985 ไบต์) เหลือราว 23 KB ส่วนจอ OLED (U8g2 + ฟอนต์ + โค้ดหน้าจอ) กินเพิ่ม <strong>~24 KB</strong> ใส่เพิ่มตรง ๆ จะคอมไพล์ไม่ผ่าน (Arduino IDE แจ้ง "Sketch too big") ส่วนที่กินแฟลชมากคือ IRremoteESP8266 ซึ่งคอมไพล์โปรโตคอลแอร์ทุกยี่ห้อ (หลายสิบยี่ห้อ) เข้ามา เพราะ <code>IRac</code> เลือกยี่ห้อตอนรันจากชื่อที่ผู้ใช้ตั้ง คอมไพเลอร์จึงตัดยี่ห้อที่ไม่ใช้ทิ้งเองไม่ได้</p>
 <h3 id="เนื้อหาไฟล์">เนื้อหาไฟล์<a class="anchor" href="#เนื้อหาไฟล์">#</a></h3>
@@ -2107,9 +2104,9 @@ y 63    │ 845 W   [OUT OF CLASS]               │  แถบล่าง: ว
 <li><strong>ข้อแลกเปลี่ยน 2:</strong> เหลือที่ว่างแค่ ~2% (ราว 30 KB) ฟีเจอร์ใหญ่ถัดไป (เช่นเปลี่ยนเป็นหน้าจอแบบ 5 ที่ใช้ฟอนต์เพิ่ม) อาจต้องตัดอย่างอื่นอีก</li>
 <li><strong>ข้อแลกเปลี่ยน 3:</strong> ไฟล์นี้ "มองไม่เห็น" ในโค้ด ถ้ามีคนลบทิ้งเพราะคิดว่าเป็น header ว่าง ๆ จะคอมไพล์ไม่ผ่านโดยไม่รู้สาเหตุ จึงมีคำเตือน "อย่าลบ" ทั้งใน <code>README_OLED_TH.md</code> และ <code>firmware/README.md</code> และถ้าแก้ไฟล์นี้ต้องปิด-เปิด IDE หรือลบโฟลเดอร์ build ชั่วคราว ไลบรารีจึงจะถูกคอมไพล์ใหม่ด้วยแฟล็กใหม่</li>
 </ul>
-<h2 id="ล้างบอร์ดเมื่อถูกลบออกจากแอป-unprovision-เพิ่ม-13-ตค-2569">ล้างบอร์ดเมื่อถูกลบออกจากแอป (unprovision) (เพิ่ม 13 ต.ค. 2569)<a class="anchor" href="#ล้างบอร์ดเมื่อถูกลบออกจากแอป-unprovision-เพิ่ม-13-ตค-2569">#</a></h2>
+<h2 id="ล้างบอร์ดเมื่อถูกลบออกจากแอป-unprovision">ล้างบอร์ดเมื่อถูกลบออกจากแอป (unprovision)<a class="anchor" href="#ล้างบอร์ดเมื่อถูกลบออกจากแอป-unprovision">#</a></h2>
 <h3 id="ปัญหาที่แก้">ปัญหาที่แก้<a class="anchor" href="#ปัญหาที่แก้">#</a></h3>
-<p>ก่อนหน้านี้เมื่อแอดมินลบแอร์หรือเซนเซอร์ออกจากแอป Backend ลบแค่แถวในฐานข้อมูลและบัญชี MQTT แต่ตัวบอร์ดยังจำ Wi-Fi, MQTT host/บัญชี, ห้อง ไว้ใน NVS บอร์ดจึงพยายามต่อ MQTT ด้วยบัญชีที่ถูกลบไปแล้วซ้ำทุก 3 วินาทีไม่รู้จบ และจะนำไปติดห้องอื่นก็ต้องเสียบสาย USB แฟลช <code>reset.ino</code> ก่อน คอมมิต <code>1f09946</code> เพิ่มคำสั่ง MQTT <code>{"action":"unprovision"}</code> ให้บอร์ด <strong>ล้างตัวเองกลับเป็นเหมือนใหม่</strong> ทั้งสามเฟิร์มแวร์ (IR 2.5.1, สายแอร์ 2.5.2-slm8, ตรวจจับคน 1.3.2)</p>
+<p>ถ้าแอดมินลบแอร์หรือเซนเซอร์ออกจากแอปแล้ว Backend ลบแค่แถวในฐานข้อมูลและบัญชี MQTT ตัวบอร์ดจะยังจำ Wi-Fi, MQTT host/บัญชี, ห้อง ไว้ใน NVS และพยายามต่อ MQTT ด้วยบัญชีที่ถูกลบไปแล้วซ้ำทุก 3 วินาทีไม่รู้จบ จะนำไปติดห้องอื่นก็ต้องเสียบสาย USB แฟลช <code>reset.ino</code> ก่อน ทั้งสามเฟิร์มแวร์จึงมีคำสั่ง MQTT <code>{"action":"unprovision"}</code> ให้บอร์ด <strong>ล้างตัวเองกลับเป็นเหมือนใหม่</strong></p>
 <h3 id="ลำดับระหว่าง-backend-กับบอร์ด">ลำดับระหว่าง Backend กับบอร์ด<a class="anchor" href="#ลำดับระหว่าง-backend-กับบอร์ด">#</a></h3>
 <div class="code-block"><div class="hl"><pre><span></span><code>แอดมินกดลบในแอป
  Backend: ลบแถวในฐานข้อมูล
@@ -2403,7 +2400,7 @@ y 63    │ 845 W   [OUT OF CLASS]               │  แถบล่าง: ว
 <tr>
 <td>436</td>
 <td><code>oledDisplay.begin()</code></td>
-<td>(เพิ่ม 11 ต.ค. 2569) ตรวจว่ามีจอ OLED ต่ออยู่ไหม ถ้ามีก็เริ่มจอ ถ้าไม่มีก็ปิดส่วนจอแล้วทำงานต่อ (ดูหัวข้อ "จอ OLED 1.3 นิ้ว") เรียกตั้งแต่ต้นเพื่อให้หน้า SETUP MODE หรือ Connecting Wi-Fi ขึ้นได้ตั้งแต่ขั้นแรกของการบูต</td>
+<td>ตรวจว่ามีจอ OLED ต่ออยู่ไหม ถ้ามีก็เริ่มจอ ถ้าไม่มีก็ปิดส่วนจอแล้วทำงานต่อ (ดูหัวข้อ "จอ OLED 1.3 นิ้ว") เรียกตั้งแต่ต้นเพื่อให้หน้า SETUP MODE หรือ Connecting Wi-Fi ขึ้นได้ตั้งแต่ขั้นแรกของการบูต</td>
 </tr>
 </tbody>
 </table></div>
@@ -2458,7 +2455,7 @@ y 63    │ 845 W   [OUT OF CLASS]               │  แถบล่าง: ว
 <tr>
 <td>442–443</td>
 <td><code>Serial.printf("Firmware: %s\n", ...)</code></td>
-<td>พิมพ์เวอร์ชัน (ปัจจุบัน <code>2.5.1</code>, แก้ 14 ต.ค. 2569 จากเดิมที่เขียน 2.4.1) เป็นวิธียืนยันว่าแฟลชสำเร็จจริง</td>
+<td>พิมพ์เวอร์ชัน (ปัจจุบัน <code>2.5.1</code>) เป็นวิธียืนยันว่าแฟลชสำเร็จจริง</td>
 </tr>
 <tr>
 <td>454</td>
@@ -2990,7 +2987,7 @@ y 63    │ 845 W   [OUT OF CLASS]               │  แถบล่าง: ว
 <li><strong>1143–1157 (<code>/provision-ack</code>):</strong> ถ้า <code>activated == true</code> และ token ที่ตอบกลับตรงกับ token ที่บอร์ดถืออยู่ → ลบ <code>prov_token</code> ออกจาก NVS, ล้างตัวแปร และตั้ง <code>provisionAckClearReady</code> เหตุผลที่ตรวจ token ซ้ำ: ป้องกัน ack ของ token ตัวอื่น/ตัวเก่า</li>
 <li><strong>1158–1165 (<code>/command</code>):</strong> ถ้าไม่ใช่หัวข้อ command ก็จบ ถ้าใช่ คัดลอก payload ทีละไบต์ต่อเป็น <code>String pendingMqttCommand</code> (เพราะ buffer ของ PubSubClient จะถูกทับด้วยข้อความถัดไป) แล้วตั้ง <code>mqttCommandReady</code> ให้ loop ไปทำต่อใน <code>processMqttCommand()</code></li>
 </ul>
-<p><strong>ไฟล์ <code>rmutt_esp32_air.ino</code> — <code>processMqttCommand()</code> ส่วนที่ตัดสินประเภทคำสั่ง บรรทัด 1223–1251</strong> (แก้ 13 ต.ค. 2569: เพิ่ม <code>unprovision</code>)</p>
+<p><strong>ไฟล์ <code>rmutt_esp32_air.ino</code> — <code>processMqttCommand()</code> ส่วนที่ตัดสินประเภทคำสั่ง บรรทัด 1223–1251</strong> (เพิ่ม <code>unprovision</code>)</p>
 <div class="code-block"><span class="code-lang">cpp</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1223</span>
 <span class="normal">1224</span>
 <span class="normal">1225</span>
@@ -3052,9 +3049,9 @@ y 63    │ 845 W   [OUT OF CLASS]               │  แถบล่าง: ว
 </div>
 
 <ul>
-<li>มี action พิเศษ <strong>3 แบบ</strong> (เดิม 2 แบบ) ถ้าไม่มี <code>action</code> ถือว่าเป็นคำสั่งสถานะแอร์ (<code>state</code> object) ซึ่งผ่านการตรวจช่วงอุณหภูมิ (Saijo 18–29 °C, ยี่ห้ออื่น 16–30 °C) และค่าที่รองรับของ Saijo ก่อนจะ <code>saveAirState()</code>, <code>sendCurrentIrState(&amp;previousState)</code> และ <code>publishState(commandId)</code> เพื่อตอบกลับพร้อม <code>commandId</code> ให้ Backend จับคู่คำสั่งกับผลได้</li>
+<li>มี action พิเศษ <strong>3 แบบ</strong> ถ้าไม่มี <code>action</code> ถือว่าเป็นคำสั่งสถานะแอร์ (<code>state</code> object) ซึ่งผ่านการตรวจช่วงอุณหภูมิ (Saijo 18–29 °C, ยี่ห้ออื่น 16–30 °C) และค่าที่รองรับของ Saijo ก่อนจะ <code>saveAirState()</code>, <code>sendCurrentIrState(&amp;previousState)</code> และ <code>publishState(commandId)</code> เพื่อตอบกลับพร้อม <code>commandId</code> ให้ Backend จับคู่คำสั่งกับผลได้</li>
 <li><code>enter_setup</code> (1224–1228): เปิด BLE ให้ตั้งค่าใหม่ (เฉพาะแอดมินผ่าน Backend)</li>
-<li><code>unprovision</code> (1229–1239, เพิ่ม 13 ต.ค. 2569): Backend ส่งมาเมื่อแอดมินลบแอร์ในแอป บรรทัด 1232 อ่าน <code>deviceId</code> จากคำสั่ง (<code>| ""</code> = ถ้าไม่มีให้เป็นสตริงว่าง) บรรทัด 1233–1236 ถ้าไม่ตรงกับ <code>config.deviceId</code> ของบอร์ดนี้ให้พิมพ์ log แล้ว <strong>ไม่ทำอะไร</strong> บรรทัด 1237 ถ้าตรงจึงเรียก <code>unprovisionAndRestart()</code> (อธิบายเต็มในหัวข้อ "ล้างบอร์ดเมื่อถูกลบออกจากแอป (unprovision)" ด้านล่าง)</li>
+<li><code>unprovision</code> (1229–1239): Backend ส่งมาเมื่อแอดมินลบแอร์ในแอป บรรทัด 1232 อ่าน <code>deviceId</code> จากคำสั่ง (<code>| ""</code> = ถ้าไม่มีให้เป็นสตริงว่าง) บรรทัด 1233–1236 ถ้าไม่ตรงกับ <code>config.deviceId</code> ของบอร์ดนี้ให้พิมพ์ log แล้ว <strong>ไม่ทำอะไร</strong> บรรทัด 1237 ถ้าตรงจึงเรียก <code>unprovisionAndRestart()</code> (อธิบายเต็มในหัวข้อ "ล้างบอร์ดเมื่อถูกลบออกจากแอป (unprovision)" ด้านล่าง)</li>
 <li><code>ota</code> (1240–1251): ตรวจ URL ด้วย <code>otaUrlAllowed</code> (ถ้าไม่ผ่านบันทึก <code>lastOtaError = "url_rejected"</code>) แล้วตั้ง <code>pendingOtaUrl</code> + <code>otaRequested</code> ให้ loop ทำต่อ</li>
 </ul>
 <h3 id="4-การอ่าน-pzem-และ-hysteresis">4) การอ่าน PZEM และ hysteresis<a class="anchor" href="#4-การอ่าน-pzem-และ-hysteresis">#</a></h3>
@@ -3198,7 +3195,7 @@ y 63    │ 845 W   [OUT OF CLASS]               │  แถบล่าง: ว
 <ul>
 <li><strong>1695–1696:</strong> <code>outsideSchedule</code> จริงเมื่อแอร์ทำงานจริง <strong>และ</strong> ตอนนี้ไม่อยู่ในเวลาที่อนุญาต (<code>isWithinAllowedSchedule()</code> เลือกระหว่างตารางเรียนจาก Backend ที่สดไม่เกิน 2 นาที กับตารางรายวันบนบอร์ด)</li>
 <li><strong>1697:</strong> สะสมค่าเข้าช่วง 5 นาทีของ offline history</li>
-<li><strong>1698:</strong> (เพิ่ม 11 ต.ค. 2569) <code>oledDisplay.pushPower(powerWatts)</code> ส่งค่าวัตต์ให้จอ OLED เก็บไว้วาดกราฟ (ข้างใน <code>pushPower</code> เก็บจริงแค่ทุก 5 วินาที แม้เรียกทุก 2 วินาที)</li>
+<li><strong>1698:</strong> <code>oledDisplay.pushPower(powerWatts)</code> ส่งค่าวัตต์ให้จอ OLED เก็บไว้วาดกราฟ (ข้างใน <code>pushPower</code> เก็บจริงแค่ทุก 5 วินาที แม้เรียกทุก 2 วินาที)</li>
 <li><strong>1699–1703:</strong> ถ้าค่าที่ Backend ควรรู้เปลี่ยน (เพิ่งพร้อมใช้งาน/สถานะทำงานเปลี่ยน/นอกตารางเปลี่ยน) ขอส่ง status ทันทีแทนที่จะรอ 10 วินาที</li>
 </ul>
 <h3 id="5-การเข้ารหัสสัญญาณของ-saijodenkiac">5) การเข้ารหัสสัญญาณของ <code>SaijoDenkiAC</code><a class="anchor" href="#5-การเข้ารหัสสัญญาณของ-saijodenkiac">#</a></h3>
@@ -4031,7 +4028,7 @@ y 63    │ 845 W   [OUT OF CLASS]               │  แถบล่าง: ว
 <tr>
 <td>990</td>
 <td><code>radar.stationaryEnergyAtGate(gate) &gt; STATIC_ENERGY_THRESHOLD</code></td>
-<td>ถามพลังงานนิ่ง (0–100) ของเกตนี้ เทียบ <strong>มากกว่า</strong> 15 (1.3.2 และก่อนหน้า = 25)</td>
+<td>ถามพลังงานนิ่ง (0–100) ของเกตนี้ เทียบ <strong>มากกว่า</strong> 15</td>
 </tr>
 <tr>
 <td>991–992</td>
@@ -4127,9 +4124,9 @@ y 63    │ 845 W   [OUT OF CLASS]               │  แถบล่าง: ว
 <p><strong>ใช้ที่ไหน:</strong> OTA (ช่องทาง MQTT + ตรวจ URL + ตรวจใบรับรอง + ช่อง A/B), Wi-Fi-only mode (<code>keepsServerAssignment</code>), ทดสอบ Wi-Fi ก่อนบันทึกลง NVS (<code>processPendingConfig</code>), token ครั้งเดียว <strong>ทำไม:</strong> แต่ละชั้นอาจพลาดได้ ผู้โจมตีหรือความผิดพลาดต้องผ่านหลายด่าน และเมื่อพลาดระบบต้องกลับสู่สถานะที่ใช้งานได้ (เฟิร์มแวร์เดิม ค่า Wi-Fi เดิม)</p>
 <h3 id="11-ค่าคงที่ตั้งชื่อ-constexpr-แทน-magic-number">11) ค่าคงที่ตั้งชื่อ (<code>constexpr</code>) แทน magic number<a class="anchor" href="#11-ค่าคงที่ตั้งชื่อ-constexpr-แทน-magic-number">#</a></h3>
 <p><strong>ใช้ที่ไหน:</strong> ค่าตั้งต้นทั้งหมดต้นไฟล์ <code>.ino</code> <strong>ทำไม:</strong> แก้เกณฑ์ที่เดียว (README ระบุว่าแก้ <code>AC_RUNNING_ON_WATTS</code>/<code>AC_RUNNING_OFF_WATTS</code> ได้) และอ่านโค้ดรู้ความหมายทันที <code>constexpr</code> ไม่กิน RAM เพิ่ม</p>
-<h3 id="12-แยก-ข้อมูล-ออกจาก-การวาด-และจำกัดอัตรา-rate-limit-เพิ่ม-14-ตค-2569">12) แยก "ข้อมูล" ออกจาก "การวาด" และจำกัดอัตรา (rate limit) (เพิ่ม 14 ต.ค. 2569)<a class="anchor" href="#12-แยก-ข้อมูล-ออกจาก-การวาด-และจำกัดอัตรา-rate-limit-เพิ่ม-14-ตค-2569">#</a></h3>
+<h3 id="12-แยก-ข้อมูล-ออกจาก-การวาด-และจำกัดอัตรา-rate-limit">12) แยก "ข้อมูล" ออกจาก "การวาด" และจำกัดอัตรา (rate limit)<a class="anchor" href="#12-แยก-ข้อมูล-ออกจาก-การวาด-และจำกัดอัตรา-rate-limit">#</a></h3>
 <p><strong>ใช้ที่ไหน:</strong> จอ OLED: <code>refreshOled()</code> ใน <code>.ino</code> กรอก <code>struct OledData</code>, <code>oled_ui.h</code> วาดจาก <code>OledData</code> อย่างเดียว (ไม่รู้จัก <code>config</code>, <code>airState</code>, <code>mqttClient</code>), <code>oled_display.h</code> คุมจังหวะ 400 ms + <code>poke()</code> <strong>ทำไม:</strong> ฟังก์ชันวาดไม่ผูกกับตัวแปร global ของเฟิร์มแวร์ จึงใช้ไฟล์เดียวกันได้ทั้งบอร์ด IR และบอร์ดสายแอร์ (คัดลอกได้ทุกไบต์) และงานที่ช้า (ส่งภาพทาง I2C ซอฟต์แวร์) ถูกจำกัดความถี่ไม่ให้แย่งเวลา <code>mqttClient.loop()</code> ส่วน <code>poke()</code> ทำให้ค่าที่ผู้ใช้เพิ่งสั่งขึ้นจอทันทีแม้มีการจำกัดอัตรา</p>
-<h3 id="13-ตรวจตัวตนก่อนทำสิ่งที่ย้อนกลับไม่ได้-เพิ่ม-14-ตค-2569">13) ตรวจตัวตนก่อนทำสิ่งที่ย้อนกลับไม่ได้ (เพิ่ม 14 ต.ค. 2569)<a class="anchor" href="#13-ตรวจตัวตนก่อนทำสิ่งที่ย้อนกลับไม่ได้-เพิ่ม-14-ตค-2569">#</a></h3>
+<h3 id="13-ตรวจตัวตนก่อนทำสิ่งที่ย้อนกลับไม่ได้">13) ตรวจตัวตนก่อนทำสิ่งที่ย้อนกลับไม่ได้<a class="anchor" href="#13-ตรวจตัวตนก่อนทำสิ่งที่ย้อนกลับไม่ได้">#</a></h3>
 <p><strong>ใช้ที่ไหน:</strong> <code>unprovision</code> ทั้งสามเฟิร์มแวร์ตรวจ <code>deviceId</code> ในคำสั่งกับ <code>config.deviceId</code> ก่อนล้าง NVS <strong>ทำไม:</strong> การล้างค่าทำให้บอร์ดหลุดจากระบบจนกว่าจะมีคนไปตั้งค่าใหม่ถึงหน้างาน การเช็กซ้ำหนึ่งบรรทัดกันความผิดพลาดของ topic หรือข้อความหลงได้ในราคาถูกมาก</p>
 <h2 id="คำถามที่อาจารย์อาจถาม">คำถามที่อาจารย์อาจถาม<a class="anchor" href="#คำถามที่อาจารย์อาจถาม">#</a></h2>
 <div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม: ทำไมใช้ ESP32 ไม่ใช้ Arduino Uno หรือ Raspberry Pi?</strong></p>
@@ -4180,7 +4177,7 @@ y 63    │ 845 W   [OUT OF CLASS]               │  แถบล่าง: ว
 <h2 id="สรุปและเช็กลิสต์ความเข้าใจ">สรุปและเช็กลิสต์ความเข้าใจ<a class="anchor" href="#สรุปและเช็กลิสต์ความเข้าใจ">#</a></h2>
 <p>ถ้าตอบข้อเหล่านี้ได้ แปลว่าเข้าใจบทนี้แล้ว</p>
 <ul>
-<li class="check"><input type="checkbox"> บอกได้ว่ามีเฟิร์มแวร์หลักกี่ตัว (สาม: บอร์ดแอร์ IR <strong>2.5.1</strong>, บอร์ดแอร์สายแอร์ <strong>2.5.2-slm8</strong>, บอร์ดตรวจจับคน <strong>1.3.3</strong> — แก้ 15 ต.ค. 2569) ตัวไหนทำอะไร และคุยกับ Backend ผ่านอะไร (MQTT เท่านั้น; BLE ไว้ตั้งค่า)</li>
+<li class="check"><input type="checkbox"> บอกได้ว่ามีเฟิร์มแวร์หลักกี่ตัว (สาม: บอร์ดแอร์ IR <strong>2.5.1</strong>, บอร์ดแอร์สายแอร์ <strong>2.5.2-slm8</strong>, บอร์ดตรวจจับคน <strong>1.3.3</strong>) ตัวไหนทำอะไร และคุยกับ Backend ผ่านอะไร (MQTT เท่านั้น; BLE ไว้ตั้งค่า)</li>
 <li class="check"><input type="checkbox"> อธิบายความต่าง MCU กับคอมพิวเตอร์, <code>setup()</code>/<code>loop()</code>, <code>millis()</code> กับ <code>delay()</code> และยกตัวอย่างในโค้ดได้</li>
 <li class="check"><input type="checkbox"> บอกขา GPIO17/16/18/25/26/27/0 และ 21/22 (จอ OLED) ของบอร์ดแอร์ IR, ขาเพิ่มของบอร์ดสายแอร์ (33/35/34/4) และ GPIO32/33/0 ของบอร์ดตรวจจับคนได้ พร้อมบอกว่าต่อไขว้ TX/RX</li>
 <li class="check"><input type="checkbox"> อธิบาย 38 kHz, mark/space, 72 บิต ของ Saijo และทำไมใช้ตารางเฟรมสำเร็จรูป</li>
@@ -4190,18 +4187,18 @@ y 63    │ 845 W   [OUT OF CLASS]               │  แถบล่าง: ว
 <li class="check"><input type="checkbox"> บอกตัวเลือก MQTT ในโค้ด: client id, LWT (QoS 1 retained), TLS + ใบรากฝัง, หัวข้อที่ subscribe, buffer 2048</li>
 <li class="check"><input type="checkbox"> อธิบาย offline history: ช่วง 5 นาที, <code>HistoryRecord</code> 32 ไบต์, ring buffer 64 KB = 2,048 รายการ ≈ 7 วัน, ส่งทีละ 10, ack, ลบเป็น sector, ส่งซ้ำ, สุ่มหน่วง 5–45 วินาที</li>
 <li class="check"><input type="checkbox"> อธิบาย OTA: partition app0/app1, ตรวจ URL สามชั้น, ปิด MQTT ก่อนโหลด, ไม่สำเร็จก็ใช้ของเดิม</li>
-<li class="check"><input type="checkbox"> อธิบายกฎมีคน: static energy เกต 0–8 &gt; 15 (เดิม 25), ไฟ LED เขียว/แดงของบอร์ดตรวจคนบอกอะไร, availability หมดเวลา 3 วินาที, ตรวจทุก 250 ms, ส่ง status เมื่อเปลี่ยนหรือทุก 10 วินาที</li>
+<li class="check"><input type="checkbox"> อธิบายกฎมีคน: static energy เกต 0–8 &gt; 15, ไฟ LED เขียว/แดงของบอร์ดตรวจคนบอกอะไร, availability หมดเวลา 3 วินาที, ตรวจทุก 250 ms, ส่ง status เมื่อเปลี่ยนหรือทุก 10 วินาที</li>
 <li class="check"><input type="checkbox"> อธิบายความต่างของ <code>partitions.csv</code> สองไฟล์ (<code>rmuttlog</code> กับ <code>coredump</code>) และทำไม nvs offset เดิมทำให้ค่าไม่หาย</li>
 <li class="check"><input type="checkbox"> บอกหน้าที่ <code>reset.ino</code>, <code>ld2410_pinscan.ino</code>, <code>update-root-ca.ps1</code> และ <code>history_log_test.cpp</code></li>
-<li class="check"><input type="checkbox"> รู้ว่าเลขรุ่นจริงอยู่ที่ <code>FIRMWARE_VERSION</code> ในไฟล์ <code>.ino</code> (2.5.1 / 2.5.2-slm8 / 1.3.3) และ <code>ld2410_probe</code> ไม่มีในโฟลเดอร์แล้ว (ใช้ <code>ld2410_pinscan</code>)</li>
-<li class="check"><input type="checkbox"> (เพิ่ม 14 ต.ค. 2569) อธิบายจอ OLED: SH1106 1.3" I2C ซอฟต์แวร์บน GPIO21/22, U8g2 full buffer, ตรวจจอด้วย pull-up/pull-down, วาดทุก 400 ms หรือเมื่อ <code>poke()</code>, หน้า SETUP / CONNECTING / NORMAL (แบบ 1 ตัวเลขใหญ่), กราฟ 64 จุดทุก 5 วินาที, พักจอเมื่อแอร์ปิดเกิน 10 นาที</li>
+<li class="check"><input type="checkbox"> รู้ว่าเลขรุ่นจริงอยู่ที่ <code>FIRMWARE_VERSION</code> ในไฟล์ <code>.ino</code> (2.5.1 / 2.5.2-slm8 / 1.3.3) และเครื่องมือวินิจฉัยเรดาร์คือ <code>ld2410_pinscan</code></li>
+<li class="check"><input type="checkbox"> อธิบายจอ OLED: SH1106 1.3" I2C ซอฟต์แวร์บน GPIO21/22, U8g2 full buffer, ตรวจจอด้วย pull-up/pull-down, วาดทุก 400 ms หรือเมื่อ <code>poke()</code>, หน้า SETUP / CONNECTING / NORMAL (แบบ 1 ตัวเลขใหญ่), กราฟ 64 จุดทุก 5 วินาที, พักจอเมื่อแอร์ปิดเกิน 10 นาที</li>
 <li class="check"><input type="checkbox"> อธิบายว่าทำไมจอไม่ทำให้ MQTT/IR สะดุด (<code>due()</code> ออกเร็ว, <code>getLocalTime(..., 0)</code> ไม่รอ, ผูกกับ <code>updateStatusLeds()</code> ที่ถูกเรียกแม้ระหว่างรอ Wi-Fi)</li>
 <li class="check"><input type="checkbox"> อธิบาย <code>build_opt.h</code>: แฟล็ก <code>-D</code> ใส่ทุกไฟล์รวมไลบรารี, ปิด HW I2C/SPI ของ U8g2 และ IR 28 ยี่ห้อ, ผล 98% ของช่องแอป, ข้อแลกเปลี่ยน</li>
 <li class="check"><input type="checkbox"> เล่าลำดับ unprovision: คำสั่ง <code>/command</code> → ตรวจ <code>deviceId</code> → ตอบ <code>unprovisioned:true</code> → ล้าง retained → disconnect ปกติ → ล้าง NVS (+ <code>rmuttlog</code>) → รีบูตเข้า BLE และบอกความต่างของบอร์ดตรวจจับคน (ตั้งธงใน callback แล้วทำใน <code>loop()</code>)</li>
 <li class="check"><input type="checkbox"> บอกได้ว่าบอร์ดสายแอร์ใช้ไฟล์ร่วมอะไรกับบอร์ด IR (คัดลอกทุกไบต์: <code>oled_display.h</code>, <code>oled_ui.h</code>, <code>history_log.h</code>, <code>ota_update.h</code>, <code>letsencrypt_ca.h</code>, <code>partitions.csv</code>) และไปอ่านรายละเอียดโปรโตคอลที่บท 19</li>
 </ul><nav class="pager"><a class="prev" href="08-protocols.html"><span>← บทก่อนหน้า</span>8. โปรโตคอลสื่อสาร: MQTT และ Bluetooth Low Energy</a><a class="next" href="10-flutter-architecture.html"><span>บทถัดไป →</span>10. แอป Flutter ตอนที่ 1: โครงสร้าง ข้อมูล และ State</a></nav>
   </main>
-  <aside class="toc"><div class="toc-title">ในบทนี้</div><ul><li><a href="#ภาพรวม">ภาพรวม</a></li><li><a href="#ความรู้ที่ต้องมีก่อนอ่านบทนี้">ความรู้ที่ต้องมีก่อนอ่านบทนี้</a></li><li><a href="#โครงสร้างโฟลเดอร์">โครงสร้างโฟลเดอร์</a></li><li><a href="#ตารางขาของแต่ละบอร์ด">ตารางขาของแต่ละบอร์ด</a></li><li><a href="#อธิบายทีละไฟล์">อธิบายทีละไฟล์</a></li><li><a href="#บอร์ดตรวจจับคน-การอ่านเรดาร์และการตัดสินใจ">บอร์ดตรวจจับคน: การอ่านเรดาร์และการตัดสินใจ</a></li><li><a href="#ตารางพาร์ติชัน-partitionscsv-ทีละบรรทัด">ตารางพาร์ติชัน (partitions.csv) ทีละบรรทัด</a></li><li><a href="#ข้อมูลย้อนหลังตอนเน็ตหลุด-history_logh-ในภาพรวม">ข้อมูลย้อนหลังตอนเน็ตหลุด: history_log.h ในภาพรวม</a></li><li><a href="#จอ-oled-13-นิ้ว-เพิ่ม-11-ตค-2569">จอ OLED 1.3 นิ้ว (เพิ่ม 11 ต.ค. 2569)</a></li><li><a href="#build_opth-ทำให้เฟิร์มแวร์พอดีแฟลช-เพิ่ม-11-ตค-2569">build_opt.h: ทำให้เฟิร์มแวร์พอดีแฟลช (เพิ่ม 11 ต.ค. 2569)</a></li><li><a href="#ล้างบอร์ดเมื่อถูกลบออกจากแอป-unprovision-เพิ่ม-13-ตค-2569">ล้างบอร์ดเมื่อถูกลบออกจากแอป (unprovision) (เพิ่ม 13 ต.ค. 2569)</a></li><li><a href="#เครื่องมือ-ld2410_pinscan-และ-reset">เครื่องมือ: ld2410_pinscan และ reset</a></li><li><a href="#ทดสอบบนคอมพิวเตอร์-testshistory_log_testcpp">ทดสอบบนคอมพิวเตอร์: tests/history_log_test.cpp</a></li><li><a href="#เจาะโค้ดทีละบรรทัด">เจาะโค้ดทีละบรรทัด</a></li><li><a href="#หลักการเขียนโค้ดที่ใช้ในส่วนนี้">หลักการเขียนโค้ดที่ใช้ในส่วนนี้</a></li><li><a href="#คำถามที่อาจารย์อาจถาม">คำถามที่อาจารย์อาจถาม</a></li><li><a href="#สรุปและเช็กลิสต์ความเข้าใจ">สรุปและเช็กลิสต์ความเข้าใจ</a></li></ul></aside>
+  <aside class="toc"><div class="toc-title">ในบทนี้</div><ul><li><a href="#ภาพรวม">ภาพรวม</a></li><li><a href="#ความรู้ที่ต้องมีก่อนอ่านบทนี้">ความรู้ที่ต้องมีก่อนอ่านบทนี้</a></li><li><a href="#โครงสร้างโฟลเดอร์">โครงสร้างโฟลเดอร์</a></li><li><a href="#ตารางขาของแต่ละบอร์ด">ตารางขาของแต่ละบอร์ด</a></li><li><a href="#อธิบายทีละไฟล์">อธิบายทีละไฟล์</a></li><li><a href="#บอร์ดตรวจจับคน-การอ่านเรดาร์และการตัดสินใจ">บอร์ดตรวจจับคน: การอ่านเรดาร์และการตัดสินใจ</a></li><li><a href="#ตารางพาร์ติชัน-partitionscsv-ทีละบรรทัด">ตารางพาร์ติชัน (partitions.csv) ทีละบรรทัด</a></li><li><a href="#ข้อมูลย้อนหลังตอนเน็ตหลุด-history_logh-ในภาพรวม">ข้อมูลย้อนหลังตอนเน็ตหลุด: history_log.h ในภาพรวม</a></li><li><a href="#จอ-oled-13-นิ้ว">จอ OLED 1.3 นิ้ว</a></li><li><a href="#build_opth-ทำให้เฟิร์มแวร์พอดีแฟลช">build_opt.h: ทำให้เฟิร์มแวร์พอดีแฟลช</a></li><li><a href="#ล้างบอร์ดเมื่อถูกลบออกจากแอป-unprovision">ล้างบอร์ดเมื่อถูกลบออกจากแอป (unprovision)</a></li><li><a href="#เครื่องมือ-ld2410_pinscan-และ-reset">เครื่องมือ: ld2410_pinscan และ reset</a></li><li><a href="#ทดสอบบนคอมพิวเตอร์-testshistory_log_testcpp">ทดสอบบนคอมพิวเตอร์: tests/history_log_test.cpp</a></li><li><a href="#เจาะโค้ดทีละบรรทัด">เจาะโค้ดทีละบรรทัด</a></li><li><a href="#หลักการเขียนโค้ดที่ใช้ในส่วนนี้">หลักการเขียนโค้ดที่ใช้ในส่วนนี้</a></li><li><a href="#คำถามที่อาจารย์อาจถาม">คำถามที่อาจารย์อาจถาม</a></li><li><a href="#สรุปและเช็กลิสต์ความเข้าใจ">สรุปและเช็กลิสต์ความเข้าใจ</a></li></ul></aside>
 </div>
 <button class="to-top" id="toTop" aria-label="กลับขึ้นด้านบน">↑</button>
 <script src="../assets/search.js"></script>

@@ -2,7 +2,7 @@
 
 ## ภาพรวม
 
-แอป Flutter ชื่อ `cpe_air_remote` (ชื่อที่ผู้ใช้เห็นคือ **RMUTT Save Energy**) เป็นหน้าตาที่เจ้าหน้าที่ใช้สั่งแอร์และดูค่าไฟของอาคาร 16 จากมือถือ Android หรือคอมพิวเตอร์ Windows เวอร์ชันในโค้ดตอนนี้คือ `3.16.0+32` (ชื่อเวอร์ชัน `3.16.0` และหมายเลข build `32` ซึ่ง Android เรียกว่า versionCode, ขึ้นจาก `3.13.1+31` เมื่อ 14 ต.ค. 2569 หลังเพิ่ม unprovision และหน้าเฟิร์มแวร์บนเว็บ) เอกสาร `docs/study/03-flutter-app.md` ปรับเป็นเลขเดียวกันแล้ว ถ้าวันหลังตัวเลขไม่ตรงกัน ให้เชื่อ `pubspec.yaml`
+แอป Flutter ชื่อ `cpe_air_remote` (ชื่อที่ผู้ใช้เห็นคือ **RMUTT Save Energy**) เป็นหน้าตาที่เจ้าหน้าที่ใช้สั่งแอร์และดูค่าไฟของอาคาร 16 จากมือถือ Android หรือคอมพิวเตอร์ Windows เวอร์ชันในโค้ดตอนนี้คือ `3.16.0+32` (ชื่อเวอร์ชัน `3.16.0` และหมายเลข build `32` ซึ่ง Android เรียกว่า versionCode) ถ้าเอกสารใดเขียนเลขไม่ตรงกัน ให้เชื่อ `pubspec.yaml`
 
 แอป **ไม่ต่อฐานข้อมูลและไม่ต่อ MQTT ตรง** ทุกอย่างผ่าน REST API ของ Backend (Node.js) ผ่าน HTTPS ยกเว้นงานเดียวที่ไม่ผ่านเน็ตคือการตั้งค่า ESP32 ครั้งแรกผ่าน **Bluetooth Low Energy (BLE)** ตรงจากมือถือไปยังบอร์ด
 
@@ -302,18 +302,18 @@ linter:
 - **enum** `AirMode {auto, cool, dry, fan, heat}`, `FanSpeed {auto, low, medium, high, turbo}`, `SwingMode {auto, top, upper, middle, lower, bottom, off}` ชื่อ enum ตรงกับสตริงที่ Backend/เฟิร์มแวร์ใช้ (ส่งด้วย `.name`) และมี extension `.label` สำหรับข้อความที่แสดง
 - **คลาส `AirConditioner`** ฟิลด์แบ่งเป็นกลุ่ม: ตัวตน (`id` = เลข air ในห้อง, `deviceId` เช่น `ESP32-XXXXXXXXXXXX`, `roomNumber`, `bleName`, `protocol` ค่าเริ่มต้น `HAIER_AC160`, `provisionStatus`, `mqttTopic`, `dailyOn/dailyOff`), สถานะออนไลน์ (`isOnline`, `lastSeenAt`), **สถานะที่สั่ง** (`isOn`, `temperature`, `mode`, `fanSpeed`, `verticalSwing`, `eco`, `turbo` ฯลฯ), **ค่าที่วัดจริงจาก PZEM** (`voltage`, `current`, `power`, `energyKwh`, `frequencyHz`, `powerFactor`, `pzemAvailable`), `isRunning` (แอร์กำลังกินไฟจริงหรือไม่) และกลุ่มปิดอัตโนมัติ (`autoOffEnabled`, `autoOffDeadlineAt`, `autoOffAttempts`, `autoOffInClass`)
 - **ข้อควรจำ:** `isOn` (คำสั่งล่าสุดที่ระบบส่ง ทั้งแบบยิง IR และแบบสายแอร์) กับ `isRunning` (กำลังไฟจริงจาก PZEM) เป็นคนละเรื่องกัน เพราะรีโมตอินฟราเรดไม่มีสัญญาณตอบกลับ และแม้บอร์ดสายแอร์จะอ่านสถานะจากสายได้ แอปก็ยังใช้กติกาเดียวกันทุกรุ่น `test/pzem_status_test.dart` ยืนยันว่าห้องนับแอร์ที่ "ทำงาน" จาก `isRunning` ไม่ใช่ `isOn`
-- **getter `isPoweredOn` (เพิ่ม 9 ต.ค.):** `isOn || (pzemAvailable && isRunning)` คือ "แอร์เปิดอยู่จริงไหม" ใช้แสดงผลบนหน้าจอแทน `isOn` แก้ปัญหาที่มีคนเปิดแอร์ด้วยรีโมตตัวจริง แล้วแอปขึ้นว่า "ปิดอยู่" ทั้งที่ PZEM วัดได้ว่ากินไฟ (เกณฑ์ ≥ 30 W ติดกัน 3 ครั้งจากเฟิร์มแวร์) ดูรายละเอียดในหัวข้อถัดไป
+- **getter `isPoweredOn`:** `isOn || (pzemAvailable && isRunning)` คือ "แอร์เปิดอยู่จริงไหม" ใช้แสดงผลบนหน้าจอแทน `isOn` แก้ปัญหาที่มีคนเปิดแอร์ด้วยรีโมตตัวจริง แล้วแอปขึ้นว่า "ปิดอยู่" ทั้งที่ PZEM วัดได้ว่ากินไฟ (เกณฑ์ ≥ 30 W ติดกัน 3 ครั้งจากเฟิร์มแวร์) ดูรายละเอียดในหัวข้อถัดไป
 - **getter สิทธิ์ควบคุม:** `canControl => isProvisioned && isOnline && deviceId != null`
-- **ยี่ห้อและวิธีควบคุม (เพิ่ม 11 ต.ค. 2569):** ฟังก์ชันนอกคลาส `airBrandOf(protocol)` / `airControlTypeOf(protocol)` และ getter `isWired`, `brand`, `controlTypeLabel` แยกแอร์ที่ **ยิง IR** ออกจากแอร์ที่ **ต่อสายแอร์ Daikin** (`protocol = 'DAIKIN_WIRED'`) ดูหัวข้อย่อยถัดไป
-- **ข้อจำกัดตามโปรโตคอล:** `isSaijoDenki` (`protocol == 'SAIJO_DENKI'`) ทำให้ `minimumTemperature`/`maximumTemperature` เป็น 18/29 (ปกติ 16/30), `supportedModes` เหลือ cool/dry/fan, `supportedSwingModes` มี upper/lower แต่ไม่มี off และ `supportsAdditionalFunctions` เป็นเท็จ ส่วน `isWired` (แก้ 11 ต.ค.) จำกัดโหมดเป็น cool/dry/fan พัดลมไม่มี turbo สวิงมีแค่ auto/off และฟังก์ชันเสริมเหลือ Sleep ผ่าน getter รายตัว `supportsEco`, `supportsSleep` ฯลฯ `normalizeForProtocol()` ถูกเรียกใน constructor และ `copyStateFrom` เพื่อบังคับค่าให้อยู่ในขอบเขต (`test/saijo_denki_support_test.dart`, `test/daikin_wired_support_test.dart`)
+- **ยี่ห้อและวิธีควบคุม:** ฟังก์ชันนอกคลาส `airBrandOf(protocol)` / `airControlTypeOf(protocol)` และ getter `isWired`, `brand`, `controlTypeLabel` แยกแอร์ที่ **ยิง IR** ออกจากแอร์ที่ **ต่อสายแอร์ Daikin** (`protocol = 'DAIKIN_WIRED'`) ดูหัวข้อย่อยถัดไป
+- **ข้อจำกัดตามโปรโตคอล:** `isSaijoDenki` (`protocol == 'SAIJO_DENKI'`) ทำให้ `minimumTemperature`/`maximumTemperature` เป็น 18/29 (ปกติ 16/30), `supportedModes` เหลือ cool/dry/fan, `supportedSwingModes` มี upper/lower แต่ไม่มี off และ `supportsAdditionalFunctions` เป็นเท็จ ส่วน `isWired` จำกัดโหมดเป็น cool/dry/fan พัดลมไม่มี turbo สวิงมีแค่ auto/off และฟังก์ชันเสริมเหลือ Sleep ผ่าน getter รายตัว `supportsEco`, `supportsSleep` ฯลฯ `normalizeForProtocol()` ถูกเรียกใน constructor และ `copyStateFrom` เพื่อบังคับค่าให้อยู่ในขอบเขต (`test/saijo_denki_support_test.dart`, `test/daikin_wired_support_test.dart`)
 - `toCommandJson()` สร้าง body ของ `POST /air-conditioners/:deviceId/command`
 - `editableCopy()` ทำสำเนาไว้ให้หน้าจอแก้ค่าก่อนกดยืนยัน `copyStateFrom(other)` คัดลอกเฉพาะฟิลด์สถานะสั่งการกลับ
 - ฟังก์ชันช่วยส่วนตัว `_enumByName`, `_string`, `_int`, `_nullableInt`, `_double` แปลงค่าจาก JSON อย่างปลอดภัย (ดูบรรทัดต่อบรรทัดในหัวข้อเจาะโค้ด)
 - ใช้โดย `AirConditionerService`, `AirConditionerController`, `Room.airConditioners` และหน้าควบคุมแอร์
 
-##### บอร์ดสายแอร์ Daikin: ยี่ห้อ วิธีควบคุม และฟังก์ชันที่ทำได้ (เพิ่ม 11 ต.ค. 2569)
+##### บอร์ดสายแอร์ Daikin: ยี่ห้อ วิธีควบคุม และฟังก์ชันที่ทำได้
 
-ตั้งแต่ commit `a5a227f` ระบบมีบอร์ดรุ่นที่สองคือ `rmutt_esp32_air_wired` ซึ่ง **ไม่ยิงอินฟราเรด** แต่ต่อเข้ากับสายสัญญาณของแอร์ Daikin แทนรีโมตติดผนัง (คุยด้วยโปรโตคอลของสายแอร์ ดูบทเฟิร์มแวร์) ในฐานข้อมูลแอร์แบบนี้มี `protocol = 'DAIKIN_WIRED'` แอปไม่ได้เพิ่มฟิลด์ใหม่ในโมเดลแอร์ แต่ **อนุมานยี่ห้อและวิธีควบคุมจาก `protocol`** ด้วยฟังก์ชันระดับบนสุด (top-level function คือฟังก์ชันที่อยู่นอกคลาส เรียกได้โดยไม่ต้องมี object) สองตัว
+ระบบมีบอร์ดแอร์สองรุ่น รุ่นที่สองคือ `rmutt_esp32_air_wired` ซึ่ง **ไม่ยิงอินฟราเรด** แต่ต่อเข้ากับสายสัญญาณของแอร์ Daikin แทนรีโมตติดผนัง (คุยด้วยโปรโตคอลของสายแอร์ ดูบทเฟิร์มแวร์) ในฐานข้อมูลแอร์แบบนี้มี `protocol = 'DAIKIN_WIRED'` แอปไม่ได้เพิ่มฟิลด์ใหม่ในโมเดลแอร์ แต่ **อนุมานยี่ห้อและวิธีควบคุมจาก `protocol`** ด้วยฟังก์ชันระดับบนสุด (top-level function คือฟังก์ชันที่อยู่นอกคลาส เรียกได้โดยไม่ต้องมี object) สองตัว
 
 **ไฟล์ `lib/models/air_conditioner.dart` บรรทัด 39–72**
 
@@ -437,13 +437,13 @@ getter ในคลาส `AirConditioner` ที่เพิ่มคู่ก�
 
 | บรรทัด | อธิบาย |
 |---|---|
-| 281 | getter เดิม: Saijo Denki ไม่มีฟังก์ชันเสริมเลย (ยังใช้อยู่เป็นเงื่อนไขพื้นฐาน) |
+| 281 | getter พื้นฐาน: Saijo Denki ไม่มีฟังก์ชันเสริมเลย getter อื่นใช้เป็นเงื่อนไขร่วม |
 | 284–286 | สวิงแนวนอน, Eco, Turbo: ต้องรองรับฟังก์ชันเสริม **และ** ไม่ใช่สายแอร์ |
 | 287–288 | Sleep: สายแอร์ใช้ได้ **ยกเว้นตอนอยู่โหมด Dry** (`!(isWired && mode == AirMode.dry)`) getter นี้ขึ้นกับ `mode` ปัจจุบัน จึงเปลี่ยนค่าทันทีเมื่อผู้ใช้สลับโหมด |
 | 289–291 | Quiet, Display Light, Clean: สายแอร์ไม่มี |
 
 > [!WHY]
-> **ทำไมแตก `supportsAdditionalFunctions` ตัวเดียวเป็น 7 getter** เดิมมีแค่สองกรณี คือ "มีครบ 7 อย่าง" (IR ทั่วไป) กับ "ไม่มีเลย" (Saijo) บูลีนตัวเดียวจึงพอ แต่สายแอร์ Daikin มี **บางอย่าง** (Sleep อย่างเดียว และมีเงื่อนไขตามโหมด) ถ้ายังใช้บูลีนตัวเดียว ต้องเลือกระหว่างซ่อน Sleep ที่ใช้ได้จริง หรือโชว์ปุ่ม Eco/Turbo ที่กดแล้วไม่มีผล การมี getter ต่อฟังก์ชันทำให้หน้าจอเขียน `if (air.supportsEco)` ได้ตรง ๆ และกติกาทั้งหมดอยู่ในโมเดลที่เดียว หน้าจอไม่ต้องรู้ว่าเป็นยี่ห้ออะไร
+> **ทำไมต้องมี 7 getter ไม่ใช่ `supportsAdditionalFunctions` ตัวเดียว** ถ้ามีแค่สองกรณี คือ "มีครบ 7 อย่าง" (IR ทั่วไป) กับ "ไม่มีเลย" (Saijo) บูลีนตัวเดียวก็พอ แต่สายแอร์ Daikin มี **บางอย่าง** (Sleep อย่างเดียว และมีเงื่อนไขตามโหมด) ถ้ายังใช้บูลีนตัวเดียว ต้องเลือกระหว่างซ่อน Sleep ที่ใช้ได้จริง หรือโชว์ปุ่ม Eco/Turbo ที่กดแล้วไม่มีผล การมี getter ต่อฟังก์ชันทำให้หน้าจอเขียน `if (air.supportsEco)` ได้ตรง ๆ และกติกาทั้งหมดอยู่ในโมเดลที่เดียว หน้าจอไม่ต้องรู้ว่าเป็นยี่ห้ออะไร
 
 สรุปเป็นตาราง (ตรงกับข้อความในหน้าตั้งค่าบลูทูธ "ใช้ได้: เปิด/ปิด, 16–30 °C, Cool / Dry / Fan, พัดลม Low / Medium / High / Auto, ส่าย เปิด/ปิด และ Sleep")
 
@@ -510,7 +510,7 @@ getter ในคลาส `AirConditioner` ที่เพิ่มคู่ก�
 - getter `runningAirCount`, `totalPower` (รวมเฉพาะแอร์ที่ `isRunning`), `displayedAirCount`, `hasOccupancySensor`, `isAutoOffPending`
 - คลาส `Room` ไม่ได้เป็น immutable เต็มตัว: `isOccupied`, `isOnline` และฟิลด์เซนเซอร์เป็น non-final เพื่อให้ Controller อัปเดตแบบแทนที่ค่าในที่เดิมโดยไม่ต้องสร้าง object ใหม่ทุกครั้ง (หน้าจอที่ถือ object เดิมอยู่จะเห็นค่าใหม่)
 
-##### สถานะเปิด/ปิดจริง: `isPoweredOn` (อัปเดต 9 ต.ค. 2569)
+##### สถานะเปิด/ปิดจริง: `isPoweredOn`
 
 **ไฟล์ `lib/models/air_conditioner.dart` บรรทัด 226–231**
 
@@ -528,9 +528,9 @@ getter ในคลาส `AirConditioner` ที่เพิ่มคู่ก�
 | 226–230 | คอมเมนต์บอกเหตุผล: `isOn` เป็นแค่ "คำสั่งล่าสุดที่ระบบส่ง" ไม่รู้ว่ามีคนกดรีโมตจริง |
 | 231 | `get` คือ getter (คำนวณใหม่ทุกครั้งที่อ่าน ไม่เก็บค่า) ถือว่าเปิดถ้า **ระบบสั่งเปิด** หรือ **PZEM ใช้ได้และยืนยันว่าแอร์ทำงาน** ต้องเช็ก `pzemAvailable` ก่อน เพราะถ้าไม่มีมิเตอร์ ค่า `isRunning` เชื่อไม่ได้ |
 
-อีกสองจุดที่แก้คู่กัน:
+อีกสองจุดที่ทำงานคู่กับ `isPoweredOn`:
 
-- **`editableCopy()`** ตอนนี้สร้างร่างด้วย `isOn: isPoweredOn` ถ้าแอร์ถูกเปิดด้วยรีโมตจริง แล้วผู้ใช้กดปุ่ม + อุณหภูมิในแอป คำสั่งที่ส่งจะเป็น "เปิด 26°C" ไม่ใช่ "ปิด" (เดิมร่างเริ่มจาก `isOn = false` กดปรับอุณหภูมิจึงเผลอสั่งปิดแอร์)
+- **`editableCopy()`** สร้างร่างด้วย `isOn: isPoweredOn` ถ้าแอร์ถูกเปิดด้วยรีโมตจริง แล้วผู้ใช้กดปุ่ม + อุณหภูมิในแอป คำสั่งที่ส่งจะเป็น "เปิด 26°C" ไม่ใช่ "ปิด" (ถ้าร่างเริ่มจาก `isOn = false` การกดปรับอุณหภูมิจะกลายเป็นสั่งปิดแอร์โดยไม่ตั้งใจ)
 - **`copyStateFrom()`** ถ้าคำสั่งที่เพิ่งส่งเป็น "ปิด" จะตั้ง `isRunning = false` ทันที หน้าจอขึ้นว่าปิดเลยไม่ต้องรอ PZEM ราว 6 วินาที (3 รอบ × 2 วินาที) ถ้าแอร์ไม่ดับจริง รอบดึงข้อมูลถัดไปจะได้ `acRunning = true` กลับมาเอง
 
 > [!WHY]
@@ -538,7 +538,7 @@ getter ในคลาส `AirConditioner` ที่เพิ่มคู่ก�
 
 > [!ASK]
 > **ถาม:** ถ้ามีคนเปิดแอร์ด้วยรีโมตจริง แอปจะรู้ไหม?
-> **ตอบ:** รู้ครับ (ตั้งแต่ 9 ต.ค.) ภายในราว 6 วินาทีที่ PZEM วัดได้ ≥ 30 W ติดกัน 3 ครั้ง บอร์ดส่ง `acRunning = true` แอปใช้ `isPoweredOn` ซึ่งเชื่อทั้งคำสั่งล่าสุดและค่าไฟจริง จึงขึ้นว่าเปิดอยู่ และถ้าผู้ใช้ปรับอุณหภูมิต่อ คำสั่งจะยังเป็น "เปิด" เว็บแอปใช้กติกาเดียวกัน แต่รู้แค่เปิด/ปิด ไม่รู้ว่าตั้งกี่องศาบนรีโมต
+> **ตอบ:** รู้ครับ ภายในราว 6 วินาทีที่ PZEM วัดได้ ≥ 30 W ติดกัน 3 ครั้ง บอร์ดส่ง `acRunning = true` แอปใช้ `isPoweredOn` ซึ่งเชื่อทั้งคำสั่งล่าสุดและค่าไฟจริง จึงขึ้นว่าเปิดอยู่ และถ้าผู้ใช้ปรับอุณหภูมิต่อ คำสั่งจะยังเป็น "เปิด" เว็บแอปใช้กติกาเดียวกัน แต่รู้แค่เปิด/ปิด ไม่รู้ว่าตั้งกี่องศาบนรีโมต
 
 #### `auth_user.dart`, `remembered_login.dart`, `admin_contact.dart`, `managed_user.dart` — ผู้ใช้และคนติดต่อ
 
@@ -557,11 +557,9 @@ getter ในคลาส `AirConditioner` ที่เพิ่มคู่ก�
 
 #### `schedule_import.dart` — นำเข้าตารางจาก Excel
 
-`ScheduleImportEntry` (หนึ่งคาบที่อ่านจากไฟล์), `ScheduleImportRoom` (ห้องที่ยังไม่มีในระบบ ค่าสำรอง roomType `'Special'`), `ScheduleImportPreview` (ผลพรีวิวทั้งไฟล์: คาบ ห้อง ห้องใหม่ คำเตือน ชีตที่ข้าม csv) และ `ScheduleImportResult` (ผลหลังยืนยัน: `importedCount`, `replacedRooms`, `createdRooms`) จุดสำคัญคือ `withTerm(...)` สร้างสำเนาที่ติดภาคเรียนและช่วงวันที่ (`isoDate` → `yyyy-MM-dd`) และ `toCommitJson()` สร้าง body ของ `POST /schedules/import/commit`: `createMissingRooms` เป็นจริงเมื่อมีห้องใหม่, ใส่ `semester`/`startDate`/`endDate` เฉพาะเมื่อผู้ใช้เลือกภาคเรียนแล้ว (`test/schedule_import_test.dart`) ฟังก์ชัน `_strings` กรองลิสต์ให้เหลือเฉพาะ `String`
+`ScheduleImportEntry` (หนึ่งคาบที่อ่านจากไฟล์), `ScheduleImportRoom` (ห้องที่ยังไม่มีในระบบ ค่าสำรอง roomType `'Special'`), `ScheduleImportPreview` (ผลพรีวิวทั้งไฟล์: คาบ ห้อง ห้องใหม่ คำเตือน ชีตที่ข้าม csv) และ `ScheduleImportResult` (ผลหลังยืนยัน: `importedCount`, `replacedRooms`, `createdRooms`) จุดสำคัญคือ `withTerm(...)` สร้างสำเนาที่ติดภาคเรียนและช่วงวันที่ (`isoDate` → `yyyy-MM-dd`) และ `toCommitJson()` สร้าง body ของ `POST /schedules/import/commit`: `createMissingRooms` เป็นจริงเมื่อมีห้องใหม่, ใส่ `semester`/`startDate`/`endDate` เฉพาะเมื่อผู้ใช้เลือกภาคเรียนแล้ว (`test/schedule_import_test.dart`) ฟังก์ชัน `_strings` กรองลิสต์ให้เหลือเฉพาะ `String` `ScheduleImportPreview` มีฟิลด์ใหม่ `replaceAll` (ค่าเริ่มต้น `false`) และเมธอด `withReplaceAll(bool)` ที่สร้างสำเนาเหมือน `withTerm` `toCommitJson()` ใส่ `'replaceAll': true` เฉพาะตอนเลือก "เปลี่ยนภาคเรียน" (ใช้ collection-if `if (replaceAll) 'replaceAll': true`) เหตุผลเขียนไว้ในคอมเมนต์ของโค้ด: ไฟล์ของเทอมใหม่มักไม่มีชีตของห้องที่เทอมนี้ไม่มีเรียน ถ้าไม่ล้าง ห้องพวกนั้นจะค้างตารางเทอมเก่า และระบบปิดแอร์จะคิดว่ายังมีคาบ (รอ 15 นาทีแทน 5) รายละเอียดหน้าจออยู่ในบทหน้าจอผู้ดูแล
 
-(เพิ่ม 9 ต.ค. 2569) `ScheduleImportPreview` มีฟิลด์ใหม่ `replaceAll` (ค่าเริ่มต้น `false`) และเมธอด `withReplaceAll(bool)` ที่สร้างสำเนาเหมือน `withTerm` `toCommitJson()` ใส่ `'replaceAll': true` เฉพาะตอนเลือก "เปลี่ยนภาคเรียน" (ใช้ collection-if `if (replaceAll) 'replaceAll': true`) เหตุผลเขียนไว้ในคอมเมนต์ของโค้ด: ไฟล์ของเทอมใหม่มักไม่มีชีตของห้องที่เทอมนี้ไม่มีเรียน ถ้าไม่ล้าง ห้องพวกนั้นจะค้างตารางเทอมเก่า และระบบปิดแอร์จะคิดว่ายังมีคาบ (รอ 15 นาทีแทน 5) รายละเอียดหน้าจออยู่ในบทหน้าจอผู้ดูแล
-
-#### `room_calendar.dart` — ปฏิทินการใช้ห้องและภาคเรียน (ใหม่ 9 ต.ค. 2569, 353 บรรทัด)
+#### `room_calendar.dart` — ปฏิทินการใช้ห้องและภาคเรียน (353 บรรทัด)
 
 ไฟล์นี้เกิดขึ้นเพื่อให้แอปมือถือ "จัดการตารางเรียนได้เหมือนเว็บแอป" คอมเมนต์หัวไฟล์บอกตรง ๆ ว่าตรรกะวันที่ทั้งหมด **เหมือนกับ Backend** (`backend/src/utils/room-booking.js`) และเว็บแอป (`webapp/assets/js/views/booking-form.js`) ผลของทั้งสามฝั่งจึงตรงกัน
 
@@ -746,7 +744,7 @@ int countBookingOccurrences({
 |---|---|
 | `BleDeviceCandidate` | อุปกรณ์ BLE ที่สแกนเจอ (`BluetoothDevice`, ชื่อ, `rssi` = ความแรงสัญญาณ) |
 | `WifiNetworkCandidate` | Wi-Fi ที่ ESP32 มองเห็น `fromCompactJson(List)` รับรูปแบบย่อ `[ssid, rssi, isSecure]` ตรวจชนิดทีละช่อง ถ้าผิดโยน `FormatException` (ประหยัดไบต์ เพราะ BLE ส่งได้ทีละน้อย) |
-| `BleDeviceIdentity` | ตัวตนที่บอร์ดรายงานตอนเชื่อมต่อ: `deviceId`, `bleName`, `firmwareVersion`, `configured`, `deviceType` (ค่าสำรอง `air`), ห้อง/เลข air, Wi-Fi, MQTT, `dailyOn/dailyOff` และ **`hasWifiPassword`/`hasMqttPassword` (บูลีน ไม่ส่งรหัสจริงกลับมา)** (เพิ่ม 11 ต.ค.) `controlType` (`ir`/`wired`), `brand` และ getter `isWired` |
+| `BleDeviceIdentity` | ตัวตนที่บอร์ดรายงานตอนเชื่อมต่อ: `deviceId`, `bleName`, `firmwareVersion`, `configured`, `deviceType` (ค่าสำรอง `air`), ห้อง/เลข air, Wi-Fi, MQTT, `dailyOn/dailyOff` และ **`hasWifiPassword`/`hasMqttPassword` (บูลีน ไม่ส่งรหัสจริงกลับมา)** `controlType` (`ir`/`wired`), `brand` และ getter `isWired` |
 | `AirProvisioningRequest` / `AirProvisioningReservation` | คำขอจากฟอร์ม และ "ใบจอง" ที่ Backend ตอบ (มี `mqttTopic`, `mqttHost`, `mqttPort`, ชื่อผู้ใช้/รหัสผ่าน MQTT, `mqttTls`, `provisioningToken`) `toReservationJson()` = body ที่ส่งจอง, `toBleJson(reservation)` = JSON ที่จะเขียนลงบอร์ดผ่าน BLE |
 | `OccupancyProvisioningRequest` / `OccupancyProvisioningReservation` | แบบเดียวกันสำหรับเซนเซอร์คนในห้อง (`deviceType: 'occupancy'`, `staticThreshold`) |
 
@@ -755,7 +753,7 @@ JSON ที่เขียนลงบอร์ดมี `version: 1`, `token` (
 > [!WHY]
 > **ทำไมแอปต้อง "จอง" กับ Backend ก่อนเขียนลงบอร์ด** ข้อมูล MQTT (host, ผู้ใช้, รหัส) และ token เป็นของที่ Backend เป็นผู้ออก แอปแค่ขนส่งผ่าน BLE ไปให้บอร์ดโดยไม่ต้องรู้จักรหัสล่วงหน้า และ token ทำให้บอร์ดยืนยันได้ว่าคำสั่งตั้งค่ามาจากการจองที่ชอบธรรม `keepWifiPassword` ใช้ตอนตั้งค่าซ้ำ ให้บอร์ดคงรหัส Wi-Fi เดิมโดยแอปไม่ต้องรู้รหัสนั้น
 
-##### `controlType` และ `brand` ใน identity ของบอร์ด (เพิ่ม 11 ต.ค. 2569)
+##### `controlType` และ `brand` ใน identity ของบอร์ด
 
 ตอนแอปอ่าน identity ผ่าน BLE บอร์ดบอกชนิดของตัวเองมาด้วย เฟิร์มแวร์สายแอร์ (`2.5.2-slm8`) ส่ง `controlType: "wired"` และ `brand: "Daikin"` ส่วนเฟิร์มแวร์ IR รุ่นใหม่ส่ง `controlType: "ir"` แอปใช้ค่านี้ตัดสินว่าหน้าตั้งค่าต้องล็อกยี่ห้อหรือให้เลือก (ดูบทหน้าจอผู้ดูแลระบบ)
 
@@ -805,7 +803,7 @@ JSON ที่เขียนลงบอร์ดมี `version: 1`, `token` (
 | `EnergyRepository` / `EnergyService` | `GET /energy/metrics`, `/energy/live`, `/energy/sources`, `/energy/summary`, `/energy/history`, `/energy/export` | timeout 20 วินาที, ดาวน์โหลด Excel 60 วินาที; ใช้ query string; อ่านหัว `x-export-filename` (ถอดด้วย `Uri.decodeComponent` เพราะชื่อไฟล์ไทยถูกเข้ารหัสมา) และ `x-export-rows` |
 | `OccupancySensorRepository` / `OccupancySensorService` | `POST /occupancy-sensors/reservations`, `POST /occupancy-sensors/:deviceId/setup-mode`, `DELETE /occupancy-sensors/:deviceId` | |
 | `RoomRepository` / `RoomService` | `GET/POST /rooms`, `PUT/DELETE /rooms/:roomNumber` | ใช้ `Uri.encodeComponent(room.number)` กันอักขระพิเศษใน URL (ห้องพิเศษอย่าง `CL503`) |
-| `ScheduleRepository` / `ScheduleService` | `GET/POST/DELETE /schedules`, `PUT/DELETE /schedules/:id`, `POST /schedules/import/preview`, `POST /schedules/import/commit`, (เพิ่ม 9 ต.ค.) `GET/PUT/DELETE /schedules/terms`, `GET /bookings?from=&to=`, `POST /bookings`, `PUT/DELETE /bookings/:id` | `fetchScheduleBundle()` คืนตาราง + `timetable` ในคำขอเดียว ส่วน `fetchSchedules()` เดิมกลายเป็นตัวห่อที่เรียก `fetchScheduleBundle()` แล้วคืนแค่ `.schedules` (โค้ดเดิมที่เรียกไม่ต้องแก้) | พรีวิวส่ง **ไฟล์ดิบ** เป็น `application/octet-stream` + หัว `X-File-Name` (เข้ารหัส URL) timeout 45 วินาที |
+| `ScheduleRepository` / `ScheduleService` | `GET/POST/DELETE /schedules`, `PUT/DELETE /schedules/:id`, `POST /schedules/import/preview`, `POST /schedules/import/commit`, `GET/PUT/DELETE /schedules/terms`, `GET /bookings?from=&to=`, `POST /bookings`, `PUT/DELETE /bookings/:id` | `fetchScheduleBundle()` คืนตาราง + `timetable` ในคำขอเดียว ส่วน `fetchSchedules()` เป็นตัวห่อที่เรียก `fetchScheduleBundle()` แล้วคืนแค่ `.schedules` | พรีวิวส่ง **ไฟล์ดิบ** เป็น `application/octet-stream` + หัว `X-File-Name` (เข้ารหัส URL) timeout 45 วินาที |
 | `SystemSettingsRepository` / `SystemSettingsService` | `GET /settings`, `PATCH /settings/auto-off` body `{enabled}` | ไฟล์ repository ยังนิยามคลาส `SystemSettings` ไว้ในที่เดียวกัน |
 | `UserRepository` / `UserService` | `GET/POST /users`, `PATCH/DELETE /users/:username` | |
 | `AuthRepository` / `AuthService` | `POST /auth/login`, `GET/PATCH /auth/me`, `POST /auth/me/password`, `POST /auth/forgot-password`, `/auth/verify-otp`, `/auth/reset-password`, `GET /public/admin-contact` | ดูหัวข้อ Auth |
@@ -907,11 +905,11 @@ JSON ที่เขียนลงบอร์ดมี `version: 1`, `token` (
 - `createRoom` / `updateRoom` / `deleteRoom` เรียก Repository แล้วอัปเดตลิสต์ในเครื่อง (ไม่ดึงใหม่ทั้งหมด) `updateRoom` คงค่าที่ Backend ไม่ส่งมา (แอร์ เซนเซอร์) จากห้องเดิม
 - `AirConditionerController.sendCommand/rename/remove` — `remove` ตามด้วย `refresh()` เต็มรอบ
 
-#### `schedule_controller.dart` (ขยาย 9 ต.ค. 2569, 306 บรรทัด)
+#### `schedule_controller.dart` (306 บรรทัด)
 
 เก็บ `_schedules` เป็น field ส่วนตัวและเปิดผ่าน getter ที่คืน `List.unmodifiable` (กันหน้าจอแก้ลิสต์ตรง ๆ) ต่างจาก Controller อื่นที่เปิดฟิลด์สาธารณะ มี `schedulesFor(room, day)` กรอง+เรียง, `createSchedule`/`updateSchedule`/`deleteSchedule`/`deleteAllSchedules` (อัปเดตลิสต์ในเครื่อง), `previewScheduleFile` (ส่งต่อ Repository), `importSchedulePreview` (เสร็จแล้ว `reload()` ทั้งหมด), `overlaps(...)` ตรวจเวลาทับกับคาบเดิมในห้อง/วันเดียวกันโดยข้าม `ignoredId` (ใช้ตอนแก้ไขคาบของตัวเอง) และ `_compare` เรียง วัน → ห้อง → เวลาเริ่ม → ชื่อวิชา
 
-ตั้งแต่ 9 ต.ค. Controller นี้ดูแลข้อมูลเพิ่มอีก 3 ชุด ทำให้หน้าตารางเรียนดูเป็น "วันที่จริง" ได้ ไม่ใช่แค่ "วันในสัปดาห์"
+นอกจากตารางเรียน Controller นี้ดูแลข้อมูลอีก 3 ชุด ทำให้หน้าตารางเรียนดูเป็น "วันที่จริง" ได้ ไม่ใช่แค่ "วันในสัปดาห์"
 
 | ข้อมูลใหม่ | getter / เมธอด | ความหมาย |
 |---|---|---|
@@ -1085,15 +1083,15 @@ JSON ที่เขียนลงบอร์ดมี `version: 1`, `token` (
 
 - `enum FileSaveStatus {saved, shared, cancelled, failed}` และ `FileSaveResult {status, path, error}` พร้อม `isSuccess`
 - `saveExportFile({fileName, bytes, fileExtension = 'xlsx', mimeType = <xlsx>, typeLabel = 'Excel'})`: บน **Android/iOS** เขียนไฟล์ลงโฟลเดอร์ชั่วคราว (`getTemporaryDirectory`) แล้วเปิดเมนูแชร์ (`SharePlus.instance.share`) ให้ผู้ใช้เลือกปลายทางเอง (เก็บลงไฟล์/ไลน์/อีเมล); บน **เดสก์ท็อป** (Windows) เปิดกล่อง Save As (`getSaveLocation`) แล้วเติมนามสกุลถ้าขาด ข้อผิดพลาดทั้งหมดถูกจับเป็น `FileSaveStatus.failed`
-- (เปลี่ยน 9 ต.ค.) เดิมฟังก์ชันผูกกับ `.xlsx` ตายตัว ตอนนี้รับนามสกุล ชนิดไฟล์ (MIME) และชื่อกลุ่มไฟล์เป็นพารามิเตอร์ ค่าเริ่มต้นยังเป็น Excel ทุกตัว โค้ดเดิมที่เรียกแบบไม่ส่งพารามิเตอร์ (หน้าส่งออกพลังงาน) จึงทำงานเหมือนเดิม ส่วนหน้าตารางเรียนและหน้านำเข้าตารางเรียกด้วย `fileExtension: 'csv'`, `mimeType: 'text/csv'`, `typeLabel: 'CSV'`
+- รับนามสกุล ชนิดไฟล์ (MIME) และชื่อกลุ่มไฟล์เป็นพารามิเตอร์ ค่าเริ่มต้นเป็น Excel ทุกตัว หน้าส่งออกพลังงานเรียกแบบไม่ส่งพารามิเตอร์จึงได้ Excel ส่วนหน้าตารางเรียนและหน้านำเข้าตารางเรียกด้วย `fileExtension: 'csv'`, `mimeType: 'text/csv'`, `typeLabel: 'CSV'`
 - `sanitizeFileName(value, {fileExtension = 'xlsx'})` แทนอักขระที่ระบบไฟล์ไม่รับ (`\ / : * ? " < > |`) ด้วย `_` และบีบช่องว่าง ชื่อภาษาไทยผ่านได้ ถ้าว่างใช้ `energy-export.<นามสกุล>`
 
 > [!NOTE]
-> commit `ae96353` แก้ `acceptedTypeGroups: const [...]` เป็น `acceptedTypeGroups: [...]` เพราะตอนนี้ข้างในใช้ตัวแปร (`typeLabel`, `fileExtension`, `mimeType`) ซึ่งไม่ใช่ค่าคงที่ตอนคอมไพล์ จึงใส่ใน `const` ไม่ได้ (คอมไพล์ไม่ผ่าน) นี่คือตัวอย่างที่ CI (`flutter analyze`) จับได้ทันที
+> `acceptedTypeGroups: [...]` ไม่มี `const` นำหน้า เพราะข้างในใช้ตัวแปร (`typeLabel`, `fileExtension`, `mimeType`) ซึ่งไม่ใช่ค่าคงที่ตอนคอมไพล์ ถ้าใส่ `const` จะคอมไพล์ไม่ผ่าน และ CI (`flutter analyze`) จะจับได้ทันที
 
 #### `thai_date.dart` — วันที่ไทย (พ.ศ.)
 
-ฟังก์ชันจัดรูป `formatDisplayDate` (`9 มิ.ย. 2569`), `formatDisplayDateTime`, `formatDayMonth`, `formatWeekdayShort` (เพิ่ม 9 ต.ค. ชื่อวันย่อ `จ`/`Mo` ใช้ใต้กราฟรายวัน ดัชนี `date.weekday % 7` เพื่อให้อาทิตย์ = 0), `formatMonthYear`, `formatNumericDate` (`09/06/2569`), `formatIsoDateText`, `displayYear`, `parseNumericDate` และปฏิทินเลือกวัน `showAppDatePicker` / `showAppDateRangePicker` / `AppDatePickerDialog` ที่แอปเขียนเอง (เพราะ `showDatePicker` ของ Flutter แสดงได้แค่ ค.ศ.) มีโหมดแตะปฏิทินหรือพิมพ์เอง ค่าคงที่ `buddhistEraOffset = 543` ไฟล์นี้ import `localized_material.dart` แทน `material.dart` ตรง ๆ เพื่อให้ `Text` ในปฏิทินถูกแปลอัตโนมัติ (รายละเอียดดูเจาะโค้ด)
+ฟังก์ชันจัดรูป `formatDisplayDate` (`9 มิ.ย. 2569`), `formatDisplayDateTime`, `formatDayMonth`, `formatWeekdayShort` (ชื่อวันย่อ `จ`/`Mo` ใช้ใต้กราฟรายวัน ดัชนี `date.weekday % 7` เพื่อให้อาทิตย์ = 0), `formatMonthYear`, `formatNumericDate` (`09/06/2569`), `formatIsoDateText`, `displayYear`, `parseNumericDate` และปฏิทินเลือกวัน `showAppDatePicker` / `showAppDateRangePicker` / `AppDatePickerDialog` ที่แอปเขียนเอง (เพราะ `showDatePicker` ของ Flutter แสดงได้แค่ ค.ศ.) มีโหมดแตะปฏิทินหรือพิมพ์เอง ค่าคงที่ `buddhistEraOffset = 543` ไฟล์นี้ import `localized_material.dart` แทน `material.dart` ตรง ๆ เพื่อให้ `Text` ในปฏิทินถูกแปลอัตโนมัติ (รายละเอียดดูเจาะโค้ด)
 
 ### Localization และ Theme
 
@@ -1107,7 +1105,7 @@ JSON ที่เขียนลงบอร์ดมี `version: 1`, `token` (
 - `_translateToEnglish(source)`: ค้นใน `_englishTranslations` (ประมาณ 70 รายการ บรรทัด 1092 เป็นต้นไป) **กุญแจเป็นข้อความภาษาไทยที่ Backend ส่งมา** เช่น `'Username หรือ Password ไม่ถูกต้อง'` → `'The username or password is incorrect.'` ไว้แปลข้อความผิดพลาดของ Backend เมื่อผู้ใช้เลือก English
 - extension `AppLocalizationsBuildContext` ให้ `context.tr('...')` แปลในโค้ดที่ไม่ใช่ `Text`
 - `_AppLocalizationsDelegate` ตัว `load` คืน `SynchronousFuture` (โหลดทันทีเพราะเป็น map ในหน่วยความจำ) และ `isSupported` เช็กรหัสภาษา
-- **(เพิ่ม 11 ต.ค. 2569) ข้อความของบอร์ดสายแอร์ 13 รายการ:** ฝั่งไทย 10 รายการอยู่บนสุดของ map ใต้คอมเมนต์ `// บอร์ดสายแอร์ / ยี่ห้อแอร์ (v3.16.0)` เช่น `'Wired'` → `'สายแอร์'`, `'IR remote'` → `'รีโมต IR'`, `'Set by the board'` → `'บอร์ดกำหนดให้'`, `'Board type: IR remote'` → `'ชนิดบอร์ด: รีโมต IR'` และข้อความยาวที่อธิบายว่าสายแอร์ใช้ฟังก์ชันอะไรได้ ฝั่งอังกฤษ 3 รายการแปล error ภาษาไทยของ Backend เช่น `'แอร์แบบสายแอร์ไม่มีพัดลมระดับ Turbo'` → `'Wired air conditioners have no Turbo fan speed.'` (รวม 23 บรรทัดที่เพิ่ม เพราะบางรายการยาวจนต้องขึ้นบรรทัดใหม่)
+- ** ข้อความของบอร์ดสายแอร์ 13 รายการ:** ฝั่งไทย 10 รายการอยู่บนสุดของ map ใต้คอมเมนต์ `// บอร์ดสายแอร์ / ยี่ห้อแอร์ (v3.16.0)` เช่น `'Wired'` → `'สายแอร์'`, `'IR remote'` → `'รีโมต IR'`, `'Set by the board'` → `'บอร์ดกำหนดให้'`, `'Board type: IR remote'` → `'ชนิดบอร์ด: รีโมต IR'` และข้อความยาวที่อธิบายว่าสายแอร์ใช้ฟังก์ชันอะไรได้ ฝั่งอังกฤษ 3 รายการแปล error ภาษาไทยของ Backend เช่น `'แอร์แบบสายแอร์ไม่มีพัดลมระดับ Turbo'` → `'Wired air conditioners have no Turbo fan speed.'` (รวม 23 บรรทัดที่เพิ่ม เพราะบางรายการยาวจนต้องขึ้นบรรทัดใหม่)
 
 #### `localization/localized_material.dart` — `Text` ที่แปลให้เอง
 
@@ -1218,7 +1216,7 @@ flutter test --name "พิมพ์ปี พ.ศ."                # รัน�
 flutter analyze          # ตรวจ lint ตาม analysis_options.yaml
 ```
 
-รวม **122 เคส** ใน 22 ไฟล์ (แก้ 11 ต.ค. 2569: นับด้วย `grep` บรรทัดที่ขึ้นต้นด้วย `test(` และ `testWidgets(` เดิม 119 เคสใน 21 ไฟล์ เพิ่ม `daikin_wired_support_test.dart` 3 เคส) เอกสาร `docs/study/03-flutter-app.md` ปรับเป็น 122 เคสใน 22 ไฟล์แล้ว (14 ต.ค. 2569) ตรงกับที่นับนี้ ทุกเทสต์รัน **ออฟไลน์** เพราะฉีด Repository/Store ปลอมแทนของจริง (นี่คือผลตอบแทนของการแยกชั้น)
+รวม **122 เคส** ใน 22 ไฟล์ (นับด้วย `grep` บรรทัดที่ขึ้นต้นด้วย `test(` และ `testWidgets(`) ทุกเทสต์รัน **ออฟไลน์** เพราะฉีด Repository/Store ปลอมแทนของจริง (นี่คือผลตอบแทนของการแยกชั้น)
 
 เทสต์มี 2 แบบ: `test(...)` คือเทสต์ฟังก์ชัน/คลาสธรรมดา (เร็ว ไม่มี UI) และ `testWidgets(...)` คือเทสต์ที่สร้างหน้าจอเสมือนแล้ว `tester.pumpWidget`, `tester.tap`, `find.text(...)`
 
@@ -1229,22 +1227,22 @@ flutter analyze          # ตรวจ lint ตาม analysis_options.yaml
 | `auto_off_countdown_test.dart` | 8 | `formatCountdown` (`300` → `05:00`, ติดลบ → `00:00`), วิดเจ็ตนับถอยหลังแบบต่าง ๆ, ฟิลด์ปิดอัตโนมัติของ `Room` และ `Room.fromJson` |
 | `ble_identity_test.dart` | 2 | identity ของเฟิร์มแวร์ 1.6 (สั้น) เปิดการตั้งค่าครั้งแรกได้ และการรวม identity กับ settings |
 | `class_schedule_test.dart` | 2 | `timesOverlap` และ `ClassSchedule.fromJson` |
-| `daikin_wired_support_test.dart` | 3 | (ใหม่ 11 ต.ค.) แอร์ `DAIKIN_WIRED` ที่สร้างด้วยค่าที่รุ่นนี้ไม่มี (Heat, Turbo, สวิง middle, Eco/Quiet/Clean เปิด) ถูกปรับเป็น Cool, High, Auto และปิดฟังก์ชันเสริม แต่ Sleep ยังอยู่; เปลี่ยนเป็นโหมด Dry แล้ว `supportsSleep` เป็นเท็จและ Sleep ถูกปิด; แอร์ IR (`HAIER_AC160`) บอก `brand = Haier`, `controlTypeLabel = 'IR remote'`; `airBrandOf`/`airControlTypeOf` (ตัวพิมพ์เล็กก็ได้); identity BLE ที่มี `controlType: wired` กับ identity เฟิร์มแวร์เก่าที่ไม่มีช่องนี้ (= `ir`) |
+| `daikin_wired_support_test.dart` | 3 | แอร์ `DAIKIN_WIRED` ที่สร้างด้วยค่าที่รุ่นนี้ไม่มี (Heat, Turbo, สวิง middle, Eco/Quiet/Clean เปิด) ถูกปรับเป็น Cool, High, Auto และปิดฟังก์ชันเสริม แต่ Sleep ยังอยู่; เปลี่ยนเป็นโหมด Dry แล้ว `supportsSleep` เป็นเท็จและ Sleep ถูกปิด; แอร์ IR (`HAIER_AC160`) บอก `brand = Haier`, `controlTypeLabel = 'IR remote'`; `airBrandOf`/`airControlTypeOf` (ตัวพิมพ์เล็กก็ได้); identity BLE ที่มี `controlType: wired` กับ identity เฟิร์มแวร์เก่าที่ไม่มีช่องนี้ (= `ir`) |
 | `energy_database_test.dart` | 5 | หน้าฐานข้อมูล: ค่าไฟสดภาษาไทย (812 W → `0.812 kW`), เปลี่ยนรอบอัปเดต, โหมดสรุปซ่อนตัวเลือก, เลือกรายเครื่อง, พรีวิว |
 | `energy_format_test.dart` | 10 | `formatEnergy`/`energyScaleReference` (Wh/kWh/MWh, ทศนิยม, หน่วยร่วม) |
-| `energy_usage_chart_test.dart` | 14 | (ปรับ 9 ต.ค. ตามกราฟแท่ง) `EnergyChartGeometry` 5 เคส (แท่งอยู่กลางช่อง, ค่าสูงสุดบนสุด/ศูนย์ล่างสุด, ทุกค่าเป็นศูนย์ไม่หารศูนย์, จุดเดียวคืนว่าง, แตะตรงไหนของช่องก็ได้และไม่หลุดขอบ), `niceScaleMax` (3.56 → 4, 17.3 → 20, 0.42 → 0.5, 212 → 250, 0 → 1), `axisLabelsFor` 3 เคส (ทุก 6 ชม., 7 วันเป็นชื่อวัน, 30 วันเป็นวันที่ทุก 7 วัน + วันสุดท้าย) และวิดเจ็ต 5 เคส (ข้อมูลไม่พอ, แตะแล้วขึ้นค่า, แตะซ้ำปิด, แตะแท่งอื่นกล่องย้าย, เปลี่ยนช่วงแล้วไม่พัง) |
+| `energy_usage_chart_test.dart` | 14 | `EnergyChartGeometry` 5 เคส (แท่งอยู่กลางช่อง, ค่าสูงสุดบนสุด/ศูนย์ล่างสุด, ทุกค่าเป็นศูนย์ไม่หารศูนย์, จุดเดียวคืนว่าง, แตะตรงไหนของช่องก็ได้และไม่หลุดขอบ), `niceScaleMax` (3.56 → 4, 17.3 → 20, 0.42 → 0.5, 212 → 250, 0 → 1), `axisLabelsFor` 3 เคส (ทุก 6 ชม., 7 วันเป็นชื่อวัน, 30 วันเป็นวันที่ทุก 7 วัน + วันสุดท้าย) และวิดเจ็ต 5 เคส (ข้อมูลไม่พอ, แตะแล้วขึ้นค่า, แตะซ้ำปิด, แตะแท่งอื่นกล่องย้าย, เปลี่ยนช่วงแล้วไม่พัง) |
 | `mock_data_test.dart` | 1 | 21 ห้อง ชั้นละ 7 |
 | `number_format_test.dart` | 1 | `formatDecimal` (`1217.25` → `1,217.25`, `270.5 * 5.25` → `1,420.13`) |
 | `occupancy_status_test.dart` | 2 | `Room.fromJson` ฟิลด์เซนเซอร์ และ identity `OCC32-...` |
-| `pzem_status_test.dart` | 5 | `isRunning` มาจาก PZEM ไม่ใช่คำสั่ง IR; (เพิ่ม 9 ต.ค.) แอร์ที่เปิดด้วยรีโมตจริงต้องขึ้นว่าเปิด และร่างคำสั่งต้องเริ่มจาก "เปิด", สั่งปิดแล้วหน้าจอขึ้นปิดทันที, ไม่มี PZEM ให้เชื่อคำสั่ง IR |
-| `room_calendar_test.dart` | 11 | (ใหม่ 9 ต.ค.) ตัวช่วยวันที่ (วันในสัปดาห์/ต้นสัปดาห์ตรง Backend, บวกวันข้ามเดือนข้ามปี), `RoomBooking` (วันเดียว, รายสัปดาห์, รายวัน, JSON ที่ส่ง/อ่าน), `AcademicTerm` (รวมวันเปิดปิด, สถานะ, รูปแบบ `1/2569`), CSV ตารางเรียนนำกลับเข้ามาได้ |
+| `pzem_status_test.dart` | 5 | `isRunning` มาจาก PZEM ไม่ใช่คำสั่ง IR; แอร์ที่เปิดด้วยรีโมตจริงต้องขึ้นว่าเปิด และร่างคำสั่งต้องเริ่มจาก "เปิด", สั่งปิดแล้วหน้าจอขึ้นปิดทันที, ไม่มี PZEM ให้เชื่อคำสั่ง IR |
+| `room_calendar_test.dart` | 11 | ตัวช่วยวันที่ (วันในสัปดาห์/ต้นสัปดาห์ตรง Backend, บวกวันข้ามเดือนข้ามปี), `RoomBooking` (วันเดียว, รายสัปดาห์, รายวัน, JSON ที่ส่ง/อ่าน), `AcademicTerm` (รวมวันเปิดปิด, สถานะ, รูปแบบ `1/2569`), CSV ตารางเรียนนำกลับเข้ามาได้ |
 | `saijo_denki_support_test.dart` | 2 | ข้อจำกัดของโปรโตคอล Saijo Denki (อุณหภูมิ 18–29, ไม่มี swing off, ปิดฟังก์ชันเสริม) เทียบกับ Haier |
 | `schedule_date_test.dart` | 2 | `scheduleDayIndexForDate`, `scheduleDateForDay` (สัปดาห์เริ่มวันอาทิตย์) จาก `schedule_screen.dart` |
 | `schedule_import_test.dart` | 2 | พรีวิวห้องใหม่ → `createMissingRooms`, `withTerm`, ผลนำเข้า |
 | `system_settings_test.dart` | 6 | `SystemSettingsController` (optimistic update, ถอยกลับ, กันกดซ้ำ) |
 | `thai_date_test.dart` | 4 | วันที่ พ.ศ./ค.ศ. `parseNumericDate`, `formatIsoDateText` |
 | `user_management_test.dart` | 6 | `ManagedUser`, `UserController` (เรียงลำดับ, เปลี่ยน role, ระงับ/ลบ, error) |
-| `widget_test.dart` | 7 | ทั้งแอปผ่าน `CpeAirRemoteApp` (login → dashboard → เมนูควบคุม), จำชื่อผู้ใช้, สลับภาษา/ธีม, ค่าไฟ, แอดมินเพิ่ม/แก้คาบเรียน (9 ต.ค. เพิ่มขั้น "เพิ่มการใช้ห้อง" ให้ห้อง 16302 แล้วตรวจว่าขึ้นในการ์ด), เพิ่ม/ลบห้อง CL503 |
+| `widget_test.dart` | 7 | ทั้งแอปผ่าน `CpeAirRemoteApp` (login → dashboard → เมนูควบคุม), จำชื่อผู้ใช้, สลับภาษา/ธีม, ค่าไฟ, แอดมินเพิ่ม/แก้คาบเรียน, เพิ่มการใช้ห้องให้ห้อง 16302 แล้วตรวจว่าขึ้นในการ์ด, เพิ่ม/ลบห้อง CL503 |
 | `wifi_network_candidate_test.dart` | 4 | `WifiNetworkCandidate`, identity ที่บอร์ดส่ง, `toBleJson` ของใบจอง (MQTT host/port/user, `keepPassword`) |
 
 **จุดที่น่าสนใจของเทสต์**
@@ -1794,9 +1792,9 @@ DateTime? parseNumericDate(String text) {
 | 53 | `expect(controller.errorMessage, isNotNull);` | และต้องมีข้อความผิดพลาดให้ผู้ใช้เห็น |
 | 100/107 | `throw Exception('ApiException: ...')` ในตัวปลอม | ตัวปลอมโยน `Exception` ที่ข้อความขึ้นต้น `ApiException:` เพื่อทดสอบว่า `_readable` ตัดคำนำหน้าได้ |
 
-### 9. เทสต์บอร์ดสายแอร์: `test/daikin_wired_support_test.dart` (เพิ่ม 14 ต.ค. 2569)
+### 9. เทสต์บอร์ดสายแอร์: `test/daikin_wired_support_test.dart`
 
-ไฟล์ใหม่ 83 บรรทัด 3 เคส มาพร้อม commit `a5a227f` ต่างจากเทสต์ในหัวข้อก่อนตรงที่ **ไม่ต้องมีของปลอมเลย** เพราะสิ่งที่ทดสอบคือกติกาในโมเดลล้วน ๆ (getter และ `normalizeForProtocol()`) ไม่ได้แตะ HTTP หรือที่เก็บข้อมูล จึงสร้าง object แล้วตรวจค่าได้ทันที
+ไฟล์ 83 บรรทัด 3 เคส ต่างจากเทสต์ในหัวข้อก่อนตรงที่ **ไม่ต้องมีของปลอมเลย** เพราะสิ่งที่ทดสอบคือกติกาในโมเดลล้วน ๆ (getter และ `normalizeForProtocol()`) ไม่ได้แตะ HTTP หรือที่เก็บข้อมูล จึงสร้าง object แล้วตรวจค่าได้ทันที
 
 **ไฟล์ `test/daikin_wired_support_test.dart` บรรทัด 6–30** (เคสแรก: สร้างแอร์ด้วยค่าที่รุ่นนี้ทำไม่ได้)
 
@@ -1923,15 +1921,15 @@ DateTime? parseNumericDate(String text) {
 > ตอบ: แยกสองค่า `isOn` คือคำสั่งที่สั่งล่าสุด ส่วน `isRunning` (`acRunning` ใน JSON) มาจากเซนเซอร์วัดไฟ PZEM-004T ที่ ESP32 อ่านจริงแล้วส่งขึ้นระบบ ห้องนับแอร์ที่ทำงานและกำลังไฟรวมจาก `isRunning` (`Room.runningAirCount`, `totalPower`) ไม่ใช่ `isOn` เทสต์ `pzem_status_test.dart` ยืนยัน
 
 > [!ASK]
-> **ถาม: แอปรู้ได้อย่างไรว่าแอร์เครื่องไหนเป็นบอร์ดสายแอร์ Daikin และทำไมปุ่มบางปุ่มหายไป?** (เพิ่ม 11 ต.ค. 2569)
+> **ถาม: แอปรู้ได้อย่างไรว่าแอร์เครื่องไหนเป็นบอร์ดสายแอร์ Daikin และทำไมปุ่มบางปุ่มหายไป?**
 > **ตอบ:** ดูจาก `protocol` ถ้าเป็น `DAIKIN_WIRED` ฟังก์ชัน `airControlTypeOf` คืน `'wired'` ทำให้ `isWired` เป็นจริง โมเดลจึงจำกัดโหมดเหลือ Cool/Dry/Fan พัดลม 4 ระดับไม่มี Turbo สวิงแค่ส่าย/หยุด และฟังก์ชันเสริมเหลือ Sleep (ใช้ไม่ได้ในโหมด Dry) เพราะบอร์ดนี้สั่งแอร์แทนรีโมตติดผนังของ Daikin ซึ่งมีปุ่มแค่นั้น หน้าจอถาม getter รายตัว เช่น `supportsEco` แล้วซ่อนปุ่มที่แอร์ทำไม่ได้ ส่วน `normalizeForProtocol()` ปรับร่างคำสั่งก่อนส่ง เพื่อไม่ให้ Backend ตอบ 400 ตอนตั้งค่าบอร์ด BLE บอร์ดเองก็บอก `controlType: "wired"` มาใน identity แอปจึงล็อกยี่ห้อให้
 
 > [!ASK]
-> **ถาม: ทดสอบอย่างไรว่าบอร์ดสายแอร์ไม่ถูกส่งคำสั่งที่ทำไม่ได้ และบอร์ดเฟิร์มแวร์เก่ายังใช้ได้?** (เพิ่ม 14 ต.ค. 2569)
+> **ถาม: ทดสอบอย่างไรว่าบอร์ดสายแอร์ไม่ถูกส่งคำสั่งที่ทำไม่ได้ และบอร์ดเฟิร์มแวร์เก่ายังใช้ได้?**
 > **ตอบ:** `test/daikin_wired_support_test.dart` มี 3 เคส เคสแรกสร้างแอร์ `DAIKIN_WIRED` ด้วยค่าที่ผิดเกือบทั้งหมด (Heat, Turbo, สวิง middle, Eco เปิด) แล้วตรวจว่าโมเดลปรับเป็น Cool, High, Auto และปิด Eco ให้เองโดยไม่ต้องเรียกอะไร เพราะ constructor เรียก `normalizeForProtocol()` จากนั้นสลับเป็นโหมด Dry เพื่อตรวจว่า Sleep ถูกปิด เคสสองตรวจว่าแอร์ IR ยังมีฟังก์ชันครบ เคสสามอ่าน identity BLE ทั้งแบบที่มี `controlType: "wired"` และแบบเฟิร์มแวร์ 2.4.1 ที่ไม่มีช่องนี้ ซึ่งต้องได้ `ir` ทั้งหมดรันออฟไลน์ ไม่ต้องมีบอร์ดจริง
 
 > [!ASK]
-> **ถาม: ทำไม Backend ส่ง `controlType` มาแล้ว แต่แอปยังคำนวณเองจาก `protocol`?** (เพิ่ม 14 ต.ค. 2569)
+> **ถาม: ทำไม Backend ส่ง `controlType` มาแล้ว แต่แอปยังคำนวณเองจาก `protocol`?**
 > **ตอบ:** เพราะค่า `controlType` ของ Backend ก็คำนวณจาก `protocol` อยู่แล้ว ถ้าแอปเก็บสองค่าแยกกันจะมีโอกาสขัดกันเอง (เช่น `HAIER_AC160` แต่ `wired`) การมีแหล่งความจริงเดียวคือ `protocol` ทำให้ไม่ต้องคิดว่าจะเชื่อค่าไหน และวิดเจ็ตที่รู้แค่ข้อความ `protocol` (เช่น `AirControlBadge`) ก็เรียก `airControlTypeOf` ได้เลย
 
 > [!ASK]
@@ -1967,9 +1965,9 @@ DateTime? parseNumericDate(String text) {
 - [ ] บอกที่เก็บข้อมูลของแอป (`flutter_secure_storage`) และคีย์สำคัญ รวมถึงสิ่งที่ "ไม่มี" ใน pubspec
 - [ ] อธิบายความหมายของ `?`, `??`, `?.`, `!`, `??=`, `late final`, `factory`, `implements`, `abstract interface class`, `..` ได้พร้อมตัวอย่างจากโปรเจกต์
 - [ ] อธิบาย `fromJson` ของ `AirConditioner` ได้ รวมถึงเหตุผลของค่าสำรองและ `_enumByName`
-- [ ] (เพิ่ม 11 ต.ค.) บอกได้ว่า `airBrandOf`/`airControlTypeOf` อนุมานยี่ห้อและวิธีควบคุมจาก `protocol` อย่างไร และสายแอร์ Daikin (`DAIKIN_WIRED`) ทำอะไรได้/ไม่ได้เทียบกับ IR และ Saijo Denki
-- [ ] (เพิ่ม 14 ต.ค. 2569) อธิบายได้ว่าทำไมต้องมี getter รายฟังก์ชัน (`supportsEco`, `supportsSleep` ฯลฯ) แทน `supportsAdditionalFunctions` ตัวเดียว และทำไม `supportsSleep` เปลี่ยนตามโหมด
-- [ ] (เพิ่ม 14 ต.ค. 2569) เล่าได้ว่า `daikin_wired_support_test.dart` ตรวจอะไร 3 เคส และทำไมเคส identity ของเฟิร์มแวร์ 2.4.1 (ไม่มี `controlType`) สำคัญ
+- [ ] บอกได้ว่า `airBrandOf`/`airControlTypeOf` อนุมานยี่ห้อและวิธีควบคุมจาก `protocol` อย่างไร และสายแอร์ Daikin (`DAIKIN_WIRED`) ทำอะไรได้/ไม่ได้เทียบกับ IR และ Saijo Denki
+- [ ] อธิบายได้ว่าทำไมต้องมี getter รายฟังก์ชัน (`supportsEco`, `supportsSleep` ฯลฯ) แทน `supportsAdditionalFunctions` ตัวเดียว และทำไม `supportsSleep` เปลี่ยนตามโหมด
+- [ ] เล่าได้ว่า `daikin_wired_support_test.dart` ตรวจอะไร 3 เคส และทำไมเคส identity ของเฟิร์มแวร์ 2.4.1 (ไม่มี `controlType`) สำคัญ
 - [ ] บอกรอบ polling ของแต่ละ Controller และหลักการ `_inFlight`/`silent`
 - [ ] อธิบาย optimistic update ของ `SystemSettingsController` พร้อมทางถอยกลับ
 - [ ] อธิบาย `AlertPreferences` (สวิตช์หลัก, รายชนิด, `unknown`, `freshAlerts` ไม่เด้งรอบแรก) และสถานะจริงของการแจ้งเตือนบนเครื่อง

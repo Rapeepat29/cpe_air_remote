@@ -55,10 +55,8 @@
 <li><a href="17-glossary.html"><span class="num">17</span>อภิธานศัพท์</a></li>
 <li><a href="18-file-map.html"><span class="num">18</span>แผนที่ไฟล์ทั้งโปรเจค</a></li>
 </ul>
-<div class="nav-part">งานที่กำลังพัฒนา</div><ul>
-<li><a href="19-daikin-slm8.html"><span class="num">19</span>แอร์ Daikin ผ่านสาย SLM8: จากการแกะโปรโตคอลถึงบอร์ดสายแอร์</a></li>
-</ul>
 <div class="nav-part">เจาะลึก</div><ul>
+<li><a href="19-daikin-slm8.html"><span class="num">19</span>แอร์ Daikin ผ่านสาย SLM8: จากการแกะโปรโตคอลถึงบอร์ดสายแอร์</a></li>
 <li><a href="20-database-design.html"><span class="num">20</span>เจาะลึกการออกแบบฐานข้อมูล</a></li>
 </ul>
     </nav>
@@ -66,7 +64,7 @@
   <main class="content" id="content">
 <div class="chapter-head"><div class="kicker">บทที่ 10 · อุปกรณ์และหน้าจอ</div><h1>แอป Flutter ตอนที่ 1: โครงสร้าง ข้อมูล และ State</h1></div>
 <h2 id="ภาพรวม">ภาพรวม<a class="anchor" href="#ภาพรวม">#</a></h2>
-<p>แอป Flutter ชื่อ <code>cpe_air_remote</code> (ชื่อที่ผู้ใช้เห็นคือ <strong>RMUTT Save Energy</strong>) เป็นหน้าตาที่เจ้าหน้าที่ใช้สั่งแอร์และดูค่าไฟของอาคาร 16 จากมือถือ Android หรือคอมพิวเตอร์ Windows เวอร์ชันในโค้ดตอนนี้คือ <code>3.16.0+32</code> (ชื่อเวอร์ชัน <code>3.16.0</code> และหมายเลข build <code>32</code> ซึ่ง Android เรียกว่า versionCode, ขึ้นจาก <code>3.13.1+31</code> เมื่อ 14 ต.ค. 2569 หลังเพิ่ม unprovision และหน้าเฟิร์มแวร์บนเว็บ) เอกสาร <code>docs/study/03-flutter-app.md</code> ปรับเป็นเลขเดียวกันแล้ว ถ้าวันหลังตัวเลขไม่ตรงกัน ให้เชื่อ <code>pubspec.yaml</code></p>
+<p>แอป Flutter ชื่อ <code>cpe_air_remote</code> (ชื่อที่ผู้ใช้เห็นคือ <strong>RMUTT Save Energy</strong>) เป็นหน้าตาที่เจ้าหน้าที่ใช้สั่งแอร์และดูค่าไฟของอาคาร 16 จากมือถือ Android หรือคอมพิวเตอร์ Windows เวอร์ชันในโค้ดตอนนี้คือ <code>3.16.0+32</code> (ชื่อเวอร์ชัน <code>3.16.0</code> และหมายเลข build <code>32</code> ซึ่ง Android เรียกว่า versionCode) ถ้าเอกสารใดเขียนเลขไม่ตรงกัน ให้เชื่อ <code>pubspec.yaml</code></p>
 <p>แอป <strong>ไม่ต่อฐานข้อมูลและไม่ต่อ MQTT ตรง</strong> ทุกอย่างผ่าน REST API ของ Backend (Node.js) ผ่าน HTTPS ยกเว้นงานเดียวที่ไม่ผ่านเน็ตคือการตั้งค่า ESP32 ครั้งแรกผ่าน <strong>Bluetooth Low Energy (BLE)</strong> ตรงจากมือถือไปยังบอร์ด</p>
 <div class="code-block"><div class="hl"><pre><span></span><code> ESP32 (แอร์/เซนเซอร์)  &lt;--MQTT--&gt;  Mosquitto  &lt;--&gt;  Backend (Node.js) &lt;--&gt; MariaDB
         ^                                                ^
@@ -445,17 +443,17 @@
 <li><strong>enum</strong> <code>AirMode {auto, cool, dry, fan, heat}</code>, <code>FanSpeed {auto, low, medium, high, turbo}</code>, <code>SwingMode {auto, top, upper, middle, lower, bottom, off}</code> ชื่อ enum ตรงกับสตริงที่ Backend/เฟิร์มแวร์ใช้ (ส่งด้วย <code>.name</code>) และมี extension <code>.label</code> สำหรับข้อความที่แสดง</li>
 <li><strong>คลาส <code>AirConditioner</code></strong> ฟิลด์แบ่งเป็นกลุ่ม: ตัวตน (<code>id</code> = เลข air ในห้อง, <code>deviceId</code> เช่น <code>ESP32-XXXXXXXXXXXX</code>, <code>roomNumber</code>, <code>bleName</code>, <code>protocol</code> ค่าเริ่มต้น <code>HAIER_AC160</code>, <code>provisionStatus</code>, <code>mqttTopic</code>, <code>dailyOn/dailyOff</code>), สถานะออนไลน์ (<code>isOnline</code>, <code>lastSeenAt</code>), <strong>สถานะที่สั่ง</strong> (<code>isOn</code>, <code>temperature</code>, <code>mode</code>, <code>fanSpeed</code>, <code>verticalSwing</code>, <code>eco</code>, <code>turbo</code> ฯลฯ), <strong>ค่าที่วัดจริงจาก PZEM</strong> (<code>voltage</code>, <code>current</code>, <code>power</code>, <code>energyKwh</code>, <code>frequencyHz</code>, <code>powerFactor</code>, <code>pzemAvailable</code>), <code>isRunning</code> (แอร์กำลังกินไฟจริงหรือไม่) และกลุ่มปิดอัตโนมัติ (<code>autoOffEnabled</code>, <code>autoOffDeadlineAt</code>, <code>autoOffAttempts</code>, <code>autoOffInClass</code>)</li>
 <li><strong>ข้อควรจำ:</strong> <code>isOn</code> (คำสั่งล่าสุดที่ระบบส่ง ทั้งแบบยิง IR และแบบสายแอร์) กับ <code>isRunning</code> (กำลังไฟจริงจาก PZEM) เป็นคนละเรื่องกัน เพราะรีโมตอินฟราเรดไม่มีสัญญาณตอบกลับ และแม้บอร์ดสายแอร์จะอ่านสถานะจากสายได้ แอปก็ยังใช้กติกาเดียวกันทุกรุ่น <code>test/pzem_status_test.dart</code> ยืนยันว่าห้องนับแอร์ที่ "ทำงาน" จาก <code>isRunning</code> ไม่ใช่ <code>isOn</code></li>
-<li><strong>getter <code>isPoweredOn</code> (เพิ่ม 9 ต.ค.):</strong> <code>isOn || (pzemAvailable &amp;&amp; isRunning)</code> คือ "แอร์เปิดอยู่จริงไหม" ใช้แสดงผลบนหน้าจอแทน <code>isOn</code> แก้ปัญหาที่มีคนเปิดแอร์ด้วยรีโมตตัวจริง แล้วแอปขึ้นว่า "ปิดอยู่" ทั้งที่ PZEM วัดได้ว่ากินไฟ (เกณฑ์ ≥ 30 W ติดกัน 3 ครั้งจากเฟิร์มแวร์) ดูรายละเอียดในหัวข้อถัดไป</li>
+<li><strong>getter <code>isPoweredOn</code>:</strong> <code>isOn || (pzemAvailable &amp;&amp; isRunning)</code> คือ "แอร์เปิดอยู่จริงไหม" ใช้แสดงผลบนหน้าจอแทน <code>isOn</code> แก้ปัญหาที่มีคนเปิดแอร์ด้วยรีโมตตัวจริง แล้วแอปขึ้นว่า "ปิดอยู่" ทั้งที่ PZEM วัดได้ว่ากินไฟ (เกณฑ์ ≥ 30 W ติดกัน 3 ครั้งจากเฟิร์มแวร์) ดูรายละเอียดในหัวข้อถัดไป</li>
 <li><strong>getter สิทธิ์ควบคุม:</strong> <code>canControl =&gt; isProvisioned &amp;&amp; isOnline &amp;&amp; deviceId != null</code></li>
-<li><strong>ยี่ห้อและวิธีควบคุม (เพิ่ม 11 ต.ค. 2569):</strong> ฟังก์ชันนอกคลาส <code>airBrandOf(protocol)</code> / <code>airControlTypeOf(protocol)</code> และ getter <code>isWired</code>, <code>brand</code>, <code>controlTypeLabel</code> แยกแอร์ที่ <strong>ยิง IR</strong> ออกจากแอร์ที่ <strong>ต่อสายแอร์ Daikin</strong> (<code>protocol = 'DAIKIN_WIRED'</code>) ดูหัวข้อย่อยถัดไป</li>
-<li><strong>ข้อจำกัดตามโปรโตคอล:</strong> <code>isSaijoDenki</code> (<code>protocol == 'SAIJO_DENKI'</code>) ทำให้ <code>minimumTemperature</code>/<code>maximumTemperature</code> เป็น 18/29 (ปกติ 16/30), <code>supportedModes</code> เหลือ cool/dry/fan, <code>supportedSwingModes</code> มี upper/lower แต่ไม่มี off และ <code>supportsAdditionalFunctions</code> เป็นเท็จ ส่วน <code>isWired</code> (แก้ 11 ต.ค.) จำกัดโหมดเป็น cool/dry/fan พัดลมไม่มี turbo สวิงมีแค่ auto/off และฟังก์ชันเสริมเหลือ Sleep ผ่าน getter รายตัว <code>supportsEco</code>, <code>supportsSleep</code> ฯลฯ <code>normalizeForProtocol()</code> ถูกเรียกใน constructor และ <code>copyStateFrom</code> เพื่อบังคับค่าให้อยู่ในขอบเขต (<code>test/saijo_denki_support_test.dart</code>, <code>test/daikin_wired_support_test.dart</code>)</li>
+<li><strong>ยี่ห้อและวิธีควบคุม:</strong> ฟังก์ชันนอกคลาส <code>airBrandOf(protocol)</code> / <code>airControlTypeOf(protocol)</code> และ getter <code>isWired</code>, <code>brand</code>, <code>controlTypeLabel</code> แยกแอร์ที่ <strong>ยิง IR</strong> ออกจากแอร์ที่ <strong>ต่อสายแอร์ Daikin</strong> (<code>protocol = 'DAIKIN_WIRED'</code>) ดูหัวข้อย่อยถัดไป</li>
+<li><strong>ข้อจำกัดตามโปรโตคอล:</strong> <code>isSaijoDenki</code> (<code>protocol == 'SAIJO_DENKI'</code>) ทำให้ <code>minimumTemperature</code>/<code>maximumTemperature</code> เป็น 18/29 (ปกติ 16/30), <code>supportedModes</code> เหลือ cool/dry/fan, <code>supportedSwingModes</code> มี upper/lower แต่ไม่มี off และ <code>supportsAdditionalFunctions</code> เป็นเท็จ ส่วน <code>isWired</code> จำกัดโหมดเป็น cool/dry/fan พัดลมไม่มี turbo สวิงมีแค่ auto/off และฟังก์ชันเสริมเหลือ Sleep ผ่าน getter รายตัว <code>supportsEco</code>, <code>supportsSleep</code> ฯลฯ <code>normalizeForProtocol()</code> ถูกเรียกใน constructor และ <code>copyStateFrom</code> เพื่อบังคับค่าให้อยู่ในขอบเขต (<code>test/saijo_denki_support_test.dart</code>, <code>test/daikin_wired_support_test.dart</code>)</li>
 <li><code>toCommandJson()</code> สร้าง body ของ <code>POST /air-conditioners/:deviceId/command</code></li>
 <li><code>editableCopy()</code> ทำสำเนาไว้ให้หน้าจอแก้ค่าก่อนกดยืนยัน <code>copyStateFrom(other)</code> คัดลอกเฉพาะฟิลด์สถานะสั่งการกลับ</li>
 <li>ฟังก์ชันช่วยส่วนตัว <code>_enumByName</code>, <code>_string</code>, <code>_int</code>, <code>_nullableInt</code>, <code>_double</code> แปลงค่าจาก JSON อย่างปลอดภัย (ดูบรรทัดต่อบรรทัดในหัวข้อเจาะโค้ด)</li>
 <li>ใช้โดย <code>AirConditionerService</code>, <code>AirConditionerController</code>, <code>Room.airConditioners</code> และหน้าควบคุมแอร์</li>
 </ul>
-<h5>บอร์ดสายแอร์ Daikin: ยี่ห้อ วิธีควบคุม และฟังก์ชันที่ทำได้ (เพิ่ม 11 ต.ค. 2569)</h5>
-<p>ตั้งแต่ commit <code>a5a227f</code> ระบบมีบอร์ดรุ่นที่สองคือ <code>rmutt_esp32_air_wired</code> ซึ่ง <strong>ไม่ยิงอินฟราเรด</strong> แต่ต่อเข้ากับสายสัญญาณของแอร์ Daikin แทนรีโมตติดผนัง (คุยด้วยโปรโตคอลของสายแอร์ ดูบทเฟิร์มแวร์) ในฐานข้อมูลแอร์แบบนี้มี <code>protocol = 'DAIKIN_WIRED'</code> แอปไม่ได้เพิ่มฟิลด์ใหม่ในโมเดลแอร์ แต่ <strong>อนุมานยี่ห้อและวิธีควบคุมจาก <code>protocol</code></strong> ด้วยฟังก์ชันระดับบนสุด (top-level function คือฟังก์ชันที่อยู่นอกคลาส เรียกได้โดยไม่ต้องมี object) สองตัว</p>
+<h5>บอร์ดสายแอร์ Daikin: ยี่ห้อ วิธีควบคุม และฟังก์ชันที่ทำได้</h5>
+<p>ระบบมีบอร์ดแอร์สองรุ่น รุ่นที่สองคือ <code>rmutt_esp32_air_wired</code> ซึ่ง <strong>ไม่ยิงอินฟราเรด</strong> แต่ต่อเข้ากับสายสัญญาณของแอร์ Daikin แทนรีโมตติดผนัง (คุยด้วยโปรโตคอลของสายแอร์ ดูบทเฟิร์มแวร์) ในฐานข้อมูลแอร์แบบนี้มี <code>protocol = 'DAIKIN_WIRED'</code> แอปไม่ได้เพิ่มฟิลด์ใหม่ในโมเดลแอร์ แต่ <strong>อนุมานยี่ห้อและวิธีควบคุมจาก <code>protocol</code></strong> ด้วยฟังก์ชันระดับบนสุด (top-level function คือฟังก์ชันที่อยู่นอกคลาส เรียกได้โดยไม่ต้องมี object) สองตัว</p>
 <p><strong>ไฟล์ <code>lib/models/air_conditioner.dart</code> บรรทัด 39–72</strong></p>
 <div class="code-block"><span class="code-lang">dart</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">39</span>
 <span class="normal">40</span>
@@ -708,7 +706,7 @@
 <tbody>
 <tr>
 <td>281</td>
-<td>getter เดิม: Saijo Denki ไม่มีฟังก์ชันเสริมเลย (ยังใช้อยู่เป็นเงื่อนไขพื้นฐาน)</td>
+<td>getter พื้นฐาน: Saijo Denki ไม่มีฟังก์ชันเสริมเลย getter อื่นใช้เป็นเงื่อนไขร่วม</td>
 </tr>
 <tr>
 <td>284–286</td>
@@ -724,7 +722,7 @@
 </tr>
 </tbody>
 </table></div>
-<div class="callout why"><div class="callout-title">ทำไม</div><p><strong>ทำไมแตก <code>supportsAdditionalFunctions</code> ตัวเดียวเป็น 7 getter</strong> เดิมมีแค่สองกรณี คือ "มีครบ 7 อย่าง" (IR ทั่วไป) กับ "ไม่มีเลย" (Saijo) บูลีนตัวเดียวจึงพอ แต่สายแอร์ Daikin มี <strong>บางอย่าง</strong> (Sleep อย่างเดียว และมีเงื่อนไขตามโหมด) ถ้ายังใช้บูลีนตัวเดียว ต้องเลือกระหว่างซ่อน Sleep ที่ใช้ได้จริง หรือโชว์ปุ่ม Eco/Turbo ที่กดแล้วไม่มีผล การมี getter ต่อฟังก์ชันทำให้หน้าจอเขียน <code>if (air.supportsEco)</code> ได้ตรง ๆ และกติกาทั้งหมดอยู่ในโมเดลที่เดียว หน้าจอไม่ต้องรู้ว่าเป็นยี่ห้ออะไร</p></div>
+<div class="callout why"><div class="callout-title">ทำไม</div><p><strong>ทำไมต้องมี 7 getter ไม่ใช่ <code>supportsAdditionalFunctions</code> ตัวเดียว</strong> ถ้ามีแค่สองกรณี คือ "มีครบ 7 อย่าง" (IR ทั่วไป) กับ "ไม่มีเลย" (Saijo) บูลีนตัวเดียวก็พอ แต่สายแอร์ Daikin มี <strong>บางอย่าง</strong> (Sleep อย่างเดียว และมีเงื่อนไขตามโหมด) ถ้ายังใช้บูลีนตัวเดียว ต้องเลือกระหว่างซ่อน Sleep ที่ใช้ได้จริง หรือโชว์ปุ่ม Eco/Turbo ที่กดแล้วไม่มีผล การมี getter ต่อฟังก์ชันทำให้หน้าจอเขียน <code>if (air.supportsEco)</code> ได้ตรง ๆ และกติกาทั้งหมดอยู่ในโมเดลที่เดียว หน้าจอไม่ต้องรู้ว่าเป็นยี่ห้ออะไร</p></div>
 
 <p>สรุปเป็นตาราง (ตรงกับข้อความในหน้าตั้งค่าบลูทูธ "ใช้ได้: เปิด/ปิด, 16–30 °C, Cool / Dry / Fan, พัดลม Low / Medium / High / Auto, ส่าย เปิด/ปิด และ Sleep")</p>
 <div class="table-wrap"><table>
@@ -871,7 +869,7 @@
 <li>getter <code>runningAirCount</code>, <code>totalPower</code> (รวมเฉพาะแอร์ที่ <code>isRunning</code>), <code>displayedAirCount</code>, <code>hasOccupancySensor</code>, <code>isAutoOffPending</code></li>
 <li>คลาส <code>Room</code> ไม่ได้เป็น immutable เต็มตัว: <code>isOccupied</code>, <code>isOnline</code> และฟิลด์เซนเซอร์เป็น non-final เพื่อให้ Controller อัปเดตแบบแทนที่ค่าในที่เดิมโดยไม่ต้องสร้าง object ใหม่ทุกครั้ง (หน้าจอที่ถือ object เดิมอยู่จะเห็นค่าใหม่)</li>
 </ul>
-<h5>สถานะเปิด/ปิดจริง: <code>isPoweredOn</code> (อัปเดต 9 ต.ค. 2569)</h5>
+<h5>สถานะเปิด/ปิดจริง: <code>isPoweredOn</code></h5>
 <p><strong>ไฟล์ <code>lib/models/air_conditioner.dart</code> บรรทัด 226–231</strong></p>
 <div class="code-block"><span class="code-lang">dart</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">226</span>
 <span class="normal">227</span>
@@ -905,15 +903,15 @@
 </tr>
 </tbody>
 </table></div>
-<p>อีกสองจุดที่แก้คู่กัน:</p>
+<p>อีกสองจุดที่ทำงานคู่กับ <code>isPoweredOn</code>:</p>
 <ul>
-<li><strong><code>editableCopy()</code></strong> ตอนนี้สร้างร่างด้วย <code>isOn: isPoweredOn</code> ถ้าแอร์ถูกเปิดด้วยรีโมตจริง แล้วผู้ใช้กดปุ่ม + อุณหภูมิในแอป คำสั่งที่ส่งจะเป็น "เปิด 26°C" ไม่ใช่ "ปิด" (เดิมร่างเริ่มจาก <code>isOn = false</code> กดปรับอุณหภูมิจึงเผลอสั่งปิดแอร์)</li>
+<li><strong><code>editableCopy()</code></strong> สร้างร่างด้วย <code>isOn: isPoweredOn</code> ถ้าแอร์ถูกเปิดด้วยรีโมตจริง แล้วผู้ใช้กดปุ่ม + อุณหภูมิในแอป คำสั่งที่ส่งจะเป็น "เปิด 26°C" ไม่ใช่ "ปิด" (ถ้าร่างเริ่มจาก <code>isOn = false</code> การกดปรับอุณหภูมิจะกลายเป็นสั่งปิดแอร์โดยไม่ตั้งใจ)</li>
 <li><strong><code>copyStateFrom()</code></strong> ถ้าคำสั่งที่เพิ่งส่งเป็น "ปิด" จะตั้ง <code>isRunning = false</code> ทันที หน้าจอขึ้นว่าปิดเลยไม่ต้องรอ PZEM ราว 6 วินาที (3 รอบ × 2 วินาที) ถ้าแอร์ไม่ดับจริง รอบดึงข้อมูลถัดไปจะได้ <code>acRunning = true</code> กลับมาเอง</li>
 </ul>
 <div class="callout why"><div class="callout-title">ทำไม</div><p>รีโมตอินฟราเรดส่งทางเดียว ระบบจึงไม่มีทางรู้ว่ามีคนกดรีโมตตัวจริง แหล่งความจริงเดียวที่มีคือไฟฟ้าที่ PZEM วัดได้ การรวมสองแหล่ง (คำสั่ง OR กำลังไฟ) ทำให้หน้าจอตรงกับความจริงมากขึ้น และกันการสั่งผิดทาง</p></div>
 
 <div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> ถ้ามีคนเปิดแอร์ด้วยรีโมตจริง แอปจะรู้ไหม?</p>
-<p><strong>ตอบ:</strong> รู้ครับ (ตั้งแต่ 9 ต.ค.) ภายในราว 6 วินาทีที่ PZEM วัดได้ ≥ 30 W ติดกัน 3 ครั้ง บอร์ดส่ง <code>acRunning = true</code> แอปใช้ <code>isPoweredOn</code> ซึ่งเชื่อทั้งคำสั่งล่าสุดและค่าไฟจริง จึงขึ้นว่าเปิดอยู่ และถ้าผู้ใช้ปรับอุณหภูมิต่อ คำสั่งจะยังเป็น "เปิด" เว็บแอปใช้กติกาเดียวกัน แต่รู้แค่เปิด/ปิด ไม่รู้ว่าตั้งกี่องศาบนรีโมต</p></div>
+<p><strong>ตอบ:</strong> รู้ครับ ภายในราว 6 วินาทีที่ PZEM วัดได้ ≥ 30 W ติดกัน 3 ครั้ง บอร์ดส่ง <code>acRunning = true</code> แอปใช้ <code>isPoweredOn</code> ซึ่งเชื่อทั้งคำสั่งล่าสุดและค่าไฟจริง จึงขึ้นว่าเปิดอยู่ และถ้าผู้ใช้ปรับอุณหภูมิต่อ คำสั่งจะยังเป็น "เปิด" เว็บแอปใช้กติกาเดียวกัน แต่รู้แค่เปิด/ปิด ไม่รู้ว่าตั้งกี่องศาบนรีโมต</p></div>
 
 <h4 id="auth_userdart-remembered_logindart-admin_contactdart-managed_userdart--ผู้ใช้และคนติดต่อ"><code>auth_user.dart</code>, <code>remembered_login.dart</code>, <code>admin_contact.dart</code>, <code>managed_user.dart</code> — ผู้ใช้และคนติดต่อ<a class="anchor" href="#auth_userdart-remembered_logindart-admin_contactdart-managed_userdart--ผู้ใช้และคนติดต่อ">#</a></h4>
 <ul>
@@ -930,9 +928,8 @@
 <div class="callout why"><div class="callout-title">ทำไม</div><p><strong>ทำไมเทียบเวลาเป็นข้อความได้</strong> เพราะรูปแบบ <code>HH:mm</code> เติมศูนย์นำหน้าเสมอ ลำดับตามตัวอักษรจึงตรงกับลำดับเวลา (<code>'09:00' &lt; '12:00'</code>) ไม่ต้องแปลงเป็นนาที ข้อเสียคือถ้ามีใครส่ง <code>9:00</code> (ไม่มีศูนย์) จะเทียบผิด จึงต้องให้ Backend/ฟอร์มรับประกันรูปแบบ</p></div>
 
 <h4 id="schedule_importdart--นำเข้าตารางจาก-excel"><code>schedule_import.dart</code> — นำเข้าตารางจาก Excel<a class="anchor" href="#schedule_importdart--นำเข้าตารางจาก-excel">#</a></h4>
-<p><code>ScheduleImportEntry</code> (หนึ่งคาบที่อ่านจากไฟล์), <code>ScheduleImportRoom</code> (ห้องที่ยังไม่มีในระบบ ค่าสำรอง roomType <code>'Special'</code>), <code>ScheduleImportPreview</code> (ผลพรีวิวทั้งไฟล์: คาบ ห้อง ห้องใหม่ คำเตือน ชีตที่ข้าม csv) และ <code>ScheduleImportResult</code> (ผลหลังยืนยัน: <code>importedCount</code>, <code>replacedRooms</code>, <code>createdRooms</code>) จุดสำคัญคือ <code>withTerm(...)</code> สร้างสำเนาที่ติดภาคเรียนและช่วงวันที่ (<code>isoDate</code> → <code>yyyy-MM-dd</code>) และ <code>toCommitJson()</code> สร้าง body ของ <code>POST /schedules/import/commit</code>: <code>createMissingRooms</code> เป็นจริงเมื่อมีห้องใหม่, ใส่ <code>semester</code>/<code>startDate</code>/<code>endDate</code> เฉพาะเมื่อผู้ใช้เลือกภาคเรียนแล้ว (<code>test/schedule_import_test.dart</code>) ฟังก์ชัน <code>_strings</code> กรองลิสต์ให้เหลือเฉพาะ <code>String</code></p>
-<p>(เพิ่ม 9 ต.ค. 2569) <code>ScheduleImportPreview</code> มีฟิลด์ใหม่ <code>replaceAll</code> (ค่าเริ่มต้น <code>false</code>) และเมธอด <code>withReplaceAll(bool)</code> ที่สร้างสำเนาเหมือน <code>withTerm</code> <code>toCommitJson()</code> ใส่ <code>'replaceAll': true</code> เฉพาะตอนเลือก "เปลี่ยนภาคเรียน" (ใช้ collection-if <code>if (replaceAll) 'replaceAll': true</code>) เหตุผลเขียนไว้ในคอมเมนต์ของโค้ด: ไฟล์ของเทอมใหม่มักไม่มีชีตของห้องที่เทอมนี้ไม่มีเรียน ถ้าไม่ล้าง ห้องพวกนั้นจะค้างตารางเทอมเก่า และระบบปิดแอร์จะคิดว่ายังมีคาบ (รอ 15 นาทีแทน 5) รายละเอียดหน้าจออยู่ในบทหน้าจอผู้ดูแล</p>
-<h4 id="room_calendardart--ปฏิทินการใช้ห้องและภาคเรียน-ใหม่-9-ตค-2569-353-บรรทัด"><code>room_calendar.dart</code> — ปฏิทินการใช้ห้องและภาคเรียน (ใหม่ 9 ต.ค. 2569, 353 บรรทัด)<a class="anchor" href="#room_calendardart--ปฏิทินการใช้ห้องและภาคเรียน-ใหม่-9-ตค-2569-353-บรรทัด">#</a></h4>
+<p><code>ScheduleImportEntry</code> (หนึ่งคาบที่อ่านจากไฟล์), <code>ScheduleImportRoom</code> (ห้องที่ยังไม่มีในระบบ ค่าสำรอง roomType <code>'Special'</code>), <code>ScheduleImportPreview</code> (ผลพรีวิวทั้งไฟล์: คาบ ห้อง ห้องใหม่ คำเตือน ชีตที่ข้าม csv) และ <code>ScheduleImportResult</code> (ผลหลังยืนยัน: <code>importedCount</code>, <code>replacedRooms</code>, <code>createdRooms</code>) จุดสำคัญคือ <code>withTerm(...)</code> สร้างสำเนาที่ติดภาคเรียนและช่วงวันที่ (<code>isoDate</code> → <code>yyyy-MM-dd</code>) และ <code>toCommitJson()</code> สร้าง body ของ <code>POST /schedules/import/commit</code>: <code>createMissingRooms</code> เป็นจริงเมื่อมีห้องใหม่, ใส่ <code>semester</code>/<code>startDate</code>/<code>endDate</code> เฉพาะเมื่อผู้ใช้เลือกภาคเรียนแล้ว (<code>test/schedule_import_test.dart</code>) ฟังก์ชัน <code>_strings</code> กรองลิสต์ให้เหลือเฉพาะ <code>String</code> <code>ScheduleImportPreview</code> มีฟิลด์ใหม่ <code>replaceAll</code> (ค่าเริ่มต้น <code>false</code>) และเมธอด <code>withReplaceAll(bool)</code> ที่สร้างสำเนาเหมือน <code>withTerm</code> <code>toCommitJson()</code> ใส่ <code>'replaceAll': true</code> เฉพาะตอนเลือก "เปลี่ยนภาคเรียน" (ใช้ collection-if <code>if (replaceAll) 'replaceAll': true</code>) เหตุผลเขียนไว้ในคอมเมนต์ของโค้ด: ไฟล์ของเทอมใหม่มักไม่มีชีตของห้องที่เทอมนี้ไม่มีเรียน ถ้าไม่ล้าง ห้องพวกนั้นจะค้างตารางเทอมเก่า และระบบปิดแอร์จะคิดว่ายังมีคาบ (รอ 15 นาทีแทน 5) รายละเอียดหน้าจออยู่ในบทหน้าจอผู้ดูแล</p>
+<h4 id="room_calendardart--ปฏิทินการใช้ห้องและภาคเรียน-353-บรรทัด"><code>room_calendar.dart</code> — ปฏิทินการใช้ห้องและภาคเรียน (353 บรรทัด)<a class="anchor" href="#room_calendardart--ปฏิทินการใช้ห้องและภาคเรียน-353-บรรทัด">#</a></h4>
 <p>ไฟล์นี้เกิดขึ้นเพื่อให้แอปมือถือ "จัดการตารางเรียนได้เหมือนเว็บแอป" คอมเมนต์หัวไฟล์บอกตรง ๆ ว่าตรรกะวันที่ทั้งหมด <strong>เหมือนกับ Backend</strong> (<code>backend/src/utils/room-booking.js</code>) และเว็บแอป (<code>webapp/assets/js/views/booking-form.js</code>) ผลของทั้งสามฝั่งจึงตรงกัน</p>
 <div class="table-wrap"><table>
 <thead>
@@ -1340,7 +1337,7 @@
 </tr>
 <tr>
 <td><code>BleDeviceIdentity</code></td>
-<td>ตัวตนที่บอร์ดรายงานตอนเชื่อมต่อ: <code>deviceId</code>, <code>bleName</code>, <code>firmwareVersion</code>, <code>configured</code>, <code>deviceType</code> (ค่าสำรอง <code>air</code>), ห้อง/เลข air, Wi-Fi, MQTT, <code>dailyOn/dailyOff</code> และ <strong><code>hasWifiPassword</code>/<code>hasMqttPassword</code> (บูลีน ไม่ส่งรหัสจริงกลับมา)</strong> (เพิ่ม 11 ต.ค.) <code>controlType</code> (<code>ir</code>/<code>wired</code>), <code>brand</code> และ getter <code>isWired</code></td>
+<td>ตัวตนที่บอร์ดรายงานตอนเชื่อมต่อ: <code>deviceId</code>, <code>bleName</code>, <code>firmwareVersion</code>, <code>configured</code>, <code>deviceType</code> (ค่าสำรอง <code>air</code>), ห้อง/เลข air, Wi-Fi, MQTT, <code>dailyOn/dailyOff</code> และ <strong><code>hasWifiPassword</code>/<code>hasMqttPassword</code> (บูลีน ไม่ส่งรหัสจริงกลับมา)</strong> <code>controlType</code> (<code>ir</code>/<code>wired</code>), <code>brand</code> และ getter <code>isWired</code></td>
 </tr>
 <tr>
 <td><code>AirProvisioningRequest</code> / <code>AirProvisioningReservation</code></td>
@@ -1355,7 +1352,7 @@
 <p>JSON ที่เขียนลงบอร์ดมี <code>version: 1</code>, <code>token</code> (provisioning token), <code>wifi {ssid, password, keepPassword}</code>, <code>mqtt {host, port, username, password, keepPassword: false, topic, tls}</code> และของแอร์มี <code>schedule {dailyOn, dailyOff, timezone: 'Asia/Bangkok'}</code> เพิ่ม</p>
 <div class="callout why"><div class="callout-title">ทำไม</div><p><strong>ทำไมแอปต้อง "จอง" กับ Backend ก่อนเขียนลงบอร์ด</strong> ข้อมูล MQTT (host, ผู้ใช้, รหัส) และ token เป็นของที่ Backend เป็นผู้ออก แอปแค่ขนส่งผ่าน BLE ไปให้บอร์ดโดยไม่ต้องรู้จักรหัสล่วงหน้า และ token ทำให้บอร์ดยืนยันได้ว่าคำสั่งตั้งค่ามาจากการจองที่ชอบธรรม <code>keepWifiPassword</code> ใช้ตอนตั้งค่าซ้ำ ให้บอร์ดคงรหัส Wi-Fi เดิมโดยแอปไม่ต้องรู้รหัสนั้น</p></div>
 
-<h5><code>controlType</code> และ <code>brand</code> ใน identity ของบอร์ด (เพิ่ม 11 ต.ค. 2569)</h5>
+<h5><code>controlType</code> และ <code>brand</code> ใน identity ของบอร์ด</h5>
 <p>ตอนแอปอ่าน identity ผ่าน BLE บอร์ดบอกชนิดของตัวเองมาด้วย เฟิร์มแวร์สายแอร์ (<code>2.5.2-slm8</code>) ส่ง <code>controlType: "wired"</code> และ <code>brand: "Daikin"</code> ส่วนเฟิร์มแวร์ IR รุ่นใหม่ส่ง <code>controlType: "ir"</code> แอปใช้ค่านี้ตัดสินว่าหน้าตั้งค่าต้องล็อกยี่ห้อหรือให้เลือก (ดูบทหน้าจอผู้ดูแลระบบ)</p>
 <p><strong>ไฟล์ <code>lib/models/provisioning.dart</code> บรรทัด 83–86</strong></p>
 <div class="code-block"><span class="code-lang">dart</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">83</span>
@@ -1465,8 +1462,8 @@
 </tr>
 <tr>
 <td><code>ScheduleRepository</code> / <code>ScheduleService</code></td>
-<td><code>GET/POST/DELETE /schedules</code>, <code>PUT/DELETE /schedules/:id</code>, <code>POST /schedules/import/preview</code>, <code>POST /schedules/import/commit</code>, (เพิ่ม 9 ต.ค.) <code>GET/PUT/DELETE /schedules/terms</code>, <code>GET /bookings?from=&amp;to=</code>, <code>POST /bookings</code>, <code>PUT/DELETE /bookings/:id</code></td>
-<td><code>fetchScheduleBundle()</code> คืนตาราง + <code>timetable</code> ในคำขอเดียว ส่วน <code>fetchSchedules()</code> เดิมกลายเป็นตัวห่อที่เรียก <code>fetchScheduleBundle()</code> แล้วคืนแค่ <code>.schedules</code> (โค้ดเดิมที่เรียกไม่ต้องแก้)</td>
+<td><code>GET/POST/DELETE /schedules</code>, <code>PUT/DELETE /schedules/:id</code>, <code>POST /schedules/import/preview</code>, <code>POST /schedules/import/commit</code>, <code>GET/PUT/DELETE /schedules/terms</code>, <code>GET /bookings?from=&amp;to=</code>, <code>POST /bookings</code>, <code>PUT/DELETE /bookings/:id</code></td>
+<td><code>fetchScheduleBundle()</code> คืนตาราง + <code>timetable</code> ในคำขอเดียว ส่วน <code>fetchSchedules()</code> เป็นตัวห่อที่เรียก <code>fetchScheduleBundle()</code> แล้วคืนแค่ <code>.schedules</code></td>
 </tr>
 <tr>
 <td><code>SystemSettingsRepository</code> / <code>SystemSettingsService</code></td>
@@ -1598,9 +1595,9 @@
 <li><code>createRoom</code> / <code>updateRoom</code> / <code>deleteRoom</code> เรียก Repository แล้วอัปเดตลิสต์ในเครื่อง (ไม่ดึงใหม่ทั้งหมด) <code>updateRoom</code> คงค่าที่ Backend ไม่ส่งมา (แอร์ เซนเซอร์) จากห้องเดิม</li>
 <li><code>AirConditionerController.sendCommand/rename/remove</code> — <code>remove</code> ตามด้วย <code>refresh()</code> เต็มรอบ</li>
 </ul>
-<h4 id="schedule_controllerdart-ขยาย-9-ตค-2569-306-บรรทัด"><code>schedule_controller.dart</code> (ขยาย 9 ต.ค. 2569, 306 บรรทัด)<a class="anchor" href="#schedule_controllerdart-ขยาย-9-ตค-2569-306-บรรทัด">#</a></h4>
+<h4 id="schedule_controllerdart-306-บรรทัด"><code>schedule_controller.dart</code> (306 บรรทัด)<a class="anchor" href="#schedule_controllerdart-306-บรรทัด">#</a></h4>
 <p>เก็บ <code>_schedules</code> เป็น field ส่วนตัวและเปิดผ่าน getter ที่คืน <code>List.unmodifiable</code> (กันหน้าจอแก้ลิสต์ตรง ๆ) ต่างจาก Controller อื่นที่เปิดฟิลด์สาธารณะ มี <code>schedulesFor(room, day)</code> กรอง+เรียง, <code>createSchedule</code>/<code>updateSchedule</code>/<code>deleteSchedule</code>/<code>deleteAllSchedules</code> (อัปเดตลิสต์ในเครื่อง), <code>previewScheduleFile</code> (ส่งต่อ Repository), <code>importSchedulePreview</code> (เสร็จแล้ว <code>reload()</code> ทั้งหมด), <code>overlaps(...)</code> ตรวจเวลาทับกับคาบเดิมในห้อง/วันเดียวกันโดยข้าม <code>ignoredId</code> (ใช้ตอนแก้ไขคาบของตัวเอง) และ <code>_compare</code> เรียง วัน → ห้อง → เวลาเริ่ม → ชื่อวิชา</p>
-<p>ตั้งแต่ 9 ต.ค. Controller นี้ดูแลข้อมูลเพิ่มอีก 3 ชุด ทำให้หน้าตารางเรียนดูเป็น "วันที่จริง" ได้ ไม่ใช่แค่ "วันในสัปดาห์"</p>
+<p>นอกจากตารางเรียน Controller นี้ดูแลข้อมูลอีก 3 ชุด ทำให้หน้าตารางเรียนดูเป็น "วันที่จริง" ได้ ไม่ใช่แค่ "วันในสัปดาห์"</p>
 <div class="table-wrap"><table>
 <thead>
 <tr>
@@ -1938,13 +1935,13 @@
 <ul>
 <li><code>enum FileSaveStatus {saved, shared, cancelled, failed}</code> และ <code>FileSaveResult {status, path, error}</code> พร้อม <code>isSuccess</code></li>
 <li><code>saveExportFile({fileName, bytes, fileExtension = 'xlsx', mimeType = &lt;xlsx&gt;, typeLabel = 'Excel'})</code>: บน <strong>Android/iOS</strong> เขียนไฟล์ลงโฟลเดอร์ชั่วคราว (<code>getTemporaryDirectory</code>) แล้วเปิดเมนูแชร์ (<code>SharePlus.instance.share</code>) ให้ผู้ใช้เลือกปลายทางเอง (เก็บลงไฟล์/ไลน์/อีเมล); บน <strong>เดสก์ท็อป</strong> (Windows) เปิดกล่อง Save As (<code>getSaveLocation</code>) แล้วเติมนามสกุลถ้าขาด ข้อผิดพลาดทั้งหมดถูกจับเป็น <code>FileSaveStatus.failed</code></li>
-<li>(เปลี่ยน 9 ต.ค.) เดิมฟังก์ชันผูกกับ <code>.xlsx</code> ตายตัว ตอนนี้รับนามสกุล ชนิดไฟล์ (MIME) และชื่อกลุ่มไฟล์เป็นพารามิเตอร์ ค่าเริ่มต้นยังเป็น Excel ทุกตัว โค้ดเดิมที่เรียกแบบไม่ส่งพารามิเตอร์ (หน้าส่งออกพลังงาน) จึงทำงานเหมือนเดิม ส่วนหน้าตารางเรียนและหน้านำเข้าตารางเรียกด้วย <code>fileExtension: 'csv'</code>, <code>mimeType: 'text/csv'</code>, <code>typeLabel: 'CSV'</code></li>
+<li>รับนามสกุล ชนิดไฟล์ (MIME) และชื่อกลุ่มไฟล์เป็นพารามิเตอร์ ค่าเริ่มต้นเป็น Excel ทุกตัว หน้าส่งออกพลังงานเรียกแบบไม่ส่งพารามิเตอร์จึงได้ Excel ส่วนหน้าตารางเรียนและหน้านำเข้าตารางเรียกด้วย <code>fileExtension: 'csv'</code>, <code>mimeType: 'text/csv'</code>, <code>typeLabel: 'CSV'</code></li>
 <li><code>sanitizeFileName(value, {fileExtension = 'xlsx'})</code> แทนอักขระที่ระบบไฟล์ไม่รับ (<code>\ / : * ? " &lt; &gt; |</code>) ด้วย <code>_</code> และบีบช่องว่าง ชื่อภาษาไทยผ่านได้ ถ้าว่างใช้ <code>energy-export.&lt;นามสกุล&gt;</code></li>
 </ul>
-<div class="callout note"><div class="callout-title">หมายเหตุ</div><p>commit <code>ae96353</code> แก้ <code>acceptedTypeGroups: const [...]</code> เป็น <code>acceptedTypeGroups: [...]</code> เพราะตอนนี้ข้างในใช้ตัวแปร (<code>typeLabel</code>, <code>fileExtension</code>, <code>mimeType</code>) ซึ่งไม่ใช่ค่าคงที่ตอนคอมไพล์ จึงใส่ใน <code>const</code> ไม่ได้ (คอมไพล์ไม่ผ่าน) นี่คือตัวอย่างที่ CI (<code>flutter analyze</code>) จับได้ทันที</p></div>
+<div class="callout note"><div class="callout-title">หมายเหตุ</div><p><code>acceptedTypeGroups: [...]</code> ไม่มี <code>const</code> นำหน้า เพราะข้างในใช้ตัวแปร (<code>typeLabel</code>, <code>fileExtension</code>, <code>mimeType</code>) ซึ่งไม่ใช่ค่าคงที่ตอนคอมไพล์ ถ้าใส่ <code>const</code> จะคอมไพล์ไม่ผ่าน และ CI (<code>flutter analyze</code>) จะจับได้ทันที</p></div>
 
 <h4 id="thai_datedart--วันที่ไทย-พศ"><code>thai_date.dart</code> — วันที่ไทย (พ.ศ.)<a class="anchor" href="#thai_datedart--วันที่ไทย-พศ">#</a></h4>
-<p>ฟังก์ชันจัดรูป <code>formatDisplayDate</code> (<code>9 มิ.ย. 2569</code>), <code>formatDisplayDateTime</code>, <code>formatDayMonth</code>, <code>formatWeekdayShort</code> (เพิ่ม 9 ต.ค. ชื่อวันย่อ <code>จ</code>/<code>Mo</code> ใช้ใต้กราฟรายวัน ดัชนี <code>date.weekday % 7</code> เพื่อให้อาทิตย์ = 0), <code>formatMonthYear</code>, <code>formatNumericDate</code> (<code>09/06/2569</code>), <code>formatIsoDateText</code>, <code>displayYear</code>, <code>parseNumericDate</code> และปฏิทินเลือกวัน <code>showAppDatePicker</code> / <code>showAppDateRangePicker</code> / <code>AppDatePickerDialog</code> ที่แอปเขียนเอง (เพราะ <code>showDatePicker</code> ของ Flutter แสดงได้แค่ ค.ศ.) มีโหมดแตะปฏิทินหรือพิมพ์เอง ค่าคงที่ <code>buddhistEraOffset = 543</code> ไฟล์นี้ import <code>localized_material.dart</code> แทน <code>material.dart</code> ตรง ๆ เพื่อให้ <code>Text</code> ในปฏิทินถูกแปลอัตโนมัติ (รายละเอียดดูเจาะโค้ด)</p>
+<p>ฟังก์ชันจัดรูป <code>formatDisplayDate</code> (<code>9 มิ.ย. 2569</code>), <code>formatDisplayDateTime</code>, <code>formatDayMonth</code>, <code>formatWeekdayShort</code> (ชื่อวันย่อ <code>จ</code>/<code>Mo</code> ใช้ใต้กราฟรายวัน ดัชนี <code>date.weekday % 7</code> เพื่อให้อาทิตย์ = 0), <code>formatMonthYear</code>, <code>formatNumericDate</code> (<code>09/06/2569</code>), <code>formatIsoDateText</code>, <code>displayYear</code>, <code>parseNumericDate</code> และปฏิทินเลือกวัน <code>showAppDatePicker</code> / <code>showAppDateRangePicker</code> / <code>AppDatePickerDialog</code> ที่แอปเขียนเอง (เพราะ <code>showDatePicker</code> ของ Flutter แสดงได้แค่ ค.ศ.) มีโหมดแตะปฏิทินหรือพิมพ์เอง ค่าคงที่ <code>buddhistEraOffset = 543</code> ไฟล์นี้ import <code>localized_material.dart</code> แทน <code>material.dart</code> ตรง ๆ เพื่อให้ <code>Text</code> ในปฏิทินถูกแปลอัตโนมัติ (รายละเอียดดูเจาะโค้ด)</p>
 <h3 id="localization-และ-theme">Localization และ Theme<a class="anchor" href="#localization-และ-theme">#</a></h3>
 <h4 id="localizationapp_localizationsdart-1212-บรรทัด"><code>localization/app_localizations.dart</code> (1,212 บรรทัด)<a class="anchor" href="#localizationapp_localizationsdart-1212-บรรทัด">#</a></h4>
 <p>ตัวแปลภาษาที่เขียนเองทั้งหมด <strong>ไม่ใช้ไฟล์ <code>.arb</code>/<code>intl</code></strong> โครงสร้าง:</p>
@@ -1955,7 +1952,7 @@
 <li><code>_translateToEnglish(source)</code>: ค้นใน <code>_englishTranslations</code> (ประมาณ 70 รายการ บรรทัด 1092 เป็นต้นไป) <strong>กุญแจเป็นข้อความภาษาไทยที่ Backend ส่งมา</strong> เช่น <code>'Username หรือ Password ไม่ถูกต้อง'</code> → <code>'The username or password is incorrect.'</code> ไว้แปลข้อความผิดพลาดของ Backend เมื่อผู้ใช้เลือก English</li>
 <li>extension <code>AppLocalizationsBuildContext</code> ให้ <code>context.tr('...')</code> แปลในโค้ดที่ไม่ใช่ <code>Text</code></li>
 <li><code>_AppLocalizationsDelegate</code> ตัว <code>load</code> คืน <code>SynchronousFuture</code> (โหลดทันทีเพราะเป็น map ในหน่วยความจำ) และ <code>isSupported</code> เช็กรหัสภาษา</li>
-<li><strong>(เพิ่ม 11 ต.ค. 2569) ข้อความของบอร์ดสายแอร์ 13 รายการ:</strong> ฝั่งไทย 10 รายการอยู่บนสุดของ map ใต้คอมเมนต์ <code>// บอร์ดสายแอร์ / ยี่ห้อแอร์ (v3.16.0)</code> เช่น <code>'Wired'</code> → <code>'สายแอร์'</code>, <code>'IR remote'</code> → <code>'รีโมต IR'</code>, <code>'Set by the board'</code> → <code>'บอร์ดกำหนดให้'</code>, <code>'Board type: IR remote'</code> → <code>'ชนิดบอร์ด: รีโมต IR'</code> และข้อความยาวที่อธิบายว่าสายแอร์ใช้ฟังก์ชันอะไรได้ ฝั่งอังกฤษ 3 รายการแปล error ภาษาไทยของ Backend เช่น <code>'แอร์แบบสายแอร์ไม่มีพัดลมระดับ Turbo'</code> → <code>'Wired air conditioners have no Turbo fan speed.'</code> (รวม 23 บรรทัดที่เพิ่ม เพราะบางรายการยาวจนต้องขึ้นบรรทัดใหม่)</li>
+<li>** ข้อความของบอร์ดสายแอร์ 13 รายการ:** ฝั่งไทย 10 รายการอยู่บนสุดของ map ใต้คอมเมนต์ <code>// บอร์ดสายแอร์ / ยี่ห้อแอร์ (v3.16.0)</code> เช่น <code>'Wired'</code> → <code>'สายแอร์'</code>, <code>'IR remote'</code> → <code>'รีโมต IR'</code>, <code>'Set by the board'</code> → <code>'บอร์ดกำหนดให้'</code>, <code>'Board type: IR remote'</code> → <code>'ชนิดบอร์ด: รีโมต IR'</code> และข้อความยาวที่อธิบายว่าสายแอร์ใช้ฟังก์ชันอะไรได้ ฝั่งอังกฤษ 3 รายการแปล error ภาษาไทยของ Backend เช่น <code>'แอร์แบบสายแอร์ไม่มีพัดลมระดับ Turbo'</code> → <code>'Wired air conditioners have no Turbo fan speed.'</code> (รวม 23 บรรทัดที่เพิ่ม เพราะบางรายการยาวจนต้องขึ้นบรรทัดใหม่)</li>
 </ul>
 <h4 id="localizationlocalized_materialdart--text-ที่แปลให้เอง"><code>localization/localized_material.dart</code> — <code>Text</code> ที่แปลให้เอง<a class="anchor" href="#localizationlocalized_materialdart--text-ที่แปลให้เอง">#</a></h4>
 <div class="code-block"><span class="code-lang">dart</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">5</span>
@@ -2095,7 +2092,7 @@ flutter<span class="w"> </span>analyze<span class="w">          </span><span cla
 </code></pre></div>
 </div>
 
-<p>รวม <strong>122 เคส</strong> ใน 22 ไฟล์ (แก้ 11 ต.ค. 2569: นับด้วย <code>grep</code> บรรทัดที่ขึ้นต้นด้วย <code>test(</code> และ <code>testWidgets(</code> เดิม 119 เคสใน 21 ไฟล์ เพิ่ม <code>daikin_wired_support_test.dart</code> 3 เคส) เอกสาร <code>docs/study/03-flutter-app.md</code> ปรับเป็น 122 เคสใน 22 ไฟล์แล้ว (14 ต.ค. 2569) ตรงกับที่นับนี้ ทุกเทสต์รัน <strong>ออฟไลน์</strong> เพราะฉีด Repository/Store ปลอมแทนของจริง (นี่คือผลตอบแทนของการแยกชั้น)</p>
+<p>รวม <strong>122 เคส</strong> ใน 22 ไฟล์ (นับด้วย <code>grep</code> บรรทัดที่ขึ้นต้นด้วย <code>test(</code> และ <code>testWidgets(</code>) ทุกเทสต์รัน <strong>ออฟไลน์</strong> เพราะฉีด Repository/Store ปลอมแทนของจริง (นี่คือผลตอบแทนของการแยกชั้น)</p>
 <p>เทสต์มี 2 แบบ: <code>test(...)</code> คือเทสต์ฟังก์ชัน/คลาสธรรมดา (เร็ว ไม่มี UI) และ <code>testWidgets(...)</code> คือเทสต์ที่สร้างหน้าจอเสมือนแล้ว <code>tester.pumpWidget</code>, <code>tester.tap</code>, <code>find.text(...)</code></p>
 <div class="table-wrap"><table>
 <thead>
@@ -2134,7 +2131,7 @@ flutter<span class="w"> </span>analyze<span class="w">          </span><span cla
 <tr>
 <td><code>daikin_wired_support_test.dart</code></td>
 <td>3</td>
-<td>(ใหม่ 11 ต.ค.) แอร์ <code>DAIKIN_WIRED</code> ที่สร้างด้วยค่าที่รุ่นนี้ไม่มี (Heat, Turbo, สวิง middle, Eco/Quiet/Clean เปิด) ถูกปรับเป็น Cool, High, Auto และปิดฟังก์ชันเสริม แต่ Sleep ยังอยู่; เปลี่ยนเป็นโหมด Dry แล้ว <code>supportsSleep</code> เป็นเท็จและ Sleep ถูกปิด; แอร์ IR (<code>HAIER_AC160</code>) บอก <code>brand = Haier</code>, <code>controlTypeLabel = 'IR remote'</code>; <code>airBrandOf</code>/<code>airControlTypeOf</code> (ตัวพิมพ์เล็กก็ได้); identity BLE ที่มี <code>controlType: wired</code> กับ identity เฟิร์มแวร์เก่าที่ไม่มีช่องนี้ (= <code>ir</code>)</td>
+<td>แอร์ <code>DAIKIN_WIRED</code> ที่สร้างด้วยค่าที่รุ่นนี้ไม่มี (Heat, Turbo, สวิง middle, Eco/Quiet/Clean เปิด) ถูกปรับเป็น Cool, High, Auto และปิดฟังก์ชันเสริม แต่ Sleep ยังอยู่; เปลี่ยนเป็นโหมด Dry แล้ว <code>supportsSleep</code> เป็นเท็จและ Sleep ถูกปิด; แอร์ IR (<code>HAIER_AC160</code>) บอก <code>brand = Haier</code>, <code>controlTypeLabel = 'IR remote'</code>; <code>airBrandOf</code>/<code>airControlTypeOf</code> (ตัวพิมพ์เล็กก็ได้); identity BLE ที่มี <code>controlType: wired</code> กับ identity เฟิร์มแวร์เก่าที่ไม่มีช่องนี้ (= <code>ir</code>)</td>
 </tr>
 <tr>
 <td><code>energy_database_test.dart</code></td>
@@ -2149,7 +2146,7 @@ flutter<span class="w"> </span>analyze<span class="w">          </span><span cla
 <tr>
 <td><code>energy_usage_chart_test.dart</code></td>
 <td>14</td>
-<td>(ปรับ 9 ต.ค. ตามกราฟแท่ง) <code>EnergyChartGeometry</code> 5 เคส (แท่งอยู่กลางช่อง, ค่าสูงสุดบนสุด/ศูนย์ล่างสุด, ทุกค่าเป็นศูนย์ไม่หารศูนย์, จุดเดียวคืนว่าง, แตะตรงไหนของช่องก็ได้และไม่หลุดขอบ), <code>niceScaleMax</code> (3.56 → 4, 17.3 → 20, 0.42 → 0.5, 212 → 250, 0 → 1), <code>axisLabelsFor</code> 3 เคส (ทุก 6 ชม., 7 วันเป็นชื่อวัน, 30 วันเป็นวันที่ทุก 7 วัน + วันสุดท้าย) และวิดเจ็ต 5 เคส (ข้อมูลไม่พอ, แตะแล้วขึ้นค่า, แตะซ้ำปิด, แตะแท่งอื่นกล่องย้าย, เปลี่ยนช่วงแล้วไม่พัง)</td>
+<td><code>EnergyChartGeometry</code> 5 เคส (แท่งอยู่กลางช่อง, ค่าสูงสุดบนสุด/ศูนย์ล่างสุด, ทุกค่าเป็นศูนย์ไม่หารศูนย์, จุดเดียวคืนว่าง, แตะตรงไหนของช่องก็ได้และไม่หลุดขอบ), <code>niceScaleMax</code> (3.56 → 4, 17.3 → 20, 0.42 → 0.5, 212 → 250, 0 → 1), <code>axisLabelsFor</code> 3 เคส (ทุก 6 ชม., 7 วันเป็นชื่อวัน, 30 วันเป็นวันที่ทุก 7 วัน + วันสุดท้าย) และวิดเจ็ต 5 เคส (ข้อมูลไม่พอ, แตะแล้วขึ้นค่า, แตะซ้ำปิด, แตะแท่งอื่นกล่องย้าย, เปลี่ยนช่วงแล้วไม่พัง)</td>
 </tr>
 <tr>
 <td><code>mock_data_test.dart</code></td>
@@ -2169,12 +2166,12 @@ flutter<span class="w"> </span>analyze<span class="w">          </span><span cla
 <tr>
 <td><code>pzem_status_test.dart</code></td>
 <td>5</td>
-<td><code>isRunning</code> มาจาก PZEM ไม่ใช่คำสั่ง IR; (เพิ่ม 9 ต.ค.) แอร์ที่เปิดด้วยรีโมตจริงต้องขึ้นว่าเปิด และร่างคำสั่งต้องเริ่มจาก "เปิด", สั่งปิดแล้วหน้าจอขึ้นปิดทันที, ไม่มี PZEM ให้เชื่อคำสั่ง IR</td>
+<td><code>isRunning</code> มาจาก PZEM ไม่ใช่คำสั่ง IR; แอร์ที่เปิดด้วยรีโมตจริงต้องขึ้นว่าเปิด และร่างคำสั่งต้องเริ่มจาก "เปิด", สั่งปิดแล้วหน้าจอขึ้นปิดทันที, ไม่มี PZEM ให้เชื่อคำสั่ง IR</td>
 </tr>
 <tr>
 <td><code>room_calendar_test.dart</code></td>
 <td>11</td>
-<td>(ใหม่ 9 ต.ค.) ตัวช่วยวันที่ (วันในสัปดาห์/ต้นสัปดาห์ตรง Backend, บวกวันข้ามเดือนข้ามปี), <code>RoomBooking</code> (วันเดียว, รายสัปดาห์, รายวัน, JSON ที่ส่ง/อ่าน), <code>AcademicTerm</code> (รวมวันเปิดปิด, สถานะ, รูปแบบ <code>1/2569</code>), CSV ตารางเรียนนำกลับเข้ามาได้</td>
+<td>ตัวช่วยวันที่ (วันในสัปดาห์/ต้นสัปดาห์ตรง Backend, บวกวันข้ามเดือนข้ามปี), <code>RoomBooking</code> (วันเดียว, รายสัปดาห์, รายวัน, JSON ที่ส่ง/อ่าน), <code>AcademicTerm</code> (รวมวันเปิดปิด, สถานะ, รูปแบบ <code>1/2569</code>), CSV ตารางเรียนนำกลับเข้ามาได้</td>
 </tr>
 <tr>
 <td><code>saijo_denki_support_test.dart</code></td>
@@ -2209,7 +2206,7 @@ flutter<span class="w"> </span>analyze<span class="w">          </span><span cla
 <tr>
 <td><code>widget_test.dart</code></td>
 <td>7</td>
-<td>ทั้งแอปผ่าน <code>CpeAirRemoteApp</code> (login → dashboard → เมนูควบคุม), จำชื่อผู้ใช้, สลับภาษา/ธีม, ค่าไฟ, แอดมินเพิ่ม/แก้คาบเรียน (9 ต.ค. เพิ่มขั้น "เพิ่มการใช้ห้อง" ให้ห้อง 16302 แล้วตรวจว่าขึ้นในการ์ด), เพิ่ม/ลบห้อง CL503</td>
+<td>ทั้งแอปผ่าน <code>CpeAirRemoteApp</code> (login → dashboard → เมนูควบคุม), จำชื่อผู้ใช้, สลับภาษา/ธีม, ค่าไฟ, แอดมินเพิ่ม/แก้คาบเรียน, เพิ่มการใช้ห้องให้ห้อง 16302 แล้วตรวจว่าขึ้นในการ์ด, เพิ่ม/ลบห้อง CL503</td>
 </tr>
 <tr>
 <td><code>wifi_network_candidate_test.dart</code></td>
@@ -3521,8 +3518,8 @@ flutter<span class="w"> </span>analyze<span class="w">          </span><span cla
 </tr>
 </tbody>
 </table></div>
-<h3 id="9-เทสต์บอร์ดสายแอร์-testdaikin_wired_support_testdart-เพิ่ม-14-ตค-2569">9. เทสต์บอร์ดสายแอร์: <code>test/daikin_wired_support_test.dart</code> (เพิ่ม 14 ต.ค. 2569)<a class="anchor" href="#9-เทสต์บอร์ดสายแอร์-testdaikin_wired_support_testdart-เพิ่ม-14-ตค-2569">#</a></h3>
-<p>ไฟล์ใหม่ 83 บรรทัด 3 เคส มาพร้อม commit <code>a5a227f</code> ต่างจากเทสต์ในหัวข้อก่อนตรงที่ <strong>ไม่ต้องมีของปลอมเลย</strong> เพราะสิ่งที่ทดสอบคือกติกาในโมเดลล้วน ๆ (getter และ <code>normalizeForProtocol()</code>) ไม่ได้แตะ HTTP หรือที่เก็บข้อมูล จึงสร้าง object แล้วตรวจค่าได้ทันที</p>
+<h3 id="9-เทสต์บอร์ดสายแอร์-testdaikin_wired_support_testdart">9. เทสต์บอร์ดสายแอร์: <code>test/daikin_wired_support_test.dart</code><a class="anchor" href="#9-เทสต์บอร์ดสายแอร์-testdaikin_wired_support_testdart">#</a></h3>
+<p>ไฟล์ 83 บรรทัด 3 เคส ต่างจากเทสต์ในหัวข้อก่อนตรงที่ <strong>ไม่ต้องมีของปลอมเลย</strong> เพราะสิ่งที่ทดสอบคือกติกาในโมเดลล้วน ๆ (getter และ <code>normalizeForProtocol()</code>) ไม่ได้แตะ HTTP หรือที่เก็บข้อมูล จึงสร้าง object แล้วตรวจค่าได้ทันที</p>
 <p><strong>ไฟล์ <code>test/daikin_wired_support_test.dart</code> บรรทัด 6–30</strong> (เคสแรก: สร้างแอร์ด้วยค่าที่รุ่นนี้ทำไม่ได้)</p>
 <div class="code-block"><span class="code-lang">dart</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 6</span>
 <span class="normal"> 7</span>
@@ -3721,13 +3718,13 @@ flutter<span class="w"> </span>analyze<span class="w">          </span><span cla
 <div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม: แอปรู้ได้อย่างไรว่าแอร์ "ทำงานอยู่จริง" ทั้งที่สั่งด้วยรีโมตอินฟราเรดไม่มีสัญญาณตอบกลับ?</strong></p>
 <p>ตอบ: แยกสองค่า <code>isOn</code> คือคำสั่งที่สั่งล่าสุด ส่วน <code>isRunning</code> (<code>acRunning</code> ใน JSON) มาจากเซนเซอร์วัดไฟ PZEM-004T ที่ ESP32 อ่านจริงแล้วส่งขึ้นระบบ ห้องนับแอร์ที่ทำงานและกำลังไฟรวมจาก <code>isRunning</code> (<code>Room.runningAirCount</code>, <code>totalPower</code>) ไม่ใช่ <code>isOn</code> เทสต์ <code>pzem_status_test.dart</code> ยืนยัน</p></div>
 
-<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม: แอปรู้ได้อย่างไรว่าแอร์เครื่องไหนเป็นบอร์ดสายแอร์ Daikin และทำไมปุ่มบางปุ่มหายไป?</strong> (เพิ่ม 11 ต.ค. 2569)</p>
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม: แอปรู้ได้อย่างไรว่าแอร์เครื่องไหนเป็นบอร์ดสายแอร์ Daikin และทำไมปุ่มบางปุ่มหายไป?</strong></p>
 <p><strong>ตอบ:</strong> ดูจาก <code>protocol</code> ถ้าเป็น <code>DAIKIN_WIRED</code> ฟังก์ชัน <code>airControlTypeOf</code> คืน <code>'wired'</code> ทำให้ <code>isWired</code> เป็นจริง โมเดลจึงจำกัดโหมดเหลือ Cool/Dry/Fan พัดลม 4 ระดับไม่มี Turbo สวิงแค่ส่าย/หยุด และฟังก์ชันเสริมเหลือ Sleep (ใช้ไม่ได้ในโหมด Dry) เพราะบอร์ดนี้สั่งแอร์แทนรีโมตติดผนังของ Daikin ซึ่งมีปุ่มแค่นั้น หน้าจอถาม getter รายตัว เช่น <code>supportsEco</code> แล้วซ่อนปุ่มที่แอร์ทำไม่ได้ ส่วน <code>normalizeForProtocol()</code> ปรับร่างคำสั่งก่อนส่ง เพื่อไม่ให้ Backend ตอบ 400 ตอนตั้งค่าบอร์ด BLE บอร์ดเองก็บอก <code>controlType: "wired"</code> มาใน identity แอปจึงล็อกยี่ห้อให้</p></div>
 
-<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม: ทดสอบอย่างไรว่าบอร์ดสายแอร์ไม่ถูกส่งคำสั่งที่ทำไม่ได้ และบอร์ดเฟิร์มแวร์เก่ายังใช้ได้?</strong> (เพิ่ม 14 ต.ค. 2569)</p>
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม: ทดสอบอย่างไรว่าบอร์ดสายแอร์ไม่ถูกส่งคำสั่งที่ทำไม่ได้ และบอร์ดเฟิร์มแวร์เก่ายังใช้ได้?</strong></p>
 <p><strong>ตอบ:</strong> <code>test/daikin_wired_support_test.dart</code> มี 3 เคส เคสแรกสร้างแอร์ <code>DAIKIN_WIRED</code> ด้วยค่าที่ผิดเกือบทั้งหมด (Heat, Turbo, สวิง middle, Eco เปิด) แล้วตรวจว่าโมเดลปรับเป็น Cool, High, Auto และปิด Eco ให้เองโดยไม่ต้องเรียกอะไร เพราะ constructor เรียก <code>normalizeForProtocol()</code> จากนั้นสลับเป็นโหมด Dry เพื่อตรวจว่า Sleep ถูกปิด เคสสองตรวจว่าแอร์ IR ยังมีฟังก์ชันครบ เคสสามอ่าน identity BLE ทั้งแบบที่มี <code>controlType: "wired"</code> และแบบเฟิร์มแวร์ 2.4.1 ที่ไม่มีช่องนี้ ซึ่งต้องได้ <code>ir</code> ทั้งหมดรันออฟไลน์ ไม่ต้องมีบอร์ดจริง</p></div>
 
-<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม: ทำไม Backend ส่ง <code>controlType</code> มาแล้ว แต่แอปยังคำนวณเองจาก <code>protocol</code>?</strong> (เพิ่ม 14 ต.ค. 2569)</p>
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม: ทำไม Backend ส่ง <code>controlType</code> มาแล้ว แต่แอปยังคำนวณเองจาก <code>protocol</code>?</strong></p>
 <p><strong>ตอบ:</strong> เพราะค่า <code>controlType</code> ของ Backend ก็คำนวณจาก <code>protocol</code> อยู่แล้ว ถ้าแอปเก็บสองค่าแยกกันจะมีโอกาสขัดกันเอง (เช่น <code>HAIER_AC160</code> แต่ <code>wired</code>) การมีแหล่งความจริงเดียวคือ <code>protocol</code> ทำให้ไม่ต้องคิดว่าจะเชื่อค่าไหน และวิดเจ็ตที่รู้แค่ข้อความ <code>protocol</code> (เช่น <code>AirControlBadge</code>) ก็เรียก <code>airControlTypeOf</code> ได้เลย</p></div>
 
 <div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม: แอปดึงข้อมูลบ่อยแค่ไหน และทำไมไม่ใช้ WebSocket?</strong></p>
@@ -3757,9 +3754,9 @@ flutter<span class="w"> </span>analyze<span class="w">          </span><span cla
 <li class="check"><input type="checkbox"> บอกที่เก็บข้อมูลของแอป (<code>flutter_secure_storage</code>) และคีย์สำคัญ รวมถึงสิ่งที่ "ไม่มี" ใน pubspec</li>
 <li class="check"><input type="checkbox"> อธิบายความหมายของ <code>?</code>, <code>??</code>, <code>?.</code>, <code>!</code>, <code>??=</code>, <code>late final</code>, <code>factory</code>, <code>implements</code>, <code>abstract interface class</code>, <code>..</code> ได้พร้อมตัวอย่างจากโปรเจกต์</li>
 <li class="check"><input type="checkbox"> อธิบาย <code>fromJson</code> ของ <code>AirConditioner</code> ได้ รวมถึงเหตุผลของค่าสำรองและ <code>_enumByName</code></li>
-<li class="check"><input type="checkbox"> (เพิ่ม 11 ต.ค.) บอกได้ว่า <code>airBrandOf</code>/<code>airControlTypeOf</code> อนุมานยี่ห้อและวิธีควบคุมจาก <code>protocol</code> อย่างไร และสายแอร์ Daikin (<code>DAIKIN_WIRED</code>) ทำอะไรได้/ไม่ได้เทียบกับ IR และ Saijo Denki</li>
-<li class="check"><input type="checkbox"> (เพิ่ม 14 ต.ค. 2569) อธิบายได้ว่าทำไมต้องมี getter รายฟังก์ชัน (<code>supportsEco</code>, <code>supportsSleep</code> ฯลฯ) แทน <code>supportsAdditionalFunctions</code> ตัวเดียว และทำไม <code>supportsSleep</code> เปลี่ยนตามโหมด</li>
-<li class="check"><input type="checkbox"> (เพิ่ม 14 ต.ค. 2569) เล่าได้ว่า <code>daikin_wired_support_test.dart</code> ตรวจอะไร 3 เคส และทำไมเคส identity ของเฟิร์มแวร์ 2.4.1 (ไม่มี <code>controlType</code>) สำคัญ</li>
+<li class="check"><input type="checkbox"> บอกได้ว่า <code>airBrandOf</code>/<code>airControlTypeOf</code> อนุมานยี่ห้อและวิธีควบคุมจาก <code>protocol</code> อย่างไร และสายแอร์ Daikin (<code>DAIKIN_WIRED</code>) ทำอะไรได้/ไม่ได้เทียบกับ IR และ Saijo Denki</li>
+<li class="check"><input type="checkbox"> อธิบายได้ว่าทำไมต้องมี getter รายฟังก์ชัน (<code>supportsEco</code>, <code>supportsSleep</code> ฯลฯ) แทน <code>supportsAdditionalFunctions</code> ตัวเดียว และทำไม <code>supportsSleep</code> เปลี่ยนตามโหมด</li>
+<li class="check"><input type="checkbox"> เล่าได้ว่า <code>daikin_wired_support_test.dart</code> ตรวจอะไร 3 เคส และทำไมเคส identity ของเฟิร์มแวร์ 2.4.1 (ไม่มี <code>controlType</code>) สำคัญ</li>
 <li class="check"><input type="checkbox"> บอกรอบ polling ของแต่ละ Controller และหลักการ <code>_inFlight</code>/<code>silent</code></li>
 <li class="check"><input type="checkbox"> อธิบาย optimistic update ของ <code>SystemSettingsController</code> พร้อมทางถอยกลับ</li>
 <li class="check"><input type="checkbox"> อธิบาย <code>AlertPreferences</code> (สวิตช์หลัก, รายชนิด, <code>unknown</code>, <code>freshAlerts</code> ไม่เด้งรอบแรก) และสถานะจริงของการแจ้งเตือนบนเครื่อง</li>

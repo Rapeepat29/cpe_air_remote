@@ -55,10 +55,8 @@
 <li><a href="17-glossary.html"><span class="num">17</span>อภิธานศัพท์</a></li>
 <li><a href="18-file-map.html"><span class="num">18</span>แผนที่ไฟล์ทั้งโปรเจค</a></li>
 </ul>
-<div class="nav-part">งานที่กำลังพัฒนา</div><ul>
-<li><a href="19-daikin-slm8.html"><span class="num">19</span>แอร์ Daikin ผ่านสาย SLM8: จากการแกะโปรโตคอลถึงบอร์ดสายแอร์</a></li>
-</ul>
 <div class="nav-part">เจาะลึก</div><ul>
+<li><a href="19-daikin-slm8.html"><span class="num">19</span>แอร์ Daikin ผ่านสาย SLM8: จากการแกะโปรโตคอลถึงบอร์ดสายแอร์</a></li>
 <li><a href="20-database-design.html"><span class="num">20</span>เจาะลึกการออกแบบฐานข้อมูล</a></li>
 </ul>
     </nav>
@@ -163,27 +161,27 @@ Service / Repository  → HTTP → Backend Node.js → MQTT (Mosquitto) → ESP3
 </tr>
 <tr>
 <td><code>lib/screens/schedule_screen.dart</code></td>
-<td>แท็บตารางเรียน: เลื่อนทีละสัปดาห์ เลือกวันที่และชั้น ดูคาบเรียน + การใช้ห้อง (ประชุม สอบ กิจกรรม) สถานะภาคเรียน ดาวน์โหลด CSV (ขยาย 9 ต.ค.)</td>
+<td>แท็บตารางเรียน: เลื่อนทีละสัปดาห์ เลือกวันที่และชั้น ดูคาบเรียน + การใช้ห้อง (ประชุม สอบ กิจกรรม) สถานะภาคเรียน ดาวน์โหลด CSV</td>
 </tr>
 <tr>
 <td><code>lib/screens/booking_editor_screen.dart</code></td>
-<td>(ใหม่ 9 ต.ค.) ฟอร์มเต็มจอเพิ่ม/แก้การใช้ห้อง ทำซ้ำ วันเดียว/ทุกวัน/ทุกสัปดาห์/ในตารางเรียน</td>
+<td>ฟอร์มเต็มจอเพิ่ม/แก้การใช้ห้อง ทำซ้ำ วันเดียว/ทุกวัน/ทุกสัปดาห์/ในตารางเรียน</td>
 </tr>
 <tr>
 <td><code>lib/screens/term_calendar_screen.dart</code></td>
-<td>(ใหม่ 9 ต.ค.) ปฏิทินภาคเรียน: เพิ่ม/แก้/ลบวันเปิด–ปิดของแต่ละเทอม</td>
+<td>ปฏิทินภาคเรียน: เพิ่ม/แก้/ลบวันเปิด–ปิดของแต่ละเทอม</td>
 </tr>
 <tr>
 <td><code>lib/widgets/air_control_card.dart</code></td>
-<td>การ์ดแอร์ 1 เครื่อง: ปรับอุณหภูมิ เปิด/ปิด โหมด พัดลม สวิง, กำลังไฟ, ป้ายนับถอยหลัง, เมนูแอดมิน และ (11 ต.ค.) ป้ายยี่ห้อ·วิธีควบคุม</td>
+<td>การ์ดแอร์ 1 เครื่อง: ปรับอุณหภูมิ เปิด/ปิด โหมด พัดลม สวิง, กำลังไฟ, ป้ายนับถอยหลัง, เมนูแอดมิน และ ป้ายยี่ห้อ·วิธีควบคุม</td>
 </tr>
 <tr>
 <td><code>lib/widgets/full_remote_sheet.dart</code></td>
-<td>รีโมตเต็มรูปแบบแบบแผ่นเลื่อนขึ้นจากล่าง (bottom sheet) ปรับทุกค่าแล้วกดส่งครั้งเดียว (11 ต.ค.) แสดงเฉพาะปุ่มที่แอร์เครื่องนั้นทำได้จริง</td>
+<td>รีโมตเต็มรูปแบบแบบแผ่นเลื่อนขึ้นจากล่าง (bottom sheet) ปรับทุกค่าแล้วกดส่งครั้งเดียว แสดงเฉพาะปุ่มที่แอร์เครื่องนั้นทำได้จริง</td>
 </tr>
 <tr>
 <td><code>lib/widgets/air_control_badge.dart</code></td>
-<td>(ใหม่ 11 ต.ค.) ป้ายเล็ก "Daikin · สายแอร์" / "Haier · รีโมต IR" บอกยี่ห้อและวิธีที่บอร์ดสั่งแอร์</td>
+<td>ป้ายเล็ก "Daikin · สายแอร์" / "Haier · รีโมต IR" บอกยี่ห้อและวิธีที่บอร์ดสั่งแอร์</td>
 </tr>
 <tr>
 <td><code>lib/widgets/auto_off_countdown.dart</code></td>
@@ -191,7 +189,7 @@ Service / Repository  → HTTP → Backend Node.js → MQTT (Mosquitto) → ESP3
 </tr>
 <tr>
 <td><code>lib/widgets/energy_usage_chart.dart</code></td>
-<td>กราฟแท่งพลังงาน (เดิมเป็นกราฟเส้น เปลี่ยน 9 ต.ค.) วาดเองด้วย <code>CustomPainter</code> ป้ายเฉพาะแท่งสูงสุด เส้นเฉลี่ย แตะ/ลากดูรายละเอียดได้</td>
+<td>กราฟแท่งพลังงาน วาดเองด้วย <code>CustomPainter</code> ป้ายเฉพาะแท่งสูงสุด เส้นเฉลี่ย แตะ/ลากดูรายละเอียดได้</td>
 </tr>
 <tr>
 <td><code>lib/widgets/period_selector.dart</code></td>
@@ -1126,8 +1124,8 @@ Widget เป็น "พิมพ์เขียว" ที่ไม่เปล
 <p><code>ChangeBadge</code> (อยู่ในไฟล์เดียวกัน): ถ้า <code>changePercent == null</code> แสดง "No earlier data to compare" ไม่งั้นแสดงลูกศรลง (สีเขียว เมื่อ ≤ 0) หรือขึ้น (สีแดง) พร้อมเปอร์เซ็นต์ ค่า ≥ 10 ไม่มีทศนิยม ค่า &lt; 10 มีทศนิยม 1 ตำแหน่ง</p>
 <div class="callout tip"><div class="callout-title">เคล็ดลับ · <span class="ct">สีเขียวแปลว่า "ใช้ไฟลดลง"</span></div><p>ในแอปประหยัดพลังงาน การใช้ไฟลดลงคือข่าวดี จึงใช้สีเขียวกับลูกศรลง และสีแดงกับลูกศรขึ้น ตรงข้ามกับกราฟหุ้น</p></div>
 
-<h2 id="energyusagechart--กราฟแท่งพลังงาน-เปลี่ยนจากกราฟเส้น-9-ตค-2569">EnergyUsageChart — กราฟแท่งพลังงาน (เปลี่ยนจากกราฟเส้น 9 ต.ค. 2569)<a class="anchor" href="#energyusagechart--กราฟแท่งพลังงาน-เปลี่ยนจากกราฟเส้น-9-ตค-2569">#</a></h2>
-<div class="callout note"><div class="callout-title">หมายเหตุ</div><p><strong>เปลี่ยนอะไร (commit <code>f82b38a</code> "หน้าสถิติ: เปลี่ยนกราฟเส้นเป็นกราฟแท่ง (แบบ 1)")</strong> เดิมเป็นกราฟเส้นโค้งที่มีป้ายตัวเลขเหนือทุกจุด พอเลือก "วันนี้" (24 จุด) หรือ "30 วัน" ป้ายเบียดกันจนต้องข้ามบางป้าย และช่วงที่ไม่ใช้ไฟมีป้าย <code>0.00 kWh</code> ซ้ำเต็มแกน รุ่นใหม่เป็น <strong>กราฟแท่ง หนึ่งแท่งต่อหนึ่งชั่วโมงหรือหนึ่งวัน</strong> ไฟล์ <code>lib/widgets/energy_usage_chart.dart</code> เขียนใหม่เกือบทั้งไฟล์ (ตอนนี้ 579 บรรทัด) และหน้าสถิติเพิ่มความสูงกล่องกราฟจาก 162 เป็น 190 px</p></div>
+<h2 id="energyusagechart--กราฟแท่งพลังงาน">EnergyUsageChart — กราฟแท่งพลังงาน<a class="anchor" href="#energyusagechart--กราฟแท่งพลังงาน">#</a></h2>
+<div class="callout note"><div class="callout-title">หมายเหตุ</div><p><strong>ทำไมเป็นกราฟแท่ง</strong> หน้าสถิติแสดง <strong>หนึ่งแท่งต่อหนึ่งชั่วโมงหรือหนึ่งวัน</strong> (<code>lib/widgets/energy_usage_chart.dart</code> 579 บรรทัด กล่องกราฟสูง 190 px) ถ้าใช้กราฟเส้นที่มีป้ายตัวเลขเหนือทุกจุด พอเลือก "วันนี้" (24 จุด) หรือ "30 วัน" ป้ายจะเบียดกันจนต้องข้ามบางป้าย และช่วงที่ไม่ใช้ไฟจะมีป้าย <code>0.00 kWh</code> ซ้ำเต็มแกน</p></div>
 
 <h3 id="หลักการออกแบบ-5-ข้อ-จากคอมเมนต์หัวคลาส">หลักการออกแบบ 5 ข้อ (จากคอมเมนต์หัวคลาส)<a class="anchor" href="#หลักการออกแบบ-5-ข้อ-จากคอมเมนต์หัวคลาส">#</a></h3>
 <div class="table-wrap"><table>
@@ -1562,7 +1560,7 @@ Widget เป็น "พิมพ์เขียว" ที่ไม่เปล
 </table></div>
 <div class="callout why"><div class="callout-title">ทำไม</div><p><strong>ทำไมแยกพิกัดเป็นคลาสกลาง</strong> ถ้าตัววาดกับตัวรับสัมผัสคำนวณพิกัดแยกกัน วันหนึ่งที่แก้ระยะขอบที่เดียว แท่งที่แตะได้จะเลื่อนไม่ตรงกับแท่งที่เห็น (คอมเมนต์ในโค้ดเขียนเหตุผลนี้ไว้) การมีสูตรเดียวทำให้เทสต์พิกัดได้โดยไม่ต้องวาดจริง เช่น เทสต์ "แตะตรงไหนของช่องก็ได้แท่งของช่องนั้น และไม่หลุดขอบ"</p></div>
 
-<div class="callout note"><div class="callout-title">หมายเหตุ</div><p>เทียบกับรุ่นกราฟเส้น: เดิม <code>_selectAt</code> วนหาจุดที่ใกล้นิ้วที่สุด (O(n) ทุกครั้งที่ลาก) รุ่นใหม่ใช้ <code>indexAt</code> คำนวณตรง ๆ ด้วยการหารครั้งเดียว (O(1)) เพราะแท่งเรียงห่างเท่ากันเสมอ</p></div>
+<div class="callout note"><div class="callout-title">หมายเหตุ</div><p><code>indexAt</code> คำนวณแท่งที่นิ้วแตะตรง ๆ ด้วยการหารครั้งเดียว (O(1)) เพราะแท่งเรียงห่างเท่ากันเสมอ ไม่ต้องวนหาจุดที่ใกล้นิ้วที่สุดทุกครั้งที่ลาก (O(n)) แบบกราฟเส้น</p></div>
 
 <h3 id="การวาดแท่ง">การวาดแท่ง<a class="anchor" href="#การวาดแท่ง">#</a></h3>
 <p>ไฟล์ <code>lib/widgets/energy_usage_chart.dart</code> บรรทัด 397–427</p>
@@ -1845,7 +1843,7 @@ Widget เป็น "พิมพ์เขียว" ที่ไม่เปล
 จึงส่งค่ามากสุดของชุดเป็น <code>scaleReference</code> ให้ทุกแท่ง ป้ายสูงสุด เส้นเฉลี่ย และกล่องรายละเอียดได้หน่วยและจำนวนทศนิยมเดียวกัน</p></div>
 
 <div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> ทำไมเปลี่ยนจากกราฟเส้นเป็นกราฟแท่ง?</p>
-<p><strong>ตอบ:</strong> ข้อมูลเป็นพลังงาน "สะสมต่อช่วง" (kWh ต่อชั่วโมง/ต่อวัน) แต่ละช่วงแยกจากกัน กราฟแท่งสื่อความหมายนี้ตรงกว่า ส่วนกราฟเส้นทำให้ดูเหมือนค่าต่อเนื่องระหว่างจุด (เหมือนกำลังไฟ ณ เวลานั้น) อีกเหตุผลคืออ่านง่ายบนจอมือถือ: เดิมมีป้ายทุกจุด พอ 24–30 จุดก็เบียดกัน รุ่นใหม่มีป้ายแค่แท่งสูงสุด ค่า 0 เป็นขีดจาง แกนตั้งเป็นตัวเลขกลม และมีเส้นเฉลี่ยให้เทียบ ค่าแท่งอื่นแตะดูได้</p></div>
+<p><strong>ตอบ:</strong> ข้อมูลเป็นพลังงาน "สะสมต่อช่วง" (kWh ต่อชั่วโมง/ต่อวัน) แต่ละช่วงแยกจากกัน กราฟแท่งสื่อความหมายนี้ตรงกว่า ส่วนกราฟเส้นทำให้ดูเหมือนค่าต่อเนื่องระหว่างจุด (เหมือนกำลังไฟ ณ เวลานั้น) อีกเหตุผลคืออ่านง่ายบนจอมือถือ: ถ้ามีป้ายทุกจุด พอ 24–30 จุดก็เบียดกัน กราฟนี้จึงมีป้ายแค่แท่งสูงสุด ค่า 0 เป็นขีดจาง แกนตั้งเป็นตัวเลขกลม และมีเส้นเฉลี่ยให้เทียบ ค่าแท่งอื่นแตะดูได้</p></div>
 
 <div class="callout note"><div class="callout-title">หมายเหตุ</div><p>การเปลี่ยนนี้เป็นของแอปมือถือเท่านั้น เว็บแอปยังใช้กราฟเส้นพื้นที่ (<code>areaChart</code> ใน <code>webapp/assets/js/charts.js</code> ดูบทเว็บแอป) ตัวเลขที่ได้ตรงกันเพราะมาจาก <code>GET /energy/summary</code> ตัวเดียวกัน ต่างแค่การแสดงผล</p></div>
 
@@ -2015,7 +2013,7 @@ Widget เป็น "พิมพ์เขียว" ที่ไม่เปล
 <h3 id="การ์ดสรุปห้อง">การ์ดสรุปห้อง<a class="anchor" href="#การ์ดสรุปห้อง">#</a></h3>
 <p><code>_RoomSummaryCard</code> คำนวณ</p>
 <ul>
-<li><code>onCount</code> = เครื่องที่ <code>air.canControl &amp;&amp; air.isPoweredOn</code> (ควบคุมได้และเปิดอยู่จริง ทั้งจากคำสั่งของระบบหรือ PZEM ยืนยันว่ากินไฟ — เปลี่ยนจาก <code>isOn</code> เมื่อ 9 ต.ค.)</li>
+<li><code>onCount</code> = เครื่องที่ <code>air.canControl &amp;&amp; air.isPoweredOn</code> (ควบคุมได้และเปิดอยู่จริง ทั้งจากคำสั่งของระบบหรือ PZEM ยืนยันว่ากินไฟ)</li>
 <li><code>room.totalPower</code> = ผลรวม <code>power</code> (วัตต์จาก PZEM-004T) ของเครื่องที่ <code>isRunning</code> แสดงเป็น kW ทศนิยม 2 ตำแหน่ง</li>
 <li><code>onlineCount</code> = เครื่องที่ ESP32 ออนไลน์</li>
 <li><code>_sensorStatus</code> คืนคู่ค่า <code>(ข้อความ, สี)</code> (Dart record) เรียงจากปัญหาที่ต้องแก้ก่อน: ไม่มีเซนเซอร์ → รอยืนยัน → ออฟไลน์ → ข้อมูลเรดาร์ใช้ไม่ได้ → พบคน → ไม่พบคน</li>
@@ -2043,20 +2041,20 @@ Widget เป็น "พิมพ์เขียว" ที่ไม่เปล
 <tr>
 <td>Remove (เซนเซอร์)</td>
 <td><code>_confirmRemoveOccupancySensor()</code></td>
-<td><code>showDialog&lt;bool&gt;</code> ยืนยัน → <code>occupancyRepository.remove</code> (<code>DELETE /occupancy-sensors/:deviceId</code>) → <code>reload()</code> (13 ต.ค.: Backend สั่งบอร์ดล้างค่าด้วย ดูหัวข้อถัดไป)</td>
+<td><code>showDialog&lt;bool&gt;</code> ยืนยัน → <code>occupancyRepository.remove</code> (<code>DELETE /occupancy-sensors/:deviceId</code>) → <code>reload()</code> (Backend สั่งบอร์ดล้างค่าด้วย ดูหัวข้อถัดไป)</td>
 </tr>
 <tr>
 <td>Remove Unit (แอร์)</td>
 <td><code>_confirmDeleteAir(air)</code></td>
-<td><code>showDialog&lt;bool&gt;</code> ยืนยัน → <code>controller.remove(air)</code> (<code>DELETE /air-conditioners/:deviceId</code> แล้ว refresh) (13 ต.ค.: Backend สั่งบอร์ดล้างค่าด้วย)</td>
+<td><code>showDialog&lt;bool&gt;</code> ยืนยัน → <code>controller.remove(air)</code> (<code>DELETE /air-conditioners/:deviceId</code> แล้ว refresh) (Backend สั่งบอร์ดล้างค่าด้วย)</td>
 </tr>
 </tbody>
 </table></div>
 <div class="callout note"><div class="callout-title">หมายเหตุ · <span class="ct">ทำไมรอ 1.2 วินาที และ 2 วินาที</span></div><p>1.2 วินาทีเผื่อเวลาให้ ESP32 ได้รับคำสั่งทาง MQTT แล้วเปิด Bluetooth ก่อนหน้าค้นหาเริ่มสแกน
 2 วินาทีหลังตั้งค่าเสร็จ เผื่อเวลาให้ ESP32 รีสตาร์ต ต่อ Wi-Fi/MQTT และรายงานตัวกับ Backend ก่อนดึงสถานะ</p></div>
 
-<h3 id="ลบแอร์หรือเซ็นเซอร์แล้วบอร์ดเกิดอะไรขึ้น-เพิ่ม-13-ตค-2569">ลบแอร์หรือเซ็นเซอร์แล้วบอร์ดเกิดอะไรขึ้น (เพิ่ม 13 ต.ค. 2569)<a class="anchor" href="#ลบแอร์หรือเซ็นเซอร์แล้วบอร์ดเกิดอะไรขึ้น-เพิ่ม-13-ตค-2569">#</a></h3>
-<p>โค้ด Dart ฝั่งแอป <strong>ไม่ได้เปลี่ยน</strong> ใน commit <code>1f09946</code> (แก้แค่ Backend และเฟิร์มแวร์) แต่ผลของปุ่มลบเปลี่ยนไป ดูเส้นทางฝั่งแอปก่อน</p>
+<h3 id="ลบแอร์หรือเซ็นเซอร์แล้วบอร์ดเกิดอะไรขึ้น">ลบแอร์หรือเซ็นเซอร์แล้วบอร์ดเกิดอะไรขึ้น<a class="anchor" href="#ลบแอร์หรือเซ็นเซอร์แล้วบอร์ดเกิดอะไรขึ้น">#</a></h3>
+<p>ฝั่งแอปแค่เรียก API ลบ งานล้างบอร์ดทั้งหมดอยู่ที่ Backend และเฟิร์มแวร์ ดูเส้นทางฝั่งแอปก่อน</p>
 <p><strong>ไฟล์ <code>lib/controllers/air_conditioner_controller.dart</code> บรรทัด 90–95</strong></p>
 <div class="code-block"><span class="code-lang">dart</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">90</span>
 <span class="normal">91</span>
@@ -2104,7 +2102,7 @@ Widget เป็น "พิมพ์เขียว" ที่ไม่เปล
 </ol>
 <div class="callout warn"><div class="callout-title">ระวัง</div><p><strong>แอปไม่แสดง <code>boardCleared</code></strong> ค้นทั้ง <code>lib/</code> แล้วไม่มีโค้ด Dart อ่านค่านี้ (<code>remove</code> ของทั้ง <code>AirConditionerService</code> และ <code>OccupancySensorService</code> คืน <code>Future&lt;void&gt;</code>) ผู้ใช้เห็นแค่ว่าเครื่องหายจากรายการเสมอ ถ้าบอร์ดออฟไลน์ตอนกดลบ บอร์ดยังจำ Wi-Fi/ห้องเดิมไว้ (แต่ต่อ MQTT ไม่ได้แล้วเพราะบัญชีถูกลบ) ต้องไปล้างที่ตัวบอร์ดเอง (แฟลช/รีเซ็ต หรือตั้งค่าใหม่ผ่านบลูทูธ) อีกจุดคือระหว่างรอคำตอบสูงสุดราว 4 วินาที กล่องยืนยันปิดไปแล้วและหน้าจอไม่มีตัวหมุนบอกว่ากำลังลบ</p></div>
 
-<div class="callout why"><div class="callout-title">ทำไม</div><p><strong>ทำไมต้องให้บอร์ดล้างตัวเอง</strong> เดิมกดลบแล้ว Backend ลบแค่แถวในฐานข้อมูล ข้อความ retained และบัญชี MQTT บอร์ดยังจำ Wi-Fi/MQTT/ห้องใน NVS และสั่งแอร์ตามค่าเดิมต่อ (ตามข้อความใน commit <code>1f09946</code>) การสั่ง unprovision ทำให้บอร์ดกลับเป็น "ของใหม่" ที่พร้อมนำไปติดห้องอื่นด้วยบลูทูธได้ทันที ส่วนการ "รอแค่ 4 วินาทีแล้วลบต่อแม้บอร์ดไม่ตอบ" ทำให้การลบในระบบสำเร็จเสมอ ไม่ติดค้างเพราะบอร์ดเสีย</p></div>
+<div class="callout why"><div class="callout-title">ทำไม</div><p><strong>ทำไมต้องให้บอร์ดล้างตัวเอง</strong> ถ้า Backend ลบแค่แถวในฐานข้อมูล ข้อความ retained และบัญชี MQTT บอร์ดจะยังจำ Wi-Fi/MQTT/ห้องใน NVS และสั่งแอร์ตามตารางเวลาที่จำไว้ต่อ การสั่ง unprovision ทำให้บอร์ดกลับเป็น "ของใหม่" ที่พร้อมนำไปติดห้องอื่นด้วยบลูทูธได้ทันที ส่วนการ "รอแค่ 4 วินาทีแล้วลบต่อแม้บอร์ดไม่ตอบ" ทำให้การลบในระบบสำเร็จเสมอ ไม่ติดค้างเพราะบอร์ดเสีย</p></div>
 
 <h2 id="aircontrolcard--การ์ดแอร์และการส่งคำสั่ง">AirControlCard — การ์ดแอร์และการส่งคำสั่ง<a class="anchor" href="#aircontrolcard--การ์ดแอร์และการส่งคำสั่ง">#</a></h2>
 <h3 id="สามหน้าตาตามสถานะ">สามหน้าตาตามสถานะ<a class="anchor" href="#สามหน้าตาตามสถานะ">#</a></h3>
@@ -2136,7 +2134,7 @@ Widget เป็น "พิมพ์เขียว" ที่ไม่เปล
 </table></div>
 <p><code>canControl</code> นิยามใน model ว่า <code>isProvisioned &amp;&amp; isOnline &amp;&amp; deviceId != null</code> คือ ตั้งค่าเสร็จแล้ว ESP32 ออนไลน์ และมี Device ID</p>
 <p>ส่วนที่แสดงเสมอเมื่อควบคุมได้: ชื่อเครื่อง, ปุ่ม −/+ อุณหภูมิ, ตัวเลขอุณหภูมิใหญ่ + โหมด·พัดลม, แถว "Power now" (โวลต์ แอมป์ พลังงานสะสม และวัตต์ — ข้อมูลจาก PZEM-004T ถ้า <code>pzemAvailable</code> ไม่งั้นขึ้น <code>–</code>) และแถวปุ่ม 5 ปุ่ม: Power, Mode, Fan, Swing, More</p>
-<p><strong>ป้ายยี่ห้อ·วิธีควบคุม (เพิ่ม 11 ต.ค. 2569)</strong> ใต้แถวชื่อเครื่องมี <code>AirControlBadge</code> ทั้งในหน้าตาปกติและหน้าตา "ยังไม่เชื่อมต่อ" (<code>_buildDisconnected</code> บรรทัด 386) ผู้ใช้จึงเห็นยี่ห้อแม้บอร์ดออฟไลน์</p>
+<p><strong>ป้ายยี่ห้อ·วิธีควบคุม</strong> ใต้แถวชื่อเครื่องมี <code>AirControlBadge</code> ทั้งในหน้าตาปกติและหน้าตา "ยังไม่เชื่อมต่อ" (<code>_buildDisconnected</code> บรรทัด 386) ผู้ใช้จึงเห็นยี่ห้อแม้บอร์ดออฟไลน์</p>
 <p><strong>ไฟล์ <code>lib/widgets/air_control_card.dart</code> บรรทัด 128–132</strong></p>
 <div class="code-block"><span class="code-lang">dart</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">128</span>
 <span class="normal">129</span>
@@ -2201,7 +2199,7 @@ Widget เป็น "พิมพ์เขียว" ที่ไม่เปล
 <li><strong>บรรทัด 9–12</strong> — ป้ายนับถอยหลังแสดงเฉพาะเมื่อแอร์เปิดอยู่จริง (<code>isPoweredOn</code> รวมกรณีเปิดด้วยรีโมตจริงที่ PZEM ยืนยัน) ใช้นาฬิกาของเครื่องก่อน ถ้าไม่มีใช้นาฬิกาของห้อง</li>
 <li><strong>บรรทัด 14–16</strong> — จำนวนครั้งที่ระบบยิงคำสั่งปิดไปแล้ว ใช้แหล่งเดียวกับ deadline</li>
 </ol>
-<p>ใน build ตัวแปร <code>on</code> มาจาก <code>air.isPoweredOn</code> (เดิมคือ <code>air.isOn</code>) ปุ่ม Power จึงขึ้น "Turn off" ถูกต้องแม้แอร์ถูกเปิดด้วยรีโมตจริง</p>
+<p>ใน build ตัวแปร <code>on</code> มาจาก <code>air.isPoweredOn</code> (ไม่ใช่ <code>air.isOn</code>) ปุ่ม Power จึงขึ้น "Turn off" ถูกต้องแม้แอร์ถูกเปิดด้วยรีโมตจริง</p>
 <p>ใน build <code>sending = deadline != null &amp;&amp; _attempts &gt; 0</code> ถ้าเป็นจริง (นับครบแล้ว ระบบกำลังยิงคำสั่งปิด) จะแสดงแถบ <code>_InfoLine</code> "Sending the off command  N/5" แทนป้ายนับถอยหลัง</p>
 <h3 id="ปุ่มแต่ละปุ่มสร้าง-ร่าง-แล้วส่ง">ปุ่มแต่ละปุ่มสร้าง "ร่าง" แล้วส่ง<a class="anchor" href="#ปุ่มแต่ละปุ่มสร้าง-ร่าง-แล้วส่ง">#</a></h3>
 <p>ปุ่มทั้งหมดเรียก <code>_change</code> พร้อมฟังก์ชันที่แก้ร่าง ตัวอย่างปุ่ม Power</p>
@@ -2267,9 +2265,9 @@ Widget เป็น "พิมพ์เขียว" ที่ไม่เปล
 <li><strong>บรรทัด 2</strong> — ทำสำเนาของแอร์ (<code>editableCopy</code>) ไม่แตะ object จริง</li>
 <li><strong>บรรทัด 3</strong> — ให้ฟังก์ชันของปุ่มแก้สำเนา เช่น <code>d.temperature += 1</code></li>
 <li><strong>บรรทัด 7–10</strong> — ปุ่ม More เปิดรีโมตเต็ม ซึ่งคืนร่างที่ผู้ใช้ปรับแล้ว (หรือ null ถ้าปัดทิ้ง) แล้วส่งด้วยเส้นทางเดียวกัน</li>
-<li><strong>บรรทัด 13</strong> — <code>normalizeForProtocol</code> ปรับร่างให้ถูกกับรุ่นแอร์ เช่น บีบอุณหภูมิให้อยู่ในช่วง รุ่น <code>SAIJO_DENKI</code> ปิดฟังก์ชันเสริมที่ไม่รองรับ และ (11 ต.ค.) รุ่น <code>DAIKIN_WIRED</code> เปลี่ยน Turbo เป็น High, สวิงที่ไม่มีเป็น Auto และปิดทุกฟังก์ชันเสริมยกเว้น Sleep (ดูบทสถาปัตยกรรม)</li>
+<li><strong>บรรทัด 13</strong> — <code>normalizeForProtocol</code> ปรับร่างให้ถูกกับรุ่นแอร์ เช่น บีบอุณหภูมิให้อยู่ในช่วง รุ่น <code>SAIJO_DENKI</code> ปิดฟังก์ชันเสริมที่ไม่รองรับ และ รุ่น <code>DAIKIN_WIRED</code> เปลี่ยน Turbo เป็น High, สวิงที่ไม่มีเป็น Auto และปิดทุกฟังก์ชันเสริมยกเว้น Sleep (ดูบทสถาปัตยกรรม)</li>
 <li><strong>บรรทัด 14</strong> — <code>_busy = true</code> ทุกปุ่มถูกปิด ปุ่ม Power เป็นวงหมุน</li>
-<li><strong>บรรทัด 16</strong> — <code>onCommand</code> = <code>AirConditionerController.sendCommand</code> → <code>AirConditionerService.sendCommand</code> ยิง <code>POST /air-conditioners/{deviceId}/command</code> พร้อม <code>toCommandJson()</code> (power, temperature, mode, fanSpeed, swing, eco, turbo, ... ทั้งชุด) Backend จึง publish MQTT ไปหา ESP32 ซึ่งยิง IR ไปที่แอร์ (หรือบอร์ดสายแอร์ส่งคำสั่งเข้าสายแทนรีโมตติดผนัง ตั้งแต่ 11 ต.ค.)</li>
+<li><strong>บรรทัด 16</strong> — <code>onCommand</code> = <code>AirConditionerController.sendCommand</code> → <code>AirConditionerService.sendCommand</code> ยิง <code>POST /air-conditioners/{deviceId}/command</code> พร้อม <code>toCommandJson()</code> (power, temperature, mode, fanSpeed, swing, eco, turbo, ... ทั้งชุด) Backend จึง publish MQTT ไปหา ESP32 ซึ่งยิง IR ไปที่แอร์ (หรือบอร์ดสายแอร์ส่งคำสั่งเข้าสายแทนรีโมตติดผนัง)</li>
 <li><strong>บรรทัด 17</strong> — หลัง await หน้าอาจถูกปิดแล้ว</li>
 <li><strong>บรรทัด 18</strong> — <strong>เซิร์ฟเวอร์ตอบรับแล้ว</strong> จึงคัดลอกค่าจากร่างลง object จริง จอเปลี่ยนทันทีโดยไม่ต้องรอรอบ 10 วินาที</li>
 <li><strong>บรรทัด 19–25</strong> — แจ้งว่าส่งคำสั่งสำเร็จ</li>
@@ -2277,7 +2275,7 @@ Widget เป็น "พิมพ์เขียว" ที่ไม่เปล
 <li><strong>บรรทัด 31–32</strong> — ปลด <code>_busy</code> เสมอ</li>
 </ol>
 <div class="callout why"><div class="callout-title">ทำไม · <span class="ct">ทำไมส่ง "สถานะเต็มชุด" ไม่ส่งแค่ "กด +1"</span></div><p>รีโมต IR ของแอร์ส่วนใหญ่ส่งสถานะทั้งหมดในทุกครั้งที่กดปุ่ม (อุณหภูมิ โหมด พัดลม ฯลฯ ในแพ็กเก็ตเดียว) ไม่ได้ส่ง "เพิ่ม 1 องศา"
-การส่งชุดเต็มจากแอปจึงตรงกับวิธีที่ ESP32 ต้องยิง IR และถ้าคำสั่งก่อนหน้าหาย คำสั่งถัดไปก็ยังทำให้แอร์อยู่ในสถานะที่ถูกต้อง (idempotent) บอร์ดสายแอร์ (เพิ่ม 11 ต.ค.) ใช้ JSON รูปแบบเดียวกัน แอปจึงไม่ต้องรู้ว่าปลายทางเป็นบอร์ดแบบไหน</p></div>
+การส่งชุดเต็มจากแอปจึงตรงกับวิธีที่ ESP32 ต้องยิง IR และถ้าคำสั่งก่อนหน้าหาย คำสั่งถัดไปก็ยังทำให้แอร์อยู่ในสถานะที่ถูกต้อง (idempotent) บอร์ดสายแอร์ ใช้ JSON รูปแบบเดียวกัน แอปจึงไม่ต้องรู้ว่าปลายทางเป็นบอร์ดแบบไหน</p></div>
 
 <div class="callout why"><div class="callout-title">ทำไม · <span class="ct">ทำไมใช้ "ร่าง" แล้วค่อย copy กลับ แทนการแก้ object ตรง ๆ</span></div><p>ถ้าแก้ object จริงก่อนส่ง แล้วการส่งล้มเหลว จอจะแสดงค่าที่แอร์ไม่ได้รับ (เช่น 24° ทั้งที่แอร์ยัง 25°) ต้องเขียนโค้ดย้อนค่ากลับเอง
 แบบร่างทำให้ "จอเปลี่ยนเมื่อเซิร์ฟเวอร์ตอบรับแล้วเท่านั้น" ง่ายและไม่หลอกผู้ใช้</p></div>
@@ -2295,8 +2293,8 @@ Widget เป็น "พิมพ์เขียว" ที่ไม่เปล
 <ul>
 <li>จอรีโมตสีเขียว (เปิด) / เทา (ปิด) แสดง ON/OFF, ปุ่ม Power, ปุ่ม −/+ และอุณหภูมิ °C</li>
 <li>Operating mode, Fan speed, Vertical swing เป็นชิปให้เลือก (<code>ChoiceChip</code>) แสดงเฉพาะค่าที่รุ่นนั้นรองรับ</li>
-<li>(เพิ่ม 11 ต.ค.) ใต้หัวข้อมี <code>AirControlBadge</code> และถ้าเป็นสายแอร์ มีบรรทัดอธิบาย "เครื่องนี้สั่งผ่านสายแอร์ จึงใช้ได้เฉพาะฟังก์ชันที่รีโมตติดผนัง Daikin มี"</li>
-<li>Additional functions (สวิตช์ Horizontal Swing, Eco, Turbo, Sleep, Quiet, Display Light, Clean) (แก้ 11 ต.ค.) แสดง <strong>ทีละสวิตช์</strong> ตาม getter <code>supportsHorizontalSwing</code>, <code>supportsEco</code>, ... ของโมเดล และซ่อนทั้งหัวข้อถ้าไม่มีสวิตช์ไหนใช้ได้เลย (เดิมเป็นทั้งหมดหรือไม่มีเลยตาม <code>supportsAdditionalFunctions</code>)</li>
+<li>ใต้หัวข้อมี <code>AirControlBadge</code> และถ้าเป็นสายแอร์ มีบรรทัดอธิบาย "เครื่องนี้สั่งผ่านสายแอร์ จึงใช้ได้เฉพาะฟังก์ชันที่รีโมตติดผนัง Daikin มี"</li>
+<li>Additional functions (สวิตช์ Horizontal Swing, Eco, Turbo, Sleep, Quiet, Display Light, Clean) แสดง <strong>ทีละสวิตช์</strong> ตาม getter <code>supportsHorizontalSwing</code>, <code>supportsEco</code>, ... ของโมเดล และซ่อนทั้งหัวข้อถ้าไม่มีสวิตช์ไหนใช้ได้เลย</li>
 <li>Timer: "Turn on in" / "Turn off in" กดแล้วเปิดแผ่นซ้อนเลือก 30 นาที, 1, 2, 4, 6, 8 ชั่วโมง หรือ Clear Timer</li>
 <li>ปุ่ม "Send command via MQTT"</li>
 </ul>
@@ -2315,7 +2313,7 @@ Widget เป็น "พิมพ์เขียว" ที่ไม่เปล
 ถ้าส่งทุกครั้งที่แตะชิปจะเกิดคำสั่งหลายครั้งติดกัน ESP32 ต้องยิง IR ซ้ำ ๆ และแอร์มักส่งเสียงบี๊บทุกครั้งที่รับสัญญาณ การรวมเป็นคำสั่งเดียวลดทั้งภาระเครือข่ายและเสียงรบกวน</p></div>
 
 <p>ตัวเลือกเวลา <code>_pickTimer</code> ใช้ค่า <code>-1</code> แทน "Clear Timer" เพราะ <code>null</code> ถูกใช้หมายถึง "ปัดแผ่นทิ้งโดยไม่เลือก" แล้ว จึงต้องแยกสองกรณีนี้ออกจากกัน</p>
-<h3 id="ซ่อนปุ่มที่แอร์ทำไม่ได้-เพิ่ม-11-ตค-2569">ซ่อนปุ่มที่แอร์ทำไม่ได้ (เพิ่ม 11 ต.ค. 2569)<a class="anchor" href="#ซ่อนปุ่มที่แอร์ทำไม่ได้-เพิ่ม-11-ตค-2569">#</a></h3>
+<h3 id="ซ่อนปุ่มที่แอร์ทำไม่ได้">ซ่อนปุ่มที่แอร์ทำไม่ได้<a class="anchor" href="#ซ่อนปุ่มที่แอร์ทำไม่ได้">#</a></h3>
 <p>ตั้งแต่มีบอร์ดสายแอร์ Daikin รีโมตเต็มต้องแสดงคนละชุดปุ่มตามเครื่อง ผลลัพธ์บนจอเมื่อเปิดรีโมตของแอร์ <code>DAIKIN_WIRED</code>: โหมดมี Cool / Dry / Fan, พัดลมมี Auto / Low / Medium / High, สวิงแนวตั้งมี Auto / Off และ "Additional functions" เหลือสวิตช์ Sleep สวิตช์เดียว (หายไปเมื่อเลือก Dry)</p>
 <p><strong>ไฟล์ <code>lib/widgets/full_remote_sheet.dart</code> บรรทัด 67–81</strong> (หัวของแผ่นรีโมต)</p>
 <div class="code-block"><span class="code-lang">dart</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">67</span>
@@ -2474,7 +2472,7 @@ Widget เป็น "พิมพ์เขียว" ที่ไม่เปล
 
 <div class="callout note"><div class="callout-title">หมายเหตุ</div><p>ข้อความ "ESP32 ยิง IR ซ้ำ ๆ แอร์ส่งเสียงบี๊บ" ในกล่อง WHY ด้านบนเป็นกรณีบอร์ด IR บอร์ดสายแอร์ไม่ได้ยิงแสง แต่การรวมเป็นคำสั่งเดียวก็ยังลดจำนวนคำสั่งที่ต้องส่งเข้าสายแอร์และภาระของ MQTT เหมือนกัน</p></div>
 
-<h2 id="aircontrolbadge--ป้ายยี่ห้อและวิธีควบคุม-ใหม่-11-ตค-2569">AirControlBadge — ป้ายยี่ห้อและวิธีควบคุม (ใหม่ 11 ต.ค. 2569)<a class="anchor" href="#aircontrolbadge--ป้ายยี่ห้อและวิธีควบคุม-ใหม่-11-ตค-2569">#</a></h2>
+<h2 id="aircontrolbadge--ป้ายยี่ห้อและวิธีควบคุม">AirControlBadge — ป้ายยี่ห้อและวิธีควบคุม<a class="anchor" href="#aircontrolbadge--ป้ายยี่ห้อและวิธีควบคุม">#</a></h2>
 <p>วิดเจ็ตเล็ก 33 บรรทัด ใช้ 3 จุด: การ์ดแอร์สองหน้าตา (ปกติ และยังไม่เชื่อมต่อ) กับหัวรีโมตเต็ม (<code>ble_provisioning_screen.dart</code> import ไฟล์นี้ไว้ แต่ยังไม่ได้เรียกใช้ หน้านั้นเขียนช่องยี่ห้อของตัวเองใน <code>_WiredBrandField</code>) แสดงข้อความเช่น "Daikin · สายแอร์" (สีฟ้า ไอคอนสายไฟ) หรือ "Haier · รีโมต IR" (สีเทา ไอคอนรีโมต) กดค้าง/ชี้เมาส์จะเห็นคำอธิบายเต็ม</p>
 <p><strong>ไฟล์ <code>lib/widgets/air_control_badge.dart</code> บรรทัด 1–33</strong></p>
 <div class="code-block"><span class="code-lang">dart</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
@@ -2688,8 +2686,8 @@ Widget เป็น "พิมพ์เขียว" ที่ไม่เปล
 
 <div class="callout warn"><div class="callout-title">ระวัง · <span class="ct">ข้อจำกัดของการเดินนาฬิกาเอง</span></div><p>ใช้ <code>DateTime.now()</code> ของมือถือ ถ้านาฬิกามือถือเพี้ยนจากเซิร์ฟเวอร์ ตัวเลขจะเพี้ยนตาม (deadline เป็นเวลาสัมบูรณ์แบบ UTC ไม่มีปัญหาเรื่องเขตเวลา แต่มีปัญหาถ้าเวลาเครื่องผิด)</p></div>
 
-<h2 id="schedulescreen--แท็บตารางเรียน-เขียนใหม่-9-ตค-2569">ScheduleScreen — แท็บตารางเรียน (เขียนใหม่ 9 ต.ค. 2569)<a class="anchor" href="#schedulescreen--แท็บตารางเรียน-เขียนใหม่-9-ตค-2569">#</a></h2>
-<div class="callout note"><div class="callout-title">หมายเหตุ</div><p><strong>เปลี่ยนอะไร (commit <code>fd650ac</code> "แอปมือถือ: จัดการตารางเรียนได้เหมือนเว็บแอป")</strong> เดิมแท็บนี้ดูได้แค่ "วันในสัปดาห์" (อาทิตย์–เสาร์) ทุกวันพุธจึงเหมือนกันหมด รุ่นใหม่ดูตาม <strong>วันที่จริง</strong> เลื่อนทีละสัปดาห์ได้ และรวม 3 อย่างเข้ามาในหน้าเดียว คือ คาบเรียนประจำ การใช้ห้องนอกตาราง (ประชุม สอบ กิจกรรม) และวันเปิด–ปิดภาคเรียน วันพุธสัปดาห์นี้กับวันพุธช่วงปิดภาคจึงแสดงไม่เหมือนกัน ไฟล์ <code>lib/screens/schedule_screen.dart</code> เพิ่มจาก 635 เป็น 1,373 บรรทัด และมีหน้าจอใหม่อีก 2 ไฟล์ (<code>booking_editor_screen.dart</code>, <code>term_calendar_screen.dart</code>) อธิบายในหัวข้อถัดไป</p></div>
+<h2 id="schedulescreen--แท็บตารางเรียน">ScheduleScreen — แท็บตารางเรียน<a class="anchor" href="#schedulescreen--แท็บตารางเรียน">#</a></h2>
+<div class="callout note"><div class="callout-title">หมายเหตุ</div><p>แท็บนี้ดูตาม <strong>วันที่จริง</strong> ไม่ใช่แค่ "วันในสัปดาห์" เลื่อนทีละสัปดาห์ได้ และรวม 3 อย่างไว้ในหน้าเดียว คือ คาบเรียนประจำ การใช้ห้องนอกตาราง (ประชุม สอบ กิจกรรม) และวันเปิด–ปิดภาคเรียน วันพุธสัปดาห์นี้กับวันพุธช่วงปิดภาคจึงแสดงไม่เหมือนกัน ไฟล์ <code>lib/screens/schedule_screen.dart</code> มี 1,373 บรรทัด และมีหน้าจอประกอบอีก 2 ไฟล์ (<code>booking_editor_screen.dart</code>, <code>term_calendar_screen.dart</code>) อธิบายในหัวข้อถัดไป</p></div>
 
 <h3 id="สิ่งที่ผู้ใช้เห็น-จากบนลงล่าง">สิ่งที่ผู้ใช้เห็น (จากบนลงล่าง)<a class="anchor" href="#สิ่งที่ผู้ใช้เห็น-จากบนลงล่าง">#</a></h3>
 <div class="table-wrap"><table>
@@ -2836,7 +2834,7 @@ Widget เป็น "พิมพ์เขียว" ที่ไม่เปล
 <tbody>
 <tr>
 <td>60</td>
-<td>เก็บวันที่ที่ดูเป็นข้อความ <code>yyyy-MM-dd</code> (เดิมเก็บเป็นเลขวัน 0–6) <code>null</code> หมายถึง "วันนี้"</td>
+<td>เก็บวันที่ที่ดูเป็นข้อความ <code>yyyy-MM-dd</code> (ไม่ใช่เลขวัน 0–6 เพราะต้องแยกวันพุธแต่ละสัปดาห์) <code>null</code> หมายถึง "วันนี้"</td>
 </tr>
 <tr>
 <td>63</td>
@@ -3104,7 +3102,7 @@ Widget เป็น "พิมพ์เขียว" ที่ไม่เปล
 </table></div>
 <div class="callout why"><div class="callout-title">ทำไม</div><p><strong>ทำไมมี "หยุดตั้งแต่วันนี้" แยกจาก "ลบ"</strong> การประชุมประจำทุกวันพุธที่ทำมาแล้ว 5 สัปดาห์แล้วยกเลิก ถ้าลบทั้งชุด ประวัติ 5 ครั้งที่ผ่านมาจะหายไปด้วย (ข้อมูลนี้มีผลกับการตัดสินของระบบปิดแอร์ย้อนหลัง และใช้ตอบคำถามว่าทำไมวันนั้นแอร์ไม่ปิด) การตัดวันสิ้นสุดเก็บอดีตไว้และหยุดเฉพาะอนาคต เงื่อนไข <code>date &gt; startDate</code> กันกรณีหยุดตั้งแต่วันแรก ซึ่งจะทำให้วันสิ้นสุดก่อนวันเริ่ม (ใช้ลบแทน)</p></div>
 
-<div class="callout note"><div class="callout-title">หมายเหตุ</div><p>โค้ดเก็บ <code>final messenger = ScaffoldMessenger.of(context);</code> ไว้ <strong>ก่อน</strong> <code>await</code> (บรรทัด 229) แล้วค่อยใช้หลัง await หลักนี้กันปัญหา "ใช้ <code>BuildContext</code> ข้ามช่วง async" ซึ่ง lint <code>use_build_context_synchronously</code> เตือน commit <code>ae96353</code> แก้จุดเดียวกันในหน้าปฏิทินภาคเรียน (สร้างข้อความ <code>done</code> ก่อน <code>await</code>)</p></div>
+<div class="callout note"><div class="callout-title">หมายเหตุ</div><p>โค้ดเก็บ <code>final messenger = ScaffoldMessenger.of(context);</code> ไว้ <strong>ก่อน</strong> <code>await</code> (บรรทัด 229) แล้วค่อยใช้หลัง await หลักนี้กันปัญหา "ใช้ <code>BuildContext</code> ข้ามช่วง async" ซึ่ง lint <code>use_build_context_synchronously</code> เตือน หน้าปฏิทินภาคเรียนใช้หลักเดียวกัน (สร้างข้อความ <code>done</code> ก่อน <code>await</code>)</p></div>
 
 <h3 id="ดาวน์โหลดตารางเป็น-csv">ดาวน์โหลดตารางเป็น CSV<a class="anchor" href="#ดาวน์โหลดตารางเป็น-csv">#</a></h3>
 <p>ไฟล์ <code>lib/screens/schedule_screen.dart</code> บรรทัด 283–305</p>
@@ -3249,7 +3247,7 @@ Widget เป็น "พิมพ์เขียว" ที่ไม่เปล
 </ol>
 <div class="callout note"><div class="callout-title">หมายเหตุ · <span class="ct">ตารางเรียนไม่ได้ poll</span></div><p><code>ScheduleController</code> โหลดตารางครั้งเดียวตอนเข้าระบบ โหลดการใช้ห้องทีละสัปดาห์เมื่อเปลี่ยนสัปดาห์ และโหลดใหม่ทั้งหมดเมื่อดึงจอลง (<code>RefreshIndicator</code>) หรือหลังแอดมินแก้/นำเข้า เพราะข้อมูลพวกนี้เปลี่ยนนานครั้ง ไม่จำเป็นต้องดึงทุก 10 วินาทีเหมือนสถานะแอร์</p></div>
 
-<h2 id="bookingeditorscreen--เพิ่มแก้การใช้ห้อง-ใหม่-9-ตค-2569-824-บรรทัด">BookingEditorScreen — เพิ่ม/แก้การใช้ห้อง (ใหม่ 9 ต.ค. 2569, 824 บรรทัด)<a class="anchor" href="#bookingeditorscreen--เพิ่มแก้การใช้ห้อง-ใหม่-9-ตค-2569-824-บรรทัด">#</a></h2>
+<h2 id="bookingeditorscreen--เพิ่มแก้การใช้ห้อง-824-บรรทัด">BookingEditorScreen — เพิ่ม/แก้การใช้ห้อง (824 บรรทัด)<a class="anchor" href="#bookingeditorscreen--เพิ่มแก้การใช้ห้อง-824-บรรทัด">#</a></h2>
 <p>ฟอร์มเต็มจอ (<code>fullscreenDialog: true</code> จึงมีปุ่ม ✕ แทนลูกศรย้อนกลับ) เปิดจากปุ่มบนหัวหน้าตารางเรียน ปุ่ม ⊕ บนการ์ดห้อง (เลือกห้องให้แล้ว) หรือ "แก้ไข" ในเมนูของรายการ คอมเมนต์หัวไฟล์บอกว่าเหมือนฟอร์มของเว็บแอป (<code>booking-form.js</code>)</p>
 <p><strong>ข้อความบนสุดของฟอร์ม</strong> อธิบายผลต่อระบบไว้ก่อนเลย: "ระหว่างเวลาที่ใช้ห้อง ระบบจะถือว่าห้องอยู่ในคาบ: ห้องว่างจะรอ 15 นาทีก่อนปิดแอร์ และไม่แจ้งเตือนว่าใช้แอร์นอกคาบ" (ตรงกับ <code>services/room-bookings.js</code> ฝั่ง Backend ที่ระบบปิดแอร์ใช้ถามว่า "ตอนนี้มีการจองไหม")</p>
 <h3 id="ช่องในฟอร์ม">ช่องในฟอร์ม<a class="anchor" href="#ช่องในฟอร์ม">#</a></h3>
@@ -3513,7 +3511,7 @@ Widget เป็น "พิมพ์เขียว" ที่ไม่เปล
 
 <p>กรณีอื่นสร้าง <code>RoomBooking</code> แล้วเรียก <code>createBooking</code> หรือ <code>updateBooking</code> (ถ้าแก้ไข) ระหว่างบันทึก <code>_busy = true</code> ปิดทุกช่องและเปลี่ยนไอคอนปุ่มเป็นวงหมุน กันกดซ้ำ ถ้าเซิร์ฟเวอร์ปฏิเสธ (เช่น ห้องไม่มีจริง) ข้อความ error แสดงในฟอร์มโดยไม่ปิดฟอร์ม ผู้ใช้แก้แล้วกดใหม่ได้</p>
 <p>ฟังก์ชันระดับไฟล์ที่หน้าอื่นใช้ร่วม: <code>l10n(context, ไทย, อังกฤษ)</code> (เลือกข้อความตามภาษา ใช้กับข้อความใหม่ที่ยังไม่อยู่ในตารางแปล), <code>shortIsoDate(iso, isThai)</code> (<code>9 ต.ค. 2569</code>), <code>describeBookingRepeat(booking, isThai)</code>, <code>thaiDayNames</code>, <code>englishDayNames</code></p>
-<h2 id="termcalendarscreen--ปฏิทินภาคเรียน-ใหม่-9-ตค-2569-496-บรรทัด">TermCalendarScreen — ปฏิทินภาคเรียน (ใหม่ 9 ต.ค. 2569, 496 บรรทัด)<a class="anchor" href="#termcalendarscreen--ปฏิทินภาคเรียน-ใหม่-9-ตค-2569-496-บรรทัด">#</a></h2>
+<h2 id="termcalendarscreen--ปฏิทินภาคเรียน-496-บรรทัด">TermCalendarScreen — ปฏิทินภาคเรียน (496 บรรทัด)<a class="anchor" href="#termcalendarscreen--ปฏิทินภาคเรียน-496-บรรทัด">#</a></h2>
 <p>เปิดจากปุ่ม "ปฏิทินภาคเรียน" ในการ์ดตาราง ทุกคนดูได้ แต่เพิ่ม/แก้/ลบได้เฉพาะแอดมิน (ปุ่มลอย "เพิ่มภาคเรียน" และปุ่มแก้/ลบบนการ์ดแสดงเมื่อ <code>isAdmin</code>) ข้อความอธิบายบนสุดของหน้าสรุปกติกาทั้งหมด</p>
 <blockquote>
 <p>ตารางเรียนมีผลเฉพาะระหว่างวันเปิด–ปิดของภาคเรียนของมัน ก่อนเปิดหรือหลังปิดภาค ระบบถือว่าทุกห้องว่าง: ห้องว่างเกิน 5 นาทีสั่งปิดแอร์ และแจ้งเตือนเมื่อมีคนเปิดแอร์ใช้ จึงไม่ต้องล้างตารางตอนปิดภาค และนำเข้าตารางเทอมหน้าไว้ล่วงหน้าได้ ภาคเรียนที่ไม่ได้ตั้งวันไว้ ระบบใช้ตารางทุกวัน</p>
@@ -3671,7 +3669,7 @@ Widget เป็น "พิมพ์เขียว" ที่ไม่เปล
 </tr>
 </tbody>
 </table></div>
-<div class="callout note"><div class="callout-title">หมายเหตุ</div><p>นี่คือสิ่งที่ commit <code>ae96353</code> แก้: เดิมสร้างข้อความด้วย <code>l10n(context, ...)</code> <strong>หลัง</strong> <code>await controller.deleteAcademicTerm(...)</code> ถ้าผู้ใช้ออกจากหน้าไประหว่างรอ <code>context</code> จะใช้ไม่ได้แล้ว lint <code>use_build_context_synchronously</code> ของ <code>flutter analyze</code> (ที่ CI รันทุก push) จึงเตือน การย้ายบรรทัดขึ้นมาก่อน await แก้ปัญหาโดยไม่เปลี่ยนพฤติกรรม</p></div>
+<div class="callout note"><div class="callout-title">หมายเหตุ</div><p>ข้อความถูกสร้างด้วย <code>l10n(context, ...)</code> <strong>ก่อน</strong> <code>await controller.deleteAcademicTerm(...)</code> เพราะถ้าสร้างหลัง await แล้วผู้ใช้ออกจากหน้าไประหว่างรอ <code>context</code> จะใช้ไม่ได้แล้ว lint <code>use_build_context_synchronously</code> ของ <code>flutter analyze</code> (ที่ CI รันทุก push) จะเตือนทันที</p></div>
 
 <h2 id="วิดเจ็ตย่อยที่ใช้ซ้ำ">วิดเจ็ตย่อยที่ใช้ซ้ำ<a class="anchor" href="#วิดเจ็ตย่อยที่ใช้ซ้ำ">#</a></h2>
 <h3 id="floorselector">FloorSelector<a class="anchor" href="#floorselector">#</a></h3>
@@ -3681,7 +3679,7 @@ Widget เป็น "พิมพ์เขียว" ที่ไม่เปล
 <h3 id="weekdayselector">WeekdaySelector<a class="anchor" href="#weekdayselector">#</a></h3>
 <p>7 ปุ่มเท่ากันด้วย <code>Expanded</code> ใน <code>Row</code> (<code>List.generate(7, ...)</code>) ปุ่มที่เลือกพื้นสีหลัก ห่อด้วย <code>Semantics(button: true, selected: ...)</code> เพื่อโปรแกรมอ่านหน้าจอ และให้ <code>Key('$dayKeyPrefix-$index')</code> ไว้สำหรับเทสต์</p>
 <h3 id="statuspill">StatusPill<a class="anchor" href="#statuspill">#</a></h3>
-<p>ป้ายทรงแคปซูลมีข้อความ (และไอคอนถ้ามี ผ่านพารามิเตอร์ <code>icon</code> ซึ่ง <code>AirControlBadge</code> ใช้ตั้งแต่ 11 ต.ค.) สีพื้นเป็นสีเดียวกับตัวอักษรแต่โปร่ง 12% ในธีมมืดผสมสีขาว 45% เข้าไปในตัวอักษร (<code>Color.lerp(color, Colors.white, 0.45)</code>) เพราะสีสถานะออกแบบมาสำหรับพื้นสว่าง บนพื้นเข้มจะจมหาย</p>
+<p>ป้ายทรงแคปซูลมีข้อความ (และไอคอนถ้ามี ผ่านพารามิเตอร์ <code>icon</code> ซึ่ง <code>AirControlBadge</code> ใช้) สีพื้นเป็นสีเดียวกับตัวอักษรแต่โปร่ง 12% ในธีมมืดผสมสีขาว 45% เข้าไปในตัวอักษร (<code>Color.lerp(color, Colors.white, 0.45)</code>) เพราะสีสถานะออกแบบมาสำหรับพื้นสว่าง บนพื้นเข้มจะจมหาย</p>
 <h3 id="sectiontitle">SectionTitle<a class="anchor" href="#sectiontitle">#</a></h3>
 <p><code>Row</code> ที่มีหัวข้อตัวหนาใน <code>Expanded</code> และวิดเจ็ตท้าย (ถ้ามี) เช่น ป้าย "3 need attention" ในหน้า Home ช่วยให้ทุกหน้ามีหัวข้อหน้าตาเดียวกัน</p>
 <h3 id="brandmark-และ-brandwordmark">BrandMark และ BrandWordmark<a class="anchor" href="#brandmark-และ-brandwordmark">#</a></h3>
@@ -3751,13 +3749,13 @@ Widget เป็น "พิมพ์เขียว" ที่ไม่เปล
 <div class="callout warn"><div class="callout-title">ระวัง · <span class="ct">สิ่งที่ควรรู้ก่อนถูกอาจารย์ถาม</span></div><ol>
 <li><strong>ชื่อตัวแปรค้างจากรุ่นเก่า</strong> — <code>LoginScreen</code> ใช้ <code>_rememberPassword</code>, <code>_setRememberPassword</code> และพารามิเตอร์ <code>rememberPassword</code> แต่จริง ๆ จำแค่ชื่อผู้ใช้ (ป้ายบนจอเขียนถูก "Remember username") โค้ดเติมรหัสผ่านจาก <code>remembered.password</code> ไม่เคยทำงานเพราะ service คืน <code>''</code> เสมอ</li>
 <li><strong>มี mock rooms ตอนเริ่มต้น</strong> — <code>main.dart</code> ส่ง <code>MockData.createRooms()</code> ให้ <code>AppShell</code> ก่อนข้อมูลจริงจาก Backend จะมาแทน ถ้า Backend โหลดไม่สำเร็จ แท็บ Control/Schedule จะยังแสดงห้องจำลอง ซึ่งอาจทำให้เข้าใจผิดว่าเป็นข้อมูลจริง</li>
-<li><strong>นิยาม "เปิดอยู่" ในการ์ดสรุปห้อง</strong> — (แก้บางส่วนแล้ว 9 ต.ค.) จำนวน "Air conditioners running" เปลี่ยนมาใช้ <code>isPoweredOn</code> จึงนับแอร์ที่เปิดด้วยรีโมตจริงด้วย แต่ยังขัดกับ "Total power" ได้ในกรณีกลับกัน คือระบบสั่งเปิดแล้วแต่ IR ไม่ถึงแอร์ (<code>isOn</code> เป็นจริง แต่ <code>isRunning</code> เป็นเท็จ)</li>
+<li><strong>นิยาม "เปิดอยู่" ในการ์ดสรุปห้อง</strong> — จำนวน "Air conditioners running" ใช้ <code>isPoweredOn</code> จึงนับแอร์ที่เปิดด้วยรีโมตจริงด้วย แต่ยังขัดกับ "Total power" ได้ในกรณีกลับกัน คือระบบสั่งเปิดแล้วแต่ IR ไม่ถึงแอร์ (<code>isOn</code> เป็นจริง แต่ <code>isRunning</code> เป็นเท็จ)</li>
 <li><strong>นาฬิกาสองตัวทำงานไม่เหมือนกัน</strong> — <code>AutoOffCountdown</code> เปลี่ยนเป็น "Sending the off command" เมื่อเวลาหมด (<code>seconds &lt;= 0</code>) แต่ <code>_CountdownChip</code> ในการ์ดแอร์จะค้างที่ <code>00:00</code> จนรอบ polling ถัดไปส่ง <code>attempts &gt; 0</code> มา (สูงสุด ~10 วินาที)</li>
 <li><strong>ปุ่มรีเฟรชในหน้าห้องอาจยิงซ้อน</strong> — ปุ่มปิดตาม <code>isLoading</code> ซึ่งเป็น true เฉพาะตอนรอบของตัวเองวิ่ง ระหว่างที่รอรอบอัตโนมัติที่ค้างอยู่ (<code>await inFlight</code>) ปุ่มยังกดได้ ถ้ากดสองครั้งในช่วงนั้น ทั้งสองจะยิงคำขอใหม่หลังรอบเดิมจบ (ไม่ทำให้ข้อมูลผิด แค่ยิงเกิน) และปุ่มไม่ดู <code>roomController.isLoading</code></li>
 <li><strong>การ์ดพลังงานหน้า Home กดแล้วไปแท็บ Control</strong> — แตะแถบ "Estimated cost" เรียก <code>onOpenControl</code> ไปหน้าเลือกห้อง ซึ่งไม่เกี่ยวกับค่าไฟโดยตรง ผู้ใช้อาจคาดว่าจะไปหน้า Analytics</li>
 <li><strong>ป้ายแท็บไม่ตรงชื่อไฟล์</strong> — แท็บ "Control" (index 3) แสดง <code>RoomsScreen</code> ไม่ใช่ <code>RoomControlScreen</code> ซึ่งเปิดแยกด้วย Navigator</li>
 <li><strong>ห้องในหน้า Schedule แสดงประเภทซ้ำ</strong> — <code>_CompactRoomCard</code> แสดง <code>room.type</code> ใต้หมายเลขห้อง และถ้าห้องไม่มีคนก็แสดง <code>room.type</code> ซ้ำอีกที่ท้ายแถว (ถ้ามีคนแสดง "In Use")</li>
-<li><strong>"วันนี้" อัปเดตตอนโหลดใหม่เท่านั้น</strong> — (ปรับ 9 ต.ค.) เดิม <code>ScheduleScreen</code> เก็บ <code>_today</code> ครั้งเดียวใน <code>initState</code> ตอนนี้เป็น getter ที่อ่าน <code>controller.today</code> (วันที่ตามเวลาไทยจากเซิร์ฟเวอร์) จึงถูกต้องขึ้น แต่ค่านี้ได้มาตอน <code>reloadCalendar()</code> ถ้าเปิดแอปค้างข้ามคืนโดยไม่ดึงจอลง "Today" ยังเป็นวันเก่า</li>
+<li><strong>"วันนี้" อัปเดตตอนโหลดใหม่เท่านั้น</strong> — <code>today</code> เป็น getter ที่อ่าน <code>controller.today</code> (วันที่ตามเวลาไทยจากเซิร์ฟเวอร์) แต่ค่านี้ได้มาตอน <code>reloadCalendar()</code> ถ้าเปิดแอปค้างข้ามคืนโดยไม่ดึงจอลง "Today" ยังเป็นวันเก่า</li>
 <li><strong><code>editableCopy()</code> ไม่คัดลอกฟิลด์ปิดอัตโนมัติ</strong> — สำเนาไม่มี <code>autoOffEnabled</code>, <code>autoOffDeadlineAt</code>, <code>autoOffAttempts</code>, <code>autoOffInClass</code> ไม่กระทบการส่งคำสั่ง (ฟิลด์เหล่านี้ไม่อยู่ใน <code>toCommandJson</code>) แต่ถ้าวันหนึ่งรีโมตเต็มต้องแสดงนับถอยหลังจะได้ค่าว่าง</li>
 <li><strong>คำอธิบายใน <code>formatEnergy</code> ขัดกันเอง</strong> — คอมเมนต์ตัวอย่างเขียน <code>0.42 kWh -&gt; 420.00 Wh</code> แล้ววงเล็บบอก "เหลือ 420 Wh" ผลจริงคือ <code>420 Wh</code> (≥ 100 ใช้ทศนิยม 0 ตำแหน่ง)</li>
 <li><strong>กรองชั้นสองชั้นในหน้า Analytics</strong> — controller ส่ง <code>floor</code> ให้ Backend กรองแล้ว หน้าจอยังกรอง <code>summary.rooms</code> ด้วย <code>floorNumber</code> อีกรอบ ไม่ผิดแต่ซ้ำซ้อน (และกันไว้ได้ถ้า Backend ไม่กรอง)</li>
@@ -3807,7 +3805,7 @@ Widget เป็น "พิมพ์เขียว" ที่ไม่เปล
 </li>
 <li>
 <p><strong>กราฟวาดอย่างไร ใช้ไลบรารีอะไร</strong>
-   ไม่ใช้ไลบรารี วาดเองด้วย <code>CustomPainter</code> (ตั้งแต่ 9 ต.ค. เป็นกราฟแท่ง): แบ่งความกว้างเป็นช่องเท่ากัน หนึ่งแท่งต่อชั่วโมง/วัน (<code>EnergyChartGeometry.slot</code>) ความสูงเทียบกับตัวเลขกลมจาก <code>niceScaleMax</code> (เช่น สูงสุดจริง 3.56 → แกน 4) วาดเส้นตาราง 3 เส้น แท่งมุมมน ค่า 0 เป็นขีดจาง ป้ายเฉพาะแท่งสูงสุด และเส้นประค่าเฉลี่ยเมื่อเป็นรายวัน ≥ 7 วัน ส่วนการแตะใช้ <code>GestureDetector</code> + <code>indexAt</code> หาร x ด้วยความกว้างช่องได้แท่งทันที</p>
+   ไม่ใช้ไลบรารี วาดเองด้วย <code>CustomPainter</code> เป็นกราฟแท่ง: แบ่งความกว้างเป็นช่องเท่ากัน หนึ่งแท่งต่อชั่วโมง/วัน (<code>EnergyChartGeometry.slot</code>) ความสูงเทียบกับตัวเลขกลมจาก <code>niceScaleMax</code> (เช่น สูงสุดจริง 3.56 → แกน 4) วาดเส้นตาราง 3 เส้น แท่งมุมมน ค่า 0 เป็นขีดจาง ป้ายเฉพาะแท่งสูงสุด และเส้นประค่าเฉลี่ยเมื่อเป็นรายวัน ≥ 7 วัน ส่วนการแตะใช้ <code>GestureDetector</code> + <code>indexAt</code> หาร x ด้วยความกว้างช่องได้แท่งทันที</p>
 </li>
 <li>
 <p><strong>ทำไมหน่วยบนกราฟเปลี่ยนเป็น Wh บ้าง kWh บ้าง</strong>
@@ -3830,19 +3828,19 @@ Widget เป็น "พิมพ์เขียว" ที่ไม่เปล
     <code>Form</code> + <code>GlobalKey&lt;FormState&gt;</code> เรียก <code>validate()</code> ซึ่งรัน validator ของทุก <code>TextFormField</code> (ห้ามว่าง) ข้อความ error ขึ้นใต้ช่อง ส่วน error จากเซิร์ฟเวอร์ (รหัสผิด เซิร์ฟเวอร์ช้า) จับด้วย <code>on ApiException</code> แล้วแสดง SnackBar สีแดง</p>
 </li>
 <li>
-<p><strong>แอร์บางเครื่องมีปุ่มน้อยกว่าเครื่องอื่น เพราะอะไร</strong> (เพิ่ม 11 ต.ค. 2569)
+<p><strong>แอร์บางเครื่องมีปุ่มน้อยกว่าเครื่องอื่น เพราะอะไร</strong>
     เครื่องที่ป้ายขึ้น "Daikin · สายแอร์" ใช้บอร์ดที่ต่อสายแอร์แทนรีโมตติดผนัง (<code>protocol = DAIKIN_WIRED</code>) ซึ่งสั่งได้แค่ที่รีโมตติดผนังทำได้: เปิด/ปิด 16–30 °C, Cool/Dry/Fan, พัดลม 4 ระดับ, ส่าย/หยุด และ Sleep <code>FullRemoteSheet</code> ถาม getter <code>supportsEco</code>, <code>supportsSleep</code> ฯลฯ ของโมเดลแล้วซ่อนสวิตช์ที่ทำไม่ได้ และ <code>normalizeForProtocol()</code> ปรับร่างก่อนส่งเพื่อไม่ให้ Backend ตอบ 400</p>
 </li>
 <li>
-<p><strong>ลบแอร์หรือเซ็นเซอร์ในแอปแล้ว บอร์ดจริงเป็นอย่างไร</strong> (เพิ่ม 13 ต.ค. 2569)
-    แอปเรียก <code>DELETE /air-conditioners/:deviceId</code> (หรือ <code>/occupancy-sensors/:deviceId</code>) เหมือนเดิม แต่ Backend ตอนนี้ส่ง <code>{"action":"unprovision"}</code> ไปที่ topic <code>command</code> ของบอร์ดและรอคำตอบไม่เกิน 4 วินาที บอร์ดที่ออนไลน์จะล้าง Wi-Fi/MQTT/ห้องใน NVS แล้วรีบูตเข้าโหมดตั้งค่าบลูทูธ จากนั้น Backend จึงล้าง retained และลบบัญชี MQTT ผลว่าบอร์ดยืนยันไหมอยู่ในช่อง <code>boardCleared</code> ของคำตอบ แต่แอปไม่ได้อ่านค่านี้ ผู้ใช้จึงไม่รู้จากแอปว่าบอร์ดออฟไลน์อยู่และยังจำค่าเดิม</p>
+<p><strong>ลบแอร์หรือเซ็นเซอร์ในแอปแล้ว บอร์ดจริงเป็นอย่างไร</strong>
+    แอปเรียก <code>DELETE /air-conditioners/:deviceId</code> (หรือ <code>/occupancy-sensors/:deviceId</code>) แล้ว Backend ส่ง <code>{"action":"unprovision"}</code> ไปที่ topic <code>command</code> ของบอร์ดและรอคำตอบไม่เกิน 4 วินาที บอร์ดที่ออนไลน์จะล้าง Wi-Fi/MQTT/ห้องใน NVS แล้วรีบูตเข้าโหมดตั้งค่าบลูทูธ จากนั้น Backend จึงล้าง retained และลบบัญชี MQTT ผลว่าบอร์ดยืนยันไหมอยู่ในช่อง <code>boardCleared</code> ของคำตอบ แต่แอปไม่ได้อ่านค่านี้ ผู้ใช้จึงไม่รู้จากแอปว่าบอร์ดออฟไลน์อยู่และยังจำค่าเดิม</p>
 </li>
 <li>
-<p><strong>ป้าย "Daikin · สายแอร์" รู้ยี่ห้อได้อย่างไร และทำไมรับแค่ <code>protocol</code> ไม่รับทั้งแอร์</strong> (เพิ่ม 14 ต.ค. 2569)
+<p><strong>ป้าย "Daikin · สายแอร์" รู้ยี่ห้อได้อย่างไร และทำไมรับแค่ <code>protocol</code> ไม่รับทั้งแอร์</strong>
     <code>AirControlBadge</code> เรียก <code>airBrandOf(protocol)</code> กับ <code>airControlTypeOf(protocol)</code> จากไฟล์โมเดล เช่น <code>HAIER_AC176</code> → "Haier · รีโมต IR" (สีเทา ไอคอนรีโมต) และ <code>DAIKIN_WIRED</code> → "Daikin · สายแอร์" (สีฟ้า ไอคอนสายไฟ) รับแค่ข้อความเพราะป้ายไม่ต้องรู้สถานะอื่นของแอร์ จะเอาไปวางที่ไหนก็ได้ที่รู้โปรโตคอล และใช้ <code>StatusPill</code> เดิม จึงได้สีที่ปรับให้อ่านง่ายในธีมมืดไปด้วย ป้ายแสดงทั้งตอนแอร์ออนไลน์และออฟไลน์ เพื่อให้รู้ว่าเครื่องนี้ปุ่มน้อยกว่าเพราะชนิดบอร์ด ไม่ใช่เพราะแอปเสีย</p>
 </li>
 <li>
-<p><strong>ทำไมเลือกโหมด Dry ในรีโมตเต็มแล้วสวิตช์ Sleep หายไป</strong> (เพิ่ม 14 ต.ค. 2569)
+<p><strong>ทำไมเลือกโหมด Dry ในรีโมตเต็มแล้วสวิตช์ Sleep หายไป</strong>
     รีโมตติดผนังของ Daikin ใช้ Sleep ในโหมด Dry ไม่ได้ โมเดลจึงเขียน <code>supportsSleep</code> ขึ้นกับ <code>mode</code> และตอนกดชิปโหมด <code>FullRemoteSheet</code> เรียก <code>normalizeForProtocol()</code> ทันทีสำหรับเครื่องสายแอร์ ค่า <code>sleep</code> จึงถูกปิดในร่างคำสั่ง และ <code>setState</code> วาดจอใหม่โดยไม่มีสวิตช์ Sleep ในเฟรมเดียวกัน ถ้าไม่ปรับค่า ร่างจะส่ง <code>sleep: true</code> ในโหมด Dry ไปให้ Backend ซึ่งบังคับปิดซ้ำอยู่ดี</p>
 </li>
 </ol>
@@ -3856,13 +3854,13 @@ Widget เป็น "พิมพ์เขียว" ที่ไม่เปล
 <li class="check"><input type="checkbox"> อธิบายการวาดกราฟแท่งด้วย <code>CustomPainter</code> (<code>niceScaleMax</code>, <code>EnergyChartGeometry</code>, การแตะดูค่า) และการเลือกหน่วย W/kWh/MWh</li>
 <li class="check"><input type="checkbox"> อธิบายได้ว่า <code>IndexedStack</code> ใน <code>AppShell</code> ทำให้สลับแท็บแล้วค่าที่เลือกไม่หายอย่างไร</li>
 <li class="check"><input type="checkbox"> อธิบายว่าทำไมปุ่มบนการ์ดส่งคำสั่งทันที แต่รีโมตเต็มต้องกดส่งครั้งเดียว</li>
-<li class="check"><input type="checkbox"> (เพิ่ม 14 ต.ค. 2569) บอกได้ว่า <code>AirControlBadge</code> แสดงที่ไหนบ้าง (การ์ดสองหน้าตา + หัวรีโมตเต็ม) สีและไอคอนต่างกันอย่างไรระหว่างสายแอร์กับ IR</li>
-<li class="check"><input type="checkbox"> (เพิ่ม 14 ต.ค. 2569) อธิบายได้ว่ารีโมตเต็มซ่อนสวิตช์ทีละตัวด้วย <code>supportsXxx</code> อย่างไร ซ่อนหัวข้อทั้งหมดเมื่อไหร่ และทำไมเลือกซ่อนแทน disable</li>
-<li class="check"><input type="checkbox"> (เพิ่ม 14 ต.ค. 2569) อธิบายได้ว่าลบแอร์ในแอปแล้วบอร์ดถูกล้างค่า (unprovision) อย่างไร และข้อจำกัดที่แอปไม่แสดง <code>boardCleared</code></li>
+<li class="check"><input type="checkbox"> บอกได้ว่า <code>AirControlBadge</code> แสดงที่ไหนบ้าง (การ์ดสองหน้าตา + หัวรีโมตเต็ม) สีและไอคอนต่างกันอย่างไรระหว่างสายแอร์กับ IR</li>
+<li class="check"><input type="checkbox"> อธิบายได้ว่ารีโมตเต็มซ่อนสวิตช์ทีละตัวด้วย <code>supportsXxx</code> อย่างไร ซ่อนหัวข้อทั้งหมดเมื่อไหร่ และทำไมเลือกซ่อนแทน disable</li>
+<li class="check"><input type="checkbox"> อธิบายได้ว่าลบแอร์ในแอปแล้วบอร์ดถูกล้างค่า (unprovision) อย่างไร และข้อจำกัดที่แอปไม่แสดง <code>boardCleared</code></li>
 <li class="check"><input type="checkbox"> อธิบายหน้าตารางเรียน: โหลดทีละสัปดาห์ คาบเรียนกับการใช้ห้องเรียงรวมกัน และวันนอกภาคเรียนขึ้นว่าไม่มีเรียน</li>
 </ul><nav class="pager"><a class="prev" href="10-flutter-architecture.html"><span>← บทก่อนหน้า</span>10. แอป Flutter ตอนที่ 1: โครงสร้าง ข้อมูล และ State</a><a class="next" href="12-flutter-admin-screens.html"><span>บทถัดไป →</span>12. แอป Flutter ตอนที่ 3: หน้าจอผู้ดูแลระบบและการตั้งค่า</a></nav>
   </main>
-  <aside class="toc"><div class="toc-title">ในบทนี้</div><ul><li><a href="#ภาพรวม">ภาพรวม</a></li><li><a href="#โครงสร้างไฟล์">โครงสร้างไฟล์</a></li><li><a href="#พื้นฐาน-flutter-ที่ต้องรู้ก่อน">พื้นฐาน Flutter ที่ต้องรู้ก่อน</a></li><li><a href="#หน้าเข้าสู่ระบบ-กลุ่ม-auth">หน้าเข้าสู่ระบบ (กลุ่ม auth)</a></li><li><a href="#appshell--โครงหลักหลังล็อกอิน">AppShell — โครงหลักหลังล็อกอิน</a></li><li><a href="#homescreen--หน้าหลัก">HomeScreen — หน้าหลัก</a></li><li><a href="#analyticsscreen--หน้าสถิติ">AnalyticsScreen — หน้าสถิติ</a></li><li><a href="#periodselector--เลือกช่วงเวลา">PeriodSelector — เลือกช่วงเวลา</a></li><li><a href="#energyusagechart--กราฟแท่งพลังงาน-เปลี่ยนจากกราฟเส้น-9-ตค-2569">EnergyUsageChart — กราฟแท่งพลังงาน (เปลี่ยนจากกราฟเส้น 9 ต.ค. 2569)</a></li><li><a href="#roomsscreen--แท็บควบคุม-เลือกห้อง">RoomsScreen — แท็บควบคุม (เลือกห้อง)</a></li><li><a href="#roomcontrolscreen--หน้าควบคุมห้อง">RoomControlScreen — หน้าควบคุมห้อง</a></li><li><a href="#aircontrolcard--การ์ดแอร์และการส่งคำสั่ง">AirControlCard — การ์ดแอร์และการส่งคำสั่ง</a></li><li><a href="#fullremotesheet--รีโมตเต็มรูปแบบ">FullRemoteSheet — รีโมตเต็มรูปแบบ</a></li><li><a href="#aircontrolbadge--ป้ายยี่ห้อและวิธีควบคุม-ใหม่-11-ตค-2569">AirControlBadge — ป้ายยี่ห้อและวิธีควบคุม (ใหม่ 11 ต.ค. 2569)</a></li><li><a href="#autooffcountdown--นาฬิกานับถอยหลังปิดแอร์">AutoOffCountdown — นาฬิกานับถอยหลังปิดแอร์</a></li><li><a href="#schedulescreen--แท็บตารางเรียน-เขียนใหม่-9-ตค-2569">ScheduleScreen — แท็บตารางเรียน (เขียนใหม่ 9 ต.ค. 2569)</a></li><li><a href="#bookingeditorscreen--เพิ่มแก้การใช้ห้อง-ใหม่-9-ตค-2569-824-บรรทัด">BookingEditorScreen — เพิ่ม/แก้การใช้ห้อง (ใหม่ 9 ต.ค. 2569, 824 บรรทัด)</a></li><li><a href="#termcalendarscreen--ปฏิทินภาคเรียน-ใหม่-9-ตค-2569-496-บรรทัด">TermCalendarScreen — ปฏิทินภาคเรียน (ใหม่ 9 ต.ค. 2569, 496 บรรทัด)</a></li><li><a href="#วิดเจ็ตย่อยที่ใช้ซ้ำ">วิดเจ็ตย่อยที่ใช้ซ้ำ</a></li><li><a href="#เส้นทางของผู้ใช้-user-journey">เส้นทางของผู้ใช้ (User journey)</a></li><li><a href="#ข้อสังเกตและจุดที่ไม่สอดคล้องในโค้ด">ข้อสังเกตและจุดที่ไม่สอดคล้องในโค้ด</a></li><li><a href="#หลักการออกแบบที่ควรจำ">หลักการออกแบบที่ควรจำ</a></li><li><a href="#คำถามที่อาจารย์อาจถาม">คำถามที่อาจารย์อาจถาม</a></li><li><a href="#สรุปและเช็กลิสต์ความเข้าใจ">สรุปและเช็กลิสต์ความเข้าใจ</a></li></ul></aside>
+  <aside class="toc"><div class="toc-title">ในบทนี้</div><ul><li><a href="#ภาพรวม">ภาพรวม</a></li><li><a href="#โครงสร้างไฟล์">โครงสร้างไฟล์</a></li><li><a href="#พื้นฐาน-flutter-ที่ต้องรู้ก่อน">พื้นฐาน Flutter ที่ต้องรู้ก่อน</a></li><li><a href="#หน้าเข้าสู่ระบบ-กลุ่ม-auth">หน้าเข้าสู่ระบบ (กลุ่ม auth)</a></li><li><a href="#appshell--โครงหลักหลังล็อกอิน">AppShell — โครงหลักหลังล็อกอิน</a></li><li><a href="#homescreen--หน้าหลัก">HomeScreen — หน้าหลัก</a></li><li><a href="#analyticsscreen--หน้าสถิติ">AnalyticsScreen — หน้าสถิติ</a></li><li><a href="#periodselector--เลือกช่วงเวลา">PeriodSelector — เลือกช่วงเวลา</a></li><li><a href="#energyusagechart--กราฟแท่งพลังงาน">EnergyUsageChart — กราฟแท่งพลังงาน</a></li><li><a href="#roomsscreen--แท็บควบคุม-เลือกห้อง">RoomsScreen — แท็บควบคุม (เลือกห้อง)</a></li><li><a href="#roomcontrolscreen--หน้าควบคุมห้อง">RoomControlScreen — หน้าควบคุมห้อง</a></li><li><a href="#aircontrolcard--การ์ดแอร์และการส่งคำสั่ง">AirControlCard — การ์ดแอร์และการส่งคำสั่ง</a></li><li><a href="#fullremotesheet--รีโมตเต็มรูปแบบ">FullRemoteSheet — รีโมตเต็มรูปแบบ</a></li><li><a href="#aircontrolbadge--ป้ายยี่ห้อและวิธีควบคุม">AirControlBadge — ป้ายยี่ห้อและวิธีควบคุม</a></li><li><a href="#autooffcountdown--นาฬิกานับถอยหลังปิดแอร์">AutoOffCountdown — นาฬิกานับถอยหลังปิดแอร์</a></li><li><a href="#schedulescreen--แท็บตารางเรียน">ScheduleScreen — แท็บตารางเรียน</a></li><li><a href="#bookingeditorscreen--เพิ่มแก้การใช้ห้อง-824-บรรทัด">BookingEditorScreen — เพิ่ม/แก้การใช้ห้อง (824 บรรทัด)</a></li><li><a href="#termcalendarscreen--ปฏิทินภาคเรียน-496-บรรทัด">TermCalendarScreen — ปฏิทินภาคเรียน (496 บรรทัด)</a></li><li><a href="#วิดเจ็ตย่อยที่ใช้ซ้ำ">วิดเจ็ตย่อยที่ใช้ซ้ำ</a></li><li><a href="#เส้นทางของผู้ใช้-user-journey">เส้นทางของผู้ใช้ (User journey)</a></li><li><a href="#ข้อสังเกตและจุดที่ไม่สอดคล้องในโค้ด">ข้อสังเกตและจุดที่ไม่สอดคล้องในโค้ด</a></li><li><a href="#หลักการออกแบบที่ควรจำ">หลักการออกแบบที่ควรจำ</a></li><li><a href="#คำถามที่อาจารย์อาจถาม">คำถามที่อาจารย์อาจถาม</a></li><li><a href="#สรุปและเช็กลิสต์ความเข้าใจ">สรุปและเช็กลิสต์ความเข้าใจ</a></li></ul></aside>
 </div>
 <button class="to-top" id="toTop" aria-label="กลับขึ้นด้านบน">↑</button>
 <script src="../assets/search.js"></script>

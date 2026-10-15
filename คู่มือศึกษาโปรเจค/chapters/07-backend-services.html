@@ -55,10 +55,8 @@
 <li><a href="17-glossary.html"><span class="num">17</span>อภิธานศัพท์</a></li>
 <li><a href="18-file-map.html"><span class="num">18</span>แผนที่ไฟล์ทั้งโปรเจค</a></li>
 </ul>
-<div class="nav-part">งานที่กำลังพัฒนา</div><ul>
-<li><a href="19-daikin-slm8.html"><span class="num">19</span>แอร์ Daikin ผ่านสาย SLM8: จากการแกะโปรโตคอลถึงบอร์ดสายแอร์</a></li>
-</ul>
 <div class="nav-part">เจาะลึก</div><ul>
+<li><a href="19-daikin-slm8.html"><span class="num">19</span>แอร์ Daikin ผ่านสาย SLM8: จากการแกะโปรโตคอลถึงบอร์ดสายแอร์</a></li>
 <li><a href="20-database-design.html"><span class="num">20</span>เจาะลึกการออกแบบฐานข้อมูล</a></li>
 </ul>
     </nav>
@@ -144,12 +142,12 @@ OCC32 เซ็นเซอร์คน ──MQTT──▶              │    
     ├── air-conditioner.js     ตรวจข้อมูลแอร์/คำสั่งแอร์, แปลงแถว DB เป็น JSON
     ├── occupancy-sensor.js    ตรวจข้อมูลเซ็นเซอร์คน, ปรับรูปข้อความสถานะ
     ├── firmware.js            ตรวจชื่อไฟล์/ชนิด/รุ่น/เนื้อไฟล์ firmware, สร้าง URL สำหรับ OTA
-    ├── unprovision.js         คำสั่งล้างค่าบอร์ด + ตรวจคำตอบ (เพิ่ม 13 ต.ค. 2569)
+    ├── unprovision.js         คำสั่งล้างค่าบอร์ด + ตรวจคำตอบ
     └── schema-doctor.js       อ่าน schema.sql เทียบกับฐานข้อมูลจริง
 </code></pre></div>
 </div>
 
-<p>ไฟล์ทดสอบที่เกี่ยวข้องอยู่ที่ <code>backend/test/</code> เช่น <code>auto-off.test.js</code>, <code>energy-history.test.js</code>, <code>offline-history.test.js</code>, <code>mqtt-accounts.test.js</code>, <code>schedule-import.test.js</code>, <code>xlsx-writer.test.js</code>, <code>unprovision.test.js</code> (เพิ่ม 13 ต.ค. 2569) รันทั้งหมดด้วย <code>npm test</code> (คือ <code>node --test</code>)</p>
+<p>ไฟล์ทดสอบที่เกี่ยวข้องอยู่ที่ <code>backend/test/</code> เช่น <code>auto-off.test.js</code>, <code>energy-history.test.js</code>, <code>offline-history.test.js</code>, <code>mqtt-accounts.test.js</code>, <code>schedule-import.test.js</code>, <code>xlsx-writer.test.js</code>, <code>unprovision.test.js</code> รันทั้งหมดด้วย <code>npm test</code> (คือ <code>node --test</code>)</p>
 <h2 id="อธิบายทีละไฟล์">อธิบายทีละไฟล์<a class="anchor" href="#อธิบายทีละไฟล์">#</a></h2>
 <p><strong>กลุ่ม MQTT</strong></p>
 <h3 id="servicesmqttjs-876-บรรทัด--สะพานระหว่าง-broker-กับ-backend"><code>services/mqtt.js</code> (876 บรรทัด) — สะพานระหว่าง Broker กับ Backend<a class="anchor" href="#servicesmqttjs-876-บรรทัด--สะพานระหว่าง-broker-กับ-backend">#</a></h3>
@@ -276,7 +274,7 @@ OCC32 เซ็นเซอร์คน ──MQTT──▶              │    
 <td><code>&lt;prefix&gt;/&lt;id&gt;/command</code></td>
 <td>ไม่</td>
 <td><code>{version:1, commandId, sentAt, action:'unprovision', deviceId}</code></td>
-<td><code>unprovisionDevice(kind, id)</code> สั่งบอร์ดล้างค่าในตัวเองตอนแอดมินลบอุปกรณ์ แล้วรอคำตอบไม่เกิน 4 วินาที (เพิ่ม 13 ต.ค. 2569)</td>
+<td><code>unprovisionDevice(kind, id)</code> สั่งบอร์ดล้างค่าในตัวเองตอนแอดมินลบอุปกรณ์ แล้วรอคำตอบไม่เกิน 4 วินาที</td>
 </tr>
 <tr>
 <td><code>rmutt/ac/&lt;id&gt;/schedule-status</code></td>
@@ -312,24 +310,24 @@ OCC32 เซ็นเซอร์คน ──MQTT──▶              │    
 </table></div>
 <p><code>commandId</code> (UUID สุ่ม) ทำให้บอร์ดแยกคำสั่งซ้ำได้ <code>version: 1</code> ให้โปรโตคอลขยายได้ในอนาคต ฟังก์ชันส่งคำสั่งทั้งหมดตรวจ <code>client?.connected</code> ก่อน ถ้ายังไม่ต่อจะโยน error ที่มี <code>statusCode = 503</code> ให้ route แปลงเป็นข้อความ "Backend ยังไม่เชื่อมต่อ MQTT Broker"</p>
 <p><strong>สถานะออนไลน์และ LWT</strong> บอร์ดแอร์ฝัง Last Will ไว้ตอน <code>connect</code> ที่ topic <code>&lt;prefix&gt;/&lt;id&gt;/status</code> (QoS 1, retained) เนื้อหา <code>{"online":false,"deviceId":"..."}</code> เมื่อบอร์ดหลุด Broker ส่งข้อความนี้ให้ Backend ผ่าน subscription <code>/status</code> เดิม <code>normalizePowerStatus</code> (บรรทัด 674) ตีความ <code>online: source.online !== false</code> และเมื่อ <code>pzemAvailable</code> ไม่ใช่ <code>true</code> ค่าไฟฟ้าทุกตัวเป็น <code>null</code> และ <code>acRunning</code> เป็น <code>false</code> ผลคือแถวถูกเขียนเป็น <code>is_online = 0</code> โดยไม่ต้องมีโค้ดแยกสำหรับ "ออฟไลน์" ข้อความ LWT ไม่มี <code>firmwareVersion</code> จึงไม่ไปทับรุ่นเฟิร์มแวร์เดิม (<code>recordFirmwareStatus</code> ข้ามเมื่อไม่มีรุ่น)</p>
-<p><strong>ล้างค่าบอร์ดตอนลบอุปกรณ์ (unprovision, เพิ่ม 13 ต.ค. 2569)</strong> <code>unprovisionDevice(kind, deviceId)</code> (บรรทัด 306) เป็นคำสั่งเดียวในไฟล์ที่ "ส่งแล้วรอคำตอบ" แทนที่จะส่งแล้วจบ ขั้นตอนคือ (1) ถ้ายังไม่ต่อ Broker คืน <code>{sent:false, acknowledged:false}</code> ทันที (2) สร้าง payload ด้วย <code>buildUnprovisionCommand</code> จาก <code>utils/unprovision.js</code> (3) สร้าง Promise ที่จะจบเมื่อบอร์ดตอบ หรือเมื่อครบ <code>UNPROVISION_ACK_TIMEOUT_MS</code> = 4000 ms แล้วเก็บฟังก์ชันปิดการรอไว้ใน <code>Map</code> ชื่อ <code>unprovisionWaiters</code> (key = รหัสบอร์ด) (4) publish ไปที่ <code>&lt;prefix&gt;/&lt;id&gt;/command</code> แบบ QoS 1 <strong>ไม่ retain</strong> (5) เมื่อบอร์ดส่ง <code>{"unprovisioned":true,"deviceId":...}</code> มาทาง <code>status</code> ตัวแยก topic เรียก <code>consumeUnprovisionAck</code> (บรรทัด 348) ซึ่งเรียกฟังก์ชันใน <code>Map</code> ด้วย <code>true</code> ฟังก์ชันนี้ <strong>ไม่โยน error เลย</strong> เพราะการลบในฐานข้อมูลต้องสำเร็จเสมอแม้บอร์ดออฟไลน์ ผลลัพธ์ <code>acknowledged</code> ถูกส่งต่อเป็น <code>boardCleared</code> ในคำตอบของ route ลบ (ดูบท Backend ตอนที่ 1)</p>
+<p><strong>ล้างค่าบอร์ดตอนลบอุปกรณ์ (unprovision)</strong> <code>unprovisionDevice(kind, deviceId)</code> (บรรทัด 306) เป็นคำสั่งเดียวในไฟล์ที่ "ส่งแล้วรอคำตอบ" แทนที่จะส่งแล้วจบ ขั้นตอนคือ (1) ถ้ายังไม่ต่อ Broker คืน <code>{sent:false, acknowledged:false}</code> ทันที (2) สร้าง payload ด้วย <code>buildUnprovisionCommand</code> จาก <code>utils/unprovision.js</code> (3) สร้าง Promise ที่จะจบเมื่อบอร์ดตอบ หรือเมื่อครบ <code>UNPROVISION_ACK_TIMEOUT_MS</code> = 4000 ms แล้วเก็บฟังก์ชันปิดการรอไว้ใน <code>Map</code> ชื่อ <code>unprovisionWaiters</code> (key = รหัสบอร์ด) (4) publish ไปที่ <code>&lt;prefix&gt;/&lt;id&gt;/command</code> แบบ QoS 1 <strong>ไม่ retain</strong> (5) เมื่อบอร์ดส่ง <code>{"unprovisioned":true,"deviceId":...}</code> มาทาง <code>status</code> ตัวแยก topic เรียก <code>consumeUnprovisionAck</code> (บรรทัด 348) ซึ่งเรียกฟังก์ชันใน <code>Map</code> ด้วย <code>true</code> ฟังก์ชันนี้ <strong>ไม่โยน error เลย</strong> เพราะการลบในฐานข้อมูลต้องสำเร็จเสมอแม้บอร์ดออฟไลน์ ผลลัพธ์ <code>acknowledged</code> ถูกส่งต่อเป็น <code>boardCleared</code> ในคำตอบของ route ลบ (ดูบท Backend ตอนที่ 1)</p>
 <div class="callout why"><div class="callout-title">ทำไม</div><p>ทำไมรอแค่ 4 วินาที: route ลบอุปกรณ์ต้องรอผลนี้ก่อนตอบแอป ถ้ารอนานแอดมินจะเห็นปุ่มค้าง บอร์ดที่ออนไลน์ปกติตอบได้ในไม่ถึงวินาที (ส่งคำตอบก่อนเริ่มล้าง NVS) ถ้าเกิน 4 วินาทีแทบแน่ใจว่าบอร์ดออฟไลน์ ซึ่งรอนานกว่านี้ก็ไม่ได้อะไรเพิ่ม และทำไมไม่ส่งแบบ retain: ถ้าคำสั่งค้างบน Broker วันหลังเอาบอร์ดตัวเดิมกลับมาติดตั้งใหม่ บอร์ดจะได้รับคำสั่งเก่าทันทีที่ต่อ แล้วล้างตัวเองทิ้งอีกรอบ</p></div>
 
 <div class="callout note"><div class="callout-title">หมายเหตุ</div><p>บรรทัด 323 <code>unprovisionWaiters.get(deviceId)?.(false)</code> ปิดการรอเก่าของบอร์ดเดียวกันก่อน (กรณีกดลบซ้ำเร็ว ๆ) และใน <code>finish</code> เช็ก <code>unprovisionWaiters.get(deviceId) === finish</code> ก่อนลบออกจาก <code>Map</code> เพื่อไม่ให้ตัวรอเก่าที่หมดเวลาทีหลังไปลบตัวรอใหม่ทิ้ง <code>?.(...)</code> คือ "เรียกฟังก์ชันถ้ามี ถ้าไม่มี (undefined) ไม่ต้องทำอะไร"</p></div>
 
-<p><strong>แก้ protocol ตามบอร์ดสายแอร์ (เพิ่ม 11 ต.ค. 2569)</strong> บอร์ดรุ่น <code>rmutt_esp32_air_wired</code> ใส่ <code>controlMode: "wired"</code> ใน status ทุกครั้ง ตัวแยก topic อ่านด้วย <code>protocolFromStatus</code> (จาก <code>utils/air-conditioner.js</code>) แล้วเรียก <code>syncControlProtocol</code> (บรรทัด 445) ให้แถวใน <code>air_conditioners</code> มี <code>protocol = 'DAIKIN_WIRED'</code> ก่อนประมวลผล status ทำในคิวเดียวกับ <code>handleAirStatus</code> (ดูเจาะโค้ดจุดที่ 2)</p>
+<p><strong>แก้ protocol ตามบอร์ดสายแอร์</strong> บอร์ดรุ่น <code>rmutt_esp32_air_wired</code> ใส่ <code>controlMode: "wired"</code> ใน status ทุกครั้ง ตัวแยก topic อ่านด้วย <code>protocolFromStatus</code> (จาก <code>utils/air-conditioner.js</code>) แล้วเรียก <code>syncControlProtocol</code> (บรรทัด 445) ให้แถวใน <code>air_conditioners</code> มี <code>protocol = 'DAIKIN_WIRED'</code> ก่อนประมวลผล status ทำในคิวเดียวกับ <code>handleAirStatus</code> (ดูเจาะโค้ดจุดที่ 2)</p>
 <p><strong>ข้อมูลย้อนหลังและ ack</strong> ตอนเน็ตหลุดบอร์ดเก็บสรุปช่วงละ 5 นาทีไว้ในตัว พอต่อได้จะส่งไปที่ <code>/history</code> เป็นชุด Backend บันทึกผ่าน <code>recordHistoryBatch</code> แล้วตอบ <code>history-ack</code> พร้อม <code>upTo</code> (เวลาของรายการล่าสุดที่จัดการแล้ว) บอร์ดลบทุกรายการที่เวลา ≤ <code>upTo</code> และส่งชุดถัดไปหลังได้รับ ack เท่านั้น <strong>ถ้าบันทึกไม่สำเร็จ Backend จะไม่ตอบ</strong> บอร์ดจึงส่งชุดเดิมซ้ำเอง (เฟิร์มแวร์รอ ack 20 วินาที ลองใหม่หลัง 5 วินาที: <code>HISTORY_ACK_TIMEOUT_MS</code>, <code>HISTORY_RETRY_DELAY_MS</code>) ความปลอดภัยของการส่งซ้ำมาจากจุดต่อ (chain) ใน <code>energy-recorder.js</code></p>
 <p><strong>ผู้ฟังเหตุการณ์ (listener)</strong> ไฟล์มี 3 ชุด <code>onAirStatus</code>, <code>onOccupancyStatus</code>, <code>onMqttConnected</code> แต่ละตัวคืนฟังก์ชันยกเลิกการสมัคร ฟังก์ชัน <code>notify</code> เรียกทุก listener ภายใน <code>try/catch</code> เพื่อให้ listener ที่พังไม่ทำให้ตัวอื่นหรือการรับ MQTT พังตาม</p>
 <div class="callout why"><div class="callout-title">ทำไม</div><p>ทำไมต้องมี listener แทนที่ <code>services/mqtt.js</code> จะ <code>import</code> <code>services/auto-off.js</code> ตรง ๆ: ระบบปิดแอร์ต้อง import <code>publishAirCommand</code> จาก <code>mqtt.js</code> อยู่แล้ว ถ้า <code>mqtt.js</code> import กลับจะเกิด <strong>circular import</strong> (สองไฟล์อ้างถึงกันเป็นวง) แก้ด้วยกลับทิศ: <code>mqtt.js</code> ไม่รู้จักใคร แค่เปิดช่องให้คนมาฟัง ผลพลอยได้คือทดสอบแต่ละฝั่งแยกกันได้</p></div>
 
-<p><strong>ใครเรียกไฟล์นี้</strong> <code>server.js</code> เรียก <code>startMqttBridge</code>/<code>stopMqttBridge</code>; <code>routes/air-conditioners.js</code> และ <code>routes/occupancy-sensors.js</code> เรียก <code>publishAirCommand</code>, <code>publishEnterSetupMode</code>, <code>publishEnterOccupancySetupMode</code>, <code>publishOtaCommand</code>, <code>unprovisionDevice</code> (เพิ่ม 13 ต.ค. 2569), <code>clearRetainedAirTopics</code>, <code>clearRetainedOccupancyTopics</code>; <code>services/auto-off.js</code> เรียก <code>onAirStatus</code>, <code>onOccupancyStatus</code>, <code>publishAirCommand</code>; <code>services/mqtt-accounts.js</code> เรียก <code>dynsecRequest</code>, <code>onMqttConnected</code>; <code>getMqttBridgeStatus()</code> ใช้ในหน้า health โดยตั้งใจไม่คืน username/password (มีเทสต์ใน <code>test/mqtt.test.js</code> ตรวจ)</p>
+<p><strong>ใครเรียกไฟล์นี้</strong> <code>server.js</code> เรียก <code>startMqttBridge</code>/<code>stopMqttBridge</code>; <code>routes/air-conditioners.js</code> และ <code>routes/occupancy-sensors.js</code> เรียก <code>publishAirCommand</code>, <code>publishEnterSetupMode</code>, <code>publishEnterOccupancySetupMode</code>, <code>publishOtaCommand</code>, <code>unprovisionDevice</code>, <code>clearRetainedAirTopics</code>, <code>clearRetainedOccupancyTopics</code>; <code>services/auto-off.js</code> เรียก <code>onAirStatus</code>, <code>onOccupancyStatus</code>, <code>publishAirCommand</code>; <code>services/mqtt-accounts.js</code> เรียก <code>dynsecRequest</code>, <code>onMqttConnected</code>; <code>getMqttBridgeStatus()</code> ใช้ในหน้า health โดยตั้งใจไม่คืน username/password (มีเทสต์ใน <code>test/mqtt.test.js</code> ตรวจ)</p>
 <p>ฟังก์ชันช่วยที่ export ไว้ให้เทสต์: <code>normalizePowerStatus</code>, <code>firmwareFields</code> (ตัดรุ่นเฟิร์มแวร์ 20 ตัวอักษร ข้อความ OTA error 120 ตัวอักษร), <code>evaluateClassSchedule</code> (re-export จาก <code>class-schedule.js</code>)</p>
 <h3 id="utilsmqtt-topicsjs-26-บรรทัด"><code>utils/mqtt-topics.js</code> (26 บรรทัด)<a class="anchor" href="#utilsmqtt-topicsjs-26-บรรทัด">#</a></h3>
 <p>รายชื่อ "ส่วนท้าย topic" ที่ถูกส่งแบบ retained: <code>AIR_RETAINED_SUFFIXES</code> (6 ตัว: <code>command</code>, <code>state</code>, <code>status</code>, <code>provision</code>, <code>provision-ack</code>, <code>schedule-status</code>) และ <code>OCCUPANCY_RETAINED_SUFFIXES</code> (4 ตัว) กับฟังก์ชัน <code>retainedTopics(prefix, deviceId, suffixes)</code> ที่ประกอบเป็น topic เต็ม ใช้ตอนถอดอุปกรณ์: <code>clearRetained</code> ใน <code>mqtt.js</code> publish ข้อความว่าง (<code>''</code>) แบบ retained ไปทุก topic ซึ่งเป็นวิธีมาตรฐานของ MQTT ที่สั่งให้ Broker ลืมข้อความ retained ของ topic นั้น แยกเป็นไฟล์ <code>utils</code> เพราะประกอบสตริงล้วน ไม่ต้องแตะ Broker จึงมีเทสต์ใน <code>test/mqtt.test.js</code></p>
 <h3 id="utilsmqtt-provisioningjs-35-บรรทัด"><code>utils/mqtt-provisioning.js</code> (35 บรรทัด)<a class="anchor" href="#utilsmqtt-provisioningjs-35-บรรทัด">#</a></h3>
 <p><code>resolveMqttProvisioningSettings(settings)</code> แปลง <code>MQTT_URL</code> (หรือ <code>MQTT_DEVICE_URL</code> ถ้าตั้งไว้) เป็น <code>{mqttHost, mqttPort, mqttUsername, mqttPassword, mqttTls}</code> ที่แอปส่งต่อให้บอร์ดผ่าน BLE ตอนติดตั้ง พอร์ตเริ่มต้น <code>1883</code> (<code>mqtt:</code>) หรือ <code>8883</code> (<code>mqtts:</code> = TLS) ถ้าค่าว่างตอบ 503 ถ้า URL ผิดรูปหรือ protocol ไม่ใช่ <code>mqtt:</code>/<code>mqtts:</code> ตอบ 500 แยก <code>MQTT_DEVICE_URL</code> ออกมาเพราะ Backend คุย Broker ในเครือข่าย Docker (<code>mqtt://mqtt:1883</code>) แต่บอร์ดต้องเข้าจากอินเทอร์เน็ต (ค่าเริ่มต้นใน compose คือ <code>mqtts://rmutt-energy.tailb292b4.ts.net:8443</code> ผ่าน Tailscale Funnel หรือ <code>mqtts://&lt;โดเมน&gt;:8883</code> ถ้าตั้งให้บอร์ดต่อตรง) ทดสอบใน <code>test/mqtt-provisioning.test.js</code></p>
 <h3 id="servicesmqtt-accountsjs-และ-utilsmqtt-accountsjs--บัญชี-mqtt-รายบอร์ด"><code>services/mqtt-accounts.js</code> และ <code>utils/mqtt-accounts.js</code> — บัญชี MQTT รายบอร์ด<a class="anchor" href="#servicesmqtt-accountsjs-และ-utilsmqtt-accountsjs--บัญชี-mqtt-รายบอร์ด">#</a></h3>
-<p><strong>ปัญหาที่แก้</strong> เดิมทุกบอร์ดใช้ username เดียวที่เข้าถึง <code>rmutt/#</code> ได้ทั้งหมด ถ้ามีคนแกะบอร์ดตัวเดียวออกจากฝ้าเพดานแล้วอ่านรหัสใน flash ก็สั่งแอร์ได้ทั้งอาคาร โหมดใหม่ <code>MQTT_DEVICE_AUTH=dynsec</code> ให้แต่ละบอร์ดมี username = Device ID ของตัวเอง และมีสิทธิ์เฉพาะ topic ของตัวเอง</p>
+<p><strong>ปัญหาที่แก้</strong> ในโหมด <code>MQTT_DEVICE_AUTH=shared</code> (ใช้ตอน dev) ทุกบอร์ดใช้ username เดียวที่เข้าถึง <code>rmutt/#</code> ได้ทั้งหมด ถ้ามีคนแกะบอร์ดตัวเดียวออกจากฝ้าเพดานแล้วอ่านรหัสใน flash ก็สั่งแอร์ได้ทั้งอาคาร โหมด <code>MQTT_DEVICE_AUTH=dynsec</code> ที่ใช้บนเซิร์ฟเวอร์จริง ให้แต่ละบอร์ดมี username = Device ID ของตัวเอง และมีสิทธิ์เฉพาะ topic ของตัวเอง</p>
 <p>ฝั่ง <code>utils/</code> (ฟังก์ชันบริสุทธิ์ ประกอบ "ชุดคำสั่ง" เป็น JSON):</p>
 <div class="table-wrap"><table>
 <thead>
@@ -712,7 +710,7 @@ OCC32 เซ็นเซอร์คน ──MQTT──▶              │    
 <p>มี cache 5 วินาที (<code>CACHE_TTL_MS = 5000</code>) เพราะตัวคุมจังหวะอ่านทุก 10 วินาทีและทุกครั้งที่บอร์ดส่งสถานะ ล้างทันทีเมื่อเขียนใหม่ (<code>clearSettingsCache</code>) <code>parseRate</code> คืนค่าเริ่มต้นแทน <code>NaN</code> เมื่อค่าอ่านไม่ออกหรือเกินขอบเขต <code>setElectricityRate</code> ปฏิเสธค่านอกขอบเขตด้วย 400 และเก็บเป็นข้อความทศนิยม 2 ตำแหน่ง (<code>toFixed(2)</code>) ให้ค่าที่อ่านกลับเท่าเดิมเป๊ะ ฟังก์ชันที่ export: <code>isAutoOffEnabled</code>, <code>readElectricityRate</code>, <code>readPublicSettings</code>, <code>setAutoOffEnabled</code>, <code>setElectricityRate</code>, <code>readTimetableInfo</code>, <code>recordTimetableImport</code>, <code>clearTimetableInfo</code> ถ้าตารางยังไม่ถูกสร้าง (<code>ER_NO_SUCH_TABLE</code>) จะถอยไปใช้ค่าเริ่มต้นเพื่อให้ระบบเดิมทำงานต่อ route <code>routes/settings.js</code> เรียกใช้</p>
 <div class="callout note"><div class="callout-title">หมายเหตุ</div><p>อัตราค่าไฟที่เก็บใน <code>system_settings</code> ถูกส่งให้แอปผ่าน <code>readPublicSettings()</code> (GET <code>/api/settings</code>) แอปนำไปใส่ใน query <code>rate</code> ตอนเรียกรายงาน ส่วนการคูณค่าไฟอยู่ใน <code>routes/energy.js</code> (ใช้ <code>query.rate</code> ที่ผู้เรียกส่งมา) ไม่ได้อ่านค่านี้จากฐานข้อมูลเอง</p></div>
 
-<h3 id="utilsfirmwarejs-124-บรรทัด-แก้-14-ตค-2569"><code>utils/firmware.js</code> (124 บรรทัด, แก้ 14 ต.ค. 2569)<a class="anchor" href="#utilsfirmwarejs-124-บรรทัด-แก้-14-ตค-2569">#</a></h3>
+<h3 id="utilsfirmwarejs-124-บรรทัด"><code>utils/firmware.js</code> (124 บรรทัด)<a class="anchor" href="#utilsfirmwarejs-124-บรรทัด">#</a></h3>
 <p>ฟังก์ชันบริสุทธิ์ทั้งหมดเกี่ยวกับไฟล์เฟิร์มแวร์ ไม่แตะดิสก์เอง (การอ่าน/เขียนไฟล์อยู่ที่ <code>routes/firmware.js</code>)</p>
 <div class="table-wrap"><table>
 <thead>
@@ -732,7 +730,7 @@ OCC32 เซ็นเซอร์คน ──MQTT──▶              │    
 </tr>
 <tr>
 <td><code>firmwareKindOf(fileName)</code></td>
-<td>ชนิดบอร์ดจากชื่อไฟล์: มี <code>occ</code> = <code>occupancy</code>, มี <code>wired</code> หรือ <code>slm8</code> = <code>wired</code> (เพิ่ม 14 ต.ค.), นอกนั้น <code>air</code> ตรวจ <code>occ</code> ก่อน เดิมใช้จัดกลุ่มในหน้าจอเท่านั้น ตอนนี้ใช้กันสั่งไฟล์ผิดชนิดด้วย</td>
+<td>ชนิดบอร์ดจากชื่อไฟล์: มี <code>occ</code> = <code>occupancy</code>, มี <code>wired</code> หรือ <code>slm8</code> = <code>wired</code>, นอกนั้น <code>air</code> ตรวจ <code>occ</code> ก่อน ใช้ทั้งจัดกลุ่มในหน้าจอและกันสั่งไฟล์ผิดชนิด</td>
 </tr>
 <tr>
 <td><code>FIRMWARE_KIND_LABELS</code></td>
@@ -767,18 +765,18 @@ OCC32 เซ็นเซอร์คน ──MQTT──▶              │    
 <p>ผู้เรียก: <code>routes/firmware.js</code> (รายการ อัปโหลด ลบ), <code>routes/air-conditioners.js</code> และ <code>routes/occupancy-sensors.js</code> (สั่ง OTA: ตรวจชื่อ ตรวจชนิด แล้วนำ URL ไปให้ <code>publishOtaCommand</code>) ทดสอบใน <code>test/firmware.test.js</code> (7 เทสต์) รายละเอียดทีละบรรทัดอยู่ในบท Backend ตอนที่ 1 หัวข้อเจาะโค้ดการอัปโหลดเฟิร์มแวร์</p>
 <div class="callout why"><div class="callout-title">ทำไม</div><p>ทำไมต้องกันไฟล์ผิดชนิด: บอร์ดแอร์ IR บอร์ดสายแอร์ และเซ็นเซอร์ ต่างก็เป็น ESP32 รับไฟล์ของกันและกันได้ทางเทคนิค ถ้าสั่งไฟล์เซ็นเซอร์ให้บอร์ดแอร์ บอร์ดจะรีบูตเข้าโปรแกรมเซ็นเซอร์ ซึ่งใช้ขาและ topic คนละชุด ต้องไปแฟลชผ่าน USB ที่หน้างาน จึงตรวจทั้งตอนอัปโหลด (ไฟล์ต้องตรงแท็บ) และตอนสั่งบอร์ด (ไฟล์ต้องตรงชนิดบอร์ด)</p></div>
 
-<h3 id="utilsair-conditionerjs-297-บรรทัด-แก้-11-ตค-2569"><code>utils/air-conditioner.js</code> (297 บรรทัด, แก้ 11 ต.ค. 2569)<a class="anchor" href="#utilsair-conditionerjs-297-บรรทัด-แก้-11-ตค-2569">#</a></h3>
+<h3 id="utilsair-conditionerjs-297-บรรทัด"><code>utils/air-conditioner.js</code> (297 บรรทัด)<a class="anchor" href="#utilsair-conditionerjs-297-บรรทัด">#</a></h3>
 <p>ตัวตรวจข้อมูลและตัวแปลงแถวฐานข้อมูลของแอร์</p>
 <ul>
-<li><code>validateReservationInput(body)</code> ตรวจตอนจองบอร์ด: รหัส <code>ESP32-…</code> 12 ฐานสิบหก, ห้อง, <code>airNumber</code> 1–6, ชื่อ 1–60 ตัวอักษร, ชื่อ Bluetooth ต้องเท่ากับ <code>RMUTT-AC-&lt;12 ตัวท้ายของรหัส&gt;</code>, <code>protocol</code> ต้องอยู่ในรายการที่รองรับ (<code>DAIKIN</code>, <code>DAIKIN_WIRED</code>, <code>GREE</code>, <code>MITSUBISHI_AC</code>, <code>SAIJO_DENKI</code>, ... รวม 19 ค่า; <code>DAIKIN_WIRED</code> เพิ่ม 11 ต.ค. 2569 เก็บในค่าคงที่ <code>WIRED_PROTOCOL</code>), เวลาเปิด-ปิดประจำวัน <code>HH:mm</code></li>
+<li><code>validateReservationInput(body)</code> ตรวจตอนจองบอร์ด: รหัส <code>ESP32-…</code> 12 ฐานสิบหก, ห้อง, <code>airNumber</code> 1–6, ชื่อ 1–60 ตัวอักษร, ชื่อ Bluetooth ต้องเท่ากับ <code>RMUTT-AC-&lt;12 ตัวท้ายของรหัส&gt;</code>, <code>protocol</code> ต้องอยู่ในรายการที่รองรับ (<code>DAIKIN</code>, <code>DAIKIN_WIRED</code>, <code>GREE</code>, <code>MITSUBISHI_AC</code>, <code>SAIJO_DENKI</code>, ... รวม 19 ค่า; <code>DAIKIN_WIRED</code> เก็บในค่าคงที่ <code>WIRED_PROTOCOL</code>), เวลาเปิด-ปิดประจำวัน <code>HH:mm</code></li>
 <li><code>validateAirState(body, protocol)</code> ตรวจคำสั่งแอร์ที่แอปส่ง: <code>power</code> ต้องเป็น boolean, อุณหภูมิ 16–30, โหมด <code>auto|cool|dry|fan|heat</code>, พัดลม <code>auto|low|medium|high|turbo</code>, swing 7 ค่า, timer 1–1440 นาที และกฎพิเศษของ <code>SAIJO_DENKI</code> (อุณหภูมิ 18–29, โหมด cool/dry/fan, ไม่มี swing off) กับกฎของ <code>DAIKIN_WIRED</code> (ดูหัวข้อถัดไป)</li>
-<li><code>controlTypeOf(protocol)</code> (เพิ่ม 11 ต.ค. 2569) คืน <code>'wired'</code> ถ้าเป็น <code>DAIKIN_WIRED</code> นอกนั้น <code>'ir'</code> ใช้ใน <code>publicAirConditioner</code> ให้ JSON ของแอร์ทุกเครื่องมีฟิลด์ <code>controlType</code> แอปและเว็บใช้แสดงป้าย "Daikin · สายแอร์" หรือ "รีโมต IR" และซ่อนปุ่มที่เครื่องทำไม่ได้</li>
-<li><code>protocolFromStatus(message)</code> (เพิ่ม 11 ต.ค. 2569) อ่าน <code>controlMode</code> ใน status ถ้าเป็น <code>wired</code> (ไม่สนตัวพิมพ์และช่องว่าง) คืน <code>'DAIKIN_WIRED'</code> นอกนั้นคืน <code>null</code> ใช้ใน <code>services/mqtt.js</code></li>
+<li><code>controlTypeOf(protocol)</code> คืน <code>'wired'</code> ถ้าเป็น <code>DAIKIN_WIRED</code> นอกนั้น <code>'ir'</code> ใช้ใน <code>publicAirConditioner</code> ให้ JSON ของแอร์ทุกเครื่องมีฟิลด์ <code>controlType</code> แอปและเว็บใช้แสดงป้าย "Daikin · สายแอร์" หรือ "รีโมต IR" และซ่อนปุ่มที่เครื่องทำไม่ได้</li>
+<li><code>protocolFromStatus(message)</code> อ่าน <code>controlMode</code> ใน status ถ้าเป็น <code>wired</code> (ไม่สนตัวพิมพ์และช่องว่าง) คืน <code>'DAIKIN_WIRED'</code> นอกนั้นคืน <code>null</code> ใช้ใน <code>services/mqtt.js</code></li>
 <li><code>publicAirConditioner(row)</code> แปลงแถว (snake_case) เป็น JSON (camelCase) ให้แอป รวมค่า <code>autoOffSecondsRemaining</code> และ <code>autoOffPhase</code> จาก <code>utils/auto-off.js</code> และ <code>state</code> ที่ parse จาก <code>state_json</code> (ถ้าอ่านไม่ได้ใช้ค่า fallback ที่ปลอดภัย)</li>
 <li><code>validateDeviceId</code></li>
 </ul>
 <p>ผู้เรียก: <code>routes/air-conditioners.js</code> ทดสอบใน <code>test/air-conditioner.test.js</code></p>
-<h4 id="กติกาคำสั่งของบอร์ดสายแอร์-daikin_wired-เพิ่ม-11-ตค-2569">กติกาคำสั่งของบอร์ดสายแอร์ <code>DAIKIN_WIRED</code> (เพิ่ม 11 ต.ค. 2569)<a class="anchor" href="#กติกาคำสั่งของบอร์ดสายแอร์-daikin_wired-เพิ่ม-11-ตค-2569">#</a></h4>
+<h4 id="กติกาคำสั่งของบอร์ดสายแอร์-daikin_wired">กติกาคำสั่งของบอร์ดสายแอร์ <code>DAIKIN_WIRED</code><a class="anchor" href="#กติกาคำสั่งของบอร์ดสายแอร์-daikin_wired">#</a></h4>
 <p>บอร์ดสายแอร์ต่อเข้าสายของรีโมตติดผนัง Daikin (โปรโตคอล SLM8) แทนการยิง IR สั่งได้เฉพาะสิ่งที่รีโมตติดผนังรุ่นนั้นทำได้ Backend จึงตรวจให้ตรงกับความสามารถจริง</p>
 <p><strong>ไฟล์ <code>backend/src/utils/air-conditioner.js</code> บรรทัด 112–123</strong></p>
 <div class="code-block"><span class="code-lang">js</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">112</span>
@@ -898,7 +896,7 @@ OCC32 เซ็นเซอร์คน ──MQTT──▶              │    
 </table></div>
 <div class="callout why"><div class="callout-title">ทำไม</div><p>ทำไมบางอย่างโยน 400 แต่บางอย่างแค่ตั้งเป็น <code>false</code>: โหมด พัดลม swing คือค่าหลักที่ผู้ใช้เลือกเอง ถ้าเลือกค่าที่แอร์ทำไม่ได้ ต้องบอกผู้ใช้ตรง ๆ ไม่งั้นแอร์จะทำอย่างอื่นโดยที่ผู้ใช้ไม่รู้ ส่วนฟังก์ชันเสริม (eco, turbo, quiet, clean) แอปรุ่นเก่าอาจส่ง <code>true</code> ติดมาจากสถานะเดิม ถ้าปฏิเสธทั้งคำสั่งเพราะสวิตช์เสริมที่ไม่มีอยู่จริง ผู้ใช้จะเปิดแอร์ไม่ได้เลย จึงเลือกตัดทิ้งเงียบ ๆ ผลคือ <code>state_json</code> ที่เก็บไว้ตรงกับที่แอร์ทำจริงเสมอ เทสต์ใน <code>test/air-conditioner.test.js</code> (<code>limits wired Daikin commands to what the wall-panel bus supports</code>) ยังตรวจด้วยว่า <code>DAIKIN</code> แบบ IR ไม่ได้รับผลกระทบ</p></div>
 
-<h3 id="utilsunprovisionjs-36-บรรทัด-เพิ่ม-13-ตค-2569"><code>utils/unprovision.js</code> (36 บรรทัด, เพิ่ม 13 ต.ค. 2569)<a class="anchor" href="#utilsunprovisionjs-36-บรรทัด-เพิ่ม-13-ตค-2569">#</a></h3>
+<h3 id="utilsunprovisionjs-36-บรรทัด"><code>utils/unprovision.js</code> (36 บรรทัด)<a class="anchor" href="#utilsunprovisionjs-36-บรรทัด">#</a></h3>
 <p>ไฟล์เล็กที่เก็บ "รูปแบบข้อความ" ของการล้างค่าบอร์ด แยกจาก <code>services/mqtt.js</code> เพื่อให้เทสต์ได้โดยไม่ต้องต่อ Broker คอมเมนต์หัวไฟล์ (บรรทัด 1–13) เขียนลำดับขั้นตอนตอนลบอุปกรณ์ไว้ครบ</p>
 <p><strong>ไฟล์ <code>backend/src/utils/unprovision.js</code> บรรทัด 15–36</strong></p>
 <div class="code-block"><span class="code-lang">js</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">15</span>
@@ -978,7 +976,7 @@ OCC32 เซ็นเซอร์คน ──MQTT──▶              │    
 <p><code>validateRoomInput</code>, <code>validateRoomNumber</code> (รูปแบบเดียวกับที่อื่น), <code>publicRoom(row)</code> (รวมสถานะเซ็นเซอร์และนาฬิกาปิดแอร์ของห้อง), <code>roomDefaultsForImport(value)</code> เดาข้อมูลห้องใหม่ตอนนำเข้าตาราง: รหัสแบบ <code>16&lt;ชั้น 1-9&gt;&lt;ลำดับ 2 หลัก&gt;</code> (เช่น <code>16103</code> = ชั้น 1 ลำดับ 3, ประเภท <code>Classroom</code>) นอกนั้นเป็น <code>Special</code> ชั้น 0 ทดสอบใน <code>test/room.test.js</code></p>
 <h3 id="utilsoccupancy-sensorjs-71-บรรทัด"><code>utils/occupancy-sensor.js</code> (71 บรรทัด)<a class="anchor" href="#utilsoccupancy-sensorjs-71-บรรทัด">#</a></h3>
 <ul>
-<li><code>STATIC_ENERGY_THRESHOLD = 25</code> ค่าความไวเริ่มต้นของเรดาร์ตรวจคนนิ่ง (ใช้ตอบกลับเมื่อแถวไม่มีค่า) <strong>ระวัง:</strong> ตั้งแต่ 15 ต.ค. 2569 เฟิร์มแวร์ 1.3.3 ใช้ค่าคงที่ของตัวเองเป็น 15 ค่า 25 ฝั่ง Backend จึงเป็นแค่ค่าที่แสดงในแอป/เว็บ ไม่ได้ควบคุมบอร์ด (ดูบท 9)</li>
+<li><code>STATIC_ENERGY_THRESHOLD = 25</code> ค่าความไวเริ่มต้นของเรดาร์ตรวจคนนิ่ง (ใช้ตอบกลับเมื่อแถวไม่มีค่า) <strong>ระวัง:</strong> เฟิร์มแวร์ตรวจคนใช้ค่าคงที่ของตัวเองเป็น 15 ค่า 25 ฝั่ง Backend จึงเป็นแค่ค่าที่แสดงในแอป/เว็บ ไม่ได้ควบคุมบอร์ด (ดูบท 9)</li>
 <li><code>validateOccupancyReservationInput</code>, <code>validateOccupancyDeviceId</code> (รหัส <code>OCC32-…</code>, ชื่อ BLE ต้องเป็น <code>RMUTT-OCC-&lt;12 ตัวท้าย&gt;</code>)</li>
 <li><code>publicOccupancySensor(row)</code></li>
 <li><code>normalizeOccupancyStatus(message)</code> ปรับข้อความสถานะ: <code>online = message.online !== false</code>; <code>radarAvailable</code> ต้อง online และบอร์ดบอกว่า <code>true</code>; <strong><code>occupied</code> จะเป็นจริงได้ก็ต่อเมื่อ <code>radarAvailable</code> เป็นจริง</strong> (เรดาร์เสียแล้วรายงาน "มีคน" ไม่ได้) ฟังก์ชันนี้คือด่านแรกของหลัก fail-safe ของระบบปิดแอร์ ทดสอบใน <code>test/occupancy-sensor.test.js</code></li>
@@ -1299,7 +1297,7 @@ routes/energy.js : /summary /history /export  →  แอป / ไฟล์ Exce
 </code></pre></div>
 </div>
 
-<div class="callout note"><div class="callout-title">หมายเหตุ</div><p>เอกสารเก่า <code>docs/study/07-energy-export.md</code> และรูป <code>07-energy-flow.svg</code> เขียนลำดับเป็น "อ่านค่าเดิม → เขียนค่าใหม่ทับ → บันทึกค่าไฟ" แต่โค้ดจริงใน <code>handleAirStatus</code> คือ <strong>อ่านค่าเดิม → บันทึกค่าไฟ → เขียนค่าใหม่ทับ</strong> (ตามที่เขียนในโค้ด) หลักการเดียวกันคือต้องอ่านค่าเดิมก่อนถูกทับ เหตุผลที่บันทึกก่อนเขียนทับคือถ้าขั้นบันทึกค่าไฟพัง (จับด้วย <code>try/catch</code> แล้วแค่ log) ค่าล่าสุดของเครื่องก็ยังถูกเขียนเสมอ</p></div>
+<div class="callout note"><div class="callout-title">หมายเหตุ</div><p>เอกสาร <code>docs/study/07-energy-export.md</code> และรูป <code>docs/study/img/07-energy-flow.svg</code> เขียนลำดับเป็น "อ่านค่าเดิม → เขียนค่าใหม่ทับ → บันทึกค่าไฟ" แต่โค้ดจริงใน <code>handleAirStatus</code> คือ <strong>อ่านค่าเดิม → บันทึกค่าไฟ → เขียนค่าใหม่ทับ</strong> (ตามที่เขียนในโค้ด) หลักการเดียวกันคือต้องอ่านค่าเดิมก่อนถูกทับ เหตุผลที่บันทึกก่อนเขียนทับคือถ้าขั้นบันทึกค่าไฟพัง (จับด้วย <code>try/catch</code> แล้วแค่ log) ค่าล่าสุดของเครื่องก็ยังถูกเขียนเสมอ</p></div>
 
 <p><strong>ทำไมต้องอ่านค่าเดิมก่อน</strong> ค่าไฟต่อชั่วโมงคำนวณจาก "ผลต่างของเลขมิเตอร์สะสม" ระหว่างตัวอย่างนี้กับตัวอย่างก่อนหน้า (และเวลาที่ห่างกัน) ถ้าเขียนทับก่อน ค่าเดิมหายไป จะหาผลต่างไม่ได้ ในทางปฏิบัติถ้าลำดับผิดตัวเลข <code>consumption_kwh</code> จะกลายเป็นเลขสะสมทั้งหมดตั้งแต่ติดตั้ง ไม่ใช่ของชั่วโมงนั้น</p>
 <p><strong>ทำไมข้ามการบันทึกเมื่อ <code>historyPending &gt; 0</code></strong> บอร์ดยังส่งข้อมูลย้อนหลังช่วงเน็ตหลุดไม่ครบ ถ้าเอา status สดมาคิดผลต่างตอนนี้ พลังงานช่วงเน็ตหลุดทั้งก้อนจะไปกองอยู่ที่ชั่วโมงที่ต่อเน็ตได้ เมื่อข้อมูลย้อนหลังมาถึงจะนับซ้ำ จึงรอจนบอร์ดบอก <code>historyPending = 0</code> ก่อน (บอร์ดรุ่นก่อน 2.4.0 ไม่ส่งฟิลด์นี้ = 0)</p>
@@ -1575,7 +1573,7 @@ routes/energy.js : /summary /history /export  →  แอป / ไฟล์ Exce
 <li><strong>บรรทัด 127–130:</strong> <code>error</code> เก็บข้อความล่าสุดไว้ดูใน health ส่วน <code>offline</code> กับ <code>close</code> เรียก <code>markDisconnected</code> ซึ่งเก็บเวลาที่หลุดครั้งล่าสุด (เฉพาะตอนที่เคยต่อติดอยู่)</li>
 </ul>
 <h3 id="จุดที่-2-handler-ของ-status-และเหตุผลที่-อ่านค่าเดิมก่อน-servicesmqttjs">จุดที่ 2: handler ของ status และเหตุผลที่ "อ่านค่าเดิมก่อน" (<code>services/mqtt.js</code>)<a class="anchor" href="#จุดที่-2-handler-ของ-status-และเหตุผลที่-อ่านค่าเดิมก่อน-servicesmqttjs">#</a></h3>
-<p><strong>ไฟล์ <code>backend/src/services/mqtt.js</code> บรรทัด 410–441</strong> (แก้ 11 และ 13 ต.ค. 2569: เพิ่มบรรทัด 411 และ 436–440)</p>
+<p><strong>ไฟล์ <code>backend/src/services/mqtt.js</code> บรรทัด 410–441</strong></p>
 <div class="code-block"><span class="code-lang">js</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">410</span>
 <span class="normal">411</span>
 <span class="normal">412</span>
@@ -1659,7 +1657,7 @@ routes/energy.js : /summary /history /export  →  แอป / ไฟล์ Exce
 <tr>
 <td>411</td>
 <td><code>consumeUnprovisionAck(deviceId, message)</code></td>
-<td>(เพิ่ม 13 ต.ค. 2569) ถ้าข้อความ <code>status</code> นี้คือคำตอบ <code>{"unprovisioned":true}</code> ของบอร์ดที่กำลังถูกลบ ให้ปลุกตัวที่รออยู่ใน <code>unprovisionDevice</code> แล้ว <code>return</code> ทันที ไม่บันทึกลงฐานข้อมูล (แถวถูกลบไปแล้ว และคำตอบนี้มี <code>online:false</code> ซึ่งถ้าปล่อยผ่านจะถูกตีความเป็นสถานะออฟไลน์)</td>
+<td>ถ้าข้อความ <code>status</code> นี้คือคำตอบ <code>{"unprovisioned":true}</code> ของบอร์ดที่กำลังถูกลบ ให้ปลุกตัวที่รออยู่ใน <code>unprovisionDevice</code> แล้ว <code>return</code> ทันที ไม่บันทึกลงฐานข้อมูล (แถวถูกลบไปแล้ว และคำตอบนี้มี <code>online:false</code> ซึ่งถ้าปล่อยผ่านจะถูกตีความเป็นสถานะออฟไลน์)</td>
 </tr>
 <tr>
 <td>412–415</td>
@@ -1679,7 +1677,7 @@ routes/energy.js : /summary /history /export  →  แอป / ไฟล์ Exce
 <tr>
 <td>436</td>
 <td><code>protocolFromStatus(message)</code></td>
-<td>(เพิ่ม 11 ต.ค. 2569) ถ้า status มี <code>controlMode: "wired"</code> ได้ <code>'DAIKIN_WIRED'</code> นอกนั้นได้ <code>null</code></td>
+<td>ถ้า status มี <code>controlMode: "wired"</code> ได้ <code>'DAIKIN_WIRED'</code> นอกนั้นได้ <code>null</code></td>
 </tr>
 <tr>
 <td>437–440</td>
@@ -1688,7 +1686,7 @@ routes/energy.js : /summary /history /export  →  แอป / ไฟล์ Exce
 </tr>
 </tbody>
 </table></div>
-<p><strong>ไฟล์ <code>backend/src/services/mqtt.js</code> บรรทัด 443–456</strong> (เพิ่ม 11 ต.ค. 2569)</p>
+<p><strong>ไฟล์ <code>backend/src/services/mqtt.js</code> บรรทัด 443–456</strong></p>
 <div class="code-block"><span class="code-lang">js</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">443</span>
 <span class="normal">444</span>
 <span class="normal">445</span>
@@ -3231,9 +3229,9 @@ routes/energy.js : /summary /history /export  →  แอป / ไฟล์ Exce
 <code>recordHistoryBatch</code> (ล็อกแถวด้วย <code>FOR UPDATE</code>) และการ commit ตารางเรียนใน <code>routes/schedules.js</code> ทำไม: ทั้งหมดสำเร็จหรือไม่มีอะไรเปลี่ยนเลย ไม่มีสถานะครึ่ง ๆ กลาง ๆ</p>
 <p><strong>14. ค่าคงที่มีชื่อ และอยู่ที่เดียว</strong>
 <code>AUTO_OFF_*</code>, <code>MAX_SAMPLE_GAP_SECONDS</code>, <code>RATE_LIMITS</code>, <code>MAX_SPAN_DAYS</code>, <code>HISTORY_MAX_*</code> ทำไม: ตัวเลขเหล่านี้คือนโยบายของระบบ แก้ที่เดียวและเทสต์อ้างชื่อเดียวกัน</p>
-<p><strong>15. ส่งแล้วรอคำตอบแบบมีเพดานเวลา และไม่ล้มทั้งงานเมื่อไม่มีคำตอบ (เพิ่ม 13 ต.ค. 2569)</strong>
+<p><strong>15. ส่งแล้วรอคำตอบแบบมีเพดานเวลา และไม่ล้มทั้งงานเมื่อไม่มีคำตอบ</strong>
 <code>unprovisionDevice</code> ใน <code>services/mqtt.js</code> เก็บตัวรอใน <code>Map</code> ต่อรหัสบอร์ด และจบด้วย timeout 4 วินาที ทำไม: ต้องการรู้ว่าบอร์ดล้างค่าจริงไหม (เพื่อบอกแอดมิน) แต่การลบในระบบต้องไม่ขึ้นกับบอร์ดที่อาจออฟไลน์ ผลจึงเป็นแค่ข้อมูลประกอบ (<code>boardCleared</code>) ไม่ใช่เงื่อนไขของความสำเร็จ</p>
-<p><strong>16. ให้อุปกรณ์เป็นแหล่งความจริงของ "ตัวเองคืออะไร" (เพิ่ม 11 ต.ค. 2569)</strong>
+<p><strong>16. ให้อุปกรณ์เป็นแหล่งความจริงของ "ตัวเองคืออะไร"</strong>
 <code>protocolFromStatus</code> + <code>syncControlProtocol</code> แก้ <code>protocol</code> ในฐานข้อมูลตาม <code>controlMode</code> ที่บอร์ดรายงาน ทำไม: ข้อมูลที่คนกรอก (ยี่ห้อที่เลือกในแอปรุ่นเก่า) ผิดได้ แต่บอร์ดรู้แน่ว่าตัวเองต่อสายหรือยิง IR และใช้ <code>AND protocol &lt;&gt; ?</code> ให้การแก้ idempotent ไม่เขียนซ้ำ</p>
 <h2 id="คำถามที่อาจารย์อาจถาม">คำถามที่อาจารย์อาจถาม<a class="anchor" href="#คำถามที่อาจารย์อาจถาม">#</a></h2>
 <div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> ทำไมตรรกะปิดแอร์อัตโนมัติอยู่ที่ Backend ไม่ใช่ที่บอร์ด ESP32?</p>
@@ -3258,7 +3256,7 @@ routes/energy.js : /summary /history /export  →  แอป / ไฟล์ Exce
 <p><strong>ตอบ:</strong> เซิร์ฟเวอร์ตั้งเวลาเป็น UTC ถ้าตัดตาม UTC ชั่วโมง 09:00 ในรายงานจะเป็น 16:00 น. เวลาไทย ซึ่งดูเผิน ๆ เหมือนถูกจนกว่าจะมีคนเทียบกับเวลาจริง จึงใช้ <code>Intl.DateTimeFormat</code> กับ <code>Asia/Bangkok</code> ในทุกจุด ส่วนผลรวม+ตัวนับเก็บแทนค่าเฉลี่ยเพราะเฉลี่ยของสองกลุ่มบวกกันตรง ๆ ไม่ได้ ผลรวมบวกได้เสมอ แล้วหารตอนอ่าน นอกจากนี้ SQL รายงานทำสองชั้น (สรุปต่อเครื่องต่อชั่วโมงก่อน แล้วค่อยรวมตามระดับ) เพื่อไม่ให้เครื่องที่ส่งข้อมูลเยอะมีน้ำหนักเกินจริง</p></div>
 
 <div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> ทำไมใช้บัญชี MQTT แยกรายบอร์ด และรหัสผ่านเก็บที่ไหน?</p>
-<p><strong>ตอบ:</strong> เดิมทุกบอร์ดใช้บัญชีเดียวที่เข้าถึงทุก topic ถ้าแกะบอร์ดเดียวออกมาอ่านรหัสใน flash ก็สั่งแอร์ทั้งอาคารได้ ตอนนี้แต่ละบอร์ดมี username = Device ID และ ACL เฉพาะ topic ของตัวเอง (publish ได้แค่ <code>state</code>, <code>status</code>, <code>provision</code>, <code>provision-ack</code>, <code>history</code> ของตัวเอง) รหัสผ่านไม่ได้เก็บในฐานข้อมูล แต่คำนวณจาก HMAC-SHA256 ของ <code>MQTT_DEVICE_SECRET</code> กับ Device ID ตัดเหลือ 32 ตัวอักษร จึงคำนวณซ้ำได้เสมอ ตั้งค่าบอร์ดซ้ำได้รหัสเดิม และถ้าไฟล์ Dynamic Security ของ Mosquitto หาย Backend สร้างบัญชีทุกบอร์ดกลับมาให้เองทุกครั้งที่ต่อ Broker (<code>reconcileAccounts</code>)</p></div>
+<p><strong>ตอบ:</strong> ถ้าทุกบอร์ดใช้บัญชีเดียวที่เข้าถึงทุก topic (โหมด shared) แกะบอร์ดเดียวออกมาอ่านรหัสใน flash ก็สั่งแอร์ทั้งอาคารได้ โหมด dynsec ที่ใช้จริงให้แต่ละบอร์ดมี username = Device ID และ ACL เฉพาะ topic ของตัวเอง (publish ได้แค่ <code>state</code>, <code>status</code>, <code>provision</code>, <code>provision-ack</code>, <code>history</code> ของตัวเอง) รหัสผ่านไม่ได้เก็บในฐานข้อมูล แต่คำนวณจาก HMAC-SHA256 ของ <code>MQTT_DEVICE_SECRET</code> กับ Device ID ตัดเหลือ 32 ตัวอักษร จึงคำนวณซ้ำได้เสมอ ตั้งค่าบอร์ดซ้ำได้รหัสเดิม และถ้าไฟล์ Dynamic Security ของ Mosquitto หาย Backend สร้างบัญชีทุกบอร์ดกลับมาให้เองทุกครั้งที่ต่อ Broker (<code>reconcileAccounts</code>)</p></div>
 
 <div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> ถ้าสอง Backend รันพร้อมกัน ระบบปิดแอร์จะยิงคำสั่งซ้ำไหม?</p>
 <p><strong>ตอบ:</strong> ไม่ครับ ก่อนประเมินแต่ละรอบ ระบบขอ named lock ของ MariaDB ชื่อ <code>rmutt_auto_off_runner</code> ด้วย <code>GET_LOCK(..., 0)</code> (ไม่รอ) ตัวที่ได้ล็อกทำงาน อีกตัวคืนค่าว่างทันที ล็อกผูกกับ connection จึงต้องถือ connection ไว้ตลอดรอบและคืนใน <code>finally</code> ภายในโปรเซสเดียวมีธง <code>running</code> กันรอบซ้อนด้วย รอบที่ถูกข้ามไม่เสียหายเพราะมี tick ทุก 10 วินาทีมาชดเชย</p></div>
@@ -3267,13 +3265,13 @@ routes/energy.js : /summary /history /export  →  แอป / ไฟล์ Exce
 <p><strong>ตอบ:</strong> ก่อนแตกไฟล์ <code>.xlsx</code> (ซึ่งคือ ZIP) ตัวอ่านตรวจ central directory ว่าจำนวนไฟล์ไม่เกิน 2000 และขนาดหลังแตกรวมไม่เกิน 32 MiB (กัน ZIP bomb) แตกเฉพาะไฟล์ที่ต้องใช้ ปิดการขยาย XML entity และจำกัดพื้นที่เซลล์ที่รวมกันไม่เกิน 10,000 ช่อง ส่วนข้อมูลที่ผิด: เซลล์ที่อ่านเวลาไม่ได้เป็นแค่คำเตือนในหน้า preview ผู้ดูแลเห็นก่อนยืนยัน แต่ถ้าผิดกฎจริง (เช่นเวลาเลิกก่อนเริ่ม) หรือคาบทับซ้อนกันในไฟล์เดียว จะปฏิเสธทั้งไฟล์ (400/409) และตอนบันทึกทำใน transaction เดียว ถ้าล้มเหลวตารางเดิมยังอยู่ครบ จึงไม่มีช่วงที่ตารางว่างแล้วระบบปิดแอร์เข้าใจผิดว่าทุกห้องอยู่นอกคาบ</p></div>
 
 <div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> บอร์ดสายแอร์ Daikin ต่างจากบอร์ด IR อย่างไรในมุมของ Backend?</p>
-<p><strong>ตอบ:</strong> ในฐานข้อมูลแยกด้วย <code>protocol = 'DAIKIN_WIRED'</code> ครับ (เพิ่ม 11 ต.ค. 2569) Backend ใช้ค่านี้สามที่ หนึ่ง <code>validateAirState</code> ตรวจคำสั่งตามที่รีโมตติดผนังทำได้ (โหมด Cool/Dry/Fan, ไม่มี Turbo, swing แค่ส่ายหรือหยุด, ฟังก์ชันเสริมถูกปิด) สอง <code>publicAirConditioner</code> ส่ง <code>controlType: 'wired'</code> ให้แอปซ่อนปุ่มที่ใช้ไม่ได้ สาม ตอนสั่ง OTA ยอมเฉพาะไฟล์ที่ชื่อมี <code>wired</code> หรือ <code>slm8</code> และถ้าในฐานข้อมูลยังเป็นยี่ห้อ IR แต่บอร์ดรายงาน <code>controlMode: "wired"</code> Backend แก้ <code>protocol</code> ให้เอง</p></div>
+<p><strong>ตอบ:</strong> ในฐานข้อมูลแยกด้วย <code>protocol = 'DAIKIN_WIRED'</code> ครับ Backend ใช้ค่านี้สามที่ หนึ่ง <code>validateAirState</code> ตรวจคำสั่งตามที่รีโมตติดผนังทำได้ (โหมด Cool/Dry/Fan, ไม่มี Turbo, swing แค่ส่ายหรือหยุด, ฟังก์ชันเสริมถูกปิด) สอง <code>publicAirConditioner</code> ส่ง <code>controlType: 'wired'</code> ให้แอปซ่อนปุ่มที่ใช้ไม่ได้ สาม ตอนสั่ง OTA ยอมเฉพาะไฟล์ที่ชื่อมี <code>wired</code> หรือ <code>slm8</code> และถ้าในฐานข้อมูลยังเป็นยี่ห้อ IR แต่บอร์ดรายงาน <code>controlMode: "wired"</code> Backend แก้ <code>protocol</code> ให้เอง</p></div>
 
 <div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> ตอนลบอุปกรณ์ ทำไม Backend ต้องรอบอร์ดตอบ และถ้าบอร์ดออฟไลน์จะเป็นอย่างไร?</p>
 <p><strong>ตอบ:</strong> รอเพื่อจะบอกแอดมินได้ว่าบอร์ดล้าง Wi-Fi/MQTT/ห้องในตัวเองแล้วจริงหรือยัง (<code>boardCleared</code>) รอไม่เกิน 4 วินาที ถ้าออฟไลน์ก็หมดเวลา ได้ <code>false</code> แต่การลบในระบบยังสำเร็จตามปกติ เพราะฟังก์ชันนี้ไม่โยน error บัญชี MQTT ของบอร์ดถูกลบแล้ว บอร์ดจึงต่อกลับเข้ามาไม่ได้อยู่ดี ส่วนค่าที่ค้างในบอร์ดต้องล้างที่ตัวบอร์ด (ตั้งค่าใหม่ผ่านบลูทูธหรือแฟลชใหม่) คำสั่งไม่ได้ส่งแบบ retain เพราะไม่อยากให้บอร์ดตัวเดิมที่ถูกเพิ่มกลับมาภายหลังโดนล้างซ้ำ</p></div>
 
 <div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> Backend รู้ได้อย่างไรว่าไฟล์เฟิร์มแวร์เป็นของบอร์ดชนิดไหนและรุ่นอะไร ทำไมไม่เปิดไฟล์อ่านเอา?</p>
-<p><strong>ตอบ:</strong> ดูจาก <strong>ชื่อไฟล์</strong> ครับ (<code>utils/firmware.js</code>, เพิ่ม 14 ต.ค. 2569) <code>firmwareKindOf</code> ให้ชื่อที่มี <code>occ</code> เป็นเซ็นเซอร์ มี <code>wired</code> หรือ <code>slm8</code> เป็นสายแอร์ ที่เหลือเป็นแอร์ IR และ <code>firmwareVersionOf</code> ดึงเลขรุ่นท้ายชื่อด้วย regex เช่น <code>rmutt_esp32_air_wired-2.5.2-slm8.bin</code> ได้ <code>2.5.2-slm8</code> ส่วน <code>compareFirmwareVersions</code> เทียบเป็นตัวเลขสามส่วน (<code>2.5.10</code> ใหม่กว่า <code>2.5.9</code> ซึ่งเทียบแบบสตริงจะผิด) ไม่อ่านจากเนื้อไฟล์เพราะเลขรุ่นใน <code>.bin</code> ไม่ได้อยู่ตำแหน่งคงที่และต้องแกะโครงสร้าง image ของ ESP32 ซึ่งซับซ้อนเกินจำเป็น ชื่อไฟล์จึงเป็นสัญญาที่ทั้งคนและโปรแกรมอ่านง่าย ส่วนเนื้อไฟล์ตรวจแค่ว่าเป็นโปรแกรม ESP32 จริง (<code>validateFirmwareImage</code>: ไบต์แรก <code>0xE9</code>, ไม่ว่าง, ไม่เกิน <code>0x1F0000</code> ไบต์ = ขนาดช่อง OTA ใน <code>partitions.csv</code>) และ <code>assertFirmwareKind</code> กันสั่งไฟล์ผิดชนิดให้บอร์ดตอน OTA</p></div>
+<p><strong>ตอบ:</strong> ดูจาก <strong>ชื่อไฟล์</strong> ครับ (<code>utils/firmware.js</code>) <code>firmwareKindOf</code> ให้ชื่อที่มี <code>occ</code> เป็นเซ็นเซอร์ มี <code>wired</code> หรือ <code>slm8</code> เป็นสายแอร์ ที่เหลือเป็นแอร์ IR และ <code>firmwareVersionOf</code> ดึงเลขรุ่นท้ายชื่อด้วย regex เช่น <code>rmutt_esp32_air_wired-2.5.2-slm8.bin</code> ได้ <code>2.5.2-slm8</code> ส่วน <code>compareFirmwareVersions</code> เทียบเป็นตัวเลขสามส่วน (<code>2.5.10</code> ใหม่กว่า <code>2.5.9</code> ซึ่งเทียบแบบสตริงจะผิด) ไม่อ่านจากเนื้อไฟล์เพราะเลขรุ่นใน <code>.bin</code> ไม่ได้อยู่ตำแหน่งคงที่และต้องแกะโครงสร้าง image ของ ESP32 ซึ่งซับซ้อนเกินจำเป็น ชื่อไฟล์จึงเป็นสัญญาที่ทั้งคนและโปรแกรมอ่านง่าย ส่วนเนื้อไฟล์ตรวจแค่ว่าเป็นโปรแกรม ESP32 จริง (<code>validateFirmwareImage</code>: ไบต์แรก <code>0xE9</code>, ไม่ว่าง, ไม่เกิน <code>0x1F0000</code> ไบต์ = ขนาดช่อง OTA ใน <code>partitions.csv</code>) และ <code>assertFirmwareKind</code> กันสั่งไฟล์ผิดชนิดให้บอร์ดตอน OTA</p></div>
 
 <h2 id="สรุปและเช็กลิสต์ความเข้าใจ">สรุปและเช็กลิสต์ความเข้าใจ<a class="anchor" href="#สรุปและเช็กลิสต์ความเข้าใจ">#</a></h2>
 <p>ถ้าตอบข้อเหล่านี้ได้ แปลว่าเข้าใจบทนี้แล้ว</p>
@@ -3295,10 +3293,10 @@ routes/energy.js : /summary /history /export  →  แอป / ไฟล์ Exce
 <li class="check"><input type="checkbox"> อธิบายขั้นตอนส่งออก Excel และโครงสร้างไฟล์ <code>.xlsx</code> ที่ <code>xlsx-writer.js</code> สร้าง (6 ไฟล์ใน ZIP, inlineStr, freeze header)</li>
 <li class="check"><input type="checkbox"> อธิบายได้ว่า "ตอนนี้อยู่ในคาบไหม" คำนวณอย่างไร (ตารางเรียน + ภาคเรียน + การจองห้อง) และเหตุผลที่ใช้เวลาไทย</li>
 <li class="check"><input type="checkbox"> อธิบายลำดับการอ่าน Excel ตารางเรียน (ชื่อชีต = ห้อง, แถว <code>วัน</code>, เซลล์ที่รวม, เวลาเริ่มอยู่แถวเหนือหัวตาราง) และด่านตรวจก่อนบันทึก</li>
-<li class="check"><input type="checkbox"> อธิบายกติกาคำสั่งของ <code>DAIKIN_WIRED</code> และที่มาของ <code>controlType</code> ได้ (เพิ่ม 11 ต.ค. 2569)</li>
-<li class="check"><input type="checkbox"> เล่าการทำงานของ <code>unprovisionDevice</code>: สร้าง payload → ตั้งตัวรอใน <code>Map</code> → publish ไม่ retain → รอ ack ทาง <code>status</code> ไม่เกิน 4 วินาที (เพิ่ม 13 ต.ค. 2569)</li>
+<li class="check"><input type="checkbox"> อธิบายกติกาคำสั่งของ <code>DAIKIN_WIRED</code> และที่มาของ <code>controlType</code> ได้</li>
+<li class="check"><input type="checkbox"> เล่าการทำงานของ <code>unprovisionDevice</code>: สร้าง payload → ตั้งตัวรอใน <code>Map</code> → publish ไม่ retain → รอ ack ทาง <code>status</code> ไม่เกิน 4 วินาที</li>
 <li class="check"><input type="checkbox"> บอกกฎชนิดไฟล์เฟิร์มแวร์จากชื่อ (<code>occ</code> / <code>wired</code>,<code>slm8</code> / ที่เหลือ) และการตรวจไบต์ <code>0xE9</code> กับขนาด <code>0x1F0000</code></li>
-<li class="check"><input type="checkbox"> อธิบายว่าทำไม <code>compareFirmwareVersions</code> เทียบเป็นตัวเลขไม่ใช่สตริง และ <code>airFirmwareKind(protocol)</code> เลือกชนิดไฟล์ของบอร์ดแอร์อย่างไร (เพิ่ม 14 ต.ค. 2569)</li>
+<li class="check"><input type="checkbox"> อธิบายว่าทำไม <code>compareFirmwareVersions</code> เทียบเป็นตัวเลขไม่ใช่สตริง และ <code>airFirmwareKind(protocol)</code> เลือกชนิดไฟล์ของบอร์ดแอร์อย่างไร</li>
 </ul><nav class="pager"><a class="prev" href="06-backend-api.html"><span>← บทก่อนหน้า</span>6. Backend ตอนที่ 1: โครงหลัก ระบบสมาชิก และ REST API</a><a class="next" href="08-protocols.html"><span>บทถัดไป →</span>8. โปรโตคอลสื่อสาร: MQTT และ Bluetooth Low Energy</a></nav>
   </main>
   <aside class="toc"><div class="toc-title">ในบทนี้</div><ul><li><a href="#ภาพรวม">ภาพรวม</a></li><li><a href="#ความรู้ที่ต้องมีก่อนอ่านบทนี้">ความรู้ที่ต้องมีก่อนอ่านบทนี้</a></li><li><a href="#โครงสร้างโฟลเดอร์">โครงสร้างโฟลเดอร์</a></li><li><a href="#อธิบายทีละไฟล์">อธิบายทีละไฟล์</a></li><li><a href="#ระบบปิดแอร์อัตโนมัติอย่างละเอียด">ระบบปิดแอร์อัตโนมัติอย่างละเอียด</a></li><li><a href="#ระบบค่าไฟอย่างละเอียด">ระบบค่าไฟอย่างละเอียด</a></li><li><a href="#เจาะโค้ดทีละบรรทัด">เจาะโค้ดทีละบรรทัด</a></li><li><a href="#หลักการเขียนโค้ดที่ใช้ในส่วนนี้">หลักการเขียนโค้ดที่ใช้ในส่วนนี้</a></li><li><a href="#คำถามที่อาจารย์อาจถาม">คำถามที่อาจารย์อาจถาม</a></li><li><a href="#สรุปและเช็กลิสต์ความเข้าใจ">สรุปและเช็กลิสต์ความเข้าใจ</a></li></ul></aside>
