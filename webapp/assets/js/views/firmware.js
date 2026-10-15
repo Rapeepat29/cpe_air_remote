@@ -188,7 +188,12 @@ function settlePending() {
       toastError(`${deviceId} อัปเดตไม่สำเร็จ: ${device.otaError}`);
     } else if (Date.now() - job.startedAt >= PENDING_MS) {
       pending.delete(deviceId);
-      toastError(`${deviceId} ยังไม่รายงานรุ่น ${job.target} ภายใน 5 นาที`);
+      toastError(
+        device.otaError
+          ? `${deviceId} อัปเดตไม่สำเร็จ: ${device.otaError}`
+          : `${deviceId} ยังไม่รายงานรุ่น ${job.target} ภายใน 5 นาที `
+            + `(รุ่นตอนนี้ ${device.firmwareVersion || 'ไม่ทราบ'})`,
+      );
     }
   }
 }
@@ -588,7 +593,9 @@ async function startUpdates(devices, meta, ctx) {
       pending.set(device.deviceId, {
         target,
         startedAt: Date.now(),
-        previousError: device.otaError ?? null,
+        // Backend ล้าง otaError ตอนส่งคำสั่ง error ที่ตามมาจึงเป็นของรอบนี้เสมอ
+        // (แม้ข้อความจะซ้ำกับรอบก่อน เช่นดาวน์โหลดไม่ได้ด้วยสาเหตุเดิม)
+        previousError: null,
       });
       selected[meta.key].delete(device.deviceId);
       sent += 1;

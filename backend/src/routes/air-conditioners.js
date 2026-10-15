@@ -389,6 +389,12 @@ airConditionersRouter.post(
     }
     const url = firmwareUrl(row.mqtt_host, fileName);
 
+    // ล้างผลรอบก่อน ให้หน้าเว็บแยกได้ว่า otaError ที่มาหลังจากนี้เป็นของรอบใหม่
+    await pool.query(
+      'UPDATE air_conditioners SET ota_error = NULL WHERE device_id = ?',
+      [deviceId],
+    );
+
     let published;
     try {
       published = await publishOtaCommand('air', deviceId, url);
