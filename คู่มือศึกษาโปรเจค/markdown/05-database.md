@@ -292,11 +292,7 @@ updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 > **ทำไม created_by / updated_by ไม่ผูก FK ไปที่ users**
 > ค่าในคอลัมน์นี้บางแถวเป็น `'system'` (ข้อมูลเริ่มต้นใน `schema.sql`) ซึ่งไม่ใช่ผู้ใช้จริง และถ้าผูก FK จะลบบัญชีผู้ใช้ที่เคยสร้างห้อง/ตารางเรียนไม่ได้ จึงเก็บเป็น "ลายเซ็น" ข้อความธรรมดาไว้ตรวจย้อนหลัง
 
-![แผนภาพฐานข้อมูล](img/02-database.svg)
-
-> [!NOTE]
-> **รูปแผนภาพนี้เก่ากว่า schema จริง**
-> รูป `02-database.svg` วาดไว้ 8 ตาราง (หัวรูปเขียน "8 ตาราง") และระบุว่า `air_conditioners` มี 37 คอลัมน์ แต่ `schema.sql` ปัจจุบันมี **11 ตาราง** รูปยังไม่มี `academic_terms` กับ `room_bookings` และ `air_conditioners` มี **43 คอลัมน์** (เพิ่ม `firmware_version`, `ota_error`, `energy_chain_*`, `history_pending`) ให้เชื่อ ER diagram แบบตัวอักษรด้านบนและตารางในบทนี้ จำนวนคอลัมน์ที่ได้จาก `parseSchemaTables()` คือ users 13, password_reset_otps 9, rooms 8, class_schedules 12, air_conditioners 43, occupancy_sensors 21, system_alerts 11, energy_hourly 27, system_settings 4, academic_terms 6, room_bookings 15
+จำนวนคอลัมน์ของแต่ละตารางใน `schema.sql` (นับด้วย `parseSchemaTables()` ของ `utils/schema-doctor.js`): users 13, password_reset_otps 9, rooms 8, class_schedules 12, air_conditioners 43, occupancy_sensors 21, system_alerts 11, energy_hourly 27, system_settings 4, academic_terms 6, room_bookings 15 รวม **11 ตาราง**
 
 ## ตารางทีละตาราง
 
@@ -581,7 +577,7 @@ CREATE TABLE IF NOT EXISTS air_conditioners (
 > **provision_status: reserved → active**
 > - `reserved` — แอดมินลงทะเบียนเครื่องในแอปแล้ว ระบบออก token ให้ แต่บอร์ดยังไม่ยืนยันตัวผ่าน MQTT (สั่งงานยังไม่ได้)
 > - `active` — บอร์ดยื่น token ถูกต้องภายในเวลา ระบบล้าง `provisioning_token_hash` เป็น `NULL` แล้วเปลี่ยนสถานะ
-> - ถอดอุปกรณ์ = ลบแถวทิ้ง (`DELETE`) แล้วสั่ง `unprovision` ให้บอร์ดล้างค่าตัวเอง ประวัติค่าไฟใน `energy_hourly` ยังอยู่ และแสดงเป็น "นำออกแล้ว" ในหน้าข้อมูลไฟฟ้า (เดิมมีค่า `removed` ไว้ซ่อนแถวแทนการลบ แต่โค้ดเลิกใช้แล้ว จึงเอาออกจาก ENUM เมื่อ 14 ต.ค. 2569 ด้วย `scripts/migrate-drop-unused.js`)
+> - ถอดอุปกรณ์ = ลบแถวทิ้ง (`DELETE`) แล้วสั่ง `unprovision` ให้บอร์ดล้างค่าตัวเอง ประวัติค่าไฟใน `energy_hourly` ยังอยู่ และแสดงเป็น "นำออกแล้ว" ในหน้าข้อมูลไฟฟ้า
 > `scripts/doctor.js` พิมพ์เตือนเครื่องที่ค้างอยู่ใน `reserved` ว่า "ESP32 ยังไม่ยืนยันตัวเองผ่าน MQTT"
 
 ไฟล์: `backend/database/schema.sql` (บล็อกที่ 2: ค่าไฟล่าสุดและระบบปิดแอร์อัตโนมัติ)
@@ -738,7 +734,7 @@ CREATE TABLE IF NOT EXISTS occupancy_sensors (
 โครงสร้างคล้าย `air_conditioners` (ทะเบียน MQTT provisioning) ต่างกันตรงนี้:
 
 1. **บรรทัด 2** — `device_id` รูปแบบ `OCC32-` + เลขฐานสิบหก 12 หลัก (`utils/occupancy-sensor.js`) คำนำหน้าต่างจากแอร์ จึงแยกชนิดบอร์ดได้จากรหัส
-2. **บรรทัด 14** — `static_threshold` เกณฑ์ค่าพลังงานสัญญาณสำหรับตรวจ "คนนั่งนิ่ง" ของ LD2410 ค่าเริ่มต้น 25 ตรงกับ `STATIC_ENERGY_THRESHOLD = 25` ใน Backend (ตอนนี้โค้ดตั้ง 25 ทุกครั้งที่ลงทะเบียน ยังไม่มีหน้าจอให้ปรับรายห้อง) **หมายเหตุ 15 ต.ค. 2569:** เฟิร์มแวร์ตรวจคน 1.3.3 ใช้เกณฑ์ 15 ในตัวเองและไม่อ่านค่าจากคอลัมน์นี้ ค่าในตารางจึงไม่ตรงกับที่บอร์ดใช้จริง
+2. **บรรทัด 14** — `static_threshold` เกณฑ์ค่าพลังงานสัญญาณสำหรับตรวจ "คนนั่งนิ่ง" ของ LD2410 ค่าเริ่มต้น 25 ตรงกับ `STATIC_ENERGY_THRESHOLD = 25` ใน Backend (โค้ดตั้ง 25 ทุกครั้งที่ลงทะเบียน ยังไม่มีหน้าจอให้ปรับรายห้อง) **ระวัง:** เฟิร์มแวร์ตรวจคนใช้เกณฑ์ 15 ที่ฝังในตัวเองและไม่อ่านค่าจากคอลัมน์นี้ ค่าในตารางจึงไม่ตรงกับที่บอร์ดใช้จริง
 3. **บรรทัด 16** — `radar_available` บอร์ดคุยกับเรดาร์ได้หรือไม่
 4. **บรรทัด 17** — `is_occupied` ตอนนี้มีคนในห้องหรือไม่ (ค่าที่ระบบปิดแอร์อัตโนมัติใช้)
 5. **บรรทัด 27** — `uq_occupancy_room (room_number)` เป็น UNIQUE: **หนึ่งห้องมีเซ็นเซอร์ได้ตัวเดียว** ความสัมพันธ์กับ `rooms` จึงเป็น 1 ต่อ 1 (ส่วนแอร์เป็น 1 ต่อหลาย)
@@ -1302,7 +1298,7 @@ await pool.query(
 | `migrate-auto-off-v380.js` | `db:migrate:autooff` | เพิ่ม 6 คอลัมน์ `auto_off_*` ใน `air_conditioners` และสร้าง `system_alerts` (รุ่น 3.8.0) |
 | `migrate-system-settings-v3100.js` | `db:migrate:settings` | สร้าง `system_settings` และ `INSERT IGNORE` ค่าเริ่มต้น `auto_off_enabled='true'`, `electricity_rate='4.50'` (รุ่น 3.10.0/3.13.0) |
 | `migrate-firmware-v3140.js` | `db:migrate:firmware` | เพิ่ม `firmware_version`, `ota_error` ให้ทั้ง `air_conditioners` และ `occupancy_sensors` (รุ่น 3.14.0) |
-| `migrate-drop-unused.js` | `db:migrate:cleanup` | (14 ต.ค. 2569) ลบ `rooms.is_active` และค่า `removed` ของ `provision_status` ที่โค้ดไม่ใช้แล้ว ลบแถว/ห้องที่ค้างสถานะซ่อน ถ้าห้องที่ซ่อนยังมีของผูกจะไม่ลบคอลัมน์และบอกผู้ดูแล มี `--dry-run` |
+| `migrate-drop-unused.js` | `db:migrate:cleanup` | ลบ `rooms.is_active` และค่า `removed` ของ `provision_status` ที่โค้ดไม่ใช้แล้ว ลบแถว/ห้องที่ค้างสถานะซ่อน ถ้าห้องที่ซ่อนยังมีของผูกจะไม่ลบคอลัมน์และบอกผู้ดูแล มี `--dry-run` |
 | `migrate-offline-history-v3150.js` | `db:migrate:history` | เพิ่ม `energy_chain_kwh`, `energy_chain_at`, `energy_chain_running`, `history_pending` และตั้งจุดต่อเริ่มต้นจากค่าล่าสุดของแต่ละเครื่อง (รุ่น 3.15.0) |
 | `migrate-legacy-user.js` | `migrate:legacy` | ย้ายผู้ใช้จากตารางเก่า (ชื่อปริยาย `user`) เข้า `users` ใน transaction เดียว แฮชรหัสผ่านที่ยังเป็นข้อความธรรมดาด้วย bcrypt cost 12 (ถ้าเป็นแฮช bcrypt อยู่แล้วเก็บตามเดิม) ชื่อตาราง/คอลัมน์เก่าปรับได้ด้วย `LEGACY_*` |
 | `convert-schedule-file.js` | `schedules:convert` | ไม่แตะฐานข้อมูล: แปลงไฟล์ตารางเรียน `.xlsx` เป็น CSV ผ่าน `parseScheduleFile()` ใช้ร่วมกับ `examples/*.csv` |

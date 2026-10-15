@@ -55,10 +55,8 @@
 <li><a href="17-glossary.html"><span class="num">17</span>อภิธานศัพท์</a></li>
 <li><a href="18-file-map.html"><span class="num">18</span>แผนที่ไฟล์ทั้งโปรเจค</a></li>
 </ul>
-<div class="nav-part">งานที่กำลังพัฒนา</div><ul>
-<li><a href="19-daikin-slm8.html"><span class="num">19</span>แอร์ Daikin ผ่านสาย SLM8: จากการแกะโปรโตคอลถึงบอร์ดสายแอร์</a></li>
-</ul>
 <div class="nav-part">เจาะลึก</div><ul>
+<li><a href="19-daikin-slm8.html"><span class="num">19</span>แอร์ Daikin ผ่านสาย SLM8: จากการแกะโปรโตคอลถึงบอร์ดสายแอร์</a></li>
 <li><a href="20-database-design.html"><span class="num">20</span>เจาะลึกการออกแบบฐานข้อมูล</a></li>
 </ul>
     </nav>
@@ -1506,8 +1504,8 @@
 </tr>
 </tbody>
 </table></div>
-<h3 id="8-อัปโหลดเฟิร์มแวร์-post-apifirmware-เพิ่ม-14-ตค-2569">8. อัปโหลดเฟิร์มแวร์ <code>POST /api/firmware</code> (เพิ่ม 14 ต.ค. 2569)<a class="anchor" href="#8-อัปโหลดเฟิร์มแวร์-post-apifirmware-เพิ่ม-14-ตค-2569">#</a></h3>
-<p>เดิมการวางไฟล์ <code>.bin</code> ต้อง <code>scp</code> เข้าเซิร์ฟเวอร์ (ต้องมีบัญชี SSH) ตอนนี้แอดมินลากไฟล์วางในหน้า "เฟิร์มแวร์" ของเว็บได้ เส้นนี้จึงเป็นเส้นแรกที่ "เขียนไฟล์ลงดิสก์ของเซิร์ฟเวอร์ตามที่ผู้ใช้ส่งมา" ต้องตรวจหนักกว่าเส้นอื่น</p>
+<h3 id="8-อัปโหลดเฟิร์มแวร์-post-apifirmware">8. อัปโหลดเฟิร์มแวร์ <code>POST /api/firmware</code><a class="anchor" href="#8-อัปโหลดเฟิร์มแวร์-post-apifirmware">#</a></h3>
+<p>แอดมินลากไฟล์ <code>.bin</code> วางในหน้า "เฟิร์มแวร์" ของเว็บได้โดยไม่ต้องมีบัญชี SSH เส้นนี้จึงเป็นเส้นเดียวที่ "เขียนไฟล์ลงดิสก์ของเซิร์ฟเวอร์ตามที่ผู้ใช้ส่งมา" ต้องตรวจหนักกว่าเส้นอื่น</p>
 <p><strong>ไฟล์ <code>backend/src/routes/firmware.js</code> บรรทัด 45–68</strong> (ตรวจก่อนเขียน)</p>
 <div class="code-block"><span class="code-lang">js</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">45</span>
 <span class="normal">46</span>
@@ -1728,8 +1726,8 @@
 
 <div class="callout note"><div class="callout-title">หมายเหตุ</div><p>ไฟล์ที่อัปโหลดชื่อยังไม่มีเลขรุ่น (เช่น <code>rmutt_esp32_air.ino.bin</code> ตรงจาก Arduino IDE) หน้าเว็บจะถามรุ่นแล้วตั้งชื่อเป็น <code>&lt;สเก็ตช์&gt;-&lt;รุ่น&gt;.bin</code> ก่อนส่ง Backend ไม่ได้บังคับว่าต้องมีเลขรุ่น (<code>version</code> เป็น <code>null</code> ได้) แต่ถ้าไม่มี หน้าเว็บจะบอกไม่ได้ว่าบอร์ดไหนเก่ากว่าไฟล์</p></div>
 
-<h3 id="9-ลบอุปกรณ์-delete-apiair-conditionersdeviceid-และการล้างค่าบอร์ด-แก้-13-ตค-2569">9. ลบอุปกรณ์ <code>DELETE /api/air-conditioners/:deviceId</code> และการล้างค่าบอร์ด (แก้ 13 ต.ค. 2569)<a class="anchor" href="#9-ลบอุปกรณ์-delete-apiair-conditionersdeviceid-และการล้างค่าบอร์ด-แก้-13-ตค-2569">#</a></h3>
-<p>ก่อน 13 ต.ค. การลบอุปกรณ์ลบแค่ข้อมูลฝั่งเซิร์ฟเวอร์ ตัวบอร์ดยังจำ Wi-Fi, ที่อยู่ Broker, ชื่อผู้ใช้/รหัส MQTT และห้องไว้ใน NVS (หน่วยความจำถาวรของ ESP32) ตอนนี้ Backend สั่งบอร์ดล้างตัวเองด้วย</p>
+<h3 id="9-ลบอุปกรณ์-delete-apiair-conditionersdeviceid-และการล้างค่าบอร์ด">9. ลบอุปกรณ์ <code>DELETE /api/air-conditioners/:deviceId</code> และการล้างค่าบอร์ด<a class="anchor" href="#9-ลบอุปกรณ์-delete-apiair-conditionersdeviceid-และการล้างค่าบอร์ด">#</a></h3>
+<p>ถ้าลบแค่ข้อมูลฝั่งเซิร์ฟเวอร์ ตัวบอร์ดจะยังจำ Wi-Fi, ที่อยู่ Broker, ชื่อผู้ใช้/รหัส MQTT และห้องไว้ใน NVS (หน่วยความจำถาวรของ ESP32) Backend จึงสั่งบอร์ดล้างตัวเองด้วย</p>
 <p><strong>ไฟล์ <code>backend/src/routes/air-conditioners.js</code> บรรทัด 418–453</strong></p>
 <div class="code-block"><span class="code-lang">js</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">418</span>
 <span class="normal">419</span>
@@ -2327,7 +2325,7 @@
 <td><code>/api/air-conditioners</code></td>
 <td>ใช่</td>
 <td>ไม่</td>
-<td>รายการแอร์ทุกเครื่อง พร้อมค่า PZEM, สถานะ, นับถอยหลัง และ <code>controlType</code> (<code>ir</code>/<code>wired</code>, เพิ่ม 11 ต.ค. 2569)</td>
+<td>รายการแอร์ทุกเครื่อง พร้อมค่า PZEM, สถานะ, นับถอยหลัง และ <code>controlType</code> (<code>ir</code>/<code>wired</code>)</td>
 <td><code>air_conditioners</code></td>
 </tr>
 <tr>
@@ -2343,7 +2341,7 @@
 <td><code>/api/air-conditioners/:deviceId/command</code></td>
 <td>ใช่</td>
 <td><strong>ไม่</strong></td>
-<td>สั่งแอร์ผ่าน MQTT (202) ใครล็อกอินก็สั่งได้ แอร์ <code>DAIKIN_WIRED</code> รับเฉพาะ Cool/Dry/Fan, ไม่มีพัดลม Turbo, สวิง Auto/Off (แก้ 11 ต.ค. 2569)</td>
+<td>สั่งแอร์ผ่าน MQTT (202) ใครล็อกอินก็สั่งได้ แอร์ <code>DAIKIN_WIRED</code> รับเฉพาะ Cool/Dry/Fan, ไม่มีพัดลม Turbo, สวิง Auto/Off</td>
 <td><code>air_conditioners</code></td>
 </tr>
 <tr>
@@ -2367,7 +2365,7 @@
 <td><code>/api/air-conditioners/:deviceId/ota</code></td>
 <td>ใช่</td>
 <td>ใช่</td>
-<td>สั่งอัปเดตเฟิร์มแวร์ผ่าน MQTT (202) ไฟล์ต้องตรงชนิดบอร์ด: <code>DAIKIN_WIRED</code> ใช้ไฟล์ <code>wired</code> ที่เหลือใช้ไฟล์ <code>air</code> (แก้ 14 ต.ค. 2569)</td>
+<td>สั่งอัปเดตเฟิร์มแวร์ผ่าน MQTT (202) ไฟล์ต้องตรงชนิดบอร์ด: <code>DAIKIN_WIRED</code> ใช้ไฟล์ <code>wired</code> ที่เหลือใช้ไฟล์ <code>air</code></td>
 <td><code>air_conditioners</code></td>
 </tr>
 <tr>
@@ -2375,7 +2373,7 @@
 <td><code>/api/air-conditioners/:deviceId</code></td>
 <td>ใช่</td>
 <td>ใช่</td>
-<td>ลบแอร์ → สั่งบอร์ดล้างค่า (unprovision) รอ ≤ 4 วินาที → ล้าง retained topic → ลบบัญชี MQTT ตอบ <code>boardCleared</code> ด้วย (แก้ 13 ต.ค. 2569)</td>
+<td>ลบแอร์ → สั่งบอร์ดล้างค่า (unprovision) รอ ≤ 4 วินาที → ล้าง retained topic → ลบบัญชี MQTT ตอบ <code>boardCleared</code> ด้วย</td>
 <td><code>air_conditioners</code> (+ Broker + บอร์ด)</td>
 </tr>
 <tr>
@@ -2407,7 +2405,7 @@
 <td><code>/api/occupancy-sensors/:deviceId/ota</code></td>
 <td>ใช่</td>
 <td>ใช่</td>
-<td>สั่ง OTA (202) ไฟล์ต้องเป็นชนิด <code>occupancy</code> (แก้ 14 ต.ค. 2569)</td>
+<td>สั่ง OTA (202) ไฟล์ต้องเป็นชนิด <code>occupancy</code></td>
 <td><code>occupancy_sensors</code></td>
 </tr>
 <tr>
@@ -2415,7 +2413,7 @@
 <td><code>/api/occupancy-sensors/:deviceId</code></td>
 <td>ใช่</td>
 <td>ใช่</td>
-<td>ลบเซ็นเซอร์ ลำดับเดียวกับแอร์ (unprovision → retained → บัญชี MQTT) ตอบ <code>boardCleared</code> (แก้ 13 ต.ค. 2569)</td>
+<td>ลบเซ็นเซอร์ ลำดับเดียวกับแอร์ (unprovision → retained → บัญชี MQTT) ตอบ <code>boardCleared</code></td>
 <td><code>occupancy_sensors</code> (+ Broker + บอร์ด)</td>
 </tr>
 <tr>
@@ -2423,7 +2421,7 @@
 <td><code>/api/firmware</code></td>
 <td>ใช่</td>
 <td>ใช่</td>
-<td><code>{configured, maxBytes, files}</code> รายการไฟล์ <code>.bin</code> พร้อม <code>kind</code> (<code>air</code>/<code>wired</code>/<code>occupancy</code>) และ <code>version</code> จากชื่อไฟล์ (แก้ 14 ต.ค. 2569)</td>
+<td><code>{configured, maxBytes, files}</code> รายการไฟล์ <code>.bin</code> พร้อม <code>kind</code> (<code>air</code>/<code>wired</code>/<code>occupancy</code>) และ <code>version</code> จากชื่อไฟล์</td>
 <td>(ระบบไฟล์)</td>
 </tr>
 <tr>
@@ -2431,7 +2429,7 @@
 <td><code>/api/firmware</code></td>
 <td>ใช่</td>
 <td>ใช่</td>
-<td>อัปโหลดไฟล์ดิบ ชื่อใน header <code>X-File-Name</code> (percent-encoded) <code>?kind=</code> ต้องตรงชนิดจากชื่อ <code>?replace=1</code> ยอมเขียนทับ ตอบ 201 <code>{file}</code> (เพิ่ม 14 ต.ค. 2569)</td>
+<td>อัปโหลดไฟล์ดิบ ชื่อใน header <code>X-File-Name</code> (percent-encoded) <code>?kind=</code> ต้องตรงชนิดจากชื่อ <code>?replace=1</code> ยอมเขียนทับ ตอบ 201 <code>{file}</code></td>
 <td>(ระบบไฟล์)</td>
 </tr>
 <tr>
@@ -2439,7 +2437,7 @@
 <td><code>/api/firmware/:fileName</code></td>
 <td>ใช่</td>
 <td>ใช่</td>
-<td>ลบไฟล์ ตอบ <code>{removed, fileName}</code> ไม่มีไฟล์ตอบ <code>removed: false</code> (เพิ่ม 14 ต.ค. 2569)</td>
+<td>ลบไฟล์ ตอบ <code>{removed, fileName}</code> ไม่มีไฟล์ตอบ <code>removed: false</code></td>
 <td>(ระบบไฟล์)</td>
 </tr>
 </tbody>
@@ -2547,7 +2545,7 @@
 </tr>
 </tbody>
 </table></div>
-<p>รวม <strong>57 endpoint</strong> (นับ <code>/api/health</code> ด้วย; เดิม 55 เพิ่ม <code>POST</code> และ <code>DELETE /api/firmware</code> เมื่อ 14 ต.ค. 2569)</p>
+<p>รวม <strong>57 endpoint</strong> (นับ <code>/api/health</code> ด้วย)</p>
 <div class="callout note"><div class="callout-title">หมายเหตุ</div><p><code>POST /api/air-conditioners/:deviceId/command</code> ไม่มี <code>requireAdmin</code> โดยตั้งใจ เพราะเจ้าหน้าที่ (staff) ต้องเปิด-ปิดแอร์ได้ ส่วนการจอง/ลบ/OTA/เข้าโหมดตั้งค่าซึ่งกระทบอุปกรณ์ถาวรเป็นของแอดมินเท่านั้น</p></div>
 
 <h2 id="ไฟล์-route-ทีละไฟล์">ไฟล์ route ทีละไฟล์<a class="anchor" href="#ไฟล์-route-ทีละไฟล์">#</a></h2>
@@ -2563,9 +2561,9 @@
 <li>ลำดับเรียงรายการ <code>ORDER BY role = 'admin' DESC, is_active DESC, username</code> ให้แอดมินที่ใช้งานอยู่ขึ้นก่อน</li>
 <li><code>ER_DUP_ENTRY</code> → 409 (username/อีเมลซ้ำ)</li>
 </ul>
-<h3 id="routesroomsjs-230-บรรทัด"><code>routes/rooms.js</code> (230 บรรทัด)<a class="anchor" href="#routesroomsjs-230-บรรทัด">#</a></h3>
+<h3 id="routesroomsjs-196-บรรทัด"><code>routes/rooms.js</code> (196 บรรทัด)<a class="anchor" href="#routesroomsjs-196-บรรทัด">#</a></h3>
 <p>ดูหัวข้อเจาะโค้ดข้อ 6 ใช้ <code>validateRoomInput</code>, <code>validateRoomNumber</code>, <code>publicRoom</code> จาก <code>utils/room.js</code></p>
-<h3 id="routesschedulesjs-500-บรรทัด"><code>routes/schedules.js</code> (500 บรรทัด)<a class="anchor" href="#routesschedulesjs-500-บรรทัด">#</a></h3>
+<h3 id="routesschedulesjs-497-บรรทัด"><code>routes/schedules.js</code> (497 บรรทัด)<a class="anchor" href="#routesschedulesjs-497-บรรทัด">#</a></h3>
 <p>ไฟล์ใหญ่ ประกอบด้วยสามกลุ่ม:</p>
 <ol>
 <li><strong>นำเข้าไฟล์:</strong> <code>import/preview</code> ใช้ <code>express.raw({type: () =&gt; true, limit: '8mb'})</code> เป็น middleware เฉพาะ route นี้ (รับไบนารีของไฟล์ Excel/CSV ตรง ๆ แทน JSON และเพิ่มเพดานเป็น 8 MB เพราะ <code>express.json</code> ที่ใช้ทั่วไปจำกัดแค่ 256 KB) แล้วส่งให้ <code>parseScheduleFile</code> (บทตอนที่ 2) แยกห้องที่มีอยู่แล้วกับห้องใหม่ (<code>roomDefaultsForImport</code> เดาชั้น/ประเภท) <code>import/commit</code> ใน <code>withTransaction</code> เดียว: สร้างห้องที่ขาด (ถ้าผู้ใช้ยืนยัน <code>createMissingRooms</code>) → ลบตารางเดิม (ทั้งหมดถ้า <code>replaceAll</code> หรือเฉพาะห้องที่อยู่ในไฟล์) → <code>INSERT</code> ทุกคาบ (id เป็น <code>crypto.randomUUID()</code>) → บันทึกภาคเรียน → บันทึกว่านำเข้าเมื่อไร ทำใน transaction เดียวเพื่อไม่ให้มีช่วงที่ตารางว่างครึ่งทาง ซึ่งระบบปิดแอร์อัตโนมัติจะเข้าใจว่าทุกห้อง "ไม่มีคาบเรียน" แล้วปิดแอร์ระหว่างสอน</li>
@@ -2576,7 +2574,7 @@
 
 <h3 id="routesbookingsjs-162-บรรทัด"><code>routes/bookings.js</code> (162 บรรทัด)<a class="anchor" href="#routesbookingsjs-162-บรรทัด">#</a></h3>
 <p>การใช้ห้องนอกตารางเรียน (ประชุม สอบ กิจกรรม) <code>GET</code> คืนรายการที่ช่วงวันที่ทับกับ <code>from</code>/<code>to</code> (ถ้าไม่ส่ง <code>from</code> ใช้ <code>end_date &gt;= CURDATE()</code> คือเฉพาะที่ยังไม่จบ) เก็บ <code>days_of_week</code> เป็นสตริงคั่นจุลภาค (<code>input.daysOfWeek.join(',')</code>) ใช้ <code>DATE_FORMAT</code> ให้วันที่เป็นข้อความ <code>YYYY-MM-DD</code> ไม่ให้ไดรเวอร์แปลงเป็น Date ที่เวลาเพี้ยนตามเขตเวลา <code>POST/PUT</code> ตอบ <code>occurrences</code> = <code>countOccurrences(input)</code> (จำนวนวันที่เกิดขึ้นจริง) <code>GET</code> ดัก <code>ER_NO_SUCH_TABLE</code> แล้วคืนรายการว่าง เพื่อให้ Backend รุ่นใหม่ยังทำงานได้กับฐานข้อมูลที่ยังไม่รัน migration ตารางนี้</p>
-<h3 id="routesair-conditionersjs-448-บรรทัด"><code>routes/air-conditioners.js</code> (448 บรรทัด)<a class="anchor" href="#routesair-conditionersjs-448-บรรทัด">#</a></h3>
+<h3 id="routesair-conditionersjs-453-บรรทัด"><code>routes/air-conditioners.js</code> (453 บรรทัด)<a class="anchor" href="#routesair-conditionersjs-453-บรรทัด">#</a></h3>
 <p>ตัวใหญ่ที่สุดของฝั่งอุปกรณ์ จุดสำคัญคือ <code>POST /reservations</code> (ขั้นจองก่อนบอร์ดจะ provisioning):</p>
 <ol>
 <li>ตรวจ input (<code>validateReservationInput</code>) และว่าห้องมีอยู่ (400 ถ้าไม่มี)</li>
@@ -2586,19 +2584,19 @@
 <li>เรียก <code>prepareDeviceCredentials</code> สร้างบัญชี MQTT ของบอร์ด <strong>ก่อนเขียน DB</strong> เพื่อไม่ให้ถ้า Broker ล้มแล้วค้างแถวจองไว้ (ล้มแล้วตอบ 503)</li>
 <li><code>INSERT</code> แถวใหม่สถานะ <code>reserved</code> หมดอายุ 15 นาที (<code>expiresInSeconds: 900</code>) หรือ <code>UPDATE</code> ถ้าบอร์ดเดิมที่ <code>active</code> มาตั้งค่าใหม่ (ตอบ 200 แทน 201)</li>
 </ol>
-<p><code>POST /:deviceId/command</code>: ต้อง <code>provision_status = 'active'</code> (409 ถ้าบอร์ดยังไม่ยืนยันตัวผ่าน MQTT) ตรวจคำสั่งด้วย <code>validateAirState(body, protocol)</code> (<code>protocol</code> อ่านจากแถวในฐานข้อมูล ถ้าเป็น <code>DAIKIN_WIRED</code> จะรับเฉพาะคำสั่งที่รีโมตติดผนังทำได้ ดูบท Backend ตอนที่ 2) แล้ว <code>publishAirCommand</code> ตอบ 202 พร้อม <code>commandId</code> ("รับคำสั่งแล้ว" ไม่ใช่ "แอร์ทำแล้ว" เพราะผลมาทาง MQTT status ภายหลัง) ถ้า Broker ไม่ต่อ ตอบ 503 <code>PATCH /:deviceId</code>: สร้าง <code>SET</code> แบบประกอบฟิลด์ที่ส่งมา (<code>fields.push('name = ?')</code>) ชื่อคอลัมน์เป็นข้อความคงที่ในโค้ด ไม่ใช่ข้อความจากผู้ใช้ ค่าผู้ใช้ผูกด้วย <code>?</code> ปิด auto-off จะรีเซ็ตนาฬิกานับถอยหลังด้วย <code>POST /:deviceId/ota</code>: ตรวจชื่อไฟล์ (<code>validateFirmwareFileName</code>), ไฟล์มีจริง (<code>assertFirmwareFileExists</code> จาก <code>firmware.js</code>), อ่าน <code>protocol</code> ของบอร์ดแล้ว <code>assertFirmwareKind(fileName, airFirmwareKind(row.protocol))</code> (เพิ่ม 14 ต.ค. 2569: บอร์ดสายแอร์รับเฉพาะไฟล์ที่ชื่อมี <code>wired</code>/<code>slm8</code> บอร์ด IR รับเฉพาะไฟล์ IR ผิดตอบ 400), บอร์ด <code>active</code> และออนไลน์ แล้วสร้าง URL ดาวน์โหลด <code>https://&lt;mqtt_host&gt;/firmware/&lt;ไฟล์&gt;</code> <strong>ล้าง <code>ota_error</code> ของบอร์ดเป็น <code>NULL</code></strong> (เพิ่ม 15 ต.ค. 2569 ให้หน้าเว็บรู้ว่า error ที่มาหลังจากนี้เป็นของรอบใหม่ แม้ข้อความจะซ้ำกับรอบก่อน) แล้วจึงสั่งผ่าน MQTT <code>DELETE</code>: ลบแถว → <code>unprovisionDevice('air', id)</code> สั่งบอร์ดล้างค่าแล้วรอคำตอบ ≤ 4 วินาที (เพิ่ม 13 ต.ค. 2569) → <code>clearRetainedAirTopics</code> (ล้างข้อความ retained ของบอร์ดบน Broker กันค่าเก่าค้าง) → <code>removeDeviceAccount</code> (ลบบัญชี MQTT) ตอบ <code>boardCleared</code> บอกว่าบอร์ดยืนยันการล้างหรือไม่ ลบซ้ำถือว่าสำเร็จ (ตอบ 200 เสมอ) เพื่อไม่ให้แอปค้างกับแถวที่หายไปแล้ว (ดูเจาะโค้ดข้อ 9)</p>
-<h3 id="routesoccupancy-sensorsjs-326-บรรทัด"><code>routes/occupancy-sensors.js</code> (326 บรรทัด)<a class="anchor" href="#routesoccupancy-sensorsjs-326-บรรทัด">#</a></h3>
-<p>โครงเหมือน <code>air-conditioners.js</code> แต่ผูก <strong>หนึ่งห้องหนึ่งเซ็นเซอร์</strong> (ตรวจ <code>room_number</code> ซ้ำ ไม่มี <code>air_number</code>) และใช้ topic prefix <code>rmutt/occupancy</code> กับค่า <code>STATIC_ENERGY_THRESHOLD</code> ของ LD2410 ใช้ <code>publishOtaCommand('occupancy', ...)</code> ต่างจากแอร์ที่ใช้ <code>'air'</code> OTA ตรวจ <code>assertFirmwareKind(fileName, 'occupancy')</code> ตั้งแต่ก่อนอ่านฐานข้อมูล (เพิ่ม 14 ต.ค. 2569 เพราะเซ็นเซอร์มีชนิดเดียว ไม่ต้องรู้ protocol) และล้าง <code>ota_error</code> ก่อนส่งคำสั่งเหมือนแอร์ (15 ต.ค. 2569) และ <code>DELETE</code> เรียก <code>unprovisionDevice('occupancy', id)</code> ก่อนล้าง retained และลบบัญชี MQTT ตอบ <code>boardCleared</code> เหมือนแอร์ (เพิ่ม 13 ต.ค. 2569)</p>
-<h3 id="routesfirmwarejs-185-บรรทัด-แก้-14-ตค-2569"><code>routes/firmware.js</code> (185 บรรทัด, แก้ 14 ต.ค. 2569)<a class="anchor" href="#routesfirmwarejs-185-บรรทัด-แก้-14-ตค-2569">#</a></h3>
+<p><code>POST /:deviceId/command</code>: ต้อง <code>provision_status = 'active'</code> (409 ถ้าบอร์ดยังไม่ยืนยันตัวผ่าน MQTT) ตรวจคำสั่งด้วย <code>validateAirState(body, protocol)</code> (<code>protocol</code> อ่านจากแถวในฐานข้อมูล ถ้าเป็น <code>DAIKIN_WIRED</code> จะรับเฉพาะคำสั่งที่รีโมตติดผนังทำได้ ดูบท Backend ตอนที่ 2) แล้ว <code>publishAirCommand</code> ตอบ 202 พร้อม <code>commandId</code> ("รับคำสั่งแล้ว" ไม่ใช่ "แอร์ทำแล้ว" เพราะผลมาทาง MQTT status ภายหลัง) ถ้า Broker ไม่ต่อ ตอบ 503 <code>PATCH /:deviceId</code>: สร้าง <code>SET</code> แบบประกอบฟิลด์ที่ส่งมา (<code>fields.push('name = ?')</code>) ชื่อคอลัมน์เป็นข้อความคงที่ในโค้ด ไม่ใช่ข้อความจากผู้ใช้ ค่าผู้ใช้ผูกด้วย <code>?</code> ปิด auto-off จะรีเซ็ตนาฬิกานับถอยหลังด้วย <code>POST /:deviceId/ota</code>: ตรวจชื่อไฟล์ (<code>validateFirmwareFileName</code>), ไฟล์มีจริง (<code>assertFirmwareFileExists</code> จาก <code>firmware.js</code>), อ่าน <code>protocol</code> ของบอร์ดแล้ว <code>assertFirmwareKind(fileName, airFirmwareKind(row.protocol))</code> (บอร์ดสายแอร์รับเฉพาะไฟล์ที่ชื่อมี <code>wired</code>/<code>slm8</code> บอร์ด IR รับเฉพาะไฟล์ IR ผิดตอบ 400), บอร์ด <code>active</code> และออนไลน์ แล้วสร้าง URL ดาวน์โหลด <code>https://&lt;mqtt_host&gt;/firmware/&lt;ไฟล์&gt;</code> <strong>ล้าง <code>ota_error</code> ของบอร์ดเป็น <code>NULL</code></strong> (ให้หน้าเว็บรู้ว่า error ที่มาหลังจากนี้เป็นของรอบใหม่ แม้ข้อความจะซ้ำกับรอบก่อน) แล้วจึงสั่งผ่าน MQTT <code>DELETE</code>: ลบแถว → <code>unprovisionDevice('air', id)</code> สั่งบอร์ดล้างค่าแล้วรอคำตอบ ≤ 4 วินาที → <code>clearRetainedAirTopics</code> (ล้างข้อความ retained ของบอร์ดบน Broker กันค่าเก่าค้าง) → <code>removeDeviceAccount</code> (ลบบัญชี MQTT) ตอบ <code>boardCleared</code> บอกว่าบอร์ดยืนยันการล้างหรือไม่ ลบซ้ำถือว่าสำเร็จ (ตอบ 200 เสมอ) เพื่อไม่ให้แอปค้างกับแถวที่หายไปแล้ว (ดูเจาะโค้ดข้อ 9)</p>
+<h3 id="routesoccupancy-sensorsjs-331-บรรทัด"><code>routes/occupancy-sensors.js</code> (331 บรรทัด)<a class="anchor" href="#routesoccupancy-sensorsjs-331-บรรทัด">#</a></h3>
+<p>โครงเหมือน <code>air-conditioners.js</code> แต่ผูก <strong>หนึ่งห้องหนึ่งเซ็นเซอร์</strong> (ตรวจ <code>room_number</code> ซ้ำ ไม่มี <code>air_number</code>) และใช้ topic prefix <code>rmutt/occupancy</code> กับค่า <code>STATIC_ENERGY_THRESHOLD</code> ของ LD2410 ใช้ <code>publishOtaCommand('occupancy', ...)</code> ต่างจากแอร์ที่ใช้ <code>'air'</code> OTA ตรวจ <code>assertFirmwareKind(fileName, 'occupancy')</code> ตั้งแต่ก่อนอ่านฐานข้อมูล (เซ็นเซอร์มีชนิดเดียว ไม่ต้องรู้ protocol) และล้าง <code>ota_error</code> ก่อนส่งคำสั่งเหมือนแอร์ และ <code>DELETE</code> เรียก <code>unprovisionDevice('occupancy', id)</code> ก่อนล้าง retained และลบบัญชี MQTT ตอบ <code>boardCleared</code> เหมือนแอร์</p>
+<h3 id="routesfirmwarejs-185-บรรทัด"><code>routes/firmware.js</code> (185 บรรทัด)<a class="anchor" href="#routesfirmwarejs-185-บรรทัด">#</a></h3>
 <p><code>firmwareRouter.use(authenticate, requireAdmin)</code> (ส่งสอง middleware ในการเรียกเดียว คลุมทุกเส้นในไฟล์ รวมเส้นอัปโหลดและลบที่เพิ่มใหม่)</p>
 <ul>
-<li><code>GET /</code> คืน <code>{configured, maxBytes, files}</code> <code>maxBytes</code> = <code>FIRMWARE_MAX_BYTES</code> ให้หน้าเว็บเตือนไฟล์ใหญ่เกินก่อนส่ง ฟังก์ชัน <code>listFirmwareFiles</code> อ่านโฟลเดอร์ <code>FIRMWARE_DIR</code> เอาเฉพาะ <code>.bin</code> ที่เป็นไฟล์ เรียงใหม่สุดก่อน แต่ละไฟล์มี <code>name</code>, <code>size</code>, <code>modifiedAt</code>, <code>kind</code> (<code>firmwareKindOf</code>) และ <code>version</code> (<code>firmwareVersionOf</code>, เพิ่ม 14 ต.ค.) ไม่ตั้งโฟลเดอร์หรือโฟลเดอร์ไม่มี คืนอาร์เรย์ว่าง</li>
-<li><code>POST /</code> (เพิ่ม 14 ต.ค. 2569) รับไฟล์ <code>.bin</code> จากหน้าเว็บแทนการ <code>scp</code> เข้าเซิร์ฟเวอร์ ใช้ <code>express.raw</code> เฉพาะเส้นนี้ (เพดาน <code>FIRMWARE_MAX_BYTES + 1024</code>) ตรวจชื่อ ชนิด เนื้อไฟล์ แล้วเขียนแบบไฟล์ชั่วคราว + <code>rename</code> (ดูเจาะโค้ดข้อ 8)</li>
-<li><code>DELETE /:fileName</code> (เพิ่ม 14 ต.ค. 2569) ตรวจชื่อด้วย <code>validateFirmwareFileName</code> แล้ว <code>fs.unlink</code> ไม่มีไฟล์ (<code>ENOENT</code>) ตอบ <code>{removed: false}</code> แบบไม่ error (ลบซ้ำได้) เขียนไม่ได้ (<code>EACCES</code>/<code>EROFS</code>) ตอบ 500 พร้อมข้อความไทย</li>
+<li><code>GET /</code> คืน <code>{configured, maxBytes, files}</code> <code>maxBytes</code> = <code>FIRMWARE_MAX_BYTES</code> ให้หน้าเว็บเตือนไฟล์ใหญ่เกินก่อนส่ง ฟังก์ชัน <code>listFirmwareFiles</code> อ่านโฟลเดอร์ <code>FIRMWARE_DIR</code> เอาเฉพาะ <code>.bin</code> ที่เป็นไฟล์ เรียงใหม่สุดก่อน แต่ละไฟล์มี <code>name</code>, <code>size</code>, <code>modifiedAt</code>, <code>kind</code> (<code>firmwareKindOf</code>) และ <code>version</code> (<code>firmwareVersionOf</code>) ไม่ตั้งโฟลเดอร์หรือโฟลเดอร์ไม่มี คืนอาร์เรย์ว่าง</li>
+<li><code>POST /</code> รับไฟล์ <code>.bin</code> จากหน้าเว็บแทนการ <code>scp</code> เข้าเซิร์ฟเวอร์ ใช้ <code>express.raw</code> เฉพาะเส้นนี้ (เพดาน <code>FIRMWARE_MAX_BYTES + 1024</code>) ตรวจชื่อ ชนิด เนื้อไฟล์ แล้วเขียนแบบไฟล์ชั่วคราว + <code>rename</code> (ดูเจาะโค้ดข้อ 8)</li>
+<li><code>DELETE /:fileName</code> ตรวจชื่อด้วย <code>validateFirmwareFileName</code> แล้ว <code>fs.unlink</code> ไม่มีไฟล์ (<code>ENOENT</code>) ตอบ <code>{removed: false}</code> แบบไม่ error (ลบซ้ำได้) เขียนไม่ได้ (<code>EACCES</code>/<code>EROFS</code>) ตอบ 500 พร้อมข้อความไทย</li>
 <li>ฟังก์ชันภายใน <code>decodeHeader</code> (ถอด percent-encoding ของ <code>X-File-Name</code> ถอดไม่ได้คืน <code>''</code> ซึ่งจะไม่ผ่านการตรวจชื่อ) และ <code>fileExists</code></li>
 <li><code>assertFirmwareFileExists</code> export ให้ route แอร์/เซ็นเซอร์ใช้ ตรวจว่าไฟล์มีและขนาด &gt; 0 ไม่งั้น 404 ถ้าไม่ได้ตั้ง <code>FIRMWARE_DIR</code> จะข้ามการตรวจ (ตอนพัฒนา)</li>
 </ul>
-<h3 id="routesenergyjs-555-บรรทัด"><code>routes/energy.js</code> (555 บรรทัด)<a class="anchor" href="#routesenergyjs-555-บรรทัด">#</a></h3>
+<h3 id="routesenergyjs-553-บรรทัด"><code>routes/energy.js</code> (553 บรรทัด)<a class="anchor" href="#routesenergyjs-553-บรรทัด">#</a></h3>
 <p>อ่านอย่างเดียว (ทุก route ล็อกอินอย่างเดียว) เรียก util ใน <code>utils/energy-history.js</code> (บทตอนที่ 2) ที่ควรรู้: <code>/summary</code> ใช้ <code>Promise.all</code> ยิง 5 query พร้อมกัน (ยอดช่วงนี้, ช่วงก่อนหน้า, กราฟ, แยกห้อง, แยกเครื่อง) แทนรอทีละอัน ตัวกรองชั้นผ่าน <code>floorFilter()</code> ซึ่งสร้างข้อความ WHERE จากชิ้นส่วนคงที่และผูกค่า <code>?</code> เสมอ <code>/export</code> ตั้ง header <code>Content-Disposition</code> ด้วย <code>filename=</code> (ชื่อ ASCII) และ <code>filename*=UTF-8''...</code> (ชื่อไทยที่ encode แล้ว) เพราะ header HTTP รับได้เฉพาะ Latin ส่งไฟล์ด้วย <code>response.send(Buffer.from(workbook))</code> และบอกจำนวนแถวใน <code>X-Export-Rows</code> ข้อมูลผ่าน <code>/history</code>/<code>/export</code> สร้างด้วย SQL ซ้อนสองชั้น (ชั้นในรวมต่ออุปกรณ์ต่อชั่วโมง ชั้นนอกรวมตามระดับที่เลือก) เพื่อให้ค่าเฉลี่ยของหลายเครื่องถูกต้อง</p>
 <h3 id="routesalertsjs-100-บรรทัด"><code>routes/alerts.js</code> (100 บรรทัด)<a class="anchor" href="#routesalertsjs-100-บรรทัด">#</a></h3>
 <p><code>GET /</code> กรองตามสถานะ (<code>open</code>/<code>acknowledged</code>/<code>resolved</code>) และห้อง สร้าง <code>WHERE</code> จากเงื่อนไขคงที่ + ค่าผูก <code>?</code> และใส่ <code>LIMIT ${limit}</code> แบบแทรกตัวเลข ซึ่งปลอดภัยเพราะ <code>clampLimit</code> แปลงเป็นจำนวนเต็ม (1–200 ค่าเริ่มต้น 30) แล้วเท่านั้น <code>ORDER BY status = 'open' DESC</code> ให้ที่ยังไม่รับทราบขึ้นก่อน และคืน <code>counts</code> แยกตามสถานะให้แสดงตัวเลขบนไอคอน <code>POST /:id/acknowledge</code>: <code>UPDATE ... WHERE id = ? AND status = 'open'</code> แล้วดู <code>affectedRows</code> ถ้า 0 = ไม่พบหรือรับทราบไปแล้ว → 404 (วิธีนี้ปลอดภัยต่อการกดซ้ำพร้อมกัน) สถานะ <code>resolved</code> ถูกตั้งโดย <code>services/alerts.js</code> ไม่ใช่ API นี้ (พารามิเตอร์แรก <code>_status</code> ของ <code>clampLimit</code> ไม่ได้ถูกใช้)</p>
@@ -2606,7 +2604,7 @@
 <p><code>GET /</code> ทุกคนที่ล็อกอินอ่านได้ (ทุกหน้าจอต้องใช้อัตราค่าไฟคูณ kWh และคนทั่วไปต้องรู้ว่า auto-off ถูกปิดอยู่เพื่อไม่ต้องสงสัยเมื่อไม่มีนับถอยหลัง) <code>PATCH /auto-off</code> รับ <code>{enabled: boolean}</code> (ชนิดต้องเป็น boolean จริง ไม่รับ <code>"true"</code>) <code>PATCH /rate</code> รับ <code>{rate}</code> แปลงเป็นตัวเลข ต้องอยู่ระหว่าง <code>RATE_LIMITS.min</code>=0.01 ถึง <code>max</code>=100 ทั้งสองแก้ได้เฉพาะแอดมิน และบันทึกชื่อผู้แก้ (<code>request.authUser?.username</code>) ผ่าน <code>services/system-settings.js</code></p>
 <h2 id="การทดสอบ">การทดสอบ<a class="anchor" href="#การทดสอบ">#</a></h2>
 <h3 id="วิธีทำงาน">วิธีทำงาน<a class="anchor" href="#วิธีทำงาน">#</a></h3>
-<p>รัน <code>npm test</code> = <code>node --test</code> ตัวรันเทสต์ที่มากับ Node (ตั้งแต่ v18) จะหาไฟล์ <code>*.test.js</code> ใต้โฟลเดอร์โปรเจค (โฟลเดอร์ <code>test/</code> ทั้งหมดอยู่ในกลุ่มนี้) แล้วรันแต่ละไฟล์ในโปรเซสแยกกัน แต่ละกรณีเขียนด้วย <code>test('ชื่อ', () =&gt; {...})</code> และตรวจด้วย <code>assert</code> จาก <code>node:assert/strict</code> (<code>assert.equal</code>, <code>assert.deepEqual</code>, <code>assert.throws</code>, <code>assert.match</code>) ไม่ต้องติดตั้ง Jest/Mocha รวม 136 กรณีใน 21 ไฟล์ (นับ ณ 14 ต.ค. 2569; เดิม 126 กรณีใน 20 ไฟล์)</p>
+<p>รัน <code>npm test</code> = <code>node --test</code> ตัวรันเทสต์ที่มากับ Node (ตั้งแต่ v18) จะหาไฟล์ <code>*.test.js</code> ใต้โฟลเดอร์โปรเจค (โฟลเดอร์ <code>test/</code> ทั้งหมดอยู่ในกลุ่มนี้) แล้วรันแต่ละไฟล์ในโปรเซสแยกกัน แต่ละกรณีเขียนด้วย <code>test('ชื่อ', () =&gt; {...})</code> และตรวจด้วย <code>assert</code> จาก <code>node:assert/strict</code> (<code>assert.equal</code>, <code>assert.deepEqual</code>, <code>assert.throws</code>, <code>assert.match</code>) ไม่ต้องติดตั้ง Jest/Mocha รวม 136 กรณีใน 21 ไฟล์</p>
 <h3 id="ทำไม-util-เป็น-pure-function">ทำไม util เป็น pure function<a class="anchor" href="#ทำไม-util-เป็น-pure-function">#</a></h3>
 <p>ฟังก์ชันใน <code>utils/</code> ไม่เปิดฐานข้อมูล ไม่ยิงเครือข่าย ไม่อ่านเวลาปัจจุบันตรง ๆ (หลายตัวรับเวลาเป็นพารามิเตอร์) ข้อมูลเข้าเหมือนกัน ผลออกเหมือนกันเสมอ การทดสอบจึงแค่ <code>import</code> แล้วเรียก ไม่ต้องจัดฉาก (เปิด DB, MQTT) รันเป็นมิลลิวินาที และเขียนกรณีขอบ (ค่า null, ภาษาไทย 72 ไบต์, วันสิ้นปี) ได้ง่าย นอกจากนี้ <code>db.js</code> สร้าง pool แบบ lazy เพื่อไม่ให้การ import ไฟล์เหล่านี้ลากการเชื่อมต่อค้างจน <code>node --test</code> ไม่จบ เมื่อ logic อยู่ที่ util และ route เป็นเพียงตัวประกอบบาง ๆ ส่วนที่ต้องเทสต์ผ่าน HTTP จริงมีน้อย</p>
 <h3 id="ไฟล์เทสต์แต่ละไฟล์">ไฟล์เทสต์แต่ละไฟล์<a class="anchor" href="#ไฟล์เทสต์แต่ละไฟล์">#</a></h3>
@@ -2662,7 +2660,7 @@
 <tr>
 <td><code>air-conditioner.test.js</code></td>
 <td>10</td>
-<td>การจอง ESP32, ห้อง/หมายเลข/ชื่อ BLE ผิด, โปรโตคอล IRac และ Saijo Denki, คำสั่ง MQTT, ช่วงค่าที่รับได้ + (เพิ่ม 11 ต.ค. 2569) จองด้วย <code>daikin_wired</code> ได้ <code>DAIKIN_WIRED</code>, คำสั่งสายแอร์ (ปฏิเสธ auto/heat/turbo/swing กลาง, ตัดฟังก์ชันเสริม, sleep ปิดใน dry, Daikin IR ไม่กระทบ), <code>controlTypeOf</code>/<code>controlType</code>, <code>protocolFromStatus</code></td>
+<td>การจอง ESP32, ห้อง/หมายเลข/ชื่อ BLE ผิด, โปรโตคอล IRac และ Saijo Denki, คำสั่ง MQTT, ช่วงค่าที่รับได้ + จองด้วย <code>daikin_wired</code> ได้ <code>DAIKIN_WIRED</code>, คำสั่งสายแอร์ (ปฏิเสธ auto/heat/turbo/swing กลาง, ตัดฟังก์ชันเสริม, sleep ปิดใน dry, Daikin IR ไม่กระทบ), <code>controlTypeOf</code>/<code>controlType</code>, <code>protocolFromStatus</code></td>
 </tr>
 <tr>
 <td><code>occupancy-sensor.test.js</code></td>
@@ -2672,12 +2670,12 @@
 <tr>
 <td><code>firmware.test.js</code></td>
 <td>7</td>
-<td>ชื่อไฟล์ <code>.bin</code> ที่ปลอดภัย (ปฏิเสธ <code>../</code>, <code>/</code>, <code>.exe</code>, ช่องว่าง, <code>..</code>), URL ใช้โฮสต์ MQTT (ปฏิเสธ <code>evil.com/x</code>), เดาชนิดบอร์ด + (เพิ่ม 14 ต.ค. 2569) แยกไฟล์ <code>wired</code> ออกจาก <code>air</code>, <code>assertFirmwareKind</code> ห้ามไฟล์ผิดชนิด, อ่านรุ่นจากชื่อและเทียบรุ่น (<code>2.5.10</code> &gt; <code>2.5.9</code>), <code>validateFirmwareImage</code> (ไบต์ <code>0xE9</code>, ใหญ่เกิน, ไฟล์ว่าง)</td>
+<td>ชื่อไฟล์ <code>.bin</code> ที่ปลอดภัย (ปฏิเสธ <code>../</code>, <code>/</code>, <code>.exe</code>, ช่องว่าง, <code>..</code>), URL ใช้โฮสต์ MQTT (ปฏิเสธ <code>evil.com/x</code>), เดาชนิดบอร์ด + แยกไฟล์ <code>wired</code> ออกจาก <code>air</code>, <code>assertFirmwareKind</code> ห้ามไฟล์ผิดชนิด, อ่านรุ่นจากชื่อและเทียบรุ่น (<code>2.5.10</code> &gt; <code>2.5.9</code>), <code>validateFirmwareImage</code> (ไบต์ <code>0xE9</code>, ใหญ่เกิน, ไฟล์ว่าง)</td>
 </tr>
 <tr>
 <td><code>unprovision.test.js</code></td>
 <td>2</td>
-<td>(เพิ่ม 13 ต.ค. 2569) payload คำสั่ง <code>unprovision</code> มี <code>deviceId</code> ของบอร์ดเป้าหมาย; นับเป็นคำตอบเฉพาะ <code>unprovisioned === true</code> และ <code>deviceId</code> ตรง</td>
+<td>payload คำสั่ง <code>unprovision</code> มี <code>deviceId</code> ของบอร์ดเป้าหมาย; นับเป็นคำตอบเฉพาะ <code>unprovisioned === true</code> และ <code>deviceId</code> ตรง</td>
 </tr>
 <tr>
 <td><code>auto-off.test.js</code></td>
@@ -2774,16 +2772,16 @@
 <p><strong>ตอบ:</strong> Express 5 ส่ง error ของ handler แบบ async เข้า error handler ให้เองโดยไม่ต้องห่อ (ใน 4 ถ้าไม่ห่อ โปรเซสอาจค้างหรือล้ม) โปรเจคยังห่อด้วย <code>asyncHandler</code> เพื่อรูปแบบเดียวกันทุกไฟล์และไม่พึ่งพฤติกรรมเฉพาะเวอร์ชัน</p></div>
 
 <div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> รันเทสต์อย่างไร และเทสต์อะไรไปแล้วบ้าง?</p>
-<p><strong>ตอบ:</strong> <code>npm test</code> ใช้ตัวรันเทสต์ของ Node (<code>node --test</code>) รวม 136 กรณีใน 21 ไฟล์ (ณ 14 ต.ค. 2569) ส่วนใหญ่เป็นเทสต์ของฟังก์ชัน pure ใน <code>utils/</code> ที่เรียกได้ตรง ๆ และมีเทสต์แบบ integration หนึ่งไฟล์ (<code>profile-email.test.js</code>) ที่เปิดเซิร์ฟเวอร์จริงแต่แทน DB ด้วยของปลอม จุดที่ยังไม่มีเทสต์ตรงคือ flow login และ OTP ผ่าน HTTP</p></div>
+<p><strong>ตอบ:</strong> <code>npm test</code> ใช้ตัวรันเทสต์ของ Node (<code>node --test</code>) รวม 136 กรณีใน 21 ไฟล์ ส่วนใหญ่เป็นเทสต์ของฟังก์ชัน pure ใน <code>utils/</code> ที่เรียกได้ตรง ๆ และมีเทสต์แบบ integration หนึ่งไฟล์ (<code>profile-email.test.js</code>) ที่เปิดเซิร์ฟเวอร์จริงแต่แทน DB ด้วยของปลอม จุดที่ยังไม่มีเทสต์ตรงคือ flow login และ OTP ผ่าน HTTP</p></div>
 
 <div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> ให้แอดมินอัปโหลดไฟล์ขึ้นเซิร์ฟเวอร์ผ่านเว็บ ไม่อันตรายเหรอ ตรวจอะไรบ้าง?</p>
-<p><strong>ตอบ:</strong> ตรวจห้าชั้นครับ (เพิ่ม 14 ต.ค. 2569) หนึ่ง เส้นนี้อยู่ใต้ <code>authenticate</code> + <code>requireAdmin</code> ทั้ง router สอง ชื่อไฟล์ต้องผ่าน regex <code>^[A-Za-z0-9][A-Za-z0-9._-]{0,118}\.bin$</code> และห้าม <code>..</code> จึงเขียนนอกโฟลเดอร์ <code>FIRMWARE_DIR</code> ไม่ได้ สาม ชนิดจากชื่อต้องตรงแท็บที่อัปโหลด สี่ เนื้อไฟล์ต้องขึ้นต้นด้วยไบต์ <code>0xE9</code> ของโปรแกรม ESP32 และไม่เกิน <code>0x1F0000</code> ไบต์ ห้า ไม่เขียนทับไฟล์เดิมถ้าไม่ยืนยัน <code>?replace=1</code> และเขียนผ่านไฟล์ชั่วคราวแล้ว rename ไฟล์ที่อัปโหลดไม่ถูกรันบนเซิร์ฟเวอร์ แค่ถูกเสิร์ฟให้บอร์ดดาวน์โหลด</p></div>
+<p><strong>ตอบ:</strong> ตรวจห้าชั้นครับ หนึ่ง เส้นนี้อยู่ใต้ <code>authenticate</code> + <code>requireAdmin</code> ทั้ง router สอง ชื่อไฟล์ต้องผ่าน regex <code>^[A-Za-z0-9][A-Za-z0-9._-]{0,118}\.bin$</code> และห้าม <code>..</code> จึงเขียนนอกโฟลเดอร์ <code>FIRMWARE_DIR</code> ไม่ได้ สาม ชนิดจากชื่อต้องตรงแท็บที่อัปโหลด สี่ เนื้อไฟล์ต้องขึ้นต้นด้วยไบต์ <code>0xE9</code> ของโปรแกรม ESP32 และไม่เกิน <code>0x1F0000</code> ไบต์ ห้า ไม่เขียนทับไฟล์เดิมถ้าไม่ยืนยัน <code>?replace=1</code> และเขียนผ่านไฟล์ชั่วคราวแล้ว rename ไฟล์ที่อัปโหลดไม่ถูกรันบนเซิร์ฟเวอร์ แค่ถูกเสิร์ฟให้บอร์ดดาวน์โหลด</p></div>
 
 <div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> ลบอุปกรณ์ในแอปแล้ว ข้อมูลในตัวบอร์ดหายด้วยไหม?</p>
-<p><strong>ตอบ:</strong> ตั้งแต่ 13 ต.ค. 2569 หายครับถ้าบอร์ดออนไลน์ Backend ส่งคำสั่ง <code>unprovision</code> ให้บอร์ดล้าง Wi-Fi, MQTT, ห้อง และสถานะแอร์ใน NVS แล้วรีบูตเข้าโหมดตั้งค่าบลูทูธ Backend รอคำตอบ 4 วินาทีแล้วตอบแอปว่า <code>boardCleared</code> เป็น true หรือ false ถ้าออฟไลน์ ต้องไปล้างที่ตัวบอร์ดเอง แต่บอร์ดก็ใช้บัญชี MQTT เดิมต่อไม่ได้แล้ว เพราะบัญชีถูกลบ</p></div>
+<p><strong>ตอบ:</strong> หายครับถ้าบอร์ดออนไลน์ Backend ส่งคำสั่ง <code>unprovision</code> ให้บอร์ดล้าง Wi-Fi, MQTT, ห้อง และสถานะแอร์ใน NVS แล้วรีบูตเข้าโหมดตั้งค่าบลูทูธ Backend รอคำตอบ 4 วินาทีแล้วตอบแอปว่า <code>boardCleared</code> เป็น true หรือ false ถ้าออฟไลน์ ต้องไปล้างที่ตัวบอร์ดเอง แต่บอร์ดก็ใช้บัญชี MQTT เดิมต่อไม่ได้แล้ว เพราะบัญชีถูกลบ</p></div>
 
 <div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> API ของแอร์มีฟิลด์ <code>controlType</code> มาทำไม ในเมื่อมี <code>protocol</code> อยู่แล้ว?</p>
-<p><strong>ตอบ:</strong> (เพิ่ม 11 ต.ค. 2569) <code>controlType</code> สรุปให้แอปและเว็บเหลือแค่สองค่า <code>"wired"</code> (บอร์ดต่อสายแทนรีโมตติดผนัง Daikin, <code>protocol = DAIKIN_WIRED</code>) กับ <code>"ir"</code> (ยิงรีโมต ทุกโปรโตคอลที่เหลือ) คำนวณใน <code>publicAirConditioner</code> ด้วย <code>controlTypeOf(row.protocol)</code> ไม่ได้เก็บเป็นคอลัมน์ จึงไม่มีทางขัดกับ <code>protocol</code> หน้าจอใช้ค่านี้ซ่อนปุ่มที่รีโมตติดผนังไม่มี (Eco, Turbo, Quiet, Clean, สวิงแนวนอน) โดยไม่ต้องรู้รายชื่อโปรโตคอลทั้งหมด ถ้าวันหนึ่งมีบอร์ดสายแอร์ยี่ห้ออื่น แก้ที่ Backend จุดเดียว ส่วนการตรวจจริงยังอยู่ที่ <code>validateAirState(body, protocol)</code> ตอนรับคำสั่ง ถ้าแอปส่งค่าที่ใช้ไม่ได้มาก็ถูกปฏิเสธหรือปิดให้</p></div>
+<p><strong>ตอบ:</strong> <code>controlType</code> สรุปให้แอปและเว็บเหลือแค่สองค่า <code>"wired"</code> (บอร์ดต่อสายแทนรีโมตติดผนัง Daikin, <code>protocol = DAIKIN_WIRED</code>) กับ <code>"ir"</code> (ยิงรีโมต ทุกโปรโตคอลที่เหลือ) คำนวณใน <code>publicAirConditioner</code> ด้วย <code>controlTypeOf(row.protocol)</code> ไม่ได้เก็บเป็นคอลัมน์ จึงไม่มีทางขัดกับ <code>protocol</code> หน้าจอใช้ค่านี้ซ่อนปุ่มที่รีโมตติดผนังไม่มี (Eco, Turbo, Quiet, Clean, สวิงแนวนอน) โดยไม่ต้องรู้รายชื่อโปรโตคอลทั้งหมด ถ้าวันหนึ่งมีบอร์ดสายแอร์ยี่ห้ออื่น แก้ที่ Backend จุดเดียว ส่วนการตรวจจริงยังอยู่ที่ <code>validateAirState(body, protocol)</code> ตอนรับคำสั่ง ถ้าแอปส่งค่าที่ใช้ไม่ได้มาก็ถูกปฏิเสธหรือปิดให้</p></div>
 
 <h2 id="สรุปและเช็กลิสต์ความเข้าใจ">สรุปและเช็กลิสต์ความเข้าใจ<a class="anchor" href="#สรุปและเช็กลิสต์ความเข้าใจ">#</a></h2>
 <p>ถ้าตอบข้อเหล่านี้ได้ แปลว่าเข้าใจบทนี้แล้ว</p>
@@ -2804,8 +2802,8 @@
 <li class="check"><input type="checkbox"> อธิบายว่าทำไมการนำเข้าตารางเรียนทำใน transaction เดียว และทำไม <code>/terms</code> ต้องประกาศก่อน <code>/:id</code></li>
 <li class="check"><input type="checkbox"> อธิบายว่า <code>node --test</code> ทำงานอย่างไร, ทำไม <code>profile-email.test.js</code> ใช้ <code>await import</code> และแทน <code>pool.query</code>, และ util pure ช่วยการทดสอบอย่างไร</li>
 <li class="check"><input type="checkbox"> บอกข้อจำกัดที่ตรวจพบ: JSON เสียรูปแบบ/CORS ถูกปฏิเสธ ตอบ 500, ตัวนับ rate limit อยู่ใน RAM, ไม่มีเทสต์ตรงของ login/OTP, <code>package.json</code> description เก่า</li>
-<li class="check"><input type="checkbox"> อธิบายการอัปโหลดเฟิร์มแวร์ <code>POST /api/firmware</code>: <code>express.raw</code>, <code>X-File-Name</code>, <code>?kind</code>, <code>?replace=1</code>, ไบต์ <code>0xE9</code>, เพดาน <code>0x1F0000</code>, ไฟล์ <code>.part</code> + rename (เพิ่ม 14 ต.ค. 2569)</li>
-<li class="check"><input type="checkbox"> เล่าลำดับการลบอุปกรณ์ 4 ขั้น (ลบแถว → unprovision รอ ≤ 4 วินาที → ล้าง retained → ลบบัญชี MQTT) และความหมายของ <code>boardCleared</code> (เพิ่ม 13 ต.ค. 2569)</li>
+<li class="check"><input type="checkbox"> อธิบายการอัปโหลดเฟิร์มแวร์ <code>POST /api/firmware</code>: <code>express.raw</code>, <code>X-File-Name</code>, <code>?kind</code>, <code>?replace=1</code>, ไบต์ <code>0xE9</code>, เพดาน <code>0x1F0000</code>, ไฟล์ <code>.part</code> + rename</li>
+<li class="check"><input type="checkbox"> เล่าลำดับการลบอุปกรณ์ 4 ขั้น (ลบแถว → unprovision รอ ≤ 4 วินาที → ล้าง retained → ลบบัญชี MQTT) และความหมายของ <code>boardCleared</code></li>
 </ul><nav class="pager"><a class="prev" href="05-database.html"><span>← บทก่อนหน้า</span>5. ฐานข้อมูล MariaDB</a><a class="next" href="07-backend-services.html"><span>บทถัดไป →</span>7. Backend ตอนที่ 2: งานเบื้องหลังและตรรกะหลักของระบบ</a></nav>
   </main>
   <aside class="toc"><div class="toc-title">ในบทนี้</div><ul><li><a href="#ภาพรวม">ภาพรวม</a></li><li><a href="#ความรู้ที่ต้องมีก่อนอ่านบทนี้">ความรู้ที่ต้องมีก่อนอ่านบทนี้</a></li><li><a href="#โครงสร้างโฟลเดอร์">โครงสร้างโฟลเดอร์</a></li><li><a href="#ลำดับการเริ่มระบบ-startup-sequence">ลำดับการเริ่มระบบ (startup sequence)</a></li><li><a href="#อธิบายทีละไฟล์">อธิบายทีละไฟล์</a></li><li><a href="#การตั้งค่าและ-fail-fast">การตั้งค่าและ fail-fast</a></li><li><a href="#การเจาะโค้ดทีละบรรทัด">การเจาะโค้ดทีละบรรทัด</a></li><li><a href="#ลำดับการทำงานของ-request">ลำดับการทำงานของ request</a></li><li><a href="#ระบบสมาชิก-auth">ระบบสมาชิก (Auth)</a></li><li><a href="#ตารางอ้างอิง-api-ทั้งหมด">ตารางอ้างอิง API ทั้งหมด</a></li><li><a href="#ไฟล์-route-ทีละไฟล์">ไฟล์ route ทีละไฟล์</a></li><li><a href="#การทดสอบ">การทดสอบ</a></li><li><a href="#หลักการเขียนโค้ดที่ใช้ในส่วนนี้">หลักการเขียนโค้ดที่ใช้ในส่วนนี้</a></li><li><a href="#คำถามที่อาจารย์อาจถาม">คำถามที่อาจารย์อาจถาม</a></li><li><a href="#สรุปและเช็กลิสต์ความเข้าใจ">สรุปและเช็กลิสต์ความเข้าใจ</a></li></ul></aside>

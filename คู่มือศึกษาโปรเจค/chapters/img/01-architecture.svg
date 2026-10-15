@@ -33,7 +33,7 @@
   <!-- MariaDB -->
   <rect x="800" y="252" width="270" height="58" rx="10" fill="#EAF1F9" stroke="#4678B8" stroke-width="2"/>
   <text x="935" y="277" font-size="14" font-weight="700" fill="#4678B8" text-anchor="middle">MariaDB 11</text>
-  <text x="935" y="296" font-size="11" fill="#17241D" text-anchor="middle">8 ตาราง · InnoDB · utf8mb4</text>
+  <text x="935" y="296" font-size="11" fill="#17241D" text-anchor="middle">11 ตาราง · InnoDB · utf8mb4</text>
 
   <!-- SMTP -->
   <rect x="800" y="326" width="270" height="48" rx="10" fill="#FFF0DC" stroke="#C97A1B" stroke-width="2"/>
@@ -43,7 +43,7 @@
   <!-- Broker -->
   <rect x="410" y="452" width="300" height="76" rx="12" fill="#ECF3EF" stroke="#0D7A4B" stroke-width="2"/>
   <text x="560" y="480" font-size="15" font-weight="700" fill="#0D7A4B" text-anchor="middle">Mosquitto MQTT Broker</text>
-  <text x="560" y="500" font-size="11" fill="#17241D" text-anchor="middle">MQTTS 8883 · Retained · Last Will</text>
+  <text x="560" y="500" font-size="11" fill="#17241D" text-anchor="middle">MQTTS ts.net:8443 / 8883 · Retained · LWT</text>
   <text x="560" y="518" font-size="11" fill="#66766E" text-anchor="middle">ACL: rmutt/ac/# และ rmutt/occupancy/#</text>
 
   <!-- ESP32 air -->
@@ -63,7 +63,7 @@
   <!-- peripherals -->
   <rect x="40" y="754" width="200" height="50" rx="10" fill="#FCE8EB" stroke="#DC4C5C" stroke-width="2"/>
   <text x="140" y="775" font-size="12.5" font-weight="700" fill="#DC4C5C" text-anchor="middle">เครื่องปรับอากาศ</text>
-  <text x="140" y="793" font-size="10.5" fill="#17241D" text-anchor="middle">รับสัญญาณ IR อย่างเดียว</text>
+  <text x="140" y="793" font-size="10.5" fill="#17241D" text-anchor="middle">รับ IR หรือสายรีโมต Daikin</text>
 
   <rect x="268" y="754" width="200" height="50" rx="10" fill="#EAF1F9" stroke="#4678B8" stroke-width="2"/>
   <text x="368" y="775" font-size="12.5" font-weight="700" fill="#4678B8" text-anchor="middle">PZEM-004T v3.0</text>
@@ -104,7 +104,7 @@
 
   <!-- esp32 air -> AC (IR) -->
   <path d="M200,714 L150,750" stroke="#DC4C5C" stroke-width="2.5" fill="none" marker-end="url(#ar)"/>
-  <text x="104" y="736" font-size="11" font-weight="700" fill="#DC4C5C">IR</text>
+  <text x="104" y="736" font-size="11" font-weight="700" fill="#DC4C5C">IR / สาย</text>
   <!-- PZEM -> esp32 air -->
   <path d="M368,750 L330,714" stroke="#4678B8" stroke-width="2.5" fill="none" marker-end="url(#arb)"/>
   <text x="378" y="734" font-size="11" font-weight="700" fill="#4678B8">UART</text>

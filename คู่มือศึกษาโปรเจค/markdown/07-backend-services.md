@@ -95,11 +95,11 @@ backend/src/
     ├── air-conditioner.js     ตรวจข้อมูลแอร์/คำสั่งแอร์, แปลงแถว DB เป็น JSON
     ├── occupancy-sensor.js    ตรวจข้อมูลเซ็นเซอร์คน, ปรับรูปข้อความสถานะ
     ├── firmware.js            ตรวจชื่อไฟล์/ชนิด/รุ่น/เนื้อไฟล์ firmware, สร้าง URL สำหรับ OTA
-    ├── unprovision.js         คำสั่งล้างค่าบอร์ด + ตรวจคำตอบ (เพิ่ม 13 ต.ค. 2569)
+    ├── unprovision.js         คำสั่งล้างค่าบอร์ด + ตรวจคำตอบ
     └── schema-doctor.js       อ่าน schema.sql เทียบกับฐานข้อมูลจริง
 ```
 
-ไฟล์ทดสอบที่เกี่ยวข้องอยู่ที่ `backend/test/` เช่น `auto-off.test.js`, `energy-history.test.js`, `offline-history.test.js`, `mqtt-accounts.test.js`, `schedule-import.test.js`, `xlsx-writer.test.js`, `unprovision.test.js` (เพิ่ม 13 ต.ค. 2569) รันทั้งหมดด้วย `npm test` (คือ `node --test`)
+ไฟล์ทดสอบที่เกี่ยวข้องอยู่ที่ `backend/test/` เช่น `auto-off.test.js`, `energy-history.test.js`, `offline-history.test.js`, `mqtt-accounts.test.js`, `schedule-import.test.js`, `xlsx-writer.test.js`, `unprovision.test.js` รันทั้งหมดด้วย `npm test` (คือ `node --test`)
 
 ## อธิบายทีละไฟล์
 
@@ -145,7 +145,7 @@ backend/src/
 | `rmutt/ac/<id>/command` | ไม่ | `{version, commandId, sentAt, action:'enter_setup'}` | `publishEnterSetupMode` ให้บอร์ดกลับเข้าโหมดตั้งค่า |
 | `<prefix>/<id>/command` | ไม่ | `{version, commandId, sentAt, action:'ota', url}` | `publishOtaCommand(kind, id, url)` สั่งอัปเดตเฟิร์มแวร์ (`kind` = `'air'` หรือ `'occupancy'`) |
 | `rmutt/occupancy/<id>/command` | ไม่ | `{..., action:'enter_setup'}` | `publishEnterOccupancySetupMode` |
-| `<prefix>/<id>/command` | ไม่ | `{version:1, commandId, sentAt, action:'unprovision', deviceId}` | `unprovisionDevice(kind, id)` สั่งบอร์ดล้างค่าในตัวเองตอนแอดมินลบอุปกรณ์ แล้วรอคำตอบไม่เกิน 4 วินาที (เพิ่ม 13 ต.ค. 2569) |
+| `<prefix>/<id>/command` | ไม่ | `{version:1, commandId, sentAt, action:'unprovision', deviceId}` | `unprovisionDevice(kind, id)` สั่งบอร์ดล้างค่าในตัวเองตอนแอดมินลบอุปกรณ์ แล้วรอคำตอบไม่เกิน 4 วินาที |
 | `rmutt/ac/<id>/schedule-status` | **ใช่** | `{version:1, classScheduleConfigured, withinClassSchedule, evaluatedAt, timezone:'Asia/Bangkok'}` | `publishScheduleEvaluation` บอกบอร์ดว่าตอนนี้อยู่ในคาบหรือไม่ |
 | `rmutt/ac/<id>/history-ack` | ไม่ | `{version:1, upTo, stored, skipped}` | `handleAirHistory` ยืนยันรับข้อมูลย้อนหลัง |
 | `<prefix>/<id>/provision-ack` | **ใช่** | `{version:1, activated:true, deviceId, token}` | ตอบหลังโทเคนติดตั้งถูกต้อง |
@@ -156,7 +156,7 @@ backend/src/
 
 **สถานะออนไลน์และ LWT** บอร์ดแอร์ฝัง Last Will ไว้ตอน `connect` ที่ topic `<prefix>/<id>/status` (QoS 1, retained) เนื้อหา `{"online":false,"deviceId":"..."}` เมื่อบอร์ดหลุด Broker ส่งข้อความนี้ให้ Backend ผ่าน subscription `/status` เดิม `normalizePowerStatus` (บรรทัด 674) ตีความ `online: source.online !== false` และเมื่อ `pzemAvailable` ไม่ใช่ `true` ค่าไฟฟ้าทุกตัวเป็น `null` และ `acRunning` เป็น `false` ผลคือแถวถูกเขียนเป็น `is_online = 0` โดยไม่ต้องมีโค้ดแยกสำหรับ "ออฟไลน์" ข้อความ LWT ไม่มี `firmwareVersion` จึงไม่ไปทับรุ่นเฟิร์มแวร์เดิม (`recordFirmwareStatus` ข้ามเมื่อไม่มีรุ่น)
 
-**ล้างค่าบอร์ดตอนลบอุปกรณ์ (unprovision, เพิ่ม 13 ต.ค. 2569)** `unprovisionDevice(kind, deviceId)` (บรรทัด 306) เป็นคำสั่งเดียวในไฟล์ที่ "ส่งแล้วรอคำตอบ" แทนที่จะส่งแล้วจบ ขั้นตอนคือ (1) ถ้ายังไม่ต่อ Broker คืน `{sent:false, acknowledged:false}` ทันที (2) สร้าง payload ด้วย `buildUnprovisionCommand` จาก `utils/unprovision.js` (3) สร้าง Promise ที่จะจบเมื่อบอร์ดตอบ หรือเมื่อครบ `UNPROVISION_ACK_TIMEOUT_MS` = 4000 ms แล้วเก็บฟังก์ชันปิดการรอไว้ใน `Map` ชื่อ `unprovisionWaiters` (key = รหัสบอร์ด) (4) publish ไปที่ `<prefix>/<id>/command` แบบ QoS 1 **ไม่ retain** (5) เมื่อบอร์ดส่ง `{"unprovisioned":true,"deviceId":...}` มาทาง `status` ตัวแยก topic เรียก `consumeUnprovisionAck` (บรรทัด 348) ซึ่งเรียกฟังก์ชันใน `Map` ด้วย `true` ฟังก์ชันนี้ **ไม่โยน error เลย** เพราะการลบในฐานข้อมูลต้องสำเร็จเสมอแม้บอร์ดออฟไลน์ ผลลัพธ์ `acknowledged` ถูกส่งต่อเป็น `boardCleared` ในคำตอบของ route ลบ (ดูบท Backend ตอนที่ 1)
+**ล้างค่าบอร์ดตอนลบอุปกรณ์ (unprovision)** `unprovisionDevice(kind, deviceId)` (บรรทัด 306) เป็นคำสั่งเดียวในไฟล์ที่ "ส่งแล้วรอคำตอบ" แทนที่จะส่งแล้วจบ ขั้นตอนคือ (1) ถ้ายังไม่ต่อ Broker คืน `{sent:false, acknowledged:false}` ทันที (2) สร้าง payload ด้วย `buildUnprovisionCommand` จาก `utils/unprovision.js` (3) สร้าง Promise ที่จะจบเมื่อบอร์ดตอบ หรือเมื่อครบ `UNPROVISION_ACK_TIMEOUT_MS` = 4000 ms แล้วเก็บฟังก์ชันปิดการรอไว้ใน `Map` ชื่อ `unprovisionWaiters` (key = รหัสบอร์ด) (4) publish ไปที่ `<prefix>/<id>/command` แบบ QoS 1 **ไม่ retain** (5) เมื่อบอร์ดส่ง `{"unprovisioned":true,"deviceId":...}` มาทาง `status` ตัวแยก topic เรียก `consumeUnprovisionAck` (บรรทัด 348) ซึ่งเรียกฟังก์ชันใน `Map` ด้วย `true` ฟังก์ชันนี้ **ไม่โยน error เลย** เพราะการลบในฐานข้อมูลต้องสำเร็จเสมอแม้บอร์ดออฟไลน์ ผลลัพธ์ `acknowledged` ถูกส่งต่อเป็น `boardCleared` ในคำตอบของ route ลบ (ดูบท Backend ตอนที่ 1)
 
 > [!WHY]
 > ทำไมรอแค่ 4 วินาที: route ลบอุปกรณ์ต้องรอผลนี้ก่อนตอบแอป ถ้ารอนานแอดมินจะเห็นปุ่มค้าง บอร์ดที่ออนไลน์ปกติตอบได้ในไม่ถึงวินาที (ส่งคำตอบก่อนเริ่มล้าง NVS) ถ้าเกิน 4 วินาทีแทบแน่ใจว่าบอร์ดออฟไลน์ ซึ่งรอนานกว่านี้ก็ไม่ได้อะไรเพิ่ม และทำไมไม่ส่งแบบ retain: ถ้าคำสั่งค้างบน Broker วันหลังเอาบอร์ดตัวเดิมกลับมาติดตั้งใหม่ บอร์ดจะได้รับคำสั่งเก่าทันทีที่ต่อ แล้วล้างตัวเองทิ้งอีกรอบ
@@ -164,7 +164,7 @@ backend/src/
 > [!NOTE]
 > บรรทัด 323 `unprovisionWaiters.get(deviceId)?.(false)` ปิดการรอเก่าของบอร์ดเดียวกันก่อน (กรณีกดลบซ้ำเร็ว ๆ) และใน `finish` เช็ก `unprovisionWaiters.get(deviceId) === finish` ก่อนลบออกจาก `Map` เพื่อไม่ให้ตัวรอเก่าที่หมดเวลาทีหลังไปลบตัวรอใหม่ทิ้ง `?.(...)` คือ "เรียกฟังก์ชันถ้ามี ถ้าไม่มี (undefined) ไม่ต้องทำอะไร"
 
-**แก้ protocol ตามบอร์ดสายแอร์ (เพิ่ม 11 ต.ค. 2569)** บอร์ดรุ่น `rmutt_esp32_air_wired` ใส่ `controlMode: "wired"` ใน status ทุกครั้ง ตัวแยก topic อ่านด้วย `protocolFromStatus` (จาก `utils/air-conditioner.js`) แล้วเรียก `syncControlProtocol` (บรรทัด 445) ให้แถวใน `air_conditioners` มี `protocol = 'DAIKIN_WIRED'` ก่อนประมวลผล status ทำในคิวเดียวกับ `handleAirStatus` (ดูเจาะโค้ดจุดที่ 2)
+**แก้ protocol ตามบอร์ดสายแอร์** บอร์ดรุ่น `rmutt_esp32_air_wired` ใส่ `controlMode: "wired"` ใน status ทุกครั้ง ตัวแยก topic อ่านด้วย `protocolFromStatus` (จาก `utils/air-conditioner.js`) แล้วเรียก `syncControlProtocol` (บรรทัด 445) ให้แถวใน `air_conditioners` มี `protocol = 'DAIKIN_WIRED'` ก่อนประมวลผล status ทำในคิวเดียวกับ `handleAirStatus` (ดูเจาะโค้ดจุดที่ 2)
 
 **ข้อมูลย้อนหลังและ ack** ตอนเน็ตหลุดบอร์ดเก็บสรุปช่วงละ 5 นาทีไว้ในตัว พอต่อได้จะส่งไปที่ `/history` เป็นชุด Backend บันทึกผ่าน `recordHistoryBatch` แล้วตอบ `history-ack` พร้อม `upTo` (เวลาของรายการล่าสุดที่จัดการแล้ว) บอร์ดลบทุกรายการที่เวลา ≤ `upTo` และส่งชุดถัดไปหลังได้รับ ack เท่านั้น **ถ้าบันทึกไม่สำเร็จ Backend จะไม่ตอบ** บอร์ดจึงส่งชุดเดิมซ้ำเอง (เฟิร์มแวร์รอ ack 20 วินาที ลองใหม่หลัง 5 วินาที: `HISTORY_ACK_TIMEOUT_MS`, `HISTORY_RETRY_DELAY_MS`) ความปลอดภัยของการส่งซ้ำมาจากจุดต่อ (chain) ใน `energy-recorder.js`
 
@@ -173,7 +173,7 @@ backend/src/
 > [!WHY]
 > ทำไมต้องมี listener แทนที่ `services/mqtt.js` จะ `import` `services/auto-off.js` ตรง ๆ: ระบบปิดแอร์ต้อง import `publishAirCommand` จาก `mqtt.js` อยู่แล้ว ถ้า `mqtt.js` import กลับจะเกิด **circular import** (สองไฟล์อ้างถึงกันเป็นวง) แก้ด้วยกลับทิศ: `mqtt.js` ไม่รู้จักใคร แค่เปิดช่องให้คนมาฟัง ผลพลอยได้คือทดสอบแต่ละฝั่งแยกกันได้
 
-**ใครเรียกไฟล์นี้** `server.js` เรียก `startMqttBridge`/`stopMqttBridge`; `routes/air-conditioners.js` และ `routes/occupancy-sensors.js` เรียก `publishAirCommand`, `publishEnterSetupMode`, `publishEnterOccupancySetupMode`, `publishOtaCommand`, `unprovisionDevice` (เพิ่ม 13 ต.ค. 2569), `clearRetainedAirTopics`, `clearRetainedOccupancyTopics`; `services/auto-off.js` เรียก `onAirStatus`, `onOccupancyStatus`, `publishAirCommand`; `services/mqtt-accounts.js` เรียก `dynsecRequest`, `onMqttConnected`; `getMqttBridgeStatus()` ใช้ในหน้า health โดยตั้งใจไม่คืน username/password (มีเทสต์ใน `test/mqtt.test.js` ตรวจ)
+**ใครเรียกไฟล์นี้** `server.js` เรียก `startMqttBridge`/`stopMqttBridge`; `routes/air-conditioners.js` และ `routes/occupancy-sensors.js` เรียก `publishAirCommand`, `publishEnterSetupMode`, `publishEnterOccupancySetupMode`, `publishOtaCommand`, `unprovisionDevice`, `clearRetainedAirTopics`, `clearRetainedOccupancyTopics`; `services/auto-off.js` เรียก `onAirStatus`, `onOccupancyStatus`, `publishAirCommand`; `services/mqtt-accounts.js` เรียก `dynsecRequest`, `onMqttConnected`; `getMqttBridgeStatus()` ใช้ในหน้า health โดยตั้งใจไม่คืน username/password (มีเทสต์ใน `test/mqtt.test.js` ตรวจ)
 
 ฟังก์ชันช่วยที่ export ไว้ให้เทสต์: `normalizePowerStatus`, `firmwareFields` (ตัดรุ่นเฟิร์มแวร์ 20 ตัวอักษร ข้อความ OTA error 120 ตัวอักษร), `evaluateClassSchedule` (re-export จาก `class-schedule.js`)
 
@@ -187,7 +187,7 @@ backend/src/
 
 ### `services/mqtt-accounts.js` และ `utils/mqtt-accounts.js` — บัญชี MQTT รายบอร์ด
 
-**ปัญหาที่แก้** เดิมทุกบอร์ดใช้ username เดียวที่เข้าถึง `rmutt/#` ได้ทั้งหมด ถ้ามีคนแกะบอร์ดตัวเดียวออกจากฝ้าเพดานแล้วอ่านรหัสใน flash ก็สั่งแอร์ได้ทั้งอาคาร โหมดใหม่ `MQTT_DEVICE_AUTH=dynsec` ให้แต่ละบอร์ดมี username = Device ID ของตัวเอง และมีสิทธิ์เฉพาะ topic ของตัวเอง
+**ปัญหาที่แก้** ในโหมด `MQTT_DEVICE_AUTH=shared` (ใช้ตอน dev) ทุกบอร์ดใช้ username เดียวที่เข้าถึง `rmutt/#` ได้ทั้งหมด ถ้ามีคนแกะบอร์ดตัวเดียวออกจากฝ้าเพดานแล้วอ่านรหัสใน flash ก็สั่งแอร์ได้ทั้งอาคาร โหมด `MQTT_DEVICE_AUTH=dynsec` ที่ใช้บนเซิร์ฟเวอร์จริง ให้แต่ละบอร์ดมี username = Device ID ของตัวเอง และมีสิทธิ์เฉพาะ topic ของตัวเอง
 
 ฝั่ง `utils/` (ฟังก์ชันบริสุทธิ์ ประกอบ "ชุดคำสั่ง" เป็น JSON):
 
@@ -382,7 +382,7 @@ backend/src/
 > [!NOTE]
 > อัตราค่าไฟที่เก็บใน `system_settings` ถูกส่งให้แอปผ่าน `readPublicSettings()` (GET `/api/settings`) แอปนำไปใส่ใน query `rate` ตอนเรียกรายงาน ส่วนการคูณค่าไฟอยู่ใน `routes/energy.js` (ใช้ `query.rate` ที่ผู้เรียกส่งมา) ไม่ได้อ่านค่านี้จากฐานข้อมูลเอง
 
-### `utils/firmware.js` (124 บรรทัด, แก้ 14 ต.ค. 2569)
+### `utils/firmware.js` (124 บรรทัด)
 
 ฟังก์ชันบริสุทธิ์ทั้งหมดเกี่ยวกับไฟล์เฟิร์มแวร์ ไม่แตะดิสก์เอง (การอ่าน/เขียนไฟล์อยู่ที่ `routes/firmware.js`)
 
@@ -390,7 +390,7 @@ backend/src/
 |---|---|
 | `validateFirmwareFileName(value)` | ชื่อไฟล์ต้องตรง `^[A-Za-z0-9][A-Za-z0-9._-]{0,118}\.bin$` และห้ามมี `..` (กัน path traversal) ผิดโยน 400 |
 | `firmwareUrl(host, fileName)` | ประกอบ `https://<host>/firmware/<ไฟล์>` host ต้องเป็นอักษร `[A-Za-z0-9.-]` และต้องเป็นโฮสต์เดียวกับ MQTT host ของบอร์ด เพราะเฟิร์มแวร์ปฏิเสธ URL ที่ชี้ไปโฮสต์อื่น |
-| `firmwareKindOf(fileName)` | ชนิดบอร์ดจากชื่อไฟล์: มี `occ` = `occupancy`, มี `wired` หรือ `slm8` = `wired` (เพิ่ม 14 ต.ค.), นอกนั้น `air` ตรวจ `occ` ก่อน เดิมใช้จัดกลุ่มในหน้าจอเท่านั้น ตอนนี้ใช้กันสั่งไฟล์ผิดชนิดด้วย |
+| `firmwareKindOf(fileName)` | ชนิดบอร์ดจากชื่อไฟล์: มี `occ` = `occupancy`, มี `wired` หรือ `slm8` = `wired`, นอกนั้น `air` ตรวจ `occ` ก่อน ใช้ทั้งจัดกลุ่มในหน้าจอและกันสั่งไฟล์ผิดชนิด |
 | `FIRMWARE_KIND_LABELS` | ชื่อภาษาไทยของแต่ละชนิด (`แอร์ IR`, `สายแอร์ Daikin`, `เซ็นเซอร์ LD2410`) ใช้ในข้อความ error |
 | `airFirmwareKind(protocol)` | บอร์ดแอร์ที่ `protocol = DAIKIN_WIRED` ใช้ไฟล์ `wired` ที่เหลือใช้ไฟล์ `air` |
 | `assertFirmwareKind(fileName, expectedKind)` | ชนิดจากชื่อไฟล์ต้องตรงกับชนิดบอร์ด ไม่งั้นโยน 400 |
@@ -404,20 +404,20 @@ backend/src/
 > [!WHY]
 > ทำไมต้องกันไฟล์ผิดชนิด: บอร์ดแอร์ IR บอร์ดสายแอร์ และเซ็นเซอร์ ต่างก็เป็น ESP32 รับไฟล์ของกันและกันได้ทางเทคนิค ถ้าสั่งไฟล์เซ็นเซอร์ให้บอร์ดแอร์ บอร์ดจะรีบูตเข้าโปรแกรมเซ็นเซอร์ ซึ่งใช้ขาและ topic คนละชุด ต้องไปแฟลชผ่าน USB ที่หน้างาน จึงตรวจทั้งตอนอัปโหลด (ไฟล์ต้องตรงแท็บ) และตอนสั่งบอร์ด (ไฟล์ต้องตรงชนิดบอร์ด)
 
-### `utils/air-conditioner.js` (297 บรรทัด, แก้ 11 ต.ค. 2569)
+### `utils/air-conditioner.js` (297 บรรทัด)
 
 ตัวตรวจข้อมูลและตัวแปลงแถวฐานข้อมูลของแอร์
 
-- `validateReservationInput(body)` ตรวจตอนจองบอร์ด: รหัส `ESP32-…` 12 ฐานสิบหก, ห้อง, `airNumber` 1–6, ชื่อ 1–60 ตัวอักษร, ชื่อ Bluetooth ต้องเท่ากับ `RMUTT-AC-<12 ตัวท้ายของรหัส>`, `protocol` ต้องอยู่ในรายการที่รองรับ (`DAIKIN`, `DAIKIN_WIRED`, `GREE`, `MITSUBISHI_AC`, `SAIJO_DENKI`, ... รวม 19 ค่า; `DAIKIN_WIRED` เพิ่ม 11 ต.ค. 2569 เก็บในค่าคงที่ `WIRED_PROTOCOL`), เวลาเปิด-ปิดประจำวัน `HH:mm`
+- `validateReservationInput(body)` ตรวจตอนจองบอร์ด: รหัส `ESP32-…` 12 ฐานสิบหก, ห้อง, `airNumber` 1–6, ชื่อ 1–60 ตัวอักษร, ชื่อ Bluetooth ต้องเท่ากับ `RMUTT-AC-<12 ตัวท้ายของรหัส>`, `protocol` ต้องอยู่ในรายการที่รองรับ (`DAIKIN`, `DAIKIN_WIRED`, `GREE`, `MITSUBISHI_AC`, `SAIJO_DENKI`, ... รวม 19 ค่า; `DAIKIN_WIRED` เก็บในค่าคงที่ `WIRED_PROTOCOL`), เวลาเปิด-ปิดประจำวัน `HH:mm`
 - `validateAirState(body, protocol)` ตรวจคำสั่งแอร์ที่แอปส่ง: `power` ต้องเป็น boolean, อุณหภูมิ 16–30, โหมด `auto|cool|dry|fan|heat`, พัดลม `auto|low|medium|high|turbo`, swing 7 ค่า, timer 1–1440 นาที และกฎพิเศษของ `SAIJO_DENKI` (อุณหภูมิ 18–29, โหมด cool/dry/fan, ไม่มี swing off) กับกฎของ `DAIKIN_WIRED` (ดูหัวข้อถัดไป)
-- `controlTypeOf(protocol)` (เพิ่ม 11 ต.ค. 2569) คืน `'wired'` ถ้าเป็น `DAIKIN_WIRED` นอกนั้น `'ir'` ใช้ใน `publicAirConditioner` ให้ JSON ของแอร์ทุกเครื่องมีฟิลด์ `controlType` แอปและเว็บใช้แสดงป้าย "Daikin · สายแอร์" หรือ "รีโมต IR" และซ่อนปุ่มที่เครื่องทำไม่ได้
-- `protocolFromStatus(message)` (เพิ่ม 11 ต.ค. 2569) อ่าน `controlMode` ใน status ถ้าเป็น `wired` (ไม่สนตัวพิมพ์และช่องว่าง) คืน `'DAIKIN_WIRED'` นอกนั้นคืน `null` ใช้ใน `services/mqtt.js`
+- `controlTypeOf(protocol)` คืน `'wired'` ถ้าเป็น `DAIKIN_WIRED` นอกนั้น `'ir'` ใช้ใน `publicAirConditioner` ให้ JSON ของแอร์ทุกเครื่องมีฟิลด์ `controlType` แอปและเว็บใช้แสดงป้าย "Daikin · สายแอร์" หรือ "รีโมต IR" และซ่อนปุ่มที่เครื่องทำไม่ได้
+- `protocolFromStatus(message)` อ่าน `controlMode` ใน status ถ้าเป็น `wired` (ไม่สนตัวพิมพ์และช่องว่าง) คืน `'DAIKIN_WIRED'` นอกนั้นคืน `null` ใช้ใน `services/mqtt.js`
 - `publicAirConditioner(row)` แปลงแถว (snake_case) เป็น JSON (camelCase) ให้แอป รวมค่า `autoOffSecondsRemaining` และ `autoOffPhase` จาก `utils/auto-off.js` และ `state` ที่ parse จาก `state_json` (ถ้าอ่านไม่ได้ใช้ค่า fallback ที่ปลอดภัย)
 - `validateDeviceId`
 
 ผู้เรียก: `routes/air-conditioners.js` ทดสอบใน `test/air-conditioner.test.js`
 
-#### กติกาคำสั่งของบอร์ดสายแอร์ `DAIKIN_WIRED` (เพิ่ม 11 ต.ค. 2569)
+#### กติกาคำสั่งของบอร์ดสายแอร์ `DAIKIN_WIRED`
 
 บอร์ดสายแอร์ต่อเข้าสายของรีโมตติดผนัง Daikin (โปรโตคอล SLM8) แทนการยิง IR สั่งได้เฉพาะสิ่งที่รีโมตติดผนังรุ่นนั้นทำได้ Backend จึงตรวจให้ตรงกับความสามารถจริง
 
@@ -478,7 +478,7 @@ backend/src/
 > [!WHY]
 > ทำไมบางอย่างโยน 400 แต่บางอย่างแค่ตั้งเป็น `false`: โหมด พัดลม swing คือค่าหลักที่ผู้ใช้เลือกเอง ถ้าเลือกค่าที่แอร์ทำไม่ได้ ต้องบอกผู้ใช้ตรง ๆ ไม่งั้นแอร์จะทำอย่างอื่นโดยที่ผู้ใช้ไม่รู้ ส่วนฟังก์ชันเสริม (eco, turbo, quiet, clean) แอปรุ่นเก่าอาจส่ง `true` ติดมาจากสถานะเดิม ถ้าปฏิเสธทั้งคำสั่งเพราะสวิตช์เสริมที่ไม่มีอยู่จริง ผู้ใช้จะเปิดแอร์ไม่ได้เลย จึงเลือกตัดทิ้งเงียบ ๆ ผลคือ `state_json` ที่เก็บไว้ตรงกับที่แอร์ทำจริงเสมอ เทสต์ใน `test/air-conditioner.test.js` (`limits wired Daikin commands to what the wall-panel bus supports`) ยังตรวจด้วยว่า `DAIKIN` แบบ IR ไม่ได้รับผลกระทบ
 
-### `utils/unprovision.js` (36 บรรทัด, เพิ่ม 13 ต.ค. 2569)
+### `utils/unprovision.js` (36 บรรทัด)
 
 ไฟล์เล็กที่เก็บ "รูปแบบข้อความ" ของการล้างค่าบอร์ด แยกจาก `services/mqtt.js` เพื่อให้เทสต์ได้โดยไม่ต้องต่อ Broker คอมเมนต์หัวไฟล์ (บรรทัด 1–13) เขียนลำดับขั้นตอนตอนลบอุปกรณ์ไว้ครบ
 
@@ -524,7 +524,7 @@ export function isUnprovisionAck(message, deviceId) {
 
 ### `utils/occupancy-sensor.js` (71 บรรทัด)
 
-- `STATIC_ENERGY_THRESHOLD = 25` ค่าความไวเริ่มต้นของเรดาร์ตรวจคนนิ่ง (ใช้ตอบกลับเมื่อแถวไม่มีค่า) **ระวัง:** ตั้งแต่ 15 ต.ค. 2569 เฟิร์มแวร์ 1.3.3 ใช้ค่าคงที่ของตัวเองเป็น 15 ค่า 25 ฝั่ง Backend จึงเป็นแค่ค่าที่แสดงในแอป/เว็บ ไม่ได้ควบคุมบอร์ด (ดูบท 9)
+- `STATIC_ENERGY_THRESHOLD = 25` ค่าความไวเริ่มต้นของเรดาร์ตรวจคนนิ่ง (ใช้ตอบกลับเมื่อแถวไม่มีค่า) **ระวัง:** เฟิร์มแวร์ตรวจคนใช้ค่าคงที่ของตัวเองเป็น 15 ค่า 25 ฝั่ง Backend จึงเป็นแค่ค่าที่แสดงในแอป/เว็บ ไม่ได้ควบคุมบอร์ด (ดูบท 9)
 - `validateOccupancyReservationInput`, `validateOccupancyDeviceId` (รหัส `OCC32-…`, ชื่อ BLE ต้องเป็น `RMUTT-OCC-<12 ตัวท้าย>`)
 - `publicOccupancySensor(row)`
 - `normalizeOccupancyStatus(message)` ปรับข้อความสถานะ: `online = message.online !== false`; `radarAvailable` ต้อง online และบอร์ดบอกว่า `true`; **`occupied` จะเป็นจริงได้ก็ต่อเมื่อ `radarAvailable` เป็นจริง** (เรดาร์เสียแล้วรายงาน "มีคน" ไม่ได้) ฟังก์ชันนี้คือด่านแรกของหลัก fail-safe ของระบบปิดแอร์ ทดสอบใน `test/occupancy-sensor.test.js`
@@ -676,7 +676,7 @@ routes/energy.js : /summary /history /export  →  แอป / ไฟล์ Exce
 ```
 
 > [!NOTE]
-> เอกสารเก่า `docs/study/07-energy-export.md` และรูป `07-energy-flow.svg` เขียนลำดับเป็น "อ่านค่าเดิม → เขียนค่าใหม่ทับ → บันทึกค่าไฟ" แต่โค้ดจริงใน `handleAirStatus` คือ **อ่านค่าเดิม → บันทึกค่าไฟ → เขียนค่าใหม่ทับ** (ตามที่เขียนในโค้ด) หลักการเดียวกันคือต้องอ่านค่าเดิมก่อนถูกทับ เหตุผลที่บันทึกก่อนเขียนทับคือถ้าขั้นบันทึกค่าไฟพัง (จับด้วย `try/catch` แล้วแค่ log) ค่าล่าสุดของเครื่องก็ยังถูกเขียนเสมอ
+> เอกสาร `docs/study/07-energy-export.md` และรูป `docs/study/img/07-energy-flow.svg` เขียนลำดับเป็น "อ่านค่าเดิม → เขียนค่าใหม่ทับ → บันทึกค่าไฟ" แต่โค้ดจริงใน `handleAirStatus` คือ **อ่านค่าเดิม → บันทึกค่าไฟ → เขียนค่าใหม่ทับ** (ตามที่เขียนในโค้ด) หลักการเดียวกันคือต้องอ่านค่าเดิมก่อนถูกทับ เหตุผลที่บันทึกก่อนเขียนทับคือถ้าขั้นบันทึกค่าไฟพัง (จับด้วย `try/catch` แล้วแค่ log) ค่าล่าสุดของเครื่องก็ยังถูกเขียนเสมอ
 
 **ทำไมต้องอ่านค่าเดิมก่อน** ค่าไฟต่อชั่วโมงคำนวณจาก "ผลต่างของเลขมิเตอร์สะสม" ระหว่างตัวอย่างนี้กับตัวอย่างก่อนหน้า (และเวลาที่ห่างกัน) ถ้าเขียนทับก่อน ค่าเดิมหายไป จะหาผลต่างไม่ได้ ในทางปฏิบัติถ้าลำดับผิดตัวเลข `consumption_kwh` จะกลายเป็นเลขสะสมทั้งหมดตั้งแต่ติดตั้ง ไม่ใช่ของชั่วโมงนั้น
 
@@ -825,7 +825,7 @@ routes/energy.js : /summary /history /export  →  แอป / ไฟล์ Exce
 
 ### จุดที่ 2: handler ของ status และเหตุผลที่ "อ่านค่าเดิมก่อน" (`services/mqtt.js`)
 
-**ไฟล์ `backend/src/services/mqtt.js` บรรทัด 410–441** (แก้ 11 และ 13 ต.ค. 2569: เพิ่มบรรทัด 411 และ 436–440)
+**ไฟล์ `backend/src/services/mqtt.js` บรรทัด 410–441**
 
 ```js:410
   const [, deviceId, type] = match;
@@ -865,14 +865,14 @@ routes/energy.js : /summary /history /export  →  แอป / ไฟล์ Exce
 | บรรทัด | โค้ด/คำสั่ง | ความหมาย |
 |---|---|---|
 | 410 | `const [, deviceId, type] = match;` | destructuring ของผล regex: ช่องแรก (`match[0]` = ข้อความทั้งก้อน) ข้ามด้วยเครื่องหมายจุลภาคเปล่า เก็บ `deviceId` และ `type` |
-| 411 | `consumeUnprovisionAck(deviceId, message)` | (เพิ่ม 13 ต.ค. 2569) ถ้าข้อความ `status` นี้คือคำตอบ `{"unprovisioned":true}` ของบอร์ดที่กำลังถูกลบ ให้ปลุกตัวที่รออยู่ใน `unprovisionDevice` แล้ว `return` ทันที ไม่บันทึกลงฐานข้อมูล (แถวถูกลบไปแล้ว และคำตอบนี้มี `online:false` ซึ่งถ้าปล่อยผ่านจะถูกตีความเป็นสถานะออฟไลน์) |
+| 411 | `consumeUnprovisionAck(deviceId, message)` | ถ้าข้อความ `status` นี้คือคำตอบ `{"unprovisioned":true}` ของบอร์ดที่กำลังถูกลบ ให้ปลุกตัวที่รออยู่ใน `unprovisionDevice` แล้ว `return` ทันที ไม่บันทึกลงฐานข้อมูล (แถวถูกลบไปแล้ว และคำตอบนี้มี `online:false` ซึ่งถ้าปล่อยผ่านจะถูกตีความเป็นสถานะออฟไลน์) |
 | 412–415 | `type === 'provision'` | ข้อความติดตั้งอุปกรณ์ ไปทางของมัน แล้ว `return` |
 | 416–426 | `type === 'state'` | `state` = สถานะคำสั่งที่บอร์ดรับไว้ (อุณหภูมิ โหมด ฯลฯ) เขียนลง `state_json` ตรง ๆ และตั้ง `is_online = 1`; `message.state ?? message` คือ "ใช้ `message.state` ถ้ามี ไม่งั้นใช้ทั้งก้อน" (`??` ตรวจเฉพาะ null/undefined) |
 | 428–434 | `type === 'history'` | ข้อมูลย้อนหลัง ห่อด้วย `runSerialForDevice` เพื่อให้ทำทีละงานต่อบอร์ด |
-| 436 | `protocolFromStatus(message)` | (เพิ่ม 11 ต.ค. 2569) ถ้า status มี `controlMode: "wired"` ได้ `'DAIKIN_WIRED'` นอกนั้นได้ `null` |
+| 436 | `protocolFromStatus(message)` | ถ้า status มี `controlMode: "wired"` ได้ `'DAIKIN_WIRED'` นอกนั้นได้ `null` |
 | 437–440 | `runSerialForDevice(deviceId, async () => {...})` | status (ข้อความที่เหลือ) ทำในคิวของบอร์ดตัวนี้ ขั้นแรกแก้ `protocol` ในฐานข้อมูลถ้าจำเป็น (`syncControlProtocol`) แล้วค่อย `handleAirStatus` ซึ่งรับค่าที่ผ่าน `normalizePowerStatus` แล้ว (ฟิลด์ที่ไม่น่าเชื่อถือกลายเป็น `null`/`false` อย่างปลอดภัย) |
 
-**ไฟล์ `backend/src/services/mqtt.js` บรรทัด 443–456** (เพิ่ม 11 ต.ค. 2569)
+**ไฟล์ `backend/src/services/mqtt.js` บรรทัด 443–456**
 
 ```js:443
 // บอร์ดรุ่นสายแอร์ยืนยันชนิดตัวเองทุกครั้งที่ส่ง status
@@ -1632,10 +1632,10 @@ function assertNoImportedOverlaps(schedules) {
 **14. ค่าคงที่มีชื่อ และอยู่ที่เดียว**
 `AUTO_OFF_*`, `MAX_SAMPLE_GAP_SECONDS`, `RATE_LIMITS`, `MAX_SPAN_DAYS`, `HISTORY_MAX_*` ทำไม: ตัวเลขเหล่านี้คือนโยบายของระบบ แก้ที่เดียวและเทสต์อ้างชื่อเดียวกัน
 
-**15. ส่งแล้วรอคำตอบแบบมีเพดานเวลา และไม่ล้มทั้งงานเมื่อไม่มีคำตอบ (เพิ่ม 13 ต.ค. 2569)**
+**15. ส่งแล้วรอคำตอบแบบมีเพดานเวลา และไม่ล้มทั้งงานเมื่อไม่มีคำตอบ**
 `unprovisionDevice` ใน `services/mqtt.js` เก็บตัวรอใน `Map` ต่อรหัสบอร์ด และจบด้วย timeout 4 วินาที ทำไม: ต้องการรู้ว่าบอร์ดล้างค่าจริงไหม (เพื่อบอกแอดมิน) แต่การลบในระบบต้องไม่ขึ้นกับบอร์ดที่อาจออฟไลน์ ผลจึงเป็นแค่ข้อมูลประกอบ (`boardCleared`) ไม่ใช่เงื่อนไขของความสำเร็จ
 
-**16. ให้อุปกรณ์เป็นแหล่งความจริงของ "ตัวเองคืออะไร" (เพิ่ม 11 ต.ค. 2569)**
+**16. ให้อุปกรณ์เป็นแหล่งความจริงของ "ตัวเองคืออะไร"**
 `protocolFromStatus` + `syncControlProtocol` แก้ `protocol` ในฐานข้อมูลตาม `controlMode` ที่บอร์ดรายงาน ทำไม: ข้อมูลที่คนกรอก (ยี่ห้อที่เลือกในแอปรุ่นเก่า) ผิดได้ แต่บอร์ดรู้แน่ว่าตัวเองต่อสายหรือยิง IR และใช้ `AND protocol <> ?` ให้การแก้ idempotent ไม่เขียนซ้ำ
 
 ## คำถามที่อาจารย์อาจถาม
@@ -1670,7 +1670,7 @@ function assertNoImportedOverlaps(schedules) {
 
 > [!ASK]
 > **ถาม:** ทำไมใช้บัญชี MQTT แยกรายบอร์ด และรหัสผ่านเก็บที่ไหน?
-> **ตอบ:** เดิมทุกบอร์ดใช้บัญชีเดียวที่เข้าถึงทุก topic ถ้าแกะบอร์ดเดียวออกมาอ่านรหัสใน flash ก็สั่งแอร์ทั้งอาคารได้ ตอนนี้แต่ละบอร์ดมี username = Device ID และ ACL เฉพาะ topic ของตัวเอง (publish ได้แค่ `state`, `status`, `provision`, `provision-ack`, `history` ของตัวเอง) รหัสผ่านไม่ได้เก็บในฐานข้อมูล แต่คำนวณจาก HMAC-SHA256 ของ `MQTT_DEVICE_SECRET` กับ Device ID ตัดเหลือ 32 ตัวอักษร จึงคำนวณซ้ำได้เสมอ ตั้งค่าบอร์ดซ้ำได้รหัสเดิม และถ้าไฟล์ Dynamic Security ของ Mosquitto หาย Backend สร้างบัญชีทุกบอร์ดกลับมาให้เองทุกครั้งที่ต่อ Broker (`reconcileAccounts`)
+> **ตอบ:** ถ้าทุกบอร์ดใช้บัญชีเดียวที่เข้าถึงทุก topic (โหมด shared) แกะบอร์ดเดียวออกมาอ่านรหัสใน flash ก็สั่งแอร์ทั้งอาคารได้ โหมด dynsec ที่ใช้จริงให้แต่ละบอร์ดมี username = Device ID และ ACL เฉพาะ topic ของตัวเอง (publish ได้แค่ `state`, `status`, `provision`, `provision-ack`, `history` ของตัวเอง) รหัสผ่านไม่ได้เก็บในฐานข้อมูล แต่คำนวณจาก HMAC-SHA256 ของ `MQTT_DEVICE_SECRET` กับ Device ID ตัดเหลือ 32 ตัวอักษร จึงคำนวณซ้ำได้เสมอ ตั้งค่าบอร์ดซ้ำได้รหัสเดิม และถ้าไฟล์ Dynamic Security ของ Mosquitto หาย Backend สร้างบัญชีทุกบอร์ดกลับมาให้เองทุกครั้งที่ต่อ Broker (`reconcileAccounts`)
 
 > [!ASK]
 > **ถาม:** ถ้าสอง Backend รันพร้อมกัน ระบบปิดแอร์จะยิงคำสั่งซ้ำไหม?
@@ -1682,7 +1682,7 @@ function assertNoImportedOverlaps(schedules) {
 
 > [!ASK]
 > **ถาม:** บอร์ดสายแอร์ Daikin ต่างจากบอร์ด IR อย่างไรในมุมของ Backend?
-> **ตอบ:** ในฐานข้อมูลแยกด้วย `protocol = 'DAIKIN_WIRED'` ครับ (เพิ่ม 11 ต.ค. 2569) Backend ใช้ค่านี้สามที่ หนึ่ง `validateAirState` ตรวจคำสั่งตามที่รีโมตติดผนังทำได้ (โหมด Cool/Dry/Fan, ไม่มี Turbo, swing แค่ส่ายหรือหยุด, ฟังก์ชันเสริมถูกปิด) สอง `publicAirConditioner` ส่ง `controlType: 'wired'` ให้แอปซ่อนปุ่มที่ใช้ไม่ได้ สาม ตอนสั่ง OTA ยอมเฉพาะไฟล์ที่ชื่อมี `wired` หรือ `slm8` และถ้าในฐานข้อมูลยังเป็นยี่ห้อ IR แต่บอร์ดรายงาน `controlMode: "wired"` Backend แก้ `protocol` ให้เอง
+> **ตอบ:** ในฐานข้อมูลแยกด้วย `protocol = 'DAIKIN_WIRED'` ครับ Backend ใช้ค่านี้สามที่ หนึ่ง `validateAirState` ตรวจคำสั่งตามที่รีโมตติดผนังทำได้ (โหมด Cool/Dry/Fan, ไม่มี Turbo, swing แค่ส่ายหรือหยุด, ฟังก์ชันเสริมถูกปิด) สอง `publicAirConditioner` ส่ง `controlType: 'wired'` ให้แอปซ่อนปุ่มที่ใช้ไม่ได้ สาม ตอนสั่ง OTA ยอมเฉพาะไฟล์ที่ชื่อมี `wired` หรือ `slm8` และถ้าในฐานข้อมูลยังเป็นยี่ห้อ IR แต่บอร์ดรายงาน `controlMode: "wired"` Backend แก้ `protocol` ให้เอง
 
 > [!ASK]
 > **ถาม:** ตอนลบอุปกรณ์ ทำไม Backend ต้องรอบอร์ดตอบ และถ้าบอร์ดออฟไลน์จะเป็นอย่างไร?
@@ -1690,7 +1690,7 @@ function assertNoImportedOverlaps(schedules) {
 
 > [!ASK]
 > **ถาม:** Backend รู้ได้อย่างไรว่าไฟล์เฟิร์มแวร์เป็นของบอร์ดชนิดไหนและรุ่นอะไร ทำไมไม่เปิดไฟล์อ่านเอา?
-> **ตอบ:** ดูจาก **ชื่อไฟล์** ครับ (`utils/firmware.js`, เพิ่ม 14 ต.ค. 2569) `firmwareKindOf` ให้ชื่อที่มี `occ` เป็นเซ็นเซอร์ มี `wired` หรือ `slm8` เป็นสายแอร์ ที่เหลือเป็นแอร์ IR และ `firmwareVersionOf` ดึงเลขรุ่นท้ายชื่อด้วย regex เช่น `rmutt_esp32_air_wired-2.5.2-slm8.bin` ได้ `2.5.2-slm8` ส่วน `compareFirmwareVersions` เทียบเป็นตัวเลขสามส่วน (`2.5.10` ใหม่กว่า `2.5.9` ซึ่งเทียบแบบสตริงจะผิด) ไม่อ่านจากเนื้อไฟล์เพราะเลขรุ่นใน `.bin` ไม่ได้อยู่ตำแหน่งคงที่และต้องแกะโครงสร้าง image ของ ESP32 ซึ่งซับซ้อนเกินจำเป็น ชื่อไฟล์จึงเป็นสัญญาที่ทั้งคนและโปรแกรมอ่านง่าย ส่วนเนื้อไฟล์ตรวจแค่ว่าเป็นโปรแกรม ESP32 จริง (`validateFirmwareImage`: ไบต์แรก `0xE9`, ไม่ว่าง, ไม่เกิน `0x1F0000` ไบต์ = ขนาดช่อง OTA ใน `partitions.csv`) และ `assertFirmwareKind` กันสั่งไฟล์ผิดชนิดให้บอร์ดตอน OTA
+> **ตอบ:** ดูจาก **ชื่อไฟล์** ครับ (`utils/firmware.js`) `firmwareKindOf` ให้ชื่อที่มี `occ` เป็นเซ็นเซอร์ มี `wired` หรือ `slm8` เป็นสายแอร์ ที่เหลือเป็นแอร์ IR และ `firmwareVersionOf` ดึงเลขรุ่นท้ายชื่อด้วย regex เช่น `rmutt_esp32_air_wired-2.5.2-slm8.bin` ได้ `2.5.2-slm8` ส่วน `compareFirmwareVersions` เทียบเป็นตัวเลขสามส่วน (`2.5.10` ใหม่กว่า `2.5.9` ซึ่งเทียบแบบสตริงจะผิด) ไม่อ่านจากเนื้อไฟล์เพราะเลขรุ่นใน `.bin` ไม่ได้อยู่ตำแหน่งคงที่และต้องแกะโครงสร้าง image ของ ESP32 ซึ่งซับซ้อนเกินจำเป็น ชื่อไฟล์จึงเป็นสัญญาที่ทั้งคนและโปรแกรมอ่านง่าย ส่วนเนื้อไฟล์ตรวจแค่ว่าเป็นโปรแกรม ESP32 จริง (`validateFirmwareImage`: ไบต์แรก `0xE9`, ไม่ว่าง, ไม่เกิน `0x1F0000` ไบต์ = ขนาดช่อง OTA ใน `partitions.csv`) และ `assertFirmwareKind` กันสั่งไฟล์ผิดชนิดให้บอร์ดตอน OTA
 
 ## สรุปและเช็กลิสต์ความเข้าใจ
 
@@ -1713,7 +1713,7 @@ function assertNoImportedOverlaps(schedules) {
 - [ ] อธิบายขั้นตอนส่งออก Excel และโครงสร้างไฟล์ `.xlsx` ที่ `xlsx-writer.js` สร้าง (6 ไฟล์ใน ZIP, inlineStr, freeze header)
 - [ ] อธิบายได้ว่า "ตอนนี้อยู่ในคาบไหม" คำนวณอย่างไร (ตารางเรียน + ภาคเรียน + การจองห้อง) และเหตุผลที่ใช้เวลาไทย
 - [ ] อธิบายลำดับการอ่าน Excel ตารางเรียน (ชื่อชีต = ห้อง, แถว `วัน`, เซลล์ที่รวม, เวลาเริ่มอยู่แถวเหนือหัวตาราง) และด่านตรวจก่อนบันทึก
-- [ ] อธิบายกติกาคำสั่งของ `DAIKIN_WIRED` และที่มาของ `controlType` ได้ (เพิ่ม 11 ต.ค. 2569)
-- [ ] เล่าการทำงานของ `unprovisionDevice`: สร้าง payload → ตั้งตัวรอใน `Map` → publish ไม่ retain → รอ ack ทาง `status` ไม่เกิน 4 วินาที (เพิ่ม 13 ต.ค. 2569)
+- [ ] อธิบายกติกาคำสั่งของ `DAIKIN_WIRED` และที่มาของ `controlType` ได้
+- [ ] เล่าการทำงานของ `unprovisionDevice`: สร้าง payload → ตั้งตัวรอใน `Map` → publish ไม่ retain → รอ ack ทาง `status` ไม่เกิน 4 วินาที
 - [ ] บอกกฎชนิดไฟล์เฟิร์มแวร์จากชื่อ (`occ` / `wired`,`slm8` / ที่เหลือ) และการตรวจไบต์ `0xE9` กับขนาด `0x1F0000`
-- [ ] อธิบายว่าทำไม `compareFirmwareVersions` เทียบเป็นตัวเลขไม่ใช่สตริง และ `airFirmwareKind(protocol)` เลือกชนิดไฟล์ของบอร์ดแอร์อย่างไร (เพิ่ม 14 ต.ค. 2569)
+- [ ] อธิบายว่าทำไม `compareFirmwareVersions` เทียบเป็นตัวเลขไม่ใช่สตริง และ `airFirmwareKind(protocol)` เลือกชนิดไฟล์ของบอร์ดแอร์อย่างไร

@@ -55,10 +55,8 @@
 <li><a href="chapters/17-glossary.html"><span class="num">17</span>อภิธานศัพท์</a></li>
 <li><a href="chapters/18-file-map.html"><span class="num">18</span>แผนที่ไฟล์ทั้งโปรเจค</a></li>
 </ul>
-<div class="nav-part">งานที่กำลังพัฒนา</div><ul>
-<li><a href="chapters/19-daikin-slm8.html"><span class="num">19</span>แอร์ Daikin ผ่านสาย SLM8: จากการแกะโปรโตคอลถึงบอร์ดสายแอร์</a></li>
-</ul>
 <div class="nav-part">เจาะลึก</div><ul>
+<li><a href="chapters/19-daikin-slm8.html"><span class="num">19</span>แอร์ Daikin ผ่านสาย SLM8: จากการแกะโปรโตคอลถึงบอร์ดสายแอร์</a></li>
 <li><a href="chapters/20-database-design.html"><span class="num">20</span>เจาะลึกการออกแบบฐานข้อมูล</a></li>
 </ul>
     </nav>
@@ -72,84 +70,25 @@
   ทุกไฟล์ในโปรเจคมีคำอธิบาย และโค้ดสำคัญถูกเจาะอธิบายทีละบรรทัด</p>
   <div class="hero-stats">
     <div><b>20</b><span>บทเรียน</span></div>
-    <div><b>~61,000</b><span>บรรทัดโค้ดที่อธิบาย</span></div>
+    <div><b>~71,000</b><span>บรรทัดโค้ดในโปรเจกต์</span></div>
     <div><b>349</b><span>ไฟล์ในแผนที่ไฟล์</span></div>
     <div><b>6</b><span>เทคโนโลยีหลัก</span></div>
   </div>
 </section>
 
-<div class="callout note"><div class="callout-title">อัปเดตล่าสุด · 15 ต.ค. 2569 บ่าย (ตามโค้ด GitHub PR #11, #12 และ commit "update pin")</div>
+<div class="callout note"><div class="callout-title">คู่มือนี้ตรงกับโค้ดบน GitHub (main) ณ 15 ต.ค. 2569</div>
+<p>เนื้อหาทุกบทเขียนตามสถานะปัจจุบันของโปรเจกต์ ถ้าเอกสารอื่นในโปรเจกต์เขียนไม่ตรงกับคู่มือนี้ ให้เชื่อโค้ด</p>
 <ul>
-<li><b>บอร์ดตรวจคน 1.3.3</b>: เพิ่มไฟ LED เขียว (GPIO25 = สถานะเชื่อมต่อ ติด/กระพริบ/ดับ) และแดง (GPIO26 = มีคน) และ<b>ลดเกณฑ์มีคนจาก &gt; 25 เป็น &gt; 15</b> (ไวขึ้น) (บท 3, 8, 9, 18)</li>
-<li><b>ระวัง: ค่าเกณฑ์ไม่ตรงกัน</b> Backend/แอป/เว็บยังแสดง 25 แต่บอร์ดใช้ 15 เพราะบอร์ดไม่ได้อ่านค่าจาก Backend (บท 5, 7, 12, 16, 20)</li>
-<li><b>บอร์ดสายแอร์ย้ายขา</b>: PZEM เป็น RX=GPIO18 / TX=GPIO14 และ LED เหลืองเป็น GPIO23 (ไม่เหมือนบอร์ด IR แล้ว) เลขรุ่นยังเป็น 2.5.2-slm8 ต้องแฟลชใหม่ถ้าต่อสายตามขาใหม่ (บท 9, 19)</li>
-<li><b>OTA ที่ล้มด้วยสาเหตุเดิมแจ้งผลทันที</b>: Backend ล้าง <code>ota_error</code> ก่อนส่งคำสั่ง หน้าเว็บจึงแจ้ง error แม้ข้อความซ้ำรอบก่อน และตอนหมดเวลาบอกรุ่นที่บอร์ดรายงานอยู่ (บท 6, 13)</li>
-<li><b>หน้าเว็บดึงข้อมูลเซ็นเซอร์ทุก 10 วินาที</b> แท็บเซ็นเซอร์ในหน้าเฟิร์มแวร์เห็นรุ่นใหม่ทันที ไม่ต้องรอ 5 นาที (บท 13)</li>
-<li><b>Caddy ไม่แคชไฟล์ JS นาน</b>: <code>/assets/js/*</code> เป็น <code>no-cache</code> deploy เว็บแล้วเห็นของใหม่ทันที (ต้องอัปเดตเซิร์ฟเวอร์ด้วย <code>update-server.ps1</code> เพื่อให้ Caddyfile ใหม่มีผล) (บท 4, 13, 15, 18)</li>
-<li>แก้เลขบรรทัดของโค้ดที่ยกมาให้ตรงไฟล์จริงทั้งหมด รวมจุดที่เลื่อนจาก PR #8 (บท 5, 6, 7, 10)</li>
-</ul></div>
-
-<div class="callout note"><div class="callout-title">อัปเดตก่อนหน้า · 15 ต.ค. 2569 รอบแรก (ลบส่วนที่ไม่ใช้ออกจากฐานข้อมูล)</div>
-<p>หลังเขียนบท 20 ได้ลบสองส่วนที่โค้ดไม่ใช้แล้วออกจากฐานข้อมูลจริง (GitHub PR #8) และปรับคู่มือตาม:</p>
+<li><b>แอป Flutter</b> 3.16.0+32 · <b>เฟิร์มแวร์</b> บอร์ดแอร์ IR 2.5.1, บอร์ดสายแอร์ Daikin 2.5.2-slm8, บอร์ดตรวจคน 1.3.3 · <b>ฐานข้อมูล</b> 11 ตาราง · <b>เทสต์</b> Backend 136, Flutter 122</li>
+<li><b>บอร์ดตรวจคน</b> มีไฟ LED เขียว (การเชื่อมต่อ) และแดง (มีคน) ตัดสินว่ามีคนเมื่อ static energy เกต 0–8 &gt; 15 (บท 9)</li>
+<li><b>บอร์ดสายแอร์</b> ใช้ขา PZEM RX18/TX14 และ LED เหลือง GPIO23 ไม่เหมือนบอร์ด IR (บท 9, 19)</li>
+<li><b>หน้าเว็บเฟิร์มแวร์</b> อัปโหลดไฟล์ .bin และสั่ง OTA หลายบอร์ดได้ Backend ล้าง <code>ota_error</code> ก่อนสั่ง ไฟล์ JS เป็น <code>no-cache</code> (บท 4, 6, 13)</li>
+</ul>
+<p><b>จุดที่ยังไม่ตรงกันในโปรเจกต์ (ควรรู้ก่อนถูกถาม):</b></p>
 <ul>
-<li><b>ลบคอลัมน์ <code>rooms.is_active</code></b> ไม่มีโค้ดไหนตั้งเป็น FALSE (ลบห้อง = <code>DELETE</code> จริง) เอาเงื่อนไขออกจาก query ทุกจุด index เปลี่ยนเป็น <code>idx_rooms_floor_order</code> (บท 5, 6, 20)</li>
-<li><b>ลบค่า <code>removed</code> ของ <code>provision_status</code></b> ถอดอุปกรณ์ = ลบแถว + <code>unprovision</code> ตอนนี้ ENUM เหลือ <code>reserved</code>/<code>active</code> ลบห้องไม่ต้องล้างแถว removed ก่อนแล้ว (บท 5, 6, 7, 8, 20)</li>
-<li><b>สคริปต์ใหม่ <code>migrate-drop-unused.js</code></b> (<code>npm run db:migrate:cleanup</code>, มี <code>--dry-run</code>) รันซ้ำได้ <code>update-remote.sh</code> เรียกให้เองหลัง Backend รุ่นใหม่ขึ้น (บท 5, 14, 18)</li>
-<li><b>วิธีอัปเดตเซิร์ฟเวอร์อย่างปลอดภัย</b>: สำรองด้วย <code>backup-db.sh</code> ก่อนเสมอ, วิธีเช็กทรัพยากรเซิร์ฟเวอร์ (RAM/ดิสก์/CPU/<code>docker stats</code>) และแก้ error "running scripts is disabled" ของ PowerShell (บท 14)</li>
-<li>แอปและบอร์ดไม่ต้อง build/แฟลชใหม่ เพราะ API ส่งข้อมูลรูปแบบเดิม · เทสต์ Backend 136 ผ่านทั้งหมด</li>
-</ul></div>
-
-<div class="callout note"><div class="callout-title">อัปเดตก่อนหน้า · 14 ต.ค. 2569 (บทใหม่ 20)</div>
-<ul>
-<li><b>บทใหม่ 20: เจาะลึกการออกแบบฐานข้อมูล</b> (ทำไม จำเป็นไหม ทำแบบอื่นได้ไหม) ทุกตารางทุกคอลัมน์ว่าทำไมออกแบบแบบนี้ จำเป็นแค่ไหน (ขาดไม่ได้ / ควรมี / ไว้ดู / เหลือจากรุ่นเก่า) ตรวจจากโค้ดจริงว่าคอลัมน์ไหนถูกอ่านไปตัดสินอะไร และทางเลือกอื่นพร้อมเหตุผลที่ไม่เลือก</li>
-<li>พบคอลัมน์ที่ไม่ได้ใช้แล้ว เช่น <code>rooms.is_active</code> และสถานะ <code>removed</code> ของอุปกรณ์ อธิบายไว้ในบทพร้อมวิธีตอบอาจารย์</li>
-</ul></div>
-
-<div class="callout note"><div class="callout-title">อัปเดตก่อนหน้า · 14 ต.ค. 2569 รอบค่ำ (ขึ้น GitHub + ตรวจกับโค้ด main ล่าสุด)</div>
-<p>คู่มือนี้อยู่บน GitHub แล้วที่โฟลเดอร์ <code>คู่มือศึกษาโปรเจค/</code> ของ repo ตรวจซ้ำกับโค้ดล่าสุดแล้วแก้ตามนี้:</p>
-<ul>
-<li><b>เวอร์ชันแอป</b> เป็น <code>3.16.0+32</code> (เดิมในคู่มือเขียน 3.13.1+31) ใน <code>pubspec.yaml</code> และ APK ที่ build บน GitHub (บท 10, 14, 18)</li>
-<li><b>เอกสารในโปรเจกต์ปรับตามโค้ดแล้ว</b> (<code>firmware/README.md</code>, <code>docs/study</code>, <code>docs/learn</code>, <code>docs/BLE_MQTT_PROTOCOL.md</code>) จึงลบหมายเหตุ "เอกสารเก่ากว่าโค้ด" ที่ไม่จริงแล้วออก และบอกว่าข้อใดยังเก่าอยู่ (บท 2, 8, 9, 10, 13)</li>
-<li>แผนที่ไฟล์เพิ่ม <code>docs/learn/</code>, <code>docs/study/</code> และโฟลเดอร์คู่มือนี้ รวม 348 รายการ (บท 18)</li>
-<li>เลขรุ่นเฟิร์มแวร์ยังตรงโค้ด: บอร์ด IR 2.5.1, บอร์ดสายแอร์ 2.5.2-slm8, บอร์ดตรวจคน 1.3.2</li>
-</ul></div>
-
-<div class="callout note"><div class="callout-title">อัปเดตก่อนหน้า · 14 ต.ค. 2569 (ตามโค้ด GitHub commit 11–14 ต.ค.)</div>
-<p>ปรับตามงาน 7 commit ล่าสุด อธิบายละเอียดพร้อมโค้ดจริงทีละบรรทัด:</p>
-<ul>
-<li><b>บอร์ดสายแอร์ Daikin ใช้งานได้จริง</b> (เฟิร์มแวร์ <code>rmutt_esp32_air_wired</code> 2.5.2-slm8) บท 19 เขียนใหม่ด้วยโค้ดจริงของ <code>DaikinSLM8.h</code>, <code>wired_bus.h</code> และไฟล์ .ino แทนโค้ดตัวอย่าง ส่งเฟรมใน FreeRTOS task แยก ป้อนอุณหภูมิห้องจาก DHT11 แผนภาพแก้ขาส่งเป็น GPIO33 (บท 19, 9)</li>
-<li><b>จอ OLED 1.3" ทั้งสองบอร์ด</b> และ <code>build_opt.h</code> ที่ทำให้เฟิร์มแวร์พอดีแฟลช (บท 9)</li>
-<li><b>ผู้ใช้เห็นว่าเป็น "Daikin · สายแอร์"</b> โปรโตคอล <code>DAIKIN_WIRED</code> ใน Backend ป้ายยี่ห้อ·วิธีควบคุม และซ่อนปุ่มที่แอร์ทำไม่ได้ (บท 6–8, 10–13)</li>
-<li><b>ลบอุปกรณ์แล้วล้างค่าในบอร์ดด้วย (unprovision)</b> (บท 6–9, 15)</li>
-<li><b>หน้าเฟิร์มแวร์บนเว็บ</b> อัปโหลดไฟล์และอัปเดตหลายบอร์ดแยกตามชนิด โฟลเดอร์ firmware เขียนได้ (บท 4, 7, 13, 14, 15)</li>
-<li>คำถามอาจารย์เพิ่มในทุกบทที่เกี่ยวข้องและบท 16 อีก 5 ข้อ อภิธานศัพท์เพิ่ม 13 คำ แผนที่ไฟล์ 345 รายการ</li>
-</ul></div>
-
-<div class="callout note"><div class="callout-title">อัปเดตก่อนหน้า · 10 ต.ค. 2569 (ตามโค้ด commit คืน 9 ต.ค. 21:35–23:20)</div>
-<p>ปรับตามงาน 5 commit ล่าสุด อธิบายละเอียดทีละบรรทัดในบทที่เกี่ยวข้อง:</p>
-<ul>
-<li><b>แอปมือถือจัดการตารางเรียนได้เหมือนเว็บแอป</b> ดูตามวันที่จริง เลื่อนทีละสัปดาห์ รวมคาบเรียนกับ<b>การใช้ห้อง</b> (ประชุม สอบ กิจกรรม ทำซ้ำได้) และ<b>ปฏิทินภาคเรียน</b> หน้าจอใหม่ <code>booking_editor_screen.dart</code>, <code>term_calendar_screen.dart</code> โมเดลใหม่ <code>room_calendar.dart</code> (บท 10, 11)</li>
-<li><b>นำเข้าตารางแบบ "เปลี่ยนภาคเรียน"</b> (<code>replaceAll</code>) ล้างตารางเดิมทุกห้องใน Transaction เดียว และดาวน์โหลดตารางเป็น CSV ได้บนมือถือ (บท 12) จุดที่เคยเขียนว่า "ยังไม่สอดคล้อง" สองข้อแก้แล้ว</li>
-<li><b>กราฟหน้าสถิติเปลี่ยนเป็นกราฟแท่ง</b> ป้ายเฉพาะแท่งสูงสุด แกนตัวเลขกลม เส้นเฉลี่ยรายวัน (บท 11)</li>
-<li><b>Build APK บน GitHub Actions</b> <code>build-android.yml</code> เซ็นด้วยกุญแจจาก GitHub Secrets (บท 14)</li>
-<li>คำถามอาจารย์เพิ่ม 5 ข้อ (บท 16) อภิธานศัพท์เพิ่ม 10 คำ (บท 17) แผนที่ไฟล์ 325 รายการ (บท 18)</li>
-</ul></div>
-
-<div class="callout note"><div class="callout-title">อัปเดตก่อนหน้า · 9 ต.ค. 2569 (ช่วงเย็น)</div>
-<p>เพิ่มเรื่องที่ทำเพิ่มเติมหลังวันที่ 5 ต.ค.:</p>
-<ul>
-<li><b>สถานะเปิด/ปิดแอร์อิงไฟจริงจาก PZEM</b> (<code>isPoweredOn</code>) เปิดแอร์ด้วยรีโมตจริง แอปและเว็บก็แสดงว่าเปิด และนับถอยหลังปิดอัตโนมัติถูกต้อง (บท 10, 11, 13, 16)</li>
-<li><b>CI อัตโนมัติ</b> <code>.github/workflows/test.yml</code> รัน <code>flutter analyze</code> และ <code>flutter test</code> ทุกครั้งที่ push (บท 14)</li>
-<li><b>บทใหม่ 19: แกะโปรโตคอลและควบคุมแอร์ Daikin ผ่านสาย SLM8</b> (งานที่กำลังพัฒนา) เล่า 8 ขั้นตั้งแต่ค้นคว้า ฟังสัญญาณ ถอด pulse-distance หา checksum แกะความหมายไบต์ คำนวณวงจร จนส่งเฟรมจาก ESP32 พร้อมแผนภาพ ตัวอย่างโค้ด แบบฝึกสร้างเฟรม และคำถามอาจารย์ 11 ข้อ</li>
-</ul></div>
-
-<div class="callout note"><div class="callout-title">อัปเดตก่อนหน้า · 8 ต.ค. 2569</div>
-<p>คู่มือปรับตามโค้ดเวอร์ชันล่าสุด (commit วันที่ 5 ต.ค. 20:06) เรื่องที่เปลี่ยน:</p>
-<ul>
-<li><b>บอร์ด ESP32 ต่อ MQTT ผ่าน Tailscale Funnel พอร์ต 8443</b> แทน duckdns:8883 บอร์ดจึงอยู่ Wi-Fi ไหนก็ได้ (บท 3, 4, 8, 9, 14, 15, 16)</li>
-<li><code>update-remote.sh</code> สร้าง container tailscale ใหม่ทุกครั้งที่อัปเดต เพื่อให้ใช้ <code>tailscale-serve.json</code> ตัวใหม่ (บท 14)</li>
-<li><code>backend.Dockerfile</code> เพิ่ม <code>chmod -R a+rX</code> แก้ปัญหา Cannot find module (บท 4, 14, 15)</li>
-<li>build iOS ระบุที่อยู่ API ได้ และใส่ไอคอนแอปอัตโนมัติ (บท 14)</li>
+<li>เกณฑ์มีคน: บอร์ดใช้ 15 แต่ Backend/แอป/เว็บแสดง 25 เพราะบอร์ดไม่ได้อ่านค่าจาก Backend (บท 5, 7, 12, 20)</li>
+<li><code>firmware/README.md</code> และ <code>README_WIRED_TH.md</code> ยังเขียนขา PZEM/LED เหลืองของบอร์ดสายแอร์เป็น 16/18/27 และบอร์ดตรวจคนเป็น 1.3.2 (บท 9, 18)</li>
+<li>แอปไม่ได้อ่าน <code>boardCleared</code> ตอนลบอุปกรณ์ และ Backend ยังไม่ใช้ <code>busOk</code>/<code>compressorRunning</code> ของบอร์ดสายแอร์ (บท 11, 12, 19)</li>
 </ul></div>
 
 <h2 class="part-title">เริ่มต้นตรงนี้</h2>
@@ -189,10 +128,8 @@
 <a class="card" href="chapters/17-glossary.html"><div class="card-num">17</div><div class="card-title">อภิธานศัพท์</div><div class="card-sub">เครือข่ายและอินเทอร์เน็ต · เซิร์ฟเวอร์และ DevOps · ความปลอดภัย · ฐานข้อมูล</div></a>
 <a class="card" href="chapters/18-file-map.html"><div class="card-num">18</div><div class="card-title">แผนที่ไฟล์ทั้งโปรเจค</div><div class="card-sub">เครือข่าย เซิร์ฟเวอร์ และ Docker · ฐานข้อมูลและสคริปต์ดูแลข้อมูล · Backend: โครงหลัก ระบบสมาชิก API และเทสต์ · Backend: services และ utils</div></a>
 </div>
-<h2 class="part-title">งานที่กำลังพัฒนา</h2><div class="cards">
-<a class="card" href="chapters/19-daikin-slm8.html"><div class="card-num">19</div><div class="card-title">แอร์ Daikin ผ่านสาย SLM8: จากการแกะโปรโตคอลถึงบอร์ดสายแอร์</div><div class="card-sub">ภาพรวม · ความรู้ที่ต้องมีก่อนอ่านบทนี้ · อุปกรณ์และเครื่องมือ · ขั้นที่ 1: ค้นคว้าก่อนลงมือ</div></a>
-</div>
 <h2 class="part-title">เจาะลึก</h2><div class="cards">
+<a class="card" href="chapters/19-daikin-slm8.html"><div class="card-num">19</div><div class="card-title">แอร์ Daikin ผ่านสาย SLM8: จากการแกะโปรโตคอลถึงบอร์ดสายแอร์</div><div class="card-sub">ภาพรวม · ความรู้ที่ต้องมีก่อนอ่านบทนี้ · อุปกรณ์และเครื่องมือ · ขั้นที่ 1: ค้นคว้าก่อนลงมือ</div></a>
 <a class="card" href="chapters/20-database-design.html"><div class="card-num">20</div><div class="card-title">เจาะลึกการออกแบบฐานข้อมูล</div><div class="card-sub">วิธีอ่านบทนี้ · หลักคิดที่ใช้ทั้งฐานข้อมูล · ตาราง users — บัญชีผู้ใช้ · ตาราง password_reset_otps — OTP ลืมรหัสผ่าน</div></a>
 </div>
 

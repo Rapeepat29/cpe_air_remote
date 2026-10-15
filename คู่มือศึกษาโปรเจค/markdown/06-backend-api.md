@@ -714,9 +714,9 @@ test('เปลี่ยนอีเมลโดยไม่ใส่รหั�
 | `fetch(...)` | `fetch` ในตัว Node ยิง HTTP จริงเข้าเซิร์ฟเวอร์ที่เปิดไว้ จึงเป็น integration test เล็ก ๆ ที่ครอบ helmet → json → authenticate → limiter → handler |
 | `assert.equal(user.email, 'alice@example.com')` | นอกจากเช็กสถานะ 400 ยังเช็กว่าข้อมูลใน "DB" **ไม่ถูกเปลี่ยน** นี่คือสิ่งที่สำคัญจริง |
 
-### 8. อัปโหลดเฟิร์มแวร์ `POST /api/firmware` (เพิ่ม 14 ต.ค. 2569)
+### 8. อัปโหลดเฟิร์มแวร์ `POST /api/firmware`
 
-เดิมการวางไฟล์ `.bin` ต้อง `scp` เข้าเซิร์ฟเวอร์ (ต้องมีบัญชี SSH) ตอนนี้แอดมินลากไฟล์วางในหน้า "เฟิร์มแวร์" ของเว็บได้ เส้นนี้จึงเป็นเส้นแรกที่ "เขียนไฟล์ลงดิสก์ของเซิร์ฟเวอร์ตามที่ผู้ใช้ส่งมา" ต้องตรวจหนักกว่าเส้นอื่น
+แอดมินลากไฟล์ `.bin` วางในหน้า "เฟิร์มแวร์" ของเว็บได้โดยไม่ต้องมีบัญชี SSH เส้นนี้จึงเป็นเส้นเดียวที่ "เขียนไฟล์ลงดิสก์ของเซิร์ฟเวอร์ตามที่ผู้ใช้ส่งมา" ต้องตรวจหนักกว่าเส้นอื่น
 
 **ไฟล์ `backend/src/routes/firmware.js` บรรทัด 45–68** (ตรวจก่อนเขียน)
 
@@ -817,9 +817,9 @@ firmwareRouter.post(
 > [!NOTE]
 > ไฟล์ที่อัปโหลดชื่อยังไม่มีเลขรุ่น (เช่น `rmutt_esp32_air.ino.bin` ตรงจาก Arduino IDE) หน้าเว็บจะถามรุ่นแล้วตั้งชื่อเป็น `<สเก็ตช์>-<รุ่น>.bin` ก่อนส่ง Backend ไม่ได้บังคับว่าต้องมีเลขรุ่น (`version` เป็น `null` ได้) แต่ถ้าไม่มี หน้าเว็บจะบอกไม่ได้ว่าบอร์ดไหนเก่ากว่าไฟล์
 
-### 9. ลบอุปกรณ์ `DELETE /api/air-conditioners/:deviceId` และการล้างค่าบอร์ด (แก้ 13 ต.ค. 2569)
+### 9. ลบอุปกรณ์ `DELETE /api/air-conditioners/:deviceId` และการล้างค่าบอร์ด
 
-ก่อน 13 ต.ค. การลบอุปกรณ์ลบแค่ข้อมูลฝั่งเซิร์ฟเวอร์ ตัวบอร์ดยังจำ Wi-Fi, ที่อยู่ Broker, ชื่อผู้ใช้/รหัส MQTT และห้องไว้ใน NVS (หน่วยความจำถาวรของ ESP32) ตอนนี้ Backend สั่งบอร์ดล้างตัวเองด้วย
+ถ้าลบแค่ข้อมูลฝั่งเซิร์ฟเวอร์ ตัวบอร์ดจะยังจำ Wi-Fi, ที่อยู่ Broker, ชื่อผู้ใช้/รหัส MQTT และห้องไว้ใน NVS (หน่วยความจำถาวรของ ESP32) Backend จึงสั่งบอร์ดล้างตัวเองด้วย
 
 **ไฟล์ `backend/src/routes/air-conditioners.js` บรรทัด 418–453**
 
@@ -1038,21 +1038,21 @@ airConditionersRouter.delete(
 
 | Method | Path | ล็อกอิน | admin | หน้าที่ | ตาราง |
 |---|---|---|---|---|---|
-| GET | `/api/air-conditioners` | ใช่ | ไม่ | รายการแอร์ทุกเครื่อง พร้อมค่า PZEM, สถานะ, นับถอยหลัง และ `controlType` (`ir`/`wired`, เพิ่ม 11 ต.ค. 2569) | `air_conditioners` |
+| GET | `/api/air-conditioners` | ใช่ | ไม่ | รายการแอร์ทุกเครื่อง พร้อมค่า PZEM, สถานะ, นับถอยหลัง และ `controlType` (`ir`/`wired`) | `air_conditioners` |
 | POST | `/api/air-conditioners/reservations` | ใช่ | ใช่ | จองอุปกรณ์ให้ ESP32 ตอน provisioning: ออก token ใช้ได้ 15 นาที + ข้อมูล MQTT | `air_conditioners`, `rooms` |
-| POST | `/api/air-conditioners/:deviceId/command` | ใช่ | **ไม่** | สั่งแอร์ผ่าน MQTT (202) ใครล็อกอินก็สั่งได้ แอร์ `DAIKIN_WIRED` รับเฉพาะ Cool/Dry/Fan, ไม่มีพัดลม Turbo, สวิง Auto/Off (แก้ 11 ต.ค. 2569) | `air_conditioners` |
+| POST | `/api/air-conditioners/:deviceId/command` | ใช่ | **ไม่** | สั่งแอร์ผ่าน MQTT (202) ใครล็อกอินก็สั่งได้ แอร์ `DAIKIN_WIRED` รับเฉพาะ Cool/Dry/Fan, ไม่มีพัดลม Turbo, สวิง Auto/Off | `air_conditioners` |
 | POST | `/api/air-conditioners/:deviceId/setup-mode` | ใช่ | ใช่ | สั่งบอร์ดเข้าโหมดตั้งค่า (202) | `air_conditioners` |
 | PATCH | `/api/air-conditioners/:deviceId` | ใช่ | ใช่ | แก้ชื่อ / เปิด-ปิด auto-off รายเครื่อง | `air_conditioners` |
-| POST | `/api/air-conditioners/:deviceId/ota` | ใช่ | ใช่ | สั่งอัปเดตเฟิร์มแวร์ผ่าน MQTT (202) ไฟล์ต้องตรงชนิดบอร์ด: `DAIKIN_WIRED` ใช้ไฟล์ `wired` ที่เหลือใช้ไฟล์ `air` (แก้ 14 ต.ค. 2569) | `air_conditioners` |
-| DELETE | `/api/air-conditioners/:deviceId` | ใช่ | ใช่ | ลบแอร์ → สั่งบอร์ดล้างค่า (unprovision) รอ ≤ 4 วินาที → ล้าง retained topic → ลบบัญชี MQTT ตอบ `boardCleared` ด้วย (แก้ 13 ต.ค. 2569) | `air_conditioners` (+ Broker + บอร์ด) |
+| POST | `/api/air-conditioners/:deviceId/ota` | ใช่ | ใช่ | สั่งอัปเดตเฟิร์มแวร์ผ่าน MQTT (202) ไฟล์ต้องตรงชนิดบอร์ด: `DAIKIN_WIRED` ใช้ไฟล์ `wired` ที่เหลือใช้ไฟล์ `air` | `air_conditioners` |
+| DELETE | `/api/air-conditioners/:deviceId` | ใช่ | ใช่ | ลบแอร์ → สั่งบอร์ดล้างค่า (unprovision) รอ ≤ 4 วินาที → ล้าง retained topic → ลบบัญชี MQTT ตอบ `boardCleared` ด้วย | `air_conditioners` (+ Broker + บอร์ด) |
 | GET | `/api/occupancy-sensors` | ใช่ | ไม่ | รายการเซ็นเซอร์ตรวจจับคน | `occupancy_sensors` |
 | POST | `/api/occupancy-sensors/reservations` | ใช่ | ใช่ | จองอุปกรณ์เซ็นเซอร์ (หนึ่งห้องหนึ่งตัว) | `occupancy_sensors`, `rooms` |
 | POST | `/api/occupancy-sensors/:deviceId/setup-mode` | ใช่ | ใช่ | เข้าโหมดตั้งค่า (202) | `occupancy_sensors` |
-| POST | `/api/occupancy-sensors/:deviceId/ota` | ใช่ | ใช่ | สั่ง OTA (202) ไฟล์ต้องเป็นชนิด `occupancy` (แก้ 14 ต.ค. 2569) | `occupancy_sensors` |
-| DELETE | `/api/occupancy-sensors/:deviceId` | ใช่ | ใช่ | ลบเซ็นเซอร์ ลำดับเดียวกับแอร์ (unprovision → retained → บัญชี MQTT) ตอบ `boardCleared` (แก้ 13 ต.ค. 2569) | `occupancy_sensors` (+ Broker + บอร์ด) |
-| GET | `/api/firmware` | ใช่ | ใช่ | `{configured, maxBytes, files}` รายการไฟล์ `.bin` พร้อม `kind` (`air`/`wired`/`occupancy`) และ `version` จากชื่อไฟล์ (แก้ 14 ต.ค. 2569) | (ระบบไฟล์) |
-| POST | `/api/firmware` | ใช่ | ใช่ | อัปโหลดไฟล์ดิบ ชื่อใน header `X-File-Name` (percent-encoded) `?kind=` ต้องตรงชนิดจากชื่อ `?replace=1` ยอมเขียนทับ ตอบ 201 `{file}` (เพิ่ม 14 ต.ค. 2569) | (ระบบไฟล์) |
-| DELETE | `/api/firmware/:fileName` | ใช่ | ใช่ | ลบไฟล์ ตอบ `{removed, fileName}` ไม่มีไฟล์ตอบ `removed: false` (เพิ่ม 14 ต.ค. 2569) | (ระบบไฟล์) |
+| POST | `/api/occupancy-sensors/:deviceId/ota` | ใช่ | ใช่ | สั่ง OTA (202) ไฟล์ต้องเป็นชนิด `occupancy` | `occupancy_sensors` |
+| DELETE | `/api/occupancy-sensors/:deviceId` | ใช่ | ใช่ | ลบเซ็นเซอร์ ลำดับเดียวกับแอร์ (unprovision → retained → บัญชี MQTT) ตอบ `boardCleared` | `occupancy_sensors` (+ Broker + บอร์ด) |
+| GET | `/api/firmware` | ใช่ | ใช่ | `{configured, maxBytes, files}` รายการไฟล์ `.bin` พร้อม `kind` (`air`/`wired`/`occupancy`) และ `version` จากชื่อไฟล์ | (ระบบไฟล์) |
+| POST | `/api/firmware` | ใช่ | ใช่ | อัปโหลดไฟล์ดิบ ชื่อใน header `X-File-Name` (percent-encoded) `?kind=` ต้องตรงชนิดจากชื่อ `?replace=1` ยอมเขียนทับ ตอบ 201 `{file}` | (ระบบไฟล์) |
+| DELETE | `/api/firmware/:fileName` | ใช่ | ใช่ | ลบไฟล์ ตอบ `{removed, fileName}` ไม่มีไฟล์ตอบ `removed: false` | (ระบบไฟล์) |
 
 ### ไฟฟ้า แจ้งเตือน ตั้งค่า
 
@@ -1070,7 +1070,7 @@ airConditionersRouter.delete(
 | PATCH | `/api/settings/auto-off` | ใช่ | ใช่ | เปิด/ปิดระบบปิดแอร์อัตโนมัติทั้งอาคาร | `system_settings` |
 | PATCH | `/api/settings/rate` | ใช่ | ใช่ | ตั้งอัตราค่าไฟ (บาท/kWh) ต้องอยู่ระหว่าง 0.01–100 | `system_settings` |
 
-รวม **57 endpoint** (นับ `/api/health` ด้วย; เดิม 55 เพิ่ม `POST` และ `DELETE /api/firmware` เมื่อ 14 ต.ค. 2569)
+รวม **57 endpoint** (นับ `/api/health` ด้วย)
 
 > [!NOTE]
 > `POST /api/air-conditioners/:deviceId/command` ไม่มี `requireAdmin` โดยตั้งใจ เพราะเจ้าหน้าที่ (staff) ต้องเปิด-ปิดแอร์ได้ ส่วนการจอง/ลบ/OTA/เข้าโหมดตั้งค่าซึ่งกระทบอุปกรณ์ถาวรเป็นของแอดมินเท่านั้น
@@ -1091,10 +1091,10 @@ endpoint เดียว ไม่ผ่าน `authenticate` เพราะห
 - ลำดับเรียงรายการ `ORDER BY role = 'admin' DESC, is_active DESC, username` ให้แอดมินที่ใช้งานอยู่ขึ้นก่อน
 - `ER_DUP_ENTRY` → 409 (username/อีเมลซ้ำ)
 
-### `routes/rooms.js` (230 บรรทัด)
+### `routes/rooms.js` (196 บรรทัด)
 ดูหัวข้อเจาะโค้ดข้อ 6 ใช้ `validateRoomInput`, `validateRoomNumber`, `publicRoom` จาก `utils/room.js`
 
-### `routes/schedules.js` (500 บรรทัด)
+### `routes/schedules.js` (497 บรรทัด)
 ไฟล์ใหญ่ ประกอบด้วยสามกลุ่ม:
 
 1. **นำเข้าไฟล์:** `import/preview` ใช้ `express.raw({type: () => true, limit: '8mb'})` เป็น middleware เฉพาะ route นี้ (รับไบนารีของไฟล์ Excel/CSV ตรง ๆ แทน JSON และเพิ่มเพดานเป็น 8 MB เพราะ `express.json` ที่ใช้ทั่วไปจำกัดแค่ 256 KB) แล้วส่งให้ `parseScheduleFile` (บทตอนที่ 2) แยกห้องที่มีอยู่แล้วกับห้องใหม่ (`roomDefaultsForImport` เดาชั้น/ประเภท) `import/commit` ใน `withTransaction` เดียว: สร้างห้องที่ขาด (ถ้าผู้ใช้ยืนยัน `createMissingRooms`) → ลบตารางเดิม (ทั้งหมดถ้า `replaceAll` หรือเฉพาะห้องที่อยู่ในไฟล์) → `INSERT` ทุกคาบ (id เป็น `crypto.randomUUID()`) → บันทึกภาคเรียน → บันทึกว่านำเข้าเมื่อไร ทำใน transaction เดียวเพื่อไม่ให้มีช่วงที่ตารางว่างครึ่งทาง ซึ่งระบบปิดแอร์อัตโนมัติจะเข้าใจว่าทุกห้อง "ไม่มีคาบเรียน" แล้วปิดแอร์ระหว่างสอน
@@ -1107,7 +1107,7 @@ endpoint เดียว ไม่ผ่าน `authenticate` เพราะห
 ### `routes/bookings.js` (162 บรรทัด)
 การใช้ห้องนอกตารางเรียน (ประชุม สอบ กิจกรรม) `GET` คืนรายการที่ช่วงวันที่ทับกับ `from`/`to` (ถ้าไม่ส่ง `from` ใช้ `end_date >= CURDATE()` คือเฉพาะที่ยังไม่จบ) เก็บ `days_of_week` เป็นสตริงคั่นจุลภาค (`input.daysOfWeek.join(',')`) ใช้ `DATE_FORMAT` ให้วันที่เป็นข้อความ `YYYY-MM-DD` ไม่ให้ไดรเวอร์แปลงเป็น Date ที่เวลาเพี้ยนตามเขตเวลา `POST/PUT` ตอบ `occurrences` = `countOccurrences(input)` (จำนวนวันที่เกิดขึ้นจริง) `GET` ดัก `ER_NO_SUCH_TABLE` แล้วคืนรายการว่าง เพื่อให้ Backend รุ่นใหม่ยังทำงานได้กับฐานข้อมูลที่ยังไม่รัน migration ตารางนี้
 
-### `routes/air-conditioners.js` (448 บรรทัด)
+### `routes/air-conditioners.js` (453 บรรทัด)
 ตัวใหญ่ที่สุดของฝั่งอุปกรณ์ จุดสำคัญคือ `POST /reservations` (ขั้นจองก่อนบอร์ดจะ provisioning):
 
 1. ตรวจ input (`validateReservationInput`) และว่าห้องมีอยู่ (400 ถ้าไม่มี)
@@ -1117,21 +1117,21 @@ endpoint เดียว ไม่ผ่าน `authenticate` เพราะห
 5. เรียก `prepareDeviceCredentials` สร้างบัญชี MQTT ของบอร์ด **ก่อนเขียน DB** เพื่อไม่ให้ถ้า Broker ล้มแล้วค้างแถวจองไว้ (ล้มแล้วตอบ 503)
 6. `INSERT` แถวใหม่สถานะ `reserved` หมดอายุ 15 นาที (`expiresInSeconds: 900`) หรือ `UPDATE` ถ้าบอร์ดเดิมที่ `active` มาตั้งค่าใหม่ (ตอบ 200 แทน 201)
 
-`POST /:deviceId/command`: ต้อง `provision_status = 'active'` (409 ถ้าบอร์ดยังไม่ยืนยันตัวผ่าน MQTT) ตรวจคำสั่งด้วย `validateAirState(body, protocol)` (`protocol` อ่านจากแถวในฐานข้อมูล ถ้าเป็น `DAIKIN_WIRED` จะรับเฉพาะคำสั่งที่รีโมตติดผนังทำได้ ดูบท Backend ตอนที่ 2) แล้ว `publishAirCommand` ตอบ 202 พร้อม `commandId` ("รับคำสั่งแล้ว" ไม่ใช่ "แอร์ทำแล้ว" เพราะผลมาทาง MQTT status ภายหลัง) ถ้า Broker ไม่ต่อ ตอบ 503 `PATCH /:deviceId`: สร้าง `SET` แบบประกอบฟิลด์ที่ส่งมา (`fields.push('name = ?')`) ชื่อคอลัมน์เป็นข้อความคงที่ในโค้ด ไม่ใช่ข้อความจากผู้ใช้ ค่าผู้ใช้ผูกด้วย `?` ปิด auto-off จะรีเซ็ตนาฬิกานับถอยหลังด้วย `POST /:deviceId/ota`: ตรวจชื่อไฟล์ (`validateFirmwareFileName`), ไฟล์มีจริง (`assertFirmwareFileExists` จาก `firmware.js`), อ่าน `protocol` ของบอร์ดแล้ว `assertFirmwareKind(fileName, airFirmwareKind(row.protocol))` (เพิ่ม 14 ต.ค. 2569: บอร์ดสายแอร์รับเฉพาะไฟล์ที่ชื่อมี `wired`/`slm8` บอร์ด IR รับเฉพาะไฟล์ IR ผิดตอบ 400), บอร์ด `active` และออนไลน์ แล้วสร้าง URL ดาวน์โหลด `https://<mqtt_host>/firmware/<ไฟล์>` **ล้าง `ota_error` ของบอร์ดเป็น `NULL`** (เพิ่ม 15 ต.ค. 2569 ให้หน้าเว็บรู้ว่า error ที่มาหลังจากนี้เป็นของรอบใหม่ แม้ข้อความจะซ้ำกับรอบก่อน) แล้วจึงสั่งผ่าน MQTT `DELETE`: ลบแถว → `unprovisionDevice('air', id)` สั่งบอร์ดล้างค่าแล้วรอคำตอบ ≤ 4 วินาที (เพิ่ม 13 ต.ค. 2569) → `clearRetainedAirTopics` (ล้างข้อความ retained ของบอร์ดบน Broker กันค่าเก่าค้าง) → `removeDeviceAccount` (ลบบัญชี MQTT) ตอบ `boardCleared` บอกว่าบอร์ดยืนยันการล้างหรือไม่ ลบซ้ำถือว่าสำเร็จ (ตอบ 200 เสมอ) เพื่อไม่ให้แอปค้างกับแถวที่หายไปแล้ว (ดูเจาะโค้ดข้อ 9)
+`POST /:deviceId/command`: ต้อง `provision_status = 'active'` (409 ถ้าบอร์ดยังไม่ยืนยันตัวผ่าน MQTT) ตรวจคำสั่งด้วย `validateAirState(body, protocol)` (`protocol` อ่านจากแถวในฐานข้อมูล ถ้าเป็น `DAIKIN_WIRED` จะรับเฉพาะคำสั่งที่รีโมตติดผนังทำได้ ดูบท Backend ตอนที่ 2) แล้ว `publishAirCommand` ตอบ 202 พร้อม `commandId` ("รับคำสั่งแล้ว" ไม่ใช่ "แอร์ทำแล้ว" เพราะผลมาทาง MQTT status ภายหลัง) ถ้า Broker ไม่ต่อ ตอบ 503 `PATCH /:deviceId`: สร้าง `SET` แบบประกอบฟิลด์ที่ส่งมา (`fields.push('name = ?')`) ชื่อคอลัมน์เป็นข้อความคงที่ในโค้ด ไม่ใช่ข้อความจากผู้ใช้ ค่าผู้ใช้ผูกด้วย `?` ปิด auto-off จะรีเซ็ตนาฬิกานับถอยหลังด้วย `POST /:deviceId/ota`: ตรวจชื่อไฟล์ (`validateFirmwareFileName`), ไฟล์มีจริง (`assertFirmwareFileExists` จาก `firmware.js`), อ่าน `protocol` ของบอร์ดแล้ว `assertFirmwareKind(fileName, airFirmwareKind(row.protocol))` (บอร์ดสายแอร์รับเฉพาะไฟล์ที่ชื่อมี `wired`/`slm8` บอร์ด IR รับเฉพาะไฟล์ IR ผิดตอบ 400), บอร์ด `active` และออนไลน์ แล้วสร้าง URL ดาวน์โหลด `https://<mqtt_host>/firmware/<ไฟล์>` **ล้าง `ota_error` ของบอร์ดเป็น `NULL`** (ให้หน้าเว็บรู้ว่า error ที่มาหลังจากนี้เป็นของรอบใหม่ แม้ข้อความจะซ้ำกับรอบก่อน) แล้วจึงสั่งผ่าน MQTT `DELETE`: ลบแถว → `unprovisionDevice('air', id)` สั่งบอร์ดล้างค่าแล้วรอคำตอบ ≤ 4 วินาที → `clearRetainedAirTopics` (ล้างข้อความ retained ของบอร์ดบน Broker กันค่าเก่าค้าง) → `removeDeviceAccount` (ลบบัญชี MQTT) ตอบ `boardCleared` บอกว่าบอร์ดยืนยันการล้างหรือไม่ ลบซ้ำถือว่าสำเร็จ (ตอบ 200 เสมอ) เพื่อไม่ให้แอปค้างกับแถวที่หายไปแล้ว (ดูเจาะโค้ดข้อ 9)
 
-### `routes/occupancy-sensors.js` (326 บรรทัด)
-โครงเหมือน `air-conditioners.js` แต่ผูก **หนึ่งห้องหนึ่งเซ็นเซอร์** (ตรวจ `room_number` ซ้ำ ไม่มี `air_number`) และใช้ topic prefix `rmutt/occupancy` กับค่า `STATIC_ENERGY_THRESHOLD` ของ LD2410 ใช้ `publishOtaCommand('occupancy', ...)` ต่างจากแอร์ที่ใช้ `'air'` OTA ตรวจ `assertFirmwareKind(fileName, 'occupancy')` ตั้งแต่ก่อนอ่านฐานข้อมูล (เพิ่ม 14 ต.ค. 2569 เพราะเซ็นเซอร์มีชนิดเดียว ไม่ต้องรู้ protocol) และล้าง `ota_error` ก่อนส่งคำสั่งเหมือนแอร์ (15 ต.ค. 2569) และ `DELETE` เรียก `unprovisionDevice('occupancy', id)` ก่อนล้าง retained และลบบัญชี MQTT ตอบ `boardCleared` เหมือนแอร์ (เพิ่ม 13 ต.ค. 2569)
+### `routes/occupancy-sensors.js` (331 บรรทัด)
+โครงเหมือน `air-conditioners.js` แต่ผูก **หนึ่งห้องหนึ่งเซ็นเซอร์** (ตรวจ `room_number` ซ้ำ ไม่มี `air_number`) และใช้ topic prefix `rmutt/occupancy` กับค่า `STATIC_ENERGY_THRESHOLD` ของ LD2410 ใช้ `publishOtaCommand('occupancy', ...)` ต่างจากแอร์ที่ใช้ `'air'` OTA ตรวจ `assertFirmwareKind(fileName, 'occupancy')` ตั้งแต่ก่อนอ่านฐานข้อมูล (เซ็นเซอร์มีชนิดเดียว ไม่ต้องรู้ protocol) และล้าง `ota_error` ก่อนส่งคำสั่งเหมือนแอร์ และ `DELETE` เรียก `unprovisionDevice('occupancy', id)` ก่อนล้าง retained และลบบัญชี MQTT ตอบ `boardCleared` เหมือนแอร์
 
-### `routes/firmware.js` (185 บรรทัด, แก้ 14 ต.ค. 2569)
+### `routes/firmware.js` (185 บรรทัด)
 `firmwareRouter.use(authenticate, requireAdmin)` (ส่งสอง middleware ในการเรียกเดียว คลุมทุกเส้นในไฟล์ รวมเส้นอัปโหลดและลบที่เพิ่มใหม่)
 
-- `GET /` คืน `{configured, maxBytes, files}` `maxBytes` = `FIRMWARE_MAX_BYTES` ให้หน้าเว็บเตือนไฟล์ใหญ่เกินก่อนส่ง ฟังก์ชัน `listFirmwareFiles` อ่านโฟลเดอร์ `FIRMWARE_DIR` เอาเฉพาะ `.bin` ที่เป็นไฟล์ เรียงใหม่สุดก่อน แต่ละไฟล์มี `name`, `size`, `modifiedAt`, `kind` (`firmwareKindOf`) และ `version` (`firmwareVersionOf`, เพิ่ม 14 ต.ค.) ไม่ตั้งโฟลเดอร์หรือโฟลเดอร์ไม่มี คืนอาร์เรย์ว่าง
-- `POST /` (เพิ่ม 14 ต.ค. 2569) รับไฟล์ `.bin` จากหน้าเว็บแทนการ `scp` เข้าเซิร์ฟเวอร์ ใช้ `express.raw` เฉพาะเส้นนี้ (เพดาน `FIRMWARE_MAX_BYTES + 1024`) ตรวจชื่อ ชนิด เนื้อไฟล์ แล้วเขียนแบบไฟล์ชั่วคราว + `rename` (ดูเจาะโค้ดข้อ 8)
-- `DELETE /:fileName` (เพิ่ม 14 ต.ค. 2569) ตรวจชื่อด้วย `validateFirmwareFileName` แล้ว `fs.unlink` ไม่มีไฟล์ (`ENOENT`) ตอบ `{removed: false}` แบบไม่ error (ลบซ้ำได้) เขียนไม่ได้ (`EACCES`/`EROFS`) ตอบ 500 พร้อมข้อความไทย
+- `GET /` คืน `{configured, maxBytes, files}` `maxBytes` = `FIRMWARE_MAX_BYTES` ให้หน้าเว็บเตือนไฟล์ใหญ่เกินก่อนส่ง ฟังก์ชัน `listFirmwareFiles` อ่านโฟลเดอร์ `FIRMWARE_DIR` เอาเฉพาะ `.bin` ที่เป็นไฟล์ เรียงใหม่สุดก่อน แต่ละไฟล์มี `name`, `size`, `modifiedAt`, `kind` (`firmwareKindOf`) และ `version` (`firmwareVersionOf`) ไม่ตั้งโฟลเดอร์หรือโฟลเดอร์ไม่มี คืนอาร์เรย์ว่าง
+- `POST /` รับไฟล์ `.bin` จากหน้าเว็บแทนการ `scp` เข้าเซิร์ฟเวอร์ ใช้ `express.raw` เฉพาะเส้นนี้ (เพดาน `FIRMWARE_MAX_BYTES + 1024`) ตรวจชื่อ ชนิด เนื้อไฟล์ แล้วเขียนแบบไฟล์ชั่วคราว + `rename` (ดูเจาะโค้ดข้อ 8)
+- `DELETE /:fileName` ตรวจชื่อด้วย `validateFirmwareFileName` แล้ว `fs.unlink` ไม่มีไฟล์ (`ENOENT`) ตอบ `{removed: false}` แบบไม่ error (ลบซ้ำได้) เขียนไม่ได้ (`EACCES`/`EROFS`) ตอบ 500 พร้อมข้อความไทย
 - ฟังก์ชันภายใน `decodeHeader` (ถอด percent-encoding ของ `X-File-Name` ถอดไม่ได้คืน `''` ซึ่งจะไม่ผ่านการตรวจชื่อ) และ `fileExists`
 - `assertFirmwareFileExists` export ให้ route แอร์/เซ็นเซอร์ใช้ ตรวจว่าไฟล์มีและขนาด > 0 ไม่งั้น 404 ถ้าไม่ได้ตั้ง `FIRMWARE_DIR` จะข้ามการตรวจ (ตอนพัฒนา)
 
-### `routes/energy.js` (555 บรรทัด)
+### `routes/energy.js` (553 บรรทัด)
 อ่านอย่างเดียว (ทุก route ล็อกอินอย่างเดียว) เรียก util ใน `utils/energy-history.js` (บทตอนที่ 2) ที่ควรรู้: `/summary` ใช้ `Promise.all` ยิง 5 query พร้อมกัน (ยอดช่วงนี้, ช่วงก่อนหน้า, กราฟ, แยกห้อง, แยกเครื่อง) แทนรอทีละอัน ตัวกรองชั้นผ่าน `floorFilter()` ซึ่งสร้างข้อความ WHERE จากชิ้นส่วนคงที่และผูกค่า `?` เสมอ `/export` ตั้ง header `Content-Disposition` ด้วย `filename=` (ชื่อ ASCII) และ `filename*=UTF-8''...` (ชื่อไทยที่ encode แล้ว) เพราะ header HTTP รับได้เฉพาะ Latin ส่งไฟล์ด้วย `response.send(Buffer.from(workbook))` และบอกจำนวนแถวใน `X-Export-Rows` ข้อมูลผ่าน `/history`/`/export` สร้างด้วย SQL ซ้อนสองชั้น (ชั้นในรวมต่ออุปกรณ์ต่อชั่วโมง ชั้นนอกรวมตามระดับที่เลือก) เพื่อให้ค่าเฉลี่ยของหลายเครื่องถูกต้อง
 
 ### `routes/alerts.js` (100 บรรทัด)
@@ -1143,7 +1143,7 @@ endpoint เดียว ไม่ผ่าน `authenticate` เพราะห
 ## การทดสอบ
 
 ### วิธีทำงาน
-รัน `npm test` = `node --test` ตัวรันเทสต์ที่มากับ Node (ตั้งแต่ v18) จะหาไฟล์ `*.test.js` ใต้โฟลเดอร์โปรเจค (โฟลเดอร์ `test/` ทั้งหมดอยู่ในกลุ่มนี้) แล้วรันแต่ละไฟล์ในโปรเซสแยกกัน แต่ละกรณีเขียนด้วย `test('ชื่อ', () => {...})` และตรวจด้วย `assert` จาก `node:assert/strict` (`assert.equal`, `assert.deepEqual`, `assert.throws`, `assert.match`) ไม่ต้องติดตั้ง Jest/Mocha รวม 136 กรณีใน 21 ไฟล์ (นับ ณ 14 ต.ค. 2569; เดิม 126 กรณีใน 20 ไฟล์)
+รัน `npm test` = `node --test` ตัวรันเทสต์ที่มากับ Node (ตั้งแต่ v18) จะหาไฟล์ `*.test.js` ใต้โฟลเดอร์โปรเจค (โฟลเดอร์ `test/` ทั้งหมดอยู่ในกลุ่มนี้) แล้วรันแต่ละไฟล์ในโปรเซสแยกกัน แต่ละกรณีเขียนด้วย `test('ชื่อ', () => {...})` และตรวจด้วย `assert` จาก `node:assert/strict` (`assert.equal`, `assert.deepEqual`, `assert.throws`, `assert.match`) ไม่ต้องติดตั้ง Jest/Mocha รวม 136 กรณีใน 21 ไฟล์
 
 ### ทำไม util เป็น pure function
 ฟังก์ชันใน `utils/` ไม่เปิดฐานข้อมูล ไม่ยิงเครือข่าย ไม่อ่านเวลาปัจจุบันตรง ๆ (หลายตัวรับเวลาเป็นพารามิเตอร์) ข้อมูลเข้าเหมือนกัน ผลออกเหมือนกันเสมอ การทดสอบจึงแค่ `import` แล้วเรียก ไม่ต้องจัดฉาก (เปิด DB, MQTT) รันเป็นมิลลิวินาที และเขียนกรณีขอบ (ค่า null, ภาษาไทย 72 ไบต์, วันสิ้นปี) ได้ง่าย นอกจากนี้ `db.js` สร้าง pool แบบ lazy เพื่อไม่ให้การ import ไฟล์เหล่านี้ลากการเชื่อมต่อค้างจน `node --test` ไม่จบ เมื่อ logic อยู่ที่ util และ route เป็นเพียงตัวประกอบบาง ๆ ส่วนที่ต้องเทสต์ผ่าน HTTP จริงมีน้อย
@@ -1160,10 +1160,10 @@ endpoint เดียว ไม่ผ่าน `authenticate` เพราะห
 | `schedule.test.js` | 11 | `validateScheduleInput`, ตัวกรอง (วัน 0 = อาทิตย์ ไม่ถือว่าว่าง), **`requireAdmin`** (admin ผ่าน staff ถูก throw), `deleteAllSchedules` ด้วย DB ปลอม, `ensureImportedRooms` (สร้างห้องเมื่อยืนยันเท่านั้น), วันที่เวลาไทย, ภาคเรียน |
 | `schedule-import.test.js` | 9 | แปลงไฟล์ Excel (เซลล์รวม) / CSV เป็นคาบเรียน, ข้ามห้องที่ยังไม่เพิ่ม, ตรวจคาบซ้อน, ป้ายชื่อวิชา, `pickSemester` |
 | `room-booking.test.js` | 5 | การจองครั้งเดียว รายวัน รายสัปดาห์, input ผิด, ห้องที่จองถือว่าใช้งานแม้นอกภาคเรียน |
-| `air-conditioner.test.js` | 10 | การจอง ESP32, ห้อง/หมายเลข/ชื่อ BLE ผิด, โปรโตคอล IRac และ Saijo Denki, คำสั่ง MQTT, ช่วงค่าที่รับได้ + (เพิ่ม 11 ต.ค. 2569) จองด้วย `daikin_wired` ได้ `DAIKIN_WIRED`, คำสั่งสายแอร์ (ปฏิเสธ auto/heat/turbo/swing กลาง, ตัดฟังก์ชันเสริม, sleep ปิดใน dry, Daikin IR ไม่กระทบ), `controlTypeOf`/`controlType`, `protocolFromStatus` |
+| `air-conditioner.test.js` | 10 | การจอง ESP32, ห้อง/หมายเลข/ชื่อ BLE ผิด, โปรโตคอล IRac และ Saijo Denki, คำสั่ง MQTT, ช่วงค่าที่รับได้ + จองด้วย `daikin_wired` ได้ `DAIKIN_WIRED`, คำสั่งสายแอร์ (ปฏิเสธ auto/heat/turbo/swing กลาง, ตัดฟังก์ชันเสริม, sleep ปิดใน dry, Daikin IR ไม่กระทบ), `controlTypeOf`/`controlType`, `protocolFromStatus` |
 | `occupancy-sensor.test.js` | 5 | ตัวตนเซ็นเซอร์ LD2410, การเก็บสถานะ occupied, JSON สาธารณะ |
-| `firmware.test.js` | 7 | ชื่อไฟล์ `.bin` ที่ปลอดภัย (ปฏิเสธ `../`, `/`, `.exe`, ช่องว่าง, `..`), URL ใช้โฮสต์ MQTT (ปฏิเสธ `evil.com/x`), เดาชนิดบอร์ด + (เพิ่ม 14 ต.ค. 2569) แยกไฟล์ `wired` ออกจาก `air`, `assertFirmwareKind` ห้ามไฟล์ผิดชนิด, อ่านรุ่นจากชื่อและเทียบรุ่น (`2.5.10` > `2.5.9`), `validateFirmwareImage` (ไบต์ `0xE9`, ใหญ่เกิน, ไฟล์ว่าง) |
-| `unprovision.test.js` | 2 | (เพิ่ม 13 ต.ค. 2569) payload คำสั่ง `unprovision` มี `deviceId` ของบอร์ดเป้าหมาย; นับเป็นคำตอบเฉพาะ `unprovisioned === true` และ `deviceId` ตรง |
+| `firmware.test.js` | 7 | ชื่อไฟล์ `.bin` ที่ปลอดภัย (ปฏิเสธ `../`, `/`, `.exe`, ช่องว่าง, `..`), URL ใช้โฮสต์ MQTT (ปฏิเสธ `evil.com/x`), เดาชนิดบอร์ด + แยกไฟล์ `wired` ออกจาก `air`, `assertFirmwareKind` ห้ามไฟล์ผิดชนิด, อ่านรุ่นจากชื่อและเทียบรุ่น (`2.5.10` > `2.5.9`), `validateFirmwareImage` (ไบต์ `0xE9`, ใหญ่เกิน, ไฟล์ว่าง) |
+| `unprovision.test.js` | 2 | payload คำสั่ง `unprovision` มี `deviceId` ของบอร์ดเป้าหมาย; นับเป็นคำตอบเฉพาะ `unprovisioned === true` และ `deviceId` ตรง |
 | `auto-off.test.js` | 15 | ตรรกะปิดแอร์อัตโนมัติ: เริ่มนับ 5 นาที (ในคาบนานกว่า), ไม่มี/เสียเซ็นเซอร์ไม่ปิด, ยกเลิกเมื่อมีคน, ยิงซ้ำทุก 20 วินาที, ยอมแพ้แล้วแจ้งเตือน |
 | `energy-history.test.js` | 17 | ถังรายชั่วโมงเวลาไทย, ผลต่างมิเตอร์, ช่วงเงียบนานไม่นับเวลา, SQL ผูกพารามิเตอร์, หัวตาราง Excel, ช่วงเวลาและเทียบช่วงก่อนหน้า |
 | `offline-history.test.js` | 4 | แปลงข้อมูลย้อนหลังที่บอร์ดเก็บตอนออฟไลน์ และลงถัง |
@@ -1235,19 +1235,19 @@ endpoint เดียว ไม่ผ่าน `authenticate` เพราะห
 
 > [!ASK]
 > **ถาม:** รันเทสต์อย่างไร และเทสต์อะไรไปแล้วบ้าง?
-> **ตอบ:** `npm test` ใช้ตัวรันเทสต์ของ Node (`node --test`) รวม 136 กรณีใน 21 ไฟล์ (ณ 14 ต.ค. 2569) ส่วนใหญ่เป็นเทสต์ของฟังก์ชัน pure ใน `utils/` ที่เรียกได้ตรง ๆ และมีเทสต์แบบ integration หนึ่งไฟล์ (`profile-email.test.js`) ที่เปิดเซิร์ฟเวอร์จริงแต่แทน DB ด้วยของปลอม จุดที่ยังไม่มีเทสต์ตรงคือ flow login และ OTP ผ่าน HTTP
+> **ตอบ:** `npm test` ใช้ตัวรันเทสต์ของ Node (`node --test`) รวม 136 กรณีใน 21 ไฟล์ ส่วนใหญ่เป็นเทสต์ของฟังก์ชัน pure ใน `utils/` ที่เรียกได้ตรง ๆ และมีเทสต์แบบ integration หนึ่งไฟล์ (`profile-email.test.js`) ที่เปิดเซิร์ฟเวอร์จริงแต่แทน DB ด้วยของปลอม จุดที่ยังไม่มีเทสต์ตรงคือ flow login และ OTP ผ่าน HTTP
 
 > [!ASK]
 > **ถาม:** ให้แอดมินอัปโหลดไฟล์ขึ้นเซิร์ฟเวอร์ผ่านเว็บ ไม่อันตรายเหรอ ตรวจอะไรบ้าง?
-> **ตอบ:** ตรวจห้าชั้นครับ (เพิ่ม 14 ต.ค. 2569) หนึ่ง เส้นนี้อยู่ใต้ `authenticate` + `requireAdmin` ทั้ง router สอง ชื่อไฟล์ต้องผ่าน regex `^[A-Za-z0-9][A-Za-z0-9._-]{0,118}\.bin$` และห้าม `..` จึงเขียนนอกโฟลเดอร์ `FIRMWARE_DIR` ไม่ได้ สาม ชนิดจากชื่อต้องตรงแท็บที่อัปโหลด สี่ เนื้อไฟล์ต้องขึ้นต้นด้วยไบต์ `0xE9` ของโปรแกรม ESP32 และไม่เกิน `0x1F0000` ไบต์ ห้า ไม่เขียนทับไฟล์เดิมถ้าไม่ยืนยัน `?replace=1` และเขียนผ่านไฟล์ชั่วคราวแล้ว rename ไฟล์ที่อัปโหลดไม่ถูกรันบนเซิร์ฟเวอร์ แค่ถูกเสิร์ฟให้บอร์ดดาวน์โหลด
+> **ตอบ:** ตรวจห้าชั้นครับ หนึ่ง เส้นนี้อยู่ใต้ `authenticate` + `requireAdmin` ทั้ง router สอง ชื่อไฟล์ต้องผ่าน regex `^[A-Za-z0-9][A-Za-z0-9._-]{0,118}\.bin$` และห้าม `..` จึงเขียนนอกโฟลเดอร์ `FIRMWARE_DIR` ไม่ได้ สาม ชนิดจากชื่อต้องตรงแท็บที่อัปโหลด สี่ เนื้อไฟล์ต้องขึ้นต้นด้วยไบต์ `0xE9` ของโปรแกรม ESP32 และไม่เกิน `0x1F0000` ไบต์ ห้า ไม่เขียนทับไฟล์เดิมถ้าไม่ยืนยัน `?replace=1` และเขียนผ่านไฟล์ชั่วคราวแล้ว rename ไฟล์ที่อัปโหลดไม่ถูกรันบนเซิร์ฟเวอร์ แค่ถูกเสิร์ฟให้บอร์ดดาวน์โหลด
 
 > [!ASK]
 > **ถาม:** ลบอุปกรณ์ในแอปแล้ว ข้อมูลในตัวบอร์ดหายด้วยไหม?
-> **ตอบ:** ตั้งแต่ 13 ต.ค. 2569 หายครับถ้าบอร์ดออนไลน์ Backend ส่งคำสั่ง `unprovision` ให้บอร์ดล้าง Wi-Fi, MQTT, ห้อง และสถานะแอร์ใน NVS แล้วรีบูตเข้าโหมดตั้งค่าบลูทูธ Backend รอคำตอบ 4 วินาทีแล้วตอบแอปว่า `boardCleared` เป็น true หรือ false ถ้าออฟไลน์ ต้องไปล้างที่ตัวบอร์ดเอง แต่บอร์ดก็ใช้บัญชี MQTT เดิมต่อไม่ได้แล้ว เพราะบัญชีถูกลบ
+> **ตอบ:** หายครับถ้าบอร์ดออนไลน์ Backend ส่งคำสั่ง `unprovision` ให้บอร์ดล้าง Wi-Fi, MQTT, ห้อง และสถานะแอร์ใน NVS แล้วรีบูตเข้าโหมดตั้งค่าบลูทูธ Backend รอคำตอบ 4 วินาทีแล้วตอบแอปว่า `boardCleared` เป็น true หรือ false ถ้าออฟไลน์ ต้องไปล้างที่ตัวบอร์ดเอง แต่บอร์ดก็ใช้บัญชี MQTT เดิมต่อไม่ได้แล้ว เพราะบัญชีถูกลบ
 
 > [!ASK]
 > **ถาม:** API ของแอร์มีฟิลด์ `controlType` มาทำไม ในเมื่อมี `protocol` อยู่แล้ว?
-> **ตอบ:** (เพิ่ม 11 ต.ค. 2569) `controlType` สรุปให้แอปและเว็บเหลือแค่สองค่า `"wired"` (บอร์ดต่อสายแทนรีโมตติดผนัง Daikin, `protocol = DAIKIN_WIRED`) กับ `"ir"` (ยิงรีโมต ทุกโปรโตคอลที่เหลือ) คำนวณใน `publicAirConditioner` ด้วย `controlTypeOf(row.protocol)` ไม่ได้เก็บเป็นคอลัมน์ จึงไม่มีทางขัดกับ `protocol` หน้าจอใช้ค่านี้ซ่อนปุ่มที่รีโมตติดผนังไม่มี (Eco, Turbo, Quiet, Clean, สวิงแนวนอน) โดยไม่ต้องรู้รายชื่อโปรโตคอลทั้งหมด ถ้าวันหนึ่งมีบอร์ดสายแอร์ยี่ห้ออื่น แก้ที่ Backend จุดเดียว ส่วนการตรวจจริงยังอยู่ที่ `validateAirState(body, protocol)` ตอนรับคำสั่ง ถ้าแอปส่งค่าที่ใช้ไม่ได้มาก็ถูกปฏิเสธหรือปิดให้
+> **ตอบ:** `controlType` สรุปให้แอปและเว็บเหลือแค่สองค่า `"wired"` (บอร์ดต่อสายแทนรีโมตติดผนัง Daikin, `protocol = DAIKIN_WIRED`) กับ `"ir"` (ยิงรีโมต ทุกโปรโตคอลที่เหลือ) คำนวณใน `publicAirConditioner` ด้วย `controlTypeOf(row.protocol)` ไม่ได้เก็บเป็นคอลัมน์ จึงไม่มีทางขัดกับ `protocol` หน้าจอใช้ค่านี้ซ่อนปุ่มที่รีโมตติดผนังไม่มี (Eco, Turbo, Quiet, Clean, สวิงแนวนอน) โดยไม่ต้องรู้รายชื่อโปรโตคอลทั้งหมด ถ้าวันหนึ่งมีบอร์ดสายแอร์ยี่ห้ออื่น แก้ที่ Backend จุดเดียว ส่วนการตรวจจริงยังอยู่ที่ `validateAirState(body, protocol)` ตอนรับคำสั่ง ถ้าแอปส่งค่าที่ใช้ไม่ได้มาก็ถูกปฏิเสธหรือปิดให้
 
 ## สรุปและเช็กลิสต์ความเข้าใจ
 
@@ -1269,5 +1269,5 @@ endpoint เดียว ไม่ผ่าน `authenticate` เพราะห
 - [ ] อธิบายว่าทำไมการนำเข้าตารางเรียนทำใน transaction เดียว และทำไม `/terms` ต้องประกาศก่อน `/:id`
 - [ ] อธิบายว่า `node --test` ทำงานอย่างไร, ทำไม `profile-email.test.js` ใช้ `await import` และแทน `pool.query`, และ util pure ช่วยการทดสอบอย่างไร
 - [ ] บอกข้อจำกัดที่ตรวจพบ: JSON เสียรูปแบบ/CORS ถูกปฏิเสธ ตอบ 500, ตัวนับ rate limit อยู่ใน RAM, ไม่มีเทสต์ตรงของ login/OTP, `package.json` description เก่า
-- [ ] อธิบายการอัปโหลดเฟิร์มแวร์ `POST /api/firmware`: `express.raw`, `X-File-Name`, `?kind`, `?replace=1`, ไบต์ `0xE9`, เพดาน `0x1F0000`, ไฟล์ `.part` + rename (เพิ่ม 14 ต.ค. 2569)
-- [ ] เล่าลำดับการลบอุปกรณ์ 4 ขั้น (ลบแถว → unprovision รอ ≤ 4 วินาที → ล้าง retained → ลบบัญชี MQTT) และความหมายของ `boardCleared` (เพิ่ม 13 ต.ค. 2569)
+- [ ] อธิบายการอัปโหลดเฟิร์มแวร์ `POST /api/firmware`: `express.raw`, `X-File-Name`, `?kind`, `?replace=1`, ไบต์ `0xE9`, เพดาน `0x1F0000`, ไฟล์ `.part` + rename
+- [ ] เล่าลำดับการลบอุปกรณ์ 4 ขั้น (ลบแถว → unprovision รอ ≤ 4 วินาที → ล้าง retained → ลบบัญชี MQTT) และความหมายของ `boardCleared`

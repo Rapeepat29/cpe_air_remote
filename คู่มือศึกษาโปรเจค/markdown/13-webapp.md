@@ -2,7 +2,7 @@
 
 ## ภาพรวม
 
-เว็บแอปคือหน้าจอ "ฝั่งคอมพิวเตอร์" ของระบบ RMUTT Save Energy อยู่ในโฟลเดอร์ `webapp/` ใช้ฐานข้อมูลและ API ชุดเดียวกับแอป Flutter บนมือถือทุกอย่าง (ผู้ใช้ชุดเดียวกัน รหัสผ่านชุดเดียวกัน) ต่างกันที่จอกว้างกว่า จึงออกแบบให้ "ดูข้อมูลละเอียดและทำงานกรอกข้อมูลเร็วกว่า" เช่น หน้าข้อมูลไฟฟ้าที่วางตารางสิบกว่าคอลัมน์ นำเข้าตารางเรียนจาก Excel จองการใช้ห้อง จัดการห้องและอุปกรณ์ และ (เพิ่ม 14 ต.ค. 2569) อัปโหลดไฟล์เฟิร์มแวร์แล้วสั่งอัปเดตบอร์ดหลายตัวพร้อมกันจากหน้า "เฟิร์มแวร์"
+เว็บแอปคือหน้าจอ "ฝั่งคอมพิวเตอร์" ของระบบ RMUTT Save Energy อยู่ในโฟลเดอร์ `webapp/` ใช้ฐานข้อมูลและ API ชุดเดียวกับแอป Flutter บนมือถือทุกอย่าง (ผู้ใช้ชุดเดียวกัน รหัสผ่านชุดเดียวกัน) ต่างกันที่จอกว้างกว่า จึงออกแบบให้ "ดูข้อมูลละเอียดและทำงานกรอกข้อมูลเร็วกว่า" เช่น หน้าข้อมูลไฟฟ้าที่วางตารางสิบกว่าคอลัมน์ นำเข้าตารางเรียนจาก Excel จองการใช้ห้อง จัดการห้องและอุปกรณ์ และ อัปโหลดไฟล์เฟิร์มแวร์แล้วสั่งอัปเดตบอร์ดหลายตัวพร้อมกันจากหน้า "เฟิร์มแวร์"
 
 ในภาพรวมของระบบ เว็บแอปคุยกับ **Backend อย่างเดียว** ผ่าน HTTP ที่ path `/api/*` มันไม่ได้ต่อ MQTT เองและไม่ได้แตะฐานข้อมูลตรง ๆ เมื่อผู้ใช้กดสั่งแอร์ เว็บส่ง `POST /api/air-conditioners/<deviceId>/command` ให้ Backend แล้ว Backend เป็นคนส่งต่อเข้า MQTT ไปหา ESP32 เอง
 
@@ -39,7 +39,7 @@ Caddy เป็นตัวเดียวที่อยู่หน้าส�
 
 **SPA (Single Page Application)** — โหลด `index.html` ครั้งเดียว แล้วใช้ JavaScript สลับเนื้อหาในหน้าเดิมเมื่อผู้ใช้กดเมนู ไม่โหลดหน้าใหม่ทั้งหน้า ข้อดีคือสลับหน้าเร็วและเก็บสถานะ (เช่น ข้อมูลที่ดึงมาแล้ว) ไว้ได้ ข้อเสียคือต้องจัดการเส้นทางเอง (ในเว็บนี้ใช้ `#/rooms` ใน URL ดูหัวข้อ app.js)
 
-**ทำไมไม่ใช้ framework (React/Vue)** — ข้อดีของมันคือจัดการ "วาดหน้าใหม่เมื่อข้อมูลเปลี่ยน" ให้ แต่ต้องแลกกับขั้นตอน build (Node, npm, bundler) เว็บนี้มี 10 หน้า (หน้าที่ 10 "เฟิร์มแวร์" เพิ่ม 14 ต.ค. 2569) ผู้ดูแลต่อไปเป็นนักศึกษารุ่นน้อง และเซิร์ฟเวอร์แค่คัดลอกไฟล์ขึ้นไปก็จบ จึงเลือกไม่มี build ราคาที่ต้องจ่ายคือ เขียนโค้ดวาด DOM เอง (ดูหัวข้อ dom.js) เปิดไฟล์ด้วยดับเบิลคลิก (`file://`) ไม่ได้ และไม่มีตัวช่วยตรวจ type
+**ทำไมไม่ใช้ framework (React/Vue)** — ข้อดีของมันคือจัดการ "วาดหน้าใหม่เมื่อข้อมูลเปลี่ยน" ให้ แต่ต้องแลกกับขั้นตอน build (Node, npm, bundler) เว็บนี้มี 10 หน้า ผู้ดูแลต่อไปเป็นนักศึกษารุ่นน้อง และเซิร์ฟเวอร์แค่คัดลอกไฟล์ขึ้นไปก็จบ จึงเลือกไม่มี build ราคาที่ต้องจ่ายคือ เขียนโค้ดวาด DOM เอง (ดูหัวข้อ dom.js) เปิดไฟล์ด้วยดับเบิลคลิก (`file://`) ไม่ได้ และไม่มีตัวช่วยตรวจ type
 
 **CSP (Content-Security-Policy)** — HTTP header ที่เซิร์ฟเวอร์ส่งไปบอกเบราว์เซอร์ว่า "หน้านี้อนุญาตให้โหลด/รันอะไรจากไหนบ้าง" ของเราตั้งที่ Caddy: `script-src 'self'` = รันได้เฉพาะสคริปต์ที่เป็นไฟล์จากโดเมนเดียวกัน **สคริปต์ที่เขียนฝังในหน้า HTML (`<script>...</script>`) และ handler แบบ `onclick="..."` ถูกบล็อกหมด** จึงไม่มี JavaScript ฝังใน `index.html` เลย (นี่คือเหตุผลที่ `main.js` และ `status.js` ต้องเป็นไฟล์แยก)
 
@@ -84,7 +84,7 @@ webapp/
         ├── dom.js            ตัวช่วยสร้าง DOM
         ├── status.js         สคริปต์ของ status.html
         └── views/            overview, rooms, energy, schedule (+ schedule-import, term-calendar, booking-form),
-                              alerts, rates, devices, firmware (เพิ่ม 14 ต.ค. 2569), users, settings
+                              alerts, rates, devices, firmware, users, settings
 ```
 
 > [!NOTE]
@@ -115,7 +115,7 @@ index.html
                   │                   + schedule-import.js, term-calendar.js, booking-form.js
                   ├─ alerts.js      ► dom, format, store, overview.js (ใช้ alertRow ซ้ำ)
                   ├─ rates.js, devices.js, users.js, settings.js  ► api, dom, format, icons, store, ui
-                  ├─ firmware.js    ► api, dom, format, icons-ui, store, ui   (เพิ่ม 14 ต.ค. 2569)
+                  ├─ firmware.js    ► api, dom, format, icons-ui, store, ui
                   └─ settings.js    ► + prefs.js, theme.js
 charts.js ► dom.js, format.js
 ```
@@ -186,7 +186,7 @@ charts.js ► dom.js, format.js
 | ห้อง | `rooms` GET `/rooms`; `createRoom` POST; `updateRoom` PUT `/rooms/:roomNumber`; `deleteRoom` DELETE |
 | แอร์ | `airConditioners` GET `/air-conditioners`; `sendCommand` POST `/air-conditioners/:id/command`; `enterSetupMode` POST `.../setup-mode`; `updateAirConditioner` PATCH; `deleteAirConditioner` DELETE; `reserveAirConditioner` POST `/air-conditioners/reservations`; `otaAirConditioner` POST `.../ota` |
 | เซ็นเซอร์คน | `occupancySensors` GET `/occupancy-sensors`; `reserveOccupancySensor` POST `/occupancy-sensors/reservations`; `occupancySetupMode`; `deleteOccupancySensor`; `otaOccupancySensor` |
-| เฟิร์มแวร์ | `firmwareFiles` GET `/firmware` (ได้ `configured`, `maxBytes`, `files[]` ที่แต่ละไฟล์มี `name` `kind` `version` `size` `modifiedAt`); **เพิ่ม 14 ต.ค. 2569:** `uploadFirmware(file, fileName, kind, replace)` POST `/firmware` (ไฟล์ดิบ + header `X-File-Name`, query `?kind=` และ `?replace=1`); `deleteFirmware(fileName)` DELETE `/firmware/:fileName` |
+| เฟิร์มแวร์ | `firmwareFiles` GET `/firmware` (ได้ `configured`, `maxBytes`, `files[]` ที่แต่ละไฟล์มี `name` `kind` `version` `size` `modifiedAt`); `uploadFirmware(file, fileName, kind, replace)` POST `/firmware` (ไฟล์ดิบ + header `X-File-Name`, query `?kind=` และ `?replace=1`); `deleteFirmware(fileName)` DELETE `/firmware/:fileName` |
 | พลังงาน | `energyMetrics` GET `/energy/metrics`; `energyLive` `/energy/live`; `energySources` `/energy/sources`; `energySummary` `/energy/summary`; `energyHistory` `/energy/history`; `exportEnergy` GET `/energy/export` (ดึงเป็น blob) |
 | แจ้งเตือน | `alerts` GET `/alerts`; `acknowledgeAlert` POST `/alerts/:id/acknowledge` |
 | ตารางเรียน | `schedules`/`schedulesWithInfo` GET `/schedules`; `academicTerms` GET `/schedules/terms`; `saveAcademicTerm` PUT / `deleteAcademicTerm` DELETE `/schedules/terms`; `createSchedule` POST; `updateSchedule` PUT; `deleteSchedule` DELETE; `deleteAllSchedules` DELETE `/schedules`; `previewScheduleImport` POST `/schedules/import/preview`; `commitScheduleImport` POST `/schedules/import/commit` |
@@ -197,7 +197,7 @@ charts.js ► dom.js, format.js
 ทุก path ที่มีค่าจากผู้ใช้ผ่าน `encodeURIComponent(...)` (กัน `/` หรือ `?` ในรหัสห้อง/ชื่อผู้ใช้ทำให้ URL เพี้ยน)
 
 > [!NOTE]
-> **แก้ 14 ต.ค. 2569:** `api.js` เพิ่มขึ้น 16 บรรทัด แต่เป็น method ใหม่แค่ **2 ตัว** (`uploadFirmware`, `deleteFirmware`) ที่เหลือคือคอมเมนต์และการจัดบรรทัด `uploadFirmware` ใช้ช่อง `upload` ของ `request()` แบบเดียวกับ `previewScheduleImport` (ส่งไฟล์ดิบ ไม่ห่อ JSON) อธิบายทีละบรรทัดในหัวข้อเจาะโค้ดข้อ 10
+> `uploadFirmware` ใช้ช่อง `upload` ของ `request()` แบบเดียวกับ `previewScheduleImport` (ส่งไฟล์ดิบ ไม่ห่อ JSON) อธิบายทีละบรรทัดในหัวข้อเจาะโค้ดข้อ 10
 
 ### `store.js`
 
@@ -214,7 +214,7 @@ charts.js ► dom.js, format.js
 - กติกาหน่วยพลังงาน: ถ้าค่าอ้างอิงใหญ่สุดของชุด < 1 ใช้ **Wh**; ≥ 1000 ใช้ **MWh**; นอกนั้น **kWh** และจำนวนทศนิยมตามขนาด (≥100 → 0 หลัก, ≥10 → 1, ≥1 → 2, น้อยกว่านั้น 3) `0` พอดีเขียน `0 kWh`
 - เวลา: `clock(seconds)` → `mm:ss`, `duration(minutes)`, `time(value)` → `HH:mm`, `relativeTime` ("5 นาทีที่แล้ว")
 - วันที่ไทย (พ.ศ. = ค.ศ. + 543): `thaiFullDate`, `thaiShortDate` (`25 ส.ค. 69`), `thaiDate` (`25 ส.ค. 2569` อ่าน `YYYY-MM-DD` เป็นวันท้องถิ่น กัน `new Date('2026-08-25')` ที่ตีเป็น UTC แล้วเลื่อนวัน), `isoDate`, `shiftDays`
-- **ยี่ห้อและวิธีควบคุมแอร์ (เพิ่ม 11 ต.ค. 2569)**: `WIRED_PROTOCOL` = `'DAIKIN_WIRED'` (บอร์ดสายแอร์ที่ต่อแทนรีโมตติดผนัง Daikin), `isWiredProtocol(protocol)`, ตาราง `BRAND_BY_PROTOCOL` (19 โปรโตคอล → ชื่อยี่ห้อ เช่น `HAIER_AC160` → Haier), `airBrand(protocol)`, `controlTypeLabel(protocol)` ("สายแอร์" / "รีโมต IR"), `airControlSummary(protocol)` ("Daikin · สายแอร์" หรือ "Haier · รีโมต IR (HAIER_AC160)") ใช้ใน `rooms.js` `devices.js` และ `firmware.js` เพื่อให้ผู้ใช้เห็น "ยี่ห้อ" แทนชื่อโปรโตคอลดิบ
+- **ยี่ห้อและวิธีควบคุมแอร์**: `WIRED_PROTOCOL` = `'DAIKIN_WIRED'` (บอร์ดสายแอร์ที่ต่อแทนรีโมตติดผนัง Daikin), `isWiredProtocol(protocol)`, ตาราง `BRAND_BY_PROTOCOL` (19 โปรโตคอล → ชื่อยี่ห้อ เช่น `HAIER_AC160` → Haier), `airBrand(protocol)`, `controlTypeLabel(protocol)` ("สายแอร์" / "รีโมต IR"), `airControlSummary(protocol)` ("Daikin · สายแอร์" หรือ "Haier · รีโมต IR (HAIER_AC160)") ใช้ใน `rooms.js` `devices.js` และ `firmware.js` เพื่อให้ผู้ใช้เห็น "ยี่ห้อ" แทนชื่อโปรโตคอลดิบ
 - ชื่อ/ป้าย: `floorLabel` (ชั้น ≤ 0 → "ห้องพิเศษ"), `describeAlert(alert)` แปลงรหัส `kind` (`outside_schedule_occupied`, `auto_off_succeeded`, `auto_off_failed`) และรหัส `detail` (`noClassNow`, `noScheduleAtAll`, `outsideTerm`, `attempts=N`) เป็นข้อความไทย, ค่าคงที่ `ALERT_STATUS_LABEL`, `MODE_LABEL`, `FAN_LABEL`, `SWING_LABEL`, `DAY_NAMES`
 
 ### `thai-date-input.js`
@@ -245,7 +245,7 @@ charts.js ► dom.js, format.js
 
 ### `icons.js` และ `icons-ui.js`
 
-ฟังก์ชันที่คืนสตริง SVG (`stroke(path, size, width)` สร้างกรอบ `<svg ... stroke="currentColor">`) `icons.js` มี `bolt grid building calendar coin chart bell chip users gear warning pulseLine board clock close menu refresh save download meter person logout plus trash edit check wifi radar` และ `firmware` (ชิปกับลูกศรขึ้น ไอคอนเมนูเฟิร์มแวร์ เพิ่ม 14 ต.ค. 2569) ส่วน `icons-ui.js` (`uiIcons`) มี `sun moon search more textSize upload sheet checkCircle alert` ใช้ `stroke="currentColor"` ไอคอนจึงเปลี่ยนสีตามสีตัวหนังสือ (ธีมเปลี่ยนแล้วไอคอนตามเอง) เขียนเองเพื่อไม่ต้องพึ่ง CDN ไอคอน และแยกไฟล์ที่สองเพราะเรื่องแคชเหมือน `theme.js`
+ฟังก์ชันที่คืนสตริง SVG (`stroke(path, size, width)` สร้างกรอบ `<svg ... stroke="currentColor">`) `icons.js` มี `bolt grid building calendar coin chart bell chip users gear warning pulseLine board clock close menu refresh save download meter person logout plus trash edit check wifi radar` และ `firmware` (ชิปกับลูกศรขึ้น ไอคอนเมนูเฟิร์มแวร์) ส่วน `icons-ui.js` (`uiIcons`) มี `sun moon search more textSize upload sheet checkCircle alert` ใช้ `stroke="currentColor"` ไอคอนจึงเปลี่ยนสีตามสีตัวหนังสือ (ธีมเปลี่ยนแล้วไอคอนตามเอง) เขียนเองเพื่อไม่ต้องพึ่ง CDN ไอคอน และแยกไฟล์ที่สองเพราะเรื่องแคชเหมือน `theme.js`
 
 ### `ui.js`
 
@@ -266,18 +266,18 @@ charts.js ► dom.js, format.js
 
 ### `app.js`
 
-ตัวประกอบร่าง (533 บรรทัด หลังเพิ่มหน้าเฟิร์มแวร์ 14 ต.ค. 2569) มีตารางหน้า `VIEWS`, ลิ้นชักรีโมต, เมนู, แถบบน
+ตัวประกอบร่าง (533 บรรทัด) มีตารางหน้า `VIEWS`, ลิ้นชักรีโมต, เมนู, แถบบน
 
 | ส่วน | ฟังก์ชัน | ทำอะไร |
 |---|---|---|
-| ตารางหน้า | `VIEWS`, `BOTTOM_NAV` (`overview rooms energy alerts`), `NAV_LABELS`, `SHORT_LABELS` | รายชื่อ 10 หน้าแบ่งกลุ่ม `main` (6 หน้า) กับ `system` (4 หน้า: devices firmware users settings; `firmware` เพิ่ม 14 ต.ค. 2569) |
+| ตารางหน้า | `VIEWS`, `BOTTOM_NAV` (`overview rooms energy alerts`), `NAV_LABELS`, `SHORT_LABELS` | รายชื่อ 10 หน้าแบ่งกลุ่ม `main` (6 หน้า) กับ `system` (4 หน้า: devices firmware users settings) |
 | เริ่ม/จบ | `startApp`, `enterApp`, `teardownSession`, `logout`, `showLogin` | ล็อกอิน/ออก เก็บกวาด state |
 | เมนู | `renderNav`, `renderBottomNav`, `renderNavBadges`, `highlightNav`, `renderUserChip`, `renderTopbar` | แถบข้างเดสก์ท็อป แถบล่างมือถือ ป้ายตัวเลขแจ้งเตือน (99+) ป้ายสถานะ MQTT และ "x / y ESP32 ออนไลน์" |
 | สลับหน้า | `readHash`, `navigate` | อ่าน `#/ชื่อหน้า` เรียก `destroy` หน้าเก่า `mount` หน้าใหม่ |
 | ลิ้นชัก | `context.openRoom/refreshDrawer/logout`, `closeDrawer`, `renderDrawer` | รีโมตของห้อง ใช้ร่วมกันทุกหน้า |
 | อื่น ๆ | `startClock` | แสดงวันที่ไทยบนแถบบน อัปเดตทุก 60 วินาที |
 
-**การเพิ่มหน้าเฟิร์มแวร์ (แก้ 14 ต.ค. 2569)** ใช้แค่ 3 บรรทัดใน `app.js`: `import firmware from './views/firmware.js';` (บรรทัด 40), แถวใน `VIEWS` และป้ายใน `NAV_LABELS` (บรรทัด 78 `firmware: 'เฟิร์มแวร์'`)
+**การเพิ่มหน้าเฟิร์มแวร์** ใช้แค่ 3 บรรทัดใน `app.js`: `import firmware from './views/firmware.js';` (บรรทัด 40), แถวใน `VIEWS` และป้ายใน `NAV_LABELS` (บรรทัด 78 `firmware: 'เฟิร์มแวร์'`)
 
 **ไฟล์ `webapp/assets/js/app.js` บรรทัด 44–55**
 
@@ -300,7 +300,7 @@ const VIEWS = [
 |---|---|
 | 44 | `VIEWS` คือรายการหน้าทั้งหมดตามลำดับที่แสดงในเมนู |
 | 45–50 | กลุ่ม `main` 6 หน้า วาดใน `<nav id="navMain">` |
-| 51–54 | กลุ่ม `system` วาดใน `<nav id="navSystem">` ตอนนี้มี 4 หน้า หน้าเฟิร์มแวร์อยู่ถัดจาก "ห้องและอุปกรณ์" เพราะเป็นงานดูแลบอร์ดเหมือนกัน |
+| 51–54 | กลุ่ม `system` วาดใน `<nav id="navSystem">` มี 4 หน้า หน้าเฟิร์มแวร์อยู่ถัดจาก "ห้องและอุปกรณ์" เพราะเป็นงานดูแลบอร์ดเหมือนกัน |
 | 52 | `icon: 'firmware'` ชี้ไปที่ `icons.firmware` (เพิ่มใน `icons.js` บรรทัด 63) ส่วน `module: firmware` คือออบเจ็กต์ที่ `firmware.js` export default |
 
 หน้าเฟิร์มแวร์ไม่อยู่ใน `BOTTOM_NAV` (แถบล่างมือถือ) เพราะใช้ไม่บ่อย บนมือถือเข้าได้จากปุ่ม "เมนู" ช่องสุดท้าย และเมนูนี้มองเห็นเฉพาะแอดมิน เพราะ `firmware.js` ประกาศ `adminOnly: true` (`renderNav` ข้ามหน้าที่ `adminOnly` ถ้าผู้ใช้ไม่ใช่แอดมิน และ `navigate` เด้งกลับ `#/overview`)
@@ -350,15 +350,15 @@ export default {
 - **การ์ดห้อง** (`roomCard`): ชื่อห้อง ประเภท ชิป "แอร์เปิด x/y" ชิปสถานะคน ("มีคนอยู่" / "ไม่มีคน" / "เซ็นเซอร์ออฟไลน์" / "ยังไม่ติดตั้งเซ็นเซอร์") กำลังนับถอยหลังปิดอัตโนมัติ (`countdownStrip`) หรือค่าไฟของช่วงที่เลือก และสถานะบอร์ดออนไลน์ ห้องที่ยังไม่มีแอร์วาดแบบย่อ
 - **ตัวกรอง** (ออบเจ็กต์ `view` ระดับโมดูล จึงจำข้ามการสลับหน้า): แท็บชั้น (ค่าเริ่มต้น "ทุกชั้น"), ช่องค้นหา (รหัสห้อง/ประเภท), ชิป "เฉพาะห้องที่แอร์ทำงาน" ช่องค้นหาสร้างครั้งเดียวใน `mount`
 - **นาฬิกานับถอยหลัง**: เซิร์ฟเวอร์ส่ง `autoOffDeadlineAt` (เวลาเส้นตาย) เบราว์เซอร์นับเองทุก 1 วินาทีด้วย `setInterval(tick, 1000)` ในฟังก์ชัน `countdownStrip` บรรทัด 400–445 (ตัว `tick` อยู่ที่ 420–440) เมื่อเลยเส้นตายแสดง "กำลังส่งคำสั่งปิด" และ `autoOffAttempts` การเคลียร์ interval ซับซ้อนเพราะแถบถูกวาดใหม่บ่อย (ตรวจ `strip.isConnected`)
-- **ลิ้นชักรีโมต** (`roomDrawerContent`): การ์ดข้อมูลห้อง + การ์ดแอร์ทีละเครื่อง (`acCard`) ปรับ **ร่างคำสั่ง** (`drafts` Map เก็บแยกจากสถานะจริง) ได้แก่ สวิตช์เปิด/ปิด (ส่งคำสั่งทันที) อุณหภูมิ ± ภายในขอบเขตตามรุ่น (`limitsFor`: `SAIJO_DENKI` 18–29°C โหมด cool/dry/fan และไม่มี swing `off`; `DAIKIN_WIRED` 16–30°C โหมด cool/dry/fan พัดลมไม่มี turbo ทิศลมแค่ auto/off ฟังก์ชันเสริมมีแค่ Sleep (เพิ่ม 11 ต.ค. 2569); รุ่นอื่น 16–30°C), โหมด, พัดลม, ทิศลม, ฟังก์ชันเสริม 7 อย่าง (eco turbo sleep quiet displayLight clean horizontalSwing) กด "ส่งคำสั่งผ่าน MQTT" → `sendCommand()` → `api.sendCommand(deviceId, payload)` ซึ่ง Backend จะส่งต่อเข้า MQTT; "คืนค่าเดิม" ทิ้งร่าง
-- **ปุ่มตามความสามารถของเครื่อง (เพิ่ม 11 ต.ค. 2569)**: `limitsFor` คืน `fans` และ `extras(mode)` เพิ่มจากเดิม การ์ดแอร์จึงวาดเฉพาะปุ่มพัดลม/ฟังก์ชันเสริมที่เครื่องนั้นมี และบอร์ดสายแอร์เรียก `fitDraft` ปรับร่างให้อยู่ในขอบเขตก่อนวาดและทุกครั้งที่เปลี่ยนโหมด หัวการ์ดแสดง "รหัส · ยี่ห้อ" (บอร์ด IR ต่อท้ายชื่อโปรโตคอลในวงเล็บ) และมีชิปใหม่ "ยี่ห้อ · สายแอร์" (สี `info`) หรือ "ยี่ห้อ · รีโมต IR" (สี `off`) อธิบายทีละบรรทัดในหัวข้อเจาะโค้ดข้อ 11
+- **ลิ้นชักรีโมต** (`roomDrawerContent`): การ์ดข้อมูลห้อง + การ์ดแอร์ทีละเครื่อง (`acCard`) ปรับ **ร่างคำสั่ง** (`drafts` Map เก็บแยกจากสถานะจริง) ได้แก่ สวิตช์เปิด/ปิด (ส่งคำสั่งทันที) อุณหภูมิ ± ภายในขอบเขตตามรุ่น (`limitsFor`: `SAIJO_DENKI` 18–29°C โหมด cool/dry/fan และไม่มี swing `off`; `DAIKIN_WIRED` 16–30°C โหมด cool/dry/fan พัดลมไม่มี turbo ทิศลมแค่ auto/off ฟังก์ชันเสริมมีแค่ Sleep; รุ่นอื่น 16–30°C), โหมด, พัดลม, ทิศลม, ฟังก์ชันเสริม 7 อย่าง (eco turbo sleep quiet displayLight clean horizontalSwing) กด "ส่งคำสั่งผ่าน MQTT" → `sendCommand()` → `api.sendCommand(deviceId, payload)` ซึ่ง Backend จะส่งต่อเข้า MQTT; "คืนค่าเดิม" ทิ้งร่าง
+- **ปุ่มตามความสามารถของเครื่อง**: `limitsFor` คืน `fans` และ `extras(mode)` เพิ่มจากเดิม การ์ดแอร์จึงวาดเฉพาะปุ่มพัดลม/ฟังก์ชันเสริมที่เครื่องนั้นมี และบอร์ดสายแอร์เรียก `fitDraft` ปรับร่างให้อยู่ในขอบเขตก่อนวาดและทุกครั้งที่เปลี่ยนโหมด หัวการ์ดแสดง "รหัส · ยี่ห้อ" (บอร์ด IR ต่อท้ายชื่อโปรโตคอลในวงเล็บ) และมีชิปใหม่ "ยี่ห้อ · สายแอร์" (สี `info`) หรือ "ยี่ห้อ · รีโมต IR" (สี `off`) อธิบายทีละบรรทัดในหัวข้อเจาะโค้ดข้อ 11
 - ค่าที่อ่านจาก PZEM (แรงดัน กระแส กำลังไฟ พลังงานสะสม ตัวประกอบกำลัง ความถี่) จาก `liveReading(deviceId)` และคำเตือนถ้า `pzemAvailable` เป็น false (ระบบปิดอัตโนมัติจะไม่ทำงานกับเครื่องนั้น เพราะยืนยันไม่ได้ว่าปิดสำเร็จ)
 - **เฉพาะแอดมิน** (เงื่อนไข `isAdmin` ใน `acCard`): สวิตช์ "ปิดอัตโนมัติเครื่องนี้" (`api.updateAirConditioner(..., { autoOffEnabled })`), "เปลี่ยนชื่อ", "สั่งเข้าโหมดตั้งค่า" (`api.enterSetupMode` บอร์ดจะหลุด Wi-Fi และเปิด Bluetooth รอตั้งค่าใหม่ ต้องมี `confirmAction` ก่อน)
 - IR (รีโมตอินฟราเรด) ไม่มีสัญญาณตอบกลับ หลังส่งคำสั่ง toast บอกให้ดูค่ากำลังไฟว่าเปลี่ยนไหม และตั้ง `setTimeout 2500ms` ดึง `airConditioners` + `live` ใหม่ ถ้าคำสั่งล้มเหลว ร่างจะถูกรีเซ็ตกลับเป็นสถานะจริง ("ไม่งั้นหน้าจอจะโกหก")
 
 
 > [!NOTE]
-> **อัปเดต 9 ต.ค. 2569:** ฟังก์ชัน `draftFor(unit)` ใน `webapp/assets/js/views/rooms.js` (บรรทัด 451–462 หลังโค้ดสายแอร์ 11 ต.ค. ดันลงมา 40 บรรทัด) สร้างร่างคำสั่งของแอร์แต่ละเครื่อง เดิมคัดลอก `unit.state` ตรง ๆ ซึ่ง `state.power` คือคำสั่งล่าสุดที่ระบบส่ง ถ้ามีคนเปิดแอร์ด้วยรีโมตจริง ค่านี้ยังเป็น `false` สวิตช์บนเว็บจึงขึ้นว่าปิด ตอนนี้ตั้ง `power` เป็นจริงด้วยถ้า `unit.pzemAvailable === true && unit.acRunning === true` (กติกาเดียวกับ `isPoweredOn` ในแอป Flutter)
+> ฟังก์ชัน `draftFor(unit)` ใน `webapp/assets/js/views/rooms.js` (บรรทัด 451–462) สร้างร่างคำสั่งของแอร์แต่ละเครื่อง ไม่คัดลอก `unit.state` ตรง ๆ เพราะ `state.power` คือคำสั่งล่าสุดที่ระบบส่ง ถ้ามีคนเปิดแอร์ด้วยรีโมตจริง ค่านี้ยังเป็น `false` สวิตช์บนเว็บจะขึ้นว่าปิด จึงตั้ง `power` เป็นจริงด้วยถ้า `unit.pzemAvailable === true && unit.acRunning === true` (กติกาเดียวกับ `isPoweredOn` ในแอป Flutter)
 
 ```js:451
 function draftFor(unit) {
@@ -419,12 +419,12 @@ function draftFor(unit) {
 ### `views/devices.js` — ห้องและอุปกรณ์ (**แอดมินเท่านั้น**: `adminOnly: true`)
 
 3 แท็บ (`tab` ตัวแปรระดับโมดูล): **ห้อง** (เพิ่ม/แก้/ลบ `api.createRoom/updateRoom/deleteRoom` — รหัสห้องแก้ไม่ได้เพราะผูกกับแอร์และตารางเรียน, รหัสต้องเป็น A–Z 0–9 _ - ยาว 2–20), **เครื่องปรับอากาศ** และ **เซ็นเซอร์ตรวจจับคน**
-- **จองช่องติดตั้ง** (`reserveAir`, `reserveOccupancy`): สิ่งที่เว็บทำแทนมือถือไม่ได้คือขั้นตอน Bluetooth (ต้องยืนใกล้บอร์ด) เว็บจึงทำได้แค่ "จองช่อง" = สร้างแถวในฐานข้อมูลพร้อมโทเคนอายุ **15 นาที ใช้ได้ครั้งเดียว** (`showReservation` แสดงโทเคน ชื่อ Bluetooth host/port/topic ของ MQTT) แล้วคนถือโทรศัพท์ไปตั้งค่าบอร์ดผ่านแอปมือถือต่อ รหัสอุปกรณ์ต้องขึ้นต้น `ESP32-` (แอร์) หรือ `OCC32-` (เซ็นเซอร์) ตามด้วยเลขฐานสิบหก 12 ตัว ชื่อ Bluetooth คำนวณให้เอง (`RMUTT-AC-<เลขฐานสิบหก 12 ตัว>` / `RMUTT-OCC-<…>` ได้จาก `deviceId.slice(6)` คือตัดคำนำหน้า `ESP32-`/`OCC32-` ออก) กันพิมพ์ผิดแล้ว Backend ปฏิเสธ และมีรายการ `PROTOCOLS` 19 ตัว (`WIRED_PROTOCOL` = `DAIKIN_WIRED` เป็นตัวแรก ตามด้วยโปรโตคอล IR 18 แบบ DAIKIN, LG, SAIJO_DENKI ...) ค่าเริ่มต้น `SAIJO_DENKI` (**แก้ 11 ต.ค. 2569:** ช่องเลือกเปลี่ยนชื่อจาก "โปรโตคอลรีโมต" เป็น "ยี่ห้อแอร์ / วิธีควบคุม" และแต่ละตัวเลือกแสดงเป็น "Daikin · สายแอร์ (บอร์ดแทนรีโมตติดผนัง)" หรือ "<ยี่ห้อ> · รีโมต IR (<โปรโตคอล>)" ค่าที่ส่งไป Backend ยังเป็นชื่อโปรโตคอลเดิม)
-- **อัปเดตเฟิร์มแวร์ผ่าน Wi-Fi ทีละเครื่อง** (`startOta`): ดึงรายการ `.bin` ในโฟลเดอร์ `/opt/rmutt/firmware` บนเซิร์ฟเวอร์ (`api.firmwareFiles`) กรองเฉพาะ `file.kind` ที่ตรงกับชนิดบอร์ดให้เลือก (**แก้ 14 ต.ค. 2569:** ปุ่มของแอร์ส่ง `kind` เป็น `'wired'` ถ้า `isWiredProtocol(unit.protocol)` ไม่งั้น `'air'` เพราะไฟล์บอร์ดสายแอร์ใช้กับบอร์ด IR ไม่ได้ และถ้าไม่มีไฟล์ ข้อความเปลี่ยนจาก "ให้วางไฟล์ .bin ไว้ที่ /opt/rmutt/firmware ก่อน" เป็น "อัปโหลดไฟล์ .bin ได้ที่เมนู "เฟิร์มแวร์"" ไม่ต้อง scp เข้าเซิร์ฟเวอร์เองแล้ว) แล้ว `api.otaAirConditioner` / `otaOccupancySensor` บอร์ดดาวน์โหลดเอง รีบูต รายงานรุ่นใหม่กลับมา (`firmwareLine` แสดงรุ่น ข้อผิดพลาด OTA และจำนวนข้อมูลค้างส่ง `historyPending`)
+- **จองช่องติดตั้ง** (`reserveAir`, `reserveOccupancy`): สิ่งที่เว็บทำแทนมือถือไม่ได้คือขั้นตอน Bluetooth (ต้องยืนใกล้บอร์ด) เว็บจึงทำได้แค่ "จองช่อง" = สร้างแถวในฐานข้อมูลพร้อมโทเคนอายุ **15 นาที ใช้ได้ครั้งเดียว** (`showReservation` แสดงโทเคน ชื่อ Bluetooth host/port/topic ของ MQTT) แล้วคนถือโทรศัพท์ไปตั้งค่าบอร์ดผ่านแอปมือถือต่อ รหัสอุปกรณ์ต้องขึ้นต้น `ESP32-` (แอร์) หรือ `OCC32-` (เซ็นเซอร์) ตามด้วยเลขฐานสิบหก 12 ตัว ชื่อ Bluetooth คำนวณให้เอง (`RMUTT-AC-<เลขฐานสิบหก 12 ตัว>` / `RMUTT-OCC-<…>` ได้จาก `deviceId.slice(6)` คือตัดคำนำหน้า `ESP32-`/`OCC32-` ออก) กันพิมพ์ผิดแล้ว Backend ปฏิเสธ และมีรายการ `PROTOCOLS` 19 ตัว (`WIRED_PROTOCOL` = `DAIKIN_WIRED` เป็นตัวแรก ตามด้วยโปรโตคอล IR 18 แบบ DAIKIN, LG, SAIJO_DENKI ...) ค่าเริ่มต้น `SAIJO_DENKI` ช่องเลือกชื่อ "ยี่ห้อแอร์ / วิธีควบคุม" แต่ละตัวเลือกแสดงเป็น "Daikin · สายแอร์ (บอร์ดแทนรีโมตติดผนัง)" หรือ "<ยี่ห้อ> · รีโมต IR (<โปรโตคอล>)" ส่วนค่าที่ส่งไป Backend เป็นชื่อโปรโตคอล
+- **อัปเดตเฟิร์มแวร์ผ่าน Wi-Fi ทีละเครื่อง** (`startOta`): ดึงรายการ `.bin` ในโฟลเดอร์ `/opt/rmutt/firmware` บนเซิร์ฟเวอร์ (`api.firmwareFiles`) กรองเฉพาะ `file.kind` ที่ตรงกับชนิดบอร์ดให้เลือก (ปุ่มของแอร์ใช้ `kind` เป็น `'wired'` ถ้า `isWiredProtocol(unit.protocol)` ไม่งั้น `'air'` เพราะไฟล์บอร์ดสายแอร์ใช้กับบอร์ด IR ไม่ได้ ถ้าไม่มีไฟล์จะบอกให้อัปโหลดไฟล์ .bin ที่เมนู "เฟิร์มแวร์") แล้ว `api.otaAirConditioner` / `otaOccupancySensor` บอร์ดดาวน์โหลดเอง รีบูต รายงานรุ่นใหม่กลับมา (`firmwareLine` แสดงรุ่น ข้อผิดพลาด OTA และจำนวนข้อมูลค้างส่ง `historyPending`)
 - ถอดอุปกรณ์ (`removeAir` → ล้างข้อความ retained บน MQTT ตามจำนวน `retainedTopicsCleared`), สั่งเข้าโหมดตั้งค่า, สวิตช์ปิดอัตโนมัติรายเครื่อง, เปลี่ยนชื่อ
-- **บรรทัดย่อยของแอร์แต่ละเครื่อง (แก้ 11 ต.ค. 2569)**: `airRow` แสดง `airControlSummary(unit.protocol)` แทนชื่อโปรโตคอลดิบ เช่น `ESP32-… · Daikin · สายแอร์ · active · ออนไลน์ · …`
+- **บรรทัดย่อยของแอร์แต่ละเครื่อง**: `airRow` แสดง `airControlSummary(unit.protocol)` แทนชื่อโปรโตคอลดิบ เช่น `ESP32-… · Daikin · สายแอร์ · active · ออนไลน์ · …`
 
-**ไฟล์ `webapp/assets/js/views/devices.js` บรรทัด 494–507** (ช่องเลือกยี่ห้อตอนจองช่องติดตั้งแอร์ แก้ 11 ต.ค. 2569)
+**ไฟล์ `webapp/assets/js/views/devices.js` บรรทัด 494–507** (ช่องเลือกยี่ห้อตอนจองช่องติดตั้งแอร์)
 
 ```js:494
       {
@@ -453,9 +453,9 @@ function draftFor(unit) {
 > แยก "สิ่งที่คนอ่าน" (`label`) ออกจาก "สิ่งที่เครื่องอ่าน" (`value`) ทำให้เปลี่ยนคำบนหน้าจอได้โดยไม่กระทบฐานข้อมูลหรือ Backend เจ้าหน้าที่ที่ติดตั้งรู้แค่ว่าแอร์ห้องนี้ "Daikin ต่อสาย" ไม่จำเป็นต้องรู้ว่าโปรโตคอลชื่อ `DAIKIN_WIRED`
 
 
-### `views/firmware.js` — เฟิร์มแวร์ (**แอดมินเท่านั้น**, เพิ่ม 14 ต.ค. 2569)
+### `views/firmware.js` — เฟิร์มแวร์ (**แอดมินเท่านั้น**)
 
-หน้าใหม่ 718 บรรทัด (commit `2432faf`) ทำงานแทนการ "scp ไฟล์ `.bin` เข้าเซิร์ฟเวอร์แล้วกดอัปเดตทีละเครื่องในหน้าห้องและอุปกรณ์" ทั้งหมดอยู่ในหน้าเดียว: ดูไฟล์ที่มี อัปโหลดรุ่นใหม่ ดูว่าบอร์ดไหนยังเก่า เลือกหลายตัวแล้วสั่งอัปเดต และเฝ้าดูจนบอร์ดรายงานรุ่นใหม่
+หน้า 725 บรรทัด รวมงานเฟิร์มแวร์ทั้งหมดไว้ในหน้าเดียว ไม่ต้อง scp ไฟล์เข้าเซิร์ฟเวอร์: ดูไฟล์ที่มี อัปโหลดรุ่นใหม่ ดูว่าบอร์ดไหนยังเก่า เลือกหลายตัวแล้วสั่งอัปเดต และเฝ้าดูจนบอร์ดรายงานรุ่นใหม่
 
 - **3 แท็บตามชนิดบอร์ด** (ค่าคงที่ `KINDS`): `air` "แอร์ IR" (สเก็ตช์ `rmutt_esp32_air`), `wired` "สายแอร์ Daikin" (`rmutt_esp32_air_wired`), `occupancy` "เซ็นเซอร์ LD2410" (`rmutt_esp32_occupancy`) แยกแท็บเพราะไฟล์ใช้ข้ามชนิดไม่ได้ ถ้าสั่งไฟล์ผิดชนิด บอร์ดจะรีบูตเข้าโปรแกรมของบอร์ดอีกแบบ
 - **ชนิดและรุ่นอ่านจากชื่อไฟล์**: มี `occ` = เซ็นเซอร์, มี `wired` หรือ `slm8` = สายแอร์, นอกนั้น = แอร์ IR รุ่นคือท้ายชื่อ เช่น `rmutt_esp32_air_wired-2.5.2-slm8.bin` → `2.5.2-slm8` (กติกาเดียวกับ `firmwareKindOf`/`firmwareVersionOf` ใน `backend/src/utils/firmware.js`)
@@ -506,7 +506,7 @@ function draftFor(unit) {
 | 1 tokens | `tokens.css` (275) | **ตัวแปรล้วน** ไม่มีกฎของ element ใด | `--accent`, `--panel`, `--fs-base`, `--radius-md` |
 | 2 base | `base.css` (573) | reset, `body`, โครงหน้า (`.app` `.sidebar` `.topbar` `.view`), แถบเมนูล่าง, การย่อจอ | `.sidebar { width: var(--sidebar-w) }` |
 | 3 components | `components.css` (1302) | ชิ้นส่วนใช้ซ้ำ ไม่ผูกกับหน้า | `.card` `.btn` `.pill` `.switch` `table.data` `.drawer` `.modal` `.toast` `.skeleton` |
-| 4 views | `views.css` (2897 หลังเพิ่มสไตล์หน้าเฟิร์มแวร์ 243 บรรทัด 14 ต.ค. 2569) | เฉพาะหน้า | `.hero-row` `.pulse-cell` `.room-card` `.sched-card` `.import-modal` |
+| 4 views | `views.css` (2897) | เฉพาะหน้า | `.hero-row` `.pulse-cell` `.room-card` `.sched-card` `.import-modal` |
 
 กฎเหล็ก: **ไม่เขียนสีหรือ px ของตัวอักษรตรง ๆ ในชั้น 2–4** ต้องอ่านจาก token (`var(--text-mid)`, `var(--fs-sm)`) ผลที่ได้คือเปลี่ยนธีม/ขนาดตัวอักษรที่ที่เดียวแล้วทุกที่เปลี่ยนตาม
 
@@ -534,12 +534,12 @@ function draftFor(unit) {
 | `min-width: 1500px` | `base.css` | เพิ่ม padding ซ้าย-ขวา เนื้อหากว้างสุด `--content-max: 1680px` (บรรทัดยาวเกินอ่านยาก) |
 | `max-width: 1100px` | `views.css` | `.hero-row` จาก 2 คอลัมน์ `1.5fr 1fr` เป็นคอลัมน์เดียว |
 | `max-width: 620px` | หลายไฟล์ | `.drawer` เต็มจอ, `.room-grid` 2 คอลัมน์ (≤380px คอลัมน์เดียว), modal กลายเป็น bottom sheet เลื่อนขึ้นจากล่าง (`align-items: flex-end`, `animation: sheet-in`) |
-| `max-width: 620px` (`.fw-table`) | `views.css` | ตารางบอร์ดของหน้าเฟิร์มแวร์กลายเป็นการ์ด (เพิ่ม 14 ต.ค. 2569 ดูหัวข้อถัดไป) |
-| `prefers-reduced-motion` | `components.css`, `views.css` | ปิดแอนิเมชัน `.skeleton` (แถบโครงกระดูกตอนโหลด) และจุดกะพริบ `.pulse-live::after` ทำ `.spinner` หมุนช้าลง และ (เพิ่ม 14 ต.ค. 2569) หยุดหมุน `.fw-spinner` ของหน้าเฟิร์มแวร์ |
+| `max-width: 620px` (`.fw-table`) | `views.css` | ตารางบอร์ดของหน้าเฟิร์มแวร์กลายเป็นการ์ด (ดูหัวข้อถัดไป) |
+| `prefers-reduced-motion` | `components.css`, `views.css` | ปิดแอนิเมชัน `.skeleton` (แถบโครงกระดูกตอนโหลด) และจุดกะพริบ `.pulse-live::after` ทำ `.spinner` หมุนช้าลง และ หยุดหมุน `.fw-spinner` ของหน้าเฟิร์มแวร์ |
 
 `env(safe-area-inset-bottom)` เว้นพื้นที่ให้แถบ home indicator ของ iPhone, `100dvh` (dynamic viewport height) แก้ปัญหา `100vh` ที่ไม่นับแถบ URL ของมือถือที่ยืด/หดได้
 
-### หน้าเฟิร์มแวร์ใน `views.css` (เพิ่ม 14 ต.ค. 2569)
+### หน้าเฟิร์มแวร์ใน `views.css`
 
 สไตล์ใหม่ 243 บรรทัดต่อท้าย `views.css` (บรรทัด 2656–2897) ขึ้นต้นด้วย `fw-` ทั้งหมด (ย่อจาก firmware) กันชื่อชนกับหน้าอื่น แนวคิดหลัก
 
@@ -649,7 +649,7 @@ function draftFor(unit) {
 > ตารางบอร์ดมี 5 คอลัมน์ บนมือถือถ้าใช้ตารางจริงต้องเลื่อนข้าง (`.table-wrap` ทำได้) แต่คนที่ยืนหน้าตู้ไฟจะเห็นแค่ครึ่งแถวและกดปุ่มอัปเดตยาก การเปลี่ยน "แถว" เป็น "การ์ด" ด้วย CSS ล้วนทำให้ HTML ชุดเดียวใช้ได้ทั้งสองจอ ไม่ต้องให้ JavaScript รู้ขนาดจอแล้ววาดสองแบบ และยังคง `<table>` ไว้ซึ่งโปรแกรมอ่านหน้าจอเข้าใจโครงสร้างบนเดสก์ท็อป ข้อแลกคือใช้ selector `table.data.fw-table td` ที่เจาะจงสูงเพื่อชนะสไตล์ตารางกลาง และต้องใช้ `!important` หนึ่งจุด
 
 > [!WARN]
-> commit นี้ไม่ได้เปลี่ยนเลข `?v=` ใน `index.html` (`views.css?v=4.2`, `main.js?v=4.4` เท่าเดิม) และเพิ่ม export ใหม่ลงไฟล์เดิม (`icons.firmware` ใน `icons.js`, `api.uploadFirmware` ใน `api.js`, และ 11 ต.ค. `WIRED_PROTOCOL`/`airBrand`/… ใน `format.js`) ซึ่งสวนกับหลักการข้อ 10 ของบทนี้ ภายใน 1 ชั่วโมงหลัง deploy เบราว์เซอร์ที่ถือไฟล์เก่าในแคชอาจได้ไฟล์ใหม่ปนเก่า เช่น `app.js` ใหม่เรียก `icons[view.icon](16)` กับ `icons.js` เก่าที่ไม่มี `firmware` ทำให้วาดเมนูพัง หรือ `rooms.js` ใหม่ import `airBrand` จาก `format.js` เก่าไม่เจอแล้วทั้งเว็บโหลดไม่ขึ้น ทางแก้หน้างานคือ Ctrl+F5 ครั้งเดียว ถ้าจะกันจริงควรขยับ `?v=` และแยก export ใหม่ไว้ในไฟล์ใหม่ตามหลักการเดิม
+> สไตล์หน้าเฟิร์มแวร์อยู่ใน `views.css?v=4.2` ซึ่งแคชได้ 1 ชั่วโมง ถ้าแก้ CSS แล้วไม่ขยับเลข `?v=` ใน `index.html` เบราว์เซอร์ที่ถือไฟล์เก่าจะยังเห็นหน้าตาเดิมจนกว่าแคชหมดหรือกด Ctrl+F5 ส่วนไฟล์ JS ไม่มีปัญหานี้เพราะ Caddy ตั้ง `no-cache` ให้ `/assets/js/*` และควรยังยึดหลักการข้อ 10 (export ใหม่ใส่ไฟล์ใหม่) เพราะ `icons.firmware` ใน `icons.js`, `api.uploadFirmware` ใน `api.js` และ `WIRED_PROTOCOL`/`airBrand` ใน `format.js` เป็น export ที่เพิ่มลงไฟล์เดิม ผู้ที่เปิดหน้าค้างไว้ก่อน deploy ยังถือโมดูลเก่าในหน่วยความจำจนกว่าจะรีเฟรช
 
 ## เจาะโค้ดทีละบรรทัด
 
@@ -1106,7 +1106,7 @@ document.addEventListener('visibilitychange', () => {
 
 | บรรทัด | ความหมาย |
 |---|---|
-| 254–271 | ตารางงาน: แต่ละงานมีชื่อ ช่วงเวลา (`every` ms จาก `POLL`) และฟังก์ชันที่รัน (`live`/`rooms`/`airConditioners`/`occupancySensors` ทุก 10 วิ, `alerts` 30 วิ, `summary` และ `health` 120 วิ) งาน `occupancySensors` เพิ่ม 15 ต.ค. 2569 ให้หน้าเฟิร์มแวร์เห็นรุ่นและผล OTA ของเซ็นเซอร์โดยไม่ต้องกด F5 |
+| 254–271 | ตารางงาน: แต่ละงานมีชื่อ ช่วงเวลา (`every` ms จาก `POLL`) และฟังก์ชันที่รัน (`live`/`rooms`/`airConditioners`/`occupancySensors` ทุก 10 วิ, `alerts` 30 วิ, `summary` และ `health` 120 วิ) งาน `occupancySensors` ทำให้หน้าเฟิร์มแวร์เห็นรุ่นและผล OTA ของเซ็นเซอร์โดยไม่ต้องกด F5 |
 | 273 | `lastRun` เก็บเวลาที่รันงานนั้นครั้งล่าสุด |
 | 277–278 | `tick(force)`: ถ้ารอบก่อนยังไม่จบ (`running`) ข้าม กันคำขอซ้อนกันเมื่อเซิร์ฟเวอร์ช้า |
 | 281 | `document.hidden` = แท็บถูกซ่อน/ย่อ ไม่ถามเซิร์ฟเวอร์ ประหยัดแบตและโควตาเน็ต |
@@ -1395,7 +1395,7 @@ export function heatColor(value, max) {
 
 นี่คือเหตุผลที่ธีมและขนาดตัวอักษรเปลี่ยนได้ทันทีทั้งเว็บ: ฝั่ง JS เปลี่ยนแค่ "แอตทริบิวต์เดียว" ที่ `<html>` แล้ว CSS cascade จัดการที่เหลือ
 
-### 10) `views/firmware.js`: หน้าเฟิร์มแวร์ (เพิ่ม 14 ต.ค. 2569)
+### 10) `views/firmware.js`: หน้าเฟิร์มแวร์
 
 หน้านี้เป็นหน้าเดียวในเว็บที่ "สั่งงานแล้วต้องรอผลหลายนาที" (บอร์ดดาวน์โหลดไฟล์ รีบูต แล้วรายงานรุ่นใหม่) จึงมีสถานะของตัวเองมากกว่าหน้าอื่น อ่านตามลำดับนี้: สถานะระดับโมดูล → อ่านชื่อไฟล์ → ตัดสินสถานะบอร์ด → ติดตามผล → วาดหน้า → อัปโหลด → สั่งอัปเดต
 
@@ -1468,7 +1468,7 @@ function compareVersions(a, b) {
 |---|---|
 | 95 | `/occ/i.test(name)` regex หา `occ` ที่ไหนก็ได้ในชื่อ (`i` = ไม่สนตัวพิมพ์เล็กใหญ่) เช็กก่อนเพราะเป็นเงื่อนไขที่ชัดที่สุด |
 | 96 | `wired` หรือ `slm8` (ชื่อโปรโตคอลสายแอร์ Daikin) = บอร์ดสายแอร์ |
-| 97 | นอกนั้นถือเป็นแอร์ IR (ชื่อไฟล์ `rmutt_esp32_air-…` เดิม ไม่ต้องเปลี่ยน) |
+| 97 | นอกนั้นถือเป็นแอร์ IR (ชื่อไฟล์ `rmutt_esp32_air-…`) |
 | 101–103 | regex จับ "ขีด + ตัวเลข.ตัวเลข(.ตัวเลข) + ส่วนท้ายแบบ `-slm8` ได้หลายท่อน" ที่อยู่ก่อน `.bin` ตรงท้ายชื่อ (`$`) `match[1]` คือส่วนในวงเล็บแรก |
 | 104 | ไม่ตรงรูปแบบคืน `null` (เช่น `rmutt_esp32_air.ino.bin` ที่ Arduino IDE ตั้งให้) |
 | 109–112 | `parts` ดึงเลข 3 ส่วนหน้าเป็นตัวเลขจริง ส่วนที่สามไม่มีถือเป็น `'0'` (`2.5` = `2.5.0`) |
@@ -1549,14 +1549,14 @@ function settlePending() {
 | 179 | `for (const [deviceId, job] of pending)` วนคู่ key/value ของ `Map` (การลบ key ระหว่างวน `Map` ทำได้ ไม่ข้ามตัว) |
 | 181–182 | บอร์ดหายจากรายการ (ถูกถอดระหว่างรอ) → ทิ้งงาน |
 | 183–185 | รุ่นที่บอร์ดรายงาน **เท่ากับ** รุ่นเป้าหมาย → สำเร็จ toast สีเขียว |
-| 186–188 | มี `otaError` และไม่ใช่ `previousError` → บอร์ดรายงานว่าล้มเหลว แสดงข้อความจากบอร์ด (ตั้งแต่ 15 ต.ค. 2569 `previousError` เป็น `null` เสมอ จึงเท่ากับ "มี `otaError` ใด ๆ") |
-| 189–196 | ครบ 5 นาที → ถ้ามี `otaError` แสดงข้อความนั้น ถ้าไม่มี แสดง "ยังไม่รายงานรุ่น … (รุ่นตอนนี้ x.y.z)" บอกรุ่นที่บอร์ดรายงานอยู่ ช่วยแยกได้ว่าบอร์ดไม่ได้อัปเดตเลย หรืออัปเดตแล้วแต่รายงานรุ่นไม่ตรงชื่อไฟล์ (เพิ่ม 15 ต.ค. 2569) |
+| 186–188 | มี `otaError` และไม่ใช่ `previousError` → บอร์ดรายงานว่าล้มเหลว แสดงข้อความจากบอร์ด (`previousError` เป็น `null` เสมอ จึงเท่ากับ "มี `otaError` ใด ๆ") |
+| 189–196 | ครบ 5 นาที → ถ้ามี `otaError` แสดงข้อความนั้น ถ้าไม่มี แสดง "ยังไม่รายงานรุ่น … (รุ่นตอนนี้ x.y.z)" บอกรุ่นที่บอร์ดรายงานอยู่ ช่วยแยกได้ว่าบอร์ดไม่ได้อัปเดตเลย หรืออัปเดตแล้วแต่รายงานรุ่นไม่ตรงชื่อไฟล์ |
 
 > [!WHY]
-> ทำไมไม่รอผลจาก `await api.otaAirConditioner(...)` ตรง ๆ? เพราะ Backend ตอบทันทีที่ส่งคำสั่งเข้า MQTT สำเร็จ ส่วนการดาวน์โหลดและรีบูตเกิดในบอร์ดหลังจากนั้น ความจริงเรื่องผลมีที่เดียวคือข้อมูลที่บอร์ดรายงานกลับ (`firmwareVersion`, `otaError`) ซึ่งมากับ polling อยู่แล้ว หน้านี้จึงไม่ต้องตั้ง `setInterval` ของตัวเอง แค่เรียก `settlePending()` ใน `render` ที่ถูกเรียกทุกครั้งที่ store เปลี่ยน เรื่อง error ของรอบก่อน: เดิมหน้าเว็บจำ `otaError` ก่อนสั่งไว้เป็น `previousError` แล้วถือว่าล้มเหลวเมื่อข้อความ **เปลี่ยน** แต่ถ้ารอบใหม่ล้มด้วยสาเหตุเดิม (ข้อความเหมือนเดิม เช่นดาวน์โหลดไม่ได้) หน้าเว็บจะไม่รู้และรอจนครบ 5 นาที ตั้งแต่ 15 ต.ค. 2569 Backend จึงล้าง `ota_error` เป็น `NULL` ตอนส่งคำสั่ง OTA และหน้าเว็บตั้ง `previousError: null` (บรรทัด 598) error ใด ๆ ที่ตามมาจึงเป็นของรอบนี้ **ข้อสังเกต:** เฟิร์มแวร์ไม่ได้ล้าง `lastOtaError` ตอนรับคำสั่งใหม่ ถ้า `/status` รอบ 10 วินาทีที่ยังมี error เก่ามาถึงหลัง Backend ล้างค่าแต่ก่อนบอร์ดเริ่มดาวน์โหลด ค่าเก่าจะถูกเขียนกลับ ช่วงเวลานี้สั้นมาก (บอร์ดเริ่ม OTA ใน `loop()` รอบถัดไปและตัด MQTT ระหว่างดาวน์โหลด) จึงเกิดได้ยาก
+> ทำไมไม่รอผลจาก `await api.otaAirConditioner(...)` ตรง ๆ? เพราะ Backend ตอบทันทีที่ส่งคำสั่งเข้า MQTT สำเร็จ ส่วนการดาวน์โหลดและรีบูตเกิดในบอร์ดหลังจากนั้น ความจริงเรื่องผลมีที่เดียวคือข้อมูลที่บอร์ดรายงานกลับ (`firmwareVersion`, `otaError`) ซึ่งมากับ polling อยู่แล้ว หน้านี้จึงไม่ต้องตั้ง `setInterval` ของตัวเอง แค่เรียก `settlePending()` ใน `render` ที่ถูกเรียกทุกครั้งที่ store เปลี่ยน เรื่อง error ของรอบก่อน: Backend ล้าง `ota_error` เป็น `NULL` ตอนส่งคำสั่ง OTA และหน้าเว็บตั้ง `previousError: null` (บรรทัด 598) error ใด ๆ ที่ตามมาจึงเป็นของรอบนี้ ถ้าแทนที่จะล้าง หน้าเว็บจำ error ก่อนสั่งไว้แล้วถือว่าล้มเหลวเมื่อข้อความ **เปลี่ยน** รอบที่ล้มด้วยสาเหตุเดิม (ข้อความเหมือนเดิม เช่นดาวน์โหลดไม่ได้) จะไม่ถูกจับและต้องรอจนครบ 5 นาที **ข้อสังเกต:** เฟิร์มแวร์ไม่ได้ล้าง `lastOtaError` ตอนรับคำสั่งใหม่ ถ้า `/status` รอบ 10 วินาทีที่ยังมี error เก่ามาถึงหลัง Backend ล้างค่าแต่ก่อนบอร์ดเริ่มดาวน์โหลด ค่าเก่าจะถูกเขียนกลับ ช่วงเวลานี้สั้นมาก (บอร์ดเริ่ม OTA ใน `loop()` รอบถัดไปและตัด MQTT ระหว่างดาวน์โหลด) จึงเกิดได้ยาก
 
 > [!WARN]
-> ความถี่ในการตรวจขึ้นกับ polling ของ `store.js` ซึ่งดึงทั้ง `airConditioners` และ `occupancySensors` ทุก 10 วินาที (เดิมไม่มี `occupancySensors` ในรายการ แท็บเซ็นเซอร์ LD2410 จึงไม่เห็นรุ่นใหม่จนครบ 5 นาทีแล้วขึ้น "ยังไม่รายงานรุ่น" ทั้งที่อัปเดตสำเร็จ แก้แล้ว 15 ต.ค. 2569) ข้อที่ยังต้องระวังคือเงื่อนไขสำเร็จเทียบข้อความ **ตรงตัว** (`===`) ถ้าชื่อไฟล์บอกรุ่น `2.5.2` แต่ `FIRMWARE_VERSION` ในโค้ดบอร์ดเป็น `2.5.2-slm8` จะไม่ขึ้น toast สำเร็จ (แต่ตารางยังแสดง "ล่าสุดแล้ว" เพราะ `statusOf` เทียบด้วย `compareVersions`) จึงควรตั้งรุ่นในชื่อไฟล์ให้ตรงกับ `FIRMWARE_VERSION` ทุกตัวอักษร
+> ความถี่ในการตรวจขึ้นกับ polling ของ `store.js` ซึ่งดึงทั้ง `airConditioners` และ `occupancySensors` ทุก 10 วินาที (ถ้าไม่ดึง `occupancySensors` แท็บเซ็นเซอร์ LD2410 จะไม่เห็นรุ่นใหม่จนครบ 5 นาทีแล้วขึ้น "ยังไม่รายงานรุ่น" ทั้งที่อัปเดตสำเร็จ) ข้อที่ต้องระวังคือเงื่อนไขสำเร็จเทียบข้อความ **ตรงตัว** (`===`) ถ้าชื่อไฟล์บอกรุ่น `2.5.2` แต่ `FIRMWARE_VERSION` ในโค้ดบอร์ดเป็น `2.5.2-slm8` จะไม่ขึ้น toast สำเร็จ (แต่ตารางยังแสดง "ล่าสุดแล้ว" เพราะ `statusOf` เทียบด้วย `compareVersions`) จึงควรตั้งรุ่นในชื่อไฟล์ให้ตรงกับ `FIRMWARE_VERSION` ทุกตัวอักษร
 
 **10.5 เลือกแท็บเริ่มต้นอย่างฉลาด** — ไฟล์ `webapp/assets/js/views/firmware.js` บรรทัด 210–220
 
@@ -1800,7 +1800,7 @@ async function uploadWithReplace(file, fileName, kind) {
 | 584–585 | นับที่ส่งสำเร็จ และเก็บข้อความของตัวที่ล้มเหลว |
 | 586 | วน **ทีละบอร์ดตามลำดับ** (`for ... of` + `await`) ไม่ยิงพร้อมกันทั้งหมด |
 | 588–592 | เซ็นเซอร์เรียก `otaOccupancySensor` แอร์ (ทั้ง IR และสายแอร์) เรียก `otaAirConditioner` ทั้งคู่ส่งชื่อไฟล์ล่าสุดของแท็บ |
-| 593–599 | Backend รับแล้ว → จดงานรอ: รุ่นเป้าหมาย เวลาเริ่ม และ `previousError: null` (แก้ 15 ต.ค. 2569 เดิมจำ `otaError` ก่อนสั่ง ตอนนี้ Backend ล้างให้แล้วตอนรับคำสั่ง) |
+| 593–599 | Backend รับแล้ว → จดงานรอ: รุ่นเป้าหมาย เวลาเริ่ม และ `previousError: null` (Backend ล้าง `ota_error` ให้แล้วตอนรับคำสั่ง) |
 | 600 | เอาบอร์ดนี้ออกจากที่เลือก แถบหลายบอร์ดจะหดลงตามจริง |
 | 602–604 | บอร์ดไหนล้มเหลว (เช่น 409 เพิ่งออฟไลน์) เก็บข้อความไว้ แต่ **วนต่อ** บอร์ดอื่นยังได้คำสั่ง |
 | 606–609 | สรุปเป็น toast เดียวสำหรับที่สำเร็จ และ toast แยกต่อบอร์ดที่ล้มเหลว |
@@ -1824,9 +1824,9 @@ async function uploadWithReplace(file, fileName, kind) {
 | 385–387 | ทุกครั้งที่วาดตาราง เอาบอร์ดที่ไม่ใช่ `outdated` ออกจาก `selected` (เช่น อัปเดตเสร็จแล้ว หรือเพิ่งออฟไลน์) จำนวนบนแถบหลายบอร์ดจึงไม่นับบอร์ดที่สั่งไม่ได้ |
 | 388 | `outdated` ใช้กับปุ่ม "เลือกทุกตัวที่ยังเก่า (N)" และช่องติ๊กบนหัวตาราง (บรรทัด 412–431) ที่ติ๊กหรือเอาออกทั้งกลุ่ม |
 
-### 11) บอร์ดสายแอร์ Daikin บนหน้าเว็บ: `format.js` + `rooms.js` (เพิ่ม 11 ต.ค. 2569)
+### 11) บอร์ดสายแอร์ Daikin บนหน้าเว็บ: `format.js` + `rooms.js`
 
-commit `a5a227f` เพิ่มบอร์ดรุ่นใหม่ที่ต่อ "สายแอร์" (สายของรีโมตติดผนัง Daikin) แทนการยิงอินฟราเรด ในฐานข้อมูลบอร์ดนี้มี `protocol` = `DAIKIN_WIRED` หน้าเว็บต้องทำ 2 อย่าง: บอกผู้ใช้ให้รู้ว่าเครื่องนี้ควบคุมแบบไหน และแสดงเฉพาะปุ่มที่เครื่องนี้ทำได้
+ระบบมีบอร์ดอีกรุ่นที่ต่อ "สายแอร์" (สายของรีโมตติดผนัง Daikin) แทนการยิงอินฟราเรด ในฐานข้อมูลบอร์ดนี้มี `protocol` = `DAIKIN_WIRED` หน้าเว็บต้องทำ 2 อย่าง: บอกผู้ใช้ให้รู้ว่าเครื่องนี้ควบคุมแบบไหน และแสดงเฉพาะปุ่มที่เครื่องนี้ทำได้
 
 **11.1 ตัวช่วยยี่ห้อ** — ไฟล์ `webapp/assets/js/format.js` บรรทัด 347–351 และ 375–390
 
@@ -1975,7 +1975,7 @@ function fitDraft(draft, limits) {
 
 **9. ให้เซิร์ฟเวอร์เป็นผู้ตัดสิน เบราว์เซอร์แค่แสดงผล** — ภาคเรียนเปิด/ปิด (`status`), "วันนี้" (`state.today` ตามเวลาไทย), กติกาปิดแอร์อัตโนมัติ, สิทธิ์แอดมิน ทั้งหมดตัดสินที่ Backend เว็บแค่แสดง เพราะเวลาและนาฬิกาของเครื่องผู้ใช้เชื่อไม่ได้ และปุ่มที่ซ่อนก็แก้ใน DevTools ได้
 
-**10. Defensive coding รับมือไฟล์รุ่นเก่าค้างแคช** — เพราะ `/assets` เคยถูกแคช 1 ชั่วโมงทั้งหมด (ตั้งแต่ 15 ต.ค. 2569 ไฟล์ JS เป็น `no-cache` แล้ว แต่ผู้ใช้ที่เปิดหน้าค้างไว้ก่อน deploy ก็ยังมีโมดูลเก่าในหน่วยความจำ) ผู้ใช้อาจได้ไฟล์ใหม่ปนไฟล์เก่า โค้ดจึง: (ก) ใส่ export ใหม่ในไฟล์ใหม่ ไม่ใส่ในไฟล์เดิม (`theme.js`, `prefs.js`, `icons-ui.js` ที่เกิดจากเหตุผลนี้) (ข) เช็ก `typeof api.academicTerms !== 'function'` หรือ `api.schedulesWithInfo ?? ...` ก่อนเรียก (`store.js` บรรทัด 199–200, 211, 222) (ค) สร้างแถบเมนูล่างจาก JS ไม่เขียนใน `index.html` เพื่อไม่ให้ไฟล์เก่าทิ้งแถบว่างไว้ (ง) แยก `undefined` (Backend เก่า) กับ `null` (ไม่มีข้อมูล)
+**10. Defensive coding รับมือไฟล์รุ่นเก่าค้างแคช** — แม้ไฟล์ JS จะเป็น `no-cache` แต่ผู้ใช้ที่เปิดหน้าค้างไว้ก่อน deploy ยังมีโมดูลเก่าในหน่วยความจำ และ CSS ยังแคชได้ 1 ชั่วโมง ผู้ใช้จึงอาจได้ไฟล์ใหม่ปนไฟล์เก่า โค้ดจึง: (ก) ใส่ export ใหม่ในไฟล์ใหม่ ไม่ใส่ในไฟล์เดิม (`theme.js`, `prefs.js`, `icons-ui.js` ที่เกิดจากเหตุผลนี้) (ข) เช็ก `typeof api.academicTerms !== 'function'` หรือ `api.schedulesWithInfo ?? ...` ก่อนเรียก (`store.js` บรรทัด 199–200, 211, 222) (ค) สร้างแถบเมนูล่างจาก JS ไม่เขียนใน `index.html` เพื่อไม่ให้ไฟล์เก่าทิ้งแถบว่างไว้ (ง) แยก `undefined` (Backend เก่า) กับ `null` (ไม่มีข้อมูล)
 
 **11. Defense in depth** — XSS ป้องกันหลายชั้น: `textContent` + CSP `script-src 'self'` + (หากโค้ดชั้นแรกพลาด) `connect-src 'self'` ไม่ให้ส่งข้อมูลออกไปเว็บอื่น + token ใน localStorage ที่ Backend ตรวจสิทธิ์ซ้ำทุกคำขอ
 
@@ -1983,7 +1983,7 @@ function fitDraft(draft, limits) {
 
 **13. ฟังก์ชันจัดรูปแบบล้วน (pure function)** — `format.js` รับค่า คืนข้อความ ไม่แตะ DOM/state ทดสอบง่ายและเหมือนกับ `number_format.dart` ของแอปมือถือ
 
-**15. สถานะ "รอผล" ฝั่งเบราว์เซอร์ + เวลาหมดอายุ (เพิ่ม 14 ต.ค. 2569)** — `firmware.js` จด `pending` ทันทีหลัง Backend รับคำสั่ง OTA แล้วตัดสินผลจากข้อมูลที่ polling นำมา (รุ่นตรงเป้า / มี `otaError` ใหม่ / เกิน 5 นาที) แทนที่จะรอคำตอบจากคำขอเดียว เพราะ OTA เป็นงานที่บอร์ดทำเองหลังคำขอ HTTP จบไปนานแล้ว ต้องมีเวลาหมดอายุเสมอ ไม่งั้นบอร์ดที่ดับไปจะค้าง "กำลังอัปเดต" ตลอดกาล
+**15. สถานะ "รอผล" ฝั่งเบราว์เซอร์ + เวลาหมดอายุ** — `firmware.js` จด `pending` ทันทีหลัง Backend รับคำสั่ง OTA แล้วตัดสินผลจากข้อมูลที่ polling นำมา (รุ่นตรงเป้า / มี `otaError` ใหม่ / เกิน 5 นาที) แทนที่จะรอคำตอบจากคำขอเดียว เพราะ OTA เป็นงานที่บอร์ดทำเองหลังคำขอ HTTP จบไปนานแล้ว ต้องมีเวลาหมดอายุเสมอ ไม่งั้นบอร์ดที่ดับไปจะค้าง "กำลังอัปเดต" ตลอดกาล
 
 **16. ตรวจสองชั้น เบราว์เซอร์เพื่อความสะดวก เซิร์ฟเวอร์เพื่อความถูกต้อง** — `handleFile` ตรวจนามสกุล ขนาด (`maxBytes` จากเซิร์ฟเวอร์) ชื่อ `.merged.bin` และชนิดตรงแท็บก่อนส่ง เพื่อบอกผู้ใช้เร็วโดยไม่ต้องอัปโหลด 2 MB ก่อน แต่ Backend ตรวจซ้ำทุกข้อ (และตรวจไบต์แรก `0xE9` ของไฟล์ ESP32 ที่เบราว์เซอร์ไม่ได้ตรวจ) เช่นเดียวกับ `fitDraft` ใน `rooms.js` ที่ปรับร่างให้ตรงกับกติกาของ `backend/src/utils/air-conditioner.js` ก่อนส่ง
 
@@ -2021,11 +2021,11 @@ Caddy คือเว็บเซิร์ฟเวอร์ตัวหน้�
 | `handle /api/* { reverse_proxy backend:3000 }` | 29–31 | ส่งทุกอย่างใต้ `/api/` ต่อให้ Backend (ชื่อ `backend` คือชื่อ service ในเครือข่าย Docker) |
 | `handle /firmware/* { root * /srv; header Cache-Control "no-store"; file_server }` | 35–39 | ไฟล์ `.bin` สำหรับ OTA ห้ามแคช |
 | `handle { root * /srv/www ... file_server }` | 41–63 | **ที่เหลือทั้งหมด** เสิร์ฟจากโฟลเดอร์เว็บ |
-| `@scripts path /assets/js/*` + `header @scripts Cache-Control "no-cache"` | 47–48 | ไฟล์ JavaScript ต้อง**ถามเซิร์ฟเวอร์ทุกครั้ง** (เพิ่ม 15 ต.ค. 2569) |
+| `@scripts path /assets/js/*` + `header @scripts Cache-Control "no-cache"` | 47–48 | ไฟล์ JavaScript ต้อง**ถามเซิร์ฟเวอร์ทุกครั้ง** |
 | `@assets { path /assets/*; not path /assets/js/* }` + `Cache-Control "public, max-age=3600"` | 51–55 | CSS/รูป/ฟอนต์ใน `/assets/` (ยกเว้น JS) แคชได้ **1 ชั่วโมง** |
 | `@html path / /index.html /status.html` + `Cache-Control "no-cache"` | 59–60 | หน้า HTML ต้อง**ตรวจกับเซิร์ฟเวอร์ทุกครั้ง** (`no-cache` ไม่ได้แปลว่าห้ามเก็บ แปลว่าต้อง revalidate ก่อนใช้ ถ้าไฟล์ไม่เปลี่ยนเซิร์ฟเวอร์ตอบ 304 สั้น ๆ) |
 
-ผลต่อการ deploy: หลัง `deploy-web.ps1` ผู้ใช้ได้ `index.html` ใหม่ทันที (ไม่แคช) ซึ่งมี `?v=` ใหม่ → CSS 4 ไฟล์และ `main.js` ถูกโหลดใหม่ ส่วน **โมดูลที่ `main.js` import ต่อ** (`app.js`, `store.js`, `views/*.js` ...) URL ไม่มี `?v=` เดิมจึงอาจถูกใช้จากแคชได้นานสูงสุด 1 ชั่วโมง (นี่คือที่มาของมาตรการกันไฟล์เก่า-ใหม่ปนกัน หลักการข้อ 10) ตั้งแต่ 15 ต.ค. 2569 Caddy ตั้ง `no-cache` ให้ `/assets/js/*` เบราว์เซอร์จึงถามเซิร์ฟเวอร์ทุกครั้งและได้ไฟล์ใหม่ทันทีหลัง deploy (ไฟล์ไม่เปลี่ยนได้ 304 กลับมาเร็ว) การเปลี่ยน Caddyfile ต้องอัปเดตเซิร์ฟเวอร์ด้วย `update-server.ps1` (`deploy-web.ps1` อัปโหลดแค่ไฟล์เว็บ)
+ผลต่อการ deploy: หลัง `deploy-web.ps1` ผู้ใช้ได้ `index.html` ใหม่ทันที (ไม่แคช) ซึ่งมี `?v=` ใหม่ → CSS 4 ไฟล์และ `main.js` ถูกโหลดใหม่ ส่วน **โมดูลที่ `main.js` import ต่อ** (`app.js`, `store.js`, `views/*.js` ...) URL ไม่มี `?v=` Caddy จึงตั้ง `no-cache` ให้ `/assets/js/*` เบราว์เซอร์ถามเซิร์ฟเวอร์ทุกครั้งและได้ไฟล์ใหม่ทันทีหลัง deploy (ไฟล์ไม่เปลี่ยนได้ 304 กลับมาเร็ว) การเปลี่ยน Caddyfile ต้องอัปเดตเซิร์ฟเวอร์ด้วย `update-server.ps1` (`deploy-web.ps1` อัปโหลดแค่ไฟล์เว็บ)
 
 **หัวความปลอดภัยแต่ละตัว** (จากบรรทัด 21–26)
 
@@ -2081,7 +2081,7 @@ Caddy คือเว็บเซิร์ฟเวอร์ตัวหน้�
 
 > [!ASK]
 > **ถาม:** deploy เว็บใหม่แล้วทำไมบางคนยังเห็นหน้าเก่า และคุณรับมืออย่างไร
-> **ตอบ:** เดิม Caddy ให้เบราว์เซอร์แคชทุกไฟล์ใน `/assets/` ได้ 1 ชั่วโมง `index.html` ตั้ง `no-cache` จึงได้เลข `?v=` ใหม่เสมอ ซึ่งบังคับโหลด CSS และ `main.js` ใหม่ แต่โมดูลที่ถูก import ต่อไม่มี `?v=` จึงค้างในแคชได้ถึง 1 ชั่วโมง ตอนนี้ (15 ต.ค. 2569) แก้ที่ต้นเหตุแล้ว: ไฟล์ JS ใน `/assets/js/` ตั้ง `no-cache` ให้เบราว์เซอร์ถามเซิร์ฟเวอร์ทุกครั้ง ส่วน CSS/รูปยังแคช 1 ชั่วโมงเพราะมี `?v=` และโค้ดยังออกแบบให้ทนไฟล์เก่า-ใหม่ปนไว้อีกชั้น: ไม่เพิ่ม export ใหม่ในไฟล์เดิม (สร้างไฟล์ใหม่ เช่น `theme.js` `icons-ui.js`), เช็ก `typeof api.xxx === 'function'` ก่อนเรียก, และถ้ายังเห็นของเก่าให้กด Ctrl+F5 หนึ่งครั้ง
+> **ตอบ:** `index.html` ตั้ง `no-cache` จึงได้เลข `?v=` ใหม่เสมอ ซึ่งบังคับโหลด CSS และ `main.js` ใหม่ ส่วนโมดูลที่ถูก import ต่อไม่มี `?v=` ถ้าแคช 1 ชั่วโมงจะค้างของเก่า Caddy จึงตั้ง `no-cache` ให้ไฟล์ JS ใน `/assets/js/` ให้เบราว์เซอร์ถามเซิร์ฟเวอร์ทุกครั้ง ส่วน CSS/รูปแคช 1 ชั่วโมงเพราะมี `?v=` (ต้องขยับเลขเมื่อแก้) และโค้ดยังออกแบบให้ทนไฟล์เก่า-ใหม่ปนไว้อีกชั้น: ไม่เพิ่ม export ใหม่ในไฟล์เดิม (สร้างไฟล์ใหม่ เช่น `theme.js` `icons-ui.js`), เช็ก `typeof api.xxx === 'function'` ก่อนเรียก, และถ้ายังเห็นของเก่าให้กด Ctrl+F5 หนึ่งครั้ง
 
 > [!ASK]
 > **ถาม:** นาฬิกานับถอยหลังปิดแอร์เดินในเบราว์เซอร์ ถ้านาฬิกาเครื่องผู้ใช้เพี้ยนจะเป็นอย่างไร ใครเป็นคนสั่งปิดจริง
@@ -2089,7 +2089,7 @@ Caddy คือเว็บเซิร์ฟเวอร์ตัวหน้�
 
 > [!ASK]
 > **ถาม:** หน้าเฟิร์มแวร์รู้ได้อย่างไรว่าบอร์ดอัปเดตสำเร็จ ในเมื่อ HTTP ตอบกลับทันทีตั้งแต่ส่งคำสั่ง
-> **ตอบ:** คำตอบ HTTP แค่บอกว่า Backend ส่งคำสั่ง OTA เข้า MQTT แล้ว บอร์ดยังต้องดาวน์โหลดไฟล์ รีบูต และต่อ MQTT ใหม่อีก 1–2 นาที หน้าเว็บจึงจดบอร์ดนั้นไว้ใน `pending` พร้อมรุ่นเป้าหมาย เวลาเริ่ม และ `otaError` เดิม แล้วทุกครั้งที่ polling นำข้อมูลแอร์ชุดใหม่มา (`state.airConditioners` ทุก 10 วินาที) `settlePending()` จะเช็ก 3 ทาง: `firmwareVersion` เท่ากับรุ่นเป้าหมาย = สำเร็จ, มี `otaError` ใหม่ที่ไม่ใช่ค่าเดิม = ล้มเหลว, เกิน 5 นาที = ถือว่าไม่สำเร็จ (บอร์ดใช้รุ่นเดิมต่อ) เก็บ `otaError` เดิมไว้เทียบเพราะถ้าบอร์ดเคยพังครั้งก่อน ข้อความเก่าจะทำให้ตัดสินผิดว่าครั้งนี้ก็พัง
+> **ตอบ:** คำตอบ HTTP แค่บอกว่า Backend ส่งคำสั่ง OTA เข้า MQTT แล้ว บอร์ดยังต้องดาวน์โหลดไฟล์ รีบูต และต่อ MQTT ใหม่อีก 1–2 นาที หน้าเว็บจึงจดบอร์ดนั้นไว้ใน `pending` พร้อมรุ่นเป้าหมายและเวลาเริ่ม แล้วทุกครั้งที่ polling นำข้อมูลบอร์ดชุดใหม่มา (`state.airConditioners` และ `state.occupancySensors` ทุก 10 วินาที) `settlePending()` จะเช็ก 3 ทาง: `firmwareVersion` เท่ากับรุ่นเป้าหมาย = สำเร็จ, มี `otaError` = ล้มเหลว, เกิน 5 นาที = ถือว่าไม่สำเร็จ (บอร์ดใช้รุ่นเดิมต่อ และบอกรุ่นที่บอร์ดรายงานอยู่) ที่ใช้ "มี `otaError`" ได้เลยเพราะ Backend ล้าง `ota_error` ตอนส่งคำสั่ง error ของรอบก่อนจึงไม่ค้างมาทำให้ตัดสินผิด
 
 > [!ASK]
 > **ถาม:** ถ้าแอดมินอัปโหลดไฟล์เซ็นเซอร์เข้าไปในแท็บแอร์ หรือสั่งไฟล์แอร์ IR ให้บอร์ดสายแอร์ จะเกิดอะไรขึ้น
@@ -2100,11 +2100,11 @@ Caddy คือเว็บเซิร์ฟเวอร์ตัวหน้�
 > **ตอบ:** ต่างที่ชิปและปุ่ม ชิปบนการ์ดแอร์บอก "Daikin · สายแอร์" หรือ "<ยี่ห้อ> · รีโมต IR" (`airBrand` + `controlTypeLabel` ใน `format.js`) ส่วนปุ่ม `limitsFor` ของบอร์ดสายแอร์คืนเฉพาะสิ่งที่รีโมตติดผนัง Daikin ทำได้: โหมด cool/dry/fan, พัดลม auto/low/medium/high (ไม่มี turbo), ทิศลม auto/off, ฟังก์ชันเสริมมีแค่ Sleep และไม่มีในโหมด Dry หน้าเว็บจึงไม่แสดงปุ่มที่กดไปแล้วเซิร์ฟเวอร์จะปฏิเสธ และ `fitDraft` ปรับค่าที่ร่างค้างไว้ (เช่น พัดลม turbo) ให้อยู่ในขอบเขตก่อนส่ง
 
 > [!ASK]
-> **ถาม:** Arduino IDE ส่งออกไฟล์ชื่อ `rmutt_esp32_air.ino.bin` ไม่มีเลขรุ่น หน้าเฟิร์มแวร์รู้รุ่นได้อย่างไร (เพิ่ม 14 ต.ค. 2569)
+> **ถาม:** Arduino IDE ส่งออกไฟล์ชื่อ `rmutt_esp32_air.ino.bin` ไม่มีเลขรุ่น หน้าเฟิร์มแวร์รู้รุ่นได้อย่างไร
 > **ตอบ:** `handleFile` เรียก `versionOfFileName` ถ้าชื่อไม่มีรูปแบบ `-x.y.z.bin` จะเปิดฟอร์มถามรุ่น (แนะนำให้ดู `FIRMWARE_VERSION` ในโค้ดหรือบรรทัด "Firmware:" ใน Serial Monitor) ตรวจรูปแบบ `2.5.1` หรือ `2.5.2-slm8` แล้วตั้งชื่อใหม่เป็น `rmutt_esp32_air-2.5.1.bin` ก่อนอัปโหลด ทุกไฟล์บนเซิร์ฟเวอร์จึงมีรุ่นในชื่อเสมอ ทั้งตาราง "ต้องอัปเดต" และการเช็กว่าอัปเดตสำเร็จพึ่งชื่อนี้ ควรพิมพ์ให้ตรงกับ `FIRMWARE_VERSION` ทุกตัวอักษร ไม่งั้นป้าย "กำลังอัปเดต" จะไม่จบด้วย toast สำเร็จ
 
 > [!ASK]
-> **ถาม:** หน้าเฟิร์มแวร์ตัดสินว่าบอร์ด "ยังเก่า" อย่างไร ทำไมไม่เทียบรุ่นเป็นข้อความ (เพิ่ม 14 ต.ค. 2569)
+> **ถาม:** หน้าเฟิร์มแวร์ตัดสินว่าบอร์ด "ยังเก่า" อย่างไร ทำไมไม่เทียบรุ่นเป็นข้อความ
 > **ตอบ:** `statusOf` เทียบ `firmwareVersion` ที่บอร์ดรายงานกับรุ่นของไฟล์ล่าสุดในแท็บด้วย `compareVersions` ซึ่งแยกเลขสามส่วนหน้าเป็นตัวเลขแล้วเทียบทีละส่วน เพราะถ้าเทียบเป็นข้อความ `'2.5.10'` จะน้อยกว่า `'2.5.9'` ส่วนท้ายอย่าง `-slm8` ไม่นับเพราะบอกชนิด ไม่ใช่ลำดับ แต่สถานะอื่นมาก่อน: กำลังอัปเดต → ตั้งค่าไม่เสร็จ → ออฟไลน์ → ไม่มีไฟล์ แล้วจึงเป็นล่าสุด/ยังเก่า มีแค่บอร์ด "ยังเก่า" ที่ติ๊กเลือกและกดอัปเดตได้
 
 ## สรุปและเช็กลิสต์ความเข้าใจ
@@ -2123,9 +2123,9 @@ Caddy คือเว็บเซิร์ฟเวอร์ตัวหน้�
 - [ ] บอกได้ว่าหน้าไหนเป็นแอดมินเท่านั้น (`devices`, `firmware`, `users`) และส่วนไหนในหน้าอื่นที่เฉพาะแอดมิน (นำเข้า/ล้างตาราง, แก้อัตราค่าไฟ, สวิตช์รวมปิดอัตโนมัติ, ปุ่มบางอันในรีโมต)
 - [ ] อธิบายทำไมต้องมีทั้ง Flutter กับเว็บ
 - [ ] อธิบายขั้นตอน `deploy-web.ps1` และทำไมต้อง "คัดลอกเข้า" `www` เดิมแทน `mv`
-- [ ] อธิบายแคช: `/assets/js/*` `no-cache` (15 ต.ค.), `/assets/*` อื่น 1 ชั่วโมง, `index.html` `no-cache`, `?v=` และผลข้างเคียงที่ต้องออกแบบรับมือ
+- [ ] อธิบายแคช: `/assets/js/*` `no-cache`, `/assets/*` อื่น 1 ชั่วโมง, `index.html` `no-cache`, `?v=` และผลข้างเคียงที่ต้องออกแบบรับมือ
 - [ ] อธิบายว่าทำไมการซ่อนปุ่มตามสิทธิ์ไม่ใช่ความปลอดภัยจริง
-- [ ] (เพิ่ม 14 ต.ค. 2569) อธิบายหน้าเฟิร์มแวร์ได้: 3 แท็บตามชนิดบอร์ด, ชนิด/รุ่นอ่านจากชื่อไฟล์, อัปโหลดเป็นไฟล์ดิบ + `X-File-Name` + `?kind` + `?replace=1`, สถานะบอร์ด 6 แบบจาก `statusOf`, และการติดตามผลด้วย `pending` + `settlePending` + 5 นาที
-- [ ] (เพิ่ม 14 ต.ค. 2569) บอกลำดับสถานะใน `statusOf` (updating → notready → offline → nofile → uptodate/outdated) และอธิบายได้ว่าทำไม `compareVersions` ต้องเทียบเป็นตัวเลข และทำไมต้องถามรุ่นเมื่อชื่อไฟล์จาก Arduino IDE ไม่มีรุ่น
+- [ ] อธิบายหน้าเฟิร์มแวร์ได้: 3 แท็บตามชนิดบอร์ด, ชนิด/รุ่นอ่านจากชื่อไฟล์, อัปโหลดเป็นไฟล์ดิบ + `X-File-Name` + `?kind` + `?replace=1`, สถานะบอร์ด 6 แบบจาก `statusOf`, และการติดตามผลด้วย `pending` + `settlePending` + 5 นาที
+- [ ] บอกลำดับสถานะใน `statusOf` (updating → notready → offline → nofile → uptodate/outdated) และอธิบายได้ว่าทำไม `compareVersions` ต้องเทียบเป็นตัวเลข และทำไมต้องถามรุ่นเมื่อชื่อไฟล์จาก Arduino IDE ไม่มีรุ่น
 - [ ] อธิบายได้ว่าตารางบอร์ดกลายเป็นการ์ดบนมือถือด้วย CSS grid อย่างไร และแถบ `.fw-bar` ค้างล่างจออย่างไร
-- [ ] (เพิ่ม 11 ต.ค. 2569) อธิบายได้ว่าเว็บแสดงยี่ห้อ/วิธีควบคุมแอร์จากโปรโตคอลอย่างไร (`airBrand`, `controlTypeLabel`, `airControlSummary`) และทำไมการ์ดแอร์สายแอร์มีปุ่มน้อยกว่า (`limitsFor`, `fitDraft`)
+- [ ] อธิบายได้ว่าเว็บแสดงยี่ห้อ/วิธีควบคุมแอร์จากโปรโตคอลอย่างไร (`airBrand`, `controlTypeLabel`, `airControlSummary`) และทำไมการ์ดแอร์สายแอร์มีปุ่มน้อยกว่า (`limitsFor`, `fitDraft`)

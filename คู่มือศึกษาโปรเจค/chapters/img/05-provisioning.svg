@@ -49,7 +49,7 @@
   <text x="36" y="368" font-size="15" font-weight="700" fill="#17241D">3</text>
   <rect x="892" y="344" width="220" height="52" rx="7" fill="#F5F8F6" stroke="#D7E2DB"/>
   <text x="902" y="362" font-size="10.5" fill="#66766E">บันทึกลง NVS (ไม่หายเมื่อไฟดับ)</text>
-  <text x="902" y="378" font-size="10.5" fill="#66766E">ต่อ Wi-Fi แล้วต่อ MQTTS 8883</text>
+  <text x="902" y="378" font-size="10.5" fill="#66766E">ต่อ Wi-Fi แล้วต่อ MQTTS (ts.net:8443)</text>
   <text x="902" y="392" font-size="10.5" fill="#66766E">ตรวจใบรับรอง ISRG Root X1</text>
 
   <!-- step 4 -->

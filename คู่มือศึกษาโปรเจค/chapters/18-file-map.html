@@ -55,10 +55,8 @@
 <li><a href="17-glossary.html"><span class="num">17</span>อภิธานศัพท์</a></li>
 <li><a class="active" href="18-file-map.html"><span class="num">18</span>แผนที่ไฟล์ทั้งโปรเจค</a></li>
 </ul>
-<div class="nav-part">งานที่กำลังพัฒนา</div><ul>
-<li><a href="19-daikin-slm8.html"><span class="num">19</span>แอร์ Daikin ผ่านสาย SLM8: จากการแกะโปรโตคอลถึงบอร์ดสายแอร์</a></li>
-</ul>
 <div class="nav-part">เจาะลึก</div><ul>
+<li><a href="19-daikin-slm8.html"><span class="num">19</span>แอร์ Daikin ผ่านสาย SLM8: จากการแกะโปรโตคอลถึงบอร์ดสายแอร์</a></li>
 <li><a href="20-database-design.html"><span class="num">20</span>เจาะลึกการออกแบบฐานข้อมูล</a></li>
 </ul>
     </nav>
@@ -80,11 +78,11 @@
 <tbody>
 <tr>
 <td><code>deploy/docker-compose.yml</code></td>
-<td>กำหนด 5 service ของเซิร์ฟเวอร์จริง (db, mqtt, backend, caddy, tailscale) พร้อมพอร์ต volume healthcheck และตัวแปรที่ส่งเข้าแต่ละกล่อง (<code>MQTT_DEVICE_URL</code> ค่าเริ่มต้นชี้ Funnel <code>ts.net:8443</code> ตั้งเป็น <code>mqtts://&lt;DOMAIN&gt;:8883</code> ใน <code>.env</code> ได้ และ tailscale <code>depends_on</code> ทั้ง caddy กับ mqtt) (14 ต.ค.) backend mount <code>./firmware</code> แบบเขียนได้ เพื่อรับไฟล์ที่อัปโหลดจากเว็บ</td>
+<td>กำหนด 5 service ของเซิร์ฟเวอร์จริง (db, mqtt, backend, caddy, tailscale) พร้อมพอร์ต volume healthcheck และตัวแปรที่ส่งเข้าแต่ละกล่อง (<code>MQTT_DEVICE_URL</code> ค่าเริ่มต้นชี้ Funnel <code>ts.net:8443</code> ตั้งเป็น <code>mqtts://&lt;DOMAIN&gt;:8883</code> ใน <code>.env</code> ได้ และ tailscale <code>depends_on</code> ทั้ง caddy กับ mqtt) backend mount <code>./firmware</code> แบบเขียนได้ เพื่อรับไฟล์ที่อัปโหลดจากเว็บ</td>
 </tr>
 <tr>
 <td><code>deploy/Caddyfile</code></td>
-<td>กฎของ reverse proxy: ขอใบรับรอง DuckDNS ด้วย DNS-01, ส่ง /api/* ไป Backend, เสิร์ฟเว็บและไฟล์เฟิร์มแวร์, ใส่หัวความปลอดภัย และรับ Funnel ที่พอร์ต 8080 (15 ต.ค.: ไฟล์ JS ใน /assets/js/ เป็น no-cache ส่วน CSS/รูปแคช 1 ชม.)</td>
+<td>กฎของ reverse proxy: ขอใบรับรอง DuckDNS ด้วย DNS-01, ส่ง /api/* ไป Backend, เสิร์ฟเว็บและไฟล์เฟิร์มแวร์, ใส่หัวความปลอดภัย และรับ Funnel ที่พอร์ต 8080 (ไฟล์ JS ใน /assets/js/ เป็น no-cache ส่วน CSS/รูปแคช 1 ชม.)</td>
 </tr>
 <tr>
 <td><code>deploy/caddy.Dockerfile</code></td>
@@ -116,7 +114,7 @@
 </tr>
 <tr>
 <td><code>deploy/DEPLOY.md</code></td>
-<td>คู่มือขั้นตอน deploy ขึ้นเซิร์ฟเวอร์ตั้งแต่ติดตั้งจนสร้างแอดมิน (บางส่วนเขียนตามแผน HTTP-01 เดิม) (14 ต.ค.) ขั้น <code>git pull</code> และหมายเหตุ PowerShell กับ cmd</td>
+<td>คู่มือขั้นตอน deploy ขึ้นเซิร์ฟเวอร์ตั้งแต่ติดตั้งจนสร้างแอดมิน (บางส่วนยังเขียนตามแผน HTTP-01 ที่ไม่ได้ใช้แล้ว) ขั้น <code>git pull</code> และหมายเหตุ PowerShell กับ cmd</td>
 </tr>
 <tr>
 <td><code>mqtt/docker-compose.yml</code></td>
@@ -216,7 +214,7 @@
 </tr>
 <tr>
 <td><code>backend/scripts/migrate-drop-unused.js</code></td>
-<td>(14 ต.ค.) เอา <code>rooms.is_active</code> และสถานะ <code>removed</code> ที่โค้ดไม่ใช้แล้วออกจากฐานข้อมูล รันซ้ำได้ มี <code>--dry-run</code> ถูกเรียกใน <code>update-remote.sh</code></td>
+<td>เอา <code>rooms.is_active</code> และสถานะ <code>removed</code> ที่โค้ดไม่ใช้แล้วออกจากฐานข้อมูล รันซ้ำได้ มี <code>--dry-run</code> ถูกเรียกใน <code>update-remote.sh</code></td>
 </tr>
 <tr>
 <td><code>backend/scripts/migrate-legacy-user.js</code></td>
@@ -328,11 +326,11 @@
 </tr>
 <tr>
 <td>backend/src/routes/air-conditioners.js</td>
-<td>ดูรายการแอร์, จองอุปกรณ์ (reservation) ให้ ESP32, สั่งแอร์ผ่าน MQTT, เข้าโหมด setup, แก้ชื่อ/ปิดอัตโนมัติ, สั่ง OTA และลบ (13 ต.ค.) ลบแอร์แล้วสั่งบอร์ด <code>unprovision</code> ก่อนลบบัญชี MQTT ตอบ <code>boardCleared</code></td>
+<td>ดูรายการแอร์, จองอุปกรณ์ (reservation) ให้ ESP32, สั่งแอร์ผ่าน MQTT, เข้าโหมด setup, แก้ชื่อ/ปิดอัตโนมัติ, สั่ง OTA และลบ ลบแอร์แล้วสั่งบอร์ด <code>unprovision</code> ก่อนลบบัญชี MQTT ตอบ <code>boardCleared</code></td>
 </tr>
 <tr>
 <td>backend/src/routes/occupancy-sensors.js</td>
-<td>จัดการเซ็นเซอร์ตรวจจับคน (ESP32 + LD2410): ดู จองอุปกรณ์ เข้าโหมด setup สั่ง OTA และลบ (13 ต.ค.) ลบเซ็นเซอร์แล้วสั่งบอร์ด <code>unprovision</code> เช่นเดียวกับแอร์</td>
+<td>จัดการเซ็นเซอร์ตรวจจับคน (ESP32 + LD2410): ดู จองอุปกรณ์ เข้าโหมด setup สั่ง OTA และลบ ลบเซ็นเซอร์แล้วสั่งบอร์ด <code>unprovision</code> เช่นเดียวกับแอร์</td>
 </tr>
 <tr>
 <td>backend/src/routes/energy.js</td>
@@ -340,7 +338,7 @@
 </tr>
 <tr>
 <td>backend/src/routes/firmware.js</td>
-<td>แสดงรายการไฟล์ .bin สำหรับ OTA ในโฟลเดอร์ firmware (แอดมินเท่านั้น) และฟังก์ชันตรวจว่าไฟล์มีจริง (14 ต.ค.) เพิ่มอัปโหลด <code>POST /api/firmware</code> (ไฟล์ดิบ + <code>X-File-Name</code>) และลบ <code>DELETE /api/firmware/:file</code> เฉพาะแอดมิน</td>
+<td>แสดงรายการไฟล์ .bin สำหรับ OTA ในโฟลเดอร์ firmware (แอดมินเท่านั้น) และฟังก์ชันตรวจว่าไฟล์มีจริง เพิ่มอัปโหลด <code>POST /api/firmware</code> (ไฟล์ดิบ + <code>X-File-Name</code>) และลบ <code>DELETE /api/firmware/:file</code> เฉพาะแอดมิน</td>
 </tr>
 <tr>
 <td>backend/src/routes/alerts.js</td>
@@ -368,7 +366,7 @@
 </tr>
 <tr>
 <td>backend/test/air-conditioner.test.js</td>
-<td>ทดสอบ validation ของการจองแอร์ ชื่อโปรโตคอล IRac และคำสั่งแอร์ที่ส่งผ่าน MQTT (11 ต.ค.) เพิ่มเคส <code>DAIKIN_WIRED</code> (รวม 10 เทสต์)</td>
+<td>ทดสอบ validation ของการจองแอร์ ชื่อโปรโตคอล IRac และคำสั่งแอร์ที่ส่งผ่าน MQTT เพิ่มเคส <code>DAIKIN_WIRED</code> (รวม 10 เทสต์)</td>
 </tr>
 <tr>
 <td>backend/test/auto-off.test.js</td>
@@ -380,11 +378,11 @@
 </tr>
 <tr>
 <td>backend/test/firmware.test.js</td>
-<td>ทดสอบการตรวจชื่อไฟล์ .bin ที่ปลอดภัย การสร้าง URL ดาวน์โหลด และการเดาชนิดบอร์ดจากชื่อไฟล์ (14 ต.ค.) เพิ่มเคสชนิดไฟล์และเนื้อไฟล์ (รวม 7 เทสต์)</td>
+<td>ทดสอบการตรวจชื่อไฟล์ .bin ที่ปลอดภัย การสร้าง URL ดาวน์โหลด และการเดาชนิดบอร์ดจากชื่อไฟล์ เพิ่มเคสชนิดไฟล์และเนื้อไฟล์ (รวม 7 เทสต์)</td>
 </tr>
 <tr>
 <td>backend/test/unprovision.test.js</td>
-<td>(ใหม่ 13 ต.ค.) ทดสอบรูปคำสั่ง unprovision และคำตอบที่นับได้/ไม่ได้ (2 เทสต์)</td>
+<td>ทดสอบรูปคำสั่ง unprovision และคำตอบที่นับได้/ไม่ได้ (2 เทสต์)</td>
 </tr>
 <tr>
 <td>backend/test/mqtt-accounts.test.js</td>
@@ -464,7 +462,7 @@
 <tbody>
 <tr>
 <td>backend/src/services/mqtt.js</td>
-<td>ต่อ Mosquitto, subscribe topic ของบอร์ด, เขียนสถานะลงฐานข้อมูล, ส่งคำสั่ง/ack/schedule-status กลับไปหาบอร์ด และให้ผู้ฟังเหตุการณ์ (listener) กับระบบอื่น (11–13 ต.ค.) แก้โปรโตคอลเป็น <code>DAIKIN_WIRED</code> เมื่อบอร์ดรายงาน <code>controlMode: wired</code> และส่ง/รอคำตอบ <code>unprovision</code></td>
+<td>ต่อ Mosquitto, subscribe topic ของบอร์ด, เขียนสถานะลงฐานข้อมูล, ส่งคำสั่ง/ack/schedule-status กลับไปหาบอร์ด และให้ผู้ฟังเหตุการณ์ (listener) กับระบบอื่น แก้โปรโตคอลเป็น <code>DAIKIN_WIRED</code> เมื่อบอร์ดรายงาน <code>controlMode: wired</code> และส่ง/รอคำตอบ <code>unprovision</code></td>
 </tr>
 <tr>
 <td>backend/src/services/mqtt-accounts.js</td>
@@ -544,7 +542,7 @@
 </tr>
 <tr>
 <td>backend/src/utils/air-conditioner.js</td>
-<td>ตรวจข้อมูลจองบอร์ดแอร์และคำสั่งแอร์ (อุณหภูมิ โหมด protocol) และแปลงแถวแอร์เป็น JSON ให้แอป (11 ต.ค.) โปรโตคอล <code>DAIKIN_WIRED</code> ตรวจคำสั่งตามความสามารถรีโมตติดผนัง และ <code>controlType</code></td>
+<td>ตรวจข้อมูลจองบอร์ดแอร์และคำสั่งแอร์ (อุณหภูมิ โหมด protocol) และแปลงแถวแอร์เป็น JSON ให้แอป โปรโตคอล <code>DAIKIN_WIRED</code> ตรวจคำสั่งตามความสามารถรีโมตติดผนัง และ <code>controlType</code></td>
 </tr>
 <tr>
 <td>backend/src/utils/occupancy-sensor.js</td>
@@ -552,11 +550,11 @@
 </tr>
 <tr>
 <td>backend/src/utils/firmware.js</td>
-<td>ตรวจชื่อไฟล์ firmware (.bin) สร้าง URL ดาวน์โหลดสำหรับ OTA และเดาชนิดบอร์ดจากชื่อไฟล์ (14 ต.ค.) แยกชนิดไฟล์ air/wired/occupancy ตรวจไบต์แรก <code>0xE9</code> และขนาดไม่เกินช่อง OTA กันสั่งไฟล์ผิดชนิดให้บอร์ด</td>
+<td>ตรวจชื่อไฟล์ firmware (.bin) สร้าง URL ดาวน์โหลดสำหรับ OTA และเดาชนิดบอร์ดจากชื่อไฟล์ แยกชนิดไฟล์ air/wired/occupancy ตรวจไบต์แรก <code>0xE9</code> และขนาดไม่เกินช่อง OTA กันสั่งไฟล์ผิดชนิดให้บอร์ด</td>
 </tr>
 <tr>
 <td>backend/src/utils/unprovision.js</td>
-<td>(ใหม่ 13 ต.ค.) สร้างคำสั่ง <code>{"action":"unprovision"}</code> พร้อม <code>deviceId</code> ของบอร์ด และตรวจว่าคำตอบ "ล้างค่าแล้ว" มาจากบอร์ดตัวเดียวกัน (รอไม่เกิน 4 วินาที)</td>
+<td>สร้างคำสั่ง <code>{"action":"unprovision"}</code> พร้อม <code>deviceId</code> ของบอร์ด และตรวจว่าคำตอบ "ล้างค่าแล้ว" มาจากบอร์ดตัวเดียวกัน (รอไม่เกิน 4 วินาที)</td>
 </tr>
 <tr>
 <td>backend/src/utils/schema-doctor.js</td>
@@ -576,7 +574,7 @@
 <tbody>
 <tr>
 <td><code>docs/BLE_MQTT_PROTOCOL.md</code></td>
-<td>เอกสารสัญญาการสื่อสาร: ตัวตนอุปกรณ์ UUID ของ BLE GATT รูปแพ็กเก็ตตั้งค่า และ topic/payload ของ MQTT (11–13 ต.ค.) เพิ่ม <code>controlType</code>/<code>controlMode</code>, บอร์ดสายแอร์ และคำสั่ง <code>unprovision</code></td>
+<td>เอกสารสัญญาการสื่อสาร: ตัวตนอุปกรณ์ UUID ของ BLE GATT รูปแพ็กเก็ตตั้งค่า และ topic/payload ของ MQTT เพิ่ม <code>controlType</code>/<code>controlMode</code>, บอร์ดสายแอร์ และคำสั่ง <code>unprovision</code></td>
 </tr>
 <tr>
 <td><code>mqtt/setup_mqtt.ps1</code></td>
@@ -604,19 +602,19 @@
 </tr>
 <tr>
 <td><code>RELEASE_NOTES.md</code></td>
-<td>บันทึกการเปลี่ยนแปลงรุ่นล่าสุด (ความปลอดภัย เว็บแอป ตารางเรียน ภาคเรียน) (14 ต.ค.) หน้าเฟิร์มแวร์บนเว็บ, บอร์ดสายแอร์ Daikin + จอ OLED</td>
+<td>บันทึกการเปลี่ยนแปลงรุ่นล่าสุด (ความปลอดภัย เว็บแอป ตารางเรียน ภาคเรียน) หน้าเฟิร์มแวร์บนเว็บ, บอร์ดสายแอร์ Daikin + จอ OLED</td>
 </tr>
 <tr>
 <td><code>docs/learn/</code></td>
-<td>บทเรียนพื้นฐาน 18 บท (00–17) ตั้งแต่ Terminal, Docker, MQTT, SQL จนถึงขึ้นเซิร์ฟเวอร์ และไฟล์ Excel แผนการอ่าน (14 ต.ค.) เพิ่มบอร์ดสายแอร์ Daikin จอ OLED และหน้าเฟิร์มแวร์บนเว็บ</td>
+<td>บทเรียนพื้นฐาน 18 บท (00–17) ตั้งแต่ Terminal, Docker, MQTT, SQL จนถึงขึ้นเซิร์ฟเวอร์ และไฟล์ Excel แผนการอ่าน เพิ่มบอร์ดสายแอร์ Daikin จอ OLED และหน้าเฟิร์มแวร์บนเว็บ</td>
 </tr>
 <tr>
 <td><code>docs/study/</code></td>
-<td>บันทึกสรุป 9 บท (00–08) แยกตามส่วน: ภาพรวม ฐานข้อมูล Backend แอป เฟิร์มแวร์ MQTT/BLE ปิดแอร์อัตโนมัติ ค่าไฟ และการขึ้นเซิร์ฟเวอร์ (14 ต.ค.) ปรับเลขรุ่นให้ตรงโค้ด</td>
+<td>บันทึกสรุป 9 บท (00–08) แยกตามส่วน: ภาพรวม ฐานข้อมูล Backend แอป เฟิร์มแวร์ MQTT/BLE ปิดแอร์อัตโนมัติ ค่าไฟ และการขึ้นเซิร์ฟเวอร์ ปรับเลขรุ่นให้ตรงโค้ด</td>
 </tr>
 <tr>
 <td><code>คู่มือศึกษาโปรเจค/</code></td>
-<td>คู่มือนี้ 20 บท: <code>index.html</code> หน้าแรก, <code>chapters/</code> ฉบับ HTML, <code>markdown/</code> ต้นฉบับ .md, <code>assets/</code> CSS/JS (ขึ้น GitHub 14 ต.ค. 2569)</td>
+<td>คู่มือนี้ 20 บท: <code>index.html</code> หน้าแรก, <code>chapters/</code> ฉบับ HTML, <code>markdown/</code> ต้นฉบับ .md, <code>assets/</code> CSS/JS</td>
 </tr>
 <tr>
 <td><code>START_HERE.md</code></td>
@@ -696,7 +694,7 @@
 <tbody>
 <tr>
 <td>firmware/README.md</td>
-<td>คู่มือรวมของเฟิร์มแวร์ ESP32 ทั้งสองบอร์ด: ไลบรารี ขา GPIO ขั้นตอนตั้งค่า การกู้ Wi-Fi การต่อสายเรดาร์ การอ่าน log และตาราง MQTT state (ปรับ 11 ต.ค.; 14 ต.ค. แก้เลขรุ่นให้ตรงโค้ด 2.5.1 / 2.5.2-slm8 / 1.3.2 และเพิ่มหัวข้อ unprovision; ณ 15 ต.ค. ยังไม่ได้แก้ตามเซ็นเซอร์ 1.3.3 และขาใหม่ของบอร์ดสายแอร์) ครอบคลุม 3 เฟิร์มแวร์ รวมบอร์ดสายแอร์ ไลบรารี U8g2/DHT ตารางขารวมจอ OLED GPIO21/22</td>
+<td>คู่มือรวมของเฟิร์มแวร์ ESP32 ทั้งสองบอร์ด: ไลบรารี ขา GPIO ขั้นตอนตั้งค่า การกู้ Wi-Fi การต่อสายเรดาร์ การอ่าน log และตาราง MQTT state หัวข้อ unprovision (บางจุดยังไม่ตรงโค้ด: เขียนเซ็นเซอร์เป็น 1.3.2 และขา PZEM/LED เหลืองของบอร์ดสายแอร์เป็น 16/18/27) ครอบคลุม 3 เฟิร์มแวร์ รวมบอร์ดสายแอร์ ไลบรารี U8g2/DHT ตารางขารวมจอ OLED GPIO21/22</td>
 </tr>
 <tr>
 <td>firmware/rmutt_esp32_air/rmutt_esp32_air.ino</td>
@@ -716,63 +714,63 @@
 </tr>
 <tr>
 <td>firmware/rmutt_esp32_air/oled_display.h</td>
-<td>(ใหม่ 11 ต.ค.) คลาส <code>OledDisplay</code> ขับจอ OLED SH1106: ตรวจว่ามีจอ วาดทุก 400 ms หรือเมื่อ <code>poke()</code> เก็บกราฟวัตต์ พักจอเมื่อแอร์ปิดเกิน 10 นาที</td>
+<td>คลาส <code>OledDisplay</code> ขับจอ OLED SH1106: ตรวจว่ามีจอ วาดทุก 400 ms หรือเมื่อ <code>poke()</code> เก็บกราฟวัตต์ พักจอเมื่อแอร์ปิดเกิน 10 นาที</td>
 </tr>
 <tr>
 <td>firmware/rmutt_esp32_air/oled_ui.h</td>
-<td>(ใหม่ 11 ต.ค.) ฟังก์ชันวาดหน้าจอ 128×64 (<code>OledData</code>, หน้าหลัก, SETUP/CONNECTING/ALERT) ใช้ร่วมกับบอร์ดสายแอร์</td>
+<td>ฟังก์ชันวาดหน้าจอ 128×64 (<code>OledData</code>, หน้าหลัก, SETUP/CONNECTING/ALERT) ใช้ร่วมกับบอร์ดสายแอร์</td>
 </tr>
 <tr>
 <td>firmware/rmutt_esp32_air/build_opt.h</td>
-<td>(ใหม่ 11 ต.ค.) แฟล็กคอมไพเลอร์ปิด I2C/SPI ฮาร์ดแวร์ของ U8g2 และโปรโตคอล IR 28 ยี่ห้อที่ไม่ใช้ ให้เฟิร์มแวร์ที่มีจอพอดีแฟลช (98%)</td>
+<td>แฟล็กคอมไพเลอร์ปิด I2C/SPI ฮาร์ดแวร์ของ U8g2 และโปรโตคอล IR 28 ยี่ห้อที่ไม่ใช้ ให้เฟิร์มแวร์ที่มีจอพอดีแฟลช (98%)</td>
 </tr>
 <tr>
 <td>firmware/rmutt_esp32_air/README_OLED_TH.md</td>
-<td>(ใหม่ 11 ต.ค.) คู่มือต่อจอ OLED หน้าจอที่แสดง ไลบรารี U8g2 และเหตุผลของ <code>build_opt.h</code></td>
+<td>คู่มือต่อจอ OLED หน้าจอที่แสดง ไลบรารี U8g2 และเหตุผลของ <code>build_opt.h</code></td>
 </tr>
 <tr>
 <td>firmware/rmutt_esp32_air_wired/rmutt_esp32_air_wired.ino</td>
-<td>(ใหม่ 11 ต.ค.) เฟิร์มแวร์บอร์ดสายแอร์ Daikin 2.5.2-slm8 สั่งแอร์ทางสาย SLM8 + DHT11 รายงานสถานะจากแอร์ BLE/MQTT/PZEM/OTA เหมือนบอร์ด IR (บท 19) ขา PZEM ย้ายเป็น RX18/TX14 และ LED เหลืองเป็น GPIO23 (15 ต.ค.)</td>
+<td>เฟิร์มแวร์บอร์ดสายแอร์ Daikin 2.5.2-slm8 สั่งแอร์ทางสาย SLM8 + DHT11 รายงานสถานะจากแอร์ BLE/MQTT/PZEM/OTA เหมือนบอร์ด IR (บท 19) ขา PZEM ย้ายเป็น RX18/TX14 และ LED เหลืองเป็น GPIO23</td>
 </tr>
 <tr>
 <td>firmware/rmutt_esp32_air_wired/DaikinSLM8.h</td>
-<td>(ใหม่ 11 ต.ค.) โปรโตคอลสาย SLM8: สร้าง/อ่านเฟรม checksum ตัวรับ Rx (interrupt + ring buffer) ตัวส่ง Tx และ Controller</td>
+<td>โปรโตคอลสาย SLM8: สร้าง/อ่านเฟรม checksum ตัวรับ Rx (interrupt + ring buffer) ตัวส่ง Tx และ Controller</td>
 </tr>
 <tr>
 <td>firmware/rmutt_esp32_air_wired/wired_bus.h</td>
-<td>(ใหม่ 11 ต.ค.) รัน Controller ใน FreeRTOS task แยก (core 1, priority 3) พร้อม mutex ส่งเฟรมทุก 1 วินาที</td>
+<td>รัน Controller ใน FreeRTOS task แยก (core 1, priority 3) พร้อม mutex ส่งเฟรมทุก 1 วินาที</td>
 </tr>
 <tr>
 <td>firmware/rmutt_esp32_air_wired/README_WIRED_TH.md</td>
-<td>(ใหม่ 11 ต.ค.) วิธีต่อสาย ไลบรารี ขั้นทดสอบหลังแฟลช และค่าที่ปรับได้ของบอร์ดสายแอร์ (ณ 15 ต.ค. ยังเขียนขา PZEM 16/18 และ LED เหลือง 27 ตามรุ่นเก่า โค้ดจริงคือ 18/14 และ 23)</td>
+<td>วิธีต่อสาย ไลบรารี ขั้นทดสอบหลังแฟลช และค่าที่ปรับได้ของบอร์ดสายแอร์ (ยังเขียนขา PZEM 16/18 และ LED เหลือง 27 โค้ดจริงคือ 18/14 และ 23)</td>
 </tr>
 <tr>
 <td>firmware/rmutt_esp32_air_wired/build_opt.h</td>
-<td>(ใหม่ 11 ต.ค.) ปิดไดรเวอร์ I2C/SPI ฮาร์ดแวร์ที่ U8g2 ไม่ใช้ เพื่อประหยัดแฟลช</td>
+<td>ปิดไดรเวอร์ I2C/SPI ฮาร์ดแวร์ที่ U8g2 ไม่ใช้ เพื่อประหยัดแฟลช</td>
 </tr>
 <tr>
 <td>firmware/rmutt_esp32_air_wired/partitions.csv</td>
-<td>(ใหม่ 11 ต.ค.) แบ่งแฟลช 4MB เป็น 2 ช่องแอป (OTA) + rmuttlog 64KB เหมือนบอร์ด IR</td>
+<td>แบ่งแฟลช 4MB เป็น 2 ช่องแอป (OTA) + rmuttlog 64KB เหมือนบอร์ด IR</td>
 </tr>
 <tr>
 <td>firmware/rmutt_esp32_air_wired/history_log.h</td>
-<td>(ใหม่ 11 ต.ค.) สำเนาเดียวกับบอร์ด IR: เก็บข้อมูลไฟย้อนหลังใน flash</td>
+<td>สำเนาเดียวกับบอร์ด IR: เก็บข้อมูลไฟย้อนหลังใน flash</td>
 </tr>
 <tr>
 <td>firmware/rmutt_esp32_air_wired/ota_update.h</td>
-<td>(ใหม่ 11 ต.ค.) สำเนาเดียวกับบอร์ด IR: อัปเดตเฟิร์มแวร์ผ่าน HTTPS</td>
+<td>สำเนาเดียวกับบอร์ด IR: อัปเดตเฟิร์มแวร์ผ่าน HTTPS</td>
 </tr>
 <tr>
 <td>firmware/rmutt_esp32_air_wired/letsencrypt_ca.h</td>
-<td>(ใหม่ 11 ต.ค.) สำเนาเดียวกับบอร์ด IR: ใบรับรอง CA ของ Let's Encrypt</td>
+<td>สำเนาเดียวกับบอร์ด IR: ใบรับรอง CA ของ Let's Encrypt</td>
 </tr>
 <tr>
 <td>firmware/rmutt_esp32_air_wired/oled_display.h</td>
-<td>(ใหม่ 11 ต.ค.) สำเนาเดียวกับบอร์ด IR: ตัวขับจอ OLED</td>
+<td>สำเนาเดียวกับบอร์ด IR: ตัวขับจอ OLED</td>
 </tr>
 <tr>
 <td>firmware/rmutt_esp32_air_wired/oled_ui.h</td>
-<td>(ใหม่ 11 ต.ค.) สำเนาเดียวกับบอร์ด IR: หน้าจอ OLED</td>
+<td>สำเนาเดียวกับบอร์ด IR: หน้าจอ OLED</td>
 </tr>
 <tr>
 <td>firmware/rmutt_esp32_air/ota_update.h</td>
@@ -788,7 +786,7 @@
 </tr>
 <tr>
 <td>firmware/rmutt_esp32_occupancy/rmutt_esp32_occupancy.ino</td>
-<td>โปรแกรมหลักของบอร์ดตรวจจับคน (v1.3.3): อ่านเรดาร์ LD2410 ใน Engineering mode, ตัดสินมีคนเมื่อ static energy เกต 0–8 มากกว่า 15 (เดิม 25), ไฟ LED เขียว GPIO25 = การเชื่อมต่อ แดง GPIO26 = มีคน (1.3.3, 15 ต.ค.), ส่งสถานะผ่าน MQTT, BLE provisioning และ OTA (1.3.2) เพิ่มคำสั่ง <code>unprovision</code> ล้าง NVS แล้วรีบูตเข้า BLE</td>
+<td>โปรแกรมหลักของบอร์ดตรวจจับคน (v1.3.3): อ่านเรดาร์ LD2410 ใน Engineering mode, ตัดสินมีคนเมื่อ static energy เกต 0–8 มากกว่า 15, ไฟ LED เขียว GPIO25 = การเชื่อมต่อ แดง GPIO26 = มีคน, ส่งสถานะผ่าน MQTT, BLE provisioning, OTA และคำสั่ง <code>unprovision</code> ล้าง NVS แล้วรีบูตเข้า BLE</td>
 </tr>
 <tr>
 <td>firmware/rmutt_esp32_occupancy/ota_update.h</td>
@@ -856,7 +854,7 @@
 </tr>
 <tr>
 <td>lib/models/air_conditioner.dart</td>
-<td>โมเดลแอร์หนึ่งเครื่อง (สถานะสั่งงาน ค่า PZEM ปิดอัตโนมัติ) พร้อม enum โหมด/ลม/สวิง และกฎตามโปรโตคอล (Saijo Denki) (11 ต.ค.) ยี่ห้อ/วิธีควบคุม (<code>DAIKIN_WIRED</code>), getter <code>supportsXxx</code> และ <code>normalizeForProtocol()</code></td>
+<td>โมเดลแอร์หนึ่งเครื่อง (สถานะสั่งงาน ค่า PZEM ปิดอัตโนมัติ) พร้อม enum โหมด/ลม/สวิง และกฎตามโปรโตคอล (Saijo Denki) ยี่ห้อ/วิธีควบคุม (<code>DAIKIN_WIRED</code>), getter <code>supportsXxx</code> และ <code>normalizeForProtocol()</code></td>
 </tr>
 <tr>
 <td>lib/models/auth_user.dart</td>
@@ -876,7 +874,7 @@
 </tr>
 <tr>
 <td>lib/models/provisioning.dart</td>
-<td>โมเดลสำหรับตั้งค่า ESP32 ผ่าน BLE: อุปกรณ์ที่สแกนเจอ Wi-Fi ที่ ESP32 เห็น identity ใบจอง และ JSON ที่เขียนลงบอร์ด (11 ต.ค.) อ่าน <code>controlType</code>/<code>brand</code> จาก identity ของบอร์ด</td>
+<td>โมเดลสำหรับตั้งค่า ESP32 ผ่าน BLE: อุปกรณ์ที่สแกนเจอ Wi-Fi ที่ ESP32 เห็น identity ใบจอง และ JSON ที่เขียนลงบอร์ด อ่าน <code>controlType</code>/<code>brand</code> จาก identity ของบอร์ด</td>
 </tr>
 <tr>
 <td>lib/models/remembered_login.dart</td>
@@ -888,11 +886,11 @@
 </tr>
 <tr>
 <td>lib/models/schedule_import.dart</td>
-<td>โมเดลพรีวิวและผลลัพธ์การนำเข้าตารางเรียนจาก Excel พร้อม <code>replaceAll</code> (เปลี่ยนภาคเรียน ล้างตารางเดิมทุกห้อง เพิ่ม 9 ต.ค.)</td>
+<td>โมเดลพรีวิวและผลลัพธ์การนำเข้าตารางเรียนจาก Excel พร้อม <code>replaceAll</code> (เปลี่ยนภาคเรียน ล้างตารางเดิมทุกห้อง)</td>
 </tr>
 <tr>
 <td>lib/models/room_calendar.dart</td>
-<td>(ใหม่ 9 ต.ค.) ปฏิทินการใช้ห้อง: ตัวช่วยวันที่ <code>yyyy-MM-dd</code>, <code>RoomBooking</code> (วันเดียว/ทุกวัน/ทุกสัปดาห์) + นับจำนวนครั้ง, <code>AcademicTerm</code>/<code>AcademicCalendar</code> ภาคเรียน, <code>TimetableInfo</code>, <code>ScheduleBundle</code> และ <code>schedulesToCsv</code></td>
+<td>ปฏิทินการใช้ห้อง: ตัวช่วยวันที่ <code>yyyy-MM-dd</code>, <code>RoomBooking</code> (วันเดียว/ทุกวัน/ทุกสัปดาห์) + นับจำนวนครั้ง, <code>AcademicTerm</code>/<code>AcademicCalendar</code> ภาคเรียน, <code>TimetableInfo</code>, <code>ScheduleBundle</code> และ <code>schedulesToCsv</code></td>
 </tr>
 <tr>
 <td>lib/models/system_alert.dart</td>
@@ -956,11 +954,11 @@
 </tr>
 <tr>
 <td>lib/services/schedule_repository.dart</td>
-<td>สัญญา CRUD ตารางเรียน นำเข้าไฟล์ Excel และ (9 ต.ค.) ปฏิทินภาคเรียนกับการใช้ห้อง</td>
+<td>สัญญา CRUD ตารางเรียน นำเข้าไฟล์ Excel และ ปฏิทินภาคเรียนกับการใช้ห้อง</td>
 </tr>
 <tr>
 <td>lib/services/schedule_service.dart</td>
-<td>ตัวจริงที่ยิง /schedules/* รวมอัปโหลดไฟล์ดิบเพื่อพรีวิว และ (9 ต.ค.) /schedules/terms, /bookings</td>
+<td>ตัวจริงที่ยิง /schedules/* รวมอัปโหลดไฟล์ดิบเพื่อพรีวิว และ /schedules/terms, /bookings</td>
 </tr>
 <tr>
 <td>lib/services/system_settings_repository.dart</td>
@@ -1004,7 +1002,7 @@
 </tr>
 <tr>
 <td>lib/controllers/schedule_controller.dart</td>
-<td>รายการตารางเรียน CRUD นำเข้า ตรวจเวลาทับกัน และ (9 ต.ค.) ภาคเรียนของตาราง ปฏิทินภาคเรียน การใช้ห้องรายสัปดาห์ <code>classesOn</code>/<code>bookingsOn</code></td>
+<td>รายการตารางเรียน CRUD นำเข้า ตรวจเวลาทับกัน และ ภาคเรียนของตาราง ปฏิทินภาคเรียน การใช้ห้องรายสัปดาห์ <code>classesOn</code>/<code>bookingsOn</code></td>
 </tr>
 <tr>
 <td>lib/controllers/system_settings_controller.dart</td>
@@ -1020,7 +1018,7 @@
 </tr>
 <tr>
 <td>lib/utils/file_saver.dart</td>
-<td>บันทึกไฟล์ Excel หรือ CSV (เลือกนามสกุลได้ตั้งแต่ 9 ต.ค.): Android/iOS ผ่านเมนูแชร์ Windows ผ่านกล่อง Save As</td>
+<td>บันทึกไฟล์ Excel หรือ CSV (เลือกนามสกุลได้): Android/iOS ผ่านเมนูแชร์ Windows ผ่านกล่อง Save As</td>
 </tr>
 <tr>
 <td>lib/utils/number_format.dart</td>
@@ -1032,7 +1030,7 @@
 </tr>
 <tr>
 <td>lib/localization/app_localizations.dart</td>
-<td>ตัวแปลไทย/อังกฤษแบบ map ข้อความ + regex และ delegate ของ Flutter (11 ต.ค.) คำแปลใหม่ของยี่ห้อ/วิธีควบคุม</td>
+<td>ตัวแปลไทย/อังกฤษแบบ map ข้อความ + regex และ delegate ของ Flutter คำแปลใหม่ของยี่ห้อ/วิธีควบคุม</td>
 </tr>
 <tr>
 <td>lib/localization/localized_material.dart</td>
@@ -1096,7 +1094,7 @@
 </tr>
 <tr>
 <td>test/daikin_wired_support_test.dart</td>
-<td>(ใหม่ 11 ต.ค.) ข้อจำกัดของแอร์ <code>DAIKIN_WIRED</code> ยี่ห้อ/วิธีควบคุมของแอร์ IR และ identity BLE แบบสายแอร์ (3 เทสต์)</td>
+<td>ข้อจำกัดของแอร์ <code>DAIKIN_WIRED</code> ยี่ห้อ/วิธีควบคุมของแอร์ IR และ identity BLE แบบสายแอร์ (3 เทสต์)</td>
 </tr>
 <tr>
 <td>test/energy_database_test.dart</td>
@@ -1128,7 +1126,7 @@
 </tr>
 <tr>
 <td>test/room_calendar_test.dart</td>
-<td>(ใหม่ 9 ต.ค.) ทดสอบตัวช่วยวันที่ การจองห้องแบบต่าง ๆ ภาคเรียน และ CSV ตารางเรียน 11 เคส</td>
+<td>ทดสอบตัวช่วยวันที่ การจองห้องแบบต่าง ๆ ภาคเรียน และ CSV ตารางเรียน 11 เคส</td>
 </tr>
 <tr>
 <td>test/saijo_denki_support_test.dart</td>
@@ -1156,7 +1154,7 @@
 </tr>
 <tr>
 <td>test/widget_test.dart</td>
-<td>ทดสอบทั้งแอป (9 ต.ค. เพิ่มขั้นเพิ่มการใช้ห้อง): ล็อกอิน จำชื่อผู้ใช้ สลับภาษา/ธีม ค่าไฟ เพิ่มตารางเรียน เพิ่มห้อง CL503</td>
+<td>ทดสอบทั้งแอป (รวมขั้นเพิ่มการใช้ห้อง): ล็อกอิน จำชื่อผู้ใช้ สลับภาษา/ธีม ค่าไฟ เพิ่มตารางเรียน เพิ่มห้อง CL503</td>
 </tr>
 <tr>
 <td>test/wifi_network_candidate_test.dart</td>
@@ -1196,15 +1194,15 @@
 </tr>
 <tr>
 <td>lib/screens/schedule_screen.dart</td>
-<td>หน้าตารางเรียนตามวันที่จริง เลื่อนทีละสัปดาห์ รวมคาบเรียนกับการใช้ห้อง สถานะภาคเรียน และดาวน์โหลด CSV (ขยาย 9 ต.ค.)</td>
+<td>หน้าตารางเรียนตามวันที่จริง เลื่อนทีละสัปดาห์ รวมคาบเรียนกับการใช้ห้อง สถานะภาคเรียน และดาวน์โหลด CSV</td>
 </tr>
 <tr>
 <td>lib/screens/booking_editor_screen.dart</td>
-<td>(ใหม่ 9 ต.ค.) ฟอร์มเพิ่ม/แก้การใช้ห้อง ทำซ้ำวันเดียว/ทุกวัน/ทุกสัปดาห์/ในตารางเรียน พร้อมสรุปจำนวนครั้ง</td>
+<td>ฟอร์มเพิ่ม/แก้การใช้ห้อง ทำซ้ำวันเดียว/ทุกวัน/ทุกสัปดาห์/ในตารางเรียน พร้อมสรุปจำนวนครั้ง</td>
 </tr>
 <tr>
 <td>lib/screens/term_calendar_screen.dart</td>
-<td>(ใหม่ 9 ต.ค.) ปฏิทินภาคเรียน เพิ่ม/แก้/ลบวันเปิด–ปิดของแต่ละเทอม</td>
+<td>ปฏิทินภาคเรียน เพิ่ม/แก้/ลบวันเปิด–ปิดของแต่ละเทอม</td>
 </tr>
 <tr>
 <td>lib/screens/schedule_management_screen.dart</td>
@@ -1220,7 +1218,7 @@
 </tr>
 <tr>
 <td>lib/screens/ble_provisioning_screen.dart</td>
-<td>ตัวช่วยตั้งค่า ESP32 ของแอร์ผ่าน BLE ทีละขั้น (11 ต.ค.) แสดงชนิดบอร์ดและล็อกยี่ห้อเมื่อเป็นบอร์ดสายแอร์</td>
+<td>ตัวช่วยตั้งค่า ESP32 ของแอร์ผ่าน BLE ทีละขั้น แสดงชนิดบอร์ดและล็อกยี่ห้อเมื่อเป็นบอร์ดสายแอร์</td>
 </tr>
 <tr>
 <td>lib/screens/occupancy_provisioning_screen.dart</td>
@@ -1268,11 +1266,11 @@
 </tr>
 <tr>
 <td>lib/widgets/air_control_card.dart</td>
-<td>การ์ดควบคุมแอร์หนึ่งเครื่อง (เปิดปิด อุณหภูมิ โหมด ค่าไฟ) (11 ต.ค.) แสดงป้าย <code>AirControlBadge</code></td>
+<td>การ์ดควบคุมแอร์หนึ่งเครื่อง (เปิดปิด อุณหภูมิ โหมด ค่าไฟ) แสดงป้าย <code>AirControlBadge</code></td>
 </tr>
 <tr>
 <td>lib/widgets/air_control_badge.dart</td>
-<td>(ใหม่ 11 ต.ค.) ป้ายยี่ห้อ·วิธีควบคุมแอร์ เช่น "Daikin · สายแอร์" / "Haier · รีโมต IR" ใช้ในการ์ดแอร์และรีโมตเต็ม</td>
+<td>ป้ายยี่ห้อ·วิธีควบคุมแอร์ เช่น "Daikin · สายแอร์" / "Haier · รีโมต IR" ใช้ในการ์ดแอร์และรีโมตเต็ม</td>
 </tr>
 <tr>
 <td>lib/widgets/auto_off_countdown.dart</td>
@@ -1284,7 +1282,7 @@
 </tr>
 <tr>
 <td>lib/widgets/energy_usage_chart.dart</td>
-<td>กราฟแท่งการใช้พลังงาน (เปลี่ยนจากกราฟเส้น 9 ต.ค.) ป้ายเฉพาะแท่งสูงสุด แกนตัวเลขกลม เส้นเฉลี่ยรายวัน แตะ/ลากดูค่าได้</td>
+<td>กราฟแท่งการใช้พลังงาน ป้ายเฉพาะแท่งสูงสุด แกนตัวเลขกลม เส้นเฉลี่ยรายวัน แตะ/ลากดูค่าได้</td>
 </tr>
 <tr>
 <td>lib/widgets/floor_selector.dart</td>
@@ -1292,7 +1290,7 @@
 </tr>
 <tr>
 <td>lib/widgets/full_remote_sheet.dart</td>
-<td>แผ่นรีโมตเต็มรูปแบบของแอร์ (11 ต.ค.) ซ่อนปุ่มที่แอร์เครื่องนั้นทำไม่ได้ และมีป้ายยี่ห้อ·วิธีควบคุม</td>
+<td>แผ่นรีโมตเต็มรูปแบบของแอร์ ซ่อนปุ่มที่แอร์เครื่องนั้นทำไม่ได้ และมีป้ายยี่ห้อ·วิธีควบคุม</td>
 </tr>
 <tr>
 <td>lib/widgets/period_selector.dart</td>
@@ -1364,7 +1362,7 @@
 </tr>
 <tr>
 <td>webapp/assets/css/views.css</td>
-<td>สไตล์เฉพาะของแต่ละหน้า เช่น ภาพรวม Building Pulse ห้อง ตารางเรียน นำเข้าตาราง ผู้ใช้ ตั้งค่า (14 ต.ค.) สไตล์หน้าเฟิร์มแวร์และชิปยี่ห้อ</td>
+<td>สไตล์เฉพาะของแต่ละหน้า เช่น ภาพรวม Building Pulse ห้อง ตารางเรียน นำเข้าตาราง ผู้ใช้ ตั้งค่า สไตล์หน้าเฟิร์มแวร์และชิปยี่ห้อ</td>
 </tr>
 <tr>
 <td>webapp/assets/js/main.js</td>
@@ -1372,7 +1370,7 @@
 </tr>
 <tr>
 <td>webapp/assets/js/app.js</td>
-<td>ตัวประกอบร่าง: ตรวจล็อกอิน วาดเมนูและแถบบน สลับหน้าตาม hash (#/rooms) และจัดการลิ้นชักรีโมตแอร์ (14 ต.ค.) เส้นทาง/เมนู "เฟิร์มแวร์" (แอดมิน)</td>
+<td>ตัวประกอบร่าง: ตรวจล็อกอิน วาดเมนูและแถบบน สลับหน้าตาม hash (#/rooms) และจัดการลิ้นชักรีโมตแอร์ เส้นทาง/เมนู "เฟิร์มแวร์" (แอดมิน)</td>
 </tr>
 <tr>
 <td>webapp/assets/js/auth.js</td>
@@ -1384,15 +1382,15 @@
 </tr>
 <tr>
 <td>webapp/assets/js/api.js</td>
-<td>ชั้นเดียวที่เรียก fetch: แนบ Bearer token จัดการ 401 แปลง error เป็น ApiError และรวม method ของทุก endpoint (14 ต.ค.) ฟังก์ชันอัปโหลด/ลบไฟล์เฟิร์มแวร์</td>
+<td>ชั้นเดียวที่เรียก fetch: แนบ Bearer token จัดการ 401 แปลง error เป็น ApiError และรวม method ของทุก endpoint ฟังก์ชันอัปโหลด/ลบไฟล์เฟิร์มแวร์</td>
 </tr>
 <tr>
 <td>webapp/assets/js/store.js</td>
-<td>state กลาง subscribe/emit ตัวโหลดข้อมูลแต่ละชุด และ polling ตามช่วงใน config.js (15 ต.ค. เพิ่มดึง occupancySensors ทุก 10 วิ)</td>
+<td>state กลาง subscribe/emit ตัวโหลดข้อมูลแต่ละชุด และ polling ตามช่วงใน config.js (รวม occupancySensors ทุก 10 วิ)</td>
 </tr>
 <tr>
 <td>webapp/assets/js/format.js</td>
-<td>ฟังก์ชันจัดรูปแบบตัวเลข หน่วยพลังงาน วันที่ไทย พ.ศ. เวลา และคำอธิบายการแจ้งเตือน (11 ต.ค.) ป้ายยี่ห้อ/วิธีควบคุมและความสามารถของแอร์</td>
+<td>ฟังก์ชันจัดรูปแบบตัวเลข หน่วยพลังงาน วันที่ไทย พ.ศ. เวลา และคำอธิบายการแจ้งเตือน ป้ายยี่ห้อ/วิธีควบคุมและความสามารถของแอร์</td>
 </tr>
 <tr>
 <td>webapp/assets/js/thai-date-input.js</td>
@@ -1412,7 +1410,7 @@
 </tr>
 <tr>
 <td>webapp/assets/js/icons.js</td>
-<td>ไอคอน SVG ชุดหลักที่เขียนเอง ไม่พึ่ง CDN (14 ต.ค.) ไอคอนเมนูเฟิร์มแวร์</td>
+<td>ไอคอน SVG ชุดหลักที่เขียนเอง ไม่พึ่ง CDN ไอคอนเมนูเฟิร์มแวร์</td>
 </tr>
 <tr>
 <td>webapp/assets/js/icons-ui.js</td>
@@ -1436,7 +1434,7 @@
 </tr>
 <tr>
 <td>webapp/assets/js/views/rooms.js</td>
-<td>หน้าห้อง: การ์ดห้อง ตัวกรอง นับถอยหลังปิดอัตโนมัติ และรีโมตแอร์ในลิ้นชัก (ส่งคำสั่งผ่าน API) (11 ต.ค.) ชิปยี่ห้อ/วิธีควบคุม และปุ่มตามความสามารถของเครื่อง</td>
+<td>หน้าห้อง: การ์ดห้อง ตัวกรอง นับถอยหลังปิดอัตโนมัติ และรีโมตแอร์ในลิ้นชัก (ส่งคำสั่งผ่าน API) ชิปยี่ห้อ/วิธีควบคุม และปุ่มตามความสามารถของเครื่อง</td>
 </tr>
 <tr>
 <td>webapp/assets/js/views/energy.js</td>
@@ -1468,11 +1466,11 @@
 </tr>
 <tr>
 <td>webapp/assets/js/views/devices.js</td>
-<td>หน้าห้องและอุปกรณ์ (แอดมินเท่านั้น): จัดการห้อง จองช่องบอร์ดแอร์และเซ็นเซอร์ อัปเดตเฟิร์มแวร์ ถอดอุปกรณ์ (11 ต.ค.) ตัวเลือกจอง "Daikin · สายแอร์"</td>
+<td>หน้าห้องและอุปกรณ์ (แอดมินเท่านั้น): จัดการห้อง จองช่องบอร์ดแอร์และเซ็นเซอร์ อัปเดตเฟิร์มแวร์ ถอดอุปกรณ์ ตัวเลือกจอง "Daikin · สายแอร์"</td>
 </tr>
 <tr>
 <td>webapp/assets/js/views/firmware.js</td>
-<td>(ใหม่ 14 ต.ค.) หน้าเฟิร์มแวร์ (แอดมิน): 3 แท็บตามชนิดบอร์ด อัปโหลด .bin (ถามรุ่นถ้าชื่อไม่มี) ตารางบอร์ดที่ยังเก่า อัปเดตหลายบอร์ด ติดตามผลจนรายงานรุ่นใหม่หรือครบ 5 นาที (15 ต.ค. แจ้ง error แม้ข้อความซ้ำรอบก่อน และบอกรุ่นปัจจุบันเมื่อหมดเวลา)</td>
+<td>หน้าเฟิร์มแวร์ (แอดมิน): 3 แท็บตามชนิดบอร์ด อัปโหลด .bin (ถามรุ่นถ้าชื่อไม่มี) ตารางบอร์ดที่ยังเก่า อัปเดตหลายบอร์ด ติดตามผลจนรายงานรุ่นใหม่ แจ้ง error หรือครบ 5 นาที (บอกรุ่นปัจจุบันเมื่อหมดเวลา)</td>
 </tr>
 <tr>
 <td>webapp/assets/js/views/users.js</td>
@@ -1528,7 +1526,7 @@
 </tr>
 <tr>
 <td>deploy/setup-vps.sh</td>
-<td>ติดตั้งเครื่อง Ubuntu ใหม่: อัปเดตระบบ, Docker, swap, เวลา/NTP, firewall (เลือกได้), โครงโฟลเดอร์ /opt/rmutt, cron (14 ต.ค.) สร้างโฟลเดอร์ firmware เป็นของ uid 1000</td>
+<td>ติดตั้งเครื่อง Ubuntu ใหม่: อัปเดตระบบ, Docker, swap, เวลา/NTP, firewall (เลือกได้), โครงโฟลเดอร์ /opt/rmutt, cron สร้างโฟลเดอร์ firmware เป็นของ uid 1000</td>
 </tr>
 <tr>
 <td>deploy/init-env.sh</td>
@@ -1536,7 +1534,7 @@
 </tr>
 <tr>
 <td>deploy/update-remote.sh</td>
-<td>สคริปต์ที่รันบนเซิร์ฟเวอร์ตอนอัปเดต: build backend, migrate, reload Caddy, สร้างกล่อง tailscale ใหม่ (<code>up -d --force-recreate tailscale</code>) ให้ <code>tailscale-serve.json</code> ใหม่มีผล, ตรวจ health และเส้นทางสำคัญ (14 ต.ค.) ตรวจและ <code>chown 1000:1000</code> โฟลเดอร์ firmware ทุกครั้งที่อัปเดต</td>
+<td>สคริปต์ที่รันบนเซิร์ฟเวอร์ตอนอัปเดต: build backend, migrate, reload Caddy, สร้างกล่อง tailscale ใหม่ (<code>up -d --force-recreate tailscale</code>) ให้ <code>tailscale-serve.json</code> ใหม่มีผล, ตรวจ health และเส้นทางสำคัญ ตรวจและ <code>chown 1000:1000</code> โฟลเดอร์ firmware ทุกครั้งที่อัปเดต</td>
 </tr>
 <tr>
 <td>deploy/update-server.ps1</td>
@@ -1564,11 +1562,11 @@
 </tr>
 <tr>
 <td>.github/workflows/test.yml</td>
-<td>GitHub Actions (เพิ่ม 9 ต.ค. 2569) รันอัตโนมัติทุกครั้งที่ push หรือเปิด pull request: ติดตั้ง Flutter แล้วรัน <code>flutter analyze</code> และ <code>flutter test</code> เพื่อจับโค้ดพังก่อนรวมเข้า main</td>
+<td>GitHub Actions รันอัตโนมัติทุกครั้งที่ push หรือเปิด pull request: ติดตั้ง Flutter แล้วรัน <code>flutter analyze</code> และ <code>flutter test</code> เพื่อจับโค้ดพังก่อนรวมเข้า main</td>
 </tr>
 <tr>
 <td>.github/workflows/build-android.yml</td>
-<td>(ใหม่ 9 ต.ค.) GitHub Actions build APK บน Ubuntu เมื่อกดรันเอง รับ <code>api_base_url</code> ติดตั้ง Java 17 (<code>setup-java@v5</code>) + Flutter เซ็นด้วยกุญแจจาก Secrets (<code>ANDROID_KEYSTORE_BASE64</code>, <code>ANDROID_KEY_PASSWORD</code>) หรือ debug key แล้วต่อท้ายชื่อ <code>-DEBUG-KEY</code> เก็บ APK เป็น artifact 14 วัน</td>
+<td>GitHub Actions build APK บน Ubuntu เมื่อกดรันเอง รับ <code>api_base_url</code> ติดตั้ง Java 17 (<code>setup-java@v5</code>) + Flutter เซ็นด้วยกุญแจจาก Secrets (<code>ANDROID_KEYSTORE_BASE64</code>, <code>ANDROID_KEY_PASSWORD</code>) หรือ debug key แล้วต่อท้ายชื่อ <code>-DEBUG-KEY</code> เก็บ APK เป็น artifact 14 วัน</td>
 </tr>
 <tr>
 <td>.github/workflows/build-ios.yml</td>

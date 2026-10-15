@@ -55,10 +55,8 @@
 <li><a href="17-glossary.html"><span class="num">17</span>อภิธานศัพท์</a></li>
 <li><a href="18-file-map.html"><span class="num">18</span>แผนที่ไฟล์ทั้งโปรเจค</a></li>
 </ul>
-<div class="nav-part">งานที่กำลังพัฒนา</div><ul>
-<li><a href="19-daikin-slm8.html"><span class="num">19</span>แอร์ Daikin ผ่านสาย SLM8: จากการแกะโปรโตคอลถึงบอร์ดสายแอร์</a></li>
-</ul>
 <div class="nav-part">เจาะลึก</div><ul>
+<li><a href="19-daikin-slm8.html"><span class="num">19</span>แอร์ Daikin ผ่านสาย SLM8: จากการแกะโปรโตคอลถึงบอร์ดสายแอร์</a></li>
 <li><a href="20-database-design.html"><span class="num">20</span>เจาะลึกการออกแบบฐานข้อมูล</a></li>
 </ul>
     </nav>
@@ -66,7 +64,7 @@
   <main class="content" id="content">
 <div class="chapter-head"><div class="kicker">บทที่ 13 · อุปกรณ์และหน้าจอ</div><h1>เว็บแอป: HTML, CSS และ JavaScript ล้วน</h1></div>
 <h2 id="ภาพรวม">ภาพรวม<a class="anchor" href="#ภาพรวม">#</a></h2>
-<p>เว็บแอปคือหน้าจอ "ฝั่งคอมพิวเตอร์" ของระบบ RMUTT Save Energy อยู่ในโฟลเดอร์ <code>webapp/</code> ใช้ฐานข้อมูลและ API ชุดเดียวกับแอป Flutter บนมือถือทุกอย่าง (ผู้ใช้ชุดเดียวกัน รหัสผ่านชุดเดียวกัน) ต่างกันที่จอกว้างกว่า จึงออกแบบให้ "ดูข้อมูลละเอียดและทำงานกรอกข้อมูลเร็วกว่า" เช่น หน้าข้อมูลไฟฟ้าที่วางตารางสิบกว่าคอลัมน์ นำเข้าตารางเรียนจาก Excel จองการใช้ห้อง จัดการห้องและอุปกรณ์ และ (เพิ่ม 14 ต.ค. 2569) อัปโหลดไฟล์เฟิร์มแวร์แล้วสั่งอัปเดตบอร์ดหลายตัวพร้อมกันจากหน้า "เฟิร์มแวร์"</p>
+<p>เว็บแอปคือหน้าจอ "ฝั่งคอมพิวเตอร์" ของระบบ RMUTT Save Energy อยู่ในโฟลเดอร์ <code>webapp/</code> ใช้ฐานข้อมูลและ API ชุดเดียวกับแอป Flutter บนมือถือทุกอย่าง (ผู้ใช้ชุดเดียวกัน รหัสผ่านชุดเดียวกัน) ต่างกันที่จอกว้างกว่า จึงออกแบบให้ "ดูข้อมูลละเอียดและทำงานกรอกข้อมูลเร็วกว่า" เช่น หน้าข้อมูลไฟฟ้าที่วางตารางสิบกว่าคอลัมน์ นำเข้าตารางเรียนจาก Excel จองการใช้ห้อง จัดการห้องและอุปกรณ์ และ อัปโหลดไฟล์เฟิร์มแวร์แล้วสั่งอัปเดตบอร์ดหลายตัวพร้อมกันจากหน้า "เฟิร์มแวร์"</p>
 <p>ในภาพรวมของระบบ เว็บแอปคุยกับ <strong>Backend อย่างเดียว</strong> ผ่าน HTTP ที่ path <code>/api/*</code> มันไม่ได้ต่อ MQTT เองและไม่ได้แตะฐานข้อมูลตรง ๆ เมื่อผู้ใช้กดสั่งแอร์ เว็บส่ง <code>POST /api/air-conditioners/&lt;deviceId&gt;/command</code> ให้ Backend แล้ว Backend เป็นคนส่งต่อเข้า MQTT ไปหา ESP32 เอง</p>
 <div class="code-block"><div class="hl"><pre><span></span><code>เบราว์เซอร์ (webapp)  --HTTPS--&gt;  Caddy  --/api/*--&gt;  Backend (Express)  --&gt;  MariaDB / MQTT
                                     |
@@ -94,7 +92,7 @@
 - <strong>ES Modules</strong>: <code>import { x } from './a.js'</code> / <code>export</code> เบราว์เซอร์โหลดไฟล์ตามที่ import ให้เอง (ต้องใส่ <code>&lt;script type="module"&gt;</code>) แต่ละไฟล์มีขอบเขตของตัวเอง และโหลดครั้งเดียวต่อ URL จึงเป็น <strong>singleton</strong> โดยปริยาย: <code>state</code> ใน <code>store.js</code> เป็นตัวเดียวกันทุกไฟล์ที่ import
 - <strong>localStorage</strong>: ที่เก็บคู่ key/value ถาวรในเบราว์เซอร์ของเครื่องนั้น (ไม่ส่งไปเซิร์ฟเวอร์) เก็บได้แต่ข้อความ อ่านเขียนอาจ throw error ได้ (โหมดส่วนตัว) จึงต้องห่อ <code>try/catch</code> เสมอ</p>
 <p><strong>SPA (Single Page Application)</strong> — โหลด <code>index.html</code> ครั้งเดียว แล้วใช้ JavaScript สลับเนื้อหาในหน้าเดิมเมื่อผู้ใช้กดเมนู ไม่โหลดหน้าใหม่ทั้งหน้า ข้อดีคือสลับหน้าเร็วและเก็บสถานะ (เช่น ข้อมูลที่ดึงมาแล้ว) ไว้ได้ ข้อเสียคือต้องจัดการเส้นทางเอง (ในเว็บนี้ใช้ <code>#/rooms</code> ใน URL ดูหัวข้อ app.js)</p>
-<p><strong>ทำไมไม่ใช้ framework (React/Vue)</strong> — ข้อดีของมันคือจัดการ "วาดหน้าใหม่เมื่อข้อมูลเปลี่ยน" ให้ แต่ต้องแลกกับขั้นตอน build (Node, npm, bundler) เว็บนี้มี 10 หน้า (หน้าที่ 10 "เฟิร์มแวร์" เพิ่ม 14 ต.ค. 2569) ผู้ดูแลต่อไปเป็นนักศึกษารุ่นน้อง และเซิร์ฟเวอร์แค่คัดลอกไฟล์ขึ้นไปก็จบ จึงเลือกไม่มี build ราคาที่ต้องจ่ายคือ เขียนโค้ดวาด DOM เอง (ดูหัวข้อ dom.js) เปิดไฟล์ด้วยดับเบิลคลิก (<code>file://</code>) ไม่ได้ และไม่มีตัวช่วยตรวจ type</p>
+<p><strong>ทำไมไม่ใช้ framework (React/Vue)</strong> — ข้อดีของมันคือจัดการ "วาดหน้าใหม่เมื่อข้อมูลเปลี่ยน" ให้ แต่ต้องแลกกับขั้นตอน build (Node, npm, bundler) เว็บนี้มี 10 หน้า ผู้ดูแลต่อไปเป็นนักศึกษารุ่นน้อง และเซิร์ฟเวอร์แค่คัดลอกไฟล์ขึ้นไปก็จบ จึงเลือกไม่มี build ราคาที่ต้องจ่ายคือ เขียนโค้ดวาด DOM เอง (ดูหัวข้อ dom.js) เปิดไฟล์ด้วยดับเบิลคลิก (<code>file://</code>) ไม่ได้ และไม่มีตัวช่วยตรวจ type</p>
 <p><strong>CSP (Content-Security-Policy)</strong> — HTTP header ที่เซิร์ฟเวอร์ส่งไปบอกเบราว์เซอร์ว่า "หน้านี้อนุญาตให้โหลด/รันอะไรจากไหนบ้าง" ของเราตั้งที่ Caddy: <code>script-src 'self'</code> = รันได้เฉพาะสคริปต์ที่เป็นไฟล์จากโดเมนเดียวกัน <strong>สคริปต์ที่เขียนฝังในหน้า HTML (<code>&lt;script&gt;...&lt;/script&gt;</code>) และ handler แบบ <code>onclick="..."</code> ถูกบล็อกหมด</strong> จึงไม่มี JavaScript ฝังใน <code>index.html</code> เลย (นี่คือเหตุผลที่ <code>main.js</code> และ <code>status.js</code> ต้องเป็นไฟล์แยก)</p>
 <p><strong>XSS (Cross-Site Scripting)</strong> — ผู้โจมตีใส่ข้อความที่เป็นโค้ด เช่น ชื่อวิชา <code>&lt;img src=x onerror=...&gt;</code> เข้าฐานข้อมูล ถ้าหน้าเว็บเอาข้อความนั้นไปต่อเป็น HTML (<code>innerHTML</code>) เบราว์เซอร์จะรันมัน โค้ดนั้นอ่าน token จาก localStorage แล้วขโมยได้ วิธีกันของเรามี 2 ชั้น: (1) ข้อมูลจากฐานข้อมูลใส่ด้วย <code>textContent</code> เสมอ ซึ่งถือเป็นข้อความล้วน ไม่ตีความเป็น HTML (2) CSP กันสคริปต์แปลกปลอมไว้อีกชั้น</p>
 <p><strong>Same-origin กับ CORS</strong> — <strong>origin</strong> = โปรโตคอล + โดเมน + พอร์ต ปกติเบราว์เซอร์ไม่ยอมให้หน้าจาก origin A อ่านคำตอบจาก origin B เว้นแต่ B ส่ง header CORS บอกว่าอนุญาต เว็บของเรากับ API อยู่ origin เดียวกัน (Caddy เสิร์ฟทั้งคู่) <code>fetch('/api/...')</code> จึงไม่ติด CORS และไม่ต้องฝังชื่อโดเมนไว้ในโค้ด ตอนพัฒนาบนเครื่อง (เว็บพอร์ต 5500, API พอร์ต 3000) เป็นคนละ origin ต้องตั้ง <code>APP_ORIGIN</code> ที่ Backend ให้อนุญาต (Backend ใช้แพ็กเกจ <code>cors</code> ใน <code>backend/src/app.js</code> ตรวจ origin กับรายการใน <code>config.appOrigin</code>)</p>
@@ -131,7 +129,7 @@
         ├── dom.js            ตัวช่วยสร้าง DOM
         ├── status.js         สคริปต์ของ status.html
         └── views/            overview, rooms, energy, schedule (+ schedule-import, term-calendar, booking-form),
-                              alerts, rates, devices, firmware (เพิ่ม 14 ต.ค. 2569), users, settings
+                              alerts, rates, devices, firmware, users, settings
 </code></pre></div>
 </div>
 
@@ -159,7 +157,7 @@
                   │                   + schedule-import.js, term-calendar.js, booking-form.js
                   ├─ alerts.js      ► dom, format, store, overview.js (ใช้ alertRow ซ้ำ)
                   ├─ rates.js, devices.js, users.js, settings.js  ► api, dom, format, icons, store, ui
-                  ├─ firmware.js    ► api, dom, format, icons-ui, store, ui   (เพิ่ม 14 ต.ค. 2569)
+                  ├─ firmware.js    ► api, dom, format, icons-ui, store, ui
                   └─ settings.js    ► + prefs.js, theme.js
 charts.js ► dom.js, format.js
 </code></pre></div>
@@ -239,7 +237,7 @@ charts.js ► dom.js, format.js
 </tr>
 <tr>
 <td>เฟิร์มแวร์</td>
-<td><code>firmwareFiles</code> GET <code>/firmware</code> (ได้ <code>configured</code>, <code>maxBytes</code>, <code>files[]</code> ที่แต่ละไฟล์มี <code>name</code> <code>kind</code> <code>version</code> <code>size</code> <code>modifiedAt</code>); <strong>เพิ่ม 14 ต.ค. 2569:</strong> <code>uploadFirmware(file, fileName, kind, replace)</code> POST <code>/firmware</code> (ไฟล์ดิบ + header <code>X-File-Name</code>, query <code>?kind=</code> และ <code>?replace=1</code>); <code>deleteFirmware(fileName)</code> DELETE <code>/firmware/:fileName</code></td>
+<td><code>firmwareFiles</code> GET <code>/firmware</code> (ได้ <code>configured</code>, <code>maxBytes</code>, <code>files[]</code> ที่แต่ละไฟล์มี <code>name</code> <code>kind</code> <code>version</code> <code>size</code> <code>modifiedAt</code>); <code>uploadFirmware(file, fileName, kind, replace)</code> POST <code>/firmware</code> (ไฟล์ดิบ + header <code>X-File-Name</code>, query <code>?kind=</code> และ <code>?replace=1</code>); <code>deleteFirmware(fileName)</code> DELETE <code>/firmware/:fileName</code></td>
 </tr>
 <tr>
 <td>พลังงาน</td>
@@ -268,7 +266,7 @@ charts.js ► dom.js, format.js
 </tbody>
 </table></div>
 <p>ทุก path ที่มีค่าจากผู้ใช้ผ่าน <code>encodeURIComponent(...)</code> (กัน <code>/</code> หรือ <code>?</code> ในรหัสห้อง/ชื่อผู้ใช้ทำให้ URL เพี้ยน)</p>
-<div class="callout note"><div class="callout-title">หมายเหตุ</div><p><strong>แก้ 14 ต.ค. 2569:</strong> <code>api.js</code> เพิ่มขึ้น 16 บรรทัด แต่เป็น method ใหม่แค่ <strong>2 ตัว</strong> (<code>uploadFirmware</code>, <code>deleteFirmware</code>) ที่เหลือคือคอมเมนต์และการจัดบรรทัด <code>uploadFirmware</code> ใช้ช่อง <code>upload</code> ของ <code>request()</code> แบบเดียวกับ <code>previewScheduleImport</code> (ส่งไฟล์ดิบ ไม่ห่อ JSON) อธิบายทีละบรรทัดในหัวข้อเจาะโค้ดข้อ 10</p></div>
+<div class="callout note"><div class="callout-title">หมายเหตุ</div><p><code>uploadFirmware</code> ใช้ช่อง <code>upload</code> ของ <code>request()</code> แบบเดียวกับ <code>previewScheduleImport</code> (ส่งไฟล์ดิบ ไม่ห่อ JSON) อธิบายทีละบรรทัดในหัวข้อเจาะโค้ดข้อ 10</p></div>
 
 <h3 id="storejs"><code>store.js</code><a class="anchor" href="#storejs">#</a></h3>
 <p>สมองกลางของฝั่งข้อมูล export: <code>state</code> (ออบเจ็กต์เดียวทั้งแอป), <code>subscribe(listener)</code>, <code>emit()</code>, <code>patchState</code>, <code>loaders</code> (ฟังก์ชันดึงข้อมูลทีละชุด), <code>startPolling/stopPolling/refreshAll</code>, <code>bootstrap</code>, <code>resetState</code> และตัวช่วยอ่าน <code>airConditionersOf</code>, <code>liveReading</code>, <code>sensorOf</code>, <code>roomsByFloor</code>, <code>roomEnergyMap</code>, <code>defaultHistoryRange</code> หัวข้อเจาะโค้ดอธิบาย <code>load()</code> และ <code>tick()</code></p>
@@ -280,7 +278,7 @@ charts.js ► dom.js, format.js
 - กติกาหน่วยพลังงาน: ถ้าค่าอ้างอิงใหญ่สุดของชุด &lt; 1 ใช้ <strong>Wh</strong>; ≥ 1000 ใช้ <strong>MWh</strong>; นอกนั้น <strong>kWh</strong> และจำนวนทศนิยมตามขนาด (≥100 → 0 หลัก, ≥10 → 1, ≥1 → 2, น้อยกว่านั้น 3) <code>0</code> พอดีเขียน <code>0 kWh</code>
 - เวลา: <code>clock(seconds)</code> → <code>mm:ss</code>, <code>duration(minutes)</code>, <code>time(value)</code> → <code>HH:mm</code>, <code>relativeTime</code> ("5 นาทีที่แล้ว")
 - วันที่ไทย (พ.ศ. = ค.ศ. + 543): <code>thaiFullDate</code>, <code>thaiShortDate</code> (<code>25 ส.ค. 69</code>), <code>thaiDate</code> (<code>25 ส.ค. 2569</code> อ่าน <code>YYYY-MM-DD</code> เป็นวันท้องถิ่น กัน <code>new Date('2026-08-25')</code> ที่ตีเป็น UTC แล้วเลื่อนวัน), <code>isoDate</code>, <code>shiftDays</code>
-- <strong>ยี่ห้อและวิธีควบคุมแอร์ (เพิ่ม 11 ต.ค. 2569)</strong>: <code>WIRED_PROTOCOL</code> = <code>'DAIKIN_WIRED'</code> (บอร์ดสายแอร์ที่ต่อแทนรีโมตติดผนัง Daikin), <code>isWiredProtocol(protocol)</code>, ตาราง <code>BRAND_BY_PROTOCOL</code> (19 โปรโตคอล → ชื่อยี่ห้อ เช่น <code>HAIER_AC160</code> → Haier), <code>airBrand(protocol)</code>, <code>controlTypeLabel(protocol)</code> ("สายแอร์" / "รีโมต IR"), <code>airControlSummary(protocol)</code> ("Daikin · สายแอร์" หรือ "Haier · รีโมต IR (HAIER_AC160)") ใช้ใน <code>rooms.js</code> <code>devices.js</code> และ <code>firmware.js</code> เพื่อให้ผู้ใช้เห็น "ยี่ห้อ" แทนชื่อโปรโตคอลดิบ
+- <strong>ยี่ห้อและวิธีควบคุมแอร์</strong>: <code>WIRED_PROTOCOL</code> = <code>'DAIKIN_WIRED'</code> (บอร์ดสายแอร์ที่ต่อแทนรีโมตติดผนัง Daikin), <code>isWiredProtocol(protocol)</code>, ตาราง <code>BRAND_BY_PROTOCOL</code> (19 โปรโตคอล → ชื่อยี่ห้อ เช่น <code>HAIER_AC160</code> → Haier), <code>airBrand(protocol)</code>, <code>controlTypeLabel(protocol)</code> ("สายแอร์" / "รีโมต IR"), <code>airControlSummary(protocol)</code> ("Daikin · สายแอร์" หรือ "Haier · รีโมต IR (HAIER_AC160)") ใช้ใน <code>rooms.js</code> <code>devices.js</code> และ <code>firmware.js</code> เพื่อให้ผู้ใช้เห็น "ยี่ห้อ" แทนชื่อโปรโตคอลดิบ
 - ชื่อ/ป้าย: <code>floorLabel</code> (ชั้น ≤ 0 → "ห้องพิเศษ"), <code>describeAlert(alert)</code> แปลงรหัส <code>kind</code> (<code>outside_schedule_occupied</code>, <code>auto_off_succeeded</code>, <code>auto_off_failed</code>) และรหัส <code>detail</code> (<code>noClassNow</code>, <code>noScheduleAtAll</code>, <code>outsideTerm</code>, <code>attempts=N</code>) เป็นข้อความไทย, ค่าคงที่ <code>ALERT_STATUS_LABEL</code>, <code>MODE_LABEL</code>, <code>FAN_LABEL</code>, <code>SWING_LABEL</code>, <code>DAY_NAMES</code></p>
 <h3 id="thai-date-inputjs"><code>thai-date-input.js</code><a class="anchor" href="#thai-date-inputjs">#</a></h3>
 <p>ช่องวันที่ที่แสดง/พิมพ์เป็น <strong>พ.ศ.</strong> <code>&lt;input type="date"&gt;</code> ของเบราว์เซอร์แสดงปีตามภาษาเครื่อง ซึ่งมักเป็น ค.ศ. คนพิมพ์ 2569 จะได้ปี ค.ศ. 2569 จริง ๆ ไฟล์นี้ export <code>thaiDateInput({ name, value, min, max, onChange })</code>, <code>isoToThaiText</code>, <code>thaiTextToIso</code>
@@ -323,7 +321,7 @@ charts.js ► dom.js, format.js
 <h3 id="chartsjs"><code>charts.js</code><a class="anchor" href="#chartsjs">#</a></h3>
 <p>กราฟวาดเองเป็น <strong>SVG</strong> ไม่ใช้ไลบรารี (เหตุผล: ต้องการแค่ 2 แบบ และไลบรารีมักดึงจาก CDN ที่เครือข่ายมหาวิทยาลัยอาจบล็อก) export: <code>areaChart(points, options)</code>, <code>rankBars(items, iconMarkup)</code>, <code>heatColor(value, max)</code>, <code>metricBox(value, unitText, label, digits)</code> ภายในมี <code>node()</code> (สร้างอิลิเมนต์ SVG ด้วย <code>createElementNS</code>) และ <code>attachTooltip()</code> อธิบายการวาดในหัวข้อเจาะโค้ด</p>
 <h3 id="iconsjs-และ-icons-uijs"><code>icons.js</code> และ <code>icons-ui.js</code><a class="anchor" href="#iconsjs-และ-icons-uijs">#</a></h3>
-<p>ฟังก์ชันที่คืนสตริง SVG (<code>stroke(path, size, width)</code> สร้างกรอบ <code>&lt;svg ... stroke="currentColor"&gt;</code>) <code>icons.js</code> มี <code>bolt grid building calendar coin chart bell chip users gear warning pulseLine board clock close menu refresh save download meter person logout plus trash edit check wifi radar</code> และ <code>firmware</code> (ชิปกับลูกศรขึ้น ไอคอนเมนูเฟิร์มแวร์ เพิ่ม 14 ต.ค. 2569) ส่วน <code>icons-ui.js</code> (<code>uiIcons</code>) มี <code>sun moon search more textSize upload sheet checkCircle alert</code> ใช้ <code>stroke="currentColor"</code> ไอคอนจึงเปลี่ยนสีตามสีตัวหนังสือ (ธีมเปลี่ยนแล้วไอคอนตามเอง) เขียนเองเพื่อไม่ต้องพึ่ง CDN ไอคอน และแยกไฟล์ที่สองเพราะเรื่องแคชเหมือน <code>theme.js</code></p>
+<p>ฟังก์ชันที่คืนสตริง SVG (<code>stroke(path, size, width)</code> สร้างกรอบ <code>&lt;svg ... stroke="currentColor"&gt;</code>) <code>icons.js</code> มี <code>bolt grid building calendar coin chart bell chip users gear warning pulseLine board clock close menu refresh save download meter person logout plus trash edit check wifi radar</code> และ <code>firmware</code> (ชิปกับลูกศรขึ้น ไอคอนเมนูเฟิร์มแวร์) ส่วน <code>icons-ui.js</code> (<code>uiIcons</code>) มี <code>sun moon search more textSize upload sheet checkCircle alert</code> ใช้ <code>stroke="currentColor"</code> ไอคอนจึงเปลี่ยนสีตามสีตัวหนังสือ (ธีมเปลี่ยนแล้วไอคอนตามเอง) เขียนเองเพื่อไม่ต้องพึ่ง CDN ไอคอน และแยกไฟล์ที่สองเพราะเรื่องแคชเหมือน <code>theme.js</code></p>
 <h3 id="uijs"><code>ui.js</code><a class="anchor" href="#uijs">#</a></h3>
 <p>ชิ้นส่วนหน้าจอที่ทุกหน้าใช้ร่วมกัน
 - <code>toast(message, kind, ms)</code> + <code>toastOk/toastError/toastInfo</code>: แถบแจ้งผลมุมจอ หายเอง (4.2 วินาที, error 6 วินาที) ใช้แทน <code>alert()</code> ที่บล็อกทั้งหน้า
@@ -336,7 +334,7 @@ charts.js ► dom.js, format.js
 <h3 id="authjs"><code>auth.js</code><a class="anchor" href="#authjs">#</a></h3>
 <p><code>mountLoginScreen(onSuccess)</code> สร้างหน้าล็อกอิน (ฟอร์ม username/password, ปุ่ม "ลืมรหัสผ่าน") ใส่ลง <code>document.body</code> เรียก <code>api.login()</code> สำเร็จแล้ว <code>screen.remove()</code> และเรียก <code>onSuccess(user)</code> ถ้าผิดแสดงข้อความ error จาก Backend ล้างช่องรหัสผ่านและโฟกัสกลับ <code>forgotPasswordFlow()</code> ทำ 3 ขั้นต่อกันด้วย <code>await openForm</code>: ขอ OTP (<code>api.forgotPassword</code> → ได้ <code>requestId</code>) → กรอก OTP 6 หลัก (<code>api.verifyOtp</code> → ได้ <code>resetToken</code>) → ตั้งรหัสใหม่ (<code>api.resetPassword</code>, ตรวจว่าสองช่องตรงกันก่อน) ถ้าไม่ได้ <code>requestId</code> กลับมา ก็แสดงข้อความกลาง ๆ "ถ้ามีบัญชีนี้ในระบบ จะได้รับอีเมล" (ถ้อยคำแบบนี้เป็นแนวปฏิบัติทั่วไปที่ไม่บอกคนนอกว่าบัญชีนั้นมีอยู่จริงหรือไม่) โทเคนเก็บ localStorage ไม่ใช่ cookie เพราะ Backend ตรวจจาก header <code>Authorization</code> อย่างเดียว ใช้ cookie แล้วต้องคิดเรื่อง CSRF เพิ่มโดยไม่ได้อะไรกลับมา</p>
 <h3 id="appjs"><code>app.js</code><a class="anchor" href="#appjs">#</a></h3>
-<p>ตัวประกอบร่าง (533 บรรทัด หลังเพิ่มหน้าเฟิร์มแวร์ 14 ต.ค. 2569) มีตารางหน้า <code>VIEWS</code>, ลิ้นชักรีโมต, เมนู, แถบบน</p>
+<p>ตัวประกอบร่าง (533 บรรทัด) มีตารางหน้า <code>VIEWS</code>, ลิ้นชักรีโมต, เมนู, แถบบน</p>
 <div class="table-wrap"><table>
 <thead>
 <tr>
@@ -349,7 +347,7 @@ charts.js ► dom.js, format.js
 <tr>
 <td>ตารางหน้า</td>
 <td><code>VIEWS</code>, <code>BOTTOM_NAV</code> (<code>overview rooms energy alerts</code>), <code>NAV_LABELS</code>, <code>SHORT_LABELS</code></td>
-<td>รายชื่อ 10 หน้าแบ่งกลุ่ม <code>main</code> (6 หน้า) กับ <code>system</code> (4 หน้า: devices firmware users settings; <code>firmware</code> เพิ่ม 14 ต.ค. 2569)</td>
+<td>รายชื่อ 10 หน้าแบ่งกลุ่ม <code>main</code> (6 หน้า) กับ <code>system</code> (4 หน้า: devices firmware users settings)</td>
 </tr>
 <tr>
 <td>เริ่ม/จบ</td>
@@ -378,7 +376,7 @@ charts.js ► dom.js, format.js
 </tr>
 </tbody>
 </table></div>
-<p><strong>การเพิ่มหน้าเฟิร์มแวร์ (แก้ 14 ต.ค. 2569)</strong> ใช้แค่ 3 บรรทัดใน <code>app.js</code>: <code>import firmware from './views/firmware.js';</code> (บรรทัด 40), แถวใน <code>VIEWS</code> และป้ายใน <code>NAV_LABELS</code> (บรรทัด 78 <code>firmware: 'เฟิร์มแวร์'</code>)</p>
+<p><strong>การเพิ่มหน้าเฟิร์มแวร์</strong> ใช้แค่ 3 บรรทัดใน <code>app.js</code>: <code>import firmware from './views/firmware.js';</code> (บรรทัด 40), แถวใน <code>VIEWS</code> และป้ายใน <code>NAV_LABELS</code> (บรรทัด 78 <code>firmware: 'เฟิร์มแวร์'</code>)</p>
 <p><strong>ไฟล์ <code>webapp/assets/js/app.js</code> บรรทัด 44–55</strong></p>
 <div class="code-block"><span class="code-lang">js</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">44</span>
 <span class="normal">45</span>
@@ -424,7 +422,7 @@ charts.js ► dom.js, format.js
 </tr>
 <tr>
 <td>51–54</td>
-<td>กลุ่ม <code>system</code> วาดใน <code>&lt;nav id="navSystem"&gt;</code> ตอนนี้มี 4 หน้า หน้าเฟิร์มแวร์อยู่ถัดจาก "ห้องและอุปกรณ์" เพราะเป็นงานดูแลบอร์ดเหมือนกัน</td>
+<td>กลุ่ม <code>system</code> วาดใน <code>&lt;nav id="navSystem"&gt;</code> มี 4 หน้า หน้าเฟิร์มแวร์อยู่ถัดจาก "ห้องและอุปกรณ์" เพราะเป็นงานดูแลบอร์ดเหมือนกัน</td>
 </tr>
 <tr>
 <td>52</td>
@@ -470,13 +468,13 @@ charts.js ► dom.js, format.js
 <li><strong>การ์ดห้อง</strong> (<code>roomCard</code>): ชื่อห้อง ประเภท ชิป "แอร์เปิด x/y" ชิปสถานะคน ("มีคนอยู่" / "ไม่มีคน" / "เซ็นเซอร์ออฟไลน์" / "ยังไม่ติดตั้งเซ็นเซอร์") กำลังนับถอยหลังปิดอัตโนมัติ (<code>countdownStrip</code>) หรือค่าไฟของช่วงที่เลือก และสถานะบอร์ดออนไลน์ ห้องที่ยังไม่มีแอร์วาดแบบย่อ</li>
 <li><strong>ตัวกรอง</strong> (ออบเจ็กต์ <code>view</code> ระดับโมดูล จึงจำข้ามการสลับหน้า): แท็บชั้น (ค่าเริ่มต้น "ทุกชั้น"), ช่องค้นหา (รหัสห้อง/ประเภท), ชิป "เฉพาะห้องที่แอร์ทำงาน" ช่องค้นหาสร้างครั้งเดียวใน <code>mount</code></li>
 <li><strong>นาฬิกานับถอยหลัง</strong>: เซิร์ฟเวอร์ส่ง <code>autoOffDeadlineAt</code> (เวลาเส้นตาย) เบราว์เซอร์นับเองทุก 1 วินาทีด้วย <code>setInterval(tick, 1000)</code> ในฟังก์ชัน <code>countdownStrip</code> บรรทัด 400–445 (ตัว <code>tick</code> อยู่ที่ 420–440) เมื่อเลยเส้นตายแสดง "กำลังส่งคำสั่งปิด" และ <code>autoOffAttempts</code> การเคลียร์ interval ซับซ้อนเพราะแถบถูกวาดใหม่บ่อย (ตรวจ <code>strip.isConnected</code>)</li>
-<li><strong>ลิ้นชักรีโมต</strong> (<code>roomDrawerContent</code>): การ์ดข้อมูลห้อง + การ์ดแอร์ทีละเครื่อง (<code>acCard</code>) ปรับ <strong>ร่างคำสั่ง</strong> (<code>drafts</code> Map เก็บแยกจากสถานะจริง) ได้แก่ สวิตช์เปิด/ปิด (ส่งคำสั่งทันที) อุณหภูมิ ± ภายในขอบเขตตามรุ่น (<code>limitsFor</code>: <code>SAIJO_DENKI</code> 18–29°C โหมด cool/dry/fan และไม่มี swing <code>off</code>; <code>DAIKIN_WIRED</code> 16–30°C โหมด cool/dry/fan พัดลมไม่มี turbo ทิศลมแค่ auto/off ฟังก์ชันเสริมมีแค่ Sleep (เพิ่ม 11 ต.ค. 2569); รุ่นอื่น 16–30°C), โหมด, พัดลม, ทิศลม, ฟังก์ชันเสริม 7 อย่าง (eco turbo sleep quiet displayLight clean horizontalSwing) กด "ส่งคำสั่งผ่าน MQTT" → <code>sendCommand()</code> → <code>api.sendCommand(deviceId, payload)</code> ซึ่ง Backend จะส่งต่อเข้า MQTT; "คืนค่าเดิม" ทิ้งร่าง</li>
-<li><strong>ปุ่มตามความสามารถของเครื่อง (เพิ่ม 11 ต.ค. 2569)</strong>: <code>limitsFor</code> คืน <code>fans</code> และ <code>extras(mode)</code> เพิ่มจากเดิม การ์ดแอร์จึงวาดเฉพาะปุ่มพัดลม/ฟังก์ชันเสริมที่เครื่องนั้นมี และบอร์ดสายแอร์เรียก <code>fitDraft</code> ปรับร่างให้อยู่ในขอบเขตก่อนวาดและทุกครั้งที่เปลี่ยนโหมด หัวการ์ดแสดง "รหัส · ยี่ห้อ" (บอร์ด IR ต่อท้ายชื่อโปรโตคอลในวงเล็บ) และมีชิปใหม่ "ยี่ห้อ · สายแอร์" (สี <code>info</code>) หรือ "ยี่ห้อ · รีโมต IR" (สี <code>off</code>) อธิบายทีละบรรทัดในหัวข้อเจาะโค้ดข้อ 11</li>
+<li><strong>ลิ้นชักรีโมต</strong> (<code>roomDrawerContent</code>): การ์ดข้อมูลห้อง + การ์ดแอร์ทีละเครื่อง (<code>acCard</code>) ปรับ <strong>ร่างคำสั่ง</strong> (<code>drafts</code> Map เก็บแยกจากสถานะจริง) ได้แก่ สวิตช์เปิด/ปิด (ส่งคำสั่งทันที) อุณหภูมิ ± ภายในขอบเขตตามรุ่น (<code>limitsFor</code>: <code>SAIJO_DENKI</code> 18–29°C โหมด cool/dry/fan และไม่มี swing <code>off</code>; <code>DAIKIN_WIRED</code> 16–30°C โหมด cool/dry/fan พัดลมไม่มี turbo ทิศลมแค่ auto/off ฟังก์ชันเสริมมีแค่ Sleep; รุ่นอื่น 16–30°C), โหมด, พัดลม, ทิศลม, ฟังก์ชันเสริม 7 อย่าง (eco turbo sleep quiet displayLight clean horizontalSwing) กด "ส่งคำสั่งผ่าน MQTT" → <code>sendCommand()</code> → <code>api.sendCommand(deviceId, payload)</code> ซึ่ง Backend จะส่งต่อเข้า MQTT; "คืนค่าเดิม" ทิ้งร่าง</li>
+<li><strong>ปุ่มตามความสามารถของเครื่อง</strong>: <code>limitsFor</code> คืน <code>fans</code> และ <code>extras(mode)</code> เพิ่มจากเดิม การ์ดแอร์จึงวาดเฉพาะปุ่มพัดลม/ฟังก์ชันเสริมที่เครื่องนั้นมี และบอร์ดสายแอร์เรียก <code>fitDraft</code> ปรับร่างให้อยู่ในขอบเขตก่อนวาดและทุกครั้งที่เปลี่ยนโหมด หัวการ์ดแสดง "รหัส · ยี่ห้อ" (บอร์ด IR ต่อท้ายชื่อโปรโตคอลในวงเล็บ) และมีชิปใหม่ "ยี่ห้อ · สายแอร์" (สี <code>info</code>) หรือ "ยี่ห้อ · รีโมต IR" (สี <code>off</code>) อธิบายทีละบรรทัดในหัวข้อเจาะโค้ดข้อ 11</li>
 <li>ค่าที่อ่านจาก PZEM (แรงดัน กระแส กำลังไฟ พลังงานสะสม ตัวประกอบกำลัง ความถี่) จาก <code>liveReading(deviceId)</code> และคำเตือนถ้า <code>pzemAvailable</code> เป็น false (ระบบปิดอัตโนมัติจะไม่ทำงานกับเครื่องนั้น เพราะยืนยันไม่ได้ว่าปิดสำเร็จ)</li>
 <li><strong>เฉพาะแอดมิน</strong> (เงื่อนไข <code>isAdmin</code> ใน <code>acCard</code>): สวิตช์ "ปิดอัตโนมัติเครื่องนี้" (<code>api.updateAirConditioner(..., { autoOffEnabled })</code>), "เปลี่ยนชื่อ", "สั่งเข้าโหมดตั้งค่า" (<code>api.enterSetupMode</code> บอร์ดจะหลุด Wi-Fi และเปิด Bluetooth รอตั้งค่าใหม่ ต้องมี <code>confirmAction</code> ก่อน)</li>
 <li>IR (รีโมตอินฟราเรด) ไม่มีสัญญาณตอบกลับ หลังส่งคำสั่ง toast บอกให้ดูค่ากำลังไฟว่าเปลี่ยนไหม และตั้ง <code>setTimeout 2500ms</code> ดึง <code>airConditioners</code> + <code>live</code> ใหม่ ถ้าคำสั่งล้มเหลว ร่างจะถูกรีเซ็ตกลับเป็นสถานะจริง ("ไม่งั้นหน้าจอจะโกหก")</li>
 </ul>
-<div class="callout note"><div class="callout-title">หมายเหตุ</div><p><strong>อัปเดต 9 ต.ค. 2569:</strong> ฟังก์ชัน <code>draftFor(unit)</code> ใน <code>webapp/assets/js/views/rooms.js</code> (บรรทัด 451–462 หลังโค้ดสายแอร์ 11 ต.ค. ดันลงมา 40 บรรทัด) สร้างร่างคำสั่งของแอร์แต่ละเครื่อง เดิมคัดลอก <code>unit.state</code> ตรง ๆ ซึ่ง <code>state.power</code> คือคำสั่งล่าสุดที่ระบบส่ง ถ้ามีคนเปิดแอร์ด้วยรีโมตจริง ค่านี้ยังเป็น <code>false</code> สวิตช์บนเว็บจึงขึ้นว่าปิด ตอนนี้ตั้ง <code>power</code> เป็นจริงด้วยถ้า <code>unit.pzemAvailable === true &amp;&amp; unit.acRunning === true</code> (กติกาเดียวกับ <code>isPoweredOn</code> ในแอป Flutter)</p></div>
+<div class="callout note"><div class="callout-title">หมายเหตุ</div><p>ฟังก์ชัน <code>draftFor(unit)</code> ใน <code>webapp/assets/js/views/rooms.js</code> (บรรทัด 451–462) สร้างร่างคำสั่งของแอร์แต่ละเครื่อง ไม่คัดลอก <code>unit.state</code> ตรง ๆ เพราะ <code>state.power</code> คือคำสั่งล่าสุดที่ระบบส่ง ถ้ามีคนเปิดแอร์ด้วยรีโมตจริง ค่านี้ยังเป็น <code>false</code> สวิตช์บนเว็บจะขึ้นว่าปิด จึงตั้ง <code>power</code> เป็นจริงด้วยถ้า <code>unit.pzemAvailable === true &amp;&amp; unit.acRunning === true</code> (กติกาเดียวกับ <code>isPoweredOn</code> ในแอป Flutter)</p></div>
 
 <div class="code-block"><span class="code-lang">js</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">451</span>
 <span class="normal">452</span>
@@ -541,11 +539,11 @@ charts.js ► dom.js, format.js
 </ul>
 <h3 id="viewsdevicesjs--ห้องและอุปกรณ์-แอดมินเท่านั้น-adminonly-true"><code>views/devices.js</code> — ห้องและอุปกรณ์ (<strong>แอดมินเท่านั้น</strong>: <code>adminOnly: true</code>)<a class="anchor" href="#viewsdevicesjs--ห้องและอุปกรณ์-แอดมินเท่านั้น-adminonly-true">#</a></h3>
 <p>3 แท็บ (<code>tab</code> ตัวแปรระดับโมดูล): <strong>ห้อง</strong> (เพิ่ม/แก้/ลบ <code>api.createRoom/updateRoom/deleteRoom</code> — รหัสห้องแก้ไม่ได้เพราะผูกกับแอร์และตารางเรียน, รหัสต้องเป็น A–Z 0–9 _ - ยาว 2–20), <strong>เครื่องปรับอากาศ</strong> และ <strong>เซ็นเซอร์ตรวจจับคน</strong>
-- <strong>จองช่องติดตั้ง</strong> (<code>reserveAir</code>, <code>reserveOccupancy</code>): สิ่งที่เว็บทำแทนมือถือไม่ได้คือขั้นตอน Bluetooth (ต้องยืนใกล้บอร์ด) เว็บจึงทำได้แค่ "จองช่อง" = สร้างแถวในฐานข้อมูลพร้อมโทเคนอายุ <strong>15 นาที ใช้ได้ครั้งเดียว</strong> (<code>showReservation</code> แสดงโทเคน ชื่อ Bluetooth host/port/topic ของ MQTT) แล้วคนถือโทรศัพท์ไปตั้งค่าบอร์ดผ่านแอปมือถือต่อ รหัสอุปกรณ์ต้องขึ้นต้น <code>ESP32-</code> (แอร์) หรือ <code>OCC32-</code> (เซ็นเซอร์) ตามด้วยเลขฐานสิบหก 12 ตัว ชื่อ Bluetooth คำนวณให้เอง (<code>RMUTT-AC-&lt;เลขฐานสิบหก 12 ตัว&gt;</code> / <code>RMUTT-OCC-&lt;…&gt;</code> ได้จาก <code>deviceId.slice(6)</code> คือตัดคำนำหน้า <code>ESP32-</code>/<code>OCC32-</code> ออก) กันพิมพ์ผิดแล้ว Backend ปฏิเสธ และมีรายการ <code>PROTOCOLS</code> 19 ตัว (<code>WIRED_PROTOCOL</code> = <code>DAIKIN_WIRED</code> เป็นตัวแรก ตามด้วยโปรโตคอล IR 18 แบบ DAIKIN, LG, SAIJO_DENKI ...) ค่าเริ่มต้น <code>SAIJO_DENKI</code> (<strong>แก้ 11 ต.ค. 2569:</strong> ช่องเลือกเปลี่ยนชื่อจาก "โปรโตคอลรีโมต" เป็น "ยี่ห้อแอร์ / วิธีควบคุม" และแต่ละตัวเลือกแสดงเป็น "Daikin · สายแอร์ (บอร์ดแทนรีโมตติดผนัง)" หรือ "&lt;ยี่ห้อ&gt; · รีโมต IR (&lt;โปรโตคอล&gt;)" ค่าที่ส่งไป Backend ยังเป็นชื่อโปรโตคอลเดิม)
-- <strong>อัปเดตเฟิร์มแวร์ผ่าน Wi-Fi ทีละเครื่อง</strong> (<code>startOta</code>): ดึงรายการ <code>.bin</code> ในโฟลเดอร์ <code>/opt/rmutt/firmware</code> บนเซิร์ฟเวอร์ (<code>api.firmwareFiles</code>) กรองเฉพาะ <code>file.kind</code> ที่ตรงกับชนิดบอร์ดให้เลือก (<strong>แก้ 14 ต.ค. 2569:</strong> ปุ่มของแอร์ส่ง <code>kind</code> เป็น <code>'wired'</code> ถ้า <code>isWiredProtocol(unit.protocol)</code> ไม่งั้น <code>'air'</code> เพราะไฟล์บอร์ดสายแอร์ใช้กับบอร์ด IR ไม่ได้ และถ้าไม่มีไฟล์ ข้อความเปลี่ยนจาก "ให้วางไฟล์ .bin ไว้ที่ /opt/rmutt/firmware ก่อน" เป็น "อัปโหลดไฟล์ .bin ได้ที่เมนู "เฟิร์มแวร์"" ไม่ต้อง scp เข้าเซิร์ฟเวอร์เองแล้ว) แล้ว <code>api.otaAirConditioner</code> / <code>otaOccupancySensor</code> บอร์ดดาวน์โหลดเอง รีบูต รายงานรุ่นใหม่กลับมา (<code>firmwareLine</code> แสดงรุ่น ข้อผิดพลาด OTA และจำนวนข้อมูลค้างส่ง <code>historyPending</code>)
+- <strong>จองช่องติดตั้ง</strong> (<code>reserveAir</code>, <code>reserveOccupancy</code>): สิ่งที่เว็บทำแทนมือถือไม่ได้คือขั้นตอน Bluetooth (ต้องยืนใกล้บอร์ด) เว็บจึงทำได้แค่ "จองช่อง" = สร้างแถวในฐานข้อมูลพร้อมโทเคนอายุ <strong>15 นาที ใช้ได้ครั้งเดียว</strong> (<code>showReservation</code> แสดงโทเคน ชื่อ Bluetooth host/port/topic ของ MQTT) แล้วคนถือโทรศัพท์ไปตั้งค่าบอร์ดผ่านแอปมือถือต่อ รหัสอุปกรณ์ต้องขึ้นต้น <code>ESP32-</code> (แอร์) หรือ <code>OCC32-</code> (เซ็นเซอร์) ตามด้วยเลขฐานสิบหก 12 ตัว ชื่อ Bluetooth คำนวณให้เอง (<code>RMUTT-AC-&lt;เลขฐานสิบหก 12 ตัว&gt;</code> / <code>RMUTT-OCC-&lt;…&gt;</code> ได้จาก <code>deviceId.slice(6)</code> คือตัดคำนำหน้า <code>ESP32-</code>/<code>OCC32-</code> ออก) กันพิมพ์ผิดแล้ว Backend ปฏิเสธ และมีรายการ <code>PROTOCOLS</code> 19 ตัว (<code>WIRED_PROTOCOL</code> = <code>DAIKIN_WIRED</code> เป็นตัวแรก ตามด้วยโปรโตคอล IR 18 แบบ DAIKIN, LG, SAIJO_DENKI ...) ค่าเริ่มต้น <code>SAIJO_DENKI</code> ช่องเลือกชื่อ "ยี่ห้อแอร์ / วิธีควบคุม" แต่ละตัวเลือกแสดงเป็น "Daikin · สายแอร์ (บอร์ดแทนรีโมตติดผนัง)" หรือ "&lt;ยี่ห้อ&gt; · รีโมต IR (&lt;โปรโตคอล&gt;)" ส่วนค่าที่ส่งไป Backend เป็นชื่อโปรโตคอล
+- <strong>อัปเดตเฟิร์มแวร์ผ่าน Wi-Fi ทีละเครื่อง</strong> (<code>startOta</code>): ดึงรายการ <code>.bin</code> ในโฟลเดอร์ <code>/opt/rmutt/firmware</code> บนเซิร์ฟเวอร์ (<code>api.firmwareFiles</code>) กรองเฉพาะ <code>file.kind</code> ที่ตรงกับชนิดบอร์ดให้เลือก (ปุ่มของแอร์ใช้ <code>kind</code> เป็น <code>'wired'</code> ถ้า <code>isWiredProtocol(unit.protocol)</code> ไม่งั้น <code>'air'</code> เพราะไฟล์บอร์ดสายแอร์ใช้กับบอร์ด IR ไม่ได้ ถ้าไม่มีไฟล์จะบอกให้อัปโหลดไฟล์ .bin ที่เมนู "เฟิร์มแวร์") แล้ว <code>api.otaAirConditioner</code> / <code>otaOccupancySensor</code> บอร์ดดาวน์โหลดเอง รีบูต รายงานรุ่นใหม่กลับมา (<code>firmwareLine</code> แสดงรุ่น ข้อผิดพลาด OTA และจำนวนข้อมูลค้างส่ง <code>historyPending</code>)
 - ถอดอุปกรณ์ (<code>removeAir</code> → ล้างข้อความ retained บน MQTT ตามจำนวน <code>retainedTopicsCleared</code>), สั่งเข้าโหมดตั้งค่า, สวิตช์ปิดอัตโนมัติรายเครื่อง, เปลี่ยนชื่อ
-- <strong>บรรทัดย่อยของแอร์แต่ละเครื่อง (แก้ 11 ต.ค. 2569)</strong>: <code>airRow</code> แสดง <code>airControlSummary(unit.protocol)</code> แทนชื่อโปรโตคอลดิบ เช่น <code>ESP32-… · Daikin · สายแอร์ · active · ออนไลน์ · …</code></p>
-<p><strong>ไฟล์ <code>webapp/assets/js/views/devices.js</code> บรรทัด 494–507</strong> (ช่องเลือกยี่ห้อตอนจองช่องติดตั้งแอร์ แก้ 11 ต.ค. 2569)</p>
+- <strong>บรรทัดย่อยของแอร์แต่ละเครื่อง</strong>: <code>airRow</code> แสดง <code>airControlSummary(unit.protocol)</code> แทนชื่อโปรโตคอลดิบ เช่น <code>ESP32-… · Daikin · สายแอร์ · active · ออนไลน์ · …</code></p>
+<p><strong>ไฟล์ <code>webapp/assets/js/views/devices.js</code> บรรทัด 494–507</strong> (ช่องเลือกยี่ห้อตอนจองช่องติดตั้งแอร์)</p>
 <div class="code-block"><span class="code-lang">js</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">494</span>
 <span class="normal">495</span>
 <span class="normal">496</span>
@@ -600,8 +598,8 @@ charts.js ► dom.js, format.js
 </table></div>
 <div class="callout why"><div class="callout-title">ทำไม</div><p>แยก "สิ่งที่คนอ่าน" (<code>label</code>) ออกจาก "สิ่งที่เครื่องอ่าน" (<code>value</code>) ทำให้เปลี่ยนคำบนหน้าจอได้โดยไม่กระทบฐานข้อมูลหรือ Backend เจ้าหน้าที่ที่ติดตั้งรู้แค่ว่าแอร์ห้องนี้ "Daikin ต่อสาย" ไม่จำเป็นต้องรู้ว่าโปรโตคอลชื่อ <code>DAIKIN_WIRED</code></p></div>
 
-<h3 id="viewsfirmwarejs--เฟิร์มแวร์-แอดมินเท่านั้น-เพิ่ม-14-ตค-2569"><code>views/firmware.js</code> — เฟิร์มแวร์ (<strong>แอดมินเท่านั้น</strong>, เพิ่ม 14 ต.ค. 2569)<a class="anchor" href="#viewsfirmwarejs--เฟิร์มแวร์-แอดมินเท่านั้น-เพิ่ม-14-ตค-2569">#</a></h3>
-<p>หน้าใหม่ 718 บรรทัด (commit <code>2432faf</code>) ทำงานแทนการ "scp ไฟล์ <code>.bin</code> เข้าเซิร์ฟเวอร์แล้วกดอัปเดตทีละเครื่องในหน้าห้องและอุปกรณ์" ทั้งหมดอยู่ในหน้าเดียว: ดูไฟล์ที่มี อัปโหลดรุ่นใหม่ ดูว่าบอร์ดไหนยังเก่า เลือกหลายตัวแล้วสั่งอัปเดต และเฝ้าดูจนบอร์ดรายงานรุ่นใหม่</p>
+<h3 id="viewsfirmwarejs--เฟิร์มแวร์-แอดมินเท่านั้น"><code>views/firmware.js</code> — เฟิร์มแวร์ (<strong>แอดมินเท่านั้น</strong>)<a class="anchor" href="#viewsfirmwarejs--เฟิร์มแวร์-แอดมินเท่านั้น">#</a></h3>
+<p>หน้า 725 บรรทัด รวมงานเฟิร์มแวร์ทั้งหมดไว้ในหน้าเดียว ไม่ต้อง scp ไฟล์เข้าเซิร์ฟเวอร์: ดูไฟล์ที่มี อัปโหลดรุ่นใหม่ ดูว่าบอร์ดไหนยังเก่า เลือกหลายตัวแล้วสั่งอัปเดต และเฝ้าดูจนบอร์ดรายงานรุ่นใหม่</p>
 <ul>
 <li><strong>3 แท็บตามชนิดบอร์ด</strong> (ค่าคงที่ <code>KINDS</code>): <code>air</code> "แอร์ IR" (สเก็ตช์ <code>rmutt_esp32_air</code>), <code>wired</code> "สายแอร์ Daikin" (<code>rmutt_esp32_air_wired</code>), <code>occupancy</code> "เซ็นเซอร์ LD2410" (<code>rmutt_esp32_occupancy</code>) แยกแท็บเพราะไฟล์ใช้ข้ามชนิดไม่ได้ ถ้าสั่งไฟล์ผิดชนิด บอร์ดจะรีบูตเข้าโปรแกรมของบอร์ดอีกแบบ</li>
 <li><strong>ชนิดและรุ่นอ่านจากชื่อไฟล์</strong>: มี <code>occ</code> = เซ็นเซอร์, มี <code>wired</code> หรือ <code>slm8</code> = สายแอร์, นอกนั้น = แอร์ IR รุ่นคือท้ายชื่อ เช่น <code>rmutt_esp32_air_wired-2.5.2-slm8.bin</code> → <code>2.5.2-slm8</code> (กติกาเดียวกับ <code>firmwareKindOf</code>/<code>firmwareVersionOf</code> ใน <code>backend/src/utils/firmware.js</code>)</li>
@@ -744,7 +742,7 @@ charts.js ► dom.js, format.js
 </tr>
 <tr>
 <td>4 views</td>
-<td><code>views.css</code> (2897 หลังเพิ่มสไตล์หน้าเฟิร์มแวร์ 243 บรรทัด 14 ต.ค. 2569)</td>
+<td><code>views.css</code> (2897)</td>
 <td>เฉพาะหน้า</td>
 <td><code>.hero-row</code> <code>.pulse-cell</code> <code>.room-card</code> <code>.sched-card</code> <code>.import-modal</code></td>
 </tr>
@@ -792,17 +790,17 @@ charts.js ► dom.js, format.js
 <tr>
 <td><code>max-width: 620px</code> (<code>.fw-table</code>)</td>
 <td><code>views.css</code></td>
-<td>ตารางบอร์ดของหน้าเฟิร์มแวร์กลายเป็นการ์ด (เพิ่ม 14 ต.ค. 2569 ดูหัวข้อถัดไป)</td>
+<td>ตารางบอร์ดของหน้าเฟิร์มแวร์กลายเป็นการ์ด (ดูหัวข้อถัดไป)</td>
 </tr>
 <tr>
 <td><code>prefers-reduced-motion</code></td>
 <td><code>components.css</code>, <code>views.css</code></td>
-<td>ปิดแอนิเมชัน <code>.skeleton</code> (แถบโครงกระดูกตอนโหลด) และจุดกะพริบ <code>.pulse-live::after</code> ทำ <code>.spinner</code> หมุนช้าลง และ (เพิ่ม 14 ต.ค. 2569) หยุดหมุน <code>.fw-spinner</code> ของหน้าเฟิร์มแวร์</td>
+<td>ปิดแอนิเมชัน <code>.skeleton</code> (แถบโครงกระดูกตอนโหลด) และจุดกะพริบ <code>.pulse-live::after</code> ทำ <code>.spinner</code> หมุนช้าลง และ หยุดหมุน <code>.fw-spinner</code> ของหน้าเฟิร์มแวร์</td>
 </tr>
 </tbody>
 </table></div>
 <p><code>env(safe-area-inset-bottom)</code> เว้นพื้นที่ให้แถบ home indicator ของ iPhone, <code>100dvh</code> (dynamic viewport height) แก้ปัญหา <code>100vh</code> ที่ไม่นับแถบ URL ของมือถือที่ยืด/หดได้</p>
-<h3 id="หน้าเฟิร์มแวร์ใน-viewscss-เพิ่ม-14-ตค-2569">หน้าเฟิร์มแวร์ใน <code>views.css</code> (เพิ่ม 14 ต.ค. 2569)<a class="anchor" href="#หน้าเฟิร์มแวร์ใน-viewscss-เพิ่ม-14-ตค-2569">#</a></h3>
+<h3 id="หน้าเฟิร์มแวร์ใน-viewscss">หน้าเฟิร์มแวร์ใน <code>views.css</code><a class="anchor" href="#หน้าเฟิร์มแวร์ใน-viewscss">#</a></h3>
 <p>สไตล์ใหม่ 243 บรรทัดต่อท้าย <code>views.css</code> (บรรทัด 2656–2897) ขึ้นต้นด้วย <code>fw-</code> ทั้งหมด (ย่อจาก firmware) กันชื่อชนกับหน้าอื่น แนวคิดหลัก</p>
 <div class="table-wrap"><table>
 <thead>
@@ -1049,7 +1047,7 @@ charts.js ► dom.js, format.js
 </table></div>
 <div class="callout why"><div class="callout-title">ทำไม</div><p>ตารางบอร์ดมี 5 คอลัมน์ บนมือถือถ้าใช้ตารางจริงต้องเลื่อนข้าง (<code>.table-wrap</code> ทำได้) แต่คนที่ยืนหน้าตู้ไฟจะเห็นแค่ครึ่งแถวและกดปุ่มอัปเดตยาก การเปลี่ยน "แถว" เป็น "การ์ด" ด้วย CSS ล้วนทำให้ HTML ชุดเดียวใช้ได้ทั้งสองจอ ไม่ต้องให้ JavaScript รู้ขนาดจอแล้ววาดสองแบบ และยังคง <code>&lt;table&gt;</code> ไว้ซึ่งโปรแกรมอ่านหน้าจอเข้าใจโครงสร้างบนเดสก์ท็อป ข้อแลกคือใช้ selector <code>table.data.fw-table td</code> ที่เจาะจงสูงเพื่อชนะสไตล์ตารางกลาง และต้องใช้ <code>!important</code> หนึ่งจุด</p></div>
 
-<div class="callout warn"><div class="callout-title">ระวัง</div><p>commit นี้ไม่ได้เปลี่ยนเลข <code>?v=</code> ใน <code>index.html</code> (<code>views.css?v=4.2</code>, <code>main.js?v=4.4</code> เท่าเดิม) และเพิ่ม export ใหม่ลงไฟล์เดิม (<code>icons.firmware</code> ใน <code>icons.js</code>, <code>api.uploadFirmware</code> ใน <code>api.js</code>, และ 11 ต.ค. <code>WIRED_PROTOCOL</code>/<code>airBrand</code>/… ใน <code>format.js</code>) ซึ่งสวนกับหลักการข้อ 10 ของบทนี้ ภายใน 1 ชั่วโมงหลัง deploy เบราว์เซอร์ที่ถือไฟล์เก่าในแคชอาจได้ไฟล์ใหม่ปนเก่า เช่น <code>app.js</code> ใหม่เรียก <code>icons[view.icon](16)</code> กับ <code>icons.js</code> เก่าที่ไม่มี <code>firmware</code> ทำให้วาดเมนูพัง หรือ <code>rooms.js</code> ใหม่ import <code>airBrand</code> จาก <code>format.js</code> เก่าไม่เจอแล้วทั้งเว็บโหลดไม่ขึ้น ทางแก้หน้างานคือ Ctrl+F5 ครั้งเดียว ถ้าจะกันจริงควรขยับ <code>?v=</code> และแยก export ใหม่ไว้ในไฟล์ใหม่ตามหลักการเดิม</p></div>
+<div class="callout warn"><div class="callout-title">ระวัง</div><p>สไตล์หน้าเฟิร์มแวร์อยู่ใน <code>views.css?v=4.2</code> ซึ่งแคชได้ 1 ชั่วโมง ถ้าแก้ CSS แล้วไม่ขยับเลข <code>?v=</code> ใน <code>index.html</code> เบราว์เซอร์ที่ถือไฟล์เก่าจะยังเห็นหน้าตาเดิมจนกว่าแคชหมดหรือกด Ctrl+F5 ส่วนไฟล์ JS ไม่มีปัญหานี้เพราะ Caddy ตั้ง <code>no-cache</code> ให้ <code>/assets/js/*</code> และควรยังยึดหลักการข้อ 10 (export ใหม่ใส่ไฟล์ใหม่) เพราะ <code>icons.firmware</code> ใน <code>icons.js</code>, <code>api.uploadFirmware</code> ใน <code>api.js</code> และ <code>WIRED_PROTOCOL</code>/<code>airBrand</code> ใน <code>format.js</code> เป็น export ที่เพิ่มลงไฟล์เดิม ผู้ที่เปิดหน้าค้างไว้ก่อน deploy ยังถือโมดูลเก่าในหน่วยความจำจนกว่าจะรีเฟรช</p></div>
 
 <h2 id="เจาะโค้ดทีละบรรทัด">เจาะโค้ดทีละบรรทัด<a class="anchor" href="#เจาะโค้ดทีละบรรทัด">#</a></h2>
 <h3 id="1-indexhtml-โครงเปลือกและการโหลดสคริปต์">1) <code>index.html</code>: โครงเปลือกและการโหลดสคริปต์<a class="anchor" href="#1-indexhtml-โครงเปลือกและการโหลดสคริปต์">#</a></h3>
@@ -1991,7 +1989,7 @@ charts.js ► dom.js, format.js
 <tbody>
 <tr>
 <td>254–271</td>
-<td>ตารางงาน: แต่ละงานมีชื่อ ช่วงเวลา (<code>every</code> ms จาก <code>POLL</code>) และฟังก์ชันที่รัน (<code>live</code>/<code>rooms</code>/<code>airConditioners</code>/<code>occupancySensors</code> ทุก 10 วิ, <code>alerts</code> 30 วิ, <code>summary</code> และ <code>health</code> 120 วิ) งาน <code>occupancySensors</code> เพิ่ม 15 ต.ค. 2569 ให้หน้าเฟิร์มแวร์เห็นรุ่นและผล OTA ของเซ็นเซอร์โดยไม่ต้องกด F5</td>
+<td>ตารางงาน: แต่ละงานมีชื่อ ช่วงเวลา (<code>every</code> ms จาก <code>POLL</code>) และฟังก์ชันที่รัน (<code>live</code>/<code>rooms</code>/<code>airConditioners</code>/<code>occupancySensors</code> ทุก 10 วิ, <code>alerts</code> 30 วิ, <code>summary</code> และ <code>health</code> 120 วิ) งาน <code>occupancySensors</code> ทำให้หน้าเฟิร์มแวร์เห็นรุ่นและผล OTA ของเซ็นเซอร์โดยไม่ต้องกด F5</td>
 </tr>
 <tr>
 <td>273</td>
@@ -2582,7 +2580,7 @@ charts.js ► dom.js, format.js
 
 <p><code>:root[data-text='large']</code> เจาะจงกว่า <code>:root</code> เฉย ๆ จึงทับ <code>--text-scale: 1</code> ได้ ผู้ใช้กด "ใหญ่" → <code>prefs.js</code> ตั้ง <code>&lt;html data-text="large"&gt;</code> → ทุกอย่างที่ใช้ <code>--fs-*</code> ขยาย 10% โดย JavaScript ไม่แตะ element ใดเลย</p>
 <p>นี่คือเหตุผลที่ธีมและขนาดตัวอักษรเปลี่ยนได้ทันทีทั้งเว็บ: ฝั่ง JS เปลี่ยนแค่ "แอตทริบิวต์เดียว" ที่ <code>&lt;html&gt;</code> แล้ว CSS cascade จัดการที่เหลือ</p>
-<h3 id="10-viewsfirmwarejs-หน้าเฟิร์มแวร์-เพิ่ม-14-ตค-2569">10) <code>views/firmware.js</code>: หน้าเฟิร์มแวร์ (เพิ่ม 14 ต.ค. 2569)<a class="anchor" href="#10-viewsfirmwarejs-หน้าเฟิร์มแวร์-เพิ่ม-14-ตค-2569">#</a></h3>
+<h3 id="10-viewsfirmwarejs-หน้าเฟิร์มแวร์">10) <code>views/firmware.js</code>: หน้าเฟิร์มแวร์<a class="anchor" href="#10-viewsfirmwarejs-หน้าเฟิร์มแวร์">#</a></h3>
 <p>หน้านี้เป็นหน้าเดียวในเว็บที่ "สั่งงานแล้วต้องรอผลหลายนาที" (บอร์ดดาวน์โหลดไฟล์ รีบูต แล้วรายงานรุ่นใหม่) จึงมีสถานะของตัวเองมากกว่าหน้าอื่น อ่านตามลำดับนี้: สถานะระดับโมดูล → อ่านชื่อไฟล์ → ตัดสินสถานะบอร์ด → ติดตามผล → วาดหน้า → อัปโหลด → สั่งอัปเดต</p>
 <p><strong>10.1 สถานะระดับโมดูล</strong> — ไฟล์ <code>webapp/assets/js/views/firmware.js</code> บรรทัด 44–57</p>
 <div class="code-block"><span class="code-lang">js</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">44</span>
@@ -2728,7 +2726,7 @@ charts.js ► dom.js, format.js
 </tr>
 <tr>
 <td>97</td>
-<td>นอกนั้นถือเป็นแอร์ IR (ชื่อไฟล์ <code>rmutt_esp32_air-…</code> เดิม ไม่ต้องเปลี่ยน)</td>
+<td>นอกนั้นถือเป็นแอร์ IR (ชื่อไฟล์ <code>rmutt_esp32_air-…</code>)</td>
 </tr>
 <tr>
 <td>101–103</td>
@@ -2907,17 +2905,17 @@ charts.js ► dom.js, format.js
 </tr>
 <tr>
 <td>186–188</td>
-<td>มี <code>otaError</code> และไม่ใช่ <code>previousError</code> → บอร์ดรายงานว่าล้มเหลว แสดงข้อความจากบอร์ด (ตั้งแต่ 15 ต.ค. 2569 <code>previousError</code> เป็น <code>null</code> เสมอ จึงเท่ากับ "มี <code>otaError</code> ใด ๆ")</td>
+<td>มี <code>otaError</code> และไม่ใช่ <code>previousError</code> → บอร์ดรายงานว่าล้มเหลว แสดงข้อความจากบอร์ด (<code>previousError</code> เป็น <code>null</code> เสมอ จึงเท่ากับ "มี <code>otaError</code> ใด ๆ")</td>
 </tr>
 <tr>
 <td>189–196</td>
-<td>ครบ 5 นาที → ถ้ามี <code>otaError</code> แสดงข้อความนั้น ถ้าไม่มี แสดง "ยังไม่รายงานรุ่น … (รุ่นตอนนี้ x.y.z)" บอกรุ่นที่บอร์ดรายงานอยู่ ช่วยแยกได้ว่าบอร์ดไม่ได้อัปเดตเลย หรืออัปเดตแล้วแต่รายงานรุ่นไม่ตรงชื่อไฟล์ (เพิ่ม 15 ต.ค. 2569)</td>
+<td>ครบ 5 นาที → ถ้ามี <code>otaError</code> แสดงข้อความนั้น ถ้าไม่มี แสดง "ยังไม่รายงานรุ่น … (รุ่นตอนนี้ x.y.z)" บอกรุ่นที่บอร์ดรายงานอยู่ ช่วยแยกได้ว่าบอร์ดไม่ได้อัปเดตเลย หรืออัปเดตแล้วแต่รายงานรุ่นไม่ตรงชื่อไฟล์</td>
 </tr>
 </tbody>
 </table></div>
-<div class="callout why"><div class="callout-title">ทำไม</div><p>ทำไมไม่รอผลจาก <code>await api.otaAirConditioner(...)</code> ตรง ๆ? เพราะ Backend ตอบทันทีที่ส่งคำสั่งเข้า MQTT สำเร็จ ส่วนการดาวน์โหลดและรีบูตเกิดในบอร์ดหลังจากนั้น ความจริงเรื่องผลมีที่เดียวคือข้อมูลที่บอร์ดรายงานกลับ (<code>firmwareVersion</code>, <code>otaError</code>) ซึ่งมากับ polling อยู่แล้ว หน้านี้จึงไม่ต้องตั้ง <code>setInterval</code> ของตัวเอง แค่เรียก <code>settlePending()</code> ใน <code>render</code> ที่ถูกเรียกทุกครั้งที่ store เปลี่ยน เรื่อง error ของรอบก่อน: เดิมหน้าเว็บจำ <code>otaError</code> ก่อนสั่งไว้เป็น <code>previousError</code> แล้วถือว่าล้มเหลวเมื่อข้อความ <strong>เปลี่ยน</strong> แต่ถ้ารอบใหม่ล้มด้วยสาเหตุเดิม (ข้อความเหมือนเดิม เช่นดาวน์โหลดไม่ได้) หน้าเว็บจะไม่รู้และรอจนครบ 5 นาที ตั้งแต่ 15 ต.ค. 2569 Backend จึงล้าง <code>ota_error</code> เป็น <code>NULL</code> ตอนส่งคำสั่ง OTA และหน้าเว็บตั้ง <code>previousError: null</code> (บรรทัด 598) error ใด ๆ ที่ตามมาจึงเป็นของรอบนี้ <strong>ข้อสังเกต:</strong> เฟิร์มแวร์ไม่ได้ล้าง <code>lastOtaError</code> ตอนรับคำสั่งใหม่ ถ้า <code>/status</code> รอบ 10 วินาทีที่ยังมี error เก่ามาถึงหลัง Backend ล้างค่าแต่ก่อนบอร์ดเริ่มดาวน์โหลด ค่าเก่าจะถูกเขียนกลับ ช่วงเวลานี้สั้นมาก (บอร์ดเริ่ม OTA ใน <code>loop()</code> รอบถัดไปและตัด MQTT ระหว่างดาวน์โหลด) จึงเกิดได้ยาก</p></div>
+<div class="callout why"><div class="callout-title">ทำไม</div><p>ทำไมไม่รอผลจาก <code>await api.otaAirConditioner(...)</code> ตรง ๆ? เพราะ Backend ตอบทันทีที่ส่งคำสั่งเข้า MQTT สำเร็จ ส่วนการดาวน์โหลดและรีบูตเกิดในบอร์ดหลังจากนั้น ความจริงเรื่องผลมีที่เดียวคือข้อมูลที่บอร์ดรายงานกลับ (<code>firmwareVersion</code>, <code>otaError</code>) ซึ่งมากับ polling อยู่แล้ว หน้านี้จึงไม่ต้องตั้ง <code>setInterval</code> ของตัวเอง แค่เรียก <code>settlePending()</code> ใน <code>render</code> ที่ถูกเรียกทุกครั้งที่ store เปลี่ยน เรื่อง error ของรอบก่อน: Backend ล้าง <code>ota_error</code> เป็น <code>NULL</code> ตอนส่งคำสั่ง OTA และหน้าเว็บตั้ง <code>previousError: null</code> (บรรทัด 598) error ใด ๆ ที่ตามมาจึงเป็นของรอบนี้ ถ้าแทนที่จะล้าง หน้าเว็บจำ error ก่อนสั่งไว้แล้วถือว่าล้มเหลวเมื่อข้อความ <strong>เปลี่ยน</strong> รอบที่ล้มด้วยสาเหตุเดิม (ข้อความเหมือนเดิม เช่นดาวน์โหลดไม่ได้) จะไม่ถูกจับและต้องรอจนครบ 5 นาที <strong>ข้อสังเกต:</strong> เฟิร์มแวร์ไม่ได้ล้าง <code>lastOtaError</code> ตอนรับคำสั่งใหม่ ถ้า <code>/status</code> รอบ 10 วินาทีที่ยังมี error เก่ามาถึงหลัง Backend ล้างค่าแต่ก่อนบอร์ดเริ่มดาวน์โหลด ค่าเก่าจะถูกเขียนกลับ ช่วงเวลานี้สั้นมาก (บอร์ดเริ่ม OTA ใน <code>loop()</code> รอบถัดไปและตัด MQTT ระหว่างดาวน์โหลด) จึงเกิดได้ยาก</p></div>
 
-<div class="callout warn"><div class="callout-title">ระวัง</div><p>ความถี่ในการตรวจขึ้นกับ polling ของ <code>store.js</code> ซึ่งดึงทั้ง <code>airConditioners</code> และ <code>occupancySensors</code> ทุก 10 วินาที (เดิมไม่มี <code>occupancySensors</code> ในรายการ แท็บเซ็นเซอร์ LD2410 จึงไม่เห็นรุ่นใหม่จนครบ 5 นาทีแล้วขึ้น "ยังไม่รายงานรุ่น" ทั้งที่อัปเดตสำเร็จ แก้แล้ว 15 ต.ค. 2569) ข้อที่ยังต้องระวังคือเงื่อนไขสำเร็จเทียบข้อความ <strong>ตรงตัว</strong> (<code>===</code>) ถ้าชื่อไฟล์บอกรุ่น <code>2.5.2</code> แต่ <code>FIRMWARE_VERSION</code> ในโค้ดบอร์ดเป็น <code>2.5.2-slm8</code> จะไม่ขึ้น toast สำเร็จ (แต่ตารางยังแสดง "ล่าสุดแล้ว" เพราะ <code>statusOf</code> เทียบด้วย <code>compareVersions</code>) จึงควรตั้งรุ่นในชื่อไฟล์ให้ตรงกับ <code>FIRMWARE_VERSION</code> ทุกตัวอักษร</p></div>
+<div class="callout warn"><div class="callout-title">ระวัง</div><p>ความถี่ในการตรวจขึ้นกับ polling ของ <code>store.js</code> ซึ่งดึงทั้ง <code>airConditioners</code> และ <code>occupancySensors</code> ทุก 10 วินาที (ถ้าไม่ดึง <code>occupancySensors</code> แท็บเซ็นเซอร์ LD2410 จะไม่เห็นรุ่นใหม่จนครบ 5 นาทีแล้วขึ้น "ยังไม่รายงานรุ่น" ทั้งที่อัปเดตสำเร็จ) ข้อที่ต้องระวังคือเงื่อนไขสำเร็จเทียบข้อความ <strong>ตรงตัว</strong> (<code>===</code>) ถ้าชื่อไฟล์บอกรุ่น <code>2.5.2</code> แต่ <code>FIRMWARE_VERSION</code> ในโค้ดบอร์ดเป็น <code>2.5.2-slm8</code> จะไม่ขึ้น toast สำเร็จ (แต่ตารางยังแสดง "ล่าสุดแล้ว" เพราะ <code>statusOf</code> เทียบด้วย <code>compareVersions</code>) จึงควรตั้งรุ่นในชื่อไฟล์ให้ตรงกับ <code>FIRMWARE_VERSION</code> ทุกตัวอักษร</p></div>
 
 <p><strong>10.5 เลือกแท็บเริ่มต้นอย่างฉลาด</strong> — ไฟล์ <code>webapp/assets/js/views/firmware.js</code> บรรทัด 210–220</p>
 <div class="code-block"><span class="code-lang">js</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">210</span>
@@ -3433,7 +3431,7 @@ charts.js ► dom.js, format.js
 </tr>
 <tr>
 <td>593–599</td>
-<td>Backend รับแล้ว → จดงานรอ: รุ่นเป้าหมาย เวลาเริ่ม และ <code>previousError: null</code> (แก้ 15 ต.ค. 2569 เดิมจำ <code>otaError</code> ก่อนสั่ง ตอนนี้ Backend ล้างให้แล้วตอนรับคำสั่ง)</td>
+<td>Backend รับแล้ว → จดงานรอ: รุ่นเป้าหมาย เวลาเริ่ม และ <code>previousError: null</code> (Backend ล้าง <code>ota_error</code> ให้แล้วตอนรับคำสั่ง)</td>
 </tr>
 <tr>
 <td>600</td>
@@ -3486,8 +3484,8 @@ charts.js ► dom.js, format.js
 </tr>
 </tbody>
 </table></div>
-<h3 id="11-บอร์ดสายแอร์-daikin-บนหน้าเว็บ-formatjs--roomsjs-เพิ่ม-11-ตค-2569">11) บอร์ดสายแอร์ Daikin บนหน้าเว็บ: <code>format.js</code> + <code>rooms.js</code> (เพิ่ม 11 ต.ค. 2569)<a class="anchor" href="#11-บอร์ดสายแอร์-daikin-บนหน้าเว็บ-formatjs--roomsjs-เพิ่ม-11-ตค-2569">#</a></h3>
-<p>commit <code>a5a227f</code> เพิ่มบอร์ดรุ่นใหม่ที่ต่อ "สายแอร์" (สายของรีโมตติดผนัง Daikin) แทนการยิงอินฟราเรด ในฐานข้อมูลบอร์ดนี้มี <code>protocol</code> = <code>DAIKIN_WIRED</code> หน้าเว็บต้องทำ 2 อย่าง: บอกผู้ใช้ให้รู้ว่าเครื่องนี้ควบคุมแบบไหน และแสดงเฉพาะปุ่มที่เครื่องนี้ทำได้</p>
+<h3 id="11-บอร์ดสายแอร์-daikin-บนหน้าเว็บ-formatjs--roomsjs">11) บอร์ดสายแอร์ Daikin บนหน้าเว็บ: <code>format.js</code> + <code>rooms.js</code><a class="anchor" href="#11-บอร์ดสายแอร์-daikin-บนหน้าเว็บ-formatjs--roomsjs">#</a></h3>
+<p>ระบบมีบอร์ดอีกรุ่นที่ต่อ "สายแอร์" (สายของรีโมตติดผนัง Daikin) แทนการยิงอินฟราเรด ในฐานข้อมูลบอร์ดนี้มี <code>protocol</code> = <code>DAIKIN_WIRED</code> หน้าเว็บต้องทำ 2 อย่าง: บอกผู้ใช้ให้รู้ว่าเครื่องนี้ควบคุมแบบไหน และแสดงเฉพาะปุ่มที่เครื่องนี้ทำได้</p>
 <p><strong>11.1 ตัวช่วยยี่ห้อ</strong> — ไฟล์ <code>webapp/assets/js/format.js</code> บรรทัด 347–351 และ 375–390</p>
 <div class="code-block"><span class="code-lang">js</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">347</span>
 <span class="normal">348</span>
@@ -3759,11 +3757,11 @@ charts.js ► dom.js, format.js
 <p><strong>7. Promise-based dialog</strong> — <code>openModal</code>/<code>openForm</code>/<code>confirmAction</code> คืน Promise ผู้เรียกเขียน <code>const ok = await confirmAction({...}); if (!ok) return;</code> อ่านเหมือนโค้ดลำดับตรง ๆ แทนที่จะซ้อน callback</p>
 <p><strong>8. ป้องกันการกดซ้ำ</strong> — <code>withBusy</code> และ <code>button.disabled = true</code> ใน <code>finally</code> (เช่น <code>rooms.js</code> <code>sendCommand</code>) กันกดรัวจนยิงคำสั่ง MQTT ซ้ำ ซึ่งแอร์บางรุ่นตีความเป็นการสลับเปิด-ปิด</p>
 <p><strong>9. ให้เซิร์ฟเวอร์เป็นผู้ตัดสิน เบราว์เซอร์แค่แสดงผล</strong> — ภาคเรียนเปิด/ปิด (<code>status</code>), "วันนี้" (<code>state.today</code> ตามเวลาไทย), กติกาปิดแอร์อัตโนมัติ, สิทธิ์แอดมิน ทั้งหมดตัดสินที่ Backend เว็บแค่แสดง เพราะเวลาและนาฬิกาของเครื่องผู้ใช้เชื่อไม่ได้ และปุ่มที่ซ่อนก็แก้ใน DevTools ได้</p>
-<p><strong>10. Defensive coding รับมือไฟล์รุ่นเก่าค้างแคช</strong> — เพราะ <code>/assets</code> เคยถูกแคช 1 ชั่วโมงทั้งหมด (ตั้งแต่ 15 ต.ค. 2569 ไฟล์ JS เป็น <code>no-cache</code> แล้ว แต่ผู้ใช้ที่เปิดหน้าค้างไว้ก่อน deploy ก็ยังมีโมดูลเก่าในหน่วยความจำ) ผู้ใช้อาจได้ไฟล์ใหม่ปนไฟล์เก่า โค้ดจึง: (ก) ใส่ export ใหม่ในไฟล์ใหม่ ไม่ใส่ในไฟล์เดิม (<code>theme.js</code>, <code>prefs.js</code>, <code>icons-ui.js</code> ที่เกิดจากเหตุผลนี้) (ข) เช็ก <code>typeof api.academicTerms !== 'function'</code> หรือ <code>api.schedulesWithInfo ?? ...</code> ก่อนเรียก (<code>store.js</code> บรรทัด 199–200, 211, 222) (ค) สร้างแถบเมนูล่างจาก JS ไม่เขียนใน <code>index.html</code> เพื่อไม่ให้ไฟล์เก่าทิ้งแถบว่างไว้ (ง) แยก <code>undefined</code> (Backend เก่า) กับ <code>null</code> (ไม่มีข้อมูล)</p>
+<p><strong>10. Defensive coding รับมือไฟล์รุ่นเก่าค้างแคช</strong> — แม้ไฟล์ JS จะเป็น <code>no-cache</code> แต่ผู้ใช้ที่เปิดหน้าค้างไว้ก่อน deploy ยังมีโมดูลเก่าในหน่วยความจำ และ CSS ยังแคชได้ 1 ชั่วโมง ผู้ใช้จึงอาจได้ไฟล์ใหม่ปนไฟล์เก่า โค้ดจึง: (ก) ใส่ export ใหม่ในไฟล์ใหม่ ไม่ใส่ในไฟล์เดิม (<code>theme.js</code>, <code>prefs.js</code>, <code>icons-ui.js</code> ที่เกิดจากเหตุผลนี้) (ข) เช็ก <code>typeof api.academicTerms !== 'function'</code> หรือ <code>api.schedulesWithInfo ?? ...</code> ก่อนเรียก (<code>store.js</code> บรรทัด 199–200, 211, 222) (ค) สร้างแถบเมนูล่างจาก JS ไม่เขียนใน <code>index.html</code> เพื่อไม่ให้ไฟล์เก่าทิ้งแถบว่างไว้ (ง) แยก <code>undefined</code> (Backend เก่า) กับ <code>null</code> (ไม่มีข้อมูล)</p>
 <p><strong>11. Defense in depth</strong> — XSS ป้องกันหลายชั้น: <code>textContent</code> + CSP <code>script-src 'self'</code> + (หากโค้ดชั้นแรกพลาด) <code>connect-src 'self'</code> ไม่ให้ส่งข้อมูลออกไปเว็บอื่น + token ใน localStorage ที่ Backend ตรวจสิทธิ์ซ้ำทุกคำขอ</p>
 <p><strong>12. Design tokens</strong> — ทุกสีและขนาดมาจาก <code>tokens.css</code> ห้ามเขียนสี/px ตรง ๆ ในไฟล์อื่น เปลี่ยนธีมที่เดียว</p>
 <p><strong>13. ฟังก์ชันจัดรูปแบบล้วน (pure function)</strong> — <code>format.js</code> รับค่า คืนข้อความ ไม่แตะ DOM/state ทดสอบง่ายและเหมือนกับ <code>number_format.dart</code> ของแอปมือถือ</p>
-<p><strong>15. สถานะ "รอผล" ฝั่งเบราว์เซอร์ + เวลาหมดอายุ (เพิ่ม 14 ต.ค. 2569)</strong> — <code>firmware.js</code> จด <code>pending</code> ทันทีหลัง Backend รับคำสั่ง OTA แล้วตัดสินผลจากข้อมูลที่ polling นำมา (รุ่นตรงเป้า / มี <code>otaError</code> ใหม่ / เกิน 5 นาที) แทนที่จะรอคำตอบจากคำขอเดียว เพราะ OTA เป็นงานที่บอร์ดทำเองหลังคำขอ HTTP จบไปนานแล้ว ต้องมีเวลาหมดอายุเสมอ ไม่งั้นบอร์ดที่ดับไปจะค้าง "กำลังอัปเดต" ตลอดกาล</p>
+<p><strong>15. สถานะ "รอผล" ฝั่งเบราว์เซอร์ + เวลาหมดอายุ</strong> — <code>firmware.js</code> จด <code>pending</code> ทันทีหลัง Backend รับคำสั่ง OTA แล้วตัดสินผลจากข้อมูลที่ polling นำมา (รุ่นตรงเป้า / มี <code>otaError</code> ใหม่ / เกิน 5 นาที) แทนที่จะรอคำตอบจากคำขอเดียว เพราะ OTA เป็นงานที่บอร์ดทำเองหลังคำขอ HTTP จบไปนานแล้ว ต้องมีเวลาหมดอายุเสมอ ไม่งั้นบอร์ดที่ดับไปจะค้าง "กำลังอัปเดต" ตลอดกาล</p>
 <p><strong>16. ตรวจสองชั้น เบราว์เซอร์เพื่อความสะดวก เซิร์ฟเวอร์เพื่อความถูกต้อง</strong> — <code>handleFile</code> ตรวจนามสกุล ขนาด (<code>maxBytes</code> จากเซิร์ฟเวอร์) ชื่อ <code>.merged.bin</code> และชนิดตรงแท็บก่อนส่ง เพื่อบอกผู้ใช้เร็วโดยไม่ต้องอัปโหลด 2 MB ก่อน แต่ Backend ตรวจซ้ำทุกข้อ (และตรวจไบต์แรก <code>0xE9</code> ของไฟล์ ESP32 ที่เบราว์เซอร์ไม่ได้ตรวจ) เช่นเดียวกับ <code>fitDraft</code> ใน <code>rooms.js</code> ที่ปรับร่างให้ตรงกับกติกาของ <code>backend/src/utils/air-conditioner.js</code> ก่อนส่ง</p>
 <p><strong>17. กติกาเดียวเขียนสองที่ต้องตรงกัน</strong> — <code>kindOfFileName</code>/<code>versionOfFileName</code>/<code>compareVersions</code> ใน <code>firmware.js</code> เป็นสำเนาของ <code>firmwareKindOf</code>/<code>firmwareVersionOf</code>/<code>compareFirmwareVersions</code> ใน <code>backend/src/utils/firmware.js</code> (คอมเมนต์บรรทัด 93 เตือนไว้) และ <code>limitsFor</code> ของ <code>rooms.js</code> ต้องตรงกับ <code>utils/air-conditioner.js</code> ข้อดีคือหน้าเว็บตอบสนองทันที ข้อเสียคือแก้ฝั่งเดียวแล้วสองฝั่งจะไม่ตรงกัน (หน้าเว็บบอกว่าใช้ได้ แต่เซิร์ฟเวอร์ตอบ 400)</p>
 <p><strong>14. รับมือ localStorage พัง</strong> — ทุกการอ่าน/เขียนห่อ <code>try/catch</code> (<code>config.js</code>, <code>api.js</code> <code>read/write</code>, <code>theme.js</code>, <code>prefs.js</code>, <code>app.js</code>) แล้วถอยไปใช้ค่าเริ่มต้น แอปทำงานได้แม้อยู่ในโหมดส่วนตัว (แค่ไม่จำค่า)</p>
@@ -3848,7 +3846,7 @@ charts.js ► dom.js, format.js
 <tr>
 <td><code>@scripts path /assets/js/*</code> + <code>header @scripts Cache-Control "no-cache"</code></td>
 <td>47–48</td>
-<td>ไฟล์ JavaScript ต้อง<strong>ถามเซิร์ฟเวอร์ทุกครั้ง</strong> (เพิ่ม 15 ต.ค. 2569)</td>
+<td>ไฟล์ JavaScript ต้อง<strong>ถามเซิร์ฟเวอร์ทุกครั้ง</strong></td>
 </tr>
 <tr>
 <td><code>@assets { path /assets/*; not path /assets/js/* }</code> + <code>Cache-Control "public, max-age=3600"</code></td>
@@ -3862,7 +3860,7 @@ charts.js ► dom.js, format.js
 </tr>
 </tbody>
 </table></div>
-<p>ผลต่อการ deploy: หลัง <code>deploy-web.ps1</code> ผู้ใช้ได้ <code>index.html</code> ใหม่ทันที (ไม่แคช) ซึ่งมี <code>?v=</code> ใหม่ → CSS 4 ไฟล์และ <code>main.js</code> ถูกโหลดใหม่ ส่วน <strong>โมดูลที่ <code>main.js</code> import ต่อ</strong> (<code>app.js</code>, <code>store.js</code>, <code>views/*.js</code> ...) URL ไม่มี <code>?v=</code> เดิมจึงอาจถูกใช้จากแคชได้นานสูงสุด 1 ชั่วโมง (นี่คือที่มาของมาตรการกันไฟล์เก่า-ใหม่ปนกัน หลักการข้อ 10) ตั้งแต่ 15 ต.ค. 2569 Caddy ตั้ง <code>no-cache</code> ให้ <code>/assets/js/*</code> เบราว์เซอร์จึงถามเซิร์ฟเวอร์ทุกครั้งและได้ไฟล์ใหม่ทันทีหลัง deploy (ไฟล์ไม่เปลี่ยนได้ 304 กลับมาเร็ว) การเปลี่ยน Caddyfile ต้องอัปเดตเซิร์ฟเวอร์ด้วย <code>update-server.ps1</code> (<code>deploy-web.ps1</code> อัปโหลดแค่ไฟล์เว็บ)</p>
+<p>ผลต่อการ deploy: หลัง <code>deploy-web.ps1</code> ผู้ใช้ได้ <code>index.html</code> ใหม่ทันที (ไม่แคช) ซึ่งมี <code>?v=</code> ใหม่ → CSS 4 ไฟล์และ <code>main.js</code> ถูกโหลดใหม่ ส่วน <strong>โมดูลที่ <code>main.js</code> import ต่อ</strong> (<code>app.js</code>, <code>store.js</code>, <code>views/*.js</code> ...) URL ไม่มี <code>?v=</code> Caddy จึงตั้ง <code>no-cache</code> ให้ <code>/assets/js/*</code> เบราว์เซอร์ถามเซิร์ฟเวอร์ทุกครั้งและได้ไฟล์ใหม่ทันทีหลัง deploy (ไฟล์ไม่เปลี่ยนได้ 304 กลับมาเร็ว) การเปลี่ยน Caddyfile ต้องอัปเดตเซิร์ฟเวอร์ด้วย <code>update-server.ps1</code> (<code>deploy-web.ps1</code> อัปโหลดแค่ไฟล์เว็บ)</p>
 <p><strong>หัวความปลอดภัยแต่ละตัว</strong> (จากบรรทัด 21–26)</p>
 <div class="table-wrap"><table>
 <thead>
@@ -3966,13 +3964,13 @@ charts.js ► dom.js, format.js
 <p><strong>ตอบ:</strong> ไม่เกิดอะไร ชื่อวิชาจะแสดงเป็นตัวอักษร <code>&lt;script&gt;alert(1)&lt;/script&gt;</code> ตรง ๆ เพราะ <code>el('div', { text: item.subjectName })</code> ใช้ <code>textContent</code> ซึ่งเบราว์เซอร์ไม่ตีความเป็น HTML ต่อให้โค้ดชั้นนั้นพลาด CSP ก็บล็อกสคริปต์ที่ไม่ได้มาจากไฟล์บนโดเมนเราอยู่ดี</p></div>
 
 <div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> deploy เว็บใหม่แล้วทำไมบางคนยังเห็นหน้าเก่า และคุณรับมืออย่างไร</p>
-<p><strong>ตอบ:</strong> เดิม Caddy ให้เบราว์เซอร์แคชทุกไฟล์ใน <code>/assets/</code> ได้ 1 ชั่วโมง <code>index.html</code> ตั้ง <code>no-cache</code> จึงได้เลข <code>?v=</code> ใหม่เสมอ ซึ่งบังคับโหลด CSS และ <code>main.js</code> ใหม่ แต่โมดูลที่ถูก import ต่อไม่มี <code>?v=</code> จึงค้างในแคชได้ถึง 1 ชั่วโมง ตอนนี้ (15 ต.ค. 2569) แก้ที่ต้นเหตุแล้ว: ไฟล์ JS ใน <code>/assets/js/</code> ตั้ง <code>no-cache</code> ให้เบราว์เซอร์ถามเซิร์ฟเวอร์ทุกครั้ง ส่วน CSS/รูปยังแคช 1 ชั่วโมงเพราะมี <code>?v=</code> และโค้ดยังออกแบบให้ทนไฟล์เก่า-ใหม่ปนไว้อีกชั้น: ไม่เพิ่ม export ใหม่ในไฟล์เดิม (สร้างไฟล์ใหม่ เช่น <code>theme.js</code> <code>icons-ui.js</code>), เช็ก <code>typeof api.xxx === 'function'</code> ก่อนเรียก, และถ้ายังเห็นของเก่าให้กด Ctrl+F5 หนึ่งครั้ง</p></div>
+<p><strong>ตอบ:</strong> <code>index.html</code> ตั้ง <code>no-cache</code> จึงได้เลข <code>?v=</code> ใหม่เสมอ ซึ่งบังคับโหลด CSS และ <code>main.js</code> ใหม่ ส่วนโมดูลที่ถูก import ต่อไม่มี <code>?v=</code> ถ้าแคช 1 ชั่วโมงจะค้างของเก่า Caddy จึงตั้ง <code>no-cache</code> ให้ไฟล์ JS ใน <code>/assets/js/</code> ให้เบราว์เซอร์ถามเซิร์ฟเวอร์ทุกครั้ง ส่วน CSS/รูปแคช 1 ชั่วโมงเพราะมี <code>?v=</code> (ต้องขยับเลขเมื่อแก้) และโค้ดยังออกแบบให้ทนไฟล์เก่า-ใหม่ปนไว้อีกชั้น: ไม่เพิ่ม export ใหม่ในไฟล์เดิม (สร้างไฟล์ใหม่ เช่น <code>theme.js</code> <code>icons-ui.js</code>), เช็ก <code>typeof api.xxx === 'function'</code> ก่อนเรียก, และถ้ายังเห็นของเก่าให้กด Ctrl+F5 หนึ่งครั้ง</p></div>
 
 <div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> นาฬิกานับถอยหลังปิดแอร์เดินในเบราว์เซอร์ ถ้านาฬิกาเครื่องผู้ใช้เพี้ยนจะเป็นอย่างไร ใครเป็นคนสั่งปิดจริง</p>
 <p><strong>ตอบ:</strong> เซิร์ฟเวอร์ส่งเวลาเส้นตาย <code>autoOffDeadlineAt</code> มา เบราว์เซอร์เอามาลบกับ <code>Date.now()</code> ของเครื่องแล้วนับถอยหลังเอง (<code>rooms.js</code> <code>countdownStrip</code>) ไม่ถามเซิร์ฟเวอร์ทุกวินาทีเพราะเส้นตายเป็นค่าคงที่ ถ้านาฬิกาเครื่องผู้ใช้เพี้ยน ตัวเลขบนจอก็เพี้ยนตาม แต่เป็นแค่การแสดงผล คนที่ตัดสินใจและสั่งปิดจริงคือ Backend (ระบบปิดอัตโนมัติ) ตามเวลาของเซิร์ฟเวอร์ และถ้าเลยเส้นตายแล้วหน้าจอจะเปลี่ยนเป็น "กำลังส่งคำสั่งปิด" แทนค้างที่ 00:00</p></div>
 
 <div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> หน้าเฟิร์มแวร์รู้ได้อย่างไรว่าบอร์ดอัปเดตสำเร็จ ในเมื่อ HTTP ตอบกลับทันทีตั้งแต่ส่งคำสั่ง</p>
-<p><strong>ตอบ:</strong> คำตอบ HTTP แค่บอกว่า Backend ส่งคำสั่ง OTA เข้า MQTT แล้ว บอร์ดยังต้องดาวน์โหลดไฟล์ รีบูต และต่อ MQTT ใหม่อีก 1–2 นาที หน้าเว็บจึงจดบอร์ดนั้นไว้ใน <code>pending</code> พร้อมรุ่นเป้าหมาย เวลาเริ่ม และ <code>otaError</code> เดิม แล้วทุกครั้งที่ polling นำข้อมูลแอร์ชุดใหม่มา (<code>state.airConditioners</code> ทุก 10 วินาที) <code>settlePending()</code> จะเช็ก 3 ทาง: <code>firmwareVersion</code> เท่ากับรุ่นเป้าหมาย = สำเร็จ, มี <code>otaError</code> ใหม่ที่ไม่ใช่ค่าเดิม = ล้มเหลว, เกิน 5 นาที = ถือว่าไม่สำเร็จ (บอร์ดใช้รุ่นเดิมต่อ) เก็บ <code>otaError</code> เดิมไว้เทียบเพราะถ้าบอร์ดเคยพังครั้งก่อน ข้อความเก่าจะทำให้ตัดสินผิดว่าครั้งนี้ก็พัง</p></div>
+<p><strong>ตอบ:</strong> คำตอบ HTTP แค่บอกว่า Backend ส่งคำสั่ง OTA เข้า MQTT แล้ว บอร์ดยังต้องดาวน์โหลดไฟล์ รีบูต และต่อ MQTT ใหม่อีก 1–2 นาที หน้าเว็บจึงจดบอร์ดนั้นไว้ใน <code>pending</code> พร้อมรุ่นเป้าหมายและเวลาเริ่ม แล้วทุกครั้งที่ polling นำข้อมูลบอร์ดชุดใหม่มา (<code>state.airConditioners</code> และ <code>state.occupancySensors</code> ทุก 10 วินาที) <code>settlePending()</code> จะเช็ก 3 ทาง: <code>firmwareVersion</code> เท่ากับรุ่นเป้าหมาย = สำเร็จ, มี <code>otaError</code> = ล้มเหลว, เกิน 5 นาที = ถือว่าไม่สำเร็จ (บอร์ดใช้รุ่นเดิมต่อ และบอกรุ่นที่บอร์ดรายงานอยู่) ที่ใช้ "มี <code>otaError</code>" ได้เลยเพราะ Backend ล้าง <code>ota_error</code> ตอนส่งคำสั่ง error ของรอบก่อนจึงไม่ค้างมาทำให้ตัดสินผิด</p></div>
 
 <div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> ถ้าแอดมินอัปโหลดไฟล์เซ็นเซอร์เข้าไปในแท็บแอร์ หรือสั่งไฟล์แอร์ IR ให้บอร์ดสายแอร์ จะเกิดอะไรขึ้น</p>
 <p><strong>ตอบ:</strong> ถูกกันไว้ 3 ชั้น ชั้นแรกหน้าเว็บ: <code>handleFile</code> อ่านชนิดจากชื่อไฟล์ (<code>occ</code> = เซ็นเซอร์, <code>wired</code>/<code>slm8</code> = สายแอร์) ถ้าไม่ตรงแท็บจะแจ้งให้ไปอัปโหลดในแท็บที่ถูก และแต่ละแท็บแสดงเฉพาะไฟล์และบอร์ดของชนิดนั้น จึงเลือกผิดไม่ได้ ชั้นสองตอนอัปโหลด: เว็บส่ง <code>?kind=</code> ไปด้วย Backend ตอบ 400 ถ้าชื่อไฟล์บอกชนิดอื่น ชั้นสามตอนสั่งบอร์ด: route <code>/ota</code> ของ Backend เช็กชนิดไฟล์กับโปรโตคอลของบอร์ดอีกครั้ง ที่ต้องเข้มขนาดนี้เพราะถ้าบอร์ดได้โปรแกรมผิดชนิด มันจะรีบูตเป็นบอร์ดอีกแบบที่ขาต่อและหัวข้อ MQTT ไม่ตรงกับฮาร์ดแวร์ ต้องไปเสียบ USB แก้ที่หน้างาน</p></div>
@@ -3980,10 +3978,10 @@ charts.js ► dom.js, format.js
 <div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> บนหน้าเว็บ แอร์ Daikin แบบต่อสาย กับแอร์ IR ต่างกันอย่างไร</p>
 <p><strong>ตอบ:</strong> ต่างที่ชิปและปุ่ม ชิปบนการ์ดแอร์บอก "Daikin · สายแอร์" หรือ "&lt;ยี่ห้อ&gt; · รีโมต IR" (<code>airBrand</code> + <code>controlTypeLabel</code> ใน <code>format.js</code>) ส่วนปุ่ม <code>limitsFor</code> ของบอร์ดสายแอร์คืนเฉพาะสิ่งที่รีโมตติดผนัง Daikin ทำได้: โหมด cool/dry/fan, พัดลม auto/low/medium/high (ไม่มี turbo), ทิศลม auto/off, ฟังก์ชันเสริมมีแค่ Sleep และไม่มีในโหมด Dry หน้าเว็บจึงไม่แสดงปุ่มที่กดไปแล้วเซิร์ฟเวอร์จะปฏิเสธ และ <code>fitDraft</code> ปรับค่าที่ร่างค้างไว้ (เช่น พัดลม turbo) ให้อยู่ในขอบเขตก่อนส่ง</p></div>
 
-<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> Arduino IDE ส่งออกไฟล์ชื่อ <code>rmutt_esp32_air.ino.bin</code> ไม่มีเลขรุ่น หน้าเฟิร์มแวร์รู้รุ่นได้อย่างไร (เพิ่ม 14 ต.ค. 2569)</p>
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> Arduino IDE ส่งออกไฟล์ชื่อ <code>rmutt_esp32_air.ino.bin</code> ไม่มีเลขรุ่น หน้าเฟิร์มแวร์รู้รุ่นได้อย่างไร</p>
 <p><strong>ตอบ:</strong> <code>handleFile</code> เรียก <code>versionOfFileName</code> ถ้าชื่อไม่มีรูปแบบ <code>-x.y.z.bin</code> จะเปิดฟอร์มถามรุ่น (แนะนำให้ดู <code>FIRMWARE_VERSION</code> ในโค้ดหรือบรรทัด "Firmware:" ใน Serial Monitor) ตรวจรูปแบบ <code>2.5.1</code> หรือ <code>2.5.2-slm8</code> แล้วตั้งชื่อใหม่เป็น <code>rmutt_esp32_air-2.5.1.bin</code> ก่อนอัปโหลด ทุกไฟล์บนเซิร์ฟเวอร์จึงมีรุ่นในชื่อเสมอ ทั้งตาราง "ต้องอัปเดต" และการเช็กว่าอัปเดตสำเร็จพึ่งชื่อนี้ ควรพิมพ์ให้ตรงกับ <code>FIRMWARE_VERSION</code> ทุกตัวอักษร ไม่งั้นป้าย "กำลังอัปเดต" จะไม่จบด้วย toast สำเร็จ</p></div>
 
-<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> หน้าเฟิร์มแวร์ตัดสินว่าบอร์ด "ยังเก่า" อย่างไร ทำไมไม่เทียบรุ่นเป็นข้อความ (เพิ่ม 14 ต.ค. 2569)</p>
+<div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> หน้าเฟิร์มแวร์ตัดสินว่าบอร์ด "ยังเก่า" อย่างไร ทำไมไม่เทียบรุ่นเป็นข้อความ</p>
 <p><strong>ตอบ:</strong> <code>statusOf</code> เทียบ <code>firmwareVersion</code> ที่บอร์ดรายงานกับรุ่นของไฟล์ล่าสุดในแท็บด้วย <code>compareVersions</code> ซึ่งแยกเลขสามส่วนหน้าเป็นตัวเลขแล้วเทียบทีละส่วน เพราะถ้าเทียบเป็นข้อความ <code>'2.5.10'</code> จะน้อยกว่า <code>'2.5.9'</code> ส่วนท้ายอย่าง <code>-slm8</code> ไม่นับเพราะบอกชนิด ไม่ใช่ลำดับ แต่สถานะอื่นมาก่อน: กำลังอัปเดต → ตั้งค่าไม่เสร็จ → ออฟไลน์ → ไม่มีไฟล์ แล้วจึงเป็นล่าสุด/ยังเก่า มีแค่บอร์ด "ยังเก่า" ที่ติ๊กเลือกและกดอัปเดตได้</p></div>
 
 <h2 id="สรุปและเช็กลิสต์ความเข้าใจ">สรุปและเช็กลิสต์ความเข้าใจ<a class="anchor" href="#สรุปและเช็กลิสต์ความเข้าใจ">#</a></h2>
@@ -4001,12 +3999,12 @@ charts.js ► dom.js, format.js
 <li class="check"><input type="checkbox"> บอกได้ว่าหน้าไหนเป็นแอดมินเท่านั้น (<code>devices</code>, <code>firmware</code>, <code>users</code>) และส่วนไหนในหน้าอื่นที่เฉพาะแอดมิน (นำเข้า/ล้างตาราง, แก้อัตราค่าไฟ, สวิตช์รวมปิดอัตโนมัติ, ปุ่มบางอันในรีโมต)</li>
 <li class="check"><input type="checkbox"> อธิบายทำไมต้องมีทั้ง Flutter กับเว็บ</li>
 <li class="check"><input type="checkbox"> อธิบายขั้นตอน <code>deploy-web.ps1</code> และทำไมต้อง "คัดลอกเข้า" <code>www</code> เดิมแทน <code>mv</code></li>
-<li class="check"><input type="checkbox"> อธิบายแคช: <code>/assets/js/*</code> <code>no-cache</code> (15 ต.ค.), <code>/assets/*</code> อื่น 1 ชั่วโมง, <code>index.html</code> <code>no-cache</code>, <code>?v=</code> และผลข้างเคียงที่ต้องออกแบบรับมือ</li>
+<li class="check"><input type="checkbox"> อธิบายแคช: <code>/assets/js/*</code> <code>no-cache</code>, <code>/assets/*</code> อื่น 1 ชั่วโมง, <code>index.html</code> <code>no-cache</code>, <code>?v=</code> และผลข้างเคียงที่ต้องออกแบบรับมือ</li>
 <li class="check"><input type="checkbox"> อธิบายว่าทำไมการซ่อนปุ่มตามสิทธิ์ไม่ใช่ความปลอดภัยจริง</li>
-<li class="check"><input type="checkbox"> (เพิ่ม 14 ต.ค. 2569) อธิบายหน้าเฟิร์มแวร์ได้: 3 แท็บตามชนิดบอร์ด, ชนิด/รุ่นอ่านจากชื่อไฟล์, อัปโหลดเป็นไฟล์ดิบ + <code>X-File-Name</code> + <code>?kind</code> + <code>?replace=1</code>, สถานะบอร์ด 6 แบบจาก <code>statusOf</code>, และการติดตามผลด้วย <code>pending</code> + <code>settlePending</code> + 5 นาที</li>
-<li class="check"><input type="checkbox"> (เพิ่ม 14 ต.ค. 2569) บอกลำดับสถานะใน <code>statusOf</code> (updating → notready → offline → nofile → uptodate/outdated) และอธิบายได้ว่าทำไม <code>compareVersions</code> ต้องเทียบเป็นตัวเลข และทำไมต้องถามรุ่นเมื่อชื่อไฟล์จาก Arduino IDE ไม่มีรุ่น</li>
+<li class="check"><input type="checkbox"> อธิบายหน้าเฟิร์มแวร์ได้: 3 แท็บตามชนิดบอร์ด, ชนิด/รุ่นอ่านจากชื่อไฟล์, อัปโหลดเป็นไฟล์ดิบ + <code>X-File-Name</code> + <code>?kind</code> + <code>?replace=1</code>, สถานะบอร์ด 6 แบบจาก <code>statusOf</code>, และการติดตามผลด้วย <code>pending</code> + <code>settlePending</code> + 5 นาที</li>
+<li class="check"><input type="checkbox"> บอกลำดับสถานะใน <code>statusOf</code> (updating → notready → offline → nofile → uptodate/outdated) และอธิบายได้ว่าทำไม <code>compareVersions</code> ต้องเทียบเป็นตัวเลข และทำไมต้องถามรุ่นเมื่อชื่อไฟล์จาก Arduino IDE ไม่มีรุ่น</li>
 <li class="check"><input type="checkbox"> อธิบายได้ว่าตารางบอร์ดกลายเป็นการ์ดบนมือถือด้วย CSS grid อย่างไร และแถบ <code>.fw-bar</code> ค้างล่างจออย่างไร</li>
-<li class="check"><input type="checkbox"> (เพิ่ม 11 ต.ค. 2569) อธิบายได้ว่าเว็บแสดงยี่ห้อ/วิธีควบคุมแอร์จากโปรโตคอลอย่างไร (<code>airBrand</code>, <code>controlTypeLabel</code>, <code>airControlSummary</code>) และทำไมการ์ดแอร์สายแอร์มีปุ่มน้อยกว่า (<code>limitsFor</code>, <code>fitDraft</code>)</li>
+<li class="check"><input type="checkbox"> อธิบายได้ว่าเว็บแสดงยี่ห้อ/วิธีควบคุมแอร์จากโปรโตคอลอย่างไร (<code>airBrand</code>, <code>controlTypeLabel</code>, <code>airControlSummary</code>) และทำไมการ์ดแอร์สายแอร์มีปุ่มน้อยกว่า (<code>limitsFor</code>, <code>fitDraft</code>)</li>
 </ul><nav class="pager"><a class="prev" href="12-flutter-admin-screens.html"><span>← บทก่อนหน้า</span>12. แอป Flutter ตอนที่ 3: หน้าจอผู้ดูแลระบบและการตั้งค่า</a><a class="next" href="14-deploy-scripts-testing.html"><span>บทถัดไป →</span>14. การติดตั้งระบบ สคริปต์อัตโนมัติ และการทดสอบ</a></nav>
   </main>
   <aside class="toc"><div class="toc-title">ในบทนี้</div><ul><li><a href="#ภาพรวม">ภาพรวม</a></li><li><a href="#ความรู้ที่ต้องมีก่อนอ่านบทนี้">ความรู้ที่ต้องมีก่อนอ่านบทนี้</a></li><li><a href="#โครงสร้างโฟลเดอร์">โครงสร้างโฟลเดอร์</a></li><li><a href="#อธิบายทีละไฟล์">อธิบายทีละไฟล์</a></li><li><a href="#หน้าจอทั้งหมดใน-views">หน้าจอทั้งหมดใน views/</a></li><li><a href="#css-สถาปัตยกรรม-4-ชั้น">CSS: สถาปัตยกรรม 4 ชั้น</a></li><li><a href="#เจาะโค้ดทีละบรรทัด">เจาะโค้ดทีละบรรทัด</a></li><li><a href="#หลักการเขียนโค้ดที่ใช้ในส่วนนี้">หลักการเขียนโค้ดที่ใช้ในส่วนนี้</a></li><li><a href="#การ-deploy-และแคช">การ deploy และแคช</a></li><li><a href="#คำถามที่อาจารย์อาจถาม">คำถามที่อาจารย์อาจถาม</a></li><li><a href="#สรุปและเช็กลิสต์ความเข้าใจ">สรุปและเช็กลิสต์ความเข้าใจ</a></li></ul></aside>

@@ -55,10 +55,8 @@
 <li><a href="17-glossary.html"><span class="num">17</span>อภิธานศัพท์</a></li>
 <li><a href="18-file-map.html"><span class="num">18</span>แผนที่ไฟล์ทั้งโปรเจค</a></li>
 </ul>
-<div class="nav-part">งานที่กำลังพัฒนา</div><ul>
-<li><a href="19-daikin-slm8.html"><span class="num">19</span>แอร์ Daikin ผ่านสาย SLM8: จากการแกะโปรโตคอลถึงบอร์ดสายแอร์</a></li>
-</ul>
 <div class="nav-part">เจาะลึก</div><ul>
+<li><a href="19-daikin-slm8.html"><span class="num">19</span>แอร์ Daikin ผ่านสาย SLM8: จากการแกะโปรโตคอลถึงบอร์ดสายแอร์</a></li>
 <li><a href="20-database-design.html"><span class="num">20</span>เจาะลึกการออกแบบฐานข้อมูล</a></li>
 </ul>
     </nav>
@@ -110,7 +108,7 @@
 </code></pre></div>
 </div>
 
-<div class="callout note"><div class="callout-title">หมายเหตุ</div><p>เอกสารเก่าบางส่วน (<code>deploy/DEPLOY.md</code>, <code>deploy/SERVER_REQUIREMENTS.md</code>, <code>docs/learn/14-*.md</code>) ยังเขียนตามแผนเดิมที่ขอให้ฝ่ายไอทีเปิดพอร์ต 80/443 จากอินเทอร์เน็ต และขอใบรับรองแบบ HTTP-01 แต่โค้ดจริงตอนนี้ใช้ DuckDNS + DNS-01 + Tailscale Funnel บทนี้อธิบายตามโค้ดจริง</p></div>
+<div class="callout note"><div class="callout-title">หมายเหตุ</div><p>เอกสารบางส่วนในโปรเจกต์ (<code>deploy/DEPLOY.md</code>, <code>deploy/SERVER_REQUIREMENTS.md</code>, <code>docs/learn/14-*.md</code>) ยังเขียนตามแผนเดิมที่ขอให้ฝ่ายไอทีเปิดพอร์ต 80/443 จากอินเทอร์เน็ต และขอใบรับรองแบบ HTTP-01 แต่โค้ดจริงตอนนี้ใช้ DuckDNS + DNS-01 + Tailscale Funnel บทนี้อธิบายตามโค้ดจริง</p></div>
 
 <h2 id="ความรู้ที่ต้องมีก่อนอ่านบทนี้">ความรู้ที่ต้องมีก่อนอ่านบทนี้<a class="anchor" href="#ความรู้ที่ต้องมีก่อนอ่านบทนี้">#</a></h2>
 <p>ส่วนนี้ยาวกว่าบทอื่น เพราะเรื่องเซิร์ฟเวอร์ต้องเข้าใจเครือข่ายก่อนถึงจะอธิบายได้ว่า "ทำไม" อ่านตามลำดับ</p>
@@ -306,7 +304,7 @@
 <li>ใครถาม DNS ก็ได้คำตอบเป็น 10.x เหมือนกันทั้งโลก</li>
 <li>เครื่องในอาคารเอา 10.x ไปต่อได้จริง</li>
 <li>เครื่องนอกมหาวิทยาลัยได้ 10.x ไปก็ต่อไม่ถึง (IP ส่วนตัวไม่ถูกส่งผ่านอินเทอร์เน็ต)</li>
-<li>บอร์ด ESP32 ที่ต่อ Wi-Fi นอกมหาวิทยาลัยเจอปัญหาเดียวกัน (เดิมบอร์ดต่อ <code>rmutt-energy.duckdns.org:8883</code> จึงต้องอยู่ในอาคาร) ค่าเริ่มต้นของบอร์ดจึงเปลี่ยนไปต่อผ่านชื่อ ts.net พอร์ต 8443 แทน (ดูหัวข้อ "ESP32 ต่อ MQTTS")</li>
+<li>บอร์ด ESP32 ที่ต่อ Wi-Fi นอกมหาวิทยาลัยเจอปัญหาเดียวกัน (ถ้าบอร์ดต่อ <code>rmutt-energy.duckdns.org:8883</code> จะใช้ได้เฉพาะในอาคาร) ค่าเริ่มต้นของบอร์ดจึงต่อผ่านชื่อ ts.net พอร์ต 8443 (ดูหัวข้อ "ESP32 ต่อ MQTTS")</li>
 </ul>
 <p>ทำไมยังต้องมีชื่อโดเมน ทั้งที่ใช้ได้แค่ในตึก: เพราะ<strong>ใบรับรอง TLS ออกให้ชื่อโดเมน ไม่ใช่ให้ IP ส่วนตัว</strong> ถ้าไม่มีชื่อ ก็ไม่มี HTTPS ที่เบราว์เซอร์และ ESP32 เชื่อ และถ้า IP เครื่องเปลี่ยน แก้ที่ DuckDNS ที่เดียว บอร์ดทุกตัวไม่ต้องตั้งใหม่</p>
 <div class="callout warn"><div class="callout-title">ระวัง</div><p>เราเตอร์/DNS บางแห่งมี "DNS rebinding protection" ที่ทิ้งคำตอบ DNS สาธารณะซึ่งชี้ไป IP ส่วนตัว ถ้าเครื่องในอาคารบางเครื่องเปิดโดเมนไม่ได้ทั้งที่อยู่ในวงเดียวกัน ให้ลอง <code>nslookup rmutt-energy.duckdns.org</code> ดูก่อนว่าได้ IP กลับมาหรือไม่</p></div>
@@ -581,7 +579,7 @@
 <li><strong>MQTT ผ่านพอร์ต 8443 แยกต่างหาก ไม่ผ่าน Caddy</strong> เพราะ Caddy พูดแต่ HTTP ส่ง MQTT ตรงไป Mosquitto ซึ่งยังบังคับ <code>allow_anonymous false</code> กับบัญชี Dynamic Security รายบอร์ด จึงเปิดพอร์ตนี้ให้อินเทอร์เน็ตได้โดยยังมีด่านล็อกอินและ ACL (บอร์ดเห็นเฉพาะ topic ของตัวเอง)</li>
 </ol>
 <p>สิ่งที่<strong>ไม่ถูกเปิด</strong>ออกอินเทอร์เน็ตคือ <code>backend:3000</code>, <code>db:3306</code> และ SSH</p>
-<div class="callout warn"><div class="callout-title">ระวัง</div><p>หลังเพิ่มพอร์ต 8443 Broker "เข้าถึงได้จากอินเทอร์เน็ต" เป็นครั้งแรก (เดิมต้องอยู่ในเครือข่ายมหาวิทยาลัย) ความปลอดภัยของ MQTT จึงพึ่ง 2 อย่าง: TLS ระหว่างบอร์ดกับกล่อง tailscale และ username/password รายบอร์ด (รหัสเป็นค่า HMAC จาก Device ID กับ secret ของเซิร์ฟเวอร์ เดาไม่ได้ง่าย) ที่ยังไม่มีคือการจำกัดอัตราการลองรหัสต่อ IP ที่ชั้น MQTT (Mosquitto เห็น IP ต้นทางเป็นกล่อง tailscale ทุกคำขอ) ถ้าไม่ต้องการเปิดแบบนี้ ตั้ง <code>MQTT_DEVICE_URL=mqtts://&lt;DOMAIN&gt;:8883</code> ใน <code>.env</code> เพื่อให้บอร์ดที่ตั้งค่าใหม่ต่อตรงในอาคาร และเอาส่วน <code>8443</code> ออกจาก <code>serve.json</code> (บรรทัด 4–7 และบรรทัด 18 พร้อมแก้เครื่องหมายจุลภาคให้ JSON ยังถูกต้อง)</p></div>
+<div class="callout warn"><div class="callout-title">ระวัง</div><p>พอร์ต 8443 ทำให้ Broker "เข้าถึงได้จากอินเทอร์เน็ต" ความปลอดภัยของ MQTT จึงพึ่ง 2 อย่าง: TLS ระหว่างบอร์ดกับกล่อง tailscale และ username/password รายบอร์ด (รหัสเป็นค่า HMAC จาก Device ID กับ secret ของเซิร์ฟเวอร์ เดาไม่ได้ง่าย) ที่ยังไม่มีคือการจำกัดอัตราการลองรหัสต่อ IP ที่ชั้น MQTT (Mosquitto เห็น IP ต้นทางเป็นกล่อง tailscale ทุกคำขอ) ถ้าไม่ต้องการเปิดแบบนี้ ตั้ง <code>MQTT_DEVICE_URL=mqtts://&lt;DOMAIN&gt;:8883</code> ใน <code>.env</code> เพื่อให้บอร์ดที่ตั้งค่าใหม่ต่อตรงในอาคาร และเอาส่วน <code>8443</code> ออกจาก <code>serve.json</code> (บรรทัด 4–7 และบรรทัด 18 พร้อมแก้เครื่องหมายจุลภาคให้ JSON ยังถูกต้อง)</p></div>
 
 <h3 id="ทำไมแอปมือถือใช้ที่อยู่-tsnet-เป็นค่าเริ่มต้น">ทำไมแอปมือถือใช้ที่อยู่ ts.net เป็นค่าเริ่มต้น<a class="anchor" href="#ทำไมแอปมือถือใช้ที่อยู่-tsnet-เป็นค่าเริ่มต้น">#</a></h3>
 <p>ใน <code>lib/config/api_config.dart</code> บรรทัด <code>defaultValue: 'https://rmutt-energy.tailb292b4.ts.net/api'</code> ค่านี้อ่านจาก <code>String.fromEnvironment('API_BASE_URL', ...)</code> คือตอน build สั่ง <code>--dart-define=API_BASE_URL=...</code> ทับได้</p>
@@ -1187,7 +1185,7 @@ mqtt/                          Broker สำหรับพัฒนาบนเ
 </div>
 
 <ul>
-<li><strong>บรรทัด 126:</strong> Backend mount โฟลเดอร์เฟิร์มแวร์เพื่อแสดงรายการไฟล์ในหน้าเว็บ และ (เปลี่ยน 14 ต.ค. 2569) <strong>เขียนได้</strong> เพื่อรับไฟล์ที่แอดมินอัปโหลดจากหน้าเฟิร์มแวร์ของเว็บ (เดิมเป็น <code>:ro</code> อ่านอย่างเดียว ต้องอัปโหลดด้วย <code>scp</code>) โฟลเดอร์บนเครื่องจริงต้องเป็นของ uid 1000 (= user <code>node</code> ในกล่อง) ซึ่ง <code>setup-vps.sh</code> และ <code>update-remote.sh</code> ตั้งให้ (บท 14) Caddy ก็ mount โฟลเดอร์เดียวกันแบบอ่านอย่างเดียวเพื่อเสิร์ฟไฟล์ให้บอร์ดดาวน์โหลด</li>
+<li><strong>บรรทัด 126:</strong> Backend mount โฟลเดอร์เฟิร์มแวร์เพื่อแสดงรายการไฟล์ในหน้าเว็บ และ <strong>เขียนได้</strong> (ไม่ใส่ <code>:ro</code>) เพื่อรับไฟล์ที่แอดมินอัปโหลดจากหน้าเฟิร์มแวร์ของเว็บ โฟลเดอร์บนเครื่องจริงต้องเป็นของ uid 1000 (= user <code>node</code> ในกล่อง) ซึ่ง <code>setup-vps.sh</code> และ <code>update-remote.sh</code> ตั้งให้ (บท 14) Caddy ก็ mount โฟลเดอร์เดียวกันแบบอ่านอย่างเดียวเพื่อเสิร์ฟไฟล์ให้บอร์ดดาวน์โหลด</li>
 <li><strong>บรรทัด 129–134:</strong> <code>CMD</code> ต่างจาก <code>CMD-SHELL</code> คือรันคำสั่งตรง ๆ ไม่ผ่าน shell ที่นี่รัน <code>node -e "&lt;โค้ด&gt;"</code> โค้ดเรียก <code>fetch</code> (มีในตัว Node 18+) ไปที่ <code>/api/health</code> ถ้า <code>r.ok</code> (สถานะ 2xx) ออกด้วยรหัส 0 (สำเร็จ) ไม่งั้น 1 และ <code>.catch</code> กรณีต่อไม่ได้ก็ออก 1 <code>=&gt;</code> คือ arrow function</li>
 <li><strong>บรรทัด 139–143:</strong> รอ db healthy ก่อนเริ่ม</li>
 </ul>
@@ -1576,7 +1574,7 @@ mqtt/                          Broker สำหรับพัฒนาบนเ
 </tr>
 <tr>
 <td>47–48</td>
-<td><code>@scripts</code> คือ <strong>named matcher</strong> (ตัวจับคู่ที่ตั้งชื่อ) จับไฟล์ JavaScript <code>/assets/js/*</code> แล้วตั้ง <code>no-cache</code> = เก็บแคชได้แต่ต้องถามเซิร์ฟเวอร์ก่อนใช้ทุกครั้ง ไฟล์ไม่เปลี่ยนได้คำตอบ 304 สั้น ๆ (เพิ่ม 15 ต.ค. 2569 เหตุผลอยู่ด้านล่าง)</td>
+<td><code>@scripts</code> คือ <strong>named matcher</strong> (ตัวจับคู่ที่ตั้งชื่อ) จับไฟล์ JavaScript <code>/assets/js/*</code> แล้วตั้ง <code>no-cache</code> = เก็บแคชได้แต่ต้องถามเซิร์ฟเวอร์ก่อนใช้ทุกครั้ง ไฟล์ไม่เปลี่ยนได้คำตอบ 304 สั้น ๆ (เหตุผลอยู่ด้านล่าง)</td>
 </tr>
 <tr>
 <td>51–55</td>
@@ -1588,7 +1586,7 @@ mqtt/                          Broker สำหรับพัฒนาบนเ
 </tr>
 </tbody>
 </table></div>
-<div class="callout why"><div class="callout-title">ทำไม</div><p><strong>ทำไมแยก JavaScript ออกจากแคช 1 ชั่วโมง (15 ต.ค. 2569):</strong> CSS และ <code>main.js</code> ถูกอ้างจาก <code>index.html</code> พร้อม <code>?v=</code> ที่เปลี่ยนทุกครั้งที่แก้ จึงแคชนานได้ แต่ไฟล์ JS ที่ <code>main.js</code> import ต่อ (<code>store.js</code>, <code>views/*.js</code> ...) ไม่มี <code>?v=</code> เดิมถูกแคช 1 ชั่วโมง หลัง deploy เบราว์เซอร์จึงใช้ไฟล์เก่าต่อแม้กด F5 (เจอจริงตอนแก้หน้าเฟิร์มแวร์) <code>no-cache</code> แก้ได้โดยไม่ต้องใส่ <code>?v=</code> ทุก import แลกกับคำขอ 304 เล็ก ๆ ต่อไฟล์ทุกครั้งที่เปิดหน้า</p></div>
+<div class="callout why"><div class="callout-title">ทำไม</div><p><strong>ทำไมแยก JavaScript ออกจากแคช 1 ชั่วโมง:</strong> CSS และ <code>main.js</code> ถูกอ้างจาก <code>index.html</code> พร้อม <code>?v=</code> ที่เปลี่ยนทุกครั้งที่แก้ จึงแคชนานได้ แต่ไฟล์ JS ที่ <code>main.js</code> import ต่อ (<code>store.js</code>, <code>views/*.js</code> ...) ไม่มี <code>?v=</code> ถ้าแคช 1 ชั่วโมง หลัง deploy เบราว์เซอร์จะใช้ไฟล์เก่าต่อแม้กด F5 <code>no-cache</code> แก้ได้โดยไม่ต้องใส่ <code>?v=</code> ทุก import แลกกับคำขอ 304 เล็ก ๆ ต่อไฟล์ทุกครั้งที่เปิดหน้า</p></div>
 
 <p><strong>ไฟล์ <code>deploy/Caddyfile</code> บรรทัด 66–93</strong></p>
 <div class="code-block"><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">66</span>
@@ -2055,7 +2053,7 @@ HTTP-01 ให้ Let's Encrypt ต่อเข้าพอร์ต 80 ขอ�
 ใบรับรอง TLS ออกให้ชื่อโดเมน ไม่ออกให้ IP ส่วนตัว บอร์ดและเบราว์เซอร์ตรวจว่าชื่อตรงกับใบ และถ้า IP เซิร์ฟเวอร์เปลี่ยน แก้ที่ DuckDNS ที่เดียว บอร์ดไม่ต้องตั้งใหม่ ชื่อนี้ใช้ได้เฉพาะในตึก ส่วนนอกตึกใช้ ts.net (แอป และบอร์ดตามค่าเริ่มต้นปัจจุบัน)</p></div>
 
 <div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ทำไม ESP32 ต่อ MQTT ผ่าน Funnel และทำไมเป็นพอร์ต 8443</strong>
-เดิมบอร์ดต่อ <code>rmutt-energy.duckdns.org:8883</code> แต่โดเมน DuckDNS ชี้ไป IP ภายใน 10.x บอร์ดที่ต่อ Wi-Fi นอกมหาวิทยาลัยจึงหา Broker ไม่เจอ ชื่อ ts.net ของ Funnel ชี้ไปที่ relay สาธารณะ เข้าได้จากทุกเครือข่าย และกล่อง tailscale เป็นฝ่ายต่อออกไปหา relay เอง จึงไม่ต้องขอเปิดพอร์ตขาเข้า Funnel รองรับพอร์ต TCP ได้ด้วย แต่เปิดสู่สาธารณะได้เฉพาะ 443, 8443 และ 10000 พอร์ต 443 เว็บใช้อยู่แล้ว และ 8883 ไม่อยู่ในรายการ จึงเลือก 8443 สำหรับ MQTT บอร์ดต่อ <code>rmutt-energy.tailb292b4.ts.net:8443</code> ได้จากทุกที่ ส่วนบอร์ดในอาคารยังต่อตรง 8883 ได้ถ้าตั้ง <code>MQTT_DEVICE_URL</code></p></div>
+ถ้าบอร์ดต่อ <code>rmutt-energy.duckdns.org:8883</code> จะติดปัญหาว่าโดเมน DuckDNS ชี้ไป IP ภายใน 10.x บอร์ดที่ต่อ Wi-Fi นอกมหาวิทยาลัยจึงหา Broker ไม่เจอ ชื่อ ts.net ของ Funnel ชี้ไปที่ relay สาธารณะ เข้าได้จากทุกเครือข่าย และกล่อง tailscale เป็นฝ่ายต่อออกไปหา relay เอง จึงไม่ต้องขอเปิดพอร์ตขาเข้า Funnel รองรับพอร์ต TCP ได้ด้วย แต่เปิดสู่สาธารณะได้เฉพาะ 443, 8443 และ 10000 พอร์ต 443 เว็บใช้อยู่แล้ว และ 8883 ไม่อยู่ในรายการ จึงเลือก 8443 สำหรับ MQTT บอร์ดต่อ <code>rmutt-energy.tailb292b4.ts.net:8443</code> ได้จากทุกที่ ส่วนบอร์ดในอาคารยังต่อตรง 8883 ได้ถ้าตั้ง <code>MQTT_DEVICE_URL</code></p></div>
 
 <div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ทำไมถอด TLS ที่กล่อง tailscale (<code>TerminateTLS</code>) ไม่ใช้ใบรับรองของ Mosquitto ที่ 8883</strong>
 บอร์ดตรวจว่าชื่อในใบรับรองตรงกับชื่อที่ต่อ ใบของ Mosquitto ออกให้ <code>rmutt-energy.duckdns.org</code> แต่บอร์ดต่อชื่อ ts.net ถ้าส่งต่อ TLS ดิบ (<code>TCPForward</code> อย่างเดียว) ไป 8883 บอร์ดจะเห็นใบผิดชื่อและปฏิเสธ จึงให้กล่อง tailscale ถอด TLS ด้วยใบ ts.net ของตัวเอง (ออกโดย Let's Encrypt จึงตรงกับใบรากที่ฝังในเฟิร์มแวร์ ไม่ต้องแฟลชใหม่) แล้วส่ง MQTT ดิบไป <code>mqtt:1883</code> ซึ่ง Backend ใช้อยู่แล้ว ไม่ต้องแก้ Mosquitto และไม่ต้องก๊อปใบด้วย cron ข้อแลกเปลี่ยนคือช่วงสุดท้ายไม่เข้ารหัส แต่วิ่งในเครือข่าย Docker ของเครื่องเดียว และบอร์ดยังต้องล็อกอินด้วยบัญชีรายตัว</p></div>
