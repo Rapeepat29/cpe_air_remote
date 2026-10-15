@@ -41,9 +41,17 @@
 	handle {
 		root * /srv/www
 
-		# ไฟล์ในโฟลเดอร์ assets มีแต่ CSS/JS ที่เปลี่ยนพร้อมกับ index.html
-		# เก็บแคชไว้หนึ่งชั่วโมง พอให้เร็วขึ้นแต่ไม่ค้างข้ามการ deploy
-		@assets path /assets/*
+		# JavaScript เป็นโมดูลที่ import กันเอง (store.js, views/*.js) ไม่มี ?v=
+		# ถ้าแคชไว้ หลัง deploy เบราว์เซอร์จะใช้ไฟล์เก่าต่อแม้กด F5
+		# no-cache = ใช้แคชได้แต่ต้องถามเซิร์ฟเวอร์ก่อน ไฟล์ไม่เปลี่ยนได้ 304 กลับมาเร็ว
+		@scripts path /assets/js/*
+		header @scripts Cache-Control "no-cache"
+
+		# CSS รูป และฟอนต์ เปลี่ยนชื่อ ?v= ใน index.html ทุกครั้งที่แก้ จึงแคชได้หนึ่งชั่วโมง
+		@assets {
+			path /assets/*
+			not path /assets/js/*
+		}
 		header @assets Cache-Control "public, max-age=3600"
 
 		# ห้ามแคชหน้าเปลือก ไม่งั้นอัปเดตเว็บแล้วผู้ใช้ยังเห็นของเก่า
