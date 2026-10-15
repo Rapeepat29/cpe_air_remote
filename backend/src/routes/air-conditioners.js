@@ -253,12 +253,6 @@ airConditionersRouter.post(
     }
     const state = validateAirState(request.body, rows[0].protocol);
 
-    // ล้างผลรอบก่อน ให้หน้าเว็บแยกได้ว่า otaError ที่มาหลังจากนี้เป็นของรอบใหม่
-    await pool.query(
-      'UPDATE air_conditioners SET ota_error = NULL WHERE device_id = ?',
-      [deviceId],
-    );
-
     let published;
     try {
       published = await publishAirCommand(deviceId, state);
@@ -394,6 +388,12 @@ airConditionersRouter.post(
       throw new ApiError(409, 'บอร์ดออฟไลน์อยู่ สั่งอัปเดตได้เมื่อบอร์ดออนไลน์');
     }
     const url = firmwareUrl(row.mqtt_host, fileName);
+
+    // ล้างผลรอบก่อน ให้หน้าเว็บแยกได้ว่า otaError ที่มาหลังจากนี้เป็นของรอบใหม่
+    await pool.query(
+      'UPDATE air_conditioners SET ota_error = NULL WHERE device_id = ?',
+      [deviceId],
+    );
 
     let published;
     try {

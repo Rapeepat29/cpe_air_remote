@@ -223,12 +223,6 @@ occupancySensorsRouter.post(
       throw new ApiError(409, 'เซ็นเซอร์ยังตั้งค่า MQTT ไม่สำเร็จ');
     }
 
-    // ล้างผลรอบก่อน ให้หน้าเว็บแยกได้ว่า otaError ที่มาหลังจากนี้เป็นของรอบใหม่
-    await pool.query(
-      'UPDATE occupancy_sensors SET ota_error = NULL WHERE device_id = ?',
-      [deviceId],
-    );
-
     let published;
     try {
       published = await publishEnterOccupancySetupMode(deviceId);
@@ -272,6 +266,12 @@ occupancySensorsRouter.post(
       throw new ApiError(409, 'บอร์ดออฟไลน์อยู่ สั่งอัปเดตได้เมื่อบอร์ดออนไลน์');
     }
     const url = firmwareUrl(row.mqtt_host, fileName);
+
+    // ล้างผลรอบก่อน ให้หน้าเว็บแยกได้ว่า otaError ที่มาหลังจากนี้เป็นของรอบใหม่
+    await pool.query(
+      'UPDATE occupancy_sensors SET ota_error = NULL WHERE device_id = ?',
+      [deviceId],
+    );
 
     let published;
     try {
