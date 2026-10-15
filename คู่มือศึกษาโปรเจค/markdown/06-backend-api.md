@@ -598,9 +598,9 @@ authRouter.post(
 
 ### 6. Route CRUD ตัวอย่าง: `POST /api/rooms` (และ DELETE)
 
-**ไฟล์ `backend/src/routes/rooms.js` บรรทัด 84–120**
+**ไฟล์ `backend/src/routes/rooms.js` บรรทัด 62–98**
 
-```js:84
+```js:62
 roomsRouter.post(
   '/',
   requireAdmin,
@@ -643,11 +643,11 @@ roomsRouter.post(
 | บรรทัด | ความหมาย |
 |---|---|
 | 15 (บนสุดไฟล์) | `roomsRouter.use(authenticate)` ทุก route ในไฟล์ต้องผ่านการล็อกอินก่อน |
-| 85–86 | ลำดับ middleware ของ route นี้: (authenticate จาก `use`) → `requireAdmin` → handler เฉพาะแอดมินจึงเพิ่มห้องได้ |
-| 88 | `validateRoomInput(request.body)` (ใน `utils/room.js`) ตรวจและ normalize: รหัสห้องแปลงเป็นตัวพิมพ์ใหญ่ (`cl503` → `CL503`) ต้องตรง `^[A-Z0-9][A-Z0-9_-]{1,19}$`, ชั้น 0–99, ลำดับ 0–9999, ประเภทห้อง 1–100 ตัว ไม่ผ่านจะ throw `ApiError 400` ออกจาก handler ทันที |
-| 89–96 | เช็กห้องซ้ำก่อน เพื่อตอบ 409 พร้อมข้อความที่เข้าใจได้ (ถ้าปล่อยให้ `INSERT` ล้มเอง จะได้ error ดิบของ DB) |
-| 97–110 | `INSERT` ด้วย `?` ทุกค่า (parameter binding) บันทึกผู้สร้าง/ผู้แก้ไขล่าสุด (`created_by`, `updated_by`) จาก `request.authUser` (ที่ `authenticate` แนบมา) ไม่รับจาก body เพราะผู้ใช้ปลอมได้ |
-| 112–118 | ตอบ 201 พร้อมห้องที่เพิ่ง สร้าง (`...input` คือ spread คัดลอกฟิลด์ทั้งหมดของ `input`) ห้องใหม่ย่อมยังไม่มีแอร์/ตารางเรียน จึงใส่ 0 ได้เลยโดยไม่ query ซ้ำ |
+| 63–64 | ลำดับ middleware ของ route นี้: (authenticate จาก `use`) → `requireAdmin` → handler เฉพาะแอดมินจึงเพิ่มห้องได้ |
+| 66 | `validateRoomInput(request.body)` (ใน `utils/room.js`) ตรวจและ normalize: รหัสห้องแปลงเป็นตัวพิมพ์ใหญ่ (`cl503` → `CL503`) ต้องตรง `^[A-Z0-9][A-Z0-9_-]{1,19}$`, ชั้น 0–99, ลำดับ 0–9999, ประเภทห้อง 1–100 ตัว ไม่ผ่านจะ throw `ApiError 400` ออกจาก handler ทันที |
+| 67–74 | เช็กห้องซ้ำก่อน เพื่อตอบ 409 พร้อมข้อความที่เข้าใจได้ (ถ้าปล่อยให้ `INSERT` ล้มเอง จะได้ error ดิบของ DB) |
+| 75–88 | `INSERT` ด้วย `?` ทุกค่า (parameter binding) บันทึกผู้สร้าง/ผู้แก้ไขล่าสุด (`created_by`, `updated_by`) จาก `request.authUser` (ที่ `authenticate` แนบมา) ไม่รับจาก body เพราะผู้ใช้ปลอมได้ |
+| 90–96 | ตอบ 201 พร้อมห้องที่เพิ่ง สร้าง (`...input` คือ spread คัดลอกฟิลด์ทั้งหมดของ `input`) ห้องใหม่ย่อมยังไม่มีแอร์/ตารางเรียน จึงใส่ 0 ได้เลยโดยไม่ query ซ้ำ |
 
 **ตรรกะเด่นของ route ข้างเคียงในไฟล์เดียวกัน**
 
@@ -821,9 +821,9 @@ firmwareRouter.post(
 
 ก่อน 13 ต.ค. การลบอุปกรณ์ลบแค่ข้อมูลฝั่งเซิร์ฟเวอร์ ตัวบอร์ดยังจำ Wi-Fi, ที่อยู่ Broker, ชื่อผู้ใช้/รหัส MQTT และห้องไว้ใน NVS (หน่วยความจำถาวรของ ESP32) ตอนนี้ Backend สั่งบอร์ดล้างตัวเองด้วย
 
-**ไฟล์ `backend/src/routes/air-conditioners.js` บรรทัด 413–448**
+**ไฟล์ `backend/src/routes/air-conditioners.js` บรรทัด 418–453**
 
-```js:413
+```js:418
 airConditionersRouter.delete(
   '/:deviceId',
   requireAdmin,
@@ -864,14 +864,14 @@ airConditionersRouter.delete(
 
 | บรรทัด | โค้ด/คำสั่ง | ความหมาย |
 |---|---|---|
-| 415 | `requireAdmin` | ลบอุปกรณ์ได้เฉพาะแอดมิน |
-| 417 | `validateDeviceId(...)` | รหัสต้องเป็น `ESP32-` + ฐานสิบหก 12 ตัว ก่อนนำไปใช้ใน SQL และ topic |
-| 418–422 | `DELETE FROM air_conditioners ...` | **ขั้น 1** ลบแถวก่อน `affectedRows` = จำนวนแถวที่ลบจริง (0 = ลบซ้ำ) |
-| 424 | `await unprovisionDevice('air', deviceId)` | **ขั้น 2** ส่ง `{"action":"unprovision"}` ไปที่ `rmutt/ac/<id>/command` แล้วรอบอร์ดตอบ `{"unprovisioned":true}` ไม่เกิน 4 วินาที คืน `{sent, acknowledged}` ไม่โยน error |
-| 425 | `clearRetainedAirTopics(deviceId)` | **ขั้น 3** ส่งข้อความว่างแบบ retained ไปทุก topic ของบอร์ด (`command`, `state`, `status`, `provision`, `provision-ack`, `schedule-status`) คืนจำนวนที่ล้างได้ |
-| 426 | `removeDeviceAccount(deviceId)` | **ขั้น 4** ลบบัญชี MQTT ของบอร์ดใน Mosquitto Dynamic Security |
-| 428–434 | `console.log(...)` | log ทุกผลรวม `boardCleared` ใช้ตรวจย้อนหลังว่าบอร์ดไหนยังอาจมีค่าค้าง |
-| 437–446 | `response.json({... boardCleared: board.acknowledged })` | ตอบ 200 เสมอ (ลบซ้ำก็สำเร็จ) ฟิลด์ใหม่ `boardCleared` ให้แอปเตือนแอดมินเมื่อเป็น `false` ว่าต้องไปล้างที่ตัวบอร์ดเอง |
+| 420 | `requireAdmin` | ลบอุปกรณ์ได้เฉพาะแอดมิน |
+| 422 | `validateDeviceId(...)` | รหัสต้องเป็น `ESP32-` + ฐานสิบหก 12 ตัว ก่อนนำไปใช้ใน SQL และ topic |
+| 423–427 | `DELETE FROM air_conditioners ...` | **ขั้น 1** ลบแถวก่อน `affectedRows` = จำนวนแถวที่ลบจริง (0 = ลบซ้ำ) |
+| 429 | `await unprovisionDevice('air', deviceId)` | **ขั้น 2** ส่ง `{"action":"unprovision"}` ไปที่ `rmutt/ac/<id>/command` แล้วรอบอร์ดตอบ `{"unprovisioned":true}` ไม่เกิน 4 วินาที คืน `{sent, acknowledged}` ไม่โยน error |
+| 430 | `clearRetainedAirTopics(deviceId)` | **ขั้น 3** ส่งข้อความว่างแบบ retained ไปทุก topic ของบอร์ด (`command`, `state`, `status`, `provision`, `provision-ack`, `schedule-status`) คืนจำนวนที่ล้างได้ |
+| 431 | `removeDeviceAccount(deviceId)` | **ขั้น 4** ลบบัญชี MQTT ของบอร์ดใน Mosquitto Dynamic Security |
+| 433–439 | `console.log(...)` | log ทุกผลรวม `boardCleared` ใช้ตรวจย้อนหลังว่าบอร์ดไหนยังอาจมีค่าค้าง |
+| 442–451 | `response.json({... boardCleared: board.acknowledged })` | ตอบ 200 เสมอ (ลบซ้ำก็สำเร็จ) ฟิลด์ใหม่ `boardCleared` ให้แอปเตือนแอดมินเมื่อเป็น `false` ว่าต้องไปล้างที่ตัวบอร์ดเอง |
 
 > [!WHY]
 > ทำไมลำดับต้องเป็น ส่ง unprovision → รอ → ล้าง retained → ลบบัญชี MQTT:
@@ -1117,10 +1117,10 @@ endpoint เดียว ไม่ผ่าน `authenticate` เพราะห
 5. เรียก `prepareDeviceCredentials` สร้างบัญชี MQTT ของบอร์ด **ก่อนเขียน DB** เพื่อไม่ให้ถ้า Broker ล้มแล้วค้างแถวจองไว้ (ล้มแล้วตอบ 503)
 6. `INSERT` แถวใหม่สถานะ `reserved` หมดอายุ 15 นาที (`expiresInSeconds: 900`) หรือ `UPDATE` ถ้าบอร์ดเดิมที่ `active` มาตั้งค่าใหม่ (ตอบ 200 แทน 201)
 
-`POST /:deviceId/command`: ต้อง `provision_status = 'active'` (409 ถ้าบอร์ดยังไม่ยืนยันตัวผ่าน MQTT) ตรวจคำสั่งด้วย `validateAirState(body, protocol)` (`protocol` อ่านจากแถวในฐานข้อมูล ถ้าเป็น `DAIKIN_WIRED` จะรับเฉพาะคำสั่งที่รีโมตติดผนังทำได้ ดูบท Backend ตอนที่ 2) แล้ว `publishAirCommand` ตอบ 202 พร้อม `commandId` ("รับคำสั่งแล้ว" ไม่ใช่ "แอร์ทำแล้ว" เพราะผลมาทาง MQTT status ภายหลัง) ถ้า Broker ไม่ต่อ ตอบ 503 `PATCH /:deviceId`: สร้าง `SET` แบบประกอบฟิลด์ที่ส่งมา (`fields.push('name = ?')`) ชื่อคอลัมน์เป็นข้อความคงที่ในโค้ด ไม่ใช่ข้อความจากผู้ใช้ ค่าผู้ใช้ผูกด้วย `?` ปิด auto-off จะรีเซ็ตนาฬิกานับถอยหลังด้วย `POST /:deviceId/ota`: ตรวจชื่อไฟล์ (`validateFirmwareFileName`), ไฟล์มีจริง (`assertFirmwareFileExists` จาก `firmware.js`), อ่าน `protocol` ของบอร์ดแล้ว `assertFirmwareKind(fileName, airFirmwareKind(row.protocol))` (เพิ่ม 14 ต.ค. 2569: บอร์ดสายแอร์รับเฉพาะไฟล์ที่ชื่อมี `wired`/`slm8` บอร์ด IR รับเฉพาะไฟล์ IR ผิดตอบ 400), บอร์ด `active` และออนไลน์ แล้วสร้าง URL ดาวน์โหลด `https://<mqtt_host>/firmware/<ไฟล์>` และสั่งผ่าน MQTT `DELETE`: ลบแถว → `unprovisionDevice('air', id)` สั่งบอร์ดล้างค่าแล้วรอคำตอบ ≤ 4 วินาที (เพิ่ม 13 ต.ค. 2569) → `clearRetainedAirTopics` (ล้างข้อความ retained ของบอร์ดบน Broker กันค่าเก่าค้าง) → `removeDeviceAccount` (ลบบัญชี MQTT) ตอบ `boardCleared` บอกว่าบอร์ดยืนยันการล้างหรือไม่ ลบซ้ำถือว่าสำเร็จ (ตอบ 200 เสมอ) เพื่อไม่ให้แอปค้างกับแถวที่หายไปแล้ว (ดูเจาะโค้ดข้อ 9)
+`POST /:deviceId/command`: ต้อง `provision_status = 'active'` (409 ถ้าบอร์ดยังไม่ยืนยันตัวผ่าน MQTT) ตรวจคำสั่งด้วย `validateAirState(body, protocol)` (`protocol` อ่านจากแถวในฐานข้อมูล ถ้าเป็น `DAIKIN_WIRED` จะรับเฉพาะคำสั่งที่รีโมตติดผนังทำได้ ดูบท Backend ตอนที่ 2) แล้ว `publishAirCommand` ตอบ 202 พร้อม `commandId` ("รับคำสั่งแล้ว" ไม่ใช่ "แอร์ทำแล้ว" เพราะผลมาทาง MQTT status ภายหลัง) ถ้า Broker ไม่ต่อ ตอบ 503 `PATCH /:deviceId`: สร้าง `SET` แบบประกอบฟิลด์ที่ส่งมา (`fields.push('name = ?')`) ชื่อคอลัมน์เป็นข้อความคงที่ในโค้ด ไม่ใช่ข้อความจากผู้ใช้ ค่าผู้ใช้ผูกด้วย `?` ปิด auto-off จะรีเซ็ตนาฬิกานับถอยหลังด้วย `POST /:deviceId/ota`: ตรวจชื่อไฟล์ (`validateFirmwareFileName`), ไฟล์มีจริง (`assertFirmwareFileExists` จาก `firmware.js`), อ่าน `protocol` ของบอร์ดแล้ว `assertFirmwareKind(fileName, airFirmwareKind(row.protocol))` (เพิ่ม 14 ต.ค. 2569: บอร์ดสายแอร์รับเฉพาะไฟล์ที่ชื่อมี `wired`/`slm8` บอร์ด IR รับเฉพาะไฟล์ IR ผิดตอบ 400), บอร์ด `active` และออนไลน์ แล้วสร้าง URL ดาวน์โหลด `https://<mqtt_host>/firmware/<ไฟล์>` **ล้าง `ota_error` ของบอร์ดเป็น `NULL`** (เพิ่ม 15 ต.ค. 2569 ให้หน้าเว็บรู้ว่า error ที่มาหลังจากนี้เป็นของรอบใหม่ แม้ข้อความจะซ้ำกับรอบก่อน) แล้วจึงสั่งผ่าน MQTT `DELETE`: ลบแถว → `unprovisionDevice('air', id)` สั่งบอร์ดล้างค่าแล้วรอคำตอบ ≤ 4 วินาที (เพิ่ม 13 ต.ค. 2569) → `clearRetainedAirTopics` (ล้างข้อความ retained ของบอร์ดบน Broker กันค่าเก่าค้าง) → `removeDeviceAccount` (ลบบัญชี MQTT) ตอบ `boardCleared` บอกว่าบอร์ดยืนยันการล้างหรือไม่ ลบซ้ำถือว่าสำเร็จ (ตอบ 200 เสมอ) เพื่อไม่ให้แอปค้างกับแถวที่หายไปแล้ว (ดูเจาะโค้ดข้อ 9)
 
 ### `routes/occupancy-sensors.js` (326 บรรทัด)
-โครงเหมือน `air-conditioners.js` แต่ผูก **หนึ่งห้องหนึ่งเซ็นเซอร์** (ตรวจ `room_number` ซ้ำ ไม่มี `air_number`) และใช้ topic prefix `rmutt/occupancy` กับค่า `STATIC_ENERGY_THRESHOLD` ของ LD2410 ใช้ `publishOtaCommand('occupancy', ...)` ต่างจากแอร์ที่ใช้ `'air'` OTA ตรวจ `assertFirmwareKind(fileName, 'occupancy')` ตั้งแต่ก่อนอ่านฐานข้อมูล (เพิ่ม 14 ต.ค. 2569 เพราะเซ็นเซอร์มีชนิดเดียว ไม่ต้องรู้ protocol) และ `DELETE` เรียก `unprovisionDevice('occupancy', id)` ก่อนล้าง retained และลบบัญชี MQTT ตอบ `boardCleared` เหมือนแอร์ (เพิ่ม 13 ต.ค. 2569)
+โครงเหมือน `air-conditioners.js` แต่ผูก **หนึ่งห้องหนึ่งเซ็นเซอร์** (ตรวจ `room_number` ซ้ำ ไม่มี `air_number`) และใช้ topic prefix `rmutt/occupancy` กับค่า `STATIC_ENERGY_THRESHOLD` ของ LD2410 ใช้ `publishOtaCommand('occupancy', ...)` ต่างจากแอร์ที่ใช้ `'air'` OTA ตรวจ `assertFirmwareKind(fileName, 'occupancy')` ตั้งแต่ก่อนอ่านฐานข้อมูล (เพิ่ม 14 ต.ค. 2569 เพราะเซ็นเซอร์มีชนิดเดียว ไม่ต้องรู้ protocol) และล้าง `ota_error` ก่อนส่งคำสั่งเหมือนแอร์ (15 ต.ค. 2569) และ `DELETE` เรียก `unprovisionDevice('occupancy', id)` ก่อนล้าง retained และลบบัญชี MQTT ตอบ `boardCleared` เหมือนแอร์ (เพิ่ม 13 ต.ค. 2569)
 
 ### `routes/firmware.js` (185 บรรทัด, แก้ 14 ต.ค. 2569)
 `firmwareRouter.use(authenticate, requireAdmin)` (ส่งสอง middleware ในการเรียกเดียว คลุมทุกเส้นในไฟล์ รวมเส้นอัปโหลดและลบที่เพิ่มใหม่)

@@ -326,7 +326,7 @@
 </div>
 
 <p>ทุกขั้นเป็นการเชื่อมต่อ<strong>ขาออก</strong>จากเซิร์ฟเวอร์ (HTTPS 443) ซึ่ง firewall อนุญาต จึงได้ใบรับรองจริงที่เชื่อถือได้ทั่วโลก แม้เครื่องจะไม่มีใครข้างนอกเข้าถึงได้เลย</p>
-<p>การตั้งค่าเพิ่ม 3 บรรทัดใน <code>tls { ... }</code> มีเหตุผลเฉพาะของเครือข่ายมหาวิทยาลัย (คอมเมนต์ใน <code>Caddyfile</code> บรรทัด 59–68)</p>
+<p>การตั้งค่าเพิ่ม 3 บรรทัดใน <code>tls { ... }</code> มีเหตุผลเฉพาะของเครือข่ายมหาวิทยาลัย (คอมเมนต์ใน <code>Caddyfile</code> บรรทัด 67–76)</p>
 <ul>
 <li><code>resolvers 1.1.1.1 8.8.8.8</code> — ก่อนเขียน TXT Caddy ต้องหาว่าชื่อ <code>_acme-challenge.rmutt-energy.duckdns.org</code> อยู่ใน zone ไหน DNS ของมหาวิทยาลัยตอบ <code>SERVFAIL</code> ตอนถามเรื่องนี้ จึงให้ไปถาม DNS สาธารณะแทน</li>
 <li><code>propagation_delay 60s</code> — หลังเขียน TXT ให้รอ 60 วินาทีให้ DuckDNS กระจายค่าก่อน</li>
@@ -1448,7 +1448,7 @@ mqtt/                          Broker สำหรับพัฒนาบนเ
 <li><strong>บรรทัด 10:</strong> <code>(app) { ... }</code> วงเล็บรอบชื่อ = <strong>snippet</strong> (ชิ้นตั้งค่าที่นำกลับมาใช้ด้วย <code>import app</code>)</li>
 <li><strong>บรรทัด 11:</strong> <code>encode gzip</code> บีบอัดคำตอบ ลดข้อมูลบนมือถือ</li>
 </ul>
-<p><strong>ไฟล์ <code>deploy/Caddyfile</code> บรรทัด 20–56</strong></p>
+<p><strong>ไฟล์ <code>deploy/Caddyfile</code> บรรทัด 20–64</strong></p>
 <div class="code-block"><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">20</span>
 <span class="normal">21</span>
 <span class="normal">22</span>
@@ -1481,7 +1481,13 @@ mqtt/                          Broker สำหรับพัฒนาบนเ
 <span class="normal">49</span>
 <span class="normal">50</span>
 <span class="normal">51</span>
-<span class="normal">52</span></pre></div></td><td class="code"><div><pre><span></span><code>	header {
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span></pre></div></td><td class="code"><div><pre><span></span><code>	header {
 		Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
 		Strict-Transport-Security "max-age=31536000"
 		X-Content-Type-Options "nosniff"
@@ -1505,7 +1511,13 @@ mqtt/                          Broker สำหรับพัฒนาบนเ
 	handle {
 		root * /srv/www
 
-		@assets path /assets/*
+		@scripts path /assets/js/*
+		header @scripts Cache-Control "no-cache"
+
+		@assets {
+			path /assets/*
+			not path /assets/js/*
+		}
 		header @assets Cache-Control "public, max-age=3600"
 
 		@html path / /index.html /status.html
@@ -1517,7 +1529,7 @@ mqtt/                          Broker สำหรับพัฒนาบนเ
 </code></pre></div></td></tr></table></div>
 </div>
 
-<p>(ย่อคอมเมนต์ภาษาไทยบางบรรทัดออกเพื่อให้อ่านง่าย เลขบรรทัดอ้างอิงตามไฟล์จริง: <code>header</code> เริ่มบรรทัด 20, <code>handle /api/*</code> บรรทัด 29, <code>handle /firmware/*</code> บรรทัด 35, <code>handle</code> สุดท้ายบรรทัด 41, <code>@assets</code> บรรทัด 46, <code>@html</code> บรรทัด 51)</p>
+<p>(ย่อคอมเมนต์ภาษาไทยบางบรรทัดออกเพื่อให้อ่านง่าย เลขบรรทัดอ้างอิงตามไฟล์จริง: <code>header</code> เริ่มบรรทัด 20, <code>handle /api/*</code> บรรทัด 29, <code>handle /firmware/*</code> บรรทัด 35, <code>handle</code> สุดท้ายบรรทัด 41, <code>@scripts</code> บรรทัด 47, <code>@assets</code> บรรทัด 51, <code>@html</code> บรรทัด 59)</p>
 <div class="table-wrap"><table>
 <thead>
 <tr>
@@ -1559,29 +1571,27 @@ mqtt/                          Broker สำหรับพัฒนาบนเ
 <td><code>/firmware/*</code>: <code>root * /srv</code> (ทุก path) แล้ว <code>file_server</code> ส่งไฟล์ <code>/srv/firmware/&lt;ไฟล์&gt;.bin</code> และ <code>no-store</code> ห้ามแคชเพื่อให้บอร์ดได้ไฟล์รุ่นล่าสุดเสมอ</td>
 </tr>
 <tr>
-<td>41–55</td>
+<td>41–63</td>
 <td><code>handle</code> ที่ไม่มี path = ที่เหลือทั้งหมด เสิร์ฟไฟล์จาก <code>/srv/www</code> (เว็บแอป)</td>
 </tr>
 <tr>
-<td>46–47</td>
-<td><code>@assets</code> คือ <strong>named matcher</strong> (ตัวจับคู่ที่ตั้งชื่อ) จับ path <code>/assets/*</code> แล้วตั้งแคช 1 ชั่วโมง</td>
+<td>47–48</td>
+<td><code>@scripts</code> คือ <strong>named matcher</strong> (ตัวจับคู่ที่ตั้งชื่อ) จับไฟล์ JavaScript <code>/assets/js/*</code> แล้วตั้ง <code>no-cache</code> = เก็บแคชได้แต่ต้องถามเซิร์ฟเวอร์ก่อนใช้ทุกครั้ง ไฟล์ไม่เปลี่ยนได้คำตอบ 304 สั้น ๆ (เพิ่ม 15 ต.ค. 2569 เหตุผลอยู่ด้านล่าง)</td>
 </tr>
 <tr>
-<td>51–52</td>
+<td>51–55</td>
+<td><code>@assets</code> จับ <code>/assets/*</code> <strong>ยกเว้น</strong> <code>/assets/js/*</code> (<code>not path</code>) คือ CSS รูป ฟอนต์ แล้วตั้งแคช 1 ชั่วโมง matcher แบบบล็อก <code>{ }</code> เงื่อนไขทุกบรรทัดต้องจริงพร้อมกัน (AND)</td>
+</tr>
+<tr>
+<td>59–60</td>
 <td><code>@html</code> จับหน้าเปลือก <code>/</code>, <code>/index.html</code>, <code>/status.html</code> แล้วตั้ง <code>no-cache</code> เพื่อให้เบราว์เซอร์ตรวจกับเซิร์ฟเวอร์ทุกครั้ง ไม่งั้นอัปเดตเว็บแล้วผู้ใช้ยังเห็นของเก่า</td>
 </tr>
 </tbody>
 </table></div>
-<p><strong>ไฟล์ <code>deploy/Caddyfile</code> บรรทัด 58–85</strong></p>
-<div class="code-block"><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">58</span>
-<span class="normal">59</span>
-<span class="normal">60</span>
-<span class="normal">61</span>
-<span class="normal">62</span>
-<span class="normal">63</span>
-<span class="normal">64</span>
-<span class="normal">65</span>
-<span class="normal">66</span>
+<div class="callout why"><div class="callout-title">ทำไม</div><p><strong>ทำไมแยก JavaScript ออกจากแคช 1 ชั่วโมง (15 ต.ค. 2569):</strong> CSS และ <code>main.js</code> ถูกอ้างจาก <code>index.html</code> พร้อม <code>?v=</code> ที่เปลี่ยนทุกครั้งที่แก้ จึงแคชนานได้ แต่ไฟล์ JS ที่ <code>main.js</code> import ต่อ (<code>store.js</code>, <code>views/*.js</code> ...) ไม่มี <code>?v=</code> เดิมถูกแคช 1 ชั่วโมง หลัง deploy เบราว์เซอร์จึงใช้ไฟล์เก่าต่อแม้กด F5 (เจอจริงตอนแก้หน้าเฟิร์มแวร์) <code>no-cache</code> แก้ได้โดยไม่ต้องใส่ <code>?v=</code> ทุก import แลกกับคำขอ 304 เล็ก ๆ ต่อไฟล์ทุกครั้งที่เปิดหน้า</p></div>
+
+<p><strong>ไฟล์ <code>deploy/Caddyfile</code> บรรทัด 66–93</strong></p>
+<div class="code-block"><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">66</span>
 <span class="normal">67</span>
 <span class="normal">68</span>
 <span class="normal">69</span>
@@ -1593,7 +1603,15 @@ mqtt/                          Broker สำหรับพัฒนาบนเ
 <span class="normal">75</span>
 <span class="normal">76</span>
 <span class="normal">77</span>
-<span class="normal">78</span></pre></div></td><td class="code"><div><pre><span></span><code>{$DOMAIN} {
+<span class="normal">78</span>
+<span class="normal">79</span>
+<span class="normal">80</span>
+<span class="normal">81</span>
+<span class="normal">82</span>
+<span class="normal">83</span>
+<span class="normal">84</span>
+<span class="normal">85</span>
+<span class="normal">86</span></pre></div></td><td class="code"><div><pre><span></span><code>{$DOMAIN} {
 	tls {
 		dns duckdns {env.DUCKDNS_TOKEN}
 		resolvers 1.1.1.1 8.8.8.8
@@ -1939,7 +1957,7 @@ CMD ["node", "src/server.js"]
    ▼
  Caddy (:443) ถอด TLS ด้วยใบ Let's Encrypt ที่ขอด้วย DNS-01
    │ 3. path /          → ไฟล์เว็บจาก /srv/www (index.html)
-   │    path /assets/*  → ไฟล์ CSS/JS (แคช 1 ชม.)
+   │    path /assets/*  → CSS/รูป แคช 1 ชม., /assets/js/* ถามเซิร์ฟเวอร์ทุกครั้ง (no-cache)
    │    path /api/*     → reverse_proxy backend:3000   (XFF ชั้นเดียว)
    ▼
  Backend → db / mqtt (ภายในเครือข่าย Docker)

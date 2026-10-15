@@ -12,7 +12,7 @@
 | ไฟล์ | หน้าที่ |
 |---|---|
 | `deploy/docker-compose.yml` | กำหนด 5 service ของเซิร์ฟเวอร์จริง (db, mqtt, backend, caddy, tailscale) พร้อมพอร์ต volume healthcheck และตัวแปรที่ส่งเข้าแต่ละกล่อง (`MQTT_DEVICE_URL` ค่าเริ่มต้นชี้ Funnel `ts.net:8443` ตั้งเป็น `mqtts://<DOMAIN>:8883` ใน `.env` ได้ และ tailscale `depends_on` ทั้ง caddy กับ mqtt) (14 ต.ค.) backend mount `./firmware` แบบเขียนได้ เพื่อรับไฟล์ที่อัปโหลดจากเว็บ |
-| `deploy/Caddyfile` | กฎของ reverse proxy: ขอใบรับรอง DuckDNS ด้วย DNS-01, ส่ง /api/* ไป Backend, เสิร์ฟเว็บและไฟล์เฟิร์มแวร์, ใส่หัวความปลอดภัย และรับ Funnel ที่พอร์ต 8080 |
+| `deploy/Caddyfile` | กฎของ reverse proxy: ขอใบรับรอง DuckDNS ด้วย DNS-01, ส่ง /api/* ไป Backend, เสิร์ฟเว็บและไฟล์เฟิร์มแวร์, ใส่หัวความปลอดภัย และรับ Funnel ที่พอร์ต 8080 (15 ต.ค.: ไฟล์ JS ใน /assets/js/ เป็น no-cache ส่วน CSS/รูปแคช 1 ชม.) |
 | `deploy/caddy.Dockerfile` | build Caddy แบบ multi-stage ที่มีปลั๊กอิน DuckDNS สำหรับ DNS challenge |
 | `deploy/backend.Dockerfile` | สูตร image ของ Backend (node:22-alpine, ติดตั้ง dependency production, ปรับสิทธิ์ซอร์สด้วย `chmod -R a+rX src scripts database` ก่อน `USER node` รันด้วย user node) |
 | `deploy/tailscale-serve.json` | กฎของ Tailscale Serve/Funnel: พอร์ต 443 ถอด TLS แล้วส่งต่อ HTTP ไป caddy:8080 (เว็บ/API) และพอร์ต 8443 ถอด TLS (`TerminateTLS`) แล้วส่งต่อ TCP ดิบ (`TCPForward`) ไป mqtt:1883 (MQTT ของ ESP32) พร้อม `AllowFunnel` เปิดทั้งสองพอร์ตให้อินเทอร์เน็ต |
@@ -185,7 +185,7 @@
 
 | ไฟล์ | หน้าที่ |
 |---|---|
-| firmware/README.md | คู่มือรวมของเฟิร์มแวร์ ESP32 ทั้งสองบอร์ด: ไลบรารี ขา GPIO ขั้นตอนตั้งค่า การกู้ Wi-Fi การต่อสายเรดาร์ การอ่าน log และตาราง MQTT state (ปรับ 11 ต.ค.; 14 ต.ค. แก้เลขรุ่นให้ตรงโค้ด 2.5.1 / 2.5.2-slm8 / 1.3.2 และเพิ่มหัวข้อ unprovision) ครอบคลุม 3 เฟิร์มแวร์ รวมบอร์ดสายแอร์ ไลบรารี U8g2/DHT ตารางขารวมจอ OLED GPIO21/22 |
+| firmware/README.md | คู่มือรวมของเฟิร์มแวร์ ESP32 ทั้งสองบอร์ด: ไลบรารี ขา GPIO ขั้นตอนตั้งค่า การกู้ Wi-Fi การต่อสายเรดาร์ การอ่าน log และตาราง MQTT state (ปรับ 11 ต.ค.; 14 ต.ค. แก้เลขรุ่นให้ตรงโค้ด 2.5.1 / 2.5.2-slm8 / 1.3.2 และเพิ่มหัวข้อ unprovision; ณ 15 ต.ค. ยังไม่ได้แก้ตามเซ็นเซอร์ 1.3.3 และขาใหม่ของบอร์ดสายแอร์) ครอบคลุม 3 เฟิร์มแวร์ รวมบอร์ดสายแอร์ ไลบรารี U8g2/DHT ตารางขารวมจอ OLED GPIO21/22 |
 | firmware/rmutt_esp32_air/rmutt_esp32_air.ino | โปรแกรมหลักของบอร์ดแอร์ (ปัจจุบัน 2.5.1 เริ่มเขียนบทนี้ตอน 2.4.1): BLE provisioning, Wi-Fi/MQTT (TLS, LWT), ยิง IR สั่งแอร์, อ่าน PZEM และตัดสินว่าแอร์ทำงาน, LED, ตารางเวลา, OTA และเก็บ/ส่งข้อมูลย้อนหลังตอนเน็ตหลุด (2.5.1) เพิ่มจอ OLED, `controlType:"ir"` ใน BLE และคำสั่ง `unprovision` ล้างบอร์ด |
 | firmware/rmutt_esp32_air/SaijoDenkiAC.h | ประกาศคลาส SaijoDenkiAC และ enum SaijoFan/SaijoSwing สำหรับไดรเวอร์ IR ของแอร์ Saijo Denki |
 | firmware/rmutt_esp32_air/SaijoDenkiAC.cpp | ค่าเวลาสัญญาณ 38 kHz และตารางเฟรม 72 บิตที่จับจากรีโมตจริง พร้อมเมธอดส่งเปิด/ปิด โหมด อุณหภูมิ 18–29 พัดลม และสวิง ผ่าน IRsend::sendGeneric |
@@ -194,10 +194,10 @@
 | firmware/rmutt_esp32_air/oled_ui.h | (ใหม่ 11 ต.ค.) ฟังก์ชันวาดหน้าจอ 128×64 (`OledData`, หน้าหลัก, SETUP/CONNECTING/ALERT) ใช้ร่วมกับบอร์ดสายแอร์ |
 | firmware/rmutt_esp32_air/build_opt.h | (ใหม่ 11 ต.ค.) แฟล็กคอมไพเลอร์ปิด I2C/SPI ฮาร์ดแวร์ของ U8g2 และโปรโตคอล IR 28 ยี่ห้อที่ไม่ใช้ ให้เฟิร์มแวร์ที่มีจอพอดีแฟลช (98%) |
 | firmware/rmutt_esp32_air/README_OLED_TH.md | (ใหม่ 11 ต.ค.) คู่มือต่อจอ OLED หน้าจอที่แสดง ไลบรารี U8g2 และเหตุผลของ `build_opt.h` |
-| firmware/rmutt_esp32_air_wired/rmutt_esp32_air_wired.ino | (ใหม่ 11 ต.ค.) เฟิร์มแวร์บอร์ดสายแอร์ Daikin 2.5.2-slm8 สั่งแอร์ทางสาย SLM8 + DHT11 รายงานสถานะจากแอร์ BLE/MQTT/PZEM/OTA เหมือนบอร์ด IR (บท 19) |
+| firmware/rmutt_esp32_air_wired/rmutt_esp32_air_wired.ino | (ใหม่ 11 ต.ค.) เฟิร์มแวร์บอร์ดสายแอร์ Daikin 2.5.2-slm8 สั่งแอร์ทางสาย SLM8 + DHT11 รายงานสถานะจากแอร์ BLE/MQTT/PZEM/OTA เหมือนบอร์ด IR (บท 19) ขา PZEM ย้ายเป็น RX18/TX14 และ LED เหลืองเป็น GPIO23 (15 ต.ค.) |
 | firmware/rmutt_esp32_air_wired/DaikinSLM8.h | (ใหม่ 11 ต.ค.) โปรโตคอลสาย SLM8: สร้าง/อ่านเฟรม checksum ตัวรับ Rx (interrupt + ring buffer) ตัวส่ง Tx และ Controller |
 | firmware/rmutt_esp32_air_wired/wired_bus.h | (ใหม่ 11 ต.ค.) รัน Controller ใน FreeRTOS task แยก (core 1, priority 3) พร้อม mutex ส่งเฟรมทุก 1 วินาที |
-| firmware/rmutt_esp32_air_wired/README_WIRED_TH.md | (ใหม่ 11 ต.ค.) วิธีต่อสาย ไลบรารี ขั้นทดสอบหลังแฟลช และค่าที่ปรับได้ของบอร์ดสายแอร์ |
+| firmware/rmutt_esp32_air_wired/README_WIRED_TH.md | (ใหม่ 11 ต.ค.) วิธีต่อสาย ไลบรารี ขั้นทดสอบหลังแฟลช และค่าที่ปรับได้ของบอร์ดสายแอร์ (ณ 15 ต.ค. ยังเขียนขา PZEM 16/18 และ LED เหลือง 27 ตามรุ่นเก่า โค้ดจริงคือ 18/14 และ 23) |
 | firmware/rmutt_esp32_air_wired/build_opt.h | (ใหม่ 11 ต.ค.) ปิดไดรเวอร์ I2C/SPI ฮาร์ดแวร์ที่ U8g2 ไม่ใช้ เพื่อประหยัดแฟลช |
 | firmware/rmutt_esp32_air_wired/partitions.csv | (ใหม่ 11 ต.ค.) แบ่งแฟลช 4MB เป็น 2 ช่องแอป (OTA) + rmuttlog 64KB เหมือนบอร์ด IR |
 | firmware/rmutt_esp32_air_wired/history_log.h | (ใหม่ 11 ต.ค.) สำเนาเดียวกับบอร์ด IR: เก็บข้อมูลไฟย้อนหลังใน flash |
@@ -208,8 +208,8 @@
 | firmware/rmutt_esp32_air/ota_update.h | ตรวจ URL ที่อนุญาตและดาวน์โหลดเฟิร์มแวร์ใหม่ผ่าน HTTPS (ตรวจใบรับรองกับใบรากที่ฝังไว้) เขียนลงช่อง OTA ที่ว่าง |
 | firmware/rmutt_esp32_air/letsencrypt_ca.h | ใบรับรองราก Let's Encrypt (ISRG Root X1 และ X2) ที่ฝังในเฟิร์มแวร์เพื่อตรวจ MQTTS และ OTA สร้างโดย update-root-ca.ps1 |
 | firmware/rmutt_esp32_air/partitions.csv | ตารางพาร์ติชัน flash 4 MB ของบอร์ดแอร์: nvs, otadata, app0, app1 (OTA) และ rmuttlog 64 KB สำหรับข้อมูลย้อนหลัง |
-| firmware/rmutt_esp32_occupancy/rmutt_esp32_occupancy.ino | โปรแกรมหลักของบอร์ดตรวจจับคน (v1.3.1): อ่านเรดาร์ LD2410 ใน Engineering mode, ตัดสินมีคนเมื่อ static energy เกต 0–8 มากกว่า 25, ส่งสถานะผ่าน MQTT, BLE provisioning และ OTA (1.3.2) เพิ่มคำสั่ง `unprovision` ล้าง NVS แล้วรีบูตเข้า BLE |
-| firmware/rmutt_esp32_occupancy/ota_update.h | ไฟล์ OTA เหมือนของบอร์ดแอร์ทุกไบต์ ใช้ตรวจ URL และอัปเดตเฟิร์มแวร์ผ่าน HTTPS |
+| firmware/rmutt_esp32_occupancy/rmutt_esp32_occupancy.ino | โปรแกรมหลักของบอร์ดตรวจจับคน (v1.3.3): อ่านเรดาร์ LD2410 ใน Engineering mode, ตัดสินมีคนเมื่อ static energy เกต 0–8 มากกว่า 15 (เดิม 25), ไฟ LED เขียว GPIO25 = การเชื่อมต่อ แดง GPIO26 = มีคน (1.3.3, 15 ต.ค.), ส่งสถานะผ่าน MQTT, BLE provisioning และ OTA (1.3.2) เพิ่มคำสั่ง `unprovision` ล้าง NVS แล้วรีบูตเข้า BLE |
+| firmware/rmutt_esp32_occupancy/ota_update.h | ไฟล์ OTA เหมือนของบอร์ดแอร์ (ต่างแค่ช่องว่างท้ายบรรทัด 22) ใช้ตรวจ URL และอัปเดตเฟิร์มแวร์ผ่าน HTTPS |
 | firmware/rmutt_esp32_occupancy/letsencrypt_ca.h | ใบรับรองรากชุดเดียวกับบอร์ดแอร์ สำหรับ MQTTS และ OTA ของบอร์ดตรวจจับคน |
 | firmware/rmutt_esp32_occupancy/partitions.csv | ตารางพาร์ติชัน flash 4 MB ของบอร์ดตรวจจับคน: nvs, otadata, app0, app1 และ coredump |
 | firmware/ld2410_pinscan/ld2410_pinscan.ino | เครื่องมือสแกนขา GPIO ทีละขาเพื่อหาว่าขาไหนรับสัญญาณ UART จาก LD2410 และตรวจหัวเฟรมที่ baud 256000/115200/57600 |
@@ -370,7 +370,7 @@
 | webapp/assets/js/auth.js | หน้าเข้าสู่ระบบและขั้นตอนลืมรหัสผ่าน 3 ขั้น (ขอ OTP ยืนยัน OTP ตั้งรหัสใหม่) |
 | webapp/assets/js/config.js | API_BASE (รับ ?api= เฉพาะ localhost) คีย์ localStorage ช่วงเวลา polling และชื่ออาคาร |
 | webapp/assets/js/api.js | ชั้นเดียวที่เรียก fetch: แนบ Bearer token จัดการ 401 แปลง error เป็น ApiError และรวม method ของทุก endpoint (14 ต.ค.) ฟังก์ชันอัปโหลด/ลบไฟล์เฟิร์มแวร์ |
-| webapp/assets/js/store.js | state กลาง subscribe/emit ตัวโหลดข้อมูลแต่ละชุด และ polling ตามช่วงใน config.js |
+| webapp/assets/js/store.js | state กลาง subscribe/emit ตัวโหลดข้อมูลแต่ละชุด และ polling ตามช่วงใน config.js (15 ต.ค. เพิ่มดึง occupancySensors ทุก 10 วิ) |
 | webapp/assets/js/format.js | ฟังก์ชันจัดรูปแบบตัวเลข หน่วยพลังงาน วันที่ไทย พ.ศ. เวลา และคำอธิบายการแจ้งเตือน (11 ต.ค.) ป้ายยี่ห้อ/วิธีควบคุมและความสามารถของแอร์ |
 | webapp/assets/js/thai-date-input.js | ช่องวันที่ที่พิมพ์และแสดงเป็น พ.ศ. มีปฏิทินป๊อปอัป แต่ .value ยังเป็น YYYY-MM-DD |
 | webapp/assets/js/theme.js | ธีมสี gray/white/black/green/auto เก็บใน localStorage ตั้ง data-palette และจุดเลือกธีมบนแถบบน |
@@ -391,7 +391,7 @@
 | webapp/assets/js/views/alerts.js | หน้าการแจ้งเตือนทั้งหมด กรองตามสถานะและห้อง กดรับทราบได้ |
 | webapp/assets/js/views/rates.js | หน้าอัตราค่าไฟต่อ kWh พร้อมตัวอย่างการคำนวณ (แอดมินแก้ได้) |
 | webapp/assets/js/views/devices.js | หน้าห้องและอุปกรณ์ (แอดมินเท่านั้น): จัดการห้อง จองช่องบอร์ดแอร์และเซ็นเซอร์ อัปเดตเฟิร์มแวร์ ถอดอุปกรณ์ (11 ต.ค.) ตัวเลือกจอง "Daikin · สายแอร์" |
-| webapp/assets/js/views/firmware.js | (ใหม่ 14 ต.ค.) หน้าเฟิร์มแวร์ (แอดมิน): 3 แท็บตามชนิดบอร์ด อัปโหลด .bin (ถามรุ่นถ้าชื่อไม่มี) ตารางบอร์ดที่ยังเก่า อัปเดตหลายบอร์ด ติดตามผลจนรายงานรุ่นใหม่หรือครบ 5 นาที |
+| webapp/assets/js/views/firmware.js | (ใหม่ 14 ต.ค.) หน้าเฟิร์มแวร์ (แอดมิน): 3 แท็บตามชนิดบอร์ด อัปโหลด .bin (ถามรุ่นถ้าชื่อไม่มี) ตารางบอร์ดที่ยังเก่า อัปเดตหลายบอร์ด ติดตามผลจนรายงานรุ่นใหม่หรือครบ 5 นาที (15 ต.ค. แจ้ง error แม้ข้อความซ้ำรอบก่อน และบอกรุ่นปัจจุบันเมื่อหมดเวลา) |
 | webapp/assets/js/views/users.js | หน้าผู้ใช้งาน (แอดมินเท่านั้น): เพิ่ม เปลี่ยนสิทธิ์ เปิด-ปิด และลบบัญชี |
 | webapp/assets/js/views/settings.js | หน้าตั้งค่า: ธีมและขนาดตัวอักษร สวิตช์ปิดแอร์อัตโนมัติรวม ข้อมูลบัญชี สถานะเชื่อมต่อ และออกจากระบบ |
 

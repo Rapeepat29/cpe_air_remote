@@ -1275,7 +1275,7 @@ JWT ที่ออกให้ตอนล็อกอินบรรจุ <co
 <p>โครงสร้างคล้าย <code>air_conditioners</code> (ทะเบียน MQTT provisioning) ต่างกันตรงนี้:</p>
 <ol>
 <li><strong>บรรทัด 2</strong> — <code>device_id</code> รูปแบบ <code>OCC32-</code> + เลขฐานสิบหก 12 หลัก (<code>utils/occupancy-sensor.js</code>) คำนำหน้าต่างจากแอร์ จึงแยกชนิดบอร์ดได้จากรหัส</li>
-<li><strong>บรรทัด 14</strong> — <code>static_threshold</code> เกณฑ์ค่าพลังงานสัญญาณสำหรับตรวจ "คนนั่งนิ่ง" ของ LD2410 ค่าเริ่มต้น 25 ตรงกับ <code>STATIC_ENERGY_THRESHOLD = 25</code> ในโค้ด (ตอนนี้โค้ดตั้ง 25 ทุกครั้งที่ลงทะเบียน ยังไม่มีหน้าจอให้ปรับรายห้อง)</li>
+<li><strong>บรรทัด 14</strong> — <code>static_threshold</code> เกณฑ์ค่าพลังงานสัญญาณสำหรับตรวจ "คนนั่งนิ่ง" ของ LD2410 ค่าเริ่มต้น 25 ตรงกับ <code>STATIC_ENERGY_THRESHOLD = 25</code> ใน Backend (ตอนนี้โค้ดตั้ง 25 ทุกครั้งที่ลงทะเบียน ยังไม่มีหน้าจอให้ปรับรายห้อง) <strong>หมายเหตุ 15 ต.ค. 2569:</strong> เฟิร์มแวร์ตรวจคน 1.3.3 ใช้เกณฑ์ 15 ในตัวเองและไม่อ่านค่าจากคอลัมน์นี้ ค่าในตารางจึงไม่ตรงกับที่บอร์ดใช้จริง</li>
 <li><strong>บรรทัด 16</strong> — <code>radar_available</code> บอร์ดคุยกับเรดาร์ได้หรือไม่</li>
 <li><strong>บรรทัด 17</strong> — <code>is_occupied</code> ตอนนี้มีคนในห้องหรือไม่ (ค่าที่ระบบปิดแอร์อัตโนมัติใช้)</li>
 <li><strong>บรรทัด 27</strong> — <code>uq_occupancy_room (room_number)</code> เป็น UNIQUE: <strong>หนึ่งห้องมีเซ็นเซอร์ได้ตัวเดียว</strong> ความสัมพันธ์กับ <code>rooms</code> จึงเป็น 1 ต่อ 1 (ส่วนแอร์เป็น 1 ต่อหลาย)</li>
@@ -2708,8 +2708,9 @@ JWT ที่ออกให้ตอนล็อกอินบรรจุ <co
 
 <h3 id="ตัวอย่าง-migration-หนึ่งตัวทีละบรรทัด-migrate-rooms-v180js">ตัวอย่าง migration หนึ่งตัวทีละบรรทัด: migrate-rooms-v180.js<a class="anchor" href="#ตัวอย่าง-migration-หนึ่งตัวทีละบรรทัด-migrate-rooms-v180js">#</a></h3>
 <p>migration นี้ยากที่สุดแบบหนึ่ง เพราะต้อง "ย้ายระบบที่มีข้อมูลเลขห้องเป็นข้อความอิสระ ไปสู่ระบบที่เลขห้องต้องมีอยู่ในตาราง <code>rooms</code>" โดยไม่ทำให้ข้อมูลเก่าพัง</p>
-<p><strong>ไฟล์ <code>backend/scripts/migrate-rooms-v180.js</code> บรรทัด 49–78</strong></p>
-<div class="code-block"><span class="code-lang">js</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">49</span>
+<p><strong>ไฟล์ <code>backend/scripts/migrate-rooms-v180.js</code> บรรทัด 48–77</strong></p>
+<div class="code-block"><span class="code-lang">js</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">48</span>
+<span class="normal">49</span>
 <span class="normal">50</span>
 <span class="normal">51</span>
 <span class="normal">52</span>
@@ -2737,8 +2738,7 @@ JWT ที่ออกให้ตอนล็อกอินบรรจุ <co
 <span class="normal">74</span>
 <span class="normal">75</span>
 <span class="normal">76</span>
-<span class="normal">77</span>
-<span class="normal">78</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">const</span><span class="w"> </span><span class="nx">room</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nx">standardRooms</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="normal">77</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">const</span><span class="w"> </span><span class="nx">room</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nx">standardRooms</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="k">await</span><span class="w"> </span><span class="nx">pool</span><span class="p">.</span><span class="nx">query</span><span class="p">(</span>
 <span class="w">      </span><span class="sb">`INSERT IGNORE INTO rooms</span>
 <span class="sb">         (room_number, floor_number, room_index, room_type,</span>
@@ -2773,11 +2773,11 @@ JWT ที่ออกให้ตอนล็อกอินบรรจุ <co
 
 <ul>
 <li><strong>บรรทัด 28–47 (ก่อนช่วงนี้):</strong> สร้างตาราง <code>rooms</code> ด้วย <code>CREATE TABLE IF NOT EXISTS</code> เหมือนใน <code>schema.sql</code></li>
-<li><strong>บรรทัด 49–57:</strong> วนใส่ห้องมาตรฐาน 22 ห้องจากอาร์เรย์ <code>standardRooms</code> (บรรทัด 3–26) ด้วย <code>INSERT IGNORE</code> ห้องที่มีอยู่แล้วถูกข้าม ไม่ทับที่แอดมินแก้ไว้ <code>room</code> เป็นอาร์เรย์ 4 ค่าที่แทน <code>?</code> สี่ตัว ส่วน <code>'system'</code> สองตัวเขียนตรงในคำสั่ง</li>
-<li><strong>บรรทัด 59:</strong> <code>tableExists('class_schedules')</code> (บรรทัด 113–122 ค้นจาก <code>information_schema.tables</code>) ทำให้สคริปต์ทำงานได้ทั้งบนฐานข้อมูลที่มีตารางนี้และที่ยังไม่มี</li>
-<li><strong>บรรทัด 60:</strong> <code>copyUnknownRoomsFrom</code> (บรรทัด 102–111) คัดลอกเลขห้องที่มีอยู่ในตารางเก่าแต่ยังไม่มีใน <code>rooms</code> เข้าไปเป็นห้องชื่อประเภท <code>'Imported room'</code> นี่คือขั้นสำคัญ ถ้าไม่ทำ การเพิ่ม FK ในบรรทัด 69 จะ error เพราะมีแถวที่ชี้ไปห้องที่ไม่มีอยู่</li>
-<li><strong>บรรทัด 61–68:</strong> <code>ALTER TABLE</code> ครั้งเดียวทำสามอย่าง: ปรับชนิด <code>room_number</code> ให้เป็น <code>VARCHAR(20)</code> ตรงกับ <code>rooms</code> (FK ต้องชนิดตรงกัน) และเติมคอลัมน์ <code>section_name</code>, <code>instructor</code> ด้วย <code>ADD COLUMN IF NOT EXISTS</code> (ไวยากรณ์ของ MariaDB: รันซ้ำได้) <code>AFTER x</code> กำหนดตำแหน่งคอลัมน์</li>
-<li><strong>บรรทัด 69–77:</strong> เพิ่ม FK ผ่าน <code>addForeignKeyIfMissing</code> ซึ่ง (บรรทัด 124–141) ค้น <code>information_schema.table_constraints</code> ว่ามี constraint ชื่อนี้แล้วหรือยัง ถ้ายังไม่มีจึงรัน SQL ที่ส่งมา เพราะ <code>ADD CONSTRAINT</code> รันซ้ำแล้วจะ error ว่า constraint ซ้ำ</li>
+<li><strong>บรรทัด 48–55:</strong> วนใส่ห้องมาตรฐาน 22 ห้องจากอาร์เรย์ <code>standardRooms</code> (บรรทัด 3–26) ด้วย <code>INSERT IGNORE</code> ห้องที่มีอยู่แล้วถูกข้าม ไม่ทับที่แอดมินแก้ไว้ <code>room</code> เป็นอาร์เรย์ 4 ค่าที่แทน <code>?</code> สี่ตัว ส่วน <code>'system'</code> สองตัวเขียนตรงในคำสั่ง</li>
+<li><strong>บรรทัด 57:</strong> <code>tableExists('class_schedules')</code> (บรรทัด 113–122 ค้นจาก <code>information_schema.tables</code>) ทำให้สคริปต์ทำงานได้ทั้งบนฐานข้อมูลที่มีตารางนี้และที่ยังไม่มี</li>
+<li><strong>บรรทัด 58:</strong> <code>copyUnknownRoomsFrom</code> (บรรทัด 102–111) คัดลอกเลขห้องที่มีอยู่ในตารางเก่าแต่ยังไม่มีใน <code>rooms</code> เข้าไปเป็นห้องชื่อประเภท <code>'Imported room'</code> นี่คือขั้นสำคัญ ถ้าไม่ทำ การเพิ่ม FK ในบรรทัด 68 จะ error เพราะมีแถวที่ชี้ไปห้องที่ไม่มีอยู่</li>
+<li><strong>บรรทัด 59–66:</strong> <code>ALTER TABLE</code> ครั้งเดียวทำสามอย่าง: ปรับชนิด <code>room_number</code> ให้เป็น <code>VARCHAR(20)</code> ตรงกับ <code>rooms</code> (FK ต้องชนิดตรงกัน) และเติมคอลัมน์ <code>section_name</code>, <code>instructor</code> ด้วย <code>ADD COLUMN IF NOT EXISTS</code> (ไวยากรณ์ของ MariaDB: รันซ้ำได้) <code>AFTER x</code> กำหนดตำแหน่งคอลัมน์</li>
+<li><strong>บรรทัด 67–75:</strong> เพิ่ม FK ผ่าน <code>addForeignKeyIfMissing</code> ซึ่ง (บรรทัด 124–141) ค้น <code>information_schema.table_constraints</code> ว่ามี constraint ชื่อนี้แล้วหรือยัง ถ้ายังไม่มีจึงรัน SQL ที่ส่งมา เพราะ <code>ADD CONSTRAINT</code> รันซ้ำแล้วจะ error ว่า constraint ซ้ำ</li>
 <li><strong>บรรทัด 97–100:</strong> <code>finally { await pool.end(); }</code> ปิดพูลเสมอ</li>
 </ul>
 <p>ลำดับ "สร้างตารางแม่ → ใส่ข้อมูลแม่ → เติมแม่ให้ครบทุกค่าที่ลูกใช้ → ค่อยเพิ่ม FK" คือสูตรมาตรฐานของการเพิ่ม foreign key ให้ตารางที่มีข้อมูลอยู่แล้ว</p>

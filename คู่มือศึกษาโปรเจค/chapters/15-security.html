@@ -176,12 +176,12 @@
 <tr>
 <td>เว็บ/มือถือ → Caddy (โดเมนหลัก)</td>
 <td>HTTPS ใบรับรอง Let's Encrypt ที่ Caddy ขอและต่ออายุให้เอง</td>
-<td><code>deploy/Caddyfile</code> บรรทัด 58–79</td>
+<td><code>deploy/Caddyfile</code> บรรทัด 66–87</td>
 </tr>
 <tr>
 <td>เว็บ/มือถือ → Funnel</td>
 <td>HTTPS ใบรับรองของ Tailscale (<code>*.ts.net</code>) ถอด TLS ที่ container tailscale แล้วส่ง HTTP ต่อใน docker network</td>
-<td><code>tailscale-serve.json</code>, <code>Caddyfile</code> บรรทัด 82–85</td>
+<td><code>tailscale-serve.json</code>, <code>Caddyfile</code> บรรทัด 90–93</td>
 </tr>
 <tr>
 <td>ESP32 → Funnel 8443 → Mosquitto (ค่าเริ่มต้น)</td>
@@ -211,14 +211,14 @@
 </tbody>
 </table></div>
 <p><strong>ใบรับรองด้วย DuckDNS แบบ DNS-01:</strong> ปกติ Let's Encrypt พิสูจน์ว่าคุณเป็นเจ้าของโดเมนด้วยการเข้ามาที่พอร์ต 80 ของเซิร์ฟเวอร์ (HTTP-01) แต่เซิร์ฟเวอร์นี้อยู่หลังเครือข่ายมหาวิทยาลัย Let's Encrypt เข้ามาไม่ได้ จึงใช้ <strong>DNS-01</strong> คือ Caddy เขียน TXT record ชื่อ <code>_acme-challenge</code> ผ่าน API ของ DuckDNS (ใช้ <code>DUCKDNS_TOKEN</code>) แล้ว Let's Encrypt ตรวจจาก DNS แทน</p>
-<p><strong>ไฟล์ <code>deploy/Caddyfile</code> บรรทัด 63–69</strong></p>
-<div class="code-block"><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">63</span>
-<span class="normal">64</span>
-<span class="normal">65</span>
-<span class="normal">66</span>
-<span class="normal">67</span>
-<span class="normal">68</span>
-<span class="normal">69</span></pre></div></td><td class="code"><div><pre><span></span><code>	tls {
+<p><strong>ไฟล์ <code>deploy/Caddyfile</code> บรรทัด 71–77</strong></p>
+<div class="code-block"><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span>
+<span class="normal">74</span>
+<span class="normal">75</span>
+<span class="normal">76</span>
+<span class="normal">77</span></pre></div></td><td class="code"><div><pre><span></span><code>	tls {
 		dns duckdns {env.DUCKDNS_TOKEN}
 		# DNS ของมหาวิทยาลัยตอบ SERVFAIL ตอนหา zone ของ _acme-challenge จึงถาม DNS สาธารณะแทน
 		resolvers 1.1.1.1 8.8.8.8

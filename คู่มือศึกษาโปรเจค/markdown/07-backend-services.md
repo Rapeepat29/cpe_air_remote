@@ -524,7 +524,7 @@ export function isUnprovisionAck(message, deviceId) {
 
 ### `utils/occupancy-sensor.js` (71 บรรทัด)
 
-- `STATIC_ENERGY_THRESHOLD = 25` ค่าความไวเริ่มต้นของเรดาร์ตรวจคนนิ่ง (ใช้ตอบกลับเมื่อแถวไม่มีค่า)
+- `STATIC_ENERGY_THRESHOLD = 25` ค่าความไวเริ่มต้นของเรดาร์ตรวจคนนิ่ง (ใช้ตอบกลับเมื่อแถวไม่มีค่า) **ระวัง:** ตั้งแต่ 15 ต.ค. 2569 เฟิร์มแวร์ 1.3.3 ใช้ค่าคงที่ของตัวเองเป็น 15 ค่า 25 ฝั่ง Backend จึงเป็นแค่ค่าที่แสดงในแอป/เว็บ ไม่ได้ควบคุมบอร์ด (ดูบท 9)
 - `validateOccupancyReservationInput`, `validateOccupancyDeviceId` (รหัส `OCC32-…`, ชื่อ BLE ต้องเป็น `RMUTT-OCC-<12 ตัวท้าย>`)
 - `publicOccupancySensor(row)`
 - `normalizeOccupancyStatus(message)` ปรับข้อความสถานะ: `online = message.online !== false`; `radarAvailable` ต้อง online และบอร์ดบอกว่า `true`; **`occupied` จะเป็นจริงได้ก็ต่อเมื่อ `radarAvailable` เป็นจริง** (เรดาร์เสียแล้วรายงาน "มีคน" ไม่ได้) ฟังก์ชันนี้คือด่านแรกของหลัก fail-safe ของระบบปิดแอร์ ทดสอบใน `test/occupancy-sensor.test.js`
@@ -1141,9 +1141,9 @@ export function startAutoOffService() {
 | 87–91 | `readDevices` ดึงแอร์ตามตัวกรอง (เครื่องเดียว/ห้องเดียว/ทั้งหมด) แล้วประเมินทีละเครื่อง `await` ในลูป `for...of` จึงทำเรียงลำดับ ไม่ขนาน (ตั้งใจ: ไม่ให้ยิงคำสั่งพร้อมกันหลายเครื่องจนเกิดภาระ MQTT/DB พุ่ง) |
 | 93–96 | `finally` ทำเสมอ ไม่ว่าสำเร็จหรือ error: คืนล็อกและเคลียร์ธง `running` ถ้าลืมทำ รอบถัดไปจะไม่ทำงานอีกเลย |
 
-**ไฟล์ `backend/src/services/auto-off.js` บรรทัด 245–270**
+**ไฟล์ `backend/src/services/auto-off.js` บรรทัด 244–269**
 
-```js:245
+```js:244
 async function fireOffCommand(row, attempt) {
   const state = { ...parseState(row.state_json), power: false };
   try {
@@ -1174,10 +1174,10 @@ async function fireOffCommand(row, attempt) {
 
 | บรรทัด | ความหมาย |
 |---|---|
-| 246 | เอา `state_json` เดิมของแอร์ (อุณหภูมิ โหมด พัดลม ฯลฯ) มา spread แล้วเขียนทับ `power: false` ได้คำสั่งที่ "เหมือนเดิมทุกอย่างแต่ปิด" ถ้าส่งแค่ `{power:false}` บอร์ดอาจรีเซ็ตค่าอื่นเป็นค่าเริ่มต้น |
-| 247–256 | ส่งคำสั่งผ่าน MQTT ถ้า Broker ไม่พร้อม `publishAirCommand` โยน error (503) → log แล้ว `return` โดย **ไม่เขียนฐานข้อมูล** จึงไม่นับเป็นความพยายาม รอบหน้าลองใหม่ได้โดยไม่เสียโควตา 5 ครั้ง |
-| 258–265 | ส่งสำเร็จจึงบันทึก `auto_off_attempts = ?`, `auto_off_last_attempt_at = CURRENT_TIMESTAMP` และ `state_json` ใหม่ |
-| 266–269 | log ว่ายิงครั้งที่เท่าไรจากกี่ครั้ง |
+| 245 | เอา `state_json` เดิมของแอร์ (อุณหภูมิ โหมด พัดลม ฯลฯ) มา spread แล้วเขียนทับ `power: false` ได้คำสั่งที่ "เหมือนเดิมทุกอย่างแต่ปิด" ถ้าส่งแค่ `{power:false}` บอร์ดอาจรีเซ็ตค่าอื่นเป็นค่าเริ่มต้น |
+| 246–255 | ส่งคำสั่งผ่าน MQTT ถ้า Broker ไม่พร้อม `publishAirCommand` โยน error (503) → log แล้ว `return` โดย **ไม่เขียนฐานข้อมูล** จึงไม่นับเป็นความพยายาม รอบหน้าลองใหม่ได้โดยไม่เสียโควตา 5 ครั้ง |
+| 257–264 | ส่งสำเร็จจึงบันทึก `auto_off_attempts = ?`, `auto_off_last_attempt_at = CURRENT_TIMESTAMP` และ `state_json` ใหม่ |
+| 265–268 | log ว่ายิงครั้งที่เท่าไรจากกี่ครั้ง |
 
 ### จุดที่ 5: คำนวณพลังงานเป็นผลต่าง (`utils/energy-history.js` + `services/energy-recorder.js`)
 

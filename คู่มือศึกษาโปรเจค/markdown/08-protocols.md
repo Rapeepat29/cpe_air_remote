@@ -459,7 +459,7 @@ JSON ตั้งค่าถูกแปลงเป็น UTF-8 แล้ว�
 
 ### เซนเซอร์ตรวจคน → ปิดแอร์อัตโนมัติ
 
-1. LD2410 ส่งข้อมูลทาง UART ให้ ESP32 ตรวจคน (บอร์ด `OCC32-…`) ทุก 250 ms (`PRESENCE_READ_INTERVAL_MS`) บอร์ดตัดสิน `occupied` จากพลังงาน stationary เกต 0–8 > 25
+1. LD2410 ส่งข้อมูลทาง UART ให้ ESP32 ตรวจคน (บอร์ด `OCC32-…`) ทุก 250 ms (`PRESENCE_READ_INTERVAL_MS`) บอร์ดตัดสิน `occupied` จากพลังงาน stationary เกต 0–8 > 15 (เฟิร์มแวร์ 1.3.3)
 2. บอร์ด publish `rmutt/occupancy/OCC32-…/status` (retained) ทุก 10 วินาทีและทันทีที่เปลี่ยน
 3. Backend `handleOccupancyMessage` บันทึก `is_online`, `radar_available`, `is_occupied` ลง `occupancy_sensors` แล้ว `notify(occupancyStatusListeners, …)` พร้อมเลขห้อง
 4. `services/auto-off.js` (สมัครเป็น listener ไว้ผ่าน `onOccupancyStatus`/`onAirStatus` และมี timer ทุก 10 วินาที) ประเมินแอร์ในห้องนั้น ผ่านฟังก์ชันตัดสิน `decideAutoOff` (ไฟล์ `utils/auto-off.js`): แอร์กินไฟอยู่ + ห้องว่าง → เริ่มนับถอยหลัง 300 วินาที (900 วินาทีถ้ามีคาบเรียน) → ครบเวลายังว่างก็ `publishAirCommand` สั่งปิด → ถ้ายังกินไฟ ยิงซ้ำทุก 20 วินาที สูงสุด 5 ครั้ง แล้วแจ้งเตือน

@@ -739,7 +739,7 @@
 
 <h3 id="เซนเซอร์ตรวจคน--ปิดแอร์อัตโนมัติ">เซนเซอร์ตรวจคน → ปิดแอร์อัตโนมัติ<a class="anchor" href="#เซนเซอร์ตรวจคน--ปิดแอร์อัตโนมัติ">#</a></h3>
 <ol>
-<li>LD2410 ส่งข้อมูลทาง UART ให้ ESP32 ตรวจคน (บอร์ด <code>OCC32-…</code>) ทุก 250 ms (<code>PRESENCE_READ_INTERVAL_MS</code>) บอร์ดตัดสิน <code>occupied</code> จากพลังงาน stationary เกต 0–8 &gt; 25</li>
+<li>LD2410 ส่งข้อมูลทาง UART ให้ ESP32 ตรวจคน (บอร์ด <code>OCC32-…</code>) ทุก 250 ms (<code>PRESENCE_READ_INTERVAL_MS</code>) บอร์ดตัดสิน <code>occupied</code> จากพลังงาน stationary เกต 0–8 &gt; 15 (เฟิร์มแวร์ 1.3.3)</li>
 <li>บอร์ด publish <code>rmutt/occupancy/OCC32-…/status</code> (retained) ทุก 10 วินาทีและทันทีที่เปลี่ยน</li>
 <li>Backend <code>handleOccupancyMessage</code> บันทึก <code>is_online</code>, <code>radar_available</code>, <code>is_occupied</code> ลง <code>occupancy_sensors</code> แล้ว <code>notify(occupancyStatusListeners, …)</code> พร้อมเลขห้อง</li>
 <li><code>services/auto-off.js</code> (สมัครเป็น listener ไว้ผ่าน <code>onOccupancyStatus</code>/<code>onAirStatus</code> และมี timer ทุก 10 วินาที) ประเมินแอร์ในห้องนั้น ผ่านฟังก์ชันตัดสิน <code>decideAutoOff</code> (ไฟล์ <code>utils/auto-off.js</code>): แอร์กินไฟอยู่ + ห้องว่าง → เริ่มนับถอยหลัง 300 วินาที (900 วินาทีถ้ามีคาบเรียน) → ครบเวลายังว่างก็ <code>publishAirCommand</code> สั่งปิด → ถ้ายังกินไฟ ยิงซ้ำทุก 20 วินาที สูงสุด 5 ครั้ง แล้วแจ้งเตือน</li>
