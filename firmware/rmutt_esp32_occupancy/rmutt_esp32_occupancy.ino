@@ -31,6 +31,12 @@ constexpr uint8_t SETUP_BUTTON_PIN = 0;
 constexpr uint8_t RADAR_RX_PIN = 32;  // ESP32 RX <- LD2410 TX
 constexpr uint8_t RADAR_TX_PIN = 33;  // ESP32 TX -> LD2410 RX
 constexpr uint32_t RADAR_BAUD = 256000;
+// ไฟสถานะ: ขาบวกของ LED ต่อผ่านตัวต้านทาน 220-330 โอห์มไปที่ขานี้ ขาลบลง GND
+// เขียว = ทำงานปกติ (ติดค้าง) / กำลังเชื่อมต่อ (กระพริบ) / ไม่ได้เชื่อมต่อ (ดับ)
+// แดง  = มีคนอยู่ในห้อง (ติด) / ไม่มีคน (ดับ)
+constexpr uint8_t GREEN_LED_PIN = 25;
+constexpr uint8_t RED_LED_PIN = 26;
+constexpr uint32_t LED_BLINK_INTERVAL_MS = 400;
 constexpr uint8_t STATIC_ENERGY_THRESHOLD = 25;
 constexpr uint8_t FIRST_GATE = 0;
 constexpr uint8_t LAST_GATE = 8;
@@ -54,7 +60,7 @@ constexpr uint32_t BLE_READVERTISE_DELAY_MS = 600;
 constexpr uint32_t ONLINE_SETUP_WINDOW_MS = 5UL * 60UL * 1000UL;
 constexpr size_t MAX_CONFIG_BYTES = 3072;
 constexpr uint32_t NTP_SYNC_TIMEOUT_MS = 15000;
-constexpr char FIRMWARE_VERSION[] = "1.3.1";
+constexpr char FIRMWARE_VERSION[] = "1.3.3";
 
 // The service layout is shared with the A/C board, while the advertised name
 // and identity clearly distinguish RMUTT-OCC devices.
@@ -136,6 +142,9 @@ bool wifiRecoveryActive = false;
 uint32_t lastWifiRecoveryAttemptAt = 0;
 String pendingOtaUrl;
 bool otaRequested = false;
+bool unprovisionRequested = false;
+// true ระหว่างรอ Wi-Fi/เวลา NTP ให้ไฟเขียวกระพริบแม้ loop() ยังไม่ได้วน
+bool connectionInProgress = false;
 String lastOtaError;
 
 String createDeviceId();
@@ -157,6 +166,8 @@ bool connectWifiCredentials(
     uint32_t timeoutMs);
 void connectMqtt();
 void mqttCallback(char *topic, byte *payload, unsigned int length);
+void updateStatusLeds();
+void unprovisionAndRestart(const String &reason);
 void initialiseRadar();
 void updateOccupancy();
 void captureRadarRawBytes();
@@ -283,6 +294,10 @@ class WifiScanCallbacks : public BLECharacteristicCallbacks {
 void setup() {
   Serial.begin(115200);
   pinMode(SETUP_BUTTON_PIN, INPUT_PULLUP);
+  pinMode(GREEN_LED_PIN, OUTPUT);
+  pinMode(RED_LED_PIN, OUTPUT);
+  digitalWrite(GREEN_LED_PIN, LOW);
+  digitalWrite(RED_LED_PIN, LOW);
   delay(80);
 
   config.deviceId = createDeviceId();
@@ -294,6 +309,10 @@ void setup() {
   Serial.printf(
       "Rule: occupied when any static gate 0-8 is greater than %u\n",
       STATIC_ENERGY_THRESHOLD);
+  Serial.printf(
+      "LEDs: green(status)=GPIO%u red(occupied)=GPIO%u\n",
+      GREEN_LED_PIN,
+      RED_LED_PIN);
 
   radarSerial.begin(
       RADAR_BAUD,
@@ -337,6 +356,7 @@ void loop() {
     lastPresenceReadAt = millis();
     updateOccupancy();
   }
+  updateStatusLeds();
 
   if (bleAdvertisingEnabled &&
       !bleBlocksNormalOperation &&
@@ -390,6 +410,7 @@ void loop() {
       publishStatus();
     }
   }
+  if (unprovisionRequested) unprovisionAndRestart("removed from the app");
   if (otaRequested) performOtaUpdate();
   delay(5);
 }
@@ -705,14 +726,17 @@ bool connectWifiCredentials(
   delay(100);
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid.c_str(), password.c_str());
+  connectionInProgress = true;
   const uint32_t startedAt = millis();
   while (WiFi.status() != WL_CONNECTED &&
          millis() - startedAt < timeoutMs) {
     if (!radar.isAutoReadTaskRunning()) radar.read();
+    updateStatusLeds();
     const wl_status_t status = WiFi.status();
     if (status == WL_CONNECT_FAILED || status == WL_NO_SSID_AVAIL) break;
     delay(20);
   }
+  connectionInProgress = false;
   if (WiFi.status() != WL_CONNECTED) {
     WiFi.disconnect(false, false);
     return false;
@@ -725,11 +749,16 @@ bool connectWifiCredentials(
 bool ensureClockSynced() {
   if (clockSynced) return true;
   configTime(7 * 3600, 0, "pool.ntp.org", "time.google.com");
+  connectionInProgress = true;
   const uint32_t startedAt = millis();
   while (time(nullptr) < 1700000000UL &&
          millis() - startedAt < NTP_SYNC_TIMEOUT_MS) {
-    delay(200);
+    for (uint8_t i = 0; i < 10; i++) {
+      updateStatusLeds();
+      delay(20);
+    }
   }
+  connectionInProgress = false;
   clockSynced = time(nullptr) >= 1700000000UL;
   if (clockSynced) {
     Serial.printf("Clock synced: %lu\n",
@@ -821,6 +850,18 @@ void mqttCallback(char *topic, byte *payload, unsigned int length) {
     enterBleReconfiguration("Flutter app requested reconfiguration");
     return;
   }
+  if (action == "unprovision") {
+    // Backend ส่งมาเมื่อแอดมินกดนำเซ็นเซอร์ออกในแอป
+    // ตรวจ deviceId ซ้ำอีกชั้น กันข้อความหลงมาผิด topic
+    // ทำต่อใน loop ไม่ใช่ใน callback เพราะต้อง publish และตัด MQTT
+    const String target = document["deviceId"] | "";
+    if (target != config.deviceId) {
+      Serial.printf("Unprovision ignored: deviceId '%s' is not this board\n", target.c_str());
+      return;
+    }
+    unprovisionRequested = true;
+    return;
+  }
   if (action == "ota") {
     // ทำใน loop ไม่ใช่ใน callback เพราะต้องตัดการเชื่อมต่อ MQTT ก่อนดาวน์โหลด
     const String url = document["url"] | "";
@@ -833,6 +874,41 @@ void mqttCallback(char *topic, byte *payload, unsigned int length) {
     pendingOtaUrl = url;
     otaRequested = true;
   }
+}
+
+// ---------------------------------------------------------------------------
+// ล้างบอร์ดเมื่อถูกนำออกจากแอป (คำสั่ง {"action":"unprovision"})
+// ลบค่าทั้งหมดใน NVS (Wi-Fi, MQTT, ห้อง) แล้วรีบูต บอร์ดกลับเป็นสภาพเหมือนใหม่
+// รอตั้งค่าผ่านบลูทูธ  Device ID ไม่เปลี่ยน เพราะสร้างจาก eFuse MAC
+// ---------------------------------------------------------------------------
+void unprovisionAndRestart(const String &reason) {
+  unprovisionRequested = false;
+  Serial.printf("Unprovision: %s - clearing all saved settings\n", reason.c_str());
+  if (mqttClient.connected()) {
+    // ตอบ Backend ว่าล้างค่าแล้ว (Backend รอคำตอบนี้ก่อนลบบัญชี MQTT ของบอร์ด)
+    DynamicJsonDocument ack(128);
+    ack["deviceId"] = config.deviceId;
+    ack["online"] = false;
+    ack["unprovisioned"] = true;
+    String ackPayload;
+    serializeJson(ack, ackPayload);
+    const String statusTopic = config.mqttTopic + "/status";
+    mqttClient.publish(statusTopic.c_str(), ackPayload.c_str(), false);
+    // ล้าง retained ของตัวเอง แล้วตัดการเชื่อมต่อแบบปกติ
+    // (ตัดแบบปกติ Broker จะไม่ส่ง Last Will "online:false" กลับมาค้างเป็น retained)
+    mqttClient.publish(statusTopic.c_str(), "", true);
+    mqttClient.loop();
+    delay(300);
+    mqttClient.disconnect();
+  }
+
+  preferences.begin("rmutt-occ", false);
+  preferences.clear();
+  preferences.end();
+
+  Serial.println("Unprovision: done, restarting into BLE setup mode");
+  delay(300);
+  ESP.restart();
 }
 
 // ดาวน์โหลดเฟิร์มแวร์ใหม่แล้วรีบูต ถ้าไม่สำเร็จจะทำงานต่อด้วยเฟิร์มแวร์เดิม
@@ -1064,4 +1140,23 @@ void publishProvisioningToken() {
   serializeJson(document, payload);
   mqttClient.publish(
       (config.mqttTopic + "/provision").c_str(), payload.c_str(), true);
+}
+
+// ไฟเขียว: ติดค้างเมื่อ Wi-Fi และ MQTT ต่อครบ (พร้อมส่งสถานะเข้าแอป)
+//          กระพริบเมื่อกำลังต่อ Wi-Fi หรือกำลังลองต่อ MQTT ใหม่
+//          ดับเมื่อยังไม่ได้ตั้งค่า หรืออยู่ในโหมดตั้งค่า BLE เพราะต่อไม่ได้
+// ไฟแดง:   ตามสถานะ occupied ซึ่งเป็น false เสมอถ้าเรดาร์ไม่ส่งข้อมูล
+void updateStatusLeds() {
+  const bool online =
+      WiFi.status() == WL_CONNECTED && mqttClient.connected();
+  const bool retrying =
+      config.configured && !bleBlocksNormalOperation && !online;
+  bool green = false;
+  if (online && !connectionInProgress) {
+    green = true;
+  } else if (connectionInProgress || retrying) {
+    green = (millis() / LED_BLINK_INTERVAL_MS) % 2 == 0;
+  }
+  digitalWrite(GREEN_LED_PIN, green ? HIGH : LOW);
+  digitalWrite(RED_LED_PIN, occupied ? HIGH : LOW);
 }

@@ -52,11 +52,11 @@ constexpr int DHT_PIN = 4;            // DHT11 (Keyes KY-015)
 constexpr float ROOM_TEMP_OFFSET_C = 0.0F;   // ชดเชยค่า DHT11 หลังเทียบเทอร์โมมิเตอร์
 constexpr uint32_t DHT_READ_INTERVAL_MS = 5000;
 constexpr uint8_t SETUP_BUTTON_PIN = 0;
-constexpr uint8_t PZEM_RX_PIN = 16;
-constexpr uint8_t PZEM_TX_PIN = 18;
+constexpr uint8_t PZEM_RX_PIN = 18;
+constexpr uint8_t PZEM_TX_PIN = 14;
 constexpr uint8_t GREEN_LED_PIN = 25;
 constexpr uint8_t RED_LED_PIN = 26;
-constexpr uint8_t YELLOW_LED_PIN = 27;
+constexpr uint8_t YELLOW_LED_PIN = 23;
 constexpr uint32_t WIFI_TIMEOUT_MS = 20000;
 constexpr uint32_t WIFI_PROVISION_TIMEOUT_MS = 15000;
 // ระหว่างเปิด BLE เพราะ Wi-Fi ล้ม ให้ลองต่อ Wi-Fi เดิมซ้ำทุกช่วงเวลานี้
