@@ -58,6 +58,7 @@
 <div class="nav-part">เจาะลึก</div><ul>
 <li><a href="19-daikin-slm8.html"><span class="num">19</span>แอร์ Daikin ผ่านสาย SLM8: จากการแกะโปรโตคอลถึงบอร์ดสายแอร์</a></li>
 <li><a class="active" href="20-database-design.html"><span class="num">20</span>เจาะลึกการออกแบบฐานข้อมูล</a></li>
+<li><a href="21-mqtt-message-flow.html"><span class="num">21</span>เส้นทางข้อความ MQTT: จากบอร์ดถึง Backend และกลับไปบอร์ด</a></li>
 </ul>
     </nav>
   </aside>
@@ -1302,7 +1303,7 @@ UUID สร้างได้ในโค้ด (<code>crypto.randomUUID()</code
 <li class="check"><input type="checkbox"> อธิบายได้ว่า <code>energy_chain_*</code> ต่างจาก <code>energy_kwh</code> อย่างไร</li>
 <li class="check"><input type="checkbox"> อธิบายได้ว่าถ้าจะลบคอลัมน์ ต้องทำตามลำดับไหนให้ปลอดภัย (สำรอง → แก้โค้ด → Backend ใหม่ขึ้น → migration)</li>
 <li class="check"><input type="checkbox"> บอกทางเลือกอื่นได้อย่างน้อยหนึ่งแบบต่อหนึ่งการตัดสินใจ พร้อมเหตุผลที่ไม่เลือก</li>
-</ul><nav class="pager"><a class="prev" href="19-daikin-slm8.html"><span>← บทก่อนหน้า</span>19. แอร์ Daikin ผ่านสาย SLM8: จากการแกะโปรโตคอลถึงบอร์ดสายแอร์</a></nav>
+</ul><nav class="pager"><a class="prev" href="19-daikin-slm8.html"><span>← บทก่อนหน้า</span>19. แอร์ Daikin ผ่านสาย SLM8: จากการแกะโปรโตคอลถึงบอร์ดสายแอร์</a><a class="next" href="21-mqtt-message-flow.html"><span>บทถัดไป →</span>21. เส้นทางข้อความ MQTT: จากบอร์ดถึง Backend และกลับไปบอร์ด</a></nav>
   </main>
   <aside class="toc"><div class="toc-title">ในบทนี้</div><ul><li><a href="#วิธีอ่านบทนี้">วิธีอ่านบทนี้</a></li><li><a href="#หลักคิดที่ใช้ทั้งฐานข้อมูล">หลักคิดที่ใช้ทั้งฐานข้อมูล</a></li><li><a href="#ตาราง-users--บัญชีผู้ใช้">ตาราง users — บัญชีผู้ใช้</a></li><li><a href="#ตาราง-password_reset_otps--otp-ลืมรหัสผ่าน">ตาราง password_reset_otps — OTP ลืมรหัสผ่าน</a></li><li><a href="#ตาราง-rooms--ห้อง">ตาราง rooms — ห้อง</a></li><li><a href="#ตาราง-class_schedules--ตารางเรียน">ตาราง class_schedules — ตารางเรียน</a></li><li><a href="#ตาราง-air_conditioners--เครื่องปรับอากาศ">ตาราง air_conditioners — เครื่องปรับอากาศ</a></li><li><a href="#ตาราง-occupancy_sensors--เซ็นเซอร์ตรวจจับคน">ตาราง occupancy_sensors — เซ็นเซอร์ตรวจจับคน</a></li><li><a href="#ตาราง-system_alerts--การแจ้งเตือน">ตาราง system_alerts — การแจ้งเตือน</a></li><li><a href="#ตาราง-energy_hourly--ค่าไฟรายชั่วโมง">ตาราง energy_hourly — ค่าไฟรายชั่วโมง</a></li><li><a href="#ตาราง-system_settings--ค่าตั้งระดับระบบ">ตาราง system_settings — ค่าตั้งระดับระบบ</a></li><li><a href="#ตาราง-academic_terms--ปฏิทินภาคเรียน">ตาราง academic_terms — ปฏิทินภาคเรียน</a></li><li><a href="#ตาราง-room_bookings--การใช้ห้องนอกตารางเรียน">ตาราง room_bookings — การใช้ห้องนอกตารางเรียน</a></li><li><a href="#สรุป-อะไรตัดได้-อะไรห้ามตัด">สรุป: อะไรตัดได้ อะไรห้ามตัด</a></li><li><a href="#คำถามที่อาจารย์อาจถาม">คำถามที่อาจารย์อาจถาม</a></li><li><a href="#เช็กลิสต์ความเข้าใจ">เช็กลิสต์ความเข้าใจ</a></li></ul></aside>
 </div>
