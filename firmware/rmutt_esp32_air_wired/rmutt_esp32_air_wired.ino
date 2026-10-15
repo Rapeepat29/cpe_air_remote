@@ -75,7 +75,7 @@ constexpr uint8_t AC_RUNNING_CONFIRM_SAMPLES = 3;
 constexpr uint8_t PZEM_FAILURE_LIMIT = 3;
 constexpr size_t MAX_CONFIG_BYTES = 4096;
 constexpr uint32_t NTP_SYNC_TIMEOUT_MS = 15000;
-constexpr char FIRMWARE_VERSION[] = "2.5.2-slm8";
+constexpr char FIRMWARE_VERSION[] = "2.5.3-slm8";
 // บอกแอปว่าเป็นบอร์ดสายแอร์ ยี่ห้อไหน (แอปแสดงให้ผู้ใช้เห็น ไม่ให้เลือกยี่ห้อ IR)
 constexpr char CONTROL_TYPE[] = "wired";
 constexpr char AIR_BRAND[] = "Daikin";

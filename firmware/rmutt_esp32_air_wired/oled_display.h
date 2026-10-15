@@ -15,7 +15,7 @@
 #define OLED_LAYOUT 1          // 1 ตัวเลขใหญ่ · 2 สี่ช่อง · 3 รายการ · 4 พลังงาน+กราฟ · 5 สลับหน้า
 #endif
 #ifndef OLED_ROTATE_180
-#define OLED_ROTATE_180 false  // true ถ้าติดจอกลับหัว (ขาเสียบอยู่ด้านล่าง)
+#define OLED_ROTATE_180 true   // true ถ้าติดจอกลับหัว (ขาเสียบอยู่ด้านล่าง)
 #endif
 #ifndef OLED_CONTRAST
 #define OLED_CONTRAST 160      // 0-255 ยิ่งต่ำยิ่งถนอมจอ
