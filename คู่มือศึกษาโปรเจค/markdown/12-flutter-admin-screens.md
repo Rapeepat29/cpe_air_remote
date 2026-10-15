@@ -1179,12 +1179,15 @@ async function activateProvisioning(deviceId, message) {
 | ช่อง SSID | `readOnly` ต้องเลือกจากรายการ | พิมพ์เองได้ และมีปุ่มค้นหา |
 | UI รายการ Wi-Fi | Bottom Sheet | `SimpleDialog` |
 | API จอง | `POST /air-conditioners/reservations` | `POST /occupancy-sensors/reservations` |
-| JSON ที่ส่งบอร์ด | มี `airNumber`, `name`, `airProtocol`, `schedule` | มี `deviceType: 'occupancy'` และ `staticThreshold` (ค่าจาก Backend `STATIC_ENERGY_THRESHOLD = 25`) |
+| JSON ที่ส่งบอร์ด | มี `airNumber`, `name`, `airProtocol`, `schedule` | มี `deviceType: 'occupancy'` และ `staticThreshold` (ค่าจาก Backend `STATIC_ENERGY_THRESHOLD = 25` แต่เฟิร์มแวร์ไม่ได้อ่านฟิลด์นี้ ใช้ค่าคงที่ของตัวเอง ซึ่งตั้งแต่ 1.3.3 คือ 15) |
 | Topic | `rmutt/ac/<id>` | `rmutt/occupancy/<id>` |
 | ฟังก์ชันยืนยันใน Backend | `activateProvisioning` | `activateOccupancyProvisioning` (ตรรกะเดียวกันแต่ตาราง `occupancy_sensors`) |
 
-> [!WHY] ทำไมเกณฑ์ 25 มาจาก Backend ไม่ใช่ให้แอดมินตั้ง
-> เกณฑ์ "พลังงานเป้าหมายนิ่ง" ของเรดาร์ LD2410 เป็นค่าที่ผ่านการทดลองแล้วว่าแยกคนนั่งนิ่งกับห้องว่างได้ ถ้าให้ตั้งเองรายห้องจะเพิ่มโอกาสตั้งผิดจนระบบปิดแอร์ใส่คนที่นั่งอยู่ Backend จึงเป็นเจ้าของค่านี้และส่งลงบอร์ดผ่าน JSON ส่วนหน้าจอแค่แสดงกฎให้รู้
+> [!WHY] ทำไมไม่ให้แอดมินตั้งเกณฑ์เอง
+> เกณฑ์ "พลังงานเป้าหมายนิ่ง" ของเรดาร์ LD2410 เป็นค่าที่ต้องทดลองกับห้องจริง ถ้าให้ตั้งเองรายห้องจะเพิ่มโอกาสตั้งผิดจนระบบปิดแอร์ใส่คนที่นั่งอยู่ ค่าที่ใช้ตัดสินจริงจึงฝังอยู่ในเฟิร์มแวร์ (`STATIC_ENERGY_THRESHOLD` ใน `.ino`) ส่วนค่าที่ Backend ส่งใน JSON ตอนตั้งค่า บอร์ดไม่ได้อ่าน หน้าจอแค่แสดงกฎให้รู้
+
+> [!WARN] ค่าที่แสดงกับค่าที่บอร์ดใช้ไม่ตรงกัน (15 ต.ค. 2569)
+> เฟิร์มแวร์ตรวจคน 1.3.3 ลดเกณฑ์เป็น **15** (ไวขึ้น) แต่ Backend ยังเป็น 25 แอปและเว็บจึงแสดง "เกณฑ์ 25" ทั้งที่บอร์ดใช้ 15 บอร์ดส่ง `"staticThreshold":15` มากับ `/status` อยู่แล้ว แต่ Backend ไม่ได้บันทึกฟิลด์นี้ ถ้าอาจารย์ถาม ให้ตอบตามเฟิร์มแวร์ (15) และบอกว่าค่าที่แสดงยังไม่ได้ปรับตาม
 
 ---
 

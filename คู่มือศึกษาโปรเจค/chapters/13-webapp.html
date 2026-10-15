@@ -647,57 +647,57 @@ charts.js ► dom.js, format.js
 </tr>
 <tr>
 <td><code>settlePending</code></td>
-<td>176–194</td>
+<td>176–199</td>
 <td>ปิดงานที่รอ: สำเร็จ / ล้มเหลว / หมดเวลา พร้อม toast</td>
 </tr>
 <tr>
 <td><code>outdatedCount</code></td>
-<td>196–201</td>
+<td>201–206</td>
 <td>นับบอร์ดที่ยังเก่า ใช้กับป้ายบนแท็บและการเลือกแท็บเริ่มต้น</td>
 </tr>
 <tr>
 <td><code>render</code></td>
-<td>205–266</td>
+<td>210–271</td>
 <td>วาดหัว แท็บ และแผงของแท็บที่เลือก</td>
 </tr>
 <tr>
 <td><code>filesCard</code></td>
-<td>268–318</td>
+<td>273–323</td>
 <td>การ์ดรายการไฟล์ ไฟล์แรก (ล่าสุด) เน้นสี ปุ่ม "ลบ" ทุกไฟล์</td>
 </tr>
 <tr>
 <td><code>dropZone</code></td>
-<td>320–371</td>
+<td>325–376</td>
 <td><code>&lt;label&gt;</code> ที่ห่อ <code>&lt;input type="file"&gt;</code> + รับลากวาง</td>
 </tr>
 <tr>
 <td><code>devicesCard</code>, <code>deviceRow</code>, <code>statusBadge</code></td>
-<td>373–523</td>
+<td>378–528</td>
 <td>ตารางบอร์ด ช่องติ๊ก รุ่นปัจจุบัน → รุ่นใหม่ ป้ายสถานะ ปุ่ม "อัปเดต"</td>
 </tr>
 <tr>
 <td><code>bulkBar</code></td>
-<td>525–555</td>
+<td>530–560</td>
 <td>แถบ "เลือก N บอร์ด · ใช้ไฟล์ …" + ปุ่ม "อัปเดต N บอร์ดที่เลือก"</td>
 </tr>
 <tr>
 <td><code>startUpdates</code></td>
-<td>559–604</td>
+<td>564–611</td>
 <td>ยืนยัน แล้วส่งคำสั่ง OTA ทีละบอร์ด จด <code>pending</code> รวมผลเป็น toast</td>
 </tr>
 <tr>
 <td><code>handleFile</code></td>
-<td>606–668</td>
+<td>613–675</td>
 <td>ตรวจไฟล์ฝั่งเบราว์เซอร์ ถามรุ่นถ้าชื่อไม่มีรุ่น ตรวจชนิดตรงแท็บ แล้วอัปโหลด</td>
 </tr>
 <tr>
 <td><code>uploadWithReplace</code></td>
-<td>670–693</td>
+<td>677–700</td>
 <td>อัปโหลด ถ้าได้ 409 ถามเขียนทับแล้วส่งซ้ำพร้อม <code>replace</code></td>
 </tr>
 <tr>
 <td><code>removeFile</code>, <code>formatSize</code></td>
-<td>695–717</td>
+<td>702–724</td>
 <td>ลบไฟล์ (ยืนยันก่อน) และแปลงขนาดเป็น KB/MB</td>
 </tr>
 </tbody>
@@ -1846,7 +1846,7 @@ charts.js ► dom.js, format.js
 </div>
 
 <p>ได้ <code>null</code> (พัง) ก็<strong>คงข้อมูลเดิมไว้</strong> (<code>if (result)</code>) หน้าจอจึงไม่ว่างเปล่าเพียงเพราะเน็ตกระตุก</p>
-<p><strong>ไฟล์ <code>webapp/assets/js/store.js</code> บรรทัด 254–313</strong> (ตารางงาน polling แบ่งเป็น 3 ช่วง)</p>
+<p><strong>ไฟล์ <code>webapp/assets/js/store.js</code> บรรทัด 254–319</strong> (ตารางงาน polling แบ่งเป็น 3 ช่วง)</p>
 <div class="code-block"><span class="code-lang">js</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">254</span>
 <span class="normal">255</span>
 <span class="normal">256</span>
@@ -1858,13 +1858,25 @@ charts.js ► dom.js, format.js
 <span class="normal">262</span>
 <span class="normal">263</span>
 <span class="normal">264</span>
-<span class="normal">265</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">tasks</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<span class="normal">265</span>
+<span class="normal">266</span>
+<span class="normal">267</span>
+<span class="normal">268</span>
+<span class="normal">269</span>
+<span class="normal">270</span>
+<span class="normal">271</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">tasks</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
 <span class="w">  </span><span class="p">{</span><span class="w"> </span><span class="nx">key</span><span class="o">:</span><span class="w"> </span><span class="s1">'live'</span><span class="p">,</span><span class="w"> </span><span class="nx">every</span><span class="o">:</span><span class="w"> </span><span class="nx">POLL</span><span class="p">.</span><span class="nx">live</span><span class="p">,</span><span class="w"> </span><span class="nx">run</span><span class="o">:</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">loaders</span><span class="p">.</span><span class="nx">live</span><span class="p">()</span><span class="w"> </span><span class="p">},</span>
 <span class="w">  </span><span class="p">{</span><span class="w"> </span><span class="nx">key</span><span class="o">:</span><span class="w"> </span><span class="s1">'rooms'</span><span class="p">,</span><span class="w"> </span><span class="nx">every</span><span class="o">:</span><span class="w"> </span><span class="nx">POLL</span><span class="p">.</span><span class="nx">rooms</span><span class="p">,</span><span class="w"> </span><span class="nx">run</span><span class="o">:</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">loaders</span><span class="p">.</span><span class="nx">rooms</span><span class="p">()</span><span class="w"> </span><span class="p">},</span>
 <span class="w">  </span><span class="p">{</span>
 <span class="w">    </span><span class="nx">key</span><span class="o">:</span><span class="w"> </span><span class="s1">'airConditioners'</span><span class="p">,</span>
 <span class="w">    </span><span class="nx">every</span><span class="o">:</span><span class="w"> </span><span class="nx">POLL</span><span class="p">.</span><span class="nx">rooms</span><span class="p">,</span>
 <span class="w">    </span><span class="nx">run</span><span class="o">:</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">loaders</span><span class="p">.</span><span class="nx">airConditioners</span><span class="p">(),</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// สถานะออนไลน์ รุ่นเฟิร์มแวร์ และผล OTA ของเซ็นเซอร์ (หน้าเฟิร์มแวร์ใช้ตัดสินผลอัปเดต)</span>
+<span class="w">    </span><span class="nx">key</span><span class="o">:</span><span class="w"> </span><span class="s1">'occupancySensors'</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">every</span><span class="o">:</span><span class="w"> </span><span class="nx">POLL</span><span class="p">.</span><span class="nx">rooms</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">run</span><span class="o">:</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">loaders</span><span class="p">.</span><span class="nx">occupancySensors</span><span class="p">(),</span>
 <span class="w">  </span><span class="p">},</span>
 <span class="w">  </span><span class="p">{</span><span class="w"> </span><span class="nx">key</span><span class="o">:</span><span class="w"> </span><span class="s1">'alerts'</span><span class="p">,</span><span class="w"> </span><span class="nx">every</span><span class="o">:</span><span class="w"> </span><span class="nx">POLL</span><span class="p">.</span><span class="nx">alerts</span><span class="p">,</span><span class="w"> </span><span class="nx">run</span><span class="o">:</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">loaders</span><span class="p">.</span><span class="nx">alerts</span><span class="p">()</span><span class="w"> </span><span class="p">},</span>
 <span class="w">  </span><span class="p">{</span><span class="w"> </span><span class="nx">key</span><span class="o">:</span><span class="w"> </span><span class="s1">'summary'</span><span class="p">,</span><span class="w"> </span><span class="nx">every</span><span class="o">:</span><span class="w"> </span><span class="nx">POLL</span><span class="p">.</span><span class="nx">summary</span><span class="p">,</span><span class="w"> </span><span class="nx">run</span><span class="o">:</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">loaders</span><span class="p">.</span><span class="nx">summary</span><span class="p">()</span><span class="w"> </span><span class="p">},</span>
@@ -1873,13 +1885,7 @@ charts.js ► dom.js, format.js
 </code></pre></div></td></tr></table></div>
 </div>
 
-<div class="code-block"><span class="code-lang">js</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">267</span>
-<span class="normal">268</span>
-<span class="normal">269</span>
-<span class="normal">270</span>
-<span class="normal">271</span>
-<span class="normal">272</span>
-<span class="normal">273</span>
+<div class="code-block"><span class="code-lang">js</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">273</span>
 <span class="normal">274</span>
 <span class="normal">275</span>
 <span class="normal">276</span>
@@ -1895,7 +1901,13 @@ charts.js ► dom.js, format.js
 <span class="normal">286</span>
 <span class="normal">287</span>
 <span class="normal">288</span>
-<span class="normal">289</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">lastRun</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nb">Map</span><span class="p">();</span>
+<span class="normal">289</span>
+<span class="normal">290</span>
+<span class="normal">291</span>
+<span class="normal">292</span>
+<span class="normal">293</span>
+<span class="normal">294</span>
+<span class="normal">295</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">lastRun</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nb">Map</span><span class="p">();</span>
 <span class="kd">let</span><span class="w"> </span><span class="nx">timer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
 <span class="kd">let</span><span class="w"> </span><span class="nx">running</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
 
@@ -1921,13 +1933,7 @@ charts.js ► dom.js, format.js
 </code></pre></div></td></tr></table></div>
 </div>
 
-<div class="code-block"><span class="code-lang">js</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">291</span>
-<span class="normal">292</span>
-<span class="normal">293</span>
-<span class="normal">294</span>
-<span class="normal">295</span>
-<span class="normal">296</span>
-<span class="normal">297</span>
+<div class="code-block"><span class="code-lang">js</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">297</span>
 <span class="normal">298</span>
 <span class="normal">299</span>
 <span class="normal">300</span>
@@ -1943,7 +1949,13 @@ charts.js ► dom.js, format.js
 <span class="normal">310</span>
 <span class="normal">311</span>
 <span class="normal">312</span>
-<span class="normal">313</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="cm">/** เริ่มดึงข้อมูลเป็นรอบ เรียกหลังเข้าสู่ระบบสำเร็จ */</span>
+<span class="normal">313</span>
+<span class="normal">314</span>
+<span class="normal">315</span>
+<span class="normal">316</span>
+<span class="normal">317</span>
+<span class="normal">318</span>
+<span class="normal">319</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="cm">/** เริ่มดึงข้อมูลเป็นรอบ เรียกหลังเข้าสู่ระบบสำเร็จ */</span>
 <span class="k">export</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="nx">startPolling</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="nx">stopPolling</span><span class="p">();</span>
 <span class="w">  </span><span class="nx">tick</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
@@ -1978,43 +1990,43 @@ charts.js ► dom.js, format.js
 </thead>
 <tbody>
 <tr>
-<td>254–265</td>
-<td>ตารางงาน: แต่ละงานมีชื่อ ช่วงเวลา (<code>every</code> ms จาก <code>POLL</code>) และฟังก์ชันที่รัน (<code>live</code>/<code>rooms</code>/<code>airConditioners</code> ทุก 10 วิ, <code>alerts</code> 30 วิ, <code>summary</code> และ <code>health</code> 120 วิ)</td>
+<td>254–271</td>
+<td>ตารางงาน: แต่ละงานมีชื่อ ช่วงเวลา (<code>every</code> ms จาก <code>POLL</code>) และฟังก์ชันที่รัน (<code>live</code>/<code>rooms</code>/<code>airConditioners</code>/<code>occupancySensors</code> ทุก 10 วิ, <code>alerts</code> 30 วิ, <code>summary</code> และ <code>health</code> 120 วิ) งาน <code>occupancySensors</code> เพิ่ม 15 ต.ค. 2569 ให้หน้าเฟิร์มแวร์เห็นรุ่นและผล OTA ของเซ็นเซอร์โดยไม่ต้องกด F5</td>
 </tr>
 <tr>
-<td>267</td>
+<td>273</td>
 <td><code>lastRun</code> เก็บเวลาที่รันงานนั้นครั้งล่าสุด</td>
 </tr>
 <tr>
-<td>271–272</td>
+<td>277–278</td>
 <td><code>tick(force)</code>: ถ้ารอบก่อนยังไม่จบ (<code>running</code>) ข้าม กันคำขอซ้อนกันเมื่อเซิร์ฟเวอร์ช้า</td>
 </tr>
 <tr>
-<td>275</td>
+<td>281</td>
 <td><code>document.hidden</code> = แท็บถูกซ่อน/ย่อ ไม่ถามเซิร์ฟเวอร์ ประหยัดแบตและโควตาเน็ต</td>
 </tr>
 <tr>
-<td>280–285</td>
+<td>286–291</td>
 <td>วนทุกงาน ข้ามงานที่ยังไม่ถึงเวลา (<code>now - previous &lt; task.every</code>) ไม่งั้นบันทึกเวลาแล้ว <code>await task.run()</code> <strong>ทีละงานตามลำดับ</strong> (ไม่ขนาน)</td>
 </tr>
 <tr>
-<td>286–288</td>
+<td>292–294</td>
 <td><code>finally { running = false }</code> ปลดล็อกแม้มี error</td>
 </tr>
 <tr>
-<td>292–296</td>
+<td>298–302</td>
 <td><code>startPolling()</code>: ล้างของเก่า, <code>tick(true)</code> ดึงทุกอย่างทันที, แล้ว <code>setInterval(() =&gt; tick(false), 5000)</code> <strong>นาฬิกาปลุกทุก 5 วินาที</strong> ไม่ใช่ 10 วินาที ตัว <code>tick</code> เองตัดสินว่างานไหนถึงรอบ (ละเอียดกว่าและให้ช่วงต่าง ๆ ใช้ตัวจับเวลาตัวเดียว)</td>
 </tr>
 <tr>
-<td>298–304</td>
+<td>304–310</td>
 <td><code>stopPolling()</code> <code>clearInterval</code> และล้าง <code>lastRun</code></td>
 </tr>
 <tr>
-<td>307–309</td>
+<td>313–315</td>
 <td><code>refreshAll()</code> บังคับดึงทุกอย่างทันที (ปุ่มรีเฟรช)</td>
 </tr>
 <tr>
-<td>311–313</td>
+<td>317–319</td>
 <td>event <code>visibilitychange</code>: กลับมาดูแท็บ (<code>!document.hidden</code>) และกำลัง polling อยู่ (<code>timer != null</code>) → ดึงใหม่ทันที ผู้ใช้จึงไม่ต้องรอข้อมูลเก่าถึง 10 วินาทีหลังสลับกลับมา</td>
 </tr>
 </tbody>
@@ -2811,10 +2823,10 @@ charts.js ► dom.js, format.js
 </tr>
 </tbody>
 </table></div>
-<p>มีแค่ <code>outdated</code> ที่ติ๊กเลือกและกดปุ่ม "อัปเดต" ได้ (<code>deviceRow</code> บรรทัด 449 <code>canUpdate = status.code === 'outdated'</code>) ดังนั้นปุ่มจะไม่โผล่ให้บอร์ดที่ออฟไลน์หรือกำลังอัปเดตอยู่</p>
+<p>มีแค่ <code>outdated</code> ที่ติ๊กเลือกและกดปุ่ม "อัปเดต" ได้ (<code>deviceRow</code> บรรทัด 454 <code>canUpdate = status.code === 'outdated'</code>) ดังนั้นปุ่มจะไม่โผล่ให้บอร์ดที่ออฟไลน์หรือกำลังอัปเดตอยู่</p>
 <div class="callout tip"><div class="callout-title">เคล็ดลับ</div><p>ลำดับของ <code>if</code> ในฟังก์ชันนี้คือ "ลำดับความสำคัญ" ของสถานะ ถ้าอาจารย์ถามว่าบอร์ดที่ออฟไลน์และรุ่นเก่าแสดงอะไร ตอบได้จากลำดับ: เช็ก <code>offline</code> (บรรทัด 161) ก่อน <code>outdated</code> จึงขึ้น "ออฟไลน์ · เห็นล่าสุด …" และกดอัปเดตไม่ได้</p></div>
 
-<p><strong>10.4 ติดตามผลหลังสั่ง</strong> — ไฟล์ <code>webapp/assets/js/views/firmware.js</code> บรรทัด 176–194</p>
+<p><strong>10.4 ติดตามผลหลังสั่ง</strong> — ไฟล์ <code>webapp/assets/js/views/firmware.js</code> บรรทัด 176–199</p>
 <div class="code-block"><span class="code-lang">js</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">176</span>
 <span class="normal">177</span>
 <span class="normal">178</span>
@@ -2833,7 +2845,12 @@ charts.js ► dom.js, format.js
 <span class="normal">191</span>
 <span class="normal">192</span>
 <span class="normal">193</span>
-<span class="normal">194</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kd">function</span><span class="w"> </span><span class="nx">settlePending</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kd">function</span><span class="w"> </span><span class="nx">settlePending</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">pending</span><span class="p">.</span><span class="nx">size</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="mf">0</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="p">;</span>
 <span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">devices</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[...(</span><span class="nx">state</span><span class="p">.</span><span class="nx">airConditioners</span><span class="w"> </span><span class="o">??</span><span class="w"> </span><span class="p">[]),</span><span class="w"> </span><span class="p">...(</span><span class="nx">state</span><span class="p">.</span><span class="nx">occupancySensors</span><span class="w"> </span><span class="o">??</span><span class="w"> </span><span class="p">[])];</span>
 <span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">const</span><span class="w"> </span><span class="p">[</span><span class="nx">deviceId</span><span class="p">,</span><span class="w"> </span><span class="nx">job</span><span class="p">]</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nx">pending</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
@@ -2848,7 +2865,12 @@ charts.js ► dom.js, format.js
 <span class="w">      </span><span class="nx">toastError</span><span class="p">(</span><span class="sb">`</span><span class="si">${</span><span class="nx">deviceId</span><span class="si">}</span><span class="sb"> อัปเดตไม่สำเร็จ: </span><span class="si">${</span><span class="nx">device</span><span class="p">.</span><span class="nx">otaError</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
 <span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">Date</span><span class="p">.</span><span class="nx">now</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nx">job</span><span class="p">.</span><span class="nx">startedAt</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="nx">PENDING_MS</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">      </span><span class="nx">pending</span><span class="p">.</span><span class="ow">delete</span><span class="p">(</span><span class="nx">deviceId</span><span class="p">);</span>
-<span class="w">      </span><span class="nx">toastError</span><span class="p">(</span><span class="sb">`</span><span class="si">${</span><span class="nx">deviceId</span><span class="si">}</span><span class="sb"> ยังไม่รายงานรุ่น </span><span class="si">${</span><span class="nx">job</span><span class="p">.</span><span class="nx">target</span><span class="si">}</span><span class="sb"> ภายใน 5 นาที`</span><span class="p">);</span>
+<span class="w">      </span><span class="nx">toastError</span><span class="p">(</span>
+<span class="w">        </span><span class="nx">device</span><span class="p">.</span><span class="nx">otaError</span>
+<span class="w">          </span><span class="o">?</span><span class="w"> </span><span class="sb">`</span><span class="si">${</span><span class="nx">deviceId</span><span class="si">}</span><span class="sb"> อัปเดตไม่สำเร็จ: </span><span class="si">${</span><span class="nx">device</span><span class="p">.</span><span class="nx">otaError</span><span class="si">}</span><span class="sb">`</span>
+<span class="w">          </span><span class="o">:</span><span class="w"> </span><span class="sb">`</span><span class="si">${</span><span class="nx">deviceId</span><span class="si">}</span><span class="sb"> ยังไม่รายงานรุ่น </span><span class="si">${</span><span class="nx">job</span><span class="p">.</span><span class="nx">target</span><span class="si">}</span><span class="sb"> ภายใน 5 นาที `</span>
+<span class="w">            </span><span class="o">+</span><span class="w"> </span><span class="sb">`(รุ่นตอนนี้ </span><span class="si">${</span><span class="nx">device</span><span class="p">.</span><span class="nx">firmwareVersion</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="s1">'ไม่ทราบ'</span><span class="si">}</span><span class="sb">)`</span><span class="p">,</span>
+<span class="w">      </span><span class="p">);</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
@@ -2885,30 +2907,30 @@ charts.js ► dom.js, format.js
 </tr>
 <tr>
 <td>186–188</td>
-<td>มี <code>otaError</code> และไม่ใช่ข้อความเดิมก่อนสั่ง → บอร์ดรายงานว่าล้มเหลว แสดงข้อความจากบอร์ด</td>
+<td>มี <code>otaError</code> และไม่ใช่ <code>previousError</code> → บอร์ดรายงานว่าล้มเหลว แสดงข้อความจากบอร์ด (ตั้งแต่ 15 ต.ค. 2569 <code>previousError</code> เป็น <code>null</code> เสมอ จึงเท่ากับ "มี <code>otaError</code> ใด ๆ")</td>
 </tr>
 <tr>
-<td>189–191</td>
-<td>ครบ 5 นาทียังไม่มีอะไร → ถือว่าไม่สำเร็จ</td>
+<td>189–196</td>
+<td>ครบ 5 นาที → ถ้ามี <code>otaError</code> แสดงข้อความนั้น ถ้าไม่มี แสดง "ยังไม่รายงานรุ่น … (รุ่นตอนนี้ x.y.z)" บอกรุ่นที่บอร์ดรายงานอยู่ ช่วยแยกได้ว่าบอร์ดไม่ได้อัปเดตเลย หรืออัปเดตแล้วแต่รายงานรุ่นไม่ตรงชื่อไฟล์ (เพิ่ม 15 ต.ค. 2569)</td>
 </tr>
 </tbody>
 </table></div>
-<div class="callout why"><div class="callout-title">ทำไม</div><p>ทำไมไม่รอผลจาก <code>await api.otaAirConditioner(...)</code> ตรง ๆ? เพราะ Backend ตอบทันทีที่ส่งคำสั่งเข้า MQTT สำเร็จ ส่วนการดาวน์โหลดและรีบูตเกิดในบอร์ดหลังจากนั้น ความจริงเรื่องผลมีที่เดียวคือข้อมูลที่บอร์ดรายงานกลับ (<code>firmwareVersion</code>, <code>otaError</code>) ซึ่งมากับ polling อยู่แล้ว หน้านี้จึงไม่ต้องตั้ง <code>setInterval</code> ของตัวเอง แค่เรียก <code>settlePending()</code> ใน <code>render</code> ที่ถูกเรียกทุกครั้งที่ store เปลี่ยน การเก็บ <code>previousError</code> (บรรทัด 591) ไว้เทียบกันการตัดสินผิดจากข้อความ error ของรอบก่อนที่ยังค้างในฐานข้อมูล</p></div>
+<div class="callout why"><div class="callout-title">ทำไม</div><p>ทำไมไม่รอผลจาก <code>await api.otaAirConditioner(...)</code> ตรง ๆ? เพราะ Backend ตอบทันทีที่ส่งคำสั่งเข้า MQTT สำเร็จ ส่วนการดาวน์โหลดและรีบูตเกิดในบอร์ดหลังจากนั้น ความจริงเรื่องผลมีที่เดียวคือข้อมูลที่บอร์ดรายงานกลับ (<code>firmwareVersion</code>, <code>otaError</code>) ซึ่งมากับ polling อยู่แล้ว หน้านี้จึงไม่ต้องตั้ง <code>setInterval</code> ของตัวเอง แค่เรียก <code>settlePending()</code> ใน <code>render</code> ที่ถูกเรียกทุกครั้งที่ store เปลี่ยน เรื่อง error ของรอบก่อน: เดิมหน้าเว็บจำ <code>otaError</code> ก่อนสั่งไว้เป็น <code>previousError</code> แล้วถือว่าล้มเหลวเมื่อข้อความ <strong>เปลี่ยน</strong> แต่ถ้ารอบใหม่ล้มด้วยสาเหตุเดิม (ข้อความเหมือนเดิม เช่นดาวน์โหลดไม่ได้) หน้าเว็บจะไม่รู้และรอจนครบ 5 นาที ตั้งแต่ 15 ต.ค. 2569 Backend จึงล้าง <code>ota_error</code> เป็น <code>NULL</code> ตอนส่งคำสั่ง OTA และหน้าเว็บตั้ง <code>previousError: null</code> (บรรทัด 598) error ใด ๆ ที่ตามมาจึงเป็นของรอบนี้ <strong>ข้อสังเกต:</strong> เฟิร์มแวร์ไม่ได้ล้าง <code>lastOtaError</code> ตอนรับคำสั่งใหม่ ถ้า <code>/status</code> รอบ 10 วินาทีที่ยังมี error เก่ามาถึงหลัง Backend ล้างค่าแต่ก่อนบอร์ดเริ่มดาวน์โหลด ค่าเก่าจะถูกเขียนกลับ ช่วงเวลานี้สั้นมาก (บอร์ดเริ่ม OTA ใน <code>loop()</code> รอบถัดไปและตัด MQTT ระหว่างดาวน์โหลด) จึงเกิดได้ยาก</p></div>
 
-<div class="callout warn"><div class="callout-title">ระวัง</div><p>ข้อสังเกตจากโค้ด: ความถี่ในการตรวจขึ้นกับ polling ของ <code>store.js</code> ซึ่งดึง <code>airConditioners</code> ทุก 10 วินาที แต่ <strong>ไม่มี <code>occupancySensors</code> อยู่ในรายการ polling</strong> (<code>tasks</code> ใน <code>store.js</code> มีแค่ live, rooms, airConditioners, alerts, summary, health; เซ็นเซอร์โหลดแค่ตอน <code>bootstrap</code> และหลังการกระทำในหน้า <code>devices.js</code>) และ <code>firmware.js</code> ก็ไม่ได้เรียก <code>loaders.occupancySensors()</code> เอง ผลคือแท็บเซ็นเซอร์ LD2410 อาจไม่เห็นรุ่นใหม่จนครบ 5 นาทีแล้วขึ้น "ยังไม่รายงานรุ่น … ภายใน 5 นาที" ทั้งที่บอร์ดอัปเดตสำเร็จ (กด F5 แล้วจะเห็นรุ่นจริง) อีกข้อคือเงื่อนไขสำเร็จเทียบข้อความ <strong>ตรงตัว</strong> (<code>===</code>) ถ้าชื่อไฟล์บอกรุ่น <code>2.5.2</code> แต่ <code>FIRMWARE_VERSION</code> ในโค้ดบอร์ดเป็น <code>2.5.2-slm8</code> จะไม่ขึ้น toast สำเร็จ (แต่ตารางยังแสดง "ล่าสุดแล้ว" เพราะ <code>statusOf</code> เทียบด้วย <code>compareVersions</code>) จึงควรตั้งรุ่นในชื่อไฟล์ให้ตรงกับ <code>FIRMWARE_VERSION</code> ทุกตัวอักษร</p></div>
+<div class="callout warn"><div class="callout-title">ระวัง</div><p>ความถี่ในการตรวจขึ้นกับ polling ของ <code>store.js</code> ซึ่งดึงทั้ง <code>airConditioners</code> และ <code>occupancySensors</code> ทุก 10 วินาที (เดิมไม่มี <code>occupancySensors</code> ในรายการ แท็บเซ็นเซอร์ LD2410 จึงไม่เห็นรุ่นใหม่จนครบ 5 นาทีแล้วขึ้น "ยังไม่รายงานรุ่น" ทั้งที่อัปเดตสำเร็จ แก้แล้ว 15 ต.ค. 2569) ข้อที่ยังต้องระวังคือเงื่อนไขสำเร็จเทียบข้อความ <strong>ตรงตัว</strong> (<code>===</code>) ถ้าชื่อไฟล์บอกรุ่น <code>2.5.2</code> แต่ <code>FIRMWARE_VERSION</code> ในโค้ดบอร์ดเป็น <code>2.5.2-slm8</code> จะไม่ขึ้น toast สำเร็จ (แต่ตารางยังแสดง "ล่าสุดแล้ว" เพราะ <code>statusOf</code> เทียบด้วย <code>compareVersions</code>) จึงควรตั้งรุ่นในชื่อไฟล์ให้ตรงกับ <code>FIRMWARE_VERSION</code> ทุกตัวอักษร</p></div>
 
-<p><strong>10.5 เลือกแท็บเริ่มต้นอย่างฉลาด</strong> — ไฟล์ <code>webapp/assets/js/views/firmware.js</code> บรรทัด 205–215</p>
-<div class="code-block"><span class="code-lang">js</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">205</span>
-<span class="normal">206</span>
-<span class="normal">207</span>
-<span class="normal">208</span>
-<span class="normal">209</span>
-<span class="normal">210</span>
+<p><strong>10.5 เลือกแท็บเริ่มต้นอย่างฉลาด</strong> — ไฟล์ <code>webapp/assets/js/views/firmware.js</code> บรรทัด 210–220</p>
+<div class="code-block"><span class="code-lang">js</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">210</span>
 <span class="normal">211</span>
 <span class="normal">212</span>
 <span class="normal">213</span>
 <span class="normal">214</span>
-<span class="normal">215</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kd">function</span><span class="w"> </span><span class="nx">render</span><span class="p">(</span><span class="nx">ctx</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kd">function</span><span class="w"> </span><span class="nx">render</span><span class="p">(</span><span class="nx">ctx</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">head</span><span class="p">,</span><span class="w"> </span><span class="nx">tabBar</span><span class="p">,</span><span class="w"> </span><span class="nx">panel</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">ctx</span><span class="p">;</span>
 <span class="w">  </span><span class="nx">settlePending</span><span class="p">();</span>
 
@@ -2931,39 +2953,34 @@ charts.js ► dom.js, format.js
 </thead>
 <tbody>
 <tr>
-<td>207</td>
+<td>212</td>
 <td>ปิดงานที่รอก่อนวาด สถานะในตารางจึงเป็นปัจจุบันเสมอ</td>
 </tr>
 <tr>
-<td>209</td>
+<td>214</td>
 <td>เลือกแท็บเองแค่ครั้งแรก (<code>activeKind</code> ยังว่าง) และต้องโหลดไฟล์แล้ว (ไม่งั้นนับบอร์ดเก่าไม่ได้)</td>
 </tr>
 <tr>
-<td>211</td>
+<td>216</td>
 <td>ตัวเลือกแรก: แท็บแรกที่มีบอร์ด "ต้องอัปเดต" (<code>?.key</code> = ถ้า <code>find</code> ไม่เจอได้ <code>undefined</code> แทนที่จะ error)</td>
 </tr>
 <tr>
-<td>212</td>
+<td>217</td>
 <td>ถ้าไม่มี: แท็บแรกที่มีบอร์ดเลย</td>
 </tr>
 <tr>
-<td>213</td>
+<td>218</td>
 <td>ถ้าไม่มีอะไรเลย: แท็บแอร์ IR (<code>??</code> = ใช้ค่าขวาเมื่อซ้ายเป็น <code>null</code>/<code>undefined</code>)</td>
 </tr>
 <tr>
-<td>215</td>
+<td>220</td>
 <td>ระหว่างที่ไฟล์ยังไม่มา วาดแท็บแอร์ IR ไปก่อน</td>
 </tr>
 </tbody>
 </table></div>
-<p><code>render</code> ที่เหลือ (บรรทัด 217–265) วาดใหม่ทั้ง 3 ส่วนด้วย <code>replace()</code> ทุกครั้ง ต่างจากหน้าอื่นที่แยก mount/update อย่างระมัดระวัง ทำได้เพราะหน้านี้ไม่มีช่องพิมพ์ข้อความค้างอยู่ (รุ่นของไฟล์ถามผ่าน <code>openForm</code> ซึ่งเป็น modal แยก ไม่ถูกลบตอนวาดใหม่) สิ่งที่ผู้ใช้เลือกไว้เก็บใน <code>selected</code>/<code>activeKind</code> นอก DOM จึงไม่หายตอนวาดใหม่ ป้ายเวลา "กำลังอัปเดตเป็น … · m:ss" ใน <code>statusBadge</code> (บรรทัด 500–505) ก็เดินตามรอบการวาดนี้ จึงขยับทีละประมาณ 5–10 วินาที ไม่ใช่ทุกวินาที</p>
-<p><strong>10.6 ช่องลากไฟล์</strong> — ไฟล์ <code>webapp/assets/js/views/firmware.js</code> บรรทัด 348–369</p>
-<div class="code-block"><span class="code-lang">js</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">348</span>
-<span class="normal">349</span>
-<span class="normal">350</span>
-<span class="normal">351</span>
-<span class="normal">352</span>
-<span class="normal">353</span>
+<p><code>render</code> ที่เหลือ (บรรทัด 222–270) วาดใหม่ทั้ง 3 ส่วนด้วย <code>replace()</code> ทุกครั้ง ต่างจากหน้าอื่นที่แยก mount/update อย่างระมัดระวัง ทำได้เพราะหน้านี้ไม่มีช่องพิมพ์ข้อความค้างอยู่ (รุ่นของไฟล์ถามผ่าน <code>openForm</code> ซึ่งเป็น modal แยก ไม่ถูกลบตอนวาดใหม่) สิ่งที่ผู้ใช้เลือกไว้เก็บใน <code>selected</code>/<code>activeKind</code> นอก DOM จึงไม่หายตอนวาดใหม่ ป้ายเวลา "กำลังอัปเดตเป็น … · m:ss" ใน <code>statusBadge</code> (บรรทัด 500–505) ก็เดินตามรอบการวาดนี้ จึงขยับทีละประมาณ 5–10 วินาที ไม่ใช่ทุกวินาที</p>
+<p><strong>10.6 ช่องลากไฟล์</strong> — ไฟล์ <code>webapp/assets/js/views/firmware.js</code> บรรทัด 353–374</p>
+<div class="code-block"><span class="code-lang">js</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">353</span>
 <span class="normal">354</span>
 <span class="normal">355</span>
 <span class="normal">356</span>
@@ -2979,7 +2996,12 @@ charts.js ► dom.js, format.js
 <span class="normal">366</span>
 <span class="normal">367</span>
 <span class="normal">368</span>
-<span class="normal">369</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">stop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nx">event</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="normal">369</span>
+<span class="normal">370</span>
+<span class="normal">371</span>
+<span class="normal">372</span>
+<span class="normal">373</span>
+<span class="normal">374</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">stop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nx">event</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="nx">event</span><span class="p">.</span><span class="nx">preventDefault</span><span class="p">();</span>
 <span class="w">    </span><span class="nx">event</span><span class="p">.</span><span class="nx">stopPropagation</span><span class="p">();</span>
 <span class="w">  </span><span class="p">};</span>
@@ -3013,42 +3035,42 @@ charts.js ► dom.js, format.js
 </thead>
 <tbody>
 <tr>
-<td>348–351</td>
+<td>353–356</td>
 <td><code>preventDefault()</code> ยกเลิกพฤติกรรมเดิมของเบราว์เซอร์ที่ <strong>เปิดไฟล์ที่ลากมาวางแทนหน้าเว็บ</strong> และ <code>stopPropagation()</code> ไม่ให้ event ไหลต่อไปยัง element ข้างนอก</td>
 </tr>
 <tr>
-<td>352–359</td>
+<td>357–364</td>
 <td>ลากเข้ามา/ลากอยู่เหนือกรอบ → ใส่ class <code>dragging</code> ให้กรอบเปลี่ยนสี (ต้องยกเลิก <code>dragover</code> ด้วย ไม่งั้นเบราว์เซอร์ไม่ยอมให้ <code>drop</code>)</td>
 </tr>
 <tr>
-<td>360–363</td>
+<td>365–368</td>
 <td>ลากออก: เอาสีออกเฉพาะเมื่อเมาส์ออกนอกกรอบจริง (<code>relatedTarget</code> คือ element ที่เมาส์ไปถึง ถ้ายังอยู่ใน <code>zone</code> แปลว่าแค่ผ่านลูก เช่นไอคอน ไม่ต้องเอาสีออก กันกรอบกะพริบ)</td>
 </tr>
 <tr>
-<td>367</td>
+<td>372</td>
 <td><code>event.dataTransfer?.files?.[0]</code> ไฟล์แรกที่ลากมา (<code>?.[0]</code> = ถ้าไม่มีรายการไฟล์ก็ได้ <code>undefined</code>)</td>
 </tr>
 <tr>
-<td>368</td>
+<td>373</td>
 <td>ไม่รับไฟล์ใหม่ระหว่างกำลังอัปโหลด</td>
 </tr>
 </tbody>
 </table></div>
 <p>กรอบทั้งหมดเป็น <code>&lt;label&gt;</code> ที่ห่อ <code>&lt;input type="file" accept=".bin" class="sr-only"&gt;</code> (บรรทัด 321–333) การคลิกที่ไหนก็ได้ใน label จึงเปิดหน้าต่างเลือกไฟล์โดยไม่ต้องเขียน JS และ <code>sr-only</code> ซ่อนช่องจากสายตาแต่โปรแกรมอ่านหน้าจอยังเห็น บรรทัด 328 <code>event.target.value = ''</code> ล้างค่าหลังอ่าน เพื่อให้เลือก <strong>ไฟล์เดิมซ้ำ</strong> แล้วยังยิง <code>change</code> อีกครั้ง (เช่นอัปโหลดไม่ผ่านแล้วแก้ชื่อรุ่นใหม่)</p>
-<p><strong>10.7 ตรวจไฟล์ก่อนส่ง</strong> — ไฟล์ <code>webapp/assets/js/views/firmware.js</code> บรรทัด 606–618 และ 620–647</p>
-<div class="code-block"><span class="code-lang">js</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">606</span>
-<span class="normal">607</span>
-<span class="normal">608</span>
-<span class="normal">609</span>
-<span class="normal">610</span>
-<span class="normal">611</span>
-<span class="normal">612</span>
-<span class="normal">613</span>
+<p><strong>10.7 ตรวจไฟล์ก่อนส่ง</strong> — ไฟล์ <code>webapp/assets/js/views/firmware.js</code> บรรทัด 613–625 และ 627–654</p>
+<div class="code-block"><span class="code-lang">js</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">613</span>
 <span class="normal">614</span>
 <span class="normal">615</span>
 <span class="normal">616</span>
 <span class="normal">617</span>
-<span class="normal">618</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="nx">handleFile</span><span class="p">(</span><span class="nx">file</span><span class="p">,</span><span class="w"> </span><span class="nx">meta</span><span class="p">,</span><span class="w"> </span><span class="nx">ctx</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="normal">618</span>
+<span class="normal">619</span>
+<span class="normal">620</span>
+<span class="normal">621</span>
+<span class="normal">622</span>
+<span class="normal">623</span>
+<span class="normal">624</span>
+<span class="normal">625</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="nx">handleFile</span><span class="p">(</span><span class="nx">file</span><span class="p">,</span><span class="w"> </span><span class="nx">meta</span><span class="p">,</span><span class="w"> </span><span class="nx">ctx</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="sr">/\.bin$/i</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">file</span><span class="p">.</span><span class="nx">name</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="nx">toastError</span><span class="p">(</span><span class="s1">'เลือกไฟล์ .bin ที่ได้จาก Sketch → Export Compiled Binary'</span><span class="p">);</span>
 <span class="w">    </span><span class="k">return</span><span class="p">;</span>
@@ -3073,28 +3095,21 @@ charts.js ► dom.js, format.js
 </thead>
 <tbody>
 <tr>
-<td>607</td>
+<td>614</td>
 <td>ต้องลงท้าย <code>.bin</code> (<code>i</code> = <code>.BIN</code> ก็ได้)</td>
 </tr>
 <tr>
-<td>611</td>
+<td>618</td>
 <td>ใหญ่กว่า <code>maxBytes</code> (ค่าจากเซิร์ฟเวอร์ ไม่ได้เขียนตายในหน้า) → ปฏิเสธก่อนเสียเวลาส่ง</td>
 </tr>
 <tr>
-<td>615</td>
+<td>622</td>
 <td>Arduino IDE "Export Compiled Binary" สร้างหลายไฟล์ เฉพาะ <code>.ino.bin</code> ที่ใช้ OTA ได้ ไฟล์ <code>.merged.bin</code> มี bootloader อยู่ข้างหน้า ถ้าส่งไปบอร์ดจะเขียนผิดตำแหน่ง</td>
 </tr>
 </tbody>
 </table></div>
-<p>ไฟล์ <code>webapp/assets/js/views/firmware.js</code> บรรทัด 620–647 (ถามรุ่นเมื่อชื่อไฟล์ไม่มีรุ่น)</p>
-<div class="code-block"><span class="code-lang">js</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">620</span>
-<span class="normal">621</span>
-<span class="normal">622</span>
-<span class="normal">623</span>
-<span class="normal">624</span>
-<span class="normal">625</span>
-<span class="normal">626</span>
-<span class="normal">627</span>
+<p>ไฟล์ <code>webapp/assets/js/views/firmware.js</code> บรรทัด 627–654 (ถามรุ่นเมื่อชื่อไฟล์ไม่มีรุ่น)</p>
+<div class="code-block"><span class="code-lang">js</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">627</span>
 <span class="normal">628</span>
 <span class="normal">629</span>
 <span class="normal">630</span>
@@ -3114,7 +3129,14 @@ charts.js ► dom.js, format.js
 <span class="normal">644</span>
 <span class="normal">645</span>
 <span class="normal">646</span>
-<span class="normal">647</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="w">  </span><span class="c1">// ชื่อไฟล์บนเซิร์ฟเวอร์ต้องมีชื่อสเก็ตช์และรุ่น</span>
+<span class="normal">647</span>
+<span class="normal">648</span>
+<span class="normal">649</span>
+<span class="normal">650</span>
+<span class="normal">651</span>
+<span class="normal">652</span>
+<span class="normal">653</span>
+<span class="normal">654</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="w">  </span><span class="c1">// ชื่อไฟล์บนเซิร์ฟเวอร์ต้องมีชื่อสเก็ตช์และรุ่น</span>
 <span class="w">  </span><span class="c1">// Arduino IDE ตั้งชื่อเป็น &lt;สเก็ตช์&gt;.ino.bin จึงถามรุ่นเพิ่ม</span>
 <span class="w">  </span><span class="kd">let</span><span class="w"> </span><span class="nx">fileName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">file</span><span class="p">.</span><span class="nx">name</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/\s+/g</span><span class="p">,</span><span class="w"> </span><span class="s1">'_'</span><span class="p">);</span>
 <span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">versionOfFileName</span><span class="p">(</span><span class="nx">fileName</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
@@ -3154,35 +3176,35 @@ charts.js ► dom.js, format.js
 </thead>
 <tbody>
 <tr>
-<td>622</td>
+<td>629</td>
 <td>แทนช่องว่างในชื่อด้วย <code>_</code> (ชื่อไฟล์บนเซิร์ฟเวอร์และใน URL ที่บอร์ดดาวน์โหลดไม่ควรมีช่องว่าง)</td>
 </tr>
 <tr>
-<td>623</td>
+<td>630</td>
 <td>ชื่อยังไม่มีรุ่น (กรณีปกติของไฟล์จาก Arduino IDE: <code>&lt;สเก็ตช์&gt;.ino.bin</code>) → ต้องถามรุ่น</td>
 </tr>
 <tr>
-<td>624</td>
+<td>631</td>
 <td>ตัด <code>.ino.bin</code> หรือ <code>.bin</code> ท้ายชื่อออกเหลือชื่อสเก็ตช์</td>
 </tr>
 <tr>
-<td>625–639</td>
+<td>632–646</td>
 <td><code>await openForm(...)</code> เปิดฟอร์มหนึ่งช่องแล้วรอ (Promise-based dialog) ตัวอย่างในช่องเปลี่ยนตามแท็บ: สายแอร์ <code>2.5.2-slm8</code> อื่น ๆ <code>2.5.1</code> และบอกว่าหาเลขรุ่นได้จาก <code>FIRMWARE_VERSION</code> หรือบรรทัด "Firmware:" ใน Serial Monitor</td>
 </tr>
 <tr>
-<td>640</td>
+<td>647</td>
 <td>กดยกเลิก (<code>null</code>) → หยุด</td>
 </tr>
 <tr>
-<td>641</td>
+<td>648</td>
 <td>ตัด <code>v</code> นำหน้าออก (<code>v2.5.1</code> → <code>2.5.1</code>)</td>
 </tr>
 <tr>
-<td>642–645</td>
+<td>649–652</td>
 <td>ตรวจรูปแบบรุ่นด้วย regex เดียวกับที่ <code>versionOfFileName</code> อ่านได้ ไม่งั้นตั้งชื่อแล้วอ่านรุ่นกลับไม่ได้</td>
 </tr>
 <tr>
-<td>646</td>
+<td>653</td>
 <td>ประกอบชื่อใหม่ <code>&lt;สเก็ตช์&gt;-&lt;รุ่น&gt;.bin</code> เช่น <code>rmutt_esp32_air_wired-2.5.2-slm8.bin</code></td>
 </tr>
 </tbody>
@@ -3251,15 +3273,8 @@ charts.js ► dom.js, format.js
 </table></div>
 <div class="callout why"><div class="callout-title">ทำไม</div><p>ทำไมส่งไฟล์ดิบแทน <code>multipart/form-data</code> (แบบฟอร์มอัปโหลดทั่วไป)? เพราะต้องการส่งไฟล์เดียว และ Backend มีแบบเดียวกันอยู่แล้วกับการนำเข้าตารางเรียน (<code>previewScheduleImport</code>) ไม่ต้องเพิ่มไลบรารีแยก multipart ฝั่ง Express ไฟล์ทั้งก้อนเป็น <code>request.body</code> ที่ตรวจขนาดและไบต์แรกได้ทันที</p></div>
 
-<p>ไฟล์ <code>webapp/assets/js/views/firmware.js</code> บรรทัด 670–693 (ใช้ API ข้างบน)</p>
-<div class="code-block"><span class="code-lang">js</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">670</span>
-<span class="normal">671</span>
-<span class="normal">672</span>
-<span class="normal">673</span>
-<span class="normal">674</span>
-<span class="normal">675</span>
-<span class="normal">676</span>
-<span class="normal">677</span>
+<p>ไฟล์ <code>webapp/assets/js/views/firmware.js</code> บรรทัด 677–700 (ใช้ API ข้างบน)</p>
+<div class="code-block"><span class="code-lang">js</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">677</span>
 <span class="normal">678</span>
 <span class="normal">679</span>
 <span class="normal">680</span>
@@ -3275,7 +3290,14 @@ charts.js ► dom.js, format.js
 <span class="normal">690</span>
 <span class="normal">691</span>
 <span class="normal">692</span>
-<span class="normal">693</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="nx">uploadWithReplace</span><span class="p">(</span><span class="nx">file</span><span class="p">,</span><span class="w"> </span><span class="nx">fileName</span><span class="p">,</span><span class="w"> </span><span class="nx">kind</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="normal">693</span>
+<span class="normal">694</span>
+<span class="normal">695</span>
+<span class="normal">696</span>
+<span class="normal">697</span>
+<span class="normal">698</span>
+<span class="normal">699</span>
+<span class="normal">700</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="nx">uploadWithReplace</span><span class="p">(</span><span class="nx">file</span><span class="p">,</span><span class="w"> </span><span class="nx">fileName</span><span class="p">,</span><span class="w"> </span><span class="nx">kind</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="k">await</span><span class="w"> </span><span class="nx">api</span><span class="p">.</span><span class="nx">uploadFirmware</span><span class="p">(</span><span class="nx">file</span><span class="p">,</span><span class="w"> </span><span class="nx">fileName</span><span class="p">,</span><span class="w"> </span><span class="nx">kind</span><span class="p">);</span>
 <span class="w">    </span><span class="nx">toastOk</span><span class="p">(</span><span class="sb">`อัปโหลด </span><span class="si">${</span><span class="nx">fileName</span><span class="si">}</span><span class="sb"> แล้ว`</span><span class="p">);</span>
@@ -3311,32 +3333,27 @@ charts.js ► dom.js, format.js
 </thead>
 <tbody>
 <tr>
-<td>672–673</td>
+<td>679–680</td>
 <td>ส่งครั้งแรก <strong>ไม่</strong> ขอเขียนทับ สำเร็จก็จบ</td>
 </tr>
 <tr>
-<td>675–678</td>
+<td>682–685</td>
 <td>error อื่นที่ไม่ใช่ 409 (เช่น 400 ไม่ใช่ไฟล์ ESP32, 413 ใหญ่เกิน, 503 ไม่ได้ตั้ง <code>FIRMWARE_DIR</code>) แสดงข้อความไทยจาก Backend ตรง ๆ (<code>ApiError</code> เก็บ <code>status</code> ไว้ให้เช็ก)</td>
 </tr>
 <tr>
-<td>679–685</td>
+<td>686–692</td>
 <td>409 = มีไฟล์ชื่อนี้แล้ว ถามยืนยันแบบปุ่มแดง (<code>danger: true</code>)</td>
 </tr>
 <tr>
-<td>686–691</td>
+<td>693–698</td>
 <td>ยืนยันแล้วส่งซ้ำพร้อม <code>replace = true</code></td>
 </tr>
 </tbody>
 </table></div>
 <div class="callout why"><div class="callout-title">ทำไม</div><p>ทำไมไม่ให้เขียนทับเงียบ ๆ? ไฟล์ชื่อเดียวกันคือ "รุ่นเดียวกัน" ถ้าเนื้อในเปลี่ยนโดยไม่รู้ตัว บอร์ดที่อัปเดตไปแล้วกับบอร์ดที่อัปเดตทีหลังจะได้โปรแกรมต่างกันทั้งที่รายงานรุ่นเหมือนกัน การให้เซิร์ฟเวอร์ตอบ 409 ก่อน แล้วให้คนตัดสินใจ ทำให้การเขียนทับเป็นการกระทำที่ตั้งใจเสมอ (Backend ยังเขียนไฟล์ชั่วคราว <code>.part</code> แล้วค่อย <code>rename</code> เพื่อไม่ให้บอร์ดที่กำลังดาวน์โหลดได้ไฟล์ครึ่งเดียว)</p></div>
 
-<p><strong>10.9 สั่งอัปเดตหลายบอร์ด</strong> — ไฟล์ <code>webapp/assets/js/views/firmware.js</code> บรรทัด 579–604 (ต่อจากกล่องยืนยันในบรรทัด 559–577)</p>
-<div class="code-block"><span class="code-lang">js</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">579</span>
-<span class="normal">580</span>
-<span class="normal">581</span>
-<span class="normal">582</span>
-<span class="normal">583</span>
-<span class="normal">584</span>
+<p><strong>10.9 สั่งอัปเดตหลายบอร์ด</strong> — ไฟล์ <code>webapp/assets/js/views/firmware.js</code> บรรทัด 584–611 (ต่อจากกล่องยืนยันในบรรทัด 564–582)</p>
+<div class="code-block"><span class="code-lang">js</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">584</span>
 <span class="normal">585</span>
 <span class="normal">586</span>
 <span class="normal">587</span>
@@ -3356,7 +3373,14 @@ charts.js ► dom.js, format.js
 <span class="normal">601</span>
 <span class="normal">602</span>
 <span class="normal">603</span>
-<span class="normal">604</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="w">  </span><span class="kd">let</span><span class="w"> </span><span class="nx">sent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0</span><span class="p">;</span>
+<span class="normal">604</span>
+<span class="normal">605</span>
+<span class="normal">606</span>
+<span class="normal">607</span>
+<span class="normal">608</span>
+<span class="normal">609</span>
+<span class="normal">610</span>
+<span class="normal">611</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="w">  </span><span class="kd">let</span><span class="w"> </span><span class="nx">sent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0</span><span class="p">;</span>
 <span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">failures</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[];</span>
 <span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">const</span><span class="w"> </span><span class="nx">device</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nx">devices</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
@@ -3368,7 +3392,9 @@ charts.js ► dom.js, format.js
 <span class="w">      </span><span class="nx">pending</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="nx">device</span><span class="p">.</span><span class="nx">deviceId</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="nx">target</span><span class="p">,</span>
 <span class="w">        </span><span class="nx">startedAt</span><span class="o">:</span><span class="w"> </span><span class="nb">Date</span><span class="p">.</span><span class="nx">now</span><span class="p">(),</span>
-<span class="w">        </span><span class="nx">previousError</span><span class="o">:</span><span class="w"> </span><span class="nx">device</span><span class="p">.</span><span class="nx">otaError</span><span class="w"> </span><span class="o">??</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+<span class="w">        </span><span class="c1">// Backend ล้าง otaError ตอนส่งคำสั่ง error ที่ตามมาจึงเป็นของรอบนี้เสมอ</span>
+<span class="w">        </span><span class="c1">// (แม้ข้อความจะซ้ำกับรอบก่อน เช่นดาวน์โหลดไม่ได้ด้วยสาเหตุเดิม)</span>
+<span class="w">        </span><span class="nx">previousError</span><span class="o">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
 <span class="w">      </span><span class="p">});</span>
 <span class="w">      </span><span class="nx">selected</span><span class="p">[</span><span class="nx">meta</span><span class="p">.</span><span class="nx">key</span><span class="p">].</span><span class="ow">delete</span><span class="p">(</span><span class="nx">device</span><span class="p">.</span><span class="nx">deviceId</span><span class="p">);</span>
 <span class="w">      </span><span class="nx">sent</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mf">1</span><span class="p">;</span>
@@ -3394,47 +3420,47 @@ charts.js ► dom.js, format.js
 </thead>
 <tbody>
 <tr>
-<td>579–580</td>
+<td>584–585</td>
 <td>นับที่ส่งสำเร็จ และเก็บข้อความของตัวที่ล้มเหลว</td>
 </tr>
 <tr>
-<td>581</td>
+<td>586</td>
 <td>วน <strong>ทีละบอร์ดตามลำดับ</strong> (<code>for ... of</code> + <code>await</code>) ไม่ยิงพร้อมกันทั้งหมด</td>
 </tr>
 <tr>
-<td>583–587</td>
+<td>588–592</td>
 <td>เซ็นเซอร์เรียก <code>otaOccupancySensor</code> แอร์ (ทั้ง IR และสายแอร์) เรียก <code>otaAirConditioner</code> ทั้งคู่ส่งชื่อไฟล์ล่าสุดของแท็บ</td>
 </tr>
 <tr>
-<td>588–592</td>
-<td>Backend รับแล้ว → จดงานรอ: รุ่นเป้าหมาย เวลาเริ่ม และ <code>otaError</code> ที่มีอยู่ก่อนสั่ง</td>
+<td>593–599</td>
+<td>Backend รับแล้ว → จดงานรอ: รุ่นเป้าหมาย เวลาเริ่ม และ <code>previousError: null</code> (แก้ 15 ต.ค. 2569 เดิมจำ <code>otaError</code> ก่อนสั่ง ตอนนี้ Backend ล้างให้แล้วตอนรับคำสั่ง)</td>
 </tr>
 <tr>
-<td>593</td>
+<td>600</td>
 <td>เอาบอร์ดนี้ออกจากที่เลือก แถบหลายบอร์ดจะหดลงตามจริง</td>
 </tr>
 <tr>
-<td>595–597</td>
+<td>602–604</td>
 <td>บอร์ดไหนล้มเหลว (เช่น 409 เพิ่งออฟไลน์) เก็บข้อความไว้ แต่ <strong>วนต่อ</strong> บอร์ดอื่นยังได้คำสั่ง</td>
 </tr>
 <tr>
-<td>599–602</td>
+<td>606–609</td>
 <td>สรุปเป็น toast เดียวสำหรับที่สำเร็จ และ toast แยกต่อบอร์ดที่ล้มเหลว</td>
 </tr>
 <tr>
-<td>603</td>
+<td>610</td>
 <td>วาดใหม่ ป้าย "กำลังอัปเดต" ขึ้นทันที</td>
 </tr>
 </tbody>
 </table></div>
-<div class="callout why"><div class="callout-title">ทำไม</div><p>ทำไมส่งทีละบอร์ด ไม่ใช้ <code>Promise.all</code>? ทุกบอร์ดดาวน์โหลดไฟล์ ~1–2 MB จากเซิร์ฟเวอร์เดียวกันผ่าน Wi-Fi ของอาคาร การส่งตามลำดับทำให้คำสั่งไปถึงบอร์ดห่างกันเล็กน้อย และทำให้รู้ผลรายบอร์ดชัดเจน ถ้าใช้ <code>Promise.all</code> ตัวเดียวพังจะทำให้ทั้งชุด reject ต้องใช้ <code>Promise.allSettled</code> แทน ส่วนกล่องยืนยัน (บรรทัด 566–576) เตือนว่า "ระหว่างนั้นสั่งงานบอร์ดจากแอปไม่ได้ … แนะนำให้อัปเดตนอกเวลาเรียน" เพราะบอร์ดแอร์ที่รีบูตจะสั่งเปิด-ปิดแอร์ไม่ได้ 1–2 นาที</p></div>
+<div class="callout why"><div class="callout-title">ทำไม</div><p>ทำไมส่งทีละบอร์ด ไม่ใช้ <code>Promise.all</code>? ทุกบอร์ดดาวน์โหลดไฟล์ ~1–2 MB จากเซิร์ฟเวอร์เดียวกันผ่าน Wi-Fi ของอาคาร การส่งตามลำดับทำให้คำสั่งไปถึงบอร์ดห่างกันเล็กน้อย และทำให้รู้ผลรายบอร์ดชัดเจน ถ้าใช้ <code>Promise.all</code> ตัวเดียวพังจะทำให้ทั้งชุด reject ต้องใช้ <code>Promise.allSettled</code> แทน ส่วนกล่องยืนยัน (บรรทัด 571–581) เตือนว่า "ระหว่างนั้นสั่งงานบอร์ดจากแอปไม่ได้ … แนะนำให้อัปเดตนอกเวลาเรียน" เพราะบอร์ดแอร์ที่รีบูตจะสั่งเปิด-ปิดแอร์ไม่ได้ 1–2 นาที</p></div>
 
-<p><strong>10.10 ช่องติ๊กที่เลือกได้เฉพาะบอร์ดที่ยังเก่า</strong> — ไฟล์ <code>webapp/assets/js/views/firmware.js</code> บรรทัด 379–383</p>
-<div class="code-block"><span class="code-lang">js</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">379</span>
-<span class="normal">380</span>
-<span class="normal">381</span>
-<span class="normal">382</span>
-<span class="normal">383</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="w">  </span><span class="c1">// บอร์ดที่เลือกไว้แต่ไม่ต้องอัปเดตแล้ว (เช่นเพิ่งอัปเดตเสร็จ) เอาออกจากที่เลือก</span>
+<p><strong>10.10 ช่องติ๊กที่เลือกได้เฉพาะบอร์ดที่ยังเก่า</strong> — ไฟล์ <code>webapp/assets/js/views/firmware.js</code> บรรทัด 384–388</p>
+<div class="code-block"><span class="code-lang">js</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">384</span>
+<span class="normal">385</span>
+<span class="normal">386</span>
+<span class="normal">387</span>
+<span class="normal">388</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="w">  </span><span class="c1">// บอร์ดที่เลือกไว้แต่ไม่ต้องอัปเดตแล้ว (เช่นเพิ่งอัปเดตเสร็จ) เอาออกจากที่เลือก</span>
 <span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">device</span><span class="p">,</span><span class="w"> </span><span class="nx">status</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nx">rows</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">status</span><span class="p">.</span><span class="nx">code</span><span class="w"> </span><span class="o">!==</span><span class="w"> </span><span class="s1">'outdated'</span><span class="p">)</span><span class="w"> </span><span class="nx">chosen</span><span class="p">.</span><span class="ow">delete</span><span class="p">(</span><span class="nx">device</span><span class="p">.</span><span class="nx">deviceId</span><span class="p">);</span>
 <span class="w">  </span><span class="p">}</span>
@@ -3451,12 +3477,12 @@ charts.js ► dom.js, format.js
 </thead>
 <tbody>
 <tr>
-<td>380–382</td>
+<td>385–387</td>
 <td>ทุกครั้งที่วาดตาราง เอาบอร์ดที่ไม่ใช่ <code>outdated</code> ออกจาก <code>selected</code> (เช่น อัปเดตเสร็จแล้ว หรือเพิ่งออฟไลน์) จำนวนบนแถบหลายบอร์ดจึงไม่นับบอร์ดที่สั่งไม่ได้</td>
 </tr>
 <tr>
-<td>383</td>
-<td><code>outdated</code> ใช้กับปุ่ม "เลือกทุกตัวที่ยังเก่า (N)" และช่องติ๊กบนหัวตาราง (บรรทัด 407–426) ที่ติ๊กหรือเอาออกทั้งกลุ่ม</td>
+<td>388</td>
+<td><code>outdated</code> ใช้กับปุ่ม "เลือกทุกตัวที่ยังเก่า (N)" และช่องติ๊กบนหัวตาราง (บรรทัด 412–431) ที่ติ๊กหรือเอาออกทั้งกลุ่ม</td>
 </tr>
 </tbody>
 </table></div>
@@ -3733,7 +3759,7 @@ charts.js ► dom.js, format.js
 <p><strong>7. Promise-based dialog</strong> — <code>openModal</code>/<code>openForm</code>/<code>confirmAction</code> คืน Promise ผู้เรียกเขียน <code>const ok = await confirmAction({...}); if (!ok) return;</code> อ่านเหมือนโค้ดลำดับตรง ๆ แทนที่จะซ้อน callback</p>
 <p><strong>8. ป้องกันการกดซ้ำ</strong> — <code>withBusy</code> และ <code>button.disabled = true</code> ใน <code>finally</code> (เช่น <code>rooms.js</code> <code>sendCommand</code>) กันกดรัวจนยิงคำสั่ง MQTT ซ้ำ ซึ่งแอร์บางรุ่นตีความเป็นการสลับเปิด-ปิด</p>
 <p><strong>9. ให้เซิร์ฟเวอร์เป็นผู้ตัดสิน เบราว์เซอร์แค่แสดงผล</strong> — ภาคเรียนเปิด/ปิด (<code>status</code>), "วันนี้" (<code>state.today</code> ตามเวลาไทย), กติกาปิดแอร์อัตโนมัติ, สิทธิ์แอดมิน ทั้งหมดตัดสินที่ Backend เว็บแค่แสดง เพราะเวลาและนาฬิกาของเครื่องผู้ใช้เชื่อไม่ได้ และปุ่มที่ซ่อนก็แก้ใน DevTools ได้</p>
-<p><strong>10. Defensive coding รับมือไฟล์รุ่นเก่าค้างแคช</strong> — เพราะ <code>/assets</code> ถูกแคช 1 ชั่วโมง ผู้ใช้อาจได้ไฟล์ใหม่ปนไฟล์เก่า โค้ดจึง: (ก) ใส่ export ใหม่ในไฟล์ใหม่ ไม่ใส่ในไฟล์เดิม (<code>theme.js</code>, <code>prefs.js</code>, <code>icons-ui.js</code> ที่เกิดจากเหตุผลนี้) (ข) เช็ก <code>typeof api.academicTerms !== 'function'</code> หรือ <code>api.schedulesWithInfo ?? ...</code> ก่อนเรียก (<code>store.js</code> บรรทัด 199–200, 211, 222) (ค) สร้างแถบเมนูล่างจาก JS ไม่เขียนใน <code>index.html</code> เพื่อไม่ให้ไฟล์เก่าทิ้งแถบว่างไว้ (ง) แยก <code>undefined</code> (Backend เก่า) กับ <code>null</code> (ไม่มีข้อมูล)</p>
+<p><strong>10. Defensive coding รับมือไฟล์รุ่นเก่าค้างแคช</strong> — เพราะ <code>/assets</code> เคยถูกแคช 1 ชั่วโมงทั้งหมด (ตั้งแต่ 15 ต.ค. 2569 ไฟล์ JS เป็น <code>no-cache</code> แล้ว แต่ผู้ใช้ที่เปิดหน้าค้างไว้ก่อน deploy ก็ยังมีโมดูลเก่าในหน่วยความจำ) ผู้ใช้อาจได้ไฟล์ใหม่ปนไฟล์เก่า โค้ดจึง: (ก) ใส่ export ใหม่ในไฟล์ใหม่ ไม่ใส่ในไฟล์เดิม (<code>theme.js</code>, <code>prefs.js</code>, <code>icons-ui.js</code> ที่เกิดจากเหตุผลนี้) (ข) เช็ก <code>typeof api.academicTerms !== 'function'</code> หรือ <code>api.schedulesWithInfo ?? ...</code> ก่อนเรียก (<code>store.js</code> บรรทัด 199–200, 211, 222) (ค) สร้างแถบเมนูล่างจาก JS ไม่เขียนใน <code>index.html</code> เพื่อไม่ให้ไฟล์เก่าทิ้งแถบว่างไว้ (ง) แยก <code>undefined</code> (Backend เก่า) กับ <code>null</code> (ไม่มีข้อมูล)</p>
 <p><strong>11. Defense in depth</strong> — XSS ป้องกันหลายชั้น: <code>textContent</code> + CSP <code>script-src 'self'</code> + (หากโค้ดชั้นแรกพลาด) <code>connect-src 'self'</code> ไม่ให้ส่งข้อมูลออกไปเว็บอื่น + token ใน localStorage ที่ Backend ตรวจสิทธิ์ซ้ำทุกคำขอ</p>
 <p><strong>12. Design tokens</strong> — ทุกสีและขนาดมาจาก <code>tokens.css</code> ห้ามเขียนสี/px ตรง ๆ ในไฟล์อื่น เปลี่ยนธีมที่เดียว</p>
 <p><strong>13. ฟังก์ชันจัดรูปแบบล้วน (pure function)</strong> — <code>format.js</code> รับค่า คืนข้อความ ไม่แตะ DOM/state ทดสอบง่ายและเหมือนกับ <code>number_format.dart</code> ของแอปมือถือ</p>
@@ -3816,22 +3842,27 @@ charts.js ► dom.js, format.js
 </tr>
 <tr>
 <td><code>handle { root * /srv/www ... file_server }</code></td>
-<td>41–55</td>
+<td>41–63</td>
 <td><strong>ที่เหลือทั้งหมด</strong> เสิร์ฟจากโฟลเดอร์เว็บ</td>
 </tr>
 <tr>
-<td><code>@assets path /assets/*</code> + <code>header @assets Cache-Control "public, max-age=3600"</code></td>
-<td>46–47</td>
-<td>ไฟล์ CSS/JS/รูปใน <code>/assets/</code> แคชได้ <strong>1 ชั่วโมง</strong></td>
+<td><code>@scripts path /assets/js/*</code> + <code>header @scripts Cache-Control "no-cache"</code></td>
+<td>47–48</td>
+<td>ไฟล์ JavaScript ต้อง<strong>ถามเซิร์ฟเวอร์ทุกครั้ง</strong> (เพิ่ม 15 ต.ค. 2569)</td>
+</tr>
+<tr>
+<td><code>@assets { path /assets/*; not path /assets/js/* }</code> + <code>Cache-Control "public, max-age=3600"</code></td>
+<td>51–55</td>
+<td>CSS/รูป/ฟอนต์ใน <code>/assets/</code> (ยกเว้น JS) แคชได้ <strong>1 ชั่วโมง</strong></td>
 </tr>
 <tr>
 <td><code>@html path / /index.html /status.html</code> + <code>Cache-Control "no-cache"</code></td>
-<td>51–52</td>
+<td>59–60</td>
 <td>หน้า HTML ต้อง<strong>ตรวจกับเซิร์ฟเวอร์ทุกครั้ง</strong> (<code>no-cache</code> ไม่ได้แปลว่าห้ามเก็บ แปลว่าต้อง revalidate ก่อนใช้ ถ้าไฟล์ไม่เปลี่ยนเซิร์ฟเวอร์ตอบ 304 สั้น ๆ)</td>
 </tr>
 </tbody>
 </table></div>
-<p>ผลต่อการ deploy: หลัง <code>deploy-web.ps1</code> ผู้ใช้ได้ <code>index.html</code> ใหม่ทันที (ไม่แคช) ซึ่งมี <code>?v=</code> ใหม่ → CSS 4 ไฟล์และ <code>main.js</code> ถูกโหลดใหม่ แต่ <strong>โมดูลที่ <code>main.js</code> import ต่อ</strong> (<code>app.js</code>, <code>store.js</code>, <code>views/*.js</code> ...) URL ไม่มี <code>?v=</code> จึงอาจถูกใช้จากแคชได้นานสูงสุด 1 ชั่วโมง นี่คือที่มาของมาตรการกันไฟล์เก่า-ใหม่ปนกัน (หลักการข้อ 10) ถ้ายังเห็นของเก่า กด Ctrl+F5 หนึ่งครั้ง</p>
+<p>ผลต่อการ deploy: หลัง <code>deploy-web.ps1</code> ผู้ใช้ได้ <code>index.html</code> ใหม่ทันที (ไม่แคช) ซึ่งมี <code>?v=</code> ใหม่ → CSS 4 ไฟล์และ <code>main.js</code> ถูกโหลดใหม่ ส่วน <strong>โมดูลที่ <code>main.js</code> import ต่อ</strong> (<code>app.js</code>, <code>store.js</code>, <code>views/*.js</code> ...) URL ไม่มี <code>?v=</code> เดิมจึงอาจถูกใช้จากแคชได้นานสูงสุด 1 ชั่วโมง (นี่คือที่มาของมาตรการกันไฟล์เก่า-ใหม่ปนกัน หลักการข้อ 10) ตั้งแต่ 15 ต.ค. 2569 Caddy ตั้ง <code>no-cache</code> ให้ <code>/assets/js/*</code> เบราว์เซอร์จึงถามเซิร์ฟเวอร์ทุกครั้งและได้ไฟล์ใหม่ทันทีหลัง deploy (ไฟล์ไม่เปลี่ยนได้ 304 กลับมาเร็ว) การเปลี่ยน Caddyfile ต้องอัปเดตเซิร์ฟเวอร์ด้วย <code>update-server.ps1</code> (<code>deploy-web.ps1</code> อัปโหลดแค่ไฟล์เว็บ)</p>
 <p><strong>หัวความปลอดภัยแต่ละตัว</strong> (จากบรรทัด 21–26)</p>
 <div class="table-wrap"><table>
 <thead>
@@ -3935,7 +3966,7 @@ charts.js ► dom.js, format.js
 <p><strong>ตอบ:</strong> ไม่เกิดอะไร ชื่อวิชาจะแสดงเป็นตัวอักษร <code>&lt;script&gt;alert(1)&lt;/script&gt;</code> ตรง ๆ เพราะ <code>el('div', { text: item.subjectName })</code> ใช้ <code>textContent</code> ซึ่งเบราว์เซอร์ไม่ตีความเป็น HTML ต่อให้โค้ดชั้นนั้นพลาด CSP ก็บล็อกสคริปต์ที่ไม่ได้มาจากไฟล์บนโดเมนเราอยู่ดี</p></div>
 
 <div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> deploy เว็บใหม่แล้วทำไมบางคนยังเห็นหน้าเก่า และคุณรับมืออย่างไร</p>
-<p><strong>ตอบ:</strong> Caddy ให้เบราว์เซอร์แคชไฟล์ใน <code>/assets/</code> ได้ 1 ชั่วโมง (<code>max-age=3600</code>) เพื่อความเร็ว แต่ <code>index.html</code> ตั้ง <code>no-cache</code> จึงได้เลขเวอร์ชัน <code>?v=</code> ใหม่เสมอ ซึ่งบังคับโหลด CSS 4 ไฟล์และ <code>main.js</code> ใหม่ แต่โมดูลที่ถูก import ต่อไม่มี <code>?v=</code> จึงอาจค้างในแคชได้ถึง 1 ชั่วโมง เราจึงออกแบบให้ทนไฟล์เก่า-ใหม่ปน: ไม่เพิ่ม export ใหม่ในไฟล์เดิม (สร้างไฟล์ใหม่ เช่น <code>theme.js</code> <code>icons-ui.js</code>), เช็ก <code>typeof api.xxx === 'function'</code> ก่อนเรียก, และถ้ายังเห็นของเก่าให้กด Ctrl+F5 หนึ่งครั้ง</p></div>
+<p><strong>ตอบ:</strong> เดิม Caddy ให้เบราว์เซอร์แคชทุกไฟล์ใน <code>/assets/</code> ได้ 1 ชั่วโมง <code>index.html</code> ตั้ง <code>no-cache</code> จึงได้เลข <code>?v=</code> ใหม่เสมอ ซึ่งบังคับโหลด CSS และ <code>main.js</code> ใหม่ แต่โมดูลที่ถูก import ต่อไม่มี <code>?v=</code> จึงค้างในแคชได้ถึง 1 ชั่วโมง ตอนนี้ (15 ต.ค. 2569) แก้ที่ต้นเหตุแล้ว: ไฟล์ JS ใน <code>/assets/js/</code> ตั้ง <code>no-cache</code> ให้เบราว์เซอร์ถามเซิร์ฟเวอร์ทุกครั้ง ส่วน CSS/รูปยังแคช 1 ชั่วโมงเพราะมี <code>?v=</code> และโค้ดยังออกแบบให้ทนไฟล์เก่า-ใหม่ปนไว้อีกชั้น: ไม่เพิ่ม export ใหม่ในไฟล์เดิม (สร้างไฟล์ใหม่ เช่น <code>theme.js</code> <code>icons-ui.js</code>), เช็ก <code>typeof api.xxx === 'function'</code> ก่อนเรียก, และถ้ายังเห็นของเก่าให้กด Ctrl+F5 หนึ่งครั้ง</p></div>
 
 <div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม:</strong> นาฬิกานับถอยหลังปิดแอร์เดินในเบราว์เซอร์ ถ้านาฬิกาเครื่องผู้ใช้เพี้ยนจะเป็นอย่างไร ใครเป็นคนสั่งปิดจริง</p>
 <p><strong>ตอบ:</strong> เซิร์ฟเวอร์ส่งเวลาเส้นตาย <code>autoOffDeadlineAt</code> มา เบราว์เซอร์เอามาลบกับ <code>Date.now()</code> ของเครื่องแล้วนับถอยหลังเอง (<code>rooms.js</code> <code>countdownStrip</code>) ไม่ถามเซิร์ฟเวอร์ทุกวินาทีเพราะเส้นตายเป็นค่าคงที่ ถ้านาฬิกาเครื่องผู้ใช้เพี้ยน ตัวเลขบนจอก็เพี้ยนตาม แต่เป็นแค่การแสดงผล คนที่ตัดสินใจและสั่งปิดจริงคือ Backend (ระบบปิดอัตโนมัติ) ตามเวลาของเซิร์ฟเวอร์ และถ้าเลยเส้นตายแล้วหน้าจอจะเปลี่ยนเป็น "กำลังส่งคำสั่งปิด" แทนค้างที่ 00:00</p></div>
@@ -3970,7 +4001,7 @@ charts.js ► dom.js, format.js
 <li class="check"><input type="checkbox"> บอกได้ว่าหน้าไหนเป็นแอดมินเท่านั้น (<code>devices</code>, <code>firmware</code>, <code>users</code>) และส่วนไหนในหน้าอื่นที่เฉพาะแอดมิน (นำเข้า/ล้างตาราง, แก้อัตราค่าไฟ, สวิตช์รวมปิดอัตโนมัติ, ปุ่มบางอันในรีโมต)</li>
 <li class="check"><input type="checkbox"> อธิบายทำไมต้องมีทั้ง Flutter กับเว็บ</li>
 <li class="check"><input type="checkbox"> อธิบายขั้นตอน <code>deploy-web.ps1</code> และทำไมต้อง "คัดลอกเข้า" <code>www</code> เดิมแทน <code>mv</code></li>
-<li class="check"><input type="checkbox"> อธิบายแคช: <code>/assets/*</code> 1 ชั่วโมง, <code>index.html</code> <code>no-cache</code>, <code>?v=</code> และผลข้างเคียงที่ต้องออกแบบรับมือ</li>
+<li class="check"><input type="checkbox"> อธิบายแคช: <code>/assets/js/*</code> <code>no-cache</code> (15 ต.ค.), <code>/assets/*</code> อื่น 1 ชั่วโมง, <code>index.html</code> <code>no-cache</code>, <code>?v=</code> และผลข้างเคียงที่ต้องออกแบบรับมือ</li>
 <li class="check"><input type="checkbox"> อธิบายว่าทำไมการซ่อนปุ่มตามสิทธิ์ไม่ใช่ความปลอดภัยจริง</li>
 <li class="check"><input type="checkbox"> (เพิ่ม 14 ต.ค. 2569) อธิบายหน้าเฟิร์มแวร์ได้: 3 แท็บตามชนิดบอร์ด, ชนิด/รุ่นอ่านจากชื่อไฟล์, อัปโหลดเป็นไฟล์ดิบ + <code>X-File-Name</code> + <code>?kind</code> + <code>?replace=1</code>, สถานะบอร์ด 6 แบบจาก <code>statusOf</code>, และการติดตามผลด้วย <code>pending</code> + <code>settlePending</code> + 5 นาที</li>
 <li class="check"><input type="checkbox"> (เพิ่ม 14 ต.ค. 2569) บอกลำดับสถานะใน <code>statusOf</code> (updating → notready → offline → nofile → uptodate/outdated) และอธิบายได้ว่าทำไม <code>compareVersions</code> ต้องเทียบเป็นตัวเลข และทำไมต้องถามรุ่นเมื่อชื่อไฟล์จาก Arduino IDE ไม่มีรุ่น</li>

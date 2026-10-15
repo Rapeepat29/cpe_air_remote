@@ -96,8 +96,8 @@
 
 | เส้นทาง | ใช้ TLS อย่างไร | ที่ตั้งค่า |
 |---|---|---|
-| เว็บ/มือถือ → Caddy (โดเมนหลัก) | HTTPS ใบรับรอง Let's Encrypt ที่ Caddy ขอและต่ออายุให้เอง | `deploy/Caddyfile` บรรทัด 58–79 |
-| เว็บ/มือถือ → Funnel | HTTPS ใบรับรองของ Tailscale (`*.ts.net`) ถอด TLS ที่ container tailscale แล้วส่ง HTTP ต่อใน docker network | `tailscale-serve.json`, `Caddyfile` บรรทัด 82–85 |
+| เว็บ/มือถือ → Caddy (โดเมนหลัก) | HTTPS ใบรับรอง Let's Encrypt ที่ Caddy ขอและต่ออายุให้เอง | `deploy/Caddyfile` บรรทัด 66–87 |
+| เว็บ/มือถือ → Funnel | HTTPS ใบรับรองของ Tailscale (`*.ts.net`) ถอด TLS ที่ container tailscale แล้วส่ง HTTP ต่อใน docker network | `tailscale-serve.json`, `Caddyfile` บรรทัด 90–93 |
 | ESP32 → Funnel 8443 → Mosquitto (ค่าเริ่มต้น) | MQTTS: บอร์ดต่อชื่อ ts.net พอร์ต 8443 ตรวจใบ ts.net (Let's Encrypt) กับ root CA ในเฟิร์มแวร์ กล่อง tailscale ถอด TLS (`TerminateTLS`) แล้วส่ง MQTT ดิบต่อไป `mqtt:1883` ในเครือข่าย docker | `tailscale-serve.json` บรรทัด 4–7, `docker-compose.yml` บรรทัด 113 |
 | ESP32 → Mosquitto (ต่อตรง) | MQTTS พอร์ต 8883, `tls_version tlsv1.2` ขึ้นไป (ใช้เมื่อตั้ง `MQTT_DEVICE_URL` เป็นพอร์ต 8883) | `deploy/mosquitto/config/mosquitto.conf` บรรทัด 23–27 |
 | ESP32 → ดาวน์โหลดเฟิร์มแวร์ | HTTPS ตรวจใบรับรองกับ root CA ในเฟิร์มแวร์ | `firmware/*/ota_update.h`, `letsencrypt_ca.h` |
@@ -106,9 +106,9 @@
 
 **ใบรับรองด้วย DuckDNS แบบ DNS-01:** ปกติ Let's Encrypt พิสูจน์ว่าคุณเป็นเจ้าของโดเมนด้วยการเข้ามาที่พอร์ต 80 ของเซิร์ฟเวอร์ (HTTP-01) แต่เซิร์ฟเวอร์นี้อยู่หลังเครือข่ายมหาวิทยาลัย Let's Encrypt เข้ามาไม่ได้ จึงใช้ **DNS-01** คือ Caddy เขียน TXT record ชื่อ `_acme-challenge` ผ่าน API ของ DuckDNS (ใช้ `DUCKDNS_TOKEN`) แล้ว Let's Encrypt ตรวจจาก DNS แทน
 
-**ไฟล์ `deploy/Caddyfile` บรรทัด 63–69**
+**ไฟล์ `deploy/Caddyfile` บรรทัด 71–77**
 
-```text:63
+```text:71
 	tls {
 		dns duckdns {env.DUCKDNS_TOKEN}
 		# DNS ของมหาวิทยาลัยตอบ SERVFAIL ตอนหา zone ของ _acme-challenge จึงถาม DNS สาธารณะแทน

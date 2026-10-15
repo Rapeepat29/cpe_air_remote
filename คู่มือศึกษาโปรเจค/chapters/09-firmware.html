@@ -92,12 +92,12 @@
 <tr>
 <td>บอร์ดตรวจจับคน</td>
 <td><code>rmutt_esp32_occupancy/rmutt_esp32_occupancy.ino</code></td>
-<td><strong>1.3.2</strong></td>
-<td>หนึ่งบอร์ดต่อห้องหนึ่งห้อง: อ่านเรดาร์ HLK-LD2410 แล้วตัดสินว่า "มีคน/ไม่มีคน"</td>
+<td><strong>1.3.3</strong></td>
+<td>หนึ่งบอร์ดต่อห้องหนึ่งห้อง: อ่านเรดาร์ HLK-LD2410 แล้วตัดสินว่า "มีคน/ไม่มีคน" มีไฟ LED เขียว/แดงบอกสถานะ</td>
 </tr>
 </tbody>
 </table></div>
-<p>ประวัติเวอร์ชันล่าสุด: บอร์ด IR 2.4.1 → <strong>2.5.0</strong> (11 ต.ค. 2569 เพิ่มจอ OLED และ <code>controlType:"ir"</code> ใน BLE) → <strong>2.5.1</strong> (13 ต.ค. 2569 เพิ่มคำสั่ง <code>unprovision</code>), บอร์ดสายแอร์ 2.5.1-slm8 (11 ต.ค.) → <strong>2.5.2-slm8</strong> (13 ต.ค. เพิ่ม <code>unprovision</code>), บอร์ดตรวจจับคน 1.3.1 → <strong>1.3.2</strong> (13 ต.ค. เพิ่ม <code>unprovision</code>)</p>
+<p>ประวัติเวอร์ชันล่าสุด: บอร์ด IR 2.4.1 → <strong>2.5.0</strong> (11 ต.ค. 2569 เพิ่มจอ OLED และ <code>controlType:"ir"</code> ใน BLE) → <strong>2.5.1</strong> (13 ต.ค. 2569 เพิ่มคำสั่ง <code>unprovision</code>), บอร์ดสายแอร์ 2.5.1-slm8 (11 ต.ค.) → <strong>2.5.2-slm8</strong> (13 ต.ค. เพิ่ม <code>unprovision</code>), บอร์ดตรวจจับคน 1.3.1 → 1.3.2 (13 ต.ค. เพิ่ม <code>unprovision</code>) → <strong>1.3.3</strong> (15 ต.ค. 2569 เพิ่ม LED เขียว/แดง และลดเกณฑ์มีคนจาก 25 เป็น 15) และบอร์ดสายแอร์ย้ายขา PZEM/LED เหลือง (15 ต.ค. 2569 commit "update pin") โดยไม่ได้ขึ้นเลขรุ่น</p>
 <p>นอกจากนี้มีสเก็ตช์เครื่องมือเล็ก ๆ อีกสองตัว (<code>reset/reset.ino</code> ล้างค่าที่จำไว้ และ <code>ld2410_pinscan/ld2410_pinscan.ino</code> หาขาที่เรดาร์ส่งข้อมูลมา) กับโค้ดทดสอบ <code>tests/history_log_test.cpp</code> ที่รันบนคอมพิวเตอร์ได้โดยไม่ต้องมีบอร์ด</p>
 <p>ในภาพรวมของระบบ บอร์ดเหล่านี้เป็น "มือและตา" ของระบบ: บอร์ดแอร์ (ทั้งรุ่น IR และรุ่นสายแอร์) เป็นมือ (สั่งแอร์) และตาที่เห็นไฟฟ้า (วัดกำลังไฟ) ส่วนบอร์ดตรวจจับคนเป็นตาที่เห็นว่าห้องมีคนหรือไม่ ทุกตัวคุยกับ Backend ผ่าน MQTT broker (Mosquitto) เท่านั้น ไม่ได้คุยกับ Backend ตรง ๆ และไม่มี HTTP server ในบอร์ด ส่วน BLE (Bluetooth Low Energy) ใช้เฉพาะตอน "ตั้งค่าครั้งแรกหรือตั้งค่าใหม่" จากแอป Flutter</p>
 <div class="code-block"><div class="hl"><pre><span></span><code> แอป Flutter ──BLE (ตั้งค่า Wi-Fi/MQTT ครั้งแรก)──┐
@@ -113,7 +113,7 @@
 
 <div class="callout note"><div class="callout-title">หมายเหตุ</div><p>หัวข้อ MQTT (topic), รูปแบบ JSON และตาราง BLE characteristic แบบเต็มอยู่ใน <strong>บทโปรโตคอลสื่อสาร</strong> บทนี้อธิบายเฉพาะ "ฝั่งเฟิร์มแวร์ทำอะไรกับมัน" และอ้างค่าที่เห็นในโค้ดจริงเท่านั้น</p></div>
 
-<div class="callout warn"><div class="callout-title">ระวัง</div><p>(อัปเดต 14 ต.ค. 2569) เอกสารในโปรเจกต์ปรับเลขรุ่นให้ตรงโค้ดแล้ว: <code>firmware/README.md</code>, <code>docs/study/04-esp32-firmware.md</code> และหมายเหตุบนสุดของ <code>README_OLED_TH.md</code> / <code>README_WIRED_TH.md</code> เขียน <strong>2.5.1</strong> (บอร์ด IR), <strong>2.5.2-slm8</strong> (บอร์ดสายแอร์) และ <strong>1.3.2</strong> (บอร์ดตรวจคน) และ <code>docs/study/04</code> บอกแล้วว่า <code>ld2410_probe/</code> ไม่มีในโฟลเดอร์ (เหลือ <code>ld2410_pinscan/</code>) ส่วนหัวเรื่องของ <code>README_OLED_TH.md</code> ยังเป็น "2.5.0" เพราะเป็นบันทึกของรุ่นที่เพิ่มจอ ถ้าเลขรุ่นในเอกสารใดไม่ตรง ให้เชื่อค่า <code>FIRMWARE_VERSION</code> ในไฟล์ <code>.ino</code></p></div>
+<div class="callout warn"><div class="callout-title">ระวัง</div><p>(อัปเดต 14 ต.ค. 2569) เอกสารในโปรเจกต์ปรับเลขรุ่นให้ตรงโค้ดแล้ว: <code>firmware/README.md</code>, <code>docs/study/04-esp32-firmware.md</code> และหมายเหตุบนสุดของ <code>README_OLED_TH.md</code> / <code>README_WIRED_TH.md</code> เขียน <strong>2.5.1</strong> (บอร์ด IR), <strong>2.5.2-slm8</strong> (บอร์ดสายแอร์) และ <strong>1.3.2</strong> (บอร์ดตรวจคน ตอนนี้โค้ดเป็น 1.3.3 แล้ว เอกสารเหล่านี้ยังไม่ได้แก้) และ <code>docs/study/04</code> บอกแล้วว่า <code>ld2410_probe/</code> ไม่มีในโฟลเดอร์ (เหลือ <code>ld2410_pinscan/</code>) ส่วนหัวเรื่องของ <code>README_OLED_TH.md</code> ยังเป็น "2.5.0" เพราะเป็นบันทึกของรุ่นที่เพิ่มจอ ถ้าเลขรุ่นในเอกสารใดไม่ตรง ให้เชื่อค่า <code>FIRMWARE_VERSION</code> ในไฟล์ <code>.ino</code></p></div>
 
 <h2 id="ความรู้ที่ต้องมีก่อนอ่านบทนี้">ความรู้ที่ต้องมีก่อนอ่านบทนี้<a class="anchor" href="#ความรู้ที่ต้องมีก่อนอ่านบทนี้">#</a></h2>
 <h3 id="ไมโครคอนโทรลเลอร์-mcu-ต่างจากคอมพิวเตอร์อย่างไร">ไมโครคอนโทรลเลอร์ (MCU) ต่างจากคอมพิวเตอร์อย่างไร<a class="anchor" href="#ไมโครคอนโทรลเลอร์-mcu-ต่างจากคอมพิวเตอร์อย่างไร">#</a></h3>
@@ -228,8 +228,8 @@
 │   │   letsencrypt_ca.h, partitions.csv
 │   └── README_WIRED_TH.md             # วงจร ต่อสาย ตารางความต่างกับรุ่น IR
 ├── rmutt_esp32_occupancy/             # บอร์ดตรวจจับคน
-│   ├── rmutt_esp32_occupancy.ino      # โปรแกรมหลัก 1,117 บรรทัด (1.3.2)
-│   ├── ota_update.h                   # เหมือนของบอร์ดแอร์ทุกไบต์
+│   ├── rmutt_esp32_occupancy.ino      # โปรแกรมหลัก 1,162 บรรทัด (1.3.3)
+│   ├── ota_update.h                   # เหมือนของบอร์ดแอร์ (ต่างแค่ช่องว่างท้ายบรรทัด 22)
 │   ├── letsencrypt_ca.h               # เหมือนของบอร์ดแอร์ทุกไบต์
 │   └── partitions.csv                 # ตารางพาร์ติชัน (มี coredump แทน rmuttlog)
 ├── ld2410_pinscan/ld2410_pinscan.ino  # เครื่องมือหาขาที่เรดาร์ส่งข้อมูลมา
@@ -318,7 +318,7 @@
 </tr>
 </tbody>
 </table></div>
-<h3 id="บอร์ดแอร์สายแอร์-บรรทัด-4660-ของ-rmutt_esp32_air_wiredino-เพิ่ม-11-ตค-2569">บอร์ดแอร์สายแอร์ (บรรทัด 46–60 ของ <code>rmutt_esp32_air_wired.ino</code>, เพิ่ม 11 ต.ค. 2569)<a class="anchor" href="#บอร์ดแอร์สายแอร์-บรรทัด-4660-ของ-rmutt_esp32_air_wiredino-เพิ่ม-11-ตค-2569">#</a></h3>
+<h3 id="บอร์ดแอร์สายแอร์-บรรทัด-4660-ของ-rmutt_esp32_air_wiredino-เพิ่ม-11-ตค-2569-ย้ายขา-15-ตค-2569">บอร์ดแอร์สายแอร์ (บรรทัด 46–60 ของ <code>rmutt_esp32_air_wired.ino</code>, เพิ่ม 11 ต.ค. 2569, ย้ายขา 15 ต.ค. 2569)<a class="anchor" href="#บอร์ดแอร์สายแอร์-บรรทัด-4660-ของ-rmutt_esp32_air_wiredino-เพิ่ม-11-ตค-2569-ย้ายขา-15-ตค-2569">#</a></h3>
 <div class="table-wrap"><table>
 <thead>
 <tr>
@@ -366,18 +366,25 @@
 <td>เหมือนบอร์ด IR</td>
 </tr>
 <tr>
-<td>16 / 18</td>
-<td><code>PZEM_RX_PIN</code> / <code>PZEM_TX_PIN</code></td>
-<td>UART</td>
-<td>PZEM</td>
-<td>เหมือนบอร์ด IR</td>
+<td>18</td>
+<td><code>PZEM_RX_PIN</code></td>
+<td>เข้า (RX ของ Serial2)</td>
+<td><strong>TX ของ PZEM</strong></td>
+<td><strong>ต่างจากบอร์ด IR</strong> (เดิม 16, ย้าย 15 ต.ค. 2569)</td>
 </tr>
 <tr>
-<td>25 / 26 / 27</td>
+<td>14</td>
+<td><code>PZEM_TX_PIN</code></td>
+<td>ออก (TX ของ Serial2)</td>
+<td><strong>RX ของ PZEM</strong></td>
+<td><strong>ต่างจากบอร์ด IR</strong> (เดิม 18, ย้าย 15 ต.ค. 2569)</td>
+</tr>
+<tr>
+<td>25 / 26 / 23</td>
 <td>LED เขียว / แดง / เหลือง</td>
 <td>ออก</td>
 <td>LED</td>
-<td>เหมือนบอร์ด IR</td>
+<td>เขียว/แดงเหมือนบอร์ด IR ส่วนเหลืองย้ายจาก 27 เป็น <strong>23</strong> (15 ต.ค. 2569)</td>
 </tr>
 <tr>
 <td>0</td>
@@ -395,10 +402,12 @@
 </tr>
 </tbody>
 </table></div>
+<div class="callout warn"><div class="callout-title">ระวัง</div><p><strong>ขา PZEM และ LED เหลืองของบอร์ดสายแอร์ไม่เหมือนบอร์ด IR แล้ว</strong> (commit "update pin" 15 ต.ค. 2569) PZEM ย้ายเป็น RX=GPIO18 / TX=GPIO14 และ LED เหลืองเป็น GPIO23 แต่เลขรุ่นยังเป็น <code>2.5.2-slm8</code> เหมือนเดิม บอร์ดที่แฟลชก่อนวันนี้ยังใช้ขาเก่า (16/18/27) ถ้าบัดกรีสายตามขาใหม่ต้องแฟลชเฟิร์มแวร์ใหม่ด้วย และ <code>firmware/README.md</code> กับ <code>README_WIRED_TH.md</code> ยังเขียนขาเก่าอยู่ ให้เชื่อค่าในไฟล์ <code>.ino</code></p></div>
+
 <p>บอร์ดนี้ <strong>ไม่มี GPIO17 (IR)</strong> และขาส่งของสายแอร์ย้ายมาจาก GPIO25 เป็น GPIO33 เพราะ GPIO25 เป็น LED เขียวของเฟิร์มแวร์แอปอยู่แล้ว (ตาม <code>README_WIRED_TH.md</code>) ตาราง Pins ใน <code>firmware/README.md</code> ถูกแก้ (11 ต.ค. 2569) จากรายการธรรมดาเป็นตารางสองคอลัมน์เทียบบอร์ด IR กับบอร์ดสายแอร์</p>
 <div class="callout why"><div class="callout-title">ทำไม</div><p><strong>ทำไมใช้ GPIO34/35 เป็นขารับ:</strong> สองขานี้ของ ESP32 เป็น "ขาเข้าอย่างเดียว" (ไม่มีวงจรขาออก) จึงเหมาะกับการรับสัญญาณจากภายนอกที่ไม่ต้องการให้ ESP32 เผลอขับกลับ และใช้ตัวแบ่งแรงดันเพราะสายของแอร์ค้างอยู่ราว 4.7–4.9 V (วัดจริงตามบันทึก <code>claude/slm8_protocol_notes_TH.md</code> ในโปรเจค) ต่อตรงเข้าขา 3.3 V จะเสี่ยงขาเสีย ตัวแบ่ง 100k/200k ลดเหลือราว 2/3 (≈3.2 V) ที่ต้องใช้ค่าสูงถึงหลักแสนโอห์มเพราะตัวดึงขึ้น (pull-up) ในแอร์อ่อนมาก (ประมาณ 20k–60k) ถ้าใช้ 10k/20k ตามบันทึกเดียวกัน แรงดันตกเหลือ 1.4–2.9 V จน ESP32 อ่านเป็น LOW ตลอด</p></div>
 
-<h3 id="บอร์ดตรวจจับคน-บรรทัด-3036-ของ-rmutt_esp32_occupancyino">บอร์ดตรวจจับคน (บรรทัด 30–36 ของ <code>rmutt_esp32_occupancy.ino</code>)<a class="anchor" href="#บอร์ดตรวจจับคน-บรรทัด-3036-ของ-rmutt_esp32_occupancyino">#</a></h3>
+<h3 id="บอร์ดตรวจจับคน-บรรทัด-3040-ของ-rmutt_esp32_occupancyino">บอร์ดตรวจจับคน (บรรทัด 30–40 ของ <code>rmutt_esp32_occupancy.ino</code>)<a class="anchor" href="#บอร์ดตรวจจับคน-บรรทัด-3040-ของ-rmutt_esp32_occupancyino">#</a></h3>
 <div class="table-wrap"><table>
 <thead>
 <tr>
@@ -432,6 +441,20 @@
 <td>เหมือนบอร์ดแอร์</td>
 </tr>
 <tr>
+<td>25</td>
+<td><code>GREEN_LED_PIN</code></td>
+<td>ออก</td>
+<td>LED เขียว ผ่านตัวต้านทาน 220–330 Ω ลง GND</td>
+<td>(เพิ่ม 15 ต.ค. 2569, 1.3.3) สถานะการเชื่อมต่อ</td>
+</tr>
+<tr>
+<td>26</td>
+<td><code>RED_LED_PIN</code></td>
+<td>ออก</td>
+<td>LED แดง ผ่านตัวต้านทาน 220–330 Ω ลง GND</td>
+<td>(เพิ่ม 15 ต.ค. 2569, 1.3.3) มีคนในห้อง</td>
+</tr>
+<tr>
 <td>—</td>
 <td>—</td>
 <td>—</td>
@@ -440,7 +463,41 @@
 </tr>
 </tbody>
 </table></div>
-<p>UART1 เปิดที่ 256000 baud, <code>SERIAL_8N1</code> (8 บิตข้อมูล ไม่มี parity 1 stop bit) บอร์ดนี้ไม่มี LED สถานะ และไม่มีการต่อไฟ AC</p>
+<p>UART1 เปิดที่ 256000 baud, <code>SERIAL_8N1</code> (8 บิตข้อมูล ไม่มี parity 1 stop bit) บอร์ดนี้ไม่มีการต่อไฟ AC</p>
+<p><strong>ไฟ LED ของบอร์ดตรวจคน</strong> (เพิ่มในเฟิร์มแวร์ 1.3.3, ฟังก์ชัน <code>updateStatusLeds()</code> บรรทัด 1149–1162)</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>LED</th>
+<th>สถานะ</th>
+<th>ความหมาย</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>เขียว (GPIO25)</td>
+<td>ติดค้าง</td>
+<td>Wi-Fi และ MQTT ต่อครบ พร้อมส่งสถานะเข้าแอป</td>
+</tr>
+<tr>
+<td>เขียว</td>
+<td>กระพริบทุก 400 ms (<code>LED_BLINK_INTERVAL_MS</code>)</td>
+<td>กำลังต่อ Wi-Fi/รอเวลา NTP (<code>connectionInProgress</code>) หรือตั้งค่าแล้วแต่ยังต่อไม่ได้และกำลังลองใหม่</td>
+</tr>
+<tr>
+<td>เขียว</td>
+<td>ดับ</td>
+<td>ยังไม่ได้ตั้งค่า หรืออยู่ในโหมดตั้งค่า BLE เพราะต่อไม่ได้</td>
+</tr>
+<tr>
+<td>แดง (GPIO26)</td>
+<td>ติด / ดับ</td>
+<td>ตามค่า <code>occupied</code> (มีคน / ไม่มีคน) ถ้าเรดาร์ไม่ส่งข้อมูล <code>occupied</code> เป็น false เสมอ แดงจึงดับ</td>
+</tr>
+</tbody>
+</table></div>
+<div class="callout why"><div class="callout-title">ทำไม</div><p><strong>ทำไมต้องเรียก <code>updateStatusLeds()</code> ในลูปรอ Wi-Fi และ NTP ด้วย:</strong> <code>connectWifiCredentials()</code> รอได้นานถึง 20 วินาที และ <code>ensureClockSynced()</code> นานถึง 15 วินาที ระหว่างนั้น <code>loop()</code> ไม่ได้วน ถ้าเรียกแค่ใน <code>loop()</code> ไฟเขียวจะค้างนิ่งแทนที่จะกระพริบ เวอร์ชันนี้จึงตั้งธง <code>connectionInProgress</code> แล้วเรียก <code>updateStatusLeds()</code> ทุก 20 ms ภายในลูปรอ (ลูป NTP เดิม <code>delay(200)</code> ถูกแตกเป็น 10 × 20 ms ด้วยเหตุผลเดียวกัน)</p></div>
+
 <h2 id="อธิบายทีละไฟล์">อธิบายทีละไฟล์<a class="anchor" href="#อธิบายทีละไฟล์">#</a></h2>
 <h3 id="firmwarermutt_esp32_airrmutt_esp32_airino-บอร์ดแอร์-ir-2032-บรรทัด-เวอร์ชัน-251"><code>firmware/rmutt_esp32_air/rmutt_esp32_air.ino</code> (บอร์ดแอร์ IR 2,032 บรรทัด, เวอร์ชัน 2.5.1)<a class="anchor" href="#firmwarermutt_esp32_airrmutt_esp32_airino-บอร์ดแอร์-ir-2032-บรรทัด-เวอร์ชัน-251">#</a></h3>
 <p>ไฟล์เดียวที่เป็นหัวใจของบอร์ดแอร์ IR เรียงตามลำดับในไฟล์ได้ดังนี้ (เลขในวงเล็บคือบรรทัดของเวอร์ชันปัจจุบัน หลังเพิ่มจอ OLED และ unprovision เลขบรรทัดเลื่อนจากเดิมราว 6–67 บรรทัด)</p>
@@ -907,12 +964,12 @@
 <h3 id="firmwarermutt_esp32_airhistory_logh"><code>firmware/rmutt_esp32_air/history_log.h</code><a class="anchor" href="#firmwarermutt_esp32_airhistory_logh">#</a></h3>
 <p>ที่เก็บข้อมูลแบบ ring buffer บนพาร์ติชัน <code>rmuttlog</code> เป็นเทมเพลต <code>HistoryLog&lt;Storage&gt;</code> ที่ไม่รู้จักฮาร์ดแวร์ ผู้ใช้ส่ง "ตัวเก็บข้อมูล" ที่มีเมธอด <code>size/read/write/eraseSector</code> เข้ามา บนบอร์ดจริงคือ <code>PartitionFlash</code> ในไฟล์ <code>.ino</code> และบนคอมพิวเตอร์คือ <code>FakeFlash</code> ใน <code>tests/history_log_test.cpp</code> ฟังก์ชันสำคัญ: <code>HistoryLog::begin/append/nextBatch/acknowledge</code>, <code>historyChecksum</code>, <code>historyRecordValid</code>, <code>historyRecordBlank</code> รายละเอียดทีละบรรทัดอยู่ในหัวข้อเจาะโค้ด</p>
 <h3 id="firmwarermutt_esp32_airota_updateh-และ-firmwarermutt_esp32_occupancyota_updateh-และ-rmutt_esp32_air_wiredota_updateh"><code>firmware/rmutt_esp32_air/ota_update.h</code> และ <code>firmware/rmutt_esp32_occupancy/ota_update.h</code> (และ <code>rmutt_esp32_air_wired/ota_update.h</code>)<a class="anchor" href="#firmwarermutt_esp32_airota_updateh-และ-firmwarermutt_esp32_occupancyota_updateh-และ-rmutt_esp32_air_wiredota_updateh">#</a></h3>
-<p>สามไฟล์ <strong>เหมือนกันทุกไบต์</strong> (ตรวจด้วย <code>diff</code>; สำเนาในโฟลเดอร์บอร์ดสายแอร์เพิ่ม 11 ต.ค. 2569) ฟังก์ชัน: <code>otaUrlAllowed(url, host)</code> ตรวจ URL, <code>otaPartitionAvailable()</code> เช็กว่ามีช่องแอปว่าง, <code>runHttpsOta(url, caCert, currentVersion)</code> ดาวน์โหลดและเขียน flash เรียกใช้จาก <code>performOtaUpdate()</code> ของทุกบอร์ด ทำไมคัดลอกแทนที่จะแชร์ไฟล์: Arduino IDE คอมไพล์เฉพาะไฟล์ในโฟลเดอร์สเก็ตช์ของตัวเอง การแชร์ข้ามโฟลเดอร์ต้องทำเป็นไลบรารีซึ่งยุ่งกับผู้ติดตั้งกว่า (ข้อแลกเปลี่ยนคือถ้าแก้ต้องแก้ทุกสำเนา ตอนนี้มีสามที่)</p>
+<p>สามไฟล์ <strong>เนื้อหาเหมือนกัน</strong> (ตรวจด้วย <code>diff</code>; สำเนาในโฟลเดอร์บอร์ดสายแอร์เพิ่ม 11 ต.ค. 2569; ตั้งแต่ 15 ต.ค. 2569 สำเนาของบอร์ดตรวจคนมีช่องว่างเกินท้าย <code>#include &lt;esp_ota_ops.h&gt;</code> บรรทัด 22 ซึ่งไม่มีผลกับโปรแกรม) ฟังก์ชัน: <code>otaUrlAllowed(url, host)</code> ตรวจ URL, <code>otaPartitionAvailable()</code> เช็กว่ามีช่องแอปว่าง, <code>runHttpsOta(url, caCert, currentVersion)</code> ดาวน์โหลดและเขียน flash เรียกใช้จาก <code>performOtaUpdate()</code> ของทุกบอร์ด ทำไมคัดลอกแทนที่จะแชร์ไฟล์: Arduino IDE คอมไพล์เฉพาะไฟล์ในโฟลเดอร์สเก็ตช์ของตัวเอง การแชร์ข้ามโฟลเดอร์ต้องทำเป็นไลบรารีซึ่งยุ่งกับผู้ติดตั้งกว่า (ข้อแลกเปลี่ยนคือถ้าแก้ต้องแก้ทุกสำเนา ตอนนี้มีสามที่)</p>
 <h3 id="firmwarermutt_esp32_airletsencrypt_cah-และ-firmwarermutt_esp32_occupancyletsencrypt_cah-และ-rmutt_esp32_air_wiredletsencrypt_cah"><code>firmware/rmutt_esp32_air/letsencrypt_ca.h</code> และ <code>firmware/rmutt_esp32_occupancy/letsencrypt_ca.h</code> (และ <code>rmutt_esp32_air_wired/letsencrypt_ca.h</code>)<a class="anchor" href="#firmwarermutt_esp32_airletsencrypt_cah-และ-firmwarermutt_esp32_occupancyletsencrypt_cah-และ-rmutt_esp32_air_wiredletsencrypt_cah">#</a></h3>
 <p>ประกาศ <code>static const char LETSENCRYPT_CA[] PROGMEM = R"EOF(...)EOF";</code> เป็นข้อความ PEM ของใบรับรองรากสองใบต่อกัน: <strong>ISRG Root X1</strong> (สาย RSA หมดอายุ 2035-06-04) และ <strong>ISRG Root X2</strong> (สาย ECDSA หมดอายุ 2040-09-17) ตามคอมเมนต์หัวไฟล์ ใส่ทั้งสองเพราะ Let's Encrypt ออกใบรับรองได้ทั้งสองสาย ถ้ามีใบเดียวแล้วเซิร์ฟเวอร์เปลี่ยนสาย บอร์ดทุกตัวจะต่อไม่ได้ <code>PROGMEM</code> คือเก็บไว้ใน flash ไม่ใช่ RAM <code>R"EOF(...)EOF"</code> เป็น raw string literal ของ C++ (ไม่ต้อง escape ขึ้นบรรทัดใหม่) ไฟล์นี้ <strong>สร้างโดยสคริปต์</strong> <code>update-root-ca.ps1</code> ห้ามแก้มือ ทุกบอร์ดได้ไฟล์เหมือนกัน (สำเนาในบอร์ดสายแอร์ตรงกับของบอร์ด IR ทุกไบต์) ใบรากชุดนี้ตรวจผ่านทั้งใบ ts.net (Funnel 8443) และใบ DuckDNS (8883) เพราะทั้งคู่ออกโดย Let's Encrypt</p>
 <h3 id="firmwarermutt_esp32_airpartitionscsv-และ-firmwarermutt_esp32_occupancypartitionscsv"><code>firmware/rmutt_esp32_air/partitions.csv</code> และ <code>firmware/rmutt_esp32_occupancy/partitions.csv</code><a class="anchor" href="#firmwarermutt_esp32_airpartitionscsv-และ-firmwarermutt_esp32_occupancypartitionscsv">#</a></h3>
 <p>ตารางพาร์ติชัน flash 4 MB อธิบายทีละบรรทัดในหัวข้อ "ตารางพาร์ติชัน" บอร์ดสายแอร์ใช้สำเนาที่เหมือนของบอร์ด IR ทุกไบต์ (มี <code>rmuttlog</code> เพราะเก็บข้อมูลย้อนหลังเหมือนกัน)</p>
-<h3 id="firmwarermutt_esp32_occupancyrmutt_esp32_occupancyino-บอร์ดตรวจจับคน-1117-บรรทัด-เวอร์ชัน-132"><code>firmware/rmutt_esp32_occupancy/rmutt_esp32_occupancy.ino</code> (บอร์ดตรวจจับคน 1,117 บรรทัด, เวอร์ชัน 1.3.2)<a class="anchor" href="#firmwarermutt_esp32_occupancyrmutt_esp32_occupancyino-บอร์ดตรวจจับคน-1117-บรรทัด-เวอร์ชัน-132">#</a></h3>
+<h3 id="firmwarermutt_esp32_occupancyrmutt_esp32_occupancyino-บอร์ดตรวจจับคน-1162-บรรทัด-เวอร์ชัน-133"><code>firmware/rmutt_esp32_occupancy/rmutt_esp32_occupancy.ino</code> (บอร์ดตรวจจับคน 1,162 บรรทัด, เวอร์ชัน 1.3.3)<a class="anchor" href="#firmwarermutt_esp32_occupancyrmutt_esp32_occupancyino-บอร์ดตรวจจับคน-1162-บรรทัด-เวอร์ชัน-133">#</a></h3>
 <p>โครงสร้างคล้ายบอร์ดแอร์มากเพราะใช้กลไก BLE/Wi-Fi/MQTT/OTA ชุดเดียวกัน (UUID ของ BLE ใช้ชุดเดียวกัน ต่างกันที่ชื่อ <code>RMUTT-OCC-</code> และฟิลด์ <code>deviceType: "occupancy"</code> ใน IDENTITY) สิ่งที่ต่างหรือเพิ่ม:</p>
 <div class="table-wrap"><table>
 <thead>
@@ -924,69 +981,74 @@
 </thead>
 <tbody>
 <tr>
-<td>ค่าคงที่เรดาร์</td>
-<td>30–56</td>
-<td><code>RADAR_RX_PIN=32</code>, <code>RADAR_TX_PIN=33</code>, <code>RADAR_BAUD=256000</code>, <code>STATIC_ENERGY_THRESHOLD=25</code>, <code>FIRST_GATE=0</code>, <code>LAST_GATE=8</code>, <code>PRESENCE_READ_INTERVAL_MS=250</code>, <code>STATUS_INTERVAL_MS=10000</code>, <code>RADAR_RETRY_INTERVAL_MS=10000</code>, <code>DIAGNOSTIC_INTERVAL_MS=10000</code>, <code>RADAR_DATA_TIMEOUT_MS=3000</code>, <code>MAX_CONFIG_BYTES=3072</code></td>
+<td>ค่าคงที่เรดาร์และ LED</td>
+<td>30–62</td>
+<td><code>RADAR_RX_PIN=32</code>, <code>RADAR_TX_PIN=33</code>, <code>RADAR_BAUD=256000</code>, <code>GREEN_LED_PIN=25</code>, <code>RED_LED_PIN=26</code>, <code>LED_BLINK_INTERVAL_MS=400</code>, <code>STATIC_ENERGY_THRESHOLD=15</code> (1.3.2 และก่อนหน้า = 25), <code>FIRST_GATE=0</code>, <code>LAST_GATE=8</code>, <code>PRESENCE_READ_INTERVAL_MS=250</code>, <code>STATUS_INTERVAL_MS=10000</code>, <code>RADAR_RETRY_INTERVAL_MS=10000</code>, <code>DIAGNOSTIC_INTERVAL_MS=10000</code>, <code>RADAR_DATA_TIMEOUT_MS=3000</code>, <code>MAX_CONFIG_BYTES=3072</code></td>
 </tr>
 <tr>
 <td><code>DeviceConfig</code></td>
-<td>74–88</td>
+<td>80–94</td>
 <td>ไม่มี airNumber/airName/protocol/dailyOn/dailyOff</td>
 </tr>
 <tr>
 <td>NVS</td>
-<td>425–454</td>
+<td>443–473</td>
 <td>namespace <code>"rmutt-occ"</code> คีย์ <code>configured, room, wifi_ssid, wifi_pass, mqtt_host, mqtt_port, mqtt_user, mqtt_pass, mqtt_tls, mqtt_topic, prov_token</code></td>
 </tr>
 <tr>
 <td><code>createDeviceId()</code></td>
-<td>400</td>
+<td>418</td>
 <td>รหัส <code>OCC32-XXXXXXXXXXXX</code></td>
 </tr>
 <tr>
 <td><code>initialiseRadar()</code></td>
-<td>917–947</td>
+<td>943–973</td>
 <td>เริ่ม LD2410 และเปิด Engineering mode</td>
 </tr>
 <tr>
 <td><code>updateOccupancy()</code></td>
-<td>949–985</td>
+<td>975–1011</td>
 <td>ตัดสินมีคน/ไม่มีคน (เจาะโค้ด)</td>
 </tr>
 <tr>
 <td><code>captureRadarRawBytes()</code></td>
-<td>1017–1027</td>
+<td>1043–1053</td>
 <td>นับไบต์ดิบตอนเรดาร์ยังเริ่มไม่ได้ เพื่อแยก "ไม่มีสัญญาณเลย" กับ "baud ผิด"</td>
 </tr>
 <tr>
 <td><code>printDiagnostics()</code></td>
-<td>1029–1104</td>
+<td>1055–1130</td>
 <td>พิมพ์ <code>[diag]</code> ทุก 10 วินาที</td>
 </tr>
 <tr>
 <td><code>publishStatus()</code></td>
-<td>987–1013</td>
+<td>1013–1039</td>
 <td>ส่ง <code>/status</code> retained</td>
 </tr>
 <tr>
 <td><code>connectMqtt()</code></td>
-<td>746–800</td>
+<td>772–826</td>
 <td>client id <code>"rmutt-occ-" + deviceId</code>; LWT payload <code>{"online":false,"deviceId":...,"radarAvailable":false,"occupied":false}</code>; subscribe แค่ <code>/command</code> และ <code>/provision-ack</code></td>
 </tr>
 <tr>
 <td><code>mqttCallback()</code></td>
-<td>802–851</td>
-<td>จัดการ <code>provision-ack</code>, <code>enter_setup</code>, <code>unprovision</code> (เพิ่ม 13 ต.ค. 2569, บรรทัด 827–838 ตั้งธง <code>unprovisionRequested</code>), <code>ota</code> (ไม่มี <code>schedule-status</code>/<code>history-ack</code>)</td>
+<td>828–877</td>
+<td>จัดการ <code>provision-ack</code>, <code>enter_setup</code>, <code>unprovision</code> (เพิ่ม 13 ต.ค. 2569, บรรทัด 853–864 ตั้งธง <code>unprovisionRequested</code>), <code>ota</code> (ไม่มี <code>schedule-status</code>/<code>history-ack</code>)</td>
 </tr>
 <tr>
 <td><code>unprovisionAndRestart()</code></td>
-<td>853–886</td>
-<td>(เพิ่ม 13 ต.ค. 2569) ตอบ Backend, ล้าง retained <code>/status</code>, ล้าง NVS namespace <code>"rmutt-occ"</code> แล้วรีบูต เรียกจาก <code>loop()</code> บรรทัด 395</td>
+<td>884–912</td>
+<td>(เพิ่ม 13 ต.ค. 2569) ตอบ Backend, ล้าง retained <code>/status</code>, ล้าง NVS namespace <code>"rmutt-occ"</code> แล้วรีบูต เรียกจาก <code>loop()</code> บรรทัด 413</td>
+</tr>
+<tr>
+<td><code>updateStatusLeds()</code></td>
+<td>1149–1162</td>
+<td>(เพิ่ม 15 ต.ค. 2569, 1.3.3) ไฟเขียวบอกการเชื่อมต่อ ไฟแดงบอกมีคน เรียกจาก <code>loop()</code> และจากลูปรอ Wi-Fi/NTP</td>
 </tr>
 </tbody>
 </table></div>
-<p>ในโหมดต่อ Wi-Fi <code>connectWifiCredentials()</code> ของบอร์ดนี้เรียก <code>radar.read()</code> ระหว่างรอ (บรรทัด 714) เพื่อไม่ให้ buffer UART ของเรดาร์ล้นขณะรอ Wi-Fi นาน</p>
-<p>บอร์ดนี้ <strong>ไม่อ่านค่าไฟ ไม่ยิง IR ไม่เก็บข้อมูลย้อนหลัง</strong> ไม่มี LED <code>loop()</code> ของบอร์ดนี้: ลองเริ่มเรดาร์ใหม่ทุก 10 วินาทีถ้ายังไม่พร้อม, <code>radar.read()</code> ถ้า background task ไม่ได้ทำงาน, พิมพ์ diag ทุก 10 วินาที, <code>updateOccupancy()</code> ทุก 250 ms, จากนั้นงาน BLE/Wi-Fi/MQTT เหมือนบอร์ดแอร์ และ <code>publishStatus()</code> เมื่อผลเปลี่ยนหรือครบ 10 วินาที</p>
+<p>ในโหมดต่อ Wi-Fi <code>connectWifiCredentials()</code> ของบอร์ดนี้เรียก <code>radar.read()</code> ระหว่างรอ (บรรทัด 733) เพื่อไม่ให้ buffer UART ของเรดาร์ล้นขณะรอ Wi-Fi นาน</p>
+<p>บอร์ดนี้ <strong>ไม่อ่านค่าไฟ ไม่ยิง IR ไม่เก็บข้อมูลย้อนหลัง</strong> (LED มีสองดวงตั้งแต่ 1.3.3) <code>loop()</code> ของบอร์ดนี้: ลองเริ่มเรดาร์ใหม่ทุก 10 วินาทีถ้ายังไม่พร้อม, <code>radar.read()</code> ถ้า background task ไม่ได้ทำงาน, พิมพ์ diag ทุก 10 วินาที, <code>updateOccupancy()</code> ทุก 250 ms, <code>updateStatusLeds()</code> ทุกรอบ, จากนั้นงาน BLE/Wi-Fi/MQTT เหมือนบอร์ดแอร์ และ <code>publishStatus()</code> เมื่อผลเปลี่ยนหรือครบ 10 วินาที</p>
 <h3 id="firmwarermutt_esp32_air_wired-เฟิร์มแวร์ตัวที่สาม-บอร์ดแอร์สายแอร์-daikin-slm8-เพิ่ม-11-ตค-2569"><code>firmware/rmutt_esp32_air_wired/</code> (เฟิร์มแวร์ตัวที่สาม: บอร์ดแอร์สายแอร์ Daikin SLM8, เพิ่ม 11 ต.ค. 2569)<a class="anchor" href="#firmwarermutt_esp32_air_wired-เฟิร์มแวร์ตัวที่สาม-บอร์ดแอร์สายแอร์-daikin-slm8-เพิ่ม-11-ตค-2569">#</a></h3>
 <p><strong>คืออะไร:</strong> เฟิร์มแวร์บอร์ดแอร์อีกรุ่นที่ใช้ <strong>แทนรีโมตติดผนังของแอร์ Daikin</strong> ที่ถอดออก ESP32 ต่อกับสายรีโมตผนังโดยตรง แล้วส่งเฟรมคำสั่งตามโปรโตคอลที่ทีมถอดรหัสเอง (เรียกว่า SLM8 ตามรุ่นรีโมต) ทุก 1 วินาที และอ่านเฟรมสถานะที่แอร์ตอบกลับ เวอร์ชันในโค้ดคือ <strong><code>2.5.2-slm8</code></strong> (บรรทัด 78; ออกครั้งแรกเป็น 2.5.1-slm8 เมื่อ 11 ต.ค. แล้วขึ้น 2.5.2-slm8 เมื่อ 13 ต.ค. 2569 ตอนเพิ่ม unprovision; <code>firmware/README.md</code> และ <code>README_WIRED_TH.md</code> ยังเขียน 2.5.1-slm8)</p>
 <p><strong>ต่างจากบอร์ด IR อย่างไร (สรุป):</strong></p>
@@ -1065,12 +1127,12 @@
 </ol>
 <h3 id="กฎตัดสินใจ">กฎตัดสินใจ<a class="anchor" href="#กฎตัดสินใจ">#</a></h3>
 <div class="code-block"><div class="hl"><pre><span></span><code>radarAvailable = เรดาร์เริ่มสำเร็จ + เปิด Engineering mode แล้ว + ได้เฟรมใหม่ภายใน 3 วินาที
-occupied       = radarAvailable AND (มีเกตใดใน 0..8 ที่ stationaryEnergy &gt; 25)
+occupied       = radarAvailable AND (มีเกตใดใน 0..8 ที่ stationaryEnergy &gt; 15)
 </code></pre></div>
 </div>
 
 <ul>
-<li><strong>เกณฑ์:</strong> <code>STATIC_ENERGY_THRESHOLD = 25</code> (มากกว่า 25 เท่านั้น ค่าเท่ากับ 25 = ว่าง)</li>
+<li><strong>เกณฑ์:</strong> <code>STATIC_ENERGY_THRESHOLD = 15</code> (มากกว่า 15 เท่านั้น ค่าเท่ากับ 15 = ว่าง) เปลี่ยนจาก 25 ในเฟิร์มแวร์ 1.3.3 (15 ต.ค. 2569) เกณฑ์ต่ำลง = ไวขึ้น จับคนนั่งนิ่งที่สัญญาณอ่อนได้มากขึ้น แต่ก็มีโอกาสนับสิ่งที่ไม่ใช่คน (เช่นพัดลมหรือม่านที่ขยับ) เป็นคนมากขึ้น ค่านี้เป็นค่าคงที่ในเฟิร์มแวร์ ค่า <code>staticThreshold</code> ที่ Backend ส่งมาตอนตั้งค่าบอร์ดไม่ได้ใช้ และ Backend/แอปยังแสดง 25 อยู่</li>
 <li><strong>เกต:</strong> 0 ถึง 8 (<code>FIRST_GATE</code>, <code>LAST_GATE</code>) ใช้เฉพาะ static energy ส่วน moving energy ระยะเป้าหมาย และค่าอื่นของ LD2410 ถูกทิ้งหมด</li>
 <li><strong>ไม่มี hold time/ดีบาวซ์ในเฟิร์มแวร์:</strong> ผลเปลี่ยนตามเฟรมล่าสุดทันที ไม่มีการหน่วง "ยังถือว่ามีคนอีก N นาที" ในบอร์ดนี้ การหน่วงก่อนสั่งปิดแอร์ไปอยู่ฝั่ง Backend (ดูบทระบบปิดแอร์อัตโนมัติ)</li>
 <li><strong>หมดเวลาข้อมูล:</strong> <code>RADAR_DATA_TIMEOUT_MS = 3000</code> เรดาร์ส่งราว 10 เฟรมต่อวินาที (ตาม README) ถ้าเงียบ 3 วินาทีถือว่าเรดาร์เสีย → <code>radarAvailable = false</code> → <code>occupied = false</code> และแอปแสดง "Sensor unavailable" แทน "ว่าง"</li>
@@ -1079,8 +1141,8 @@ occupied       = radarAvailable AND (มีเกตใดใน 0..8 ที่ 
 
 <h3 id="สิ่งที่ส่งออกไป">สิ่งที่ส่งออกไป<a class="anchor" href="#สิ่งที่ส่งออกไป">#</a></h3>
 <p><code>publishStatus()</code> ส่ง JSON (retained) ไปที่ <code>&lt;topic&gt;/status</code>:</p>
-<div class="code-block"><span class="code-lang">json</span><div class="hl"><pre><span></span><code><span class="p">{</span><span class="nt">"online"</span><span class="p">:</span><span class="kc">true</span><span class="p">,</span><span class="nt">"deviceId"</span><span class="p">:</span><span class="s2">"OCC32-AABBCCDDEEFF"</span><span class="p">,</span><span class="nt">"firmwareVersion"</span><span class="p">:</span><span class="s2">"1.3.2"</span><span class="p">,</span>
-<span class="w"> </span><span class="nt">"roomNumber"</span><span class="p">:</span><span class="s2">"16203"</span><span class="p">,</span><span class="nt">"radarAvailable"</span><span class="p">:</span><span class="kc">true</span><span class="p">,</span><span class="nt">"occupied"</span><span class="p">:</span><span class="kc">true</span><span class="p">,</span><span class="nt">"staticThreshold"</span><span class="p">:</span><span class="mi">25</span><span class="p">}</span>
+<div class="code-block"><span class="code-lang">json</span><div class="hl"><pre><span></span><code><span class="p">{</span><span class="nt">"online"</span><span class="p">:</span><span class="kc">true</span><span class="p">,</span><span class="nt">"deviceId"</span><span class="p">:</span><span class="s2">"OCC32-AABBCCDDEEFF"</span><span class="p">,</span><span class="nt">"firmwareVersion"</span><span class="p">:</span><span class="s2">"1.3.3"</span><span class="p">,</span>
+<span class="w"> </span><span class="nt">"roomNumber"</span><span class="p">:</span><span class="s2">"16203"</span><span class="p">,</span><span class="nt">"radarAvailable"</span><span class="p">:</span><span class="kc">true</span><span class="p">,</span><span class="nt">"occupied"</span><span class="p">:</span><span class="kc">true</span><span class="p">,</span><span class="nt">"staticThreshold"</span><span class="p">:</span><span class="mi">15</span><span class="p">}</span>
 </code></pre></div>
 </div>
 
@@ -2203,19 +2265,19 @@ y 63    │ 845 W   [OUT OF CLASS]               │  แถบล่าง: ว
 <p>สิ่งที่ <strong>ไม่</strong> เปลี่ยน: Device ID (สร้างจาก eFuse MAC ไม่ได้เก็บใน NVS) และแอร์ไม่ถูกสั่งอะไรเพิ่ม (IR ส่งครั้งเดียว แอร์จึงค้างที่สถานะล่าสุด ตามคอมเมนต์บรรทัด 1171–1172) บอร์ดสายแอร์มีฟังก์ชันเดียวกัน (บรรทัด 1203 ของ <code>rmutt_esp32_air_wired.ino</code>)</p>
 <h3 id="บอร์ดตรวจจับคน-ตั้งธงใน-callback-แล้วทำใน-loop">บอร์ดตรวจจับคน: ตั้งธงใน callback แล้วทำใน <code>loop()</code><a class="anchor" href="#บอร์ดตรวจจับคน-ตั้งธงใน-callback-แล้วทำใน-loop">#</a></h3>
 <p>บอร์ดตรวจจับคนจัดการ <code>/command</code> <strong>ใน <code>mqttCallback()</code> โดยตรง</strong> (ไม่มี <code>processMqttCommand()</code> แบบบอร์ดแอร์) จึงต้องเลื่อนงานออกไปแบบเดียวกับ OTA</p>
-<p><strong>ไฟล์ <code>firmware/rmutt_esp32_occupancy/rmutt_esp32_occupancy.ino</code> บรรทัด 827–838</strong></p>
-<div class="code-block"><span class="code-lang">cpp</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">827</span>
-<span class="normal">828</span>
-<span class="normal">829</span>
-<span class="normal">830</span>
-<span class="normal">831</span>
-<span class="normal">832</span>
-<span class="normal">833</span>
-<span class="normal">834</span>
-<span class="normal">835</span>
-<span class="normal">836</span>
-<span class="normal">837</span>
-<span class="normal">838</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">action</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s">"unprovision"</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<p><strong>ไฟล์ <code>firmware/rmutt_esp32_occupancy/rmutt_esp32_occupancy.ino</code> บรรทัด 853–864</strong></p>
+<div class="code-block"><span class="code-lang">cpp</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">853</span>
+<span class="normal">854</span>
+<span class="normal">855</span>
+<span class="normal">856</span>
+<span class="normal">857</span>
+<span class="normal">858</span>
+<span class="normal">859</span>
+<span class="normal">860</span>
+<span class="normal">861</span>
+<span class="normal">862</span>
+<span class="normal">863</span>
+<span class="normal">864</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">action</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s">"unprovision"</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="c1">// Backend ส่งมาเมื่อแอดมินกดนำเซ็นเซอร์ออกในแอป</span>
 <span class="w">    </span><span class="c1">// ตรวจ deviceId ซ้ำอีกชั้น กันข้อความหลงมาผิด topic</span>
 <span class="w">    </span><span class="c1">// ทำต่อใน loop ไม่ใช่ใน callback เพราะต้อง publish และตัด MQTT</span>
@@ -2239,16 +2301,16 @@ y 63    │ 845 W   [OUT OF CLASS]               │  แถบล่าง: ว
 </thead>
 <tbody>
 <tr>
-<td>831–835</td>
+<td>857–861</td>
 <td>ตรวจ <code>deviceId</code> ในคำสั่งต้องตรงกับบอร์ดนี้ (ป้องกันเป็นชั้น: แม้ ACL จะกันแล้ว แต่ถ้า topic ตั้งผิดหรือข้อความหลง บอร์ดจะไม่ล้างตัวเองผิดตัว ซึ่งเป็นความเสียหายที่ย้อนไม่ได้)</td>
 </tr>
 <tr>
-<td>836</td>
-<td>ตั้งธง <code>unprovisionRequested</code> (ประกาศบรรทัด 139) แทนการเรียกตรง เพราะอยู่ใน <code>mqttClient.loop()</code> อยู่ ถ้า publish แล้ว <code>disconnect()</code> จากใน callback ของ PubSubClient เองจะเป็นการตัดการเชื่อมต่อที่ตัวเองกำลังใช้ประมวลผลข้อความอยู่</td>
+<td>862</td>
+<td>ตั้งธง <code>unprovisionRequested</code> (ประกาศบรรทัด 145) แทนการเรียกตรง เพราะอยู่ใน <code>mqttClient.loop()</code> อยู่ ถ้า publish แล้ว <code>disconnect()</code> จากใน callback ของ PubSubClient เองจะเป็นการตัดการเชื่อมต่อที่ตัวเองกำลังใช้ประมวลผลข้อความอยู่</td>
 </tr>
 </tbody>
 </table></div>
-<p><code>loop()</code> บรรทัด 395 <code>if (unprovisionRequested) unprovisionAndRestart("removed from the app");</code> เรียกฟังก์ชัน (บรรทัด 858–886) ที่ทำเหมือนบอร์ดแอร์ แต่ต่างกันสามจุด: ล้างธงก่อน (บรรทัด 859), ล้าง retained แค่ <code>/status</code> (บอร์ดนี้ไม่มี <code>/state</code>), และล้าง NVS namespace เดียว <code>rmutt-occ</code> (ไม่มีสถานะแอร์และไม่มี <code>rmuttlog</code>)</p>
+<p><code>loop()</code> บรรทัด 413 <code>if (unprovisionRequested) unprovisionAndRestart("removed from the app");</code> เรียกฟังก์ชัน (บรรทัด 884–912) ที่ทำเหมือนบอร์ดแอร์ แต่ต่างกันสามจุด: ล้างธงก่อน (บรรทัด 885), ล้าง retained แค่ <code>/status</code> (บอร์ดนี้ไม่มี <code>/state</code>), และล้าง NVS namespace เดียว <code>rmutt-occ</code> (ไม่มีสถานะแอร์และไม่มี <code>rmuttlog</code>)</p>
 <div class="callout why"><div class="callout-title">ทำไม</div><p><strong>ทำไมให้บอร์ดตอบก่อน แล้ว Backend จึงลบบัญชี MQTT:</strong> ถ้า Backend ลบบัญชีก่อน Broker (Dynamic Security) จะตัดบอร์ดออกทันที คำสั่ง unprovision จะไปไม่ถึง ลำดับ "สั่ง → รอคำยืนยัน (ไม่เกิน 4 วินาที) → ลบบัญชี" ทำให้แน่ใจว่าบอร์ดที่ออนไลน์ได้รับคำสั่ง และการลบในฐานข้อมูลไม่ต้องรอบอร์ด (ถ้าบอร์ดไม่ตอบ Backend ก็ลบต่อตามปกติ ตามคอมเมนต์ใน <code>unprovisionDevice</code>)</p></div>
 
 <h2 id="เครื่องมือ-ld2410_pinscan-และ-reset">เครื่องมือ: <code>ld2410_pinscan</code> และ <code>reset</code><a class="anchor" href="#เครื่องมือ-ld2410_pinscan-และ-reset">#</a></h2>
@@ -3885,29 +3947,29 @@ y 63    │ 845 W   [OUT OF CLASS]               │  แถบล่าง: ว
 <div class="callout why"><div class="callout-title">ทำไม</div><p><strong>ป้องกันเฟิร์มแวร์ปลอมสามชั้น</strong> (ตามคอมเมนต์ในหัวไฟล์ <code>ota_update.h</code>): (1) คำสั่ง OTA มาทาง <code>/command</code> ซึ่งตาม ACL ของ Mosquitto Dynamic Security มีแต่ Backend ที่ส่งได้ (2) URL ต้องอยู่ใต้ <code>https://&lt;MQTT host&gt;/firmware/</code> ชี้ไปเซิร์ฟเวอร์อื่นไม่ได้ (host นี้คือชื่อ ts.net ตามค่าเริ่มต้น ดาวน์โหลดผ่าน Funnel 443 → Caddy หรือชื่อ DuckDNS เมื่อต่อตรง) (3) การดาวน์โหลดตรวจใบรับรอง HTTPS กับใบรากที่ฝังไว้ ผลคือแม้ใครแอบส่งข้อความ OTA ได้ ก็บังคับให้บอร์ดโหลดจากเซิร์ฟเวอร์ของเราเท่านั้น และไฟล์ที่เสียระหว่างทางจะไม่ถูกสลับไปใช้ <strong>ข้อจำกัดที่ควรรู้:</strong> โค้ดไม่มีลายเซ็นดิจิทัลของไฟล์ .bin เอง และไม่ได้เขียนกลไกยืนยันหลังบูต/rollback อัตโนมัติ ความปลอดภัยจึงอยู่ที่ช่องทางและเซิร์ฟเวอร์</p></div>
 
 <h3 id="8-การตัดสินว่ามีคน-updateoccupancy">8) การตัดสินว่ามีคน: <code>updateOccupancy()</code><a class="anchor" href="#8-การตัดสินว่ามีคน-updateoccupancy">#</a></h3>
-<p><strong>ไฟล์ <code>firmware/rmutt_esp32_occupancy/rmutt_esp32_occupancy.ino</code> บรรทัด 949–970</strong></p>
-<div class="code-block"><span class="code-lang">cpp</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">949</span>
-<span class="normal">950</span>
-<span class="normal">951</span>
-<span class="normal">952</span>
-<span class="normal">953</span>
-<span class="normal">954</span>
-<span class="normal">955</span>
-<span class="normal">956</span>
-<span class="normal">957</span>
-<span class="normal">958</span>
-<span class="normal">959</span>
-<span class="normal">960</span>
-<span class="normal">961</span>
-<span class="normal">962</span>
-<span class="normal">963</span>
-<span class="normal">964</span>
-<span class="normal">965</span>
-<span class="normal">966</span>
-<span class="normal">967</span>
-<span class="normal">968</span>
-<span class="normal">969</span>
-<span class="normal">970</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">updateOccupancy</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<p><strong>ไฟล์ <code>firmware/rmutt_esp32_occupancy/rmutt_esp32_occupancy.ino</code> บรรทัด 975–996</strong></p>
+<div class="code-block"><span class="code-lang">cpp</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">975</span>
+<span class="normal">976</span>
+<span class="normal">977</span>
+<span class="normal">978</span>
+<span class="normal">979</span>
+<span class="normal">980</span>
+<span class="normal">981</span>
+<span class="normal">982</span>
+<span class="normal">983</span>
+<span class="normal">984</span>
+<span class="normal">985</span>
+<span class="normal">986</span>
+<span class="normal">987</span>
+<span class="normal">988</span>
+<span class="normal">989</span>
+<span class="normal">990</span>
+<span class="normal">991</span>
+<span class="normal">992</span>
+<span class="normal">993</span>
+<span class="normal">994</span>
+<span class="normal">995</span>
+<span class="normal">996</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">updateOccupancy</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="n">previousAvailable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">radarAvailable</span><span class="p">;</span>
 <span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="n">previousOccupied</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">occupied</span><span class="p">;</span>
 
@@ -3942,62 +4004,62 @@ y 63    │ 845 W   [OUT OF CLASS]               │  แถบล่าง: ว
 </thead>
 <tbody>
 <tr>
-<td>950–951</td>
+<td>976–977</td>
 <td><code>previousAvailable</code>, <code>previousOccupied</code></td>
 <td>เก็บค่าก่อนหน้าเพื่อเทียบตอนท้ายว่า "เปลี่ยนไหม"</td>
 </tr>
 <tr>
-<td>955–959</td>
+<td>981–985</td>
 <td><code>freshFrame = a &amp;&amp; b &amp;&amp; c &amp;&amp; d</code></td>
 <td>มีเฟรมใหม่เมื่อ: เรดาร์เริ่มแล้ว, เปิด Engineering mode แล้ว, <code>radar.isConnected()</code> (ไลบรารีเพิ่งได้เฟรมจากเรดาร์ในช่วงสั้น ๆ ที่ผ่านมา) และ <code>engineeringRetrieved()</code> คืน true <code>&amp;&amp;</code> ลัดวงจร (short-circuit) ดังนั้น <code>engineeringRetrieved()</code> ซึ่ง "กินธงเฟรม" ถูกเรียกเฉพาะเมื่อสามข้อแรกจริง</td>
 </tr>
 <tr>
-<td>960–961</td>
+<td>986–987</td>
 <td><code>if (freshFrame) { lastRadarDataAt = millis();</code></td>
 <td>จำเวลาที่ได้ข้อมูลล่าสุด</td>
 </tr>
 <tr>
-<td>962</td>
+<td>988</td>
 <td><code>bool detected = false;</code></td>
 <td>สมมติว่าไม่มีคนก่อน</td>
 </tr>
 <tr>
-<td>963</td>
+<td>989</td>
 <td><code>for (uint8_t gate = FIRST_GATE; gate &lt;= LAST_GATE; gate++)</code></td>
 <td>วนเกต 0–8 (9 เกต)</td>
 </tr>
 <tr>
-<td>964</td>
+<td>990</td>
 <td><code>radar.stationaryEnergyAtGate(gate) &gt; STATIC_ENERGY_THRESHOLD</code></td>
-<td>ถามพลังงานนิ่ง (0–100) ของเกตนี้ เทียบ <strong>มากกว่า</strong> 25</td>
+<td>ถามพลังงานนิ่ง (0–100) ของเกตนี้ เทียบ <strong>มากกว่า</strong> 15 (1.3.2 และก่อนหน้า = 25)</td>
 </tr>
 <tr>
-<td>965–966</td>
+<td>991–992</td>
 <td><code>detected = true; break;</code></td>
 <td>เจอเกตเดียวก็พอ หยุดวนทันที</td>
 </tr>
 <tr>
-<td>969</td>
+<td>995</td>
 <td><code>lastRadarDetected = detected;</code></td>
 <td>เก็บผลของเฟรมล่าสุด</td>
 </tr>
 </tbody>
 </table></div>
-<p><strong>บรรทัด 972–985</strong></p>
-<div class="code-block"><span class="code-lang">cpp</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">972</span>
-<span class="normal">973</span>
-<span class="normal">974</span>
-<span class="normal">975</span>
-<span class="normal">976</span>
-<span class="normal">977</span>
-<span class="normal">978</span>
-<span class="normal">979</span>
-<span class="normal">980</span>
-<span class="normal">981</span>
-<span class="normal">982</span>
-<span class="normal">983</span>
-<span class="normal">984</span>
-<span class="normal">985</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="w">  </span><span class="n">radarAvailable</span><span class="w"> </span><span class="o">=</span>
+<p><strong>บรรทัด 998–1011</strong></p>
+<div class="code-block"><span class="code-lang">cpp</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 998</span>
+<span class="normal"> 999</span>
+<span class="normal">1000</span>
+<span class="normal">1001</span>
+<span class="normal">1002</span>
+<span class="normal">1003</span>
+<span class="normal">1004</span>
+<span class="normal">1005</span>
+<span class="normal">1006</span>
+<span class="normal">1007</span>
+<span class="normal">1008</span>
+<span class="normal">1009</span>
+<span class="normal">1010</span>
+<span class="normal">1011</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="w">  </span><span class="n">radarAvailable</span><span class="w"> </span><span class="o">=</span>
 <span class="w">      </span><span class="n">radarInitialised</span><span class="w"> </span><span class="o">&amp;&amp;</span>
 <span class="w">      </span><span class="n">radarEngineeringEnabled</span><span class="w"> </span><span class="o">&amp;&amp;</span>
 <span class="w">      </span><span class="n">lastRadarDataAt</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">&amp;&amp;</span>
@@ -4024,17 +4086,17 @@ y 63    │ 845 W   [OUT OF CLASS]               │  แถบล่าง: ว
 </thead>
 <tbody>
 <tr>
-<td>972–976</td>
+<td>998–1002</td>
 <td><code>radarAvailable = init &amp;&amp; engineering &amp;&amp; lastRadarDataAt != 0 &amp;&amp; millis() - lastRadarDataAt &lt; 3000</code></td>
 <td>เรดาร์ถือว่าพร้อมเมื่อมีเฟรมภายใน 3 วินาทีที่ผ่านมา <code>lastRadarDataAt != 0</code> กันกรณียังไม่เคยได้เฟรมเลย</td>
 </tr>
 <tr>
-<td>977</td>
+<td>1003</td>
 <td><code>occupied = radarAvailable &amp;&amp; lastRadarDetected</code></td>
 <td><strong>มีคน = เรดาร์พร้อม และเฟรมล่าสุดเห็นเกตที่เกินเกณฑ์</strong> ถ้าเรดาร์ไม่พร้อม จะรายงาน <code>occupied = false</code> แต่แอปดูจาก <code>radarAvailable</code> จึงแสดง "ไม่พร้อม" ไม่ใช่ "ว่าง"</td>
 </tr>
 <tr>
-<td>978–984</td>
+<td>1004–1010</td>
 <td><code>if (previousAvailable != ... ) { statusPublishRequested = true; Serial.printf(...) }</code></td>
 <td>เมื่อใดสองค่านี้เปลี่ยน ขอส่ง status ทันทีและพิมพ์ log เช่น <code>Room occupancy: occupied (radar available)</code></td>
 </tr>
@@ -4118,7 +4180,7 @@ y 63    │ 845 W   [OUT OF CLASS]               │  แถบล่าง: ว
 <h2 id="สรุปและเช็กลิสต์ความเข้าใจ">สรุปและเช็กลิสต์ความเข้าใจ<a class="anchor" href="#สรุปและเช็กลิสต์ความเข้าใจ">#</a></h2>
 <p>ถ้าตอบข้อเหล่านี้ได้ แปลว่าเข้าใจบทนี้แล้ว</p>
 <ul>
-<li class="check"><input type="checkbox"> บอกได้ว่ามีเฟิร์มแวร์หลักกี่ตัว (สาม: บอร์ดแอร์ IR <strong>2.5.1</strong>, บอร์ดแอร์สายแอร์ <strong>2.5.2-slm8</strong>, บอร์ดตรวจจับคน <strong>1.3.2</strong> — แก้ 14 ต.ค. 2569) ตัวไหนทำอะไร และคุยกับ Backend ผ่านอะไร (MQTT เท่านั้น; BLE ไว้ตั้งค่า)</li>
+<li class="check"><input type="checkbox"> บอกได้ว่ามีเฟิร์มแวร์หลักกี่ตัว (สาม: บอร์ดแอร์ IR <strong>2.5.1</strong>, บอร์ดแอร์สายแอร์ <strong>2.5.2-slm8</strong>, บอร์ดตรวจจับคน <strong>1.3.3</strong> — แก้ 15 ต.ค. 2569) ตัวไหนทำอะไร และคุยกับ Backend ผ่านอะไร (MQTT เท่านั้น; BLE ไว้ตั้งค่า)</li>
 <li class="check"><input type="checkbox"> อธิบายความต่าง MCU กับคอมพิวเตอร์, <code>setup()</code>/<code>loop()</code>, <code>millis()</code> กับ <code>delay()</code> และยกตัวอย่างในโค้ดได้</li>
 <li class="check"><input type="checkbox"> บอกขา GPIO17/16/18/25/26/27/0 และ 21/22 (จอ OLED) ของบอร์ดแอร์ IR, ขาเพิ่มของบอร์ดสายแอร์ (33/35/34/4) และ GPIO32/33/0 ของบอร์ดตรวจจับคนได้ พร้อมบอกว่าต่อไขว้ TX/RX</li>
 <li class="check"><input type="checkbox"> อธิบาย 38 kHz, mark/space, 72 บิต ของ Saijo และทำไมใช้ตารางเฟรมสำเร็จรูป</li>
@@ -4128,10 +4190,10 @@ y 63    │ 845 W   [OUT OF CLASS]               │  แถบล่าง: ว
 <li class="check"><input type="checkbox"> บอกตัวเลือก MQTT ในโค้ด: client id, LWT (QoS 1 retained), TLS + ใบรากฝัง, หัวข้อที่ subscribe, buffer 2048</li>
 <li class="check"><input type="checkbox"> อธิบาย offline history: ช่วง 5 นาที, <code>HistoryRecord</code> 32 ไบต์, ring buffer 64 KB = 2,048 รายการ ≈ 7 วัน, ส่งทีละ 10, ack, ลบเป็น sector, ส่งซ้ำ, สุ่มหน่วง 5–45 วินาที</li>
 <li class="check"><input type="checkbox"> อธิบาย OTA: partition app0/app1, ตรวจ URL สามชั้น, ปิด MQTT ก่อนโหลด, ไม่สำเร็จก็ใช้ของเดิม</li>
-<li class="check"><input type="checkbox"> อธิบายกฎมีคน: static energy เกต 0–8 &gt; 25, availability หมดเวลา 3 วินาที, ตรวจทุก 250 ms, ส่ง status เมื่อเปลี่ยนหรือทุก 10 วินาที</li>
+<li class="check"><input type="checkbox"> อธิบายกฎมีคน: static energy เกต 0–8 &gt; 15 (เดิม 25), ไฟ LED เขียว/แดงของบอร์ดตรวจคนบอกอะไร, availability หมดเวลา 3 วินาที, ตรวจทุก 250 ms, ส่ง status เมื่อเปลี่ยนหรือทุก 10 วินาที</li>
 <li class="check"><input type="checkbox"> อธิบายความต่างของ <code>partitions.csv</code> สองไฟล์ (<code>rmuttlog</code> กับ <code>coredump</code>) และทำไม nvs offset เดิมทำให้ค่าไม่หาย</li>
 <li class="check"><input type="checkbox"> บอกหน้าที่ <code>reset.ino</code>, <code>ld2410_pinscan.ino</code>, <code>update-root-ca.ps1</code> และ <code>history_log_test.cpp</code></li>
-<li class="check"><input type="checkbox"> รู้ว่าเลขรุ่นจริงอยู่ที่ <code>FIRMWARE_VERSION</code> ในไฟล์ <code>.ino</code> (2.5.1 / 2.5.2-slm8 / 1.3.2) และ <code>ld2410_probe</code> ไม่มีในโฟลเดอร์แล้ว (ใช้ <code>ld2410_pinscan</code>)</li>
+<li class="check"><input type="checkbox"> รู้ว่าเลขรุ่นจริงอยู่ที่ <code>FIRMWARE_VERSION</code> ในไฟล์ <code>.ino</code> (2.5.1 / 2.5.2-slm8 / 1.3.3) และ <code>ld2410_probe</code> ไม่มีในโฟลเดอร์แล้ว (ใช้ <code>ld2410_pinscan</code>)</li>
 <li class="check"><input type="checkbox"> (เพิ่ม 14 ต.ค. 2569) อธิบายจอ OLED: SH1106 1.3" I2C ซอฟต์แวร์บน GPIO21/22, U8g2 full buffer, ตรวจจอด้วย pull-up/pull-down, วาดทุก 400 ms หรือเมื่อ <code>poke()</code>, หน้า SETUP / CONNECTING / NORMAL (แบบ 1 ตัวเลขใหญ่), กราฟ 64 จุดทุก 5 วินาที, พักจอเมื่อแอร์ปิดเกิน 10 นาที</li>
 <li class="check"><input type="checkbox"> อธิบายว่าทำไมจอไม่ทำให้ MQTT/IR สะดุด (<code>due()</code> ออกเร็ว, <code>getLocalTime(..., 0)</code> ไม่รอ, ผูกกับ <code>updateStatusLeds()</code> ที่ถูกเรียกแม้ระหว่างรอ Wi-Fi)</li>
 <li class="check"><input type="checkbox"> อธิบาย <code>build_opt.h</code>: แฟล็ก <code>-D</code> ใส่ทุกไฟล์รวมไลบรารี, ปิด HW I2C/SPI ของ U8g2 และ IR 28 ยี่ห้อ, ผล 98% ของช่องแอป, ข้อแลกเปลี่ยน</li>

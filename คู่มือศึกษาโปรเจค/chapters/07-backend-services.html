@@ -978,7 +978,7 @@ OCC32 เซ็นเซอร์คน ──MQTT──▶              │    
 <p><code>validateRoomInput</code>, <code>validateRoomNumber</code> (รูปแบบเดียวกับที่อื่น), <code>publicRoom(row)</code> (รวมสถานะเซ็นเซอร์และนาฬิกาปิดแอร์ของห้อง), <code>roomDefaultsForImport(value)</code> เดาข้อมูลห้องใหม่ตอนนำเข้าตาราง: รหัสแบบ <code>16&lt;ชั้น 1-9&gt;&lt;ลำดับ 2 หลัก&gt;</code> (เช่น <code>16103</code> = ชั้น 1 ลำดับ 3, ประเภท <code>Classroom</code>) นอกนั้นเป็น <code>Special</code> ชั้น 0 ทดสอบใน <code>test/room.test.js</code></p>
 <h3 id="utilsoccupancy-sensorjs-71-บรรทัด"><code>utils/occupancy-sensor.js</code> (71 บรรทัด)<a class="anchor" href="#utilsoccupancy-sensorjs-71-บรรทัด">#</a></h3>
 <ul>
-<li><code>STATIC_ENERGY_THRESHOLD = 25</code> ค่าความไวเริ่มต้นของเรดาร์ตรวจคนนิ่ง (ใช้ตอบกลับเมื่อแถวไม่มีค่า)</li>
+<li><code>STATIC_ENERGY_THRESHOLD = 25</code> ค่าความไวเริ่มต้นของเรดาร์ตรวจคนนิ่ง (ใช้ตอบกลับเมื่อแถวไม่มีค่า) <strong>ระวัง:</strong> ตั้งแต่ 15 ต.ค. 2569 เฟิร์มแวร์ 1.3.3 ใช้ค่าคงที่ของตัวเองเป็น 15 ค่า 25 ฝั่ง Backend จึงเป็นแค่ค่าที่แสดงในแอป/เว็บ ไม่ได้ควบคุมบอร์ด (ดูบท 9)</li>
 <li><code>validateOccupancyReservationInput</code>, <code>validateOccupancyDeviceId</code> (รหัส <code>OCC32-…</code>, ชื่อ BLE ต้องเป็น <code>RMUTT-OCC-&lt;12 ตัวท้าย&gt;</code>)</li>
 <li><code>publicOccupancySensor(row)</code></li>
 <li><code>normalizeOccupancyStatus(message)</code> ปรับข้อความสถานะ: <code>online = message.online !== false</code>; <code>radarAvailable</code> ต้อง online และบอร์ดบอกว่า <code>true</code>; <strong><code>occupied</code> จะเป็นจริงได้ก็ต่อเมื่อ <code>radarAvailable</code> เป็นจริง</strong> (เรดาร์เสียแล้วรายงาน "มีคน" ไม่ได้) ฟังก์ชันนี้คือด่านแรกของหลัก fail-safe ของระบบปิดแอร์ ทดสอบใน <code>test/occupancy-sensor.test.js</code></li>
@@ -2271,8 +2271,9 @@ routes/energy.js : /summary /history /export  →  แอป / ไฟล์ Exce
 </tr>
 </tbody>
 </table></div>
-<p><strong>ไฟล์ <code>backend/src/services/auto-off.js</code> บรรทัด 245–270</strong></p>
-<div class="code-block"><span class="code-lang">js</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">245</span>
+<p><strong>ไฟล์ <code>backend/src/services/auto-off.js</code> บรรทัด 244–269</strong></p>
+<div class="code-block"><span class="code-lang">js</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">244</span>
+<span class="normal">245</span>
 <span class="normal">246</span>
 <span class="normal">247</span>
 <span class="normal">248</span>
@@ -2296,8 +2297,7 @@ routes/energy.js : /summary /history /export  →  แอป / ไฟล์ Exce
 <span class="normal">266</span>
 <span class="normal">267</span>
 <span class="normal">268</span>
-<span class="normal">269</span>
-<span class="normal">270</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="nx">fireOffCommand</span><span class="p">(</span><span class="nx">row</span><span class="p">,</span><span class="w"> </span><span class="nx">attempt</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="normal">269</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="nx">fireOffCommand</span><span class="p">(</span><span class="nx">row</span><span class="p">,</span><span class="w"> </span><span class="nx">attempt</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="nx">parseState</span><span class="p">(</span><span class="nx">row</span><span class="p">.</span><span class="nx">state_json</span><span class="p">),</span><span class="w"> </span><span class="nx">power</span><span class="o">:</span><span class="w"> </span><span class="kc">false</span><span class="w"> </span><span class="p">};</span>
 <span class="w">  </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="k">await</span><span class="w"> </span><span class="nx">publishAirCommand</span><span class="p">(</span><span class="nx">row</span><span class="p">.</span><span class="nx">device_id</span><span class="p">,</span><span class="w"> </span><span class="nx">state</span><span class="p">);</span>
@@ -2335,19 +2335,19 @@ routes/energy.js : /summary /history /export  →  แอป / ไฟล์ Exce
 </thead>
 <tbody>
 <tr>
-<td>246</td>
+<td>245</td>
 <td>เอา <code>state_json</code> เดิมของแอร์ (อุณหภูมิ โหมด พัดลม ฯลฯ) มา spread แล้วเขียนทับ <code>power: false</code> ได้คำสั่งที่ "เหมือนเดิมทุกอย่างแต่ปิด" ถ้าส่งแค่ <code>{power:false}</code> บอร์ดอาจรีเซ็ตค่าอื่นเป็นค่าเริ่มต้น</td>
 </tr>
 <tr>
-<td>247–256</td>
+<td>246–255</td>
 <td>ส่งคำสั่งผ่าน MQTT ถ้า Broker ไม่พร้อม <code>publishAirCommand</code> โยน error (503) → log แล้ว <code>return</code> โดย <strong>ไม่เขียนฐานข้อมูล</strong> จึงไม่นับเป็นความพยายาม รอบหน้าลองใหม่ได้โดยไม่เสียโควตา 5 ครั้ง</td>
 </tr>
 <tr>
-<td>258–265</td>
+<td>257–264</td>
 <td>ส่งสำเร็จจึงบันทึก <code>auto_off_attempts = ?</code>, <code>auto_off_last_attempt_at = CURRENT_TIMESTAMP</code> และ <code>state_json</code> ใหม่</td>
 </tr>
 <tr>
-<td>266–269</td>
+<td>265–268</td>
 <td>log ว่ายิงครั้งที่เท่าไรจากกี่ครั้ง</td>
 </tr>
 </tbody>

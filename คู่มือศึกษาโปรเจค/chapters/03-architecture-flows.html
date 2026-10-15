@@ -240,7 +240,7 @@
 <h2 id="เส้นทางที่-3-ห้องว่าง--ปิดแอร์อัตโนมัติ">เส้นทางที่ 3: ห้องว่าง → ปิดแอร์อัตโนมัติ<a class="anchor" href="#เส้นทางที่-3-ห้องว่าง--ปิดแอร์อัตโนมัติ">#</a></h2>
 <figure><img alt="ระบบปิดแอร์อัตโนมัติ" src="img/06-auto-off.svg" /></figure>
 <div class="code-block"><div class="hl"><pre><span></span><code>[บอร์ดตรวจจับคน] อ่าน LD2410 ทุก 250 ms
-        │  มีคน = มีเกต 0–8 เกตใดเกตหนึ่งที่ static energy &gt; 25
+        │  มีคน = มีเกต 0–8 เกตใดเกตหนึ่งที่ static energy &gt; 15
         │  ส่ง rmutt/occupancy/OCC32-XXXX/status ทุก 10 วินาที และทันทีเมื่อเปลี่ยน
         ▼
 [Backend] mqtt.js → UPDATE occupancy_sensors → แจ้ง services/auto-off.js
@@ -438,7 +438,7 @@
 </tr>
 <tr>
 <td>เกณฑ์มีคน</td>
-<td>static energy เกตใดเกตหนึ่ง &gt; 25</td>
+<td>static energy เกตใดเกตหนึ่ง &gt; 15 (เฟิร์มแวร์ 1.3.3; ก่อน 15 ต.ค. 2569 คือ &gt; 25)</td>
 <td>เฟิร์มแวร์ตรวจคน</td>
 </tr>
 <tr>

@@ -3309,7 +3309,7 @@ flutter<span class="w"> </span>analyze<span class="w">          </span><span cla
 <div class="callout why"><div class="callout-title">ทำไม</div><p><strong>ทำไมใช้ optimistic update กับสวิตช์นี้</strong> ถ้ารอเซิร์ฟเวอร์ตอบก่อนแล้วค่อยขยับสวิตช์ ผู้ใช้จะรู้สึกว่าหน่วงทุกครั้งที่กด (เน็ตช้าเป็นวินาที) การขยับทันทีแล้วถอยกลับเมื่อพลาดให้ความรู้สึกไว และยังปลอดภัยเพราะมีการถอยกลับกับข้อความผิดพลาดเสมอ ข้อเสียคือผู้ใช้อาจเห็นค่าเปลี่ยนแล้วเด้งกลับ ถ้าเซิร์ฟเวอร์ปฏิเสธ (ซึ่งเป็นเรื่องที่ควรเห็นอยู่แล้ว)</p></div>
 
 <h3 id="7-libutilsthai_datedart--ปี-พศ-และการอ่านวันที่">7. <code>lib/utils/thai_date.dart</code> — ปี พ.ศ. และการอ่านวันที่<a class="anchor" href="#7-libutilsthai_datedart--ปี-พศ-และการอ่านวันที่">#</a></h3>
-<p><strong>ไฟล์ <code>lib/utils/thai_date.dart</code> บรรทัด 27–45 และ 72–89</strong></p>
+<p><strong>ไฟล์ <code>lib/utils/thai_date.dart</code> บรรทัด 27–45 และ 78–95</strong></p>
 <div class="code-block"><span class="code-lang">dart</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">27</span>
 <span class="normal">28</span>
 <span class="normal">29</span>
@@ -3340,13 +3340,7 @@ flutter<span class="w"> </span>analyze<span class="w">          </span><span cla
 </code></pre></div></td></tr></table></div>
 </div>
 
-<div class="code-block"><span class="code-lang">dart</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">72</span>
-<span class="normal">73</span>
-<span class="normal">74</span>
-<span class="normal">75</span>
-<span class="normal">76</span>
-<span class="normal">77</span>
-<span class="normal">78</span>
+<div class="code-block"><span class="code-lang">dart</span><div class="hl"><table class="hltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">78</span>
 <span class="normal">79</span>
 <span class="normal">80</span>
 <span class="normal">81</span>
@@ -3357,7 +3351,13 @@ flutter<span class="w"> </span>analyze<span class="w">          </span><span cla
 <span class="normal">86</span>
 <span class="normal">87</span>
 <span class="normal">88</span>
-<span class="normal">89</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c1">/// อ่านวันที่ที่ผู้ใช้พิมพ์ `วว/ดด/ปปปป` (ใช้ / - หรือ . คั่นก็ได้)</span>
+<span class="normal">89</span>
+<span class="normal">90</span>
+<span class="normal">91</span>
+<span class="normal">92</span>
+<span class="normal">93</span>
+<span class="normal">94</span>
+<span class="normal">95</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c1">/// อ่านวันที่ที่ผู้ใช้พิมพ์ `วว/ดด/ปปปป` (ใช้ / - หรือ . คั่นก็ได้)</span>
 <span class="c1">///</span>
 <span class="c1">/// ปีตั้งแต่ 2400 ขึ้นไปถือเป็น พ.ศ. แล้วลบ 543 ให้ คนพิมพ์ ค.ศ. ก็ยังใช้ได้</span>
 <span class="c1">/// คืน null ถ้ารูปแบบผิดหรือไม่มีวันนั้นจริง (เช่น 31/02)</span>
@@ -3408,37 +3408,37 @@ flutter<span class="w"> </span>analyze<span class="w">          </span><span cla
 <td>เลือกรายชื่อเดือนย่อไทย/อังกฤษ แล้วประกอบ <code>วัน เดือน ปี</code> ใช้ <code>date.month - 1</code> เพราะเดือนใน <code>DateTime</code> เริ่มที่ 1 แต่ลิสต์เริ่มที่ 0</td>
 </tr>
 <tr>
-<td>76</td>
+<td>82</td>
 <td><code>DateTime? parseNumericDate(String text)</code></td>
 <td>คืน <code>null</code> ได้ (ชนิดมี <code>?</code>) = อ่านไม่ได้</td>
 </tr>
 <tr>
-<td>77–79</td>
+<td>83–85</td>
 <td><code>RegExp(r'^\s*(\d{1,2})[/.\-](\d{1,2})[/.\-](\d{4})\s*$')</code></td>
 <td>นิพจน์ปรกติ: ช่องว่างหัวท้ายได้, วัน 1–2 หลัก, ตัวคั่น <code>/</code> <code>.</code> หรือ <code>-</code>, เดือน 1–2 หลัก, ปี 4 หลัก วงเล็บ <code>( )</code> คือกลุ่มที่เก็บไว้ (match[1], [2], [3])</td>
 </tr>
 <tr>
-<td>80</td>
+<td>86</td>
 <td><code>if (match == null) return null;</code></td>
 <td>รูปแบบไม่ตรง</td>
 </tr>
 <tr>
-<td>81–83</td>
+<td>87–89</td>
 <td><code>int.parse(match[1]!)</code></td>
 <td>แปลงข้อความเป็นเลข <code>!</code> เพราะรู้ว่ากลุ่มนั้นต้องมีเมื่อ regex ผ่าน</td>
 </tr>
 <tr>
-<td>84</td>
+<td>90</td>
 <td><code>if (year &gt;= 2400) year -= buddhistEraOffset;</code></td>
 <td>ปี ≥ 2400 ถือเป็น พ.ศ. แล้วลบ 543 (ปี ค.ศ. ยังไม่ถึง 2400 ในอีกร้อยปี) พิมพ์ได้ทั้งสองแบบ</td>
 </tr>
 <tr>
-<td>85</td>
+<td>91</td>
 <td><code>if (month &lt; 1 || month &gt; 12 || day &lt; 1) return null;</code></td>
 <td>กรองค่าออกนอกช่วงก่อน</td>
 </tr>
 <tr>
-<td>86–88</td>
+<td>92–94</td>
 <td><code>final date = DateTime(year, month, day); if (date.month != month || date.day != day) return null;</code></td>
 <td><strong>เทคนิคตรวจวันที่ไม่มีจริง:</strong> <code>DateTime(2569-543, 2, 31)</code> ไม่ error แต่ "ล้น" ไปเป็น 3 มีนาคม พอเทียบเดือน/วันกับที่ตั้งใจแล้วไม่ตรง แปลว่าวันนั้นไม่มีจริง คืน <code>null</code> (เทสต์ <code>31/02/2569</code> → <code>isNull</code>)</td>
 </tr>
