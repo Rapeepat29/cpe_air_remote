@@ -26,7 +26,7 @@
   <rect x="364" y="96" width="250" height="104" rx="10" fill="#FFFFFF" stroke="#17241D" stroke-width="2"/>
   <text x="489" y="122" font-size="14" font-weight="700" fill="#17241D" text-anchor="middle">ESP32 แอร์</text>
   <text x="489" y="144" font-size="11" fill="#17241D" text-anchor="middle">ตัดสิน acRunning ด้วย hysteresis</text>
-  <text x="489" y="163" font-size="10.5" fill="#66766E" text-anchor="middle">ขึ้น: ≥30 W ×3 · ลง: ≤10 W ×3</text>
+  <text x="489" y="163" font-size="10.5" fill="#66766E" text-anchor="middle">ขึ้น: ≥50 W ×3 · ลง: ≤10 W ×3</text>
   <text x="489" y="184" font-size="10.5" fill="#66766E" text-anchor="middle">ส่งข้อสรุป ไม่ส่งค่าดิบทุกครั้ง</text>
 
   <path d="M614,148 L684,148" stroke="#0D7A4B" stroke-width="2.5" marker-end="url(#e1)"/>

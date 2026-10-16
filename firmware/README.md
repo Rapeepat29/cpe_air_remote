@@ -150,7 +150,7 @@ The Backend and every ESP32 must use the same broker and
 `MQTT_TOPIC_PREFIX=rmutt/ac`.
 
 Firmware 2.0.0 samples the PZEM every two seconds. It marks the air
-conditioner as running after three readings at or above 30 W, and stopped
+conditioner as running after three readings at or above 50 W, and stopped
 after three readings at or below 10 W. The Backend evaluates the room's real
 class timetable in Asia/Bangkok and returns the result on `schedule-status`.
 If that result is unavailable for two minutes, the firmware falls back to the
