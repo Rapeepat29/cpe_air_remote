@@ -152,7 +152,7 @@ docker compose logs backend | grep "per-device accounts"
 
 ## 6 · ESP32 และแอป
 
-1. แฟลชเฟิร์มแวร์ผ่าน USB หนึ่งครั้ง (แอร์ IR `2.5.1`, สายแอร์ Daikin `2.5.2-slm8`, เซ็นเซอร์ `1.3.2`)
+1. แฟลชเฟิร์มแวร์ผ่าน USB หนึ่งครั้ง (แอร์ IR `2.5.2`, สายแอร์ Daikin `2.5.5-slm8`, เซ็นเซอร์ `1.3.9`)
    - บอร์ดแอร์ทั้งสองแบบต้องลงไลบรารี **U8g2** (จอ OLED) บอร์ดสายแอร์ต้องลง **DHT sensor library** เพิ่ม
      และอย่าลบไฟล์ `build_opt.h` ในโฟลเดอร์สเก็ตช์
    - Arduino IDE: **Tools → Partition Scheme → "No FS 4MB (2MB APP x2)"**

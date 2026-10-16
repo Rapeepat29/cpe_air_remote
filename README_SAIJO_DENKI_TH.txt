@@ -1,3 +1,13 @@
+หมายเหตุ (ต.ค. 2569): ยี่ห้อ Saijo Denki (รหัส SAIJO_DENKI) ยังรองรับอยู่ในแอป Backend เว็บแอป และเฟิร์มแวร์แอร์ IR (SaijoDenkiAC.cpp/.h)
+เลขรุ่นที่เขียนในไฟล์นี้ (App 3.4.1+21 / Firmware 1.8.1) เป็นรุ่นตอนเพิ่มยี่ห้อ ปัจจุบันแฟลชแล้ว Serial Monitor ต้องขึ้น Firmware: 2.5.2
+ห้ามแยก SaijoDenkiAC.cpp/.h ออกจากโฟลเดอร์ของ .ino เหมือนเดิม และบอร์ด IR ไม่ใช่บอร์ดสายแอร์ Daikin (รุ่น -slm8)
+วิธีติดตั้ง/อัปเดตปัจจุบัน: ดึงโค้ดด้วย git pull แล้วรัน .\deploy\update-server.ps1 (รัน migration ให้เอง)
+  แอปรันด้วย flutter pub get แล้ว flutter run --dart-define=API_BASE_URL=... (ไม่ต้องใช้ MQTT_DEFAULT_HOST แล้ว)
+  ขั้นตอนแบบแตก ZIP ทับโปรเจกต์ และ MQTT_URL/ACL แบบ LAN IP ด้านล่างเป็นของรุ่นนั้น ใช้เป็นประวัติเท่านั้น
+รุ่นปัจจุบัน (ต.ค. 2569): แอป 3.16.0+32 · เฟิร์มแวร์แอร์ IR 2.5.2 · สายแอร์ Daikin 2.5.5-slm8 · เซ็นเซอร์ LD2410 1.3.9
+รายละเอียดทุกรุ่นดู RELEASE_NOTES.md และ README.md
+============================================================
+
 RMUTT Save Energy - Saijo Denki (App 3.4.1+21 / Firmware 1.8.1)
 
 สิ่งที่เพิ่ม
