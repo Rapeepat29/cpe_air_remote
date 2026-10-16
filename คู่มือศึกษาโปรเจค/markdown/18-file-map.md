@@ -165,7 +165,6 @@
 | `START_HERE.md` | คู่มือเริ่มต้นฉบับย่อ: เตรียมโปรแกรม ตั้งค่า MQTT และรันระบบ |
 | `README_TH.txt` | บันทึกอัปเดต firmware 1.6.0: เมนู "ตั้งค่าบอร์ด" ส่ง `enter_setup` ผ่าน MQTT และแก้เพิ่มบอร์ดตัวที่สองบน Windows |
 | `README_FIXED_MQTT_TH.txt` | แอป 3.3.8: ตัดช่อง MQTT ออกจากฟอร์ม ให้ Backend ส่งค่าจาก `backend/.env` ให้บอร์ดอัตโนมัติ |
-| `README_MQTT_HOST_EDIT_TH.txt` | อัปเดตเก่าที่ทำให้ช่อง MQTT Host แก้ไขได้ และอธิบายว่าห้ามใช้ 127.0.0.1 กับบอร์ด |
 | `README_WIFI_RECOVERY_TH.txt` | บอร์ดทดสอบ Wi-Fi ก่อนบันทึกลง NVS และเปิด BLE recovery เมื่อต่อ Wi-Fi ที่เก็บไว้ไม่ได้ |
 | `README_BLE_WINDOWS_GATT_FIX_TH.txt` | แก้ Windows เชื่อม BLE ได้แต่ค้นหา Service ไม่จบ (connect รอ GATT เสร็จก่อน ล็อก winrt 0.0.20) |
 | `README_BLE_SECOND_DEVICE_FIX_TH.txt` | แก้ปัญหาเพิ่ม ESP32 ตัวที่สอง: Identity สั้นลงและแยกค่าตั้งเดิมไป characteristic ใหม่ |
@@ -175,9 +174,6 @@
 | `README_PZEM_LED_V200_TH.txt` | เพิ่ม PZEM-004T วัดไฟจริง ไฟ LED บอกสถานะ และการตรวจตารางเรียนโดย Backend |
 | `README_ROOM_MANAGEMENT_V180_TH.txt` | เพิ่มชื่ออาจารย์ในตาราง และให้ Admin จัดการห้อง (เพิ่ม แก้ ลบ ห้องพิเศษ) |
 | `README_SAIJO_DENKI_TH.txt` | เพิ่มโปรโตคอลแอร์ Saijo Denki (`SAIJO_DENKI`) พร้อมไดรเวอร์ IR เฉพาะและคำสั่งที่รองรับ |
-| `README_UI_V181_TH.txt` | ปรับหน้าควบคุม: ปุ่มจัดการห้องเป็นเฟือง การ์ดห้อง และตัวเลือกชั้น |
-| `README_UI_V182_TH.txt` | ปรับหน้าตารางและหน้าควบคุม: แถบวันครบ 7 วันและชุดสีเขียวเดียวกัน |
-| `README_UI_V183_TH.txt` | หน้าตารางเลือกวันปัจจุบันอัตโนมัติและแสดงวันที่จริง |
 
 ## เฟิร์มแวร์ ESP32
 
