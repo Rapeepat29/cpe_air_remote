@@ -1,9 +1,9 @@
 # เริ่มใช้งาน RMUTT Save Energy
 
 ระบบนี้ประกอบด้วย Flutter App (3.16.0+32), Node.js Backend, MariaDB, Mosquitto MQTT Broker
-ESP32 Firmware หนึ่งบอร์ดต่อแอร์หนึ่งเครื่อง (บอร์ดรีโมต IR `rmutt_esp32_air` 2.5.1
-หรือบอร์ดต่อสายแอร์ Daikin `rmutt_esp32_air_wired` 2.5.2-slm8 สำหรับแอร์ที่ใช้รีโมตติดผนัง)
-และบอร์ด ESP32 + LD2410 (`rmutt_esp32_occupancy` 1.3.2) แยกอีกหนึ่งบอร์ดต่อห้องที่ต้องการตรวจคน
+ESP32 Firmware หนึ่งบอร์ดต่อแอร์หนึ่งเครื่อง (บอร์ดรีโมต IR `rmutt_esp32_air` 2.5.2
+หรือบอร์ดต่อสายแอร์ Daikin `rmutt_esp32_air_wired` 2.5.5-slm8 สำหรับแอร์ที่ใช้รีโมตติดผนัง)
+และบอร์ด ESP32 + LD2410 (`rmutt_esp32_occupancy` 1.3.9) แยกอีกหนึ่งบอร์ดต่อห้องที่ต้องการตรวจคน
 
 ## 1. เตรียมโปรแกรม
 

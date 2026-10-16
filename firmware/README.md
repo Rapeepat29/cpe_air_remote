@@ -10,8 +10,8 @@ offline-history behaviour, so the app and Backend treat them alike:
 
 | Sketch | Talks to the A/C by | Brand in the app |
 |---|---|---|
-| `rmutt_esp32_air` (2.5.1) | IR, like a handheld remote | Chosen by the user (IRac protocol) |
-| `rmutt_esp32_air_wired` (2.5.2-slm8) | The Daikin wall-panel cable (SLM8), replacing the wall remote | Fixed by the board: **Daikin · Wired** (`DAIKIN_WIRED`) |
+| `rmutt_esp32_air` (2.5.2) | IR, like a handheld remote | Chosen by the user (IRac protocol) |
+| `rmutt_esp32_air_wired` (2.5.5-slm8) | The Daikin wall-panel cable (SLM8), replacing the wall remote | Fixed by the board: **Daikin · Wired** (`DAIKIN_WIRED`) |
 
 Both boards now drive a 1.3" SH1106 I2C OLED (SDA GPIO21, SCL GPIO22) and need
 the **U8g2** library. The wired board also needs **DHT sensor library**
@@ -231,7 +231,7 @@ Open the Serial Monitor at 115200 and press EN/RST. A healthy boot prints:
 ```text
 entry 0x400805b4
 RMUTT ESP32 LD2410 Occupancy Sensor
-Firmware: 1.3.2
+Firmware: 1.3.9
 Device ID: OCC32-XXXXXXXXXXXX
 LD2410 engineering mode ready
 Wi-Fi connected: 192.168.1.109
