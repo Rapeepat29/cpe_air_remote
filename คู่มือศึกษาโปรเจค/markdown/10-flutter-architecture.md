@@ -117,7 +117,7 @@ cpe_air_remote/
 > [!WHY]
 > **ทำไมตรึง `flutter_blue_plus` เป็น `2.3.11` เป๊ะ ๆ ไม่ใช้ `^`** BLE บน Windows มีปัญหาเรื่องการเชื่อมต่อที่ไวต่อเวอร์ชัน ถ้าปล่อยให้ `flutter pub get` ขยับเวอร์ชันเองอาจกลับไปมีบั๊กเดิม การตรึงเวอร์ชันทำให้ทุกเครื่องที่ build ได้พฤติกรรมเดียวกัน (ข้อเสียคือต้องอัปเดตเองเมื่อต้องการ)
 
-**สิ่งที่ "ไม่มี" ใน pubspec ก็สำคัญ** ไม่มี `provider`, `riverpod`, `bloc`, `get_it` และไม่มี `shared_preferences`, `dio`, `flutter_local_notifications` (ผลคือการแจ้งเตือนบนเครื่องยังไม่มีตัวจริง ดูหัวข้อ `alert_notifier.dart`)
+**สิ่งที่ "ไม่มี" ใน pubspec ก็สำคัญ** ไม่มี `provider`, `riverpod`, `bloc`, `get_it` และไม่มี `shared_preferences`, `dio` (ส่วนแจ้งเตือนบนเครื่องใช้ `flutter_local_notifications` ^18.0.1 ดูหัวข้อ `alert_notifier.dart`)
 
 **ไฟล์ `analysis_options.yaml`**
 
@@ -836,7 +836,8 @@ JSON ที่เขียนลงบอร์ดมี `version: 1`, `token` (
 - `abstract interface class AlertNotifier { Future<bool> initialize(); Future<void> show({alert, title, body}); }`
 - `NoopAlertNotifier` ตัวที่ไม่ทำอะไร (`initialize` คืน `false`, `show` ว่าง)
 - `AlertNotificationText {title, body}` และฟังก์ชัน `describeAlert(SystemAlert, AppLocalizations)` สร้างหัวข้อและเนื้อความตามภาษา: หัวข้อแปลจากชนิด, เนื้อความเป็น `ห้อง XXX · ชื่อเครื่อง — ข้อความ` (ไม่รับ `BuildContext` เพราะผู้เรียกอยู่ใน Controller/State ที่ไม่ได้อยู่ในต้นไม้วิดเจ็ตและหน้าจอนั้นอาจถูกถอดไปแล้ว)
-- **สถานะจริงของโค้ด:** ในโปรเจกต์นี้ไม่มีคลาสไหน `implements AlertNotifier` นอกจาก `NoopAlertNotifier` และ `main()` ไม่ได้ส่ง `alertNotifier` เข้า `CpeAirRemoteApp` ดังนั้นใน `AppShell._handleNewAlerts` ตัวแปร `notifier` เป็น `null` และ **การเด้งแจ้งเตือนบนเครื่องยังไม่ทำงานจริง** (ไม่มีปลั๊กอินแจ้งเตือนใน `pubspec.yaml`) สิ่งที่ทำงานจริงคือรายการแจ้งเตือนในแอปและหน้าตั้งค่าที่จำสวิตช์ไว้ เป็นโครงรอการต่อ (คอมเมนต์บอกว่าวันหลังอาจย้ายไป FCM โดยเปลี่ยนเฉพาะตัวที่ implement สัญญานี้)
+- `LocalAlertNotifier` (ไฟล์ `services/mobile_notification_gateway.dart`) ตัวจริงที่ `implements AlertNotifier` ใช้ `flutter_local_notifications` สร้าง channel `system_alerts` (Importance.high) ขอสิทธิ์ตอนเรียก `initialize()` ครั้งแรก (Android 13+ ใช้ `requestNotificationsPermission`, iOS ใช้ `requestPermissions`) และ `show()` จะเรียก `initialize()` ให้เองถ้ายังไม่ได้ทำ `LocalAlertNotifier.isSupported` เป็นจริงเฉพาะ Android/iOS ฝั่ง iOS ตั้ง `presentAlert/presentBanner/presentList/presentSound` เป็น true เพื่อให้แบนเนอร์ขึ้นตอนแอปเปิดอยู่
+- **สถานะจริงของโค้ด:** `_CpeAirRemoteAppState.initState` เลือกตัวเด้งเป็น `widget.alertNotifier ?? (LocalAlertNotifier.isSupported ? LocalAlertNotifier() : const NoopAlertNotifier())` แล้วส่งเข้า `AppShell` จึงบนมือถือการแจ้งเตือนในเครื่องทำงานจริง ส่วนเดสก์ท็อป/เว็บและเทสต์ยังเป็นตัวเปล่า **ข้อจำกัด:** เป็นแจ้งเตือนในเครื่องที่เกิดจากการ poll alert ของ `DashboardController` จึงเด้งได้ตราบที่แอปยังรันอยู่ (iOS หยุดแอปเบื้องหลังเร็วกว่า Android) ถ้าแอปถูกปิดสนิทต้องย้ายไปใช้ FCM/APNs โดยเปลี่ยนเฉพาะตัวที่ implement สัญญานี้ Android ต้องมีสิทธิ์ `POST_NOTIFICATIONS` และเปิด core library desugaring ใน `android/app/build.gradle.kts`
 
 ### Controllers (`lib/controllers/`)
 

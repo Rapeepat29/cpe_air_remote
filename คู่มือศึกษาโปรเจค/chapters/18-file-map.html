@@ -894,6 +894,10 @@
 <td>สัญญาตัวเด้งแจ้งเตือนของเครื่อง + NoopAlertNotifier + ฟังก์ชัน describeAlert สร้างข้อความตามภาษา</td>
 </tr>
 <tr>
+<td>lib/services/mobile_notification_gateway.dart</td>
+<td>LocalAlertNotifier: ตัวเด้งแจ้งเตือนในเครื่องจริงด้วย flutter_local_notifications (Android/iOS)</td>
+</tr>
+<tr>
 <td>lib/services/alert_repository.dart</td>
 <td>สัญญาดึงและรับทราบการแจ้งเตือนของระบบ</td>
 </tr>
@@ -1035,7 +1039,7 @@
 </tr>
 <tr>
 <td>android/app/build.gradle.kts</td>
-<td>ตั้ง applicationId, namespace, Java 17 และการเซ็น release ด้วย key.properties</td>
+<td>ตั้ง applicationId, namespace, Java 17, core library desugaring (ที่ flutter_local_notifications ต้องใช้) และการเซ็น release ด้วย key.properties</td>
 </tr>
 <tr>
 <td>android/build.gradle.kts</td>
@@ -1051,7 +1055,7 @@
 </tr>
 <tr>
 <td>android/app/src/main/AndroidManifest.xml</td>
-<td>ประกาศสิทธิ์ INTERNET/Bluetooth/Location และ MainActivity ของแอป</td>
+<td>ประกาศสิทธิ์ INTERNET/POST_NOTIFICATIONS/RECEIVE_BOOT_COMPLETED/Bluetooth/Location และ MainActivity ของแอป</td>
 </tr>
 <tr>
 <td>android/app/src/main/kotlin/.../MainActivity.kt</td>

@@ -239,6 +239,7 @@
 | lib/services/air_conditioner_repository.dart | สัญญา (abstract interface) ของการดึง/สั่ง/จอง/เปลี่ยนชื่อ/ลบแอร์ |
 | lib/services/air_conditioner_service.dart | ตัวจริงที่ยิง HTTP ไป /air-conditioners ของ Backend |
 | lib/services/alert_notifier.dart | สัญญาตัวเด้งแจ้งเตือนของเครื่อง + NoopAlertNotifier + ฟังก์ชัน describeAlert สร้างข้อความตามภาษา |
+| lib/services/mobile_notification_gateway.dart | LocalAlertNotifier: ตัวเด้งแจ้งเตือนในเครื่องจริงด้วย flutter_local_notifications (Android/iOS) |
 | lib/services/alert_repository.dart | สัญญาดึงและรับทราบการแจ้งเตือนของระบบ |
 | lib/services/alert_service.dart | ตัวจริงที่ยิง GET /alerts และ POST /alerts/:id/acknowledge |
 | lib/services/auth_repository.dart | สัญญาทั้งหมดเรื่องบัญชี: restoreSession, login, logout, ลืมรหัสผ่าน, แก้โปรไฟล์, เปลี่ยนรหัส |
@@ -274,11 +275,11 @@
 | lib/theme/app_theme.dart | สีแบรนด์ 4 ธีม (ขาว/เทา/ดำ/เขียว) + ตามเครื่อง ผ่าน AppColors, AppPalette และ AppTheme |
 | web/index.html | หน้าเว็บเปล่าของ Flutter Web (flutter build web) ไม่ใช่เว็บแอปที่ใช้งานจริง |
 | web/manifest.json | manifest ของ Flutter Web (ชื่อแอป สีธีม) |
-| android/app/build.gradle.kts | ตั้ง applicationId, namespace, Java 17 และการเซ็น release ด้วย key.properties |
+| android/app/build.gradle.kts | ตั้ง applicationId, namespace, Java 17, core library desugaring (ที่ flutter_local_notifications ต้องใช้) และการเซ็น release ด้วย key.properties |
 | android/build.gradle.kts | ตั้ง repository และย้ายโฟลเดอร์ build ของโปรเจกต์ Android |
 | android/settings.gradle.kts | โหลด Flutter SDK และกำหนดเวอร์ชัน plugin (AGP 9.0.1, Kotlin 2.3.20) |
 | android/gradle.properties | ตั้งหน่วยความจำ Gradle และแฟลก AndroidX/newDsl |
-| android/app/src/main/AndroidManifest.xml | ประกาศสิทธิ์ INTERNET/Bluetooth/Location และ MainActivity ของแอป |
+| android/app/src/main/AndroidManifest.xml | ประกาศสิทธิ์ INTERNET/POST_NOTIFICATIONS/RECEIVE_BOOT_COMPLETED/Bluetooth/Location และ MainActivity ของแอป |
 | android/app/src/main/kotlin/.../MainActivity.kt | ไม่มีในสำเนาที่ให้มา (ปกติ flutter สร้าง FlutterActivity เปล่า) |
 | test/app_localizations_test.dart | ทดสอบตัวแปลไทย/อังกฤษและข้อความผิดพลาดจาก Backend |
 | test/app_preferences_test.dart | ทดสอบธีม ขนาดตัวอักษร AlertPreferences freshAlerts และการจำค่าตั้งด้วย store ปลอม |
