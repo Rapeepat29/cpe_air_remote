@@ -40,6 +40,17 @@ class SystemSettingsService implements SystemSettingsRepository {
     );
   }
 
+  @override
+  Future<SystemSettings> setAutoOffTestMode(bool testMode) async {
+    return SystemSettings.fromJson(
+      await _request(
+        'PATCH',
+        '/settings/auto-off',
+        body: {'testMode': testMode},
+      ),
+    );
+  }
+
   Future<Map<String, dynamic>> _request(
     String method,
     String path, {

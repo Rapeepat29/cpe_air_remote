@@ -4,24 +4,35 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('SystemSettings', () {
-    test('ค่าที่หายไปจากเซิร์ฟเวอร์ถือว่าเปิดอยู่', () {
+    test('ค่าที่หายไปจากเซิร์ฟเวอร์ถือว่าเปิดอยู่ และโหมดทดสอบปิดอยู่', () {
       // ตรงกับค่าเริ่มต้นฝั่ง Backend ถ้าตีความกลับกัน ระบบจะดูเหมือนพัง
       expect(SystemSettings.fromJson(const {}).autoOffEnabled, isTrue);
+      expect(SystemSettings.fromJson(const {}).autoOffTestMode, isFalse);
       expect(
         SystemSettings.fromJson(const {'autoOffEnabled': false}).autoOffEnabled,
         isFalse,
+      );
+      expect(
+        SystemSettings.fromJson(
+          const {'autoOffTestMode': true},
+        ).autoOffTestMode,
+        isTrue,
       );
     });
   });
 
   group('SystemSettingsController', () {
     test('โหลดค่าจากเซิร์ฟเวอร์ตอนเริ่ม', () async {
-      final repository = _MemoryRepository(autoOffEnabled: false);
+      final repository = _MemoryRepository(
+        autoOffEnabled: false,
+        autoOffTestMode: true,
+      );
       final controller = SystemSettingsController(repository: repository);
 
       await controller.initialize();
 
       expect(controller.autoOffEnabled, isFalse);
+      expect(controller.autoOffTestMode, isTrue);
       expect(controller.hasLoaded, isTrue);
       expect(controller.errorMessage, isNull);
     });
@@ -39,6 +50,31 @@ void main() {
       expect(await pending, isTrue);
       expect(controller.isSaving, isFalse);
       expect(repository.saved, [false]);
+    });
+
+    test('กดสวิตช์โหมดทดสอบแล้วเห็นผลทันที และถอยกลับเมื่อเซิร์ฟเวอร์ปฏิเสธ', () async {
+      final repository = _MemoryRepository(delay: true);
+      final controller = SystemSettingsController(repository: repository);
+      await controller.initialize();
+
+      final pending = controller.setAutoOffTestMode(true);
+      expect(controller.autoOffTestMode, isTrue);
+      expect(controller.isSaving, isTrue);
+
+      expect(await pending, isTrue);
+      expect(controller.isSaving, isFalse);
+      expect(repository.savedTestMode, [true]);
+
+      final failingRepo = _MemoryRepository(failOnWrite: true);
+      final failingController = SystemSettingsController(
+        repository: failingRepo,
+      );
+      await failingController.initialize();
+      expect(failingController.autoOffTestMode, isFalse);
+
+      expect(await failingController.setAutoOffTestMode(true), isFalse);
+      expect(failingController.autoOffTestMode, isFalse);
+      expect(failingController.errorMessage, isNotNull);
     });
 
     test('เซิร์ฟเวอร์ปฏิเสธแล้วสวิตช์ต้องเด้งกลับ ไม่ใช่ค้างผิด', () async {
@@ -83,15 +119,20 @@ void main() {
 class _MemoryRepository implements SystemSettingsRepository {
   _MemoryRepository({
     bool autoOffEnabled = true,
+    bool autoOffTestMode = false,
     this.failOnRead = false,
     this.failOnWrite = false,
     this.delay = false,
-  }) : _settings = SystemSettings(autoOffEnabled: autoOffEnabled);
+  }) : _settings = SystemSettings(
+         autoOffEnabled: autoOffEnabled,
+         autoOffTestMode: autoOffTestMode,
+       );
 
   final bool failOnRead;
   final bool failOnWrite;
   final bool delay;
   final saved = <bool>[];
+  final savedTestMode = <bool>[];
 
   SystemSettings _settings;
 
@@ -106,7 +147,16 @@ class _MemoryRepository implements SystemSettingsRepository {
     if (delay) await Future<void>.delayed(const Duration(milliseconds: 10));
     if (failOnWrite) throw Exception('ApiException: บันทึกไม่ได้');
     saved.add(enabled);
-    _settings = SystemSettings(autoOffEnabled: enabled);
+    _settings = _settings.copyWith(autoOffEnabled: enabled);
+    return _settings;
+  }
+
+  @override
+  Future<SystemSettings> setAutoOffTestMode(bool testMode) async {
+    if (delay) await Future<void>.delayed(const Duration(milliseconds: 10));
+    if (failOnWrite) throw Exception('ApiException: บันทึกไม่ได้');
+    savedTestMode.add(testMode);
+    _settings = _settings.copyWith(autoOffTestMode: testMode);
     return _settings;
   }
 }

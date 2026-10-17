@@ -9,7 +9,7 @@ import { readTodayBookings } from './room-bookings.js';
 import { withBookings } from '../utils/room-booking.js';
 import { ALERT_KINDS, raiseAlert, resolveOpenAlerts } from './alerts.js';
 import { onAirStatus, onOccupancyStatus, publishAirCommand } from './mqtt.js';
-import { isAutoOffEnabled } from './system-settings.js';
+import { isAutoOffEnabled, isAutoOffTestMode } from './system-settings.js';
 
 // ระบบปิดแอร์อัตโนมัติเมื่อห้องว่าง
 //
@@ -84,10 +84,11 @@ export async function evaluateAutoOff({
       return [];
     }
 
+    const testMode = await isAutoOffTestMode();
     const devices = await readDevices({ deviceId, roomNumber });
     const results = [];
     for (const device of devices) {
-      results.push(await evaluateDevice(device, now));
+      results.push(await evaluateDevice(device, now, testMode));
     }
     return results;
   } finally {
@@ -155,7 +156,7 @@ async function readDevices({ deviceId, roomNumber }) {
   );
 }
 
-async function evaluateDevice(row, now) {
+async function evaluateDevice(row, now, testMode = false) {
   const device = {
     deviceId: row.device_id,
     roomNumber: row.room_number,
@@ -179,6 +180,7 @@ async function evaluateDevice(row, now) {
     device,
     occupancy,
     withinClass: schedule.withinSchedule,
+    testMode,
     now,
   });
 
@@ -259,7 +261,7 @@ async function fireOffCommand(row, attempt) {
         SET auto_off_attempts = ?,
             auto_off_last_attempt_at = CURRENT_TIMESTAMP,
             state_json = ?
-      WHERE device_id = ?`,
+       WHERE device_id = ?`,
     [attempt, JSON.stringify(state), row.device_id],
   );
   console.log(
@@ -269,12 +271,12 @@ async function fireOffCommand(row, attempt) {
 }
 
 /**
- * ล้างนาฬิกาที่ค้างอยู่ทุกเครื่อง ใช้ตอนแอดมินปิดสวิตช์รวม
+ * ล้างนาฬิกาที่ค้างอยู่ทุกเครื่อง ใช้ตอนแอดมินปิดสวิตช์รวมหรือสลับโหมดทดสอบ
  *
  * เงื่อนไข `IS NOT NULL` ทำให้รอบที่ไม่มีอะไรค้างไม่ต้องเขียนฐานข้อมูลเลย
  * ตัวคุมจังหวะเรียกทุก 10 วินาที ถ้าเขียนทุกรอบจะกวนฐานข้อมูลเปล่า ๆ
  */
-function clearAllCountdowns() {
+export function clearAllCountdowns() {
   return pool.query(
     `UPDATE air_conditioners
         SET auto_off_started_at = NULL,

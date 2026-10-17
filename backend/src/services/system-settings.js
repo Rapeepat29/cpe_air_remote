@@ -9,6 +9,8 @@ import { pool } from '../db.js';
 export const SETTING_KEYS = {
   /** สวิตช์รวมของระบบปิดแอร์อัตโนมัติ */
   AUTO_OFF_ENABLED: 'auto_off_enabled',
+  /** โหมดทดสอบการปิดแอร์อัตโนมัติ (นอกคาบ 30 วินาที · ในคาบ 1 นาที) */
+  AUTO_OFF_TEST_MODE: 'auto_off_test_mode',
   /** อัตราค่าไฟต่อ kWh ที่ใช้คำนวณตัวเลขค่าใช้จ่ายโดยประมาณ */
   ELECTRICITY_RATE: 'electricity_rate',
   /**
@@ -30,6 +32,7 @@ export const SETTING_KEYS = {
  */
 const DEFAULTS = {
   [SETTING_KEYS.AUTO_OFF_ENABLED]: true,
+  [SETTING_KEYS.AUTO_OFF_TEST_MODE]: false,
   [SETTING_KEYS.ELECTRICITY_RATE]: 4.5,
 };
 
@@ -82,7 +85,10 @@ async function readAll() {
       'SELECT setting_key, setting_value FROM system_settings',
     );
     for (const row of rows) {
-      if (row.setting_key === SETTING_KEYS.AUTO_OFF_ENABLED) {
+      if (
+        row.setting_key === SETTING_KEYS.AUTO_OFF_ENABLED
+        || row.setting_key === SETTING_KEYS.AUTO_OFF_TEST_MODE
+      ) {
         values[row.setting_key] = parseBoolean(
           row.setting_value,
           DEFAULTS[row.setting_key],
@@ -108,6 +114,12 @@ export async function isAutoOffEnabled() {
   return values[SETTING_KEYS.AUTO_OFF_ENABLED];
 }
 
+/** โหมดทดสอบการปิดแอร์อัตโนมัติ (นอกคาบ 30 วินาที · ในคาบ 1 นาที) เปิดอยู่หรือไม่ */
+export async function isAutoOffTestMode() {
+  const values = await readAll();
+  return values[SETTING_KEYS.AUTO_OFF_TEST_MODE];
+}
+
 /** อัตราค่าไฟต่อ kWh ที่ใช้อยู่ */
 export async function readElectricityRate() {
   const values = await readAll();
@@ -119,6 +131,7 @@ export async function readPublicSettings() {
   const values = await readAll();
   return {
     autoOffEnabled: values[SETTING_KEYS.AUTO_OFF_ENABLED],
+    autoOffTestMode: values[SETTING_KEYS.AUTO_OFF_TEST_MODE],
     electricityRate: values[SETTING_KEYS.ELECTRICITY_RATE],
   };
 }
@@ -147,6 +160,15 @@ export async function setAutoOffEnabled(enabled, username) {
   return writeSetting(
     SETTING_KEYS.AUTO_OFF_ENABLED,
     enabled ? 'true' : 'false',
+    username,
+  );
+}
+
+/** เขียนสวิตช์โหมดทดสอบการปิดแอร์อัตโนมัติ */
+export async function setAutoOffTestMode(testMode, username) {
+  return writeSetting(
+    SETTING_KEYS.AUTO_OFF_TEST_MODE,
+    testMode ? 'true' : 'false',
     username,
   );
 }

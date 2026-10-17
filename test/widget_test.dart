@@ -521,7 +521,13 @@ class _MemorySystemSettingsRepository implements SystemSettingsRepository {
 
   @override
   Future<SystemSettings> setAutoOffEnabled(bool enabled) async {
-    _settings = SystemSettings(autoOffEnabled: enabled);
+    _settings = _settings.copyWith(autoOffEnabled: enabled);
+    return _settings;
+  }
+
+  @override
+  Future<SystemSettings> setAutoOffTestMode(bool testMode) async {
+    _settings = _settings.copyWith(autoOffTestMode: testMode);
     return _settings;
   }
 }

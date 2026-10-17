@@ -4,7 +4,6 @@ import '../models/provisioning.dart';
 import '../services/air_conditioner_repository.dart';
 import '../services/ble_provisioning_service.dart';
 import '../theme/app_theme.dart';
-import '../widgets/air_control_badge.dart';
 
 class BleProvisioningScreen extends StatefulWidget {
   const BleProvisioningScreen({

@@ -5,6 +5,8 @@ import {
   AUTO_OFF_IDLE_SECONDS,
   AUTO_OFF_IN_CLASS_SECONDS,
   AUTO_OFF_MAX_ATTEMPTS,
+  AUTO_OFF_TEST_IDLE_SECONDS,
+  AUTO_OFF_TEST_IN_CLASS_SECONDS,
   autoOffPhase,
   autoOffSecondsRemaining,
   decideAutoOff,
@@ -61,6 +63,43 @@ test('ระหว่างมีคาบเรียนให้เวลา�
   assert.equal(result.action, 'start');
   assert.equal(result.graceSeconds, AUTO_OFF_IN_CLASS_SECONDS);
   assert.equal(result.withinClass, true);
+});
+
+test('โหมดทดสอบ: นอกคาบเรียนให้นับถอยหลัง 30 วินาที และในคาบเรียน 1 นาที', () => {
+  const idleResult = decideAutoOff({
+    device: device(),
+    occupancy: sensor(),
+    withinClass: false,
+    testMode: true,
+    now: NOW,
+  });
+
+  assert.equal(idleResult.action, 'start');
+  assert.equal(idleResult.graceSeconds, AUTO_OFF_TEST_IDLE_SECONDS);
+  assert.equal(idleResult.graceSeconds, 30);
+  assert.equal(idleResult.testMode, true);
+  assert.equal(
+    idleResult.deadlineAt.toISOString(),
+    '2026-08-21T08:00:30.000Z',
+  );
+
+  const inClassResult = decideAutoOff({
+    device: device(),
+    occupancy: sensor(),
+    withinClass: true,
+    testMode: true,
+    now: NOW,
+  });
+
+  assert.equal(inClassResult.action, 'start');
+  assert.equal(inClassResult.graceSeconds, AUTO_OFF_TEST_IN_CLASS_SECONDS);
+  assert.equal(inClassResult.graceSeconds, 60);
+  assert.equal(inClassResult.withinClass, true);
+  assert.equal(inClassResult.testMode, true);
+  assert.equal(
+    inClassResult.deadlineAt.toISOString(),
+    '2026-08-21T08:01:00.000Z',
+  );
 });
 
 test('ไม่มีเซ็นเซอร์หรือเซ็นเซอร์ไม่ตอบ จะไม่ปิดให้เด็ดขาด', () => {

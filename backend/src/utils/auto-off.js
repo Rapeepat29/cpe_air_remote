@@ -9,6 +9,12 @@ export const AUTO_OFF_IDLE_SECONDS = 300;
 /** ระหว่างมีคาบเรียนให้เวลานานกว่า เผื่อพักเบรกแล้วกลับเข้ามา */
 export const AUTO_OFF_IN_CLASS_SECONDS = 900;
 
+/** โหมดทดสอบ: ไม่มีคนนานเท่านี้นอกคาบเรียน (30 วินาที) = สั่งปิด */
+export const AUTO_OFF_TEST_IDLE_SECONDS = 30;
+
+/** โหมดทดสอบ: ระหว่างมีคาบเรียน (1 นาที) = สั่งปิด */
+export const AUTO_OFF_TEST_IN_CLASS_SECONDS = 60;
+
 /** ยิง IR ซ้ำทุกกี่วินาที ถ้าแอร์ยังกินไฟอยู่ */
 export const AUTO_OFF_RETRY_SECONDS = 20;
 
@@ -26,7 +32,13 @@ export const AUTO_OFF_MAX_ATTEMPTS = 5;
  * - `giveUp`    ยิงครบจำนวนแล้วแอร์ยังทำงาน ต้องแจ้งคน
  * - `cancel`    เงื่อนไขหมดไป (มีคนเข้ามา / เซ็นเซอร์ตาย / ปิดฟีเจอร์)
  */
-export function decideAutoOff({ device, occupancy, withinClass, now }) {
+export function decideAutoOff({
+  device,
+  occupancy,
+  withinClass,
+  testMode = false,
+  now,
+}) {
   const current = now instanceof Date ? now : new Date(now);
   const counting = device?.autoOffDeadlineAt != null;
   const attempts = Number(device?.autoOffAttempts ?? 0);
@@ -66,14 +78,16 @@ export function decideAutoOff({ device, occupancy, withinClass, now }) {
 
   // ถึงตรงนี้: แอร์ทำงานอยู่ ห้องว่าง เซ็นเซอร์เชื่อถือได้
   if (!counting) {
+    const isTest = testMode === true;
     const graceSeconds = withinClass === true
-      ? AUTO_OFF_IN_CLASS_SECONDS
-      : AUTO_OFF_IDLE_SECONDS;
+      ? (isTest ? AUTO_OFF_TEST_IN_CLASS_SECONDS : AUTO_OFF_IN_CLASS_SECONDS)
+      : (isTest ? AUTO_OFF_TEST_IDLE_SECONDS : AUTO_OFF_IDLE_SECONDS);
     return {
       action: 'start',
       reason: 'emptyRoom',
       graceSeconds,
       withinClass: withinClass === true,
+      testMode: isTest,
       deadlineAt: new Date(current.getTime() + graceSeconds * 1000),
     };
   }

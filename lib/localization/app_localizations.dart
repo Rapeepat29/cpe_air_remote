@@ -332,6 +332,11 @@ const _thaiTranslations = <String, String>{
   // สวิตช์รวมของระบบปิดแอร์อัตโนมัติ (v3.10.0)
   'AUTOMATIC SHUTDOWN': 'ระบบปิดแอร์อัตโนมัติ',
   'Switch air conditioners off automatically': 'ปิดแอร์อัตโนมัติเมื่อห้องว่าง',
+  'Auto-off test mode': 'โหมดทดสอบการปิดอัตโนมัติ',
+  'Count down 30 seconds outside class hours and 1 minute during class hours.':
+      'นับถอยหลัง 30 วินาทีเมื่ออยู่นอกคาบเรียน และ 1 นาทีเมื่ออยู่ในคาบเรียน',
+  'Test mode is active: empty rooms switch off after 30 seconds outside class hours or 1 minute during class hours.':
+      'โหมดทดสอบเปิดอยู่: ห้องว่างจะสั่งปิดแอร์ใน 30 วินาที (นอกคาบเรียน) หรือ 1 นาที (ในคาบเรียน)',
   'Counts down 5 minutes when a room is empty with the air conditioner running, then sends the off signal.': 'เมื่อแอร์ทำงานอยู่แต่ไม่มีคนในห้อง จะนับถอยหลัง 5 นาที แล้วส่งสัญญาณปิด',
   'Only an admin can change this. It applies to the whole building.': 'เฉพาะผู้ดูแลระบบเท่านั้นที่เปลี่ยนการตั้งค่านี้ได้ เนื่องจากมีผลกับทั้งอาคาร',
   'Every room is affected. No countdown runs and nothing is switched off until this is turned back on.': 'มีผลกับทุกห้อง จะไม่มีการนับถอยหลังและไม่มีการสั่งปิด จนกว่าจะเปิดใหม่',
@@ -1197,6 +1202,12 @@ const _englishTranslations = <String, String>{
   // --- Auto switch-off and account settings (v3.8.0) ---
   'ค่าปิดอัตโนมัติต้องเป็น true หรือ false':
       'The auto switch-off setting must be true or false.',
+  'ต้องส่ง enabled เป็น true หรือ false':
+      'The enabled setting must be true or false.',
+  'ต้องส่ง testMode เป็น true หรือ false':
+      'The testMode setting must be true or false.',
+  'ต้องส่ง enabled หรือ testMode เป็น true หรือ false':
+      'Either enabled or testMode must be true or false.',
   'รหัสการแจ้งเตือนไม่ถูกต้อง': 'That alert id is invalid.',
   'ไม่พบการแจ้งเตือนนี้ หรือรับทราบไปแล้ว':
       'That alert was not found, or it has already been handled.',

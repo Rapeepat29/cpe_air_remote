@@ -15,7 +15,8 @@ class LocalAlertNotifier implements AlertNotifier {
   static const _channelName = 'System alerts';
 
   final FlutterLocalNotificationsPlugin _plugin;
-  Future<bool>? _initialization;
+  Future<bool>? _setup;
+  bool _permissionGranted = false;
 
   /// รองรับเฉพาะมือถือ แพลตฟอร์มอื่นให้ใช้ [NoopAlertNotifier]
   static bool get isSupported =>
@@ -24,14 +25,28 @@ class LocalAlertNotifier implements AlertNotifier {
           defaultTargetPlatform == TargetPlatform.iOS);
 
   @override
-  Future<bool> initialize() => _initialization ??= _doInitialize();
+  Future<bool> initialize() async {
+    if (!await (_setup ??= _doSetup())) {
+      _setup = null;
+      return false;
+    }
+    if (_permissionGranted) return true;
+    _permissionGranted = await _requestPermission();
+    return _permissionGranted;
+  }
 
-  Future<bool> _doInitialize() async {
+  /// เตรียมปลั๊กอินและช่องแจ้งเตือนครั้งเดียว แยกจากการขอสิทธิ์เพื่อให้ขอใหม่ได้
+  /// หากผู้ใช้กดไม่อนุญาตในครั้งแรกแล้วไปเปิดใน Settings ของเครื่องทีหลัง
+  Future<bool> _doSetup() async {
     try {
       await _plugin.initialize(
         const InitializationSettings(
           android: AndroidInitializationSettings('@mipmap/ic_launcher'),
-          iOS: DarwinInitializationSettings(),
+          iOS: DarwinInitializationSettings(
+            requestAlertPermission: false,
+            requestBadgePermission: false,
+            requestSoundPermission: false,
+          ),
         ),
       );
       final android = _plugin
@@ -46,16 +61,37 @@ class LocalAlertNotifier implements AlertNotifier {
             importance: Importance.high,
           ),
         );
+      }
+      return true;
+    } catch (error) {
+      debugPrint('LocalAlertNotifier setup failed: $error');
+      return false;
+    }
+  }
+
+  Future<bool> _requestPermission() async {
+    try {
+      final android = _plugin
+          .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin
+          >();
+      if (android != null) {
+        final enabled = await android.areNotificationsEnabled();
+        if (enabled == true) return true;
         return await android.requestNotificationsPermission() ?? false;
       }
       final ios = _plugin
           .resolvePlatformSpecificImplementation<
             IOSFlutterLocalNotificationsPlugin
           >();
-      return await ios?.requestPermissions(alert: true, badge: true, sound: true) ??
+      return await ios?.requestPermissions(
+            alert: true,
+            badge: true,
+            sound: true,
+          ) ??
           false;
     } catch (error) {
-      debugPrint('LocalAlertNotifier init failed: $error');
+      debugPrint('LocalAlertNotifier permission check failed: $error');
       return false;
     }
   }

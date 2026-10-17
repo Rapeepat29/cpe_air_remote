@@ -729,11 +729,31 @@ class _AutoOffRow extends StatelessWidget {
       );
   }
 
+  Future<void> _toggleTestMode(BuildContext context, bool testMode) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final fallback = context.tr(
+      'The setting could not be saved. Please try again.',
+    );
+
+    final saved = await controller.setAutoOffTestMode(testMode);
+    if (saved) return;
+
+    messenger
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          backgroundColor: AppColors.red,
+          content: Text(controller.errorMessage ?? fallback),
+        ),
+      );
+  }
+
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final palette = AppPalette.of(context);
     final enabled = controller.autoOffEnabled;
+    final testMode = controller.autoOffTestMode;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -762,6 +782,36 @@ class _AutoOffRow extends StatelessWidget {
             style: const TextStyle(fontSize: 12.5, height: 1.4),
           ),
         ),
+        Divider(
+          height: 1,
+          thickness: 1,
+          indent: 56,
+          color: colors.outlineVariant,
+        ),
+        SwitchListTile(
+          key: const Key('auto-off-test-mode-switch'),
+          contentPadding: const EdgeInsets.fromLTRB(20, 4, 20, 4),
+          value: testMode,
+          onChanged: isAdmin && enabled && !controller.isSaving
+              ? (value) => _toggleTestMode(context, value)
+              : null,
+          secondary: Icon(
+            Icons.timer_outlined,
+            size: 22,
+            color: enabled && testMode ? palette.warn : colors.onSurfaceVariant,
+          ),
+          title: Text(
+            context.tr('Auto-off test mode'),
+            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+          ),
+          subtitle: Text(
+            context.tr(
+              'Count down 30 seconds outside class hours and 1 minute '
+              'during class hours.',
+            ),
+            style: const TextStyle(fontSize: 12.5, height: 1.4),
+          ),
+        ),
         Padding(
           padding: const EdgeInsets.fromLTRB(20, 0, 20, 14),
           child: Column(
@@ -781,6 +831,16 @@ class _AutoOffRow extends StatelessWidget {
                   text: context.tr(
                     'Only administrators can change this setting because it '
                     'applies to the whole building.',
+                  ),
+                ),
+              if (enabled && testMode)
+                _AutoOffNote(
+                  icon: Icons.science_outlined,
+                  color: palette.warn,
+                  text: context.tr(
+                    'Test mode is active: empty rooms switch off after '
+                    '30 seconds outside class hours or 1 minute during '
+                    'class hours.',
                   ),
                 ),
               if (isAdmin && controller.hasLoaded && !enabled)

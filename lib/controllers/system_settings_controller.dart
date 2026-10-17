@@ -19,6 +19,7 @@ class SystemSettingsController extends ChangeNotifier {
   String? errorMessage;
 
   bool get autoOffEnabled => settings.autoOffEnabled;
+  bool get autoOffTestMode => settings.autoOffTestMode;
 
   Future<void> initialize() async {
     if (hasLoaded || isLoading) return;
@@ -48,13 +49,36 @@ class SystemSettingsController extends ChangeNotifier {
     if (isSaving) return false;
 
     final previous = settings;
-    settings = SystemSettings(autoOffEnabled: enabled);
+    settings = settings.copyWith(autoOffEnabled: enabled);
     isSaving = true;
     errorMessage = null;
     notifyListeners();
 
     try {
       settings = await repository.setAutoOffEnabled(enabled);
+      return true;
+    } catch (error) {
+      settings = previous;
+      errorMessage = _readable(error);
+      return false;
+    } finally {
+      isSaving = false;
+      notifyListeners();
+    }
+  }
+
+  /// เปิดปิดโหมดทดสอบการปิดแอร์อัตโนมัติ (นอกคาบเรียน 30 วินาที · ในคาบเรียน 1 นาที)
+  Future<bool> setAutoOffTestMode(bool testMode) async {
+    if (isSaving) return false;
+
+    final previous = settings;
+    settings = settings.copyWith(autoOffTestMode: testMode);
+    isSaving = true;
+    errorMessage = null;
+    notifyListeners();
+
+    try {
+      settings = await repository.setAutoOffTestMode(testMode);
       return true;
     } catch (error) {
       settings = previous;

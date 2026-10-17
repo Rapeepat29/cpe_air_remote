@@ -2,10 +2,12 @@ import express from 'express';
 
 import { authenticate } from '../middleware/authenticate.js';
 import { requireAdmin } from '../middleware/require-admin.js';
+import { clearAllCountdowns, evaluateAutoOff } from '../services/auto-off.js';
 import {
   RATE_LIMITS,
   readPublicSettings,
   setAutoOffEnabled,
+  setAutoOffTestMode,
   setElectricityRate,
 } from '../services/system-settings.js';
 import { ApiError, asyncHandler } from '../utils/http.js';
@@ -26,21 +28,39 @@ settingsRouter.get(
   }),
 );
 
-// แก้ได้เฉพาะแอดมิน เพราะกดทีเดียวหยุดทั้งอาคาร
+// แก้ได้เฉพาะแอดมิน เพราะกดทีเดียวหยุดหรือเปลี่ยนเวลานับถอยหลังทั้งอาคาร
 settingsRouter.patch(
   '/auto-off',
   requireAdmin,
   asyncHandler(async (request, response) => {
-    const { enabled } = request.body ?? {};
-    if (typeof enabled !== 'boolean') {
+    const { enabled, testMode } = request.body ?? {};
+    if (enabled !== undefined && typeof enabled !== 'boolean') {
       throw new ApiError(400, 'ต้องส่ง enabled เป็น true หรือ false');
     }
+    if (testMode !== undefined && typeof testMode !== 'boolean') {
+      throw new ApiError(400, 'ต้องส่ง testMode เป็น true หรือ false');
+    }
+    if (enabled === undefined && testMode === undefined) {
+      throw new ApiError(400, 'ต้องส่ง enabled หรือ testMode เป็น true หรือ false');
+    }
 
-    const settings = await setAutoOffEnabled(
-      enabled,
-      request.authUser?.username,
-    );
-    response.json(settings);
+    const username = request.authUser?.username;
+    let settings;
+    if (typeof enabled === 'boolean') {
+      settings = await setAutoOffEnabled(enabled, username);
+    }
+    if (typeof testMode === 'boolean') {
+      settings = await setAutoOffTestMode(testMode, username);
+    }
+
+    // ล้างนาฬิกาเดิมที่กำลังนับอยู่แล้วประเมินใหม่ทันที เพื่อให้สลับระหว่าง
+    // โหมดปกติ (5/15 นาที) กับโหมดทดสอบ (30 วินาที / 1 นาที) มีผลทันที
+    await clearAllCountdowns();
+    evaluateAutoOff().catch((error) => {
+      console.error('ประเมินการปิดแอร์อัตโนมัติหลังเปลี่ยนค่าตั้งไม่สำเร็จ', error.message);
+    });
+
+    response.json(settings ?? (await readPublicSettings()));
   }),
 );
 

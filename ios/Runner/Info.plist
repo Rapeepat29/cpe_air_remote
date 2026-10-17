@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Cpe Air Remote</string>
+	<string>RMUTT Energy</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -26,6 +26,10 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>ใช้บลูทูธเพื่อค้นหาและตั้งค่าบอร์ด ESP32 ที่ควบคุมแอร์และตรวจจับคนในห้อง</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>ใช้บลูทูธเพื่อค้นหาและตั้งค่าบอร์ด ESP32 ที่ควบคุมแอร์และตรวจจับคนในห้อง</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
