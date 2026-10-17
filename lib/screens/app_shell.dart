@@ -121,6 +121,9 @@ class _AppShellState extends State<AppShell> {
     );
     _systemSettingsController.initialize();
     _dashboardController.initialize();
+    // ขอสิทธิ์แจ้งเตือนตั้งแต่เปิดแอป ไม่รอให้มีใบแรก ไม่งั้น iOS จะไม่แสดง
+    // แถว "การแจ้งเตือน" ในหน้าตั้งค่า และผู้ใช้ไม่เคยเห็นหน้าต่างขออนุญาต
+    widget.alertNotifier?.initialize();
     _initializeRoomsAndAir();
   }
 

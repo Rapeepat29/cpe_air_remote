@@ -52,6 +52,16 @@ jobs:
           plutil -replace CFBundleDisplayName -string "RMUTT Energy" "$PLIST"
           plutil -lint "$PLIST"
 
+      - name: ตั้งค่า AppDelegate สำหรับแจ้งเตือนในเครื่อง
+        run: |
+          # flutter_local_notifications ต้องให้ AppDelegate เป็น delegate ของ
+          # UNUserNotificationCenter ไม่งั้นแบนเนอร์ไม่ขึ้นตอนแอปเปิดอยู่
+          FILE=ios/Runner/AppDelegate.swift
+          if ! grep -q UNUserNotificationCenter "$FILE"; then
+            perl -0pi -e 's/(\n\s*)return super\.application\(application, didFinishLaunchingWithOptions: launchOptions\)/$1UNUserNotificationCenter.current().delegate = self as UNUserNotificationCenterDelegate$1return super.application(application, didFinishLaunchingWithOptions: launchOptions)/' "$FILE"
+          fi
+          grep -n UNUserNotificationCenter "$FILE" || { echo "แก้ AppDelegate ไม่สำเร็จ"; exit 1; }
+
       - name: ใส่ไอคอนแอป RMUTT Energy
         run: |
           # flutter create ใส่ไอคอน Flutter มาให้ จึงต้องแทนทุกขนาดด้วยโลโก้ของเรา
