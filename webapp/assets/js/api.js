@@ -340,5 +340,6 @@ export const api = {
   // --------------------------------------------------------------- ตั้งค่า
   settings: () => get('/settings'),
   setAutoOffEnabled: (enabled) => patch('/settings/auto-off', { enabled }),
+  setAutoOffTestMode: (testMode) => patch('/settings/auto-off', { testMode }),
   setElectricityRate: (rate) => patch('/settings/rate', { rate }),
 };

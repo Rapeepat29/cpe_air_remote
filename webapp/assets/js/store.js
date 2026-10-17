@@ -19,7 +19,7 @@ import { isoDate, shiftDays } from './format.js';
 /** ค่าเริ่มต้นของทุกอย่าง หน้าจอจึงวาดได้ตั้งแต่ก่อนข้อมูลชุดแรกมาถึง */
 const initialState = {
   user: null,
-  settings: { autoOffEnabled: true, electricityRate: 4.5 },
+  settings: { autoOffEnabled: true, autoOffTestMode: false, electricityRate: 4.5 },
   health: null,
   rooms: [],
   airConditioners: [],
@@ -121,6 +121,7 @@ export const loaders = {
     if (result) {
       state.settings = {
         autoOffEnabled: result.autoOffEnabled !== false,
+        autoOffTestMode: result.autoOffTestMode === true,
         // Backend รุ่นเก่ายังไม่มีอัตราค่าไฟ ให้ถอยไปใช้ค่าเดิมของแอปมือถือ
         electricityRate: Number.isFinite(Number(result.electricityRate))
           ? Number(result.electricityRate)

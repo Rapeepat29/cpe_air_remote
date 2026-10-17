@@ -137,6 +137,7 @@ function themeChooser(onChanged) {
 
 function autoOffCard(isAdmin) {
   const enabled = state.settings.autoOffEnabled;
+  const testMode = state.settings.autoOffTestMode === true;
   const counting = state.rooms.filter(
     (room) => room.autoOffSecondsRemaining != null,
   ).length;
@@ -145,8 +146,12 @@ function autoOffCard(isAdmin) {
     el('div', { class: 'panel-title' }, [
       'ระบบปิดแอร์อัตโนมัติ',
       el('span', {
-        class: `status-chip ${enabled ? 'done' : 'off'}`,
-        text: enabled ? 'เปิดอยู่' : 'ปิดอยู่',
+        class: `status-chip ${!enabled ? 'off' : testMode ? 'warn' : 'done'}`,
+        text: !enabled
+          ? 'ปิดอยู่'
+          : testMode
+            ? 'โหมดทดสอบ (30 วิ / 1 นาที)'
+            : 'เปิดอยู่',
       }),
     ]),
     el('div', { class: 'switch-row' }, [
@@ -155,8 +160,10 @@ function autoOffCard(isAdmin) {
         el('div', {
           class: 'sub',
           text: enabled
-            ? 'เมื่อห้องว่างและแอร์ยังทำงาน ระบบจะนับถอยหลังแล้วส่งคำสั่งปิดเอง ' +
-              '(นอกคาบเรียน 5 นาที · ในคาบเรียน 15 นาที)'
+            ? testMode
+              ? 'โหมดทดสอบเปิดอยู่: เมื่อห้องว่างและแอร์ยังทำงาน ระบบจะนับถอยหลัง 30 วินาที (นอกคาบเรียน) หรือ 1 นาที (ในคาบเรียน) แล้วส่งคำสั่งปิด'
+              : 'เมื่อห้องว่างและแอร์ยังทำงาน ระบบจะนับถอยหลังแล้วส่งคำสั่งปิดเอง ' +
+                '(นอกคาบเรียน 5 นาที · ในคาบเรียน 15 นาที)'
             : 'ปิดอยู่ ระบบจะไม่ส่งคำสั่งปิดแอร์เอง และนาฬิกาที่ค้างอยู่ถูกล้างแล้ว',
         }),
         !isAdmin
@@ -202,6 +209,53 @@ function autoOffCard(isAdmin) {
         },
       }),
     ]),
+    el(
+      'div',
+      {
+        class: 'switch-row',
+        style: {
+          marginTop: '12px',
+          paddingTop: '12px',
+          borderTop: '1px solid var(--border, rgba(255,255,255,0.08))',
+        },
+      },
+      [
+        el('div', { class: 'grow' }, [
+          el('div', { class: 'label', text: 'โหมดทดสอบการปิดอัตโนมัติ' }),
+          el('div', {
+            class: 'sub',
+            text: 'นับถอยหลัง 30 วินาทีเมื่ออยู่นอกคาบเรียน และ 1 นาทีเมื่ออยู่ในคาบเรียน (สำหรับทดสอบระบบ)',
+          }),
+          enabled && testMode
+            ? el('div', {
+                class: 'sub warn',
+                text: 'กำลังใช้เวลาโหมดทดสอบกับทุกห้องในอาคาร (นอกคาบ 30 วินาที · ในคาบ 1 นาที)',
+              })
+            : null,
+        ]),
+        toggle(testMode, {
+          disabled: !isAdmin || !enabled,
+          onclick: async (event) => {
+            const button = event.currentTarget;
+            button.disabled = true;
+            try {
+              await api.setAutoOffTestMode(!testMode);
+              await loaders.settings();
+              await loaders.rooms();
+              toastOk(
+                testMode
+                  ? 'ปิดโหมดทดสอบแล้ว (ใช้เวลาปกติ 5 / 15 นาที)'
+                  : 'เปิดโหมดทดสอบแล้ว (นอกคาบ 30 วินาที · ในคาบ 1 นาที)',
+              );
+            } catch (error) {
+              toastError(error.message);
+            } finally {
+              button.disabled = false;
+            }
+          },
+        }),
+      ],
+    ),
     el('div', {
       class: 'dim',
       style: { fontSize: 'var(--fs-xs)', marginTop: '10px' },
