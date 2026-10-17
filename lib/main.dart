@@ -14,6 +14,7 @@ import 'services/air_conditioner_repository.dart';
 import 'services/air_conditioner_service.dart';
 import 'services/ble_provisioning_service.dart';
 import 'services/alert_notifier.dart';
+import 'services/mobile_notification_gateway.dart';
 import 'services/alert_repository.dart';
 import 'services/alert_service.dart';
 import 'services/energy_repository.dart';
@@ -79,6 +80,7 @@ class _CpeAirRemoteAppState extends State<CpeAirRemoteApp> {
   late final UserRepository _userRepository;
   late final EnergyRepository _energyRepository;
   late final AlertRepository _alertRepository;
+  late final AlertNotifier _alertNotifier;
   late final SystemSettingsRepository _systemSettingsRepository;
   late final bool _ownsAppSettingsController;
 
@@ -100,6 +102,11 @@ class _CpeAirRemoteAppState extends State<CpeAirRemoteApp> {
     _userRepository = widget.userRepository ?? UserService();
     _energyRepository = widget.energyRepository ?? EnergyService();
     _alertRepository = widget.alertRepository ?? AlertService();
+    _alertNotifier =
+        widget.alertNotifier ??
+        (LocalAlertNotifier.isSupported
+            ? LocalAlertNotifier()
+            : const NoopAlertNotifier());
     _systemSettingsRepository =
         widget.systemSettingsRepository ?? SystemSettingsService();
     _authController.initialize();
@@ -172,7 +179,7 @@ class _CpeAirRemoteAppState extends State<CpeAirRemoteApp> {
                 userRepository: _userRepository,
                 energyRepository: _energyRepository,
                 alertRepository: _alertRepository,
-                alertNotifier: widget.alertNotifier,
+                alertNotifier: _alertNotifier,
                 systemSettingsRepository: _systemSettingsRepository,
                 authController: _authController,
                 onLogout: _authController.logout,
