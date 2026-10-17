@@ -694,6 +694,7 @@ void initState() {
   );
   _systemSettingsController.initialize();
   _dashboardController.initialize();
+  widget.alertNotifier?.initialize();
   _initializeRoomsAndAir();
 }
 ```

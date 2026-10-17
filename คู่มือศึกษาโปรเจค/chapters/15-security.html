@@ -1268,8 +1268,8 @@ USER node
 </tr>
 <tr>
 <td>5</td>
-<td><code>AlertNotifier</code> ไม่ได้ต่อสาย</td>
-<td><code>main.dart</code> บรรทัด 34 <code>runApp(const CpeAirRemoteApp())</code> ไม่ส่ง <code>alertNotifier</code> เข้าไป (บรรทัด 49, 175 รับเป็น nullable) ตัวที่มีคือ <code>NoopAlertNotifier</code></td>
+<td>แจ้งเตือนทำงานเฉพาะตอนแอปรันอยู่</td>
+<td>ต่อ <code>LocalAlertNotifier</code> (<code>flutter_local_notifications</code>) แล้ว แต่ยังต้องอาศัยการ poll จากแอป</td>
 <td>การแจ้งเตือนผิดปกติ (เช่น แอร์เปิดเกินเวลา) ไม่ถึงผู้ดูแลแบบ push จึงเป็นเรื่อง Availability/การตอบสนองต่อเหตุ</td>
 <td>ต่อ notifier จริง (local notification/FCM)</td>
 </tr>

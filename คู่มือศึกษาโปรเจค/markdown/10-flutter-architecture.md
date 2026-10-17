@@ -837,7 +837,7 @@ JSON ที่เขียนลงบอร์ดมี `version: 1`, `token` (
 - `NoopAlertNotifier` ตัวที่ไม่ทำอะไร (`initialize` คืน `false`, `show` ว่าง)
 - `AlertNotificationText {title, body}` และฟังก์ชัน `describeAlert(SystemAlert, AppLocalizations)` สร้างหัวข้อและเนื้อความตามภาษา: หัวข้อแปลจากชนิด, เนื้อความเป็น `ห้อง XXX · ชื่อเครื่อง — ข้อความ` (ไม่รับ `BuildContext` เพราะผู้เรียกอยู่ใน Controller/State ที่ไม่ได้อยู่ในต้นไม้วิดเจ็ตและหน้าจอนั้นอาจถูกถอดไปแล้ว)
 - `LocalAlertNotifier` (ไฟล์ `services/mobile_notification_gateway.dart`) ตัวจริงที่ `implements AlertNotifier` ใช้ `flutter_local_notifications` สร้าง channel `system_alerts` (Importance.high) ขอสิทธิ์ตอนเรียก `initialize()` ครั้งแรก (Android 13+ ใช้ `requestNotificationsPermission`, iOS ใช้ `requestPermissions`) และ `show()` จะเรียก `initialize()` ให้เองถ้ายังไม่ได้ทำ `LocalAlertNotifier.isSupported` เป็นจริงเฉพาะ Android/iOS ฝั่ง iOS ตั้ง `presentAlert/presentBanner/presentList/presentSound` เป็น true เพื่อให้แบนเนอร์ขึ้นตอนแอปเปิดอยู่
-- **สถานะจริงของโค้ด:** `_CpeAirRemoteAppState.initState` เลือกตัวเด้งเป็น `widget.alertNotifier ?? (LocalAlertNotifier.isSupported ? LocalAlertNotifier() : const NoopAlertNotifier())` แล้วส่งเข้า `AppShell` จึงบนมือถือการแจ้งเตือนในเครื่องทำงานจริง ส่วนเดสก์ท็อป/เว็บและเทสต์ยังเป็นตัวเปล่า **ข้อจำกัด:** เป็นแจ้งเตือนในเครื่องที่เกิดจากการ poll alert ของ `DashboardController` จึงเด้งได้ตราบที่แอปยังรันอยู่ (iOS หยุดแอปเบื้องหลังเร็วกว่า Android) ถ้าแอปถูกปิดสนิทต้องย้ายไปใช้ FCM/APNs โดยเปลี่ยนเฉพาะตัวที่ implement สัญญานี้ Android ต้องมีสิทธิ์ `POST_NOTIFICATIONS` และเปิด core library desugaring ใน `android/app/build.gradle.kts`
+- **สถานะจริงของโค้ด:** `_CpeAirRemoteAppState.initState` เลือกตัวเด้งเป็น `widget.alertNotifier ?? (LocalAlertNotifier.isSupported ? LocalAlertNotifier() : const NoopAlertNotifier())` แล้วส่งเข้า `AppShell` และ `AppShell.initState` เรียก `widget.alertNotifier?.initialize()` ทันทีตั้งแต่เปิดแอป เพื่อให้ระบบขึ้นหน้าต่างขออนุญาตและแสดงแถว "การแจ้งเตือน" ใน Settings ของ iOS โดยไม่ต้องรอให้มีใบแรก จึงบนมือถือการแจ้งเตือนในเครื่องทำงานจริง ส่วนเดสก์ท็อป/เว็บและเทสต์ยังเป็นตัวเปล่า **ข้อจำกัด:** เป็นแจ้งเตือนในเครื่องที่เกิดจากการ poll alert ของ `DashboardController` จึงเด้งได้ตราบที่แอปยังรันอยู่ (iOS หยุดแอปเบื้องหลังเร็วกว่า Android) ถ้าแอปถูกปิดสนิทต้องย้ายไปใช้ FCM/APNs โดยเปลี่ยนเฉพาะตัวที่ implement สัญญานี้ Android ต้องมีสิทธิ์ `POST_NOTIFICATIONS` และเปิด core library desugaring ใน `android/app/build.gradle.kts` ส่วน iOS ต้องตั้ง `UNUserNotificationCenter.current().delegate` ใน `AppDelegate.swift` (ซึ่ง `build-ios.yml` เติมให้อัตโนมัติ)
 
 ### Controllers (`lib/controllers/`)
 
@@ -1951,7 +1951,7 @@ DateTime? parseNumericDate(String text) {
 
 > [!ASK]
 > **ถาม: การแจ้งเตือนบนมือถือทำงานจริงหรือยัง?**
-> ตอบ: ตามโค้ดตอนนี้ **ยัง** ครึ่งทาง ตัวตรวจใบแจ้งเตือนใหม่ ค่าตั้งรายชนิด และสัญญา `AlertNotifier` พร้อมแล้ว แต่ไม่มีตัวที่ implement จริง (มีแค่ `NoopAlertNotifier`) และ `main()` ไม่ส่ง `alertNotifier` เข้าไป ที่ทำงานจริงคือรายการแจ้งเตือนในแอป การจะเด้งบนเครื่องต้องเพิ่มปลั๊กอินแจ้งเตือนและคลาสที่ implement `AlertNotifier`
+> ตอบ: บนมือถือ **เด้งจริงแบบแจ้งเตือนในเครื่อง (local notification)** ด้วย `LocalAlertNotifier` (`flutter_local_notifications`) ที่ขอสิทธิ์ตั้งแต่เข้า `AppShell` และเด้งเมื่อ `DashboardController` poll เจอใบใหม่ที่ตรงกับสวิตช์ใน `AlertPreferences` แต่ยังเป็นแจ้งเตือนในเครื่อง จึงทำงานเฉพาะตอนแอปยังรันอยู่ ถ้าต้องการให้เด้งแม้ปิดแอปสนิทต้องต่อ FCM/APNs แทน
 
 ## สรุปและเช็กลิสต์ความเข้าใจ
 

@@ -146,7 +146,7 @@
 | flutter_localizations | ชุดคำแปลและปฏิทินมาตรฐานของ Flutter | `localizationsDelegates` ใน `main.dart` |
 | flutter_secure_storage | เก็บ key/value แบบเข้ารหัสในเครื่อง (Android ใช้ Keystore ของระบบ) | เก็บ JWT และการตั้งค่า (`auth_service.dart`, `app_settings_controller.dart`) |
 | kDisplayFont (ChakraPetch) | ค่าคงที่ชื่อฟอนต์หัวข้อ/ตัวเลขใหญ่ ฟอนต์เดียวกับโลโก้ รองรับภาษาไทย | `pubspec.yaml` และไฟล์ธีม |
-| NoopAlertNotifier | ตัวแจ้งเตือนที่ "ไม่ทำอะไร" ใช้แทนการแจ้งเตือนบนเครื่อง ซึ่งยังไม่มีตัวจริงในแอป | `alert_notifier.dart` (บท 10) |
+| NoopAlertNotifier | ตัวแจ้งเตือนที่ "ไม่ทำอะไร" ใช้บนแพลตฟอร์มที่ไม่ใช่มือถือและในเทสต์ (ส่วนมือถือจริงใช้ `LocalAlertNotifier`) | `alert_notifier.dart` (บท 10) |
 | Null safety | ตัวแปรปกติห้ามเป็น null ถ้าจะให้เป็นได้ต้องเติม `?` พร้อมตัวช่วย `??`, `?.`, `!` | ทุกไฟล์ Dart |
 | pubspec.yaml | ไฟล์ประกาศชื่อแอป เวอร์ชัน แพ็กเกจ ฟอนต์ และ assets | `pubspec.yaml` ที่รากโปรเจค Flutter |
 | Repository | ชั้นกลางที่ซ่อนว่าข้อมูลมาจากไหน Controller ถาม Repository ไม่ต้องรู้เรื่อง HTTP | `lib/services/*_repository.dart` เช่น `RoomRepository` |

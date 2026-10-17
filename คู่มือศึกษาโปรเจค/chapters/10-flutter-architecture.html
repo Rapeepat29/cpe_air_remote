@@ -1510,7 +1510,7 @@
 <li><code>NoopAlertNotifier</code> ตัวที่ไม่ทำอะไร (<code>initialize</code> คืน <code>false</code>, <code>show</code> ว่าง)</li>
 <li><code>AlertNotificationText {title, body}</code> และฟังก์ชัน <code>describeAlert(SystemAlert, AppLocalizations)</code> สร้างหัวข้อและเนื้อความตามภาษา: หัวข้อแปลจากชนิด, เนื้อความเป็น <code>ห้อง XXX · ชื่อเครื่อง — ข้อความ</code> (ไม่รับ <code>BuildContext</code> เพราะผู้เรียกอยู่ใน Controller/State ที่ไม่ได้อยู่ในต้นไม้วิดเจ็ตและหน้าจอนั้นอาจถูกถอดไปแล้ว)</li>
 <li><code>LocalAlertNotifier</code> (ไฟล์ <code>services/mobile_notification_gateway.dart</code>) ตัวจริงที่ <code>implements AlertNotifier</code> ใช้ <code>flutter_local_notifications</code> สร้าง channel <code>system_alerts</code> (Importance.high) ขอสิทธิ์ตอนเรียก <code>initialize()</code> ครั้งแรก (Android 13+ ใช้ <code>requestNotificationsPermission</code>, iOS ใช้ <code>requestPermissions</code>) และ <code>show()</code> จะเรียก <code>initialize()</code> ให้เองถ้ายังไม่ได้ทำ <code>LocalAlertNotifier.isSupported</code> เป็นจริงเฉพาะ Android/iOS ฝั่ง iOS ตั้ง <code>presentAlert/presentBanner/presentList/presentSound</code> เป็น true เพื่อให้แบนเนอร์ขึ้นตอนแอปเปิดอยู่</li>
-<li><strong>สถานะจริงของโค้ด:</strong> <code>_CpeAirRemoteAppState.initState</code> เลือกตัวเด้งเป็น <code>widget.alertNotifier ?? (LocalAlertNotifier.isSupported ? LocalAlertNotifier() : const NoopAlertNotifier())</code> แล้วส่งเข้า <code>AppShell</code> จึงบนมือถือการแจ้งเตือนในเครื่องทำงานจริง ส่วนเดสก์ท็อป/เว็บและเทสต์ยังเป็นตัวเปล่า <strong>ข้อจำกัด:</strong> เป็นแจ้งเตือนในเครื่องที่เกิดจากการ poll alert ของ <code>DashboardController</code> จึงเด้งได้ตราบที่แอปยังรันอยู่ (iOS หยุดแอปเบื้องหลังเร็วกว่า Android) ถ้าแอปถูกปิดสนิทต้องย้ายไปใช้ FCM/APNs โดยเปลี่ยนเฉพาะตัวที่ implement สัญญานี้ Android ต้องมีสิทธิ์ <code>POST_NOTIFICATIONS</code> และเปิด core library desugaring ใน <code>android/app/build.gradle.kts</code></li>
+<li><strong>สถานะจริงของโค้ด:</strong> <code>_CpeAirRemoteAppState.initState</code> เลือกตัวเด้งเป็น <code>widget.alertNotifier ?? (LocalAlertNotifier.isSupported ? LocalAlertNotifier() : const NoopAlertNotifier())</code> แล้วส่งเข้า <code>AppShell</code> และ <code>AppShell.initState</code> เรียก <code>widget.alertNotifier?.initialize()</code> ทันทีตั้งแต่เปิดแอป เพื่อให้ระบบขึ้นหน้าต่างขออนุญาตและแสดงแถว &quot;การแจ้งเตือน&quot; ใน Settings ของ iOS โดยไม่ต้องรอให้มีใบแรก จึงบนมือถือการแจ้งเตือนในเครื่องทำงานจริง ส่วนเดสก์ท็อป/เว็บและเทสต์ยังเป็นตัวเปล่า <strong>ข้อจำกัด:</strong> เป็นแจ้งเตือนในเครื่องที่เกิดจากการ poll alert ของ <code>DashboardController</code> จึงเด้งได้ตราบที่แอปยังรันอยู่ (iOS หยุดแอปเบื้องหลังเร็วกว่า Android) ถ้าแอปถูกปิดสนิทต้องย้ายไปใช้ FCM/APNs โดยเปลี่ยนเฉพาะตัวที่ implement สัญญานี้ Android ต้องมีสิทธิ์ <code>POST_NOTIFICATIONS</code> และเปิด core library desugaring ใน <code>android/app/build.gradle.kts</code> ส่วน iOS ต้องตั้ง <code>UNUserNotificationCenter.current().delegate</code> ใน <code>AppDelegate.swift</code> (ซึ่ง <code>build-ios.yml</code> เติมให้อัตโนมัติ)</li>
 </ul>
 <h3 id="controllers-libcontrollers">Controllers (<code>lib/controllers/</code>)<a class="anchor" href="#controllers-libcontrollers">#</a></h3>
 <p>ทุกตัว <code>extends ChangeNotifier</code> และมีรูปแบบร่วมกัน</p>
@@ -2080,7 +2080,7 @@
 <ol>
 <li><code>DashboardController</code> ดึง <code>GET /alerts?limit=30</code> ทุก 30 วินาที</li>
 <li><code>freshAlerts</code> หาใบที่ยังไม่เคยเห็น → เรียก <code>onNewAlerts(fresh)</code> (หลังรอบแรก)</li>
-<li><code>AppShell._handleNewAlerts</code> กรองด้วย <code>AlertPreferences.pushable(fresh)</code> แล้วเรียก <code>AlertNotifier.show(...)</code> (ปัจจุบัน <code>alertNotifier</code> เป็น <code>null</code> จึงไม่เด้ง)</li>
+<li><code>AppShell._handleNewAlerts</code> กรองด้วย <code>AlertPreferences.pushable(fresh)</code> แล้วเรียก <code>AlertNotifier.show(...)</code> (บนมือถือเป็น <code>LocalAlertNotifier</code> จึงเด้งแจ้งเตือนในเครื่องจริง)</li>
 <li>ในแอป <code>DashboardController.alerts</code> = <code>AlertPreferences.visible(...)</code> แสดงครบทุกใบเสมอ</li>
 <li>ผู้ใช้กดรับทราบ → <code>acknowledge(id)</code> → <code>POST /alerts/:id/acknowledge</code></li>
 </ol>
@@ -2417,7 +2417,7 @@ flutter<span class="w"> </span>analyze<span class="w">          </span><span cla
 <tr>
 <td>163–179</td>
 <td><code>AuthStatus.signedIn =&gt; AppShell(...)</code></td>
-<td><code>rooms: MockData.createRooms()</code> ห้องตั้งต้น 21 ห้อง (AppShell เก็บชุดแรกไว้ใน <code>initState</code> ไม่ว่า build นี้จะถูกเรียกกี่ครั้ง), <code>user: _authController.user!</code> (<code>!</code> ปลอดภัยเพราะ signedIn แปลว่ามี user), ส่ง Repository ทุกตัว, <code>alertNotifier: widget.alertNotifier</code> (null ในแอปจริง), <code>onLogout: _authController.logout</code> ส่ง <strong>ฟังก์ชัน</strong> (ไม่มี <code>()</code>) ให้ปุ่มออกจากระบบเรียกเอง</td>
+<td><code>rooms: MockData.createRooms()</code> ห้องตั้งต้น 21 ห้อง (AppShell เก็บชุดแรกไว้ใน <code>initState</code> ไม่ว่า build นี้จะถูกเรียกกี่ครั้ง), <code>user: _authController.user!</code> (<code>!</code> ปลอดภัยเพราะ signedIn แปลว่ามี user), ส่ง Repository ทุกตัว, <code>alertNotifier: _alertNotifier</code> (<code>LocalAlertNotifier</code> บนมือถือ, <code>NoopAlertNotifier</code> บนแพลตฟอร์มอื่น), <code>onLogout: _authController.logout</code> ส่ง <strong>ฟังก์ชัน</strong> (ไม่มี <code>()</code>) ให้ปุ่มออกจากระบบเรียกเอง</td>
 </tr>
 </tbody>
 </table></div>
@@ -3742,7 +3742,7 @@ flutter<span class="w"> </span>analyze<span class="w">          </span><span cla
 <p>ตอบ: ใช้ BLE ตั้งค่า ESP32 ครั้งแรก Android 12+ ใช้ <code>BLUETOOTH_SCAN</code> (ประกาศ <code>neverForLocation</code> จึงไม่ต้องขอตำแหน่ง) และ <code>BLUETOOTH_CONNECT</code> ส่วน <code>ACCESS_FINE_LOCATION</code> ขอเฉพาะ Android 11 ลงไป (<code>maxSdkVersion="30"</code>) ที่ระบบบังคับ ถ้าไม่มี <code>android/key.properties</code> build จะผ่านแต่เซ็น release ด้วย debug key และเตือนในคอนโซล ห้ามแจกและอัปเดตทับแอปที่เซ็นด้วยกุญแจจริงไม่ได้</p></div>
 
 <div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม: การแจ้งเตือนบนมือถือทำงานจริงหรือยัง?</strong></p>
-<p>ตอบ: ตามโค้ดตอนนี้ <strong>ยัง</strong> ครึ่งทาง ตัวตรวจใบแจ้งเตือนใหม่ ค่าตั้งรายชนิด และสัญญา <code>AlertNotifier</code> พร้อมแล้ว แต่ไม่มีตัวที่ implement จริง (มีแค่ <code>NoopAlertNotifier</code>) และ <code>main()</code> ไม่ส่ง <code>alertNotifier</code> เข้าไป ที่ทำงานจริงคือรายการแจ้งเตือนในแอป การจะเด้งบนเครื่องต้องเพิ่มปลั๊กอินแจ้งเตือนและคลาสที่ implement <code>AlertNotifier</code></p></div>
+<p>ตอบ: บนมือถือ <strong>เด้งจริงแบบแจ้งเตือนในเครื่อง (local notification)</strong> ด้วย <code>LocalAlertNotifier</code> (<code>flutter_local_notifications</code>) ที่ขอสิทธิ์ตั้งแต่เข้า <code>AppShell</code> และเด้งเมื่อ <code>DashboardController</code> poll เจอใบใหม่ที่ตรงกับสวิตช์ใน <code>AlertPreferences</code> แต่ยังเป็นแจ้งเตือนในเครื่อง จึงทำงานเฉพาะตอนแอปยังรันอยู่ ถ้าต้องการให้เด้งแม้ปิดแอปสนิทต้องต่อ FCM/APNs แทน</p>
 
 <h2 id="สรุปและเช็กลิสต์ความเข้าใจ">สรุปและเช็กลิสต์ความเข้าใจ<a class="anchor" href="#สรุปและเช็กลิสต์ความเข้าใจ">#</a></h2>
 <p>ถ้าตอบข้อเหล่านี้ได้โดยไม่ต้องเปิดโค้ด แปลว่าเข้าใจบทนี้แล้ว</p>

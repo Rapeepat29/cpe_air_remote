@@ -854,7 +854,7 @@ Widget เป็น "พิมพ์เขียว" ที่ไม่เปล
 <li><strong>บรรทัด 19–25</strong> — controller ของผู้ใช้และฐานข้อมูลพลังงาน (ใช้ในหน้า Profile)</li>
 <li><strong>บรรทัด 26–29</strong> — <code>DashboardController</code> ใช้ร่วมกันระหว่างหน้า Home และ Analytics เปลี่ยนช่วงเวลาที่หน้าไหนก็เห็นตรงกัน</li>
 <li><strong>บรรทัด 30–33</strong> — ส่งค่าตั้งการแจ้งเตือนเข้าไป และฟังการเปลี่ยนแปลงของค่าตั้ง (<code>addListener</code>) เพื่อซิงก์ทันที <code>onNewAlerts</code> คือ callback เด้งแจ้งเตือนของเครื่อง</li>
-<li><strong>บรรทัด 37–39</strong> — เริ่มโหลดข้อมูล <code>_initializeRoomsAndAir()</code> โหลดห้องก่อนแล้วค่อยโหลดแอร์ (await ต่อกัน) เพราะแอร์ต้องหาห้องที่ตัวเองสังกัดให้เจอ</li>
+<li><strong>บรรทัด 37–40</strong> — เริ่มโหลดข้อมูล ขอสิทธิ์แจ้งเตือนในเครื่อง (<code>widget.alertNotifier?.initialize()</code>) ทันทีเพื่อให้ iOS/Android ขึ้นหน้าต่างขออนุญาตตั้งแต่เปิดแอป และ <code>_initializeRoomsAndAir()</code> โหลดห้องก่อนแล้วค่อยโหลดแอร์ (await ต่อกัน) เพราะแอร์ต้องหาห้องที่ตัวเองสังกัดให้เจอ</li>
 </ol>
 <div class="callout why"><div class="callout-title">ทำไม · <span class="ct">ทำไมสร้าง controller ไว้ที่ AppShell ไม่สร้างในแต่ละหน้า</span></div><p>1) ข้อมูลชุดเดียวกันถูกใช้หลายหน้า (ห้องใช้ใน Schedule, Control, หน้าห้อง) ถ้าแต่ละหน้าโหลดเองจะยิงซ้ำและค่าไม่ตรงกัน
 2) controller มี Timer ดึงข้อมูลทุก 10/30 วินาที อายุควรเท่ากับช่วงที่ผู้ใช้ล็อกอินอยู่ ซึ่งก็คืออายุของ AppShell
