@@ -1468,8 +1468,8 @@
 </tr>
 <tr>
 <td><code>SystemSettingsRepository</code> / <code>SystemSettingsService</code></td>
-<td><code>GET /settings</code>, <code>PATCH /settings/auto-off</code> body <code>{enabled}</code></td>
-<td>ไฟล์ repository ยังนิยามคลาส <code>SystemSettings</code> ไว้ในที่เดียวกัน</td>
+<td><code>GET /settings</code>, <code>PATCH /settings/auto-off</code> body <code>{enabled}</code> หรือ <code>{testMode}</code></td>
+<td>ไฟล์ repository ยังนิยามคลาส <code>SystemSettings</code> (<code>autoOffEnabled</code>, <code>autoOffTestMode</code>, <code>electricityRate</code> พร้อม <code>copyWith</code>) ไว้ในที่เดียวกัน</td>
 </tr>
 <tr>
 <td><code>UserRepository</code> / <code>UserService</code></td>

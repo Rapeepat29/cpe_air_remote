@@ -120,7 +120,7 @@ backend/
 │   ├── routes/             12 ไฟล์ = endpoint ทั้งหมด
 │   ├── services/           mailer (บทนี้), mqtt/auto-off/... (ตอนที่ 2)
 │   └── utils/              http, security, user (บทนี้), ที่เหลือ (ตอนที่ 2)
-└── test/                   21 ไฟล์ *.test.js รันด้วย node --test (136 เทสต์)
+└── test/                   21 ไฟล์ *.test.js รันด้วย node --test (138 เทสต์)
 ```
 
 ## ลำดับการเริ่มระบบ (startup sequence)
@@ -1066,8 +1066,8 @@ airConditionersRouter.delete(
 | GET | `/api/energy/export` | ใช่ | ไม่ | ส่งออกไฟล์ `.xlsx` (404 ถ้าไม่มีข้อมูล) | `energy_hourly`, `air_conditioners` |
 | GET | `/api/alerts` | ใช่ | ไม่ | รายการแจ้งเตือน กรอง `status`, `room`, `limit` (ค่าเริ่ม 30, สูงสุด 200) + จำนวนแยกสถานะ | `system_alerts` |
 | POST | `/api/alerts/:id/acknowledge` | ใช่ | ไม่ | รับทราบแจ้งเตือน (ต้องเป็น `open`) | `system_alerts` |
-| GET | `/api/settings` | ใช่ | ไม่ | ค่าตั้งสาธารณะ: สถานะ auto-off, อัตราค่าไฟ | `system_settings` |
-| PATCH | `/api/settings/auto-off` | ใช่ | ใช่ | เปิด/ปิดระบบปิดแอร์อัตโนมัติทั้งอาคาร | `system_settings` |
+| GET | `/api/settings` | ใช่ | ไม่ | ค่าตั้งสาธารณะ: สถานะ auto-off (`autoOffEnabled`), โหมดทดสอบ (`autoOffTestMode`), อัตราค่าไฟ (`electricityRate`) | `system_settings` |
+| PATCH | `/api/settings/auto-off` | ใช่ | ใช่ | เปิด/ปิดระบบปิดแอร์อัตโนมัติ (`enabled`) และ/หรือ โหมดทดสอบ 30 วิ / 1 นาที (`testMode`) พร้อมล้างนาฬิกาเก่าแล้วประเมินใหม่ทันที | `system_settings`, `air_conditioners` |
 | PATCH | `/api/settings/rate` | ใช่ | ใช่ | ตั้งอัตราค่าไฟ (บาท/kWh) ต้องอยู่ระหว่าง 0.01–100 | `system_settings` |
 
 รวม **57 endpoint** (นับ `/api/health` ด้วย)
@@ -1137,13 +1137,40 @@ endpoint เดียว ไม่ผ่าน `authenticate` เพราะห
 ### `routes/alerts.js` (100 บรรทัด)
 `GET /` กรองตามสถานะ (`open`/`acknowledged`/`resolved`) และห้อง สร้าง `WHERE` จากเงื่อนไขคงที่ + ค่าผูก `?` และใส่ `LIMIT ${limit}` แบบแทรกตัวเลข ซึ่งปลอดภัยเพราะ `clampLimit` แปลงเป็นจำนวนเต็ม (1–200 ค่าเริ่มต้น 30) แล้วเท่านั้น `ORDER BY status = 'open' DESC` ให้ที่ยังไม่รับทราบขึ้นก่อน และคืน `counts` แยกตามสถานะให้แสดงตัวเลขบนไอคอน `POST /:id/acknowledge`: `UPDATE ... WHERE id = ? AND status = 'open'` แล้วดู `affectedRows` ถ้า 0 = ไม่พบหรือรับทราบไปแล้ว → 404 (วิธีนี้ปลอดภัยต่อการกดซ้ำพร้อมกัน) สถานะ `resolved` ถูกตั้งโดย `services/alerts.js` ไม่ใช่ API นี้ (พารามิเตอร์แรก `_status` ของ `clampLimit` ไม่ได้ถูกใช้)
 
-### `routes/settings.js` (72 บรรทัด)
-`GET /` ทุกคนที่ล็อกอินอ่านได้ (ทุกหน้าจอต้องใช้อัตราค่าไฟคูณ kWh และคนทั่วไปต้องรู้ว่า auto-off ถูกปิดอยู่เพื่อไม่ต้องสงสัยเมื่อไม่มีนับถอยหลัง) `PATCH /auto-off` รับ `{enabled: boolean}` (ชนิดต้องเป็น boolean จริง ไม่รับ `"true"`) `PATCH /rate` รับ `{rate}` แปลงเป็นตัวเลข ต้องอยู่ระหว่าง `RATE_LIMITS.min`=0.01 ถึง `max`=100 ทั้งสองแก้ได้เฉพาะแอดมิน และบันทึกชื่อผู้แก้ (`request.authUser?.username`) ผ่าน `services/system-settings.js`
+### `routes/settings.js` (96 บรรทัด)
+`GET /` ทุกคนที่ล็อกอินอ่านได้ คืน `{ settings: { autoOffEnabled, autoOffTestMode, electricityRate } }` (ทุกหน้าจอต้องใช้อัตราค่าไฟคูณ kWh และคนทั่วไปต้องเห็นสถานะว่า auto-off ปิดอยู่หรืออยู่ในโหมดทดสอบ)
+
+`PATCH /auto-off` (เฉพาะแอดมิน) รับ JSON body ที่ส่ง `enabled` หรือ `testMode` หรือส่งพร้อมกันทั้งคู่ก็ได้:
+- `enabled` (`boolean`): สวิตช์หลักเปิด/ปิดระบบปิดแอร์อัตโนมัติทั้งอาคาร
+- `testMode` (`boolean`): สวิตช์โหมดทดสอบ (เมื่อเป็น `true` จะเปลี่ยนเวลานับถอย後から 5 นาที / 15 นาที เหลือ **30 วินาที (นอกคาบ)** และ **1 นาที (ในคาบเรียน)**)
+- ตรวจชนิดอย่างเข้มงวด: ต้องมีอย่างน้อย 1 ฟิลด์ที่เป็น `boolean` จริง (`typeof === 'boolean'` ไม่รับสตริง `"true"`) มิฉะนั้นโยน `ApiError(400, ...)`
+- หลังบันทึกค่าลง `system_settings` แล้ว route นี้จะสั่ง **`await clearAllCountdowns()`** ตามด้วย **`evaluateAutoOff()`** ทันที
+
+```text
+ทำไมต้อง clearAllCountdowns() + evaluateAutoOff() ทันทีที่สลับโหมดทดสอบ?
+
+สมมติห้อง 16203 ว่างอยู่ แอร์กำลังนับถอยหลังโหมดปกติ (5 นาที) เหลืออีก 04:20 นาที:
+  [ใน DB เดิม] auto_off_deadline_at = 10:05:00 (อีก 260 วินาที)
+
+ถ้าแอดมินกดเปิด "โหมดทดสอบ (30 วิ / 1 นาที)" ตอน 10:00:40:
+  ❌ ถ้าไม่ล้าง deadline เดิม:
+     decideAutoOff เห็นว่า counting === true จึงใช้ deadline เดิม (10:05:00) ต่อไป!
+     แอดมินต้องรออีก 4 นาทีกว่าแอร์จะตัด ทั้งที่เปิดโหมดทดสอบแล้ว
+
+  ✅ สิ่งที่ routes/settings.js ทำจริง:
+     1. setAutoOffTestMode(true, username)  → บันทึก auto_off_test_mode = 'true' + ล้าง cache
+     2. await clearAllCountdowns()          → ล้าง auto_off_deadline_at = NULL ทุกเครื่องที่ยังไม่ได้เริ่มยิง IR
+     3. evaluateAutoOff()                   → ประเมินใหม่เดี๋ยวนั้นเลย!
+                                              ได้ action = 'start', graceSeconds = 30 (นอกคาบ) หรือ 60 (ในคาบ)
+                                              ตั้ง auto_off_deadline_at ใหม่เป็น 10:01:10 (อีก 30 วินาที) ทันที!
+```
+
+`PATCH /rate` (เฉพาะแอดมิน) รับ `{rate}` แปลงเป็นตัวเลข ต้องอยู่ระหว่าง `RATE_LIMITS.min`=0.01 ถึง `max`=100 และบันทึกชื่อผู้แก้ (`request.authUser?.username`) ผ่าน `services/system-settings.js`
 
 ## การทดสอบ
 
 ### วิธีทำงาน
-รัน `npm test` = `node --test` ตัวรันเทสต์ที่มากับ Node (ตั้งแต่ v18) จะหาไฟล์ `*.test.js` ใต้โฟลเดอร์โปรเจค (โฟลเดอร์ `test/` ทั้งหมดอยู่ในกลุ่มนี้) แล้วรันแต่ละไฟล์ในโปรเซสแยกกัน แต่ละกรณีเขียนด้วย `test('ชื่อ', () => {...})` และตรวจด้วย `assert` จาก `node:assert/strict` (`assert.equal`, `assert.deepEqual`, `assert.throws`, `assert.match`) ไม่ต้องติดตั้ง Jest/Mocha รวม 136 กรณีใน 21 ไฟล์
+รัน `npm test` = `node --test` ตัวรันเทสต์ที่มากับ Node (ตั้งแต่ v18) จะหาไฟล์ `*.test.js` ใต้โฟลเดอร์โปรเจค (โฟลเดอร์ `test/` ทั้งหมดอยู่ในกลุ่มนี้) แล้วรันแต่ละไฟล์ในโปรเซสแยกกัน แต่ละกรณีเขียนด้วย `test('ชื่อ', () => {...})` และตรวจด้วย `assert` จาก `node:assert/strict` (`assert.equal`, `assert.deepEqual`, `assert.throws`, `assert.match`) ไม่ต้องติดตั้ง Jest/Mocha รวม 138 กรณีใน 21 ไฟล์
 
 ### ทำไม util เป็น pure function
 ฟังก์ชันใน `utils/` ไม่เปิดฐานข้อมูล ไม่ยิงเครือข่าย ไม่อ่านเวลาปัจจุบันตรง ๆ (หลายตัวรับเวลาเป็นพารามิเตอร์) ข้อมูลเข้าเหมือนกัน ผลออกเหมือนกันเสมอ การทดสอบจึงแค่ `import` แล้วเรียก ไม่ต้องจัดฉาก (เปิด DB, MQTT) รันเป็นมิลลิวินาที และเขียนกรณีขอบ (ค่า null, ภาษาไทย 72 ไบต์, วันสิ้นปี) ได้ง่าย นอกจากนี้ `db.js` สร้าง pool แบบ lazy เพื่อไม่ให้การ import ไฟล์เหล่านี้ลากการเชื่อมต่อค้างจน `node --test` ไม่จบ เมื่อ logic อยู่ที่ util และ route เป็นเพียงตัวประกอบบาง ๆ ส่วนที่ต้องเทสต์ผ่าน HTTP จริงมีน้อย
@@ -1164,7 +1191,7 @@ endpoint เดียว ไม่ผ่าน `authenticate` เพราะห
 | `occupancy-sensor.test.js` | 5 | ตัวตนเซ็นเซอร์ LD2410, การเก็บสถานะ occupied, JSON สาธารณะ |
 | `firmware.test.js` | 7 | ชื่อไฟล์ `.bin` ที่ปลอดภัย (ปฏิเสธ `../`, `/`, `.exe`, ช่องว่าง, `..`), URL ใช้โฮสต์ MQTT (ปฏิเสธ `evil.com/x`), เดาชนิดบอร์ด + แยกไฟล์ `wired` ออกจาก `air`, `assertFirmwareKind` ห้ามไฟล์ผิดชนิด, อ่านรุ่นจากชื่อและเทียบรุ่น (`2.5.10` > `2.5.9`), `validateFirmwareImage` (ไบต์ `0xE9`, ใหญ่เกิน, ไฟล์ว่าง) |
 | `unprovision.test.js` | 2 | payload คำสั่ง `unprovision` มี `deviceId` ของบอร์ดเป้าหมาย; นับเป็นคำตอบเฉพาะ `unprovisioned === true` และ `deviceId` ตรง |
-| `auto-off.test.js` | 15 | ตรรกะปิดแอร์อัตโนมัติ: เริ่มนับ 5 นาที (ในคาบนานกว่า), ไม่มี/เสียเซ็นเซอร์ไม่ปิด, ยกเลิกเมื่อมีคน, ยิงซ้ำทุก 20 วินาที, ยอมแพ้แล้วแจ้งเตือน |
+| `auto-off.test.js` | 17 | ตรรกะปิดแอร์อัตโนมัติ: เริ่มนับ 5 นาที (ในคาบนานกว่า 15 นาที), โหมดทดสอบ 30 วินาที (นอกคาบ) และ 1 นาที (ในคาบ), ไม่มี/เสียเซ็นเซอร์ไม่ปิด, ยกเลิกเมื่อมีคน, ยิงซ้ำทุก 20 วินาที, ยอมแพ้แล้วแจ้งเตือน |
 | `energy-history.test.js` | 17 | ถังรายชั่วโมงเวลาไทย, ผลต่างมิเตอร์, ช่วงเงียบนานไม่นับเวลา, SQL ผูกพารามิเตอร์, หัวตาราง Excel, ช่วงเวลาและเทียบช่วงก่อนหน้า |
 | `offline-history.test.js` | 4 | แปลงข้อมูลย้อนหลังที่บอร์ดเก็บตอนออฟไลน์ และลงถัง |
 | `pzem-status.test.js` | 4 | normalize ค่า PZEM, เวอร์ชันเฟิร์มแวร์/OTA error, คาบเรียนเวลา Asia/Bangkok |

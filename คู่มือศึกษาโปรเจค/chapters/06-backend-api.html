@@ -2601,11 +2601,34 @@
 <p>อ่านอย่างเดียว (ทุก route ล็อกอินอย่างเดียว) เรียก util ใน <code>utils/energy-history.js</code> (บทตอนที่ 2) ที่ควรรู้: <code>/summary</code> ใช้ <code>Promise.all</code> ยิง 5 query พร้อมกัน (ยอดช่วงนี้, ช่วงก่อนหน้า, กราฟ, แยกห้อง, แยกเครื่อง) แทนรอทีละอัน ตัวกรองชั้นผ่าน <code>floorFilter()</code> ซึ่งสร้างข้อความ WHERE จากชิ้นส่วนคงที่และผูกค่า <code>?</code> เสมอ <code>/export</code> ตั้ง header <code>Content-Disposition</code> ด้วย <code>filename=</code> (ชื่อ ASCII) และ <code>filename*=UTF-8''...</code> (ชื่อไทยที่ encode แล้ว) เพราะ header HTTP รับได้เฉพาะ Latin ส่งไฟล์ด้วย <code>response.send(Buffer.from(workbook))</code> และบอกจำนวนแถวใน <code>X-Export-Rows</code> ข้อมูลผ่าน <code>/history</code>/<code>/export</code> สร้างด้วย SQL ซ้อนสองชั้น (ชั้นในรวมต่ออุปกรณ์ต่อชั่วโมง ชั้นนอกรวมตามระดับที่เลือก) เพื่อให้ค่าเฉลี่ยของหลายเครื่องถูกต้อง</p>
 <h3 id="routesalertsjs-100-บรรทัด"><code>routes/alerts.js</code> (100 บรรทัด)<a class="anchor" href="#routesalertsjs-100-บรรทัด">#</a></h3>
 <p><code>GET /</code> กรองตามสถานะ (<code>open</code>/<code>acknowledged</code>/<code>resolved</code>) และห้อง สร้าง <code>WHERE</code> จากเงื่อนไขคงที่ + ค่าผูก <code>?</code> และใส่ <code>LIMIT ${limit}</code> แบบแทรกตัวเลข ซึ่งปลอดภัยเพราะ <code>clampLimit</code> แปลงเป็นจำนวนเต็ม (1–200 ค่าเริ่มต้น 30) แล้วเท่านั้น <code>ORDER BY status = 'open' DESC</code> ให้ที่ยังไม่รับทราบขึ้นก่อน และคืน <code>counts</code> แยกตามสถานะให้แสดงตัวเลขบนไอคอน <code>POST /:id/acknowledge</code>: <code>UPDATE ... WHERE id = ? AND status = 'open'</code> แล้วดู <code>affectedRows</code> ถ้า 0 = ไม่พบหรือรับทราบไปแล้ว → 404 (วิธีนี้ปลอดภัยต่อการกดซ้ำพร้อมกัน) สถานะ <code>resolved</code> ถูกตั้งโดย <code>services/alerts.js</code> ไม่ใช่ API นี้ (พารามิเตอร์แรก <code>_status</code> ของ <code>clampLimit</code> ไม่ได้ถูกใช้)</p>
-<h3 id="routessettingsjs-72-บรรทัด"><code>routes/settings.js</code> (72 บรรทัด)<a class="anchor" href="#routessettingsjs-72-บรรทัด">#</a></h3>
-<p><code>GET /</code> ทุกคนที่ล็อกอินอ่านได้ (ทุกหน้าจอต้องใช้อัตราค่าไฟคูณ kWh และคนทั่วไปต้องรู้ว่า auto-off ถูกปิดอยู่เพื่อไม่ต้องสงสัยเมื่อไม่มีนับถอยหลัง) <code>PATCH /auto-off</code> รับ <code>{enabled: boolean}</code> (ชนิดต้องเป็น boolean จริง ไม่รับ <code>"true"</code>) <code>PATCH /rate</code> รับ <code>{rate}</code> แปลงเป็นตัวเลข ต้องอยู่ระหว่าง <code>RATE_LIMITS.min</code>=0.01 ถึง <code>max</code>=100 ทั้งสองแก้ได้เฉพาะแอดมิน และบันทึกชื่อผู้แก้ (<code>request.authUser?.username</code>) ผ่าน <code>services/system-settings.js</code></p>
+<h3 id="routessettingsjs-96-บรรทัด"><code>routes/settings.js</code> (96 บรรทัด)<a class="anchor" href="#routessettingsjs-96-บรรทัด">#</a></h3>
+<p><code>GET /</code> ทุกคนที่ล็อกอินอ่านได้ (ทุกหน้าจอต้องใช้อัตราค่าไฟคูณ kWh และคนทั่วไปต้องรู้ว่า auto-off หรือโหมดทดสอบเปิดอยู่เพื่อเข้าใจเวลาที่แสดงบนการ์ดแอร์) คืน <code>{autoOffEnabled, autoOffTestMode, electricityRate, timetable}</code> <code>PATCH /auto-off</code> รับ <code>{enabled?: boolean, testMode?: boolean}</code> (ต้องส่งอย่างน้อยหนึ่งฟิลด์ และฟิลด์ที่ส่งมาต้องเป็น boolean จริง ไม่รับ <code>"true"</code>) รองรับทั้งการสลับสวิตช์หลักและการสลับ <strong>โหมดทดสอบ (นอกคาบ 30 วินาที / ในคาบเรียน 1 นาที)</strong> แยกกันหรือพร้อมกันได้:</p>
+<ul>
+<li>ถ้าส่ง <code>enabled: false</code> → เรียก <code>clearAllCountdowns()</code> ล้างการนับถอยหลังของแอร์ทุกเครื่องทันที</li>
+<li>ถ้าส่ง <code>testMode</code> (เปิดหรือปิดโหมดทดสอบ) → เรียก <code>clearAllCountdowns()</code> เพื่อล้างเวลาครบกำหนดเดิม (เช่น ที่เคยตั้งไว้ 5 หรือ 15 นาที) แล้วถ้า <code>autoOffEnabled</code> เปิดอยู่จะเรียก <code>evaluateAutoOff()</code> ทันที เพื่อให้ห้องที่ว่างอยู่เริ่มนับถอยหลังใหม่ด้วยเวลาของโหมดที่เพิ่งเลือกทันที (30 วิ / 1 นาที หรือกลับเป็น 5 นาที / 15 นาที)</li>
+</ul>
+<div class="code-block"><div class="hl"><pre><span></span><code>แอดมินกดเปิด "โหมดทดสอบ" ในแอป/เว็บ
+  │
+  ▼
+PATCH /api/settings/auto-off { testMode: true }
+  │
+  ├─► 1. setAutoOffTestMode(true, username)
+  │      └─ บันทึก auto_off_test_mode = '1' ลงตาราง system_settings + ล้าง cache
+  │
+  ├─► 2. clearAllCountdowns()
+  │      └─ UPDATE air_conditioners SET auto_off_started_at = NULL, auto_off_deadline_at = NULL ...
+  │         (ล้าง deadline เก่าที่อาจนับค้างไว้ 5 นาที / 15 นาที)
+  │
+  └─► 3. evaluateAutoOff() (ถ้า autoOffEnabled เปิดอยู่)
+         └─ ประเมินทุกห้องทันทีด้วย testMode = true
+            ├─ ห้องว่างนอกคาบ → ตั้ง deadline ใหม่ = now + 30 วินาที
+            └─ ห้องว่างในคาบ  → ตั้ง deadline ใหม่ = now + 60 วินาที (1 นาที)
+</code></pre></div>
+</div>
+<p><code>PATCH /rate</code> รับ <code>{rate}</code> แปลงเป็นตัวเลข ต้องอยู่ระหว่าง <code>RATE_LIMITS.min</code>=0.01 ถึง <code>max</code>=100 ทั้งสองแก้ได้เฉพาะแอดมิน และบันทึกชื่อผู้แก้ (<code>request.authUser?.username</code>) ผ่าน <code>services/system-settings.js</code></p>
 <h2 id="การทดสอบ">การทดสอบ<a class="anchor" href="#การทดสอบ">#</a></h2>
 <h3 id="วิธีทำงาน">วิธีทำงาน<a class="anchor" href="#วิธีทำงาน">#</a></h3>
-<p>รัน <code>npm test</code> = <code>node --test</code> ตัวรันเทสต์ที่มากับ Node (ตั้งแต่ v18) จะหาไฟล์ <code>*.test.js</code> ใต้โฟลเดอร์โปรเจค (โฟลเดอร์ <code>test/</code> ทั้งหมดอยู่ในกลุ่มนี้) แล้วรันแต่ละไฟล์ในโปรเซสแยกกัน แต่ละกรณีเขียนด้วย <code>test('ชื่อ', () =&gt; {...})</code> และตรวจด้วย <code>assert</code> จาก <code>node:assert/strict</code> (<code>assert.equal</code>, <code>assert.deepEqual</code>, <code>assert.throws</code>, <code>assert.match</code>) ไม่ต้องติดตั้ง Jest/Mocha รวม 136 กรณีใน 21 ไฟล์</p>
+<p>รัน <code>npm test</code> = <code>node --test</code> ตัวรันเทสต์ที่มากับ Node (ตั้งแต่ v18) จะหาไฟล์ <code>*.test.js</code> ใต้โฟลเดอร์โปรเจค (โฟลเดอร์ <code>test/</code> ทั้งหมดอยู่ในกลุ่มนี้) แล้วรันแต่ละไฟล์ในโปรเซสแยกกัน แต่ละกรณีเขียนด้วย <code>test('ชื่อ', () =&gt; {...})</code> และตรวจด้วย <code>assert</code> จาก <code>node:assert/strict</code> (<code>assert.equal</code>, <code>assert.deepEqual</code>, <code>assert.throws</code>, <code>assert.match</code>) ไม่ต้องติดตั้ง Jest/Mocha รวม 138 กรณีใน 21 ไฟล์</p>
 <h3 id="ทำไม-util-เป็น-pure-function">ทำไม util เป็น pure function<a class="anchor" href="#ทำไม-util-เป็น-pure-function">#</a></h3>
 <p>ฟังก์ชันใน <code>utils/</code> ไม่เปิดฐานข้อมูล ไม่ยิงเครือข่าย ไม่อ่านเวลาปัจจุบันตรง ๆ (หลายตัวรับเวลาเป็นพารามิเตอร์) ข้อมูลเข้าเหมือนกัน ผลออกเหมือนกันเสมอ การทดสอบจึงแค่ <code>import</code> แล้วเรียก ไม่ต้องจัดฉาก (เปิด DB, MQTT) รันเป็นมิลลิวินาที และเขียนกรณีขอบ (ค่า null, ภาษาไทย 72 ไบต์, วันสิ้นปี) ได้ง่าย นอกจากนี้ <code>db.js</code> สร้าง pool แบบ lazy เพื่อไม่ให้การ import ไฟล์เหล่านี้ลากการเชื่อมต่อค้างจน <code>node --test</code> ไม่จบ เมื่อ logic อยู่ที่ util และ route เป็นเพียงตัวประกอบบาง ๆ ส่วนที่ต้องเทสต์ผ่าน HTTP จริงมีน้อย</p>
 <h3 id="ไฟล์เทสต์แต่ละไฟล์">ไฟล์เทสต์แต่ละไฟล์<a class="anchor" href="#ไฟล์เทสต์แต่ละไฟล์">#</a></h3>

@@ -2256,8 +2256,32 @@
 <p>ค่าทั้งหมดเก็บผ่าน <code>SecureAppSettingsStore</code> ซึ่งห่อ <code>FlutterSecureStorage</code> ด้วยคีย์ <code>app_theme</code>, <code>app_dark_mode</code> (ค่าเก่าก่อน v3.13 เก็บไว้ให้ย้อนรุ่นได้), <code>app_language_code</code>, <code>app_electricity_rate</code>, <code>app_text_scale</code> และ <code>app_alert_preferences</code> ตอนเปิดแอป <code>initialize()</code> อ่านทีละค่าใน <code>try</code> แยกกัน ค่าไหนอ่านไม่ได้ก็ใช้ค่าเริ่มต้นของค่านั้น (ธีมขาว ภาษาไทย 4.50 บาท ขนาดปกติ แจ้งเตือนเปิดหมด) และถ้าไม่เคยมีค่าธีมใหม่แต่เคยเปิดโหมดมืดไว้ จะแปลงเป็นธีมเทา (Migration ค่าเก่า)</p>
 <div class="callout note"><div class="callout-title">หมายเหตุ · <span class="ct">ทำไมใช้ Secure Storage กับค่าที่ไม่ลับ</span></div><p>ภาษาหรือธีมไม่ใช่ความลับ แต่แอปใช้ <code>flutter_secure_storage</code> อยู่แล้วสำหรับ Token และรหัสที่จำไว้ การใช้ที่เก็บเดียวทำให้ไม่ต้องเพิ่มแพ็กเกจ (เช่น shared_preferences) และ Interface <code>AppSettingsStore</code> ทำให้เทสต์ใส่ที่เก็บปลอมได้</p></div>
 
-<h3 id="สวิตช์ปิดแอร์อัตโนมัติ-ค่าระดับระบบ">สวิตช์ปิดแอร์อัตโนมัติ (ค่าระดับระบบ)<a class="anchor" href="#สวิตช์ปิดแอร์อัตโนมัติ-ค่าระดับระบบ">#</a></h3>
-<p><code>_AutoOffRow</code> ใช้ <code>SystemSettingsController</code> ไม่ใช่ <code>AppSettingsController</code> เพราะผู้ที่ส่งคำสั่งปิดแอร์จริงคือ Backend สวิตช์ในมือถือหยุดระบบไม่ได้ ทุกคนเห็นสถานะ แต่ <code>onChanged</code> เป็น <code>null</code> (กดไม่ได้) ถ้าไม่ใช่ Admin Controller ใช้ <strong>Optimistic Update</strong> คือแสดงค่าใหม่ทันทีก่อนได้คำตอบ ถ้าเซิร์ฟเวอร์ปฏิเสธจะถอยกลับค่าเดิมแล้วแสดง SnackBar สีแดง ฝั่ง Backend <code>PATCH /settings/...</code> มี <code>requireAdmin</code></p>
+<h3 id="สวิตช์ปิดแอร์อัตโนมัติและโหมดทดสอบ-ค่าระดับระบบ">สวิตช์ปิดแอร์อัตโนมัติและโหมดทดสอบ (ค่าระดับระบบ)<a class="anchor" href="#สวิตช์ปิดแอร์อัตโนมัติและโหมดทดสอบ-ค่าระดับระบบ">#</a></h3>
+<p><code>_AutoOffRow</code> ใช้ <code>SystemSettingsController</code> ไม่ใช่ <code>AppSettingsController</code> เพราะผู้ที่ส่งคำสั่งปิดแอร์จริงคือ Backend สวิตช์ในมือถือหยุดระบบไม่ได้ ทุกคนเห็นสถานะ แต่ <code>onChanged</code> เป็น <code>null</code> (กดไม่ได้) ถ้าไม่ใช่ Admin Controller ใช้ <strong>Optimistic Update</strong> คือแสดงค่าใหม่ทันทีก่อนได้คำตอบ ถ้าเซิร์ฟเวอร์ปฏิเสธจะถอยกลับค่าเดิมแล้วแสดง SnackBar สีแดง ฝั่ง Backend <code>PATCH /settings/auto-off</code> มี <code>requireAdmin</code></p>
+<p>ภายในวิดเจ็ต <code>_AutoOffRow</code> ประกอบด้วยแถวตั้งค่า 2 แถวและแบนเนอร์สถานะ:</p>
+<div class="code-block"><div class="hl"><pre><span></span><code>┌───────────────────────────────────────────────────────────────────┐
+│  สำหรับผู้ดูแลระบบ                                                 │
+├───────────────────────────────────────────────────────────────────┤
+│  [⏱]  ปิดแอร์อัตโนมัติทั้งอาคาร                         [ สวิตช์ 1 ] │
+│       เมื่อห้องว่าง นับถอยหลัง 30 วิ (นอกคาบ) / 1 นาที (ในคาบ)      │
+│       (หรือ "5 นาที (นอกคาบ) / 15 นาที (ในคาบ)" เมื่อปิดโหมดทดสอบ) │
+│  ───────────────────────────────────────────────────────────────  │
+│  [🧪] โหมดทดสอบการปิดอัตโนมัติ                          [ สวิตช์ 2 ] │
+│       นอกคาบเรียน 30 วินาที · ในคาบเรียน 1 นาที                     │
+│  ┌─────────────────────────────────────────────────────────────┐  │
+│  │ ⚠ กำลังใช้เวลาทดสอบ 30 วิ / 1 นาที แทนเวลาปกติ 5 / 15 นาที  │  │
+│  └─────────────────────────────────────────────────────────────┘  │
+└───────────────────────────────────────────────────────────────────┘
+</code></pre></div>
+</div>
+<ul>
+<li><strong>สวิตช์ที่ 1 (<code>auto-off-master-switch</code>)</strong> — เปิด/ปิดระบบปิดแอร์อัตโนมัติทั้งอาคาร ข้อความอธิบายใต้หัวข้อจะเปลี่ยนตามโหมดที่เลือกอยู่โดยอัตโนมัติ (เช่น ถ้าเปิดโหมดทดสอบอยู่ จะแสดง <em>"เมื่อห้องว่าง นับถอยหลัง 30 วิ (นอกคาบ) / 1 นาที (ในคาบ)"</em>)</li>
+<li><strong>สวิตช์ที่ 2 (<code>auto-off-test-mode-switch</code>)</strong> — เปิด/ปิด <strong>โหมดทดสอบการปิดอัตโนมัติ</strong> (ไอคอนขวดทดลอง <code>Icons.science_outlined</code>):<ul>
+<li>ถ้าสวิตช์หลักถูกปิดอยู่ (<code>!enabled</code>) แถวโหมดทดสอบจะถูกจางลง (<code>Opacity 0.5</code>) และกดไม่ได้ (<code>canToggleTestMode = isAdmin &amp;&amp; !busy &amp;&amp; enabled</code>) เพื่อสื่อให้ชัดเจนว่าโหมดทดสอบจะมีผลก็ต่อเมื่อเปิดระบบปิดอัตโนมัติหลักไว้เท่านั้น</li>
+<li>เมื่อเปิดใช้งานทั้งสวิตช์หลักและโหมดทดสอบ จะแสดงแบนเนอร์กรอบสีส้มอำพัน (<code>palette.warning</code>) เตือนผู้ดูแลว่า <em>"กำลังใช้เวลาทดสอบ 30 วิ / 1 นาที แทนเวลาปกติ 5 / 15 นาที"</em> เพื่อป้องกันการลืมปิดโหมดทดสอบหลังสาธิตเสร็จ</li>
+</ul>
+</li>
+</ul>
 <hr />
 <h2 id="notification_settings_screendart--ตั้งค่าการแจ้งเตือน">notification_settings_screen.dart — ตั้งค่าการแจ้งเตือน<a class="anchor" href="#notification_settings_screendart--ตั้งค่าการแจ้งเตือน">#</a></h2>
 <p>มีสวิตช์หลัก "Allow notifications" และสวิตช์รายประเภท 3 ชนิดตาม <code>AlertPreferences.configurableKinds</code></p>

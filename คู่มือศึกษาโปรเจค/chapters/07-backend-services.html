@@ -402,7 +402,7 @@ OCC32 เซ็นเซอร์คน ──MQTT──▶              │    
 
 <p>ทดสอบใน <code>test/mqtt-accounts.test.js</code></p>
 <p><strong>กลุ่มระบบปิดแอร์อัตโนมัติ</strong></p>
-<h3 id="utilsauto-offjs-142-บรรทัด--ตัวตัดสินใจ-pure"><code>utils/auto-off.js</code> (142 บรรทัด) — ตัวตัดสินใจ (pure)<a class="anchor" href="#utilsauto-offjs-142-บรรทัด--ตัวตัดสินใจ-pure">#</a></h3>
+<h3 id="utilsauto-offjs-156-บรรทัด--ตัวตัดสินใจ-pure"><code>utils/auto-off.js</code> (156 บรรทัด) — ตัวตัดสินใจ (pure)<a class="anchor" href="#utilsauto-offjs-156-บรรทัด--ตัวตัดสินใจ-pure">#</a></h3>
 <p>ค่าคงที่ (export ทั้งหมด) และฟังก์ชัน</p>
 <div class="table-wrap"><table>
 <thead>
@@ -416,12 +416,22 @@ OCC32 เซ็นเซอร์คน ──MQTT──▶              │    
 <tr>
 <td><code>AUTO_OFF_IDLE_SECONDS</code></td>
 <td><code>300</code></td>
-<td>ห้องว่างนอกคาบเรียน: นับถอยหลัง 5 นาที</td>
+<td>โหมดปกติ — ห้องว่างนอกคาบเรียน: นับถอยหลัง 5 นาที</td>
 </tr>
 <tr>
 <td><code>AUTO_OFF_IN_CLASS_SECONDS</code></td>
 <td><code>900</code></td>
-<td>ห้องว่างระหว่างมีคาบ: นับ 15 นาที (เผื่อพักเบรก)</td>
+<td>โหมดปกติ — ห้องว่างระหว่างมีคาบ: นับ 15 นาที (เผื่อพักเบรก)</td>
+</tr>
+<tr>
+<td><code>AUTO_OFF_TEST_IDLE_SECONDS</code></td>
+<td><code>30</code></td>
+<td>โหมดทดสอบ — ห้องว่างนอกคาบเรียน: นับถอยหลัง 30 วินาที</td>
+</tr>
+<tr>
+<td><code>AUTO_OFF_TEST_IN_CLASS_SECONDS</code></td>
+<td><code>60</code></td>
+<td>โหมดทดสอบ — ห้องว่างระหว่างมีคาบ: นับถอยหลัง 1 นาที (60 วินาที)</td>
 </tr>
 <tr>
 <td><code>AUTO_OFF_RETRY_SECONDS</code></td>
@@ -434,9 +444,9 @@ OCC32 เซ็นเซอร์คน ──MQTT──▶              │    
 <td>ยิงซ้ำสูงสุดกี่ครั้งก่อนยอมแพ้</td>
 </tr>
 <tr>
-<td><code>decideAutoOff({device, occupancy, withinClass, now})</code></td>
+<td><code>decideAutoOff({device, occupancy, withinClass, testMode, now})</code></td>
 <td>—</td>
-<td>คืน <code>{action, reason, ...}</code></td>
+<td>คืน <code>{action, reason, ...}</code> (เลือกระยะเวลานับถอยหลังตาม <code>testMode</code> และ <code>withinClass</code>)</td>
 </tr>
 <tr>
 <td><code>autoOffSecondsRemaining(device, now)</code></td>
@@ -451,8 +461,8 @@ OCC32 เซ็นเซอร์คน ──MQTT──▶              │    
 </tbody>
 </table></div>
 <p><code>autoOffSecondsRemaining</code> และ <code>autoOffPhase</code> ถูกเรียกจาก <code>utils/room.js</code> (<code>publicRoom</code>) และ <code>utils/air-conditioner.js</code> (<code>publicAirConditioner</code>) เพื่อใส่ใน JSON ที่ส่งให้แอป รายละเอียดทุกกติกาอยู่ในหัวข้อ "ระบบปิดแอร์อัตโนมัติอย่างละเอียด" ด้านล่าง</p>
-<h3 id="servicesauto-offjs-373-บรรทัด--ตัวคุมจังหวะ"><code>services/auto-off.js</code> (373 บรรทัด) — ตัวคุมจังหวะ<a class="anchor" href="#servicesauto-offjs-373-บรรทัด--ตัวคุมจังหวะ">#</a></h3>
-<p><code>startAutoOffService()</code> / <code>stopAutoOffService()</code> (เรียกจาก <code>server.js</code>), <code>evaluateAutoOff({deviceId, roomNumber, now})</code> (export ไว้ให้เทสต์/เรียกตรง) และฟังก์ชันภายใน <code>readDevices</code>, <code>evaluateDevice</code>, <code>fireOffCommand</code>, <code>clearCountdown</code>, <code>clearAllCountdowns</code>, <code>applyNotificationRules</code>, <code>readSchedule</code>, <code>acquireRunnerLock</code>/<code>releaseRunnerLock</code>, <code>parseState</code> อธิบายละเอียดด้านล่างและในหัวข้อเจาะโค้ด</p>
+<h3 id="servicesauto-offjs-379-บรรทัด--ตัวคุมจังหวะ"><code>services/auto-off.js</code> (379 บรรทัด) — ตัวคุมจังหวะ<a class="anchor" href="#servicesauto-offjs-379-บรรทัด--ตัวคุมจังหวะ">#</a></h3>
+<p><code>startAutoOffService()</code> / <code>stopAutoOffService()</code> (เรียกจาก <code>server.js</code>), <code>evaluateAutoOff({deviceId, roomNumber, now})</code> และ <code>clearAllCountdowns(database)</code> (export ไว้ให้ <code>routes/settings.js</code> ล้างตัวนับเมื่อแอดมินปิดระบบหรือสลับโหมดทดสอบ และให้เทสต์เรียกตรง) ส่วนฟังก์ชันภายในได้แก่ <code>readDevices</code>, <code>evaluateDevice</code>, <code>fireOffCommand</code>, <code>clearCountdown</code>, <code>applyNotificationRules</code>, <code>readSchedule</code>, <code>acquireRunnerLock</code>/<code>releaseRunnerLock</code>, <code>parseState</code> อธิบายละเอียดด้านล่างและในหัวข้อเจาะโค้ด</p>
 <h3 id="servicesalertsjs-111-บรรทัด--ใบแจ้งเตือน"><code>services/alerts.js</code> (111 บรรทัด) — ใบแจ้งเตือน<a class="anchor" href="#servicesalertsjs-111-บรรทัด--ใบแจ้งเตือน">#</a></h3>
 <p>ตาราง <code>system_alerts</code> เก็บเหตุการณ์ที่คนควรรู้ ชนิดเก็บเป็นรหัสไม่ใช่ข้อความสำเร็จรูป (แอปแปลภาษาเอง และเปลี่ยนถ้อยคำได้โดยไม่แก้ข้อมูลเก่า)</p>
 <div class="table-wrap"><table>
@@ -1043,6 +1053,11 @@ OCC32 เซ็นเซอร์คน ──MQTT──▶              │    
 <td>ตอนนี้อยู่ในคาบ (หรือมีการจอง) ไหม</td>
 </tr>
 <tr>
+<td><code>testMode</code></td>
+<td><code>isAutoOffTestMode()</code> จาก <code>system_settings</code></td>
+<td>เปิดโหมดทดสอบ (นอกคาบ 30 วิ / ในคาบ 60 วิ) อยู่หรือไม่</td>
+</tr>
+<tr>
 <td><code>now</code></td>
 <td>ส่งเข้ามา</td>
 <td>เวลาปัจจุบัน (ส่งเข้ามาเพื่อให้เทสต์ควบคุมเวลาได้)</td>
@@ -1066,7 +1081,7 @@ OCC32 เซ็นเซอร์คน ──MQTT──▶              │    
 </tr>
 <tr>
 <td><code>start</code></td>
-<td>เริ่มนับถอยหลัง (มี <code>graceSeconds</code>, <code>withinClass</code>)</td>
+<td>เริ่มนับถอยหลัง (มี <code>graceSeconds</code>, <code>withinClass</code>, <code>testMode</code>)</td>
 <td><code>UPDATE</code> ตั้ง <code>auto_off_started_at</code>, <code>auto_off_deadline_at</code>, <code>auto_off_attempts = 0</code>, <code>auto_off_in_class</code></td>
 </tr>
 <tr>
@@ -1187,7 +1202,59 @@ OCC32 เซ็นเซอร์คน ──MQTT──▶              │    
 </tr>
 </tbody>
 </table></div>
-<p>เวลานับถอยหลังที่ด่าน 5: <code>withinClass === true</code> → <code>AUTO_OFF_IN_CLASS_SECONDS = 900</code> (15 นาที), นอกนั้น → <code>AUTO_OFF_IDLE_SECONDS = 300</code> (5 นาที)</p>
+<h3 id="ตารางเปรียบเทียบเวลานับถอยหลังที่ด่าน-5-โหมดปกติ-vs-โหมดทดสอบ">ตารางเปรียบเทียบเวลานับถอยหลังที่ด่าน 5 (โหมดปกติ vs โหมดทดสอบ)<a class="anchor" href="#ตารางเปรียบเทียบเวลานับถอยหลังที่ด่าน-5-โหมดปกติ-vs-โหมดทดสอบ">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>สถานะโหมด (<code>testMode</code>)</th>
+<th>ช่วงเวลาของห้อง (<code>withinClass</code>)</th>
+<th>ค่าคงที่ที่ใช้</th>
+<th>เวลานับถอยหลัง (<code>graceSeconds</code>)</th>
+<th>เหมาะสำหรับ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>โหมดปกติ</strong> (<code>false</code>)</td>
+<td>นอกคาบเรียน (<code>false</code>)</td>
+<td><code>AUTO_OFF_IDLE_SECONDS</code></td>
+<td><strong>300 วินาที (5 นาที)</strong></td>
+<td>ใช้งานจริงในชีวิตประจำวัน</td>
+</tr>
+<tr>
+<td><strong>โหมดปกติ</strong> (<code>false</code>)</td>
+<td>ในคาบเรียน / มีการจอง (<code>true</code>)</td>
+<td><code>AUTO_OFF_IN_CLASS_SECONDS</code></td>
+<td><strong>900 วินาที (15 นาที)</strong></td>
+<td>เผื่อเวลาอาจารย์/นักศึกษาพักเบรกเข้าห้องน้ำ</td>
+</tr>
+<tr>
+<td><strong>โหมดทดสอบ</strong> (<code>true</code>)</td>
+<td>นอกคาบเรียน (<code>false</code>)</td>
+<td><code>AUTO_OFF_TEST_IDLE_SECONDS</code></td>
+<td><strong>30 วินาที</strong></td>
+<td>สาธิตระบบตอนไม่มีคาบเรียนโดยไม่ต้องรอ 5 นาที</td>
+</tr>
+<tr>
+<td><strong>โหมดทดสอบ</strong> (<code>true</code>)</td>
+<td>ในคาบเรียน / มีการจอง (<code>true</code>)</td>
+<td><code>AUTO_OFF_TEST_IN_CLASS_SECONDS</code></td>
+<td><strong>60 วินาที (1 นาที)</strong></td>
+<td>สาธิตความแตกต่างระหว่างในคาบกับนอกคาบภายใน 1 นาที</td>
+</tr>
+</tbody>
+</table></div>
+<div class="code-block"><div class="hl"><pre><span></span><code>เปรียบเทียบเส้นเวลาเมื่อห้องเริ่มว่าง (t = 0):
+
+[โหมดปกติ: testMode = false]
+  นอกคาบเรียน : 0s ─────────────────────────── 300s (5 นาที) ──► ยิงคำสั่งปิดแอร์
+  ในคาบเรียน  : 0s ────────────────────────────────────────────────────── 900s (15 นาที) ──► ยิงคำสั่งปิดแอร์
+
+[โหมดทดสอบ: testMode = true]
+  นอกคาบเรียน : 0s ── 30s ──► ยิงคำสั่งปิดแอร์
+  ในคาบเรียน  : 0s ────── 60s (1 นาที) ──► ยิงคำสั่งปิดแอร์
+</code></pre></div>
+</div>
 <p><strong>เงื่อนไขยกเลิก (cancel) ทั้งหมด</strong> ขณะนับอยู่: มีคนเข้ามา (<code>occupied</code>), เซ็นเซอร์ตายหรือไม่มี (<code>noSensor</code>), ปิดฟีเจอร์รายเครื่อง (<code>disabled</code>), PZEM อ่านไม่ได้ (<code>noPzem</code>), แอร์หยุดเอง ก่อนที่เราสั่ง (<code>notRunning</code> เมื่อ <code>attempts = 0</code> ซึ่งไม่ใช่ผลงานของระบบจึงไม่แจ้ง "สำเร็จ"), วันที่ครบกำหนดอ่านไม่ได้ (<code>badDeadline</code>) และสวิตช์รวมถูกปิด</p>
 <div class="callout why"><div class="callout-title">ทำไม</div><p>ทำไมมีคนเข้ามาแล้ว <strong>ยกเลิก</strong> ไม่ใช่ "พักนับ": ถ้าคนเข้ามาแล้วออกไปอีก ควรนับใหม่ 5 นาทีเต็ม ไม่ใช่เหลือแค่ไม่กี่วินาทีจากรอบก่อนแล้วโดนปิดแอร์ทันที</p></div>
 

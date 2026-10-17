@@ -804,7 +804,7 @@ JSON ที่เขียนลงบอร์ดมี `version: 1`, `token` (
 | `OccupancySensorRepository` / `OccupancySensorService` | `POST /occupancy-sensors/reservations`, `POST /occupancy-sensors/:deviceId/setup-mode`, `DELETE /occupancy-sensors/:deviceId` | |
 | `RoomRepository` / `RoomService` | `GET/POST /rooms`, `PUT/DELETE /rooms/:roomNumber` | ใช้ `Uri.encodeComponent(room.number)` กันอักขระพิเศษใน URL (ห้องพิเศษอย่าง `CL503`) |
 | `ScheduleRepository` / `ScheduleService` | `GET/POST/DELETE /schedules`, `PUT/DELETE /schedules/:id`, `POST /schedules/import/preview`, `POST /schedules/import/commit`, `GET/PUT/DELETE /schedules/terms`, `GET /bookings?from=&to=`, `POST /bookings`, `PUT/DELETE /bookings/:id` | `fetchScheduleBundle()` คืนตาราง + `timetable` ในคำขอเดียว ส่วน `fetchSchedules()` เป็นตัวห่อที่เรียก `fetchScheduleBundle()` แล้วคืนแค่ `.schedules` | พรีวิวส่ง **ไฟล์ดิบ** เป็น `application/octet-stream` + หัว `X-File-Name` (เข้ารหัส URL) timeout 45 วินาที |
-| `SystemSettingsRepository` / `SystemSettingsService` | `GET /settings`, `PATCH /settings/auto-off` body `{enabled}` | ไฟล์ repository ยังนิยามคลาส `SystemSettings` ไว้ในที่เดียวกัน |
+| `SystemSettingsRepository` / `SystemSettingsService` | `GET /settings`, `PATCH /settings/auto-off` body `{enabled}` หรือ `{testMode}` | ไฟล์ repository ยังนิยามคลาส `SystemSettings` (`autoOffEnabled`, `autoOffTestMode` และเมธอด `copyWith`) ไว้ในที่เดียวกัน |
 | `UserRepository` / `UserService` | `GET/POST /users`, `PATCH/DELETE /users/:username` | |
 | `AuthRepository` / `AuthService` | `POST /auth/login`, `GET/PATCH /auth/me`, `POST /auth/me/password`, `POST /auth/forgot-password`, `/auth/verify-otp`, `/auth/reset-password`, `GET /public/admin-contact` | ดูหัวข้อ Auth |
 
@@ -1669,14 +1669,14 @@ abstract interface class RoomRepository {
 | 63–64 | ล้มเหลว → เก็บข้อความ โดยตัดคำนำหน้า `ApiException: ` ที่ `toString()` ของ Exception บางชนิดใส่มา (ของเราเองคืน `message` เปล่าอยู่แล้ว) **ไม่โยนต่อ** เพราะ Timer เรียกโดยไม่มีใครดัก |
 | 65–68 | `finally`: ปิดสถานะโหลดและ `notifyListeners()` ทุกกรณี (สำเร็จ/ล้ม/เงียบ) ให้หน้าจอวาดค่าล่าสุด |
 
-**ไฟล์ `lib/controllers/system_settings_controller.dart` บรรทัด 47–67 (optimistic update)**
+**ไฟล์ `lib/controllers/system_settings_controller.dart` บรรทัด 49–91 (optimistic update ทั้งสวิตช์หลักและโหมดทดสอบ)**
 
-```dart:47
+```dart:49
   Future<bool> setAutoOffEnabled(bool enabled) async {
     if (isSaving) return false;
 
     final previous = settings;
-    settings = SystemSettings(autoOffEnabled: enabled);
+    settings = settings.copyWith(autoOffEnabled: enabled);
     isSaving = true;
     errorMessage = null;
     notifyListeners();
@@ -1693,20 +1693,42 @@ abstract interface class RoomRepository {
       notifyListeners();
     }
   }
+
+  Future<bool> setAutoOffTestMode(bool testMode) async {
+    if (isSaving) return false;
+
+    final previous = settings;
+    settings = settings.copyWith(autoOffTestMode: testMode);
+    isSaving = true;
+    errorMessage = null;
+    notifyListeners();
+
+    try {
+      settings = await repository.setAutoOffTestMode(testMode);
+      return true;
+    } catch (error) {
+      settings = previous;
+      errorMessage = _readable(error);
+      return false;
+    } finally {
+      isSaving = false;
+      notifyListeners();
+    }
+  }
 ```
 
 | บรรทัด | ความหมาย |
 |---|---|
-| 48 | กำลังบันทึกอยู่ → ปฏิเสธคำสั่งใหม่ (กดรัวไม่ยิงซ้อน) คืน `false` |
-| 50 | `previous` จำค่าเดิมไว้เผื่อถอยกลับ |
-| 51 | **เปลี่ยน state ทันทีก่อนได้คำตอบ** สวิตช์บนจอขยับตอนกดเลย (optimistic update) |
-| 52–54 | ตั้งธงกำลังบันทึก ล้าง error แล้ว notify |
-| 57–58 | ส่งไป Backend (`PATCH /settings/auto-off`) แล้ว **ใช้ค่าที่เซิร์ฟเวอร์ยืนยันกลับมา** ทับของที่เดาไว้ คืน `true` |
-| 59–62 | ล้มเหลว → **ถอยกลับ** เป็นค่าเดิม เก็บข้อความ คืน `false` ให้ผู้เรียกแสดง SnackBar |
-| 63–66 | `finally` ปลดธงและ notify เสมอ ทั้งสองทางหน้าจอได้รับการอัปเดต |
+| 50, 72 | กำลังบันทึกอยู่ → ปฏิเสธคำสั่งใหม่ (กดรัวไม่ยิงซ้อน) คืน `false` |
+| 52, 74 | `previous` จำค่าเดิมไว้เผื่อถอยกลับ |
+| 53, 75 | **เปลี่ยน state ทันทีก่อนได้คำตอบ** ด้วย `settings.copyWith(...)` (เปลี่ยนเฉพาะฟิลด์ที่กดโดยไม่ทำให้อีกฟิลด์หลุดกลับไปเป็นค่าเริ่มต้น) สวิตช์บนจอขยับตอนกดเลย (optimistic update) |
+| 54–56 | ตั้งธงกำลังบันทึก ล้าง error แล้ว notify |
+| 59, 81 | ส่งไป Backend (`PATCH /settings/auto-off` ด้วย `{enabled}` หรือ `{testMode}`) แล้ว **ใช้ค่าที่เซิร์ฟเวอร์ยืนยันกลับมา** ทับของที่เดาไว้ คืน `true` |
+| 61–64, 83–86 | ล้มเหลว → **ถอยกลับ** เป็นค่าเดิม เก็บข้อความ คืน `false` ให้ผู้เรียกแสดง SnackBar |
+| 65–68, 87–90 | `finally` ปลดธงและ notify เสมอ ทั้งสองทางหน้าจอได้รับการอัปเดต |
 
 > [!WHY]
-> **ทำไมใช้ optimistic update กับสวิตช์นี้** ถ้ารอเซิร์ฟเวอร์ตอบก่อนแล้วค่อยขยับสวิตช์ ผู้ใช้จะรู้สึกว่าหน่วงทุกครั้งที่กด (เน็ตช้าเป็นวินาที) การขยับทันทีแล้วถอยกลับเมื่อพลาดให้ความรู้สึกไว และยังปลอดภัยเพราะมีการถอยกลับกับข้อความผิดพลาดเสมอ ข้อเสียคือผู้ใช้อาจเห็นค่าเปลี่ยนแล้วเด้งกลับ ถ้าเซิร์ฟเวอร์ปฏิเสธ (ซึ่งเป็นเรื่องที่ควรเห็นอยู่แล้ว)
+> **ทำไมใช้ `settings.copyWith(...)` แทนการสร้าง `SystemSettings(autoOffEnabled: enabled)` ใหม่ตรง ๆ** เพราะ `SystemSettings` มี 2 ฟิลด์ (`autoOffEnabled` และ `autoOffTestMode`) ถ้าสร้างอินสแตนซ์ใหม่โดยใส่แค่ `autoOffEnabled` ฟิลด์ `autoOffTestMode` จะถูกรีเซ็ตเป็น `false` ชั่วคราวระหว่างรอเซิร์ฟเวอร์ตอบ ทำให้สวิตช์โหมดทดสอบกระพริบดับแล้วติดใหม่ การใช้ `copyWith` จึงรักษาสถานะของอีกสวิตช์ไว้ได้ครบถ้วน
 
 ### 7. `lib/utils/thai_date.dart` — ปี พ.ศ. และการอ่านวันที่
 

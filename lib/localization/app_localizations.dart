@@ -56,6 +56,13 @@ class AppLocalizations {
     }
 
     match = RegExp(
+      r'^Floor (\d+) · (\d+) units$',
+    ).firstMatch(source);
+    if (match != null) {
+      return 'ชั้น ${match[1]} · ${match[2]} เครื่อง';
+    }
+
+    match = RegExp(
       r'^Room ([A-Z0-9_-]+) · Unit (\d+)$',
     ).firstMatch(source);
     if (match != null) {

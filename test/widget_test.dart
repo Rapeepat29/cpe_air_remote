@@ -311,6 +311,8 @@ void main() {
     await tester.tap(find.text('สถิติ'));
     await tester.pumpAndSettle();
     expect(find.text('≈ 223.13 บาท'), findsOneWidget);
+    expect(find.text('ห้อง 16301'), findsOneWidget);
+    expect(find.text('ชั้น 3 · 1 เครื่อง'), findsOneWidget);
   });
 
   testWidgets('admin adds and edits a room class schedule', (tester) async {

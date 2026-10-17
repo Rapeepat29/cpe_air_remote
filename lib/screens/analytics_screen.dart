@@ -321,7 +321,7 @@ class _UsageRoomCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  context.tr('${usage.deviceCount} units'),
+                  context.tr('Room ${usage.roomNumber}'),
                   style: TextStyle(
                     color: colors.onSurface,
                     fontSize: 13,
@@ -330,9 +330,7 @@ class _UsageRoomCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 3),
                 Text(
-                  context.tr(
-                    'Floor ${usage.floorNumber} · Room ${usage.roomNumber}',
-                  ),
+                  '${usage.floorNumber == 0 ? context.tr('Special') : context.tr('Floor ${usage.floorNumber}')} · ${context.tr('${usage.deviceCount} units')}',
                   style: TextStyle(
                     color: colors.onSurfaceVariant,
                     fontSize: 10.5,

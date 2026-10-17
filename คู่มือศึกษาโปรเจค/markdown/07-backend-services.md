@@ -225,25 +225,27 @@ backend/src/
 
 **กลุ่มระบบปิดแอร์อัตโนมัติ**
 
-### `utils/auto-off.js` (142 บรรทัด) — ตัวตัดสินใจ (pure)
+### `utils/auto-off.js` (148 บรรทัด) — ตัวตัดสินใจ (pure)
 
 ค่าคงที่ (export ทั้งหมด) และฟังก์ชัน
 
 | ชื่อ | ค่า | ความหมาย |
 |---|---|---|
-| `AUTO_OFF_IDLE_SECONDS` | `300` | ห้องว่างนอกคาบเรียน: นับถอยหลัง 5 นาที |
-| `AUTO_OFF_IN_CLASS_SECONDS` | `900` | ห้องว่างระหว่างมีคาบ: นับ 15 นาที (เผื่อพักเบรก) |
+| `AUTO_OFF_IDLE_SECONDS` | `300` | โหมดปกติ — ห้องว่างนอกคาบเรียน: นับถอยหลัง 5 นาที |
+| `AUTO_OFF_IN_CLASS_SECONDS` | `900` | โหมดปกติ — ห้องว่างระหว่างมีคาบ: นับ 15 นาที (เผื่อพักเบรก) |
+| `AUTO_OFF_TEST_IDLE_SECONDS` | `30` | โหมดทดสอบ — ห้องว่างนอกคาบเรียน: นับถอยหลัง 30 วินาที |
+| `AUTO_OFF_TEST_IN_CLASS_SECONDS` | `60` | โหมดทดสอบ — ห้องว่างระหว่างมีคาบ: นับถอยหลัง 1 นาที (60 วินาที) |
 | `AUTO_OFF_RETRY_SECONDS` | `20` | ยิง IR ซ้ำทุกกี่วินาที ถ้าแอร์ยังกินไฟ |
 | `AUTO_OFF_MAX_ATTEMPTS` | `5` | ยิงซ้ำสูงสุดกี่ครั้งก่อนยอมแพ้ |
-| `decideAutoOff({device, occupancy, withinClass, now})` | — | คืน `{action, reason, ...}` |
+| `decideAutoOff({device, occupancy, withinClass, testMode, now})` | — | คืน `{action, reason, ...}` (เมื่อ `action: 'start'` คืน `graceSeconds`, `withinClass`, `testMode`, `deadlineAt`) |
 | `autoOffSecondsRemaining(device, now)` | — | วินาทีที่เหลือ (ใช้แสดงนาฬิกาในแอป) หรือ `null` |
 | `autoOffPhase(device, now)` | — | `'idle'` / `'counting'` / `'commanding'` ที่ส่งให้แอป |
 
 `autoOffSecondsRemaining` และ `autoOffPhase` ถูกเรียกจาก `utils/room.js` (`publicRoom`) และ `utils/air-conditioner.js` (`publicAirConditioner`) เพื่อใส่ใน JSON ที่ส่งให้แอป รายละเอียดทุกกติกาอยู่ในหัวข้อ "ระบบปิดแอร์อัตโนมัติอย่างละเอียด" ด้านล่าง
 
-### `services/auto-off.js` (373 บรรทัด) — ตัวคุมจังหวะ
+### `services/auto-off.js` (378 บรรทัด) — ตัวคุมจังหวะ
 
-`startAutoOffService()` / `stopAutoOffService()` (เรียกจาก `server.js`), `evaluateAutoOff({deviceId, roomNumber, now})` (export ไว้ให้เทสต์/เรียกตรง) และฟังก์ชันภายใน `readDevices`, `evaluateDevice`, `fireOffCommand`, `clearCountdown`, `clearAllCountdowns`, `applyNotificationRules`, `readSchedule`, `acquireRunnerLock`/`releaseRunnerLock`, `parseState` อธิบายละเอียดด้านล่างและในหัวข้อเจาะโค้ด
+`startAutoOffService()` / `stopAutoOffService()` (เรียกจาก `server.js`), `evaluateAutoOff({deviceId, roomNumber, now})` (export ไว้ให้เทสต์และ `routes/settings.js` เรียกประเมินทันทีเมื่อสลับสวิตช์), `clearAllCountdowns()` (export เพื่อให้ `routes/settings.js` ล้างนาฬิกาเก่าทันทีเมื่อแอดมินสลับโหมดปกติ ↔ โหมดทดสอบ) และฟังก์ชันภายใน `readDevices`, `evaluateDevice`, `fireOffCommand`, `clearCountdown`, `applyNotificationRules`, `readSchedule`, `acquireRunnerLock`/`releaseRunnerLock`, `parseState` อธิบายละเอียดด้านล่างและในหัวข้อเจาะโค้ด
 
 ### `services/alerts.js` (111 บรรทัด) — ใบแจ้งเตือน
 
@@ -367,17 +369,18 @@ backend/src/
 
 **กลุ่มค่าตั้งระบบ**
 
-### `services/system-settings.js` (246 บรรทัด)
+### `services/system-settings.js` (266 บรรทัด)
 
 ค่าตั้งระดับ "ทั้งอาคาร" เก็บเป็นคู่ key-value ในตาราง `system_settings` (คอลัมน์ `setting_key`, `setting_value`, `updated_by`, `updated_at`)
 
 | `SETTING_KEYS` | key | ค่าเริ่มต้น | หมายเหตุ |
 |---|---|---|---|
 | `AUTO_OFF_ENABLED` | `auto_off_enabled` | `true` | สวิตช์รวมของระบบปิดแอร์ ต้องอยู่ฝั่งเซิร์ฟเวอร์เพราะ Backend เป็นคนยิงคำสั่งปิด |
+| `AUTO_OFF_TEST_MODE` | `auto_off_test_mode` | `false` | สวิตช์โหมดทดสอบทั้งอาคาร (`true` = นอกคาบ 30 วิ / ในคาบ 1 นาที, `false` = นอกคาบ 5 นาที / ในคาบ 15 นาที) |
 | `ELECTRICITY_RATE` | `electricity_rate` | `4.5` บาท/kWh | ขอบเขต `RATE_LIMITS = {min: 0.01, max: 100}` |
 | `TIMETABLE_SEMESTER` | `timetable_semester` | — | ภาคเรียนของตารางที่ใช้ + ผู้นำเข้า/เวลา ไม่ได้ใช้ตัดสินปิดแอร์โดยตรง |
 
-มี cache 5 วินาที (`CACHE_TTL_MS = 5000`) เพราะตัวคุมจังหวะอ่านทุก 10 วินาทีและทุกครั้งที่บอร์ดส่งสถานะ ล้างทันทีเมื่อเขียนใหม่ (`clearSettingsCache`) `parseRate` คืนค่าเริ่มต้นแทน `NaN` เมื่อค่าอ่านไม่ออกหรือเกินขอบเขต `setElectricityRate` ปฏิเสธค่านอกขอบเขตด้วย 400 และเก็บเป็นข้อความทศนิยม 2 ตำแหน่ง (`toFixed(2)`) ให้ค่าที่อ่านกลับเท่าเดิมเป๊ะ ฟังก์ชันที่ export: `isAutoOffEnabled`, `readElectricityRate`, `readPublicSettings`, `setAutoOffEnabled`, `setElectricityRate`, `readTimetableInfo`, `recordTimetableImport`, `clearTimetableInfo` ถ้าตารางยังไม่ถูกสร้าง (`ER_NO_SUCH_TABLE`) จะถอยไปใช้ค่าเริ่มต้นเพื่อให้ระบบเดิมทำงานต่อ route `routes/settings.js` เรียกใช้
+มี cache 5 วินาที (`CACHE_TTL_MS = 5000`) เพราะตัวคุมจังหวะอ่านทุก 10 วินาทีและทุกครั้งที่บอร์ดส่งสถานะ ล้างทันทีเมื่อเขียนใหม่ (`clearSettingsCache`) `parseRate` คืนค่าเริ่มต้นแทน `NaN` เมื่อค่าอ่านไม่ออกหรือเกินขอบเขต `setElectricityRate` ปฏิเสธค่านอกขอบเขตด้วย 400 และเก็บเป็นข้อความทศนิยม 2 ตำแหน่ง (`toFixed(2)`) ให้ค่าที่อ่านกลับเท่าเดิมเป๊ะ ฟังก์ชันที่ export: `isAutoOffEnabled`, `isAutoOffTestMode`, `readElectricityRate`, `readPublicSettings`, `setAutoOffEnabled`, `setAutoOffTestMode`, `setElectricityRate`, `readTimetableInfo`, `recordTimetableImport`, `clearTimetableInfo` ถ้าตารางยังไม่ถูกสร้าง (`ER_NO_SUCH_TABLE`) จะถอยไปใช้ค่าเริ่มต้นเพื่อให้ระบบเดิมทำงานต่อ route `routes/settings.js` เรียกใช้
 
 > [!NOTE]
 > อัตราค่าไฟที่เก็บใน `system_settings` ถูกส่งให้แอปผ่าน `readPublicSettings()` (GET `/api/settings`) แอปนำไปใส่ใน query `rate` ตอนเรียกรายงาน ส่วนการคูณค่าไฟอยู่ใน `routes/energy.js` (ใช้ `query.rate` ที่ผู้เรียกส่งมา) ไม่ได้อ่านค่านี้จากฐานข้อมูลเอง
@@ -545,7 +548,7 @@ export function isUnprovisionAck(message, deviceId) {
 
 ### อินพุตและเอาต์พุตของ `decideAutoOff`
 
-อินพุต `{ device, occupancy, withinClass, now }`
+อินพุต `{ device, occupancy, withinClass, testMode = false, now }`
 
 | ฟิลด์ | ที่มา (`services/auto-off.js`) | ความหมาย |
 |---|---|---|
@@ -557,6 +560,7 @@ export function isUnprovisionAck(message, deviceId) {
 | `device.autoOffLastAttemptAt` | `auto_off_last_attempt_at` | เวลายิงครั้งล่าสุด |
 | `occupancy.hasSensor / online / radarAvailable / occupied` | `LEFT JOIN occupancy_sensors` | ห้องมีเซ็นเซอร์ไหม ออนไลน์ไหม เรดาร์ใช้ได้ไหม มีคนไหม |
 | `withinClass` | `evaluateClassSchedule` + ปฏิทินภาคเรียน + การจองห้อง | ตอนนี้อยู่ในคาบ (หรือมีการจอง) ไหม |
+| `testMode` | `isAutoOffTestMode()` จาก `system_settings` | เปิดโหมดทดสอบอยู่ไหม (`true` = ใช้เวลา 30 วิ / 60 วิ, ค่าเริ่มต้น `false`) |
 | `now` | ส่งเข้ามา | เวลาปัจจุบัน (ส่งเข้ามาเพื่อให้เทสต์ควบคุมเวลาได้) |
 
 เอาต์พุต `{ action, reason, ... }` มี 7 `action`
@@ -564,7 +568,7 @@ export function isUnprovisionAck(message, deviceId) {
 | `action` | ความหมาย | `services/auto-off.js` ทำอะไรต่อ |
 |---|---|---|
 | `idle` | ไม่มีอะไรต้องทำ ไม่มีนาฬิกาเดิน | ไม่ทำอะไร |
-| `start` | เริ่มนับถอยหลัง (มี `graceSeconds`, `withinClass`) | `UPDATE` ตั้ง `auto_off_started_at`, `auto_off_deadline_at`, `auto_off_attempts = 0`, `auto_off_in_class` |
+| `start` | เริ่มนับถอยหลัง (มี `graceSeconds`, `withinClass`, `testMode`, `deadlineAt`) | `UPDATE` ตั้ง `auto_off_started_at`, `auto_off_deadline_at`, `auto_off_attempts = 0`, `auto_off_in_class` |
 | `wait` | นับอยู่ยังไม่ครบ หรือเพิ่งยิงรอดูผล | ไม่ทำอะไร |
 | `fire` | ถึงเวลา (มี `attempt` = ครั้งที่) | `fireOffCommand` |
 | `succeeded` | แอร์หยุดกินไฟหลังจากที่เราสั่ง | ล้างนาฬิกา, `raiseAlert(AUTO_OFF_SUCCEEDED)`, ปิดใบ `AUTO_OFF_FAILED` ที่ค้างอยู่ |
@@ -587,7 +591,30 @@ export function isUnprovisionAck(message, deviceId) {
 | 9 | ยิงล่าสุดห่างไม่ถึง 20 วินาที | `wait` | — | `retryCooldown` |
 | 10 | นอกนั้น | `fire` (`attempt = attempts + 1`) | — | `deadlinePassed` |
 
-เวลานับถอยหลังที่ด่าน 5: `withinClass === true` → `AUTO_OFF_IN_CLASS_SECONDS = 900` (15 นาที), นอกนั้น → `AUTO_OFF_IDLE_SECONDS = 300` (5 นาที)
+### ตารางเปรียบเทียบเวลานับถอยหลังที่ด่าน 5 (โหมดปกติ vs โหมดทดสอบ)
+
+เมื่อผ่านด่าน 1–4 แล้วเพิ่งเริ่มนับ (`action: 'start'`) ฟังก์ชัน `decideAutoOff` จะเลือก `graceSeconds` จาก 2 ตัวแปร คือ `withinClass` (อยู่ในคาบเรียน/จองห้องไหม) และ `testMode` (เปิดโหมดทดสอบไหม):
+
+| สถานะคาบเรียน (`withinClass`) | โหมดปกติ (`testMode = false`) | โหมดทดสอบ (`testMode = true`) | เหตุผลที่เวลาต่างกัน |
+|---|---|---|---|
+| **นอกคาบเรียน** (`false`) | `AUTO_OFF_IDLE_SECONDS` = **300 วินาที (5 นาที)** | `AUTO_OFF_TEST_IDLE_SECONDS` = **30 วินาที** | นอกเวลาเรียน ถ้าไม่มีคนอยู่ในห้องเลย มีโอกาสสูงที่ลืมปิดแอร์หลังเลิกคลาส จึงตัดเร็วกว่า |
+| **ในคาบเรียน / มีการจองห้อง** (`true`) | `AUTO_OFF_IN_CLASS_SECONDS` = **900 วินาที (15 นาที)** | `AUTO_OFF_TEST_IN_CLASS_SECONDS` = **60 วินาที (1 นาที)** | ระหว่างคาบเรียน อาจารย์และนักศึกษาอาจออกไปพักเบรกหรือเข้าห้องน้ำชั่วคราว จึงเผื่อเวลานานกว่า |
+
+```text
+ภาพเปรียบเทียบเส้นเวลา (Timeline) เมื่อคนเดินออกจากห้องหมด (t = 0s):
+
+1) โหมดปกติ (ใช้งานจริงประจำวัน)
+   • นอกคาบเรียน (5 นาที):
+     t=0s (ห้องว่าง) ──────────────────────────────► t=300s ยิงคำสั่งปิดแอร์ (power:false)
+   • ในคาบเรียน (15 นาที):
+     t=0s (ห้องว่าง) ────────────────────────────────────────────────────────► t=900s ยิงคำสั่งปิดแอร์
+
+2) โหมดทดสอบ (ตอนเดินตรวจห้อง หรือสาธิตโปรเจกต์ให้กรรมการดู)
+   • นอกคาบเรียน (30 วินาที):
+     t=0s (ห้องว่าง) ────► t=30s ยิงคำสั่งปิดแอร์ทันที!
+   • ในคาบเรียน (1 นาที):
+     t=0s (ห้องว่าง) ─────────► t=60s ยิงคำสั่งปิดแอร์ทันที!
+```
 
 **เงื่อนไขยกเลิก (cancel) ทั้งหมด** ขณะนับอยู่: มีคนเข้ามา (`occupied`), เซ็นเซอร์ตายหรือไม่มี (`noSensor`), ปิดฟีเจอร์รายเครื่อง (`disabled`), PZEM อ่านไม่ได้ (`noPzem`), แอร์หยุดเอง ก่อนที่เราสั่ง (`notRunning` เมื่อ `attempts = 0` ซึ่งไม่ใช่ผลงานของระบบจึงไม่แจ้ง "สำเร็จ"), วันที่ครบกำหนดอ่านไม่ได้ (`badDeadline`) และสวิตช์รวมถูกปิด
 
@@ -950,10 +977,16 @@ async function handleAirStatus(deviceId, status) {
 
 ### จุดที่ 3: ตัวตัดสินใจปิดแอร์ (`utils/auto-off.js`)
 
-**ไฟล์ `backend/src/utils/auto-off.js` บรรทัด 29–56**
+**ไฟล์ `backend/src/utils/auto-off.js` บรรทัด 31–62**
 
-```js:29
-export function decideAutoOff({ device, occupancy, withinClass, now }) {
+```js:31
+export function decideAutoOff({
+  device,
+  occupancy,
+  withinClass,
+  testMode = false,
+  now,
+}) {
   const current = now instanceof Date ? now : new Date(now);
   const counting = device?.autoOffDeadlineAt != null;
   const attempts = Number(device?.autoOffAttempts ?? 0);
@@ -985,19 +1018,19 @@ export function decideAutoOff({ device, occupancy, withinClass, now }) {
 
 | บรรทัด | โค้ด/คำสั่ง | ความหมาย |
 |---|---|---|
-| 29 | `export function decideAutoOff({ device, occupancy, withinClass, now })` | รับอ็อบเจกต์เดียวแล้ว destructure เป็นสี่ตัวแปร เรียกด้วยชื่อ ไม่ต้องจำลำดับพารามิเตอร์ |
-| 30 | `now instanceof Date ? now : new Date(now)` | ยอมรับทั้ง `Date` และตัวเลข/สตริงเวลา |
-| 31 | `device?.autoOffDeadlineAt != null` | `?.` (optional chaining) = ถ้า `device` เป็น null/undefined ให้ได้ `undefined` แทนที่จะ error; `!= null` (เท่ากับหลวม) ครอบทั้ง `null` และ `undefined` ได้ `counting = true` เมื่อมีนาฬิกาเดินอยู่ |
-| 32 | `Number(device?.autoOffAttempts ?? 0)` | จำนวนครั้งที่ยิงไปแล้ว ค่าไม่มี = 0 |
-| 34–36 | `sensorUsable = hasSensor === true && online === true && radarAvailable === true` | ใช้ `=== true` ไม่ใช่แค่ truthy: `1`, `"yes"`, `undefined` จะไม่ผ่าน ต้องเป็น boolean จริงเท่านั้น |
-| 39 | `autoOffEnabled !== true \|\| !sensorUsable` | ด่าน 1 `!== true` ทำให้ค่าที่หาย/แปลกตกเป็น "ปิด" (fail-safe) |
-| 40–42 | `return counting ? {cancel...} : {idle...}` | รูปแบบที่ซ้ำทุกด่าน: ถ้ากำลังนับอยู่ต้อง `cancel` เพื่อล้างนาฬิกาที่ค้าง ถ้าไม่ได้นับก็ `idle` เฉย ๆ |
-| 46–50 | `pzemAvailable !== true` | ด่าน 2 |
-| 52–56 | `occupancy.occupied === true` | ด่าน 3 บรรทัด 52 เข้าถึง `occupancy.occupied` ตรง ๆ ได้โดยไม่ต้อง `?.` เพราะผ่านด่าน 1 มาแล้ว `sensorUsable` จริง แปลว่า `occupancy` เป็นอ็อบเจกต์แน่นอน |
+| 31–37 | `export function decideAutoOff({ device, occupancy, withinClass, testMode = false, now })` | รับอ็อบเจกต์เดียวแล้ว destructure เป็นห้าตัวแปร โดย `testMode` มีค่าเริ่มต้นเป็น `false` (โหมดปกติ) |
+| 38 | `now instanceof Date ? now : new Date(now)` | ยอมรับทั้ง `Date` และตัวเลข/สตริงเวลา |
+| 39 | `device?.autoOffDeadlineAt != null` | `?.` (optional chaining) = ถ้า `device` เป็น null/undefined ให้ได้ `undefined` แทนที่จะ error; `!= null` (เท่ากับหลวม) ครอบทั้ง `null` และ `undefined` ได้ `counting = true` เมื่อมีนาฬิกาเดินอยู่ |
+| 40 | `Number(device?.autoOffAttempts ?? 0)` | จำนวนครั้งที่ยิงไปแล้ว ค่าไม่มี = 0 |
+| 42–44 | `sensorUsable = hasSensor === true && online === true && radarAvailable === true` | ใช้ `=== true` ไม่ใช่แค่ truthy: `1`, `"yes"`, `undefined` จะไม่ผ่าน ต้องเป็น boolean จริงเท่านั้น |
+| 47 | `autoOffEnabled !== true \|\| !sensorUsable` | ด่าน 1 `!== true` ทำให้ค่าที่หาย/แปลกตกเป็น "ปิด" (fail-safe) |
+| 48–50 | `return counting ? {cancel...} : {idle...}` | รูปแบบที่ซ้ำทุกด่าน: ถ้ากำลังนับอยู่ต้อง `cancel` เพื่อล้างนาฬิกาที่ค้าง ถ้าไม่ได้นับก็ `idle` เฉย ๆ |
+| 53–56 | `pzemAvailable !== true` | ด่าน 2 |
+| 58–62 | `occupancy.occupied === true` | ด่าน 3 บรรทัด 58 เข้าถึง `occupancy.occupied` ตรง ๆ ได้โดยไม่ต้อง `?.` เพราะผ่านด่าน 1 มาแล้ว `sensorUsable` จริง แปลว่า `occupancy` เป็นอ็อบเจกต์แน่นอน |
 
-**ไฟล์ `backend/src/utils/auto-off.js` บรรทัด 58–79**
+**ไฟล์ `backend/src/utils/auto-off.js` บรรทัด 64–90**
 
-```js:58
+```js:64
   if (device?.acRunning !== true) {
     if (counting && attempts > 0) {
       return { action: 'succeeded', reason: 'powerDropped', attempts };
@@ -1009,14 +1042,16 @@ export function decideAutoOff({ device, occupancy, withinClass, now }) {
 
   // ถึงตรงนี้: แอร์ทำงานอยู่ ห้องว่าง เซ็นเซอร์เชื่อถือได้
   if (!counting) {
-    const graceSeconds = withinClass === true
-      ? AUTO_OFF_IN_CLASS_SECONDS
-      : AUTO_OFF_IDLE_SECONDS;
+    const isTest = testMode === true;
+    const inClassSeconds = isTest ? AUTO_OFF_TEST_IN_CLASS_SECONDS : AUTO_OFF_IN_CLASS_SECONDS;
+    const idleSeconds = isTest ? AUTO_OFF_TEST_IDLE_SECONDS : AUTO_OFF_IDLE_SECONDS;
+    const graceSeconds = withinClass === true ? inClassSeconds : idleSeconds;
     return {
       action: 'start',
       reason: 'emptyRoom',
       graceSeconds,
       withinClass: withinClass === true,
+      testMode: isTest,
       deadlineAt: new Date(current.getTime() + graceSeconds * 1000),
     };
   }
@@ -1024,14 +1059,14 @@ export function decideAutoOff({ device, occupancy, withinClass, now }) {
 
 | บรรทัด | ความหมาย |
 |---|---|
-| 58 | ด่าน 4: แอร์ไม่ได้กินไฟแล้ว |
-| 59–61 | ถ้ากำลังนับและเคยยิงแล้ว (`attempts > 0`) แปลว่าคำสั่งของเราได้ผล → `succeeded` พร้อมเหตุผล `powerDropped` |
-| 62–64 | ไม่งั้น แอร์ดับไปเองก่อนที่เราสั่ง (หรือไม่เคยเดิน) → ไม่ใช่ผลงานของระบบ แค่ `cancel`/`idle` เงียบ ๆ |
-| 68–79 | ถึงตรงนี้แอร์เดินอยู่ ห้องว่าง เซ็นเซอร์ดี ถ้ายังไม่ได้นับก็เริ่ม: เลือก `graceSeconds` 900 หากอยู่ในคาบ (`withinClass === true`) ไม่งั้น 300 แล้วคืน `start` พร้อม `deadlineAt` (`current.getTime() + graceSeconds * 1000` เพราะ `getTime()` ให้มิลลิวินาที) |
+| 64 | ด่าน 4: แอร์ไม่ได้กินไฟแล้ว |
+| 65–67 | ถ้ากำลังนับและเคยยิงแล้ว (`attempts > 0`) แปลว่าคำสั่งของเราได้ผล → `succeeded` พร้อมเหตุผล `powerDropped` |
+| 68–70 | ไม่งั้น แอร์ดับไปเองก่อนที่เราสั่ง (หรือไม่เคยเดิน) → ไม่ใช่ผลงานของระบบ แค่ `cancel`/`idle` เงียบ ๆ |
+| 74–88 | ถึงตรงนี้แอร์เดินอยู่ ห้องว่าง เซ็นเซอร์ดี ถ้ายังไม่ได้นับก็เริ่ม: ตรวจ `isTest = testMode === true` (ต้องเป็น boolean `true` เท่านั้น) แล้วเลือกคู่เวลา (ในคาบ 60 วิ vs 900 วิ / นอกคาบ 30 วิ vs 300 วิ) จากนั้นเลือกตาม `withinClass === true` แล้วคืน `start` พร้อม `graceSeconds`, `withinClass`, `testMode` และ `deadlineAt` (`current.getTime() + graceSeconds * 1000`) |
 
-**ไฟล์ `backend/src/utils/auto-off.js` บรรทัด 81–111**
+**ไฟล์ `backend/src/utils/auto-off.js` บรรทัด 91–121**
 
-```js:81
+```js:91
   const deadline = toDate(device.autoOffDeadlineAt);
   if (deadline == null) {
     return { action: 'cancel', reason: 'badDeadline' };
@@ -1067,11 +1102,11 @@ export function decideAutoOff({ device, occupancy, withinClass, now }) {
 
 | บรรทัด | ความหมาย |
 |---|---|
-| 81–84 | อ่าน deadline เป็น `Date` (ฟังก์ชัน `toDate` คืน null ถ้า parse ไม่ได้) ถ้าอ่านไม่ได้ `cancel` ด้วยเหตุผล `badDeadline` ดีกว่าปล่อยให้เทียบกับ `NaN` |
-| 86–92 | ยังไม่ถึงเวลา → `wait` พร้อมวินาทีที่เหลือ (`Math.ceil` ปัดขึ้นเพื่อไม่ให้เห็น 0 ก่อนถึงเวลาจริง) |
-| 94–96 | ยิงครบ `AUTO_OFF_MAX_ATTEMPTS` (5) → `giveUp` |
-| 98–108 | ถ้าเคยยิงมาแล้ว เทียบเวลาจากครั้งล่าสุด ถ้าห่างไม่ถึง 20 วินาที (`AUTO_OFF_RETRY_SECONDS`) → `wait` แบบ `retryCooldown` |
-| 110 | ผ่านทุกอย่างแล้ว → `fire` ครั้งที่ `attempts + 1` |
+| 91–94 | อ่าน deadline เป็น `Date` (ฟังก์ชัน `toDate` คืน null ถ้า parse ไม่ได้) ถ้าอ่านไม่ได้ `cancel` ด้วยเหตุผล `badDeadline` ดีกว่าปล่อยให้เทียบกับ `NaN` |
+| 96–102 | ยังไม่ถึงเวลา → `wait` พร้อมวินาทีที่เหลือ (`Math.ceil` ปัดขึ้นเพื่อไม่ให้เห็น 0 ก่อนถึงเวลาจริง) |
+| 104–106 | ยิงครบ `AUTO_OFF_MAX_ATTEMPTS` (5) → `giveUp` |
+| 108–118 | ถ้าเคยยิงมาแล้ว เทียบเวลาจากครั้งล่าสุด ถ้าห่างไม่ถึง 20 วินาที (`AUTO_OFF_RETRY_SECONDS`) → `wait` แบบ `retryCooldown` |
+| 120 | ผ่านทุกอย่างแล้ว → `fire` ครั้งที่ `attempts + 1` |
 
 ### จุดที่ 4: ตัวคุมจังหวะปิดแอร์ (`services/auto-off.js`)
 
@@ -1099,7 +1134,7 @@ export function startAutoOffService() {
 | 40 | `setInterval(() => runEvaluation(), TICK_INTERVAL_MS)` ประเมินทุกเครื่องทุก 10 วินาที |
 | 41 | `timer.unref()` ไม่ให้ timer นี้ยื้อให้โปรเซสปิดไม่ลง (ตรวจ `typeof ... === 'function'` กันกรณีสภาพแวดล้อมไม่มีเมธอดนี้) |
 
-**ไฟล์ `backend/src/services/auto-off.js` บรรทัด 69–97**
+**ไฟล์ `backend/src/services/auto-off.js` บรรทัด 69–98**
 
 ```js:69
   if (running) return [];
@@ -1120,10 +1155,11 @@ export function startAutoOffService() {
       return [];
     }
 
+    const testMode = await isAutoOffTestMode();
     const devices = await readDevices({ deviceId, roomNumber });
     const results = [];
     for (const device of devices) {
-      results.push(await evaluateDevice(device, now));
+      results.push(await evaluateDevice(device, now, testMode));
     }
     return results;
   } finally {
@@ -1138,8 +1174,9 @@ export function startAutoOffService() {
 | 69–70 | `running` เป็นธง "กำลังทำงานอยู่" ถ้ารอบก่อนยังไม่เสร็จ คืน `[]` ทันที (ไม่ต่อคิว) แล้วตั้งธง |
 | 76–77 | ขอ named lock ของ MariaDB (`GET_LOCK(name, 0)` รอ 0 วินาที) ถ้าได้ล็อกจะได้ connection ที่ถือล็อกไว้ ถ้าไม่ได้ (มี Backend อีกตัวทำอยู่) → ออกเฉย ๆ ล็อกผูกกับ connection จึงต้องถือ connection นี้ไว้ตลอดรอบและ `RELEASE_LOCK` ใน `finally` |
 | 82–85 | สวิตช์รวมปิดอยู่ → ล้างนาฬิกาทุกเครื่องแล้วจบรอบ |
-| 87–91 | `readDevices` ดึงแอร์ตามตัวกรอง (เครื่องเดียว/ห้องเดียว/ทั้งหมด) แล้วประเมินทีละเครื่อง `await` ในลูป `for...of` จึงทำเรียงลำดับ ไม่ขนาน (ตั้งใจ: ไม่ให้ยิงคำสั่งพร้อมกันหลายเครื่องจนเกิดภาระ MQTT/DB พุ่ง) |
-| 93–96 | `finally` ทำเสมอ ไม่ว่าสำเร็จหรือ error: คืนล็อกและเคลียร์ธง `running` ถ้าลืมทำ รอบถัดไปจะไม่ทำงานอีกเลย |
+| 87 | อ่าน `testMode = await isAutoOffTestMode()` ครั้งเดียวต่อรอบ (มี cache 5 วินาทีใน `system-settings.js`) แล้วส่งต่อให้ `evaluateDevice(device, now, testMode)` → `decideAutoOff({ ..., testMode })` |
+| 88–92 | `readDevices` ดึงแอร์ตามตัวกรอง (เครื่องเดียว/ห้องเดียว/ทั้งหมด) แล้วประเมินทีละเครื่อง `await` ในลูป `for...of` จึงทำเรียงลำดับ ไม่ขนาน (ตั้งใจ: ไม่ให้ยิงคำสั่งพร้อมกันหลายเครื่องจนเกิดภาระ MQTT/DB พุ่ง) |
+| 94–97 | `finally` ทำเสมอ ไม่ว่าสำเร็จหรือ error: คืนล็อกและเคลียร์ธง `running` ถ้าลืมทำ รอบถัดไปจะไม่ทำงานอีกเลย |
 
 **ไฟล์ `backend/src/services/auto-off.js` บรรทัด 244–269**
 

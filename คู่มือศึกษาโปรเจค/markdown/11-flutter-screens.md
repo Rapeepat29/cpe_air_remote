@@ -889,7 +889,7 @@ Future<void> _acknowledge(BuildContext context, SystemAlert alert) async {
 - หัวสีเขียวมุมล่างโค้ง (`_SummaryHeader`): "Energy Summary" + `PeriodSelector` สีขาว, ช่วงวันที่, ยอดรวมพลังงาน, ค่าไฟ "≈ THB ...", ป้าย `ChangeBadge` (ขึ้น/ลงกี่ % เทียบช่วงก่อน), และกราฟ `EnergyUsageChart` สูง 162 px
 - `FloorSelector` (แสดงเมื่อมีมากกว่า 1 ชั้น) มีตัวเลือก "All floors"
 - หัวข้อ "Usage by Room" + ชั้นที่เลือก
-- การ์ดรายห้อง (`_UsageRoomCard`): จำนวนเครื่อง, ชั้น·ห้อง, เวลาทำงานเป็นนาที, พลังงาน และค่าไฟ
+- การ์ดรายห้อง (`_UsageRoomCard`): เลขห้อง (หัวข้อหลักตัวหนา), ชั้น·จำนวนเครื่อง, เวลาทำงานเป็นนาที, พลังงาน และค่าไฟ
 
 ### หน่วยร่วมของการ์ดทุกใบ
 

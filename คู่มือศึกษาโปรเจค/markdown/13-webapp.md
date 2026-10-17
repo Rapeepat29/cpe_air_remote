@@ -192,7 +192,7 @@ charts.js ► dom.js, format.js
 | ตารางเรียน | `schedules`/`schedulesWithInfo` GET `/schedules`; `academicTerms` GET `/schedules/terms`; `saveAcademicTerm` PUT / `deleteAcademicTerm` DELETE `/schedules/terms`; `createSchedule` POST; `updateSchedule` PUT; `deleteSchedule` DELETE; `deleteAllSchedules` DELETE `/schedules`; `previewScheduleImport` POST `/schedules/import/preview`; `commitScheduleImport` POST `/schedules/import/commit` |
 | การใช้ห้อง | `bookings` GET `/bookings`; `createBooking` POST; `updateBooking` PUT; `deleteBooking` DELETE |
 | ผู้ใช้ | `users` GET `/users`; `createUser` POST; `updateUser` PATCH `/users/:username`; `deleteUser` DELETE |
-| ตั้งค่า | `settings` GET `/settings`; `setAutoOffEnabled` PATCH `/settings/auto-off`; `setElectricityRate` PATCH `/settings/rate` |
+| ตั้งค่า | `settings` GET `/settings`; `setAutoOffEnabled` PATCH `/settings/auto-off` (`{enabled}`); `setAutoOffTestMode` PATCH `/settings/auto-off` (`{testMode}`); `setElectricityRate` PATCH `/settings/rate` |
 
 ทุก path ที่มีค่าจากผู้ใช้ผ่าน `encodeURIComponent(...)` (กัน `/` หรือ `?` ในรหัสห้อง/ชื่อผู้ใช้ทำให้ URL เพี้ยน)
 
@@ -203,7 +203,7 @@ charts.js ► dom.js, format.js
 
 สมองกลางของฝั่งข้อมูล export: `state` (ออบเจ็กต์เดียวทั้งแอป), `subscribe(listener)`, `emit()`, `patchState`, `loaders` (ฟังก์ชันดึงข้อมูลทีละชุด), `startPolling/stopPolling/refreshAll`, `bootstrap`, `resetState` และตัวช่วยอ่าน `airConditionersOf`, `liveReading`, `sensorOf`, `roomsByFloor`, `roomEnergyMap`, `defaultHistoryRange` หัวข้อเจาะโค้ดอธิบาย `load()` และ `tick()`
 
-ฟิลด์ใน `state`: `user`, `settings` (`autoOffEnabled`, `electricityRate` เริ่มต้น 4.5), `health`, `rooms`, `airConditioners`, `occupancySensors`, `live` (`readings`, `totals`, `serverTime`), `alerts` (`alerts`, `counts`), `summary` + `summaryQuery` (`period: 'week'`, `floor: null`), `schedules`, `timetable`, `terms`, `today`, `bookings` + `bookingsRange`, `users`, `metricCatalog`, `loading`, `errors`
+ฟิลด์ใน `state`: `user`, `settings` (`autoOffEnabled`, `autoOffTestMode` เริ่มต้น `false`, `electricityRate` เริ่มต้น 4.5), `health`, `rooms`, `airConditioners`, `occupancySensors`, `live` (`readings`, `totals`, `serverTime`), `alerts` (`alerts`, `counts`), `summary` + `summaryQuery` (`period: 'week'`, `floor: null`), `schedules`, `timetable`, `terms`, `today`, `bookings` + `bookingsRange`, `users`, `metricCatalog`, `loading`, `errors`
 
 ค่า `undefined` กับ `null` ใน `timetable`/`terms`/`bookings` มีความหมายต่างกันโดยตั้งใจ: `undefined` = Backend รุ่นเก่าที่ยังไม่มีฟีเจอร์นี้ (หน้าจอจะซ่อนส่วนนั้น) `null` = มีฟีเจอร์แต่ยังไม่มีข้อมูล
 
@@ -495,7 +495,18 @@ function draftFor(unit) {
 
 ### `views/settings.js` — ตั้งค่า (ทุกคน, สวิตช์รวมเป็นของแอดมิน)
 
-ประกอบจาก 5 การ์ด: `displayCard` (ธีมสี 5 แบบ + ขนาดตัวอักษร 3 ระดับ "มีผลเฉพาะเครื่องนี้" ใช้ `theme.js`/`prefs.js` ไม่เรียก API), `autoOffCard` (สวิตช์รวมระบบปิดแอร์อัตโนมัติทั้งอาคาร `api.setAutoOffEnabled` ปิดแล้วต้องผ่าน `confirmAction` เพราะกดทีเดียวหยุดทั้งอาคาร: เจ้าหน้าที่เห็นสถานะแต่เปลี่ยนไม่ได้ `disabled: !isAdmin`), `profileCard` (ดู/แก้ข้อมูลส่วนตัว `api.updateProfile` เปลี่ยนอีเมลต้องกรอกรหัสผ่านปัจจุบันเพราะ OTP ลืมรหัสส่งไปอีเมลนี้, เปลี่ยนรหัสผ่าน `api.changePassword`), `healthCard` (สถานะ API/MQTT จาก `state.health` เวลาเซิร์ฟเวอร์ และรายการ `state.errors` ถ้ามีชุดข้อมูลโหลดไม่สำเร็จ + ปุ่ม `refreshAll`), `sessionCard` (ออกจากระบบ `context.logout()` ลบโทเคนในเครื่องนี้เท่านั้น)
+ประกอบจาก 5 การ์ด:
+- `displayCard`: ธีมสี 5 แบบ + ขนาดตัวอักษร 3 ระดับ "มีผลเฉพาะเครื่องนี้" ใช้ `theme.js`/`prefs.js` ไม่เรียก API
+- `autoOffCard`: การ์ดควบคุมระบบปิดแอร์อัตโนมัติทั้งอาคาร แสดงป้ายสถานะมุมขวาบน (`chip`) เป็น 3 สถานะตามจริง:
+  1. `'ปิดอยู่'` (สีส้ม `warn`) เมื่อ `autoOffEnabled === false`
+  2. `'โหมดทดสอบ (30 วิ / 1 นาที)'` (สีส้ม `warn`) เมื่อ `autoOffEnabled === true && autoOffTestMode === true`
+  3. `'ทำงานอยู่'` (สีเขียว `ok`) เมื่อเปิดใช้งานในโหมดปกติ
+  ภายในประกอบด้วย 2 แถวสวิตช์:
+  - **แถวที่ 1 — เปิดระบบปิดแอร์อัตโนมัติ** (`api.setAutoOffEnabled`): การกดปิดต้องยืนยันผ่าน `confirmAction` เพราะหยุดทั้งอาคาร
+  - **แถวที่ 2 — โหมดทดสอบการปิดอัตโนมัติ** (`api.setAutoOffTestMode`): สลับเวลานับถอยหลังเป็นนอกคาบเรียน 30 วินาที · ในคาบเรียน 1 นาที (ปิดปุ่ม `disabled: !isAdmin || !enabled` เมื่อไม่ใช่แอดมินหรือเมื่อสวิตช์หลักปิดอยู่) และหลังสลับสำเร็จจะเรียก `loaders.rooms()` + `loaders.air()` ทันทีเพื่อให้นาฬิกานับถอยหลังบนหน้าเว็บอัปเดตเดี๋ยวนั้น
+- `profileCard`: ดู/แก้ข้อมูลส่วนตัว `api.updateProfile` เปลี่ยนอีเมลต้องกรอกรหัสผ่านปัจจุบันเพราะ OTP ลืมรหัสส่งไปอีเมลนี้, เปลี่ยนรหัสผ่าน `api.changePassword`
+- `healthCard`: สถานะ API/MQTT จาก `state.health` เวลาเซิร์ฟเวอร์ และรายการ `state.errors` ถ้ามีชุดข้อมูลโหลดไม่สำเร็จ + ปุ่ม `refreshAll`
+- `sessionCard`: ออกจากระบบ `context.logout()` ลบโทเคนในเครื่องนี้เท่านั้น
 
 ## CSS: สถาปัตยกรรม 4 ชั้น
 
