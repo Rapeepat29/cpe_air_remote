@@ -62,6 +62,7 @@ constexpr uint32_t CLASS_SCHEDULE_TTL_MS = 2UL * 60UL * 1000UL;
 constexpr float AC_RUNNING_ON_WATTS = 50.0F;
 constexpr float AC_RUNNING_OFF_WATTS = 10.0F;
 constexpr uint8_t AC_RUNNING_CONFIRM_SAMPLES = 3;
+constexpr uint32_t AC_POWER_ON_GRACE_MS = 20000;
 constexpr uint8_t PZEM_FAILURE_LIMIT = 3;
 constexpr size_t MAX_CONFIG_BYTES = 4096;
 constexpr uint32_t NTP_SYNC_TIMEOUT_MS = 15000;
@@ -236,6 +237,7 @@ uint32_t lastPzemReadAt = 0;
 uint32_t lastYellowLedToggleAt = 0;
 uint32_t timerOnAt = 0;
 uint32_t timerOffAt = 0;
+uint32_t lastPowerOnAt = 0;
 int lastScheduleMinute = -1;
 bool wifiConnectionInProgress = false;
 bool yellowLedState = false;
@@ -654,6 +656,7 @@ void loadAirState() {
   airState.displayLight = preferences.getBool("light", true);
   airState.clean = preferences.getBool("clean", false);
   preferences.end();
+  if (airState.power) lastPowerOnAt = millis();
 }
 
 void saveAirState() {
@@ -1336,6 +1339,7 @@ void processMqttCommand() {
 
   const AirState previousState = airState;
   airState.power = state["power"] | false;
+  if (airState.power) lastPowerOnAt = millis();
   airState.temperature = temperature;
   airState.mode = mode;
   airState.fanSpeed = fanSpeed;
@@ -1621,6 +1625,7 @@ void processTimers() {
     timerOnAt = 0;
     airState.timerOnMinutes = -1;
     airState.power = true;
+    lastPowerOnAt = now;
     saveAirState();
     sendCurrentIrState(&previousState);
     publishState();
@@ -1655,6 +1660,7 @@ void processDailySchedule() {
   const AirState previousState = airState;
   if (config.dailyOn == current && !airState.power) {
     airState.power = true;
+    lastPowerOnAt = millis();
     changed = true;
   }
   if (config.dailyOff == current && airState.power) {
@@ -1720,6 +1726,15 @@ void readPowerMeter() {
     }
     if (powerMeasurements.stoppedSamples >= AC_RUNNING_CONFIRM_SAMPLES) {
       powerMeasurements.acRunning = false;
+      if (airState.power &&
+          static_cast<int32_t>(millis() - lastPowerOnAt) >=
+              static_cast<int32_t>(AC_POWER_ON_GRACE_MS)) {
+        airState.power = false;
+        saveAirState();
+        publishState();
+        Serial.println(
+            "PZEM confirmed A/C is stopped after grace period; power state synced to OFF");
+      }
     }
   } else {
     // Values inside the hysteresis band keep the current state but do not

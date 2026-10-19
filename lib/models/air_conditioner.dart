@@ -112,6 +112,7 @@ class AirConditioner {
     this.autoOffDeadlineAt,
     this.autoOffAttempts = 0,
     this.autoOffInClass = false,
+    this.commandedAt,
   }) {
     normalizeForProtocol();
   }
@@ -221,14 +222,35 @@ class AirConditioner {
   /// นาฬิการอบนี้เริ่มตอนมีคาบเรียนอยู่หรือไม่ (ใช้เวลานับต่างกัน)
   bool autoOffInClass;
 
+  /// ช่วงเวลารอให้แอร์เริ่มทำงานและให้ PZEM อ่านค่าครบ 3 รอบหลังสั่งงานผ่านแอป
+  static const Duration commandGracePeriod = Duration(seconds: 20);
+
+  /// เวลาที่ผู้ใช้กดส่งคำสั่งเปิด/ปิดจากแอปครั้งล่าสุด
+  DateTime? commandedAt;
+
   bool get isAutoOffPending => autoOffDeadlineAt != null;
+
+  /// ยังอยู่ในช่วงหน่วง 20 วินาทีหลังสั่งงานจากแอปหรือไม่
+  bool inCommandGracePeriod([DateTime? now]) {
+    final sentAt = commandedAt;
+    if (sentAt == null) return false;
+    final elapsed = (now ?? DateTime.now()).difference(sentAt);
+    return !elapsed.isNegative && elapsed < commandGracePeriod;
+  }
 
   /// เครื่องเปิดอยู่จริงหรือไม่ ใช้แสดงผลและเป็นค่าตั้งต้นของคำสั่งถัดไป
   ///
-  /// `isOn` คือคำสั่งล่าสุดที่ระบบยิง IR ไป ถ้ามีคนเปิดแอร์ด้วยรีโมตจริง
-  /// ค่านี้จะยังเป็น false ทั้งที่แอร์กินไฟอยู่ จึงเชื่อ PZEM ด้วย:
-  /// ถ้าเฟิร์มแวร์ยืนยันแล้วว่าแอร์ทำงาน (>= 50 W ติดกัน 3 ครั้ง) ถือว่าเปิดอยู่
-  bool get isPoweredOn => isOn || (pzemAvailable && isRunning);
+  /// - ถ้ามี PZEM (`pzemAvailable == true`) จะเชื่อค่าจริงจาก PZEM (`isRunning`)
+  ///   ยกเว้นในช่วง 20 วินาทีแรกหลังกดสั่งจากแอป (`inCommandGracePeriod`)
+  ///   ที่จะยึดตามคำสั่ง (`isOn`) ไปก่อน เพื่อไม่ให้ปุ่มเด้งกลับเป็นปิดระหว่างรอแอร์สตาร์ท
+  /// - ถ้าพ้น 20 วินาทีแล้วยังกินไฟไม่ถึงเกณฑ์ (`isRunning == false` เช่น ขึ้นแค่ 2 W)
+  ///   สถานะจะเปลี่ยนกลับเป็นปิด (`false`) อัตโนมัติ
+  /// - ถ้าไม่มี PZEM (`pzemAvailable == false`) จะยึดตามคำสั่ง `isOn`
+  bool get isPoweredOn {
+    if (!pzemAvailable) return isOn;
+    if (inCommandGracePeriod()) return isOn;
+    return isRunning;
+  }
 
   bool get isProvisioned => provisionStatus == 'active';
   bool get canControl => isProvisioned && isOnline && deviceId != null;
@@ -384,10 +406,12 @@ class AirConditioner {
     pzemAvailable: pzemAvailable,
     isRunning: isRunning,
     outsideSchedule: outsideSchedule,
+    commandedAt: commandedAt,
   );
 
-  void copyStateFrom(AirConditioner other) {
+  void copyStateFrom(AirConditioner other, {DateTime? commandedAt}) {
     isOn = other.isOn;
+    this.commandedAt = commandedAt ?? other.commandedAt ?? DateTime.now();
     // สั่งปิดแล้ว ให้หน้าจอขึ้นว่าปิดทันที ไม่ต้องรอ PZEM ยืนยัน (~6 วินาที)
     // ถ้าแอร์ไม่ดับจริง รอบรีเฟรชถัดไปจะได้ acRunning = true กลับมาเอง
     if (!other.isOn) isRunning = false;

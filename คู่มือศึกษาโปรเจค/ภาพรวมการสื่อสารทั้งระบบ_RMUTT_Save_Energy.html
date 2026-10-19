@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <title>คู่มือภาพรวมการสื่อสารทั้งระบบ — RMUTT Save Energy (อาคาร 16)</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 14mm 14mm 16mm 14mm;
+    }
+    * {
+      box-sizing: border-box;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+    body {
+      font-family: "Leelawadee UI", "Segoe UI", Tahoma, sans-serif;
+      color: #1e293b;
+      background: #ffffff;
+      margin: 0;
+      padding: 0;
+      font-size: 12.2px;
+      line-height: 1.58;
+    }
+    h1, h2, h3, h4 {
+      color: #0f172a;
+      margin-top: 0;
+      font-weight: 700;
+    }
+    code, pre {
+      font-family: "Consolas", "Cascadia Mono", "Courier New", monospace;
+    }
+    code {
+      background: #f1f5f9;
+      color: #0f766e;
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-size: 11.2px;
+      border: 1px solid #e2e8f0;
+    }
+    pre {
+      background: #0f172a;
+      color: #f8fafc;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 10.6px;
+      line-height: 1.45;
+      overflow-x: auto;
+      margin: 8px 0 12px 0;
+      border: 1px solid #1e293b;
+      page-break-inside: avoid;
+    }
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+      border: none;
+      font-size: inherit;
+    }
+
+    /* Cover Banner */
+    .hero {
+      background: linear-gradient(135deg, #064e3b 0%, #0f766e 55%, #0284c7 100%);
+      color: #ffffff;
+      padding: 24px 26px;
+      border-radius: 14px;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 14px rgba(15, 118, 110, 0.18);
+    }
+    .hero-badge {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.18);
+      color: #ecfdf5;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 999px;
+      margin-bottom: 8px;
+      letter-spacing: 0.3px;
+    }
+    .hero h1 {
+      color: #ffffff;
+      font-size: 22px;
+      margin: 0 0 6px 0;
+      line-height: 1.3;
+    }
+    .hero p {
+      margin: 0;
+      color: #e2e8f0;
+      font-size: 12.5px;
+    }
+    .hero-meta {
+      margin-top: 14px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .hero-pill {
+      background: rgba(15, 23, 42, 0.32);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      color: #f8fafc;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+    }
+
+    /* Section Headers */
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #f0fdf4;
+      border-left: 5px solid #059669;
+      padding: 8px 14px;
+      border-radius: 0 8px 8px 0;
+      margin: 18px 0 12px 0;
+      page-break-after: avoid;
+    }
+    .section-num {
+      background: #059669;
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 12px;
+      padding: 2px 9px;
+      border-radius: 6px;
+    }
+    .section-header h2 {
+      font-size: 15.5px;
+      color: #064e3b;
+      margin: 0;
+    }
+
+    h3 {
+      font-size: 13.5px;
+      color: #0f766e;
+      margin: 14px 0 6px 0;
+      border-bottom: 1.5px solid #ccfbf1;
+      padding-bottom: 3px;
+      page-break-after: avoid;
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 8px 0 14px 0;
+      font-size: 11.3px;
+    }
+    th {
+      background: #0f766e;
+      color: #ffffff;
+      text-align: left;
+      padding: 7px 9px;
+      font-weight: 700;
+      border: 1px solid #0f766e;
+    }
+    td {
+      padding: 6px 9px;
+      border: 1px solid #cbd5e1;
+      vertical-align: top;
+    }
+    tr:nth-child(even) td {
+      background: #f8fafc;
+    }
+    tr {
+      page-break-inside: avoid;
+    }
+
+    /* Cards & Grids */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 10px 0;
+    }
+    .card {
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      padding: 11px 13px;
+      background: #ffffff;
+      page-break-inside: avoid;
+    }
+    .card-title {
+      font-weight: 700;
+      font-size: 12.8px;
+      color: #0f172a;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 1px 7px;
+      border-radius: 99px;
+      font-size: 10.2px;
+      font-weight: 700;
+    }
+    .badge-green { background: #dcfce7; color: #166534; }
+    .badge-blue { background: #dbeafe; color: #1e40af; }
+    .badge-amber { background: #fef3c7; color: #92400e; }
+    .badge-purple { background: #f3e8ff; color: #6b21a8; }
+    .badge-rose { background: #ffe4e6; color: #9f1239; }
+
+    /* Callout boxes */
+    .callout {
+      border-radius: 8px;
+      padding: 9px 13px;
+      margin: 10px 0;
+      font-size: 11.6px;
+      page-break-inside: avoid;
+    }
+    .callout-why {
+      background: #eff6ff;
+      border-left: 4px solid #2563eb;
+      color: #1e3a8a;
+    }
+    .callout-warn {
+      background: #fffbeb;
+      border-left: 4px solid #d97706;
+      color: #78350f;
+    }
+    .callout-tip {
+      background: #f0fdf4;
+      border-left: 4px solid #16a34a;
+      color: #14532d;
+    }
+    .callout-title {
+      font-weight: 700;
+      margin-bottom: 3px;
+    }
+
+    /* Flow steps */
+    .flow-box {
+      border: 1.5px solid #94a3b8;
+      border-radius: 10px;
+      background: #f8fafc;
+      padding: 12px 14px;
+      margin: 10px 0 14px 0;
+      page-break-inside: avoid;
+    }
+    .flow-header {
+      font-weight: 700;
+      font-size: 13px;
+      color: #0f172a;
+      margin-bottom: 8px;
+      padding-bottom: 5px;
+      border-bottom: 1px dashed #cbd5e1;
+    }
+    .step-list {
+      margin: 0;
+      padding-left: 18px;
+    }
+    .step-list li {
+      margin-bottom: 5px;
+    }
+    .page-break {
+      page-break-before: always;
+    }
+    .diagram-box {
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      padding: 10px;
+      background: #ffffff;
+      text-align: center;
+      margin: 10px 0 14px 0;
+      page-break-inside: avoid;
+    }
+    .footer-note {
+      margin-top: 18px;
+      padding-top: 10px;
+      border-top: 1px solid #cbd5e1;
+      text-align: center;
+      font-size: 10.5px;
+      color: #64748b;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==================== HERO COVER ==================== -->
+  <div class="hero">
+    <div class="hero-badge">เอกสารสรุปสถาปัตยกรรมและการสื่อสารข้อมูล (System Communication Blueprint)</div>
+    <h1>ภาพรวมการสื่อสารทั้งระบบ RMUTT Save Energy (อาคาร 16)</h1>
+    <p>อธิบายละเอียดตั้งแต่ระดับเซนเซอร์และบอร์ด ESP32 หน้าห้องเรียน ไปจนถึง MQTT Broker, Backend API, ฐานข้อมูล MariaDB, แอปมือถือ Flutter และเว็บแดชบอร์ด — ส่งอะไร รับอะไร ใช้โปรโตคอลไหน ตั้งแต่ต้นจนจบ</p>
+    <div class="hero-meta">
+      <span class="hero-pill">📱 แอป Flutter (Android / Windows)</span>
+      <span class="hero-pill">💻 เว็บแดชบอร์ด (SPA)</span>
+      <span class="hero-pill">⚙️ Backend Node.js + MariaDB</span>
+      <span class="hero-pill">📡 Mosquitto MQTTS + Dynamic Security</span>
+      <span class="hero-pill">❄️ บอร์ดแอร์ IR &amp; สายแอร์ Daikin SLM8 + PZEM-004T</span>
+      <span class="hero-pill">👀 บอร์ดตรวจจับคน LD2410</span>
+    </div>
+  </div>
+
+  <!-- ==================== SECTION 1: MASTER ARCHITECTURE ==================== -->
+  <div class="section-header">
+    <span class="section-num">ส่วนที่ 1</span>
+    <h2>แผนผังภาพใหญ่ทั้งระบบ (Master Architecture &amp; Communication Map)</h2>
+  </div>
+
+  <p>ระบบถูกออกแบบเป็น <strong>3 โซนแยกจากกันอย่างชัดเจน</strong> โดยยึดหลักความปลอดภัยสำคัญคือ <strong>แอปมือถือและเว็บแดชบอร์ดจะไม่คุยกับบอร์ด ESP32 หรือฐานข้อมูล MariaDB โดยตรง</strong> (ยกเว้นขั้นตอนตั้งค่าบอร์ดครั้งแรกผ่าน Bluetooth ระยะใกล้) ทุกคำสั่งและทุกข้อมูลต้องวิ่งผ่าน <strong>Backend</strong> เพื่อตรวจสอบสิทธิ์ (JWT) ตรวจสอบความถูกต้องของข้อมูล และบันทึกเป็นข้อมูลจริงชุดเดียวที่ศูนย์กลาง</p>
+
+  <div class="diagram-box">
+    <svg viewBox="0 0 860 450" width="100%" xmlns="http://www.w3.org/2000/svg" style="font-family: 'Leelawadee UI', Tahoma, sans-serif;">
+      <defs>
+        <marker id="arrow-teal" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 1 L 10 5 L 0 9 z" fill="#0f766e"/>
+        </marker>
+        <marker id="arrow-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 1 L 10 5 L 0 9 z" fill="#2563eb"/>
+        </marker>
+        <marker id="arrow-purple" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 1 L 10 5 L 0 9 z" fill="#7c3aed"/>
+        </marker>
+        <marker id="arrow-amber" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 1 L 10 5 L 0 9 z" fill="#d97706"/>
+        </marker>
+      </defs>
+
+      <!-- Zone 1: Clients -->
+      <rect x="12" y="10" width="836" height="92" rx="10" fill="#f0fdf4" stroke="#86efac" stroke-width="1.5"/>
+      <text x="24" y="29" font-size="12" font-weight="bold" fill="#166534">โซนที่ 1: ผู้ใช้งาน (Client Zone)</text>
+
+      <rect x="40" y="38" width="340" height="52" rx="8" fill="#ffffff" stroke="#16a34a" stroke-width="1.5"/>
+      <text x="210" y="58" font-size="12.5" font-weight="bold" text-anchor="middle" fill="#0f172a">📱 แอปมือถือ Flutter (Android / Windows)</text>
+      <text x="210" y="76" font-size="10.5" text-anchor="middle" fill="#475569">ดึงสถานะห้อง/แอร์ทุก 10 วิ · กราฟ/แจ้งเตือนทุก 30 วิ · ตั้งค่าบอร์ดผ่าน BLE</text>
+
+      <rect x="480" y="38" width="340" height="52" rx="8" fill="#ffffff" stroke="#16a34a" stroke-width="1.5"/>
+      <text x="650" y="58" font-size="12.5" font-weight="bold" text-anchor="middle" fill="#0f172a">💻 เว็บแดชบอร์ด (Browser SPA)</text>
+      <text x="650" y="76" font-size="10.5" text-anchor="middle" fill="#475569">ดึงสถานะสดทุก 10 วิ · จัดการตารางเรียน · ส่งออก Excel · อัปโหลด OTA</text>
+
+      <!-- Arrows Zone 1 -> Zone 2 -->
+      <line x1="250" y1="90" x2="250" y2="140" stroke="#0f766e" stroke-width="2" marker-end="url(#arrow-teal)" marker-start="url(#arrow-teal)"/>
+      <text x="258" y="118" font-size="10.5" font-weight="bold" fill="#0f766e">HTTPS REST API + JWT (:443)</text>
+
+      <line x1="650" y1="90" x2="650" y2="140" stroke="#0f766e" stroke-width="2" marker-end="url(#arrow-teal)" marker-start="url(#arrow-teal)"/>
+      <text x="658" y="118" font-size="10.5" font-weight="bold" fill="#0f766e">HTTPS /api + JWT (:443)</text>
+
+      <!-- Zone 2: Server -->
+      <rect x="140" y="142" width="708" height="145" rx="10" fill="#eff6ff" stroke="#93c5fd" stroke-width="1.5"/>
+      <text x="155" y="162" font-size="12" font-weight="bold" fill="#1e40af">โซนที่ 2: เซิร์ฟเวอร์กลาง (Docker Compose บนเซิร์ฟเวอร์ Linux)</text>
+
+      <!-- Caddy & Tailscale -->
+      <rect x="160" y="172" width="175" height="98" rx="8" fill="#ffffff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="247" y="194" font-size="11.5" font-weight="bold" text-anchor="middle" fill="#1e3a8a">🌐 Tailscale Funnel &amp; Caddy</text>
+      <text x="247" y="212" font-size="10" text-anchor="middle" fill="#475569">• HTTPS :443 ──► เว็บ &amp; /api/*</text>
+      <text x="247" y="227" font-size="10" text-anchor="middle" fill="#475569">• HTTPS :443 ──► /firmware/*.bin</text>
+      <text x="247" y="242" font-size="10" text-anchor="middle" fill="#475569">• MQTTS :8443 / :8883 (ถอด TLS)</text>
+
+      <!-- Backend Node.js -->
+      <rect x="375" y="172" width="225" height="98" rx="8" fill="#ffffff" stroke="#2563eb" stroke-width="1.8"/>
+      <text x="487" y="192" font-size="12" font-weight="bold" text-anchor="middle" fill="#0f172a">⚙️ Backend (Node.js :3000)</text>
+      <text x="487" y="209" font-size="10" text-anchor="middle" fill="#334155">• ตรวจ JWT / สิทธิ์ Admin &amp; Staff</text>
+      <text x="487" y="224" font-size="10" text-anchor="middle" fill="#334155">• คำนวณผลต่างหน่วยไฟ (kWh)</text>
+      <text x="487" y="239" font-size="10" text-anchor="middle" fill="#334155">• ประเมิน Auto-Off ทุก 10 วินาที</text>
+      <text x="487" y="254" font-size="10" text-anchor="middle" fill="#0f766e" font-weight="bold">• โหมดปกติ 5/15 นาที · ทดสอบ 30วิ/1นาที</text>
+
+      <!-- MariaDB & Mosquitto -->
+      <rect x="640" y="170" width="190" height="45" rx="7" fill="#ffffff" stroke="#0284c7" stroke-width="1.5"/>
+      <text x="735" y="190" font-size="11.5" font-weight="bold" text-anchor="middle" fill="#0369a1">🗄️ MariaDB 11.4 (:3306)</text>
+      <text x="735" y="205" font-size="9.8" text-anchor="middle" fill="#475569">9 ตาราง (ผู้ใช้, ห้อง, แอร์, ถังไฟ ฯลฯ)</text>
+
+      <rect x="640" y="225" width="190" height="45" rx="7" fill="#ffffff" stroke="#0284c7" stroke-width="1.5"/>
+      <text x="735" y="245" font-size="11.5" font-weight="bold" text-anchor="middle" fill="#0369a1">📡 Mosquitto Broker (:1883)</text>
+      <text x="735" y="260" font-size="9.8" text-anchor="middle" fill="#475569">Dynamic Security แยกบัญชีรายบอร์ด</text>
+
+      <!-- Internal Server Arrows -->
+      <line x1="335" y1="215" x2="375" y2="215" stroke="#2563eb" stroke-width="1.8" marker-end="url(#arrow-blue)" marker-start="url(#arrow-blue)"/>
+      <line x1="600" y1="193" x2="640" y2="193" stroke="#2563eb" stroke-width="1.8" marker-end="url(#arrow-blue)" marker-start="url(#arrow-blue)"/>
+      <line x1="600" y1="248" x2="640" y2="248" stroke="#2563eb" stroke-width="1.8" marker-end="url(#arrow-blue)" marker-start="url(#arrow-blue)"/>
+
+      <!-- BLE Direct Line from App to Zone 3 -->
+      <path d="M 65 90 L 65 380 L 140 380" fill="none" stroke="#7c3aed" stroke-width="2" stroke-dasharray="5,4" marker-end="url(#arrow-purple)" marker-start="url(#arrow-purple)"/>
+      <rect x="16" y="195" width="112" height="58" rx="6" fill="#f3e8ff" stroke="#c084fc"/>
+      <text x="72" y="213" font-size="10.2" font-weight="bold" text-anchor="middle" fill="#6b21a8">Bluetooth (BLE)</text>
+      <text x="72" y="227" font-size="9.5" text-anchor="middle" fill="#581c87">เฉพาะตอนตั้งค่าบอร์ด</text>
+      <text x="72" y="241" font-size="9.5" text-anchor="middle" fill="#581c87">(หั่นก้อนละ 150 ไบต์)</text>
+
+      <!-- Arrows Zone 2 <-> Zone 3 -->
+      <line x1="420" y1="287" x2="320" y2="332" stroke="#d97706" stroke-width="2" marker-end="url(#arrow-amber)" marker-start="url(#arrow-amber)"/>
+      <line x1="680" y1="287" x2="660" y2="332" stroke="#d97706" stroke-width="2" marker-end="url(#arrow-amber)" marker-start="url(#arrow-amber)"/>
+      <text x="505" y="314" font-size="10.5" font-weight="bold" text-anchor="middle" fill="#b45309">MQTTS เข้ารหัส TLS (:8443 / :8883) + ดาวน์โหลด OTA HTTPS (:443)</text>
+
+      <!-- Zone 3: Hardware -->
+      <rect x="140" y="334" width="708" height="106" rx="10" fill="#fffbeb" stroke="#fcd34d" stroke-width="1.5"/>
+      <text x="155" y="353" font-size="12" font-weight="bold" fill="#92400e">โซนที่ 3: ฮาร์ดแวร์ในห้องเรียน (Edge / Hardware Zone)</text>
+
+      <rect x="158" y="362" width="365" height="66" rx="8" fill="#ffffff" stroke="#d97706" stroke-width="1.5"/>
+      <text x="340" y="381" font-size="11.5" font-weight="bold" text-anchor="middle" fill="#0f172a">❄️ บอร์ดควบคุมแอร์ (ESP32-XXXXXXXXXXXX)</text>
+      <text x="340" y="397" font-size="10" text-anchor="middle" fill="#334155">• รุ่น IR: ยิงแสงอินฟราเรด 38 kHz ──► แอร์ (19 โปรโตคอล)</text>
+      <text x="340" y="411" font-size="10" text-anchor="middle" fill="#334155">• รุ่นสายแอร์: SLM8 2 ทิศทาง ◄─► แอร์ Daikin   |   • UART Modbus ◄── PZEM-004T</text>
+
+      <rect x="545" y="362" width="285" height="66" rx="8" fill="#ffffff" stroke="#d97706" stroke-width="1.5"/>
+      <text x="687" y="381" font-size="11.5" font-weight="bold" text-anchor="middle" fill="#0f172a">👀 บอร์ดตรวจจับคน (OCC32-XXXXXXXXXXXX)</text>
+      <text x="687" y="397" font-size="10" text-anchor="middle" fill="#334155">• UART 256000 bps ◄── เรดาร์ mmWave LD2410</text>
+      <text x="687" y="411" font-size="10" text-anchor="middle" fill="#334155">• อ่านเกต 0–8 ทุก 250 ms (Static Energy &gt; 15 = มีคน)</text>
+    </svg>
+  </div>
+
+  <h3>ตารางสรุปทุกช่องทางการสื่อสารในระบบ (11 เส้นทางหลัก)</h3>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 14%;">ต้นทาง</th>
+        <th style="width: 14%;">ปลายทาง</th>
+        <th style="width: 18%;">โปรโตคอล / พอร์ต</th>
+        <th style="width: 15%;">จังหวะการรับ–ส่ง</th>
+        <th style="width: 22%;">สิ่งที่ส่งและรับ</th>
+        <th style="width: 17%;">ไฟล์โค้ดหลัก</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>แอป Flutter</strong></td>
+        <td><strong>Backend</strong></td>
+        <td>HTTPS REST API (<code>:443</code>) + JSON + JWT</td>
+        <td>เมื่อกดปุ่ม + ดึงซ้ำทุก 10 วิ / 30 วิ</td>
+        <td>ล็อกอิน, ดูสถานะห้อง/แอร์, สั่งรีโมตแอร์, ดูกราฟพลังงาน, ตั้งค่าระบบ/โหมดทดสอบ</td>
+        <td><code>lib/services/*_service.dart</code></td>
+      </tr>
+      <tr>
+        <td><strong>เว็บแดชบอร์ด</strong></td>
+        <td><strong>Backend</strong></td>
+        <td>HTTPS <code>/api/*</code> (<code>:443</code>) + JSON + JWT</td>
+        <td>เมื่อกดปุ่ม + ดึงซ้ำทุก 10 วินาที</td>
+        <td>เหมือนแอปมือถือ + อัปโหลดไฟล์เฟิร์มแวร์ <code>.bin</code> และสั่งอัปเดต OTA หลายเครื่อง</td>
+        <td><code>webapp/assets/js/api.js</code></td>
+      </tr>
+      <tr>
+        <td><strong>แอป Flutter</strong></td>
+        <td><strong>บอร์ด ESP32</strong></td>
+        <td>Bluetooth Low Energy (BLE GATT)</td>
+        <td>เฉพาะตอนติดตั้งหรือตั้งค่าบอร์ดใหม่</td>
+        <td>อ่านตัวตนบอร์ด, สั่งบอร์ดสแกน Wi‑Fi, ส่งรหัส Wi‑Fi + บัญชี MQTT (หั่นก้อนละ 150 ไบต์)</td>
+        <td><code>ble_provisioning_service.dart</code></td>
+      </tr>
+      <tr>
+        <td><strong>บอร์ดแอร์ ESP32</strong></td>
+        <td><strong>Mosquitto Broker</strong></td>
+        <td>MQTTS เข้ารหัส TLS (<code>:8443</code> หรือ <code>:8883</code>)</td>
+        <td>ส่ง <code>/status</code> ทุก 10 วิ + ทันทีเมื่อเปลี่ยน</td>
+        <td>ส่งค่าไฟสด (V, A, W, kWh), รับคำสั่งแอร์ (<code>/command</code>), ส่งข้อมูลไฟย้อนหลัง (<code>/history</code>)</td>
+        <td><code>rmutt_esp32_air.ino</code></td>
+      </tr>
+      <tr>
+        <td><strong>บอร์ดตรวจจับคน</strong></td>
+        <td><strong>Mosquitto Broker</strong></td>
+        <td>MQTTS เข้ารหัส TLS (<code>:8443</code> หรือ <code>:8883</code>)</td>
+        <td>ส่ง <code>/status</code> ทุก 10 วิ + ทันทีเมื่อคนเข้า/ออก</td>
+        <td>ส่งสถานะมีคน/ไม่มีคน (<code>occupied</code>) และค่าพลังงานเรดาร์ทั้ง 9 เกต (<code>Gate0</code>–<code>Gate8</code>)</td>
+        <td><code>rmutt_esp32_occupancy.ino</code></td>
+      </tr>
+      <tr>
+        <td><strong>บอร์ด ESP32 ทั้งคู่</strong></td>
+        <td><strong>Caddy Server</strong></td>
+        <td>HTTPS GET <code>/firmware/*.bin</code> (<code>:443</code>)</td>
+        <td>เมื่อได้รับคำสั่ง <code>action: "ota"</code></td>
+        <td>ดาวน์โหลดไฟล์ไบนารีเฟิร์มแวร์ใหม่มาเขียนลงพาร์ติชันสำรอง (<code>app0</code>/<code>app1</code>) แล้วรีบูต</td>
+        <td><code>ota_update.h</code>, <code>routes/firmware.js</code></td>
+      </tr>
+      <tr>
+        <td><strong>Backend</strong></td>
+        <td><strong>Mosquitto Broker</strong></td>
+        <td>MQTT ภายใน Docker (<code>mqtt:1883</code>)</td>
+        <td>เชื่อมต่อค้างตลอดเวลา (Persistent)</td>
+        <td>Subscribe รับข้อมูลจากทุกบอร์ด, Publish คำสั่งแอร์, จัดการบัญชี MQTT รายบอร์ดผ่าน <code>$CONTROL</code></td>
+        <td><code>backend/src/services/mqtt.js</code></td>
+      </tr>
+      <tr>
+        <td><strong>Backend</strong></td>
+        <td><strong>MariaDB</strong></td>
+        <td>MariaDB TCP Protocol (<code>db:3306</code>)</td>
+        <td>ทุกครั้งที่มี API หรือข้อความ MQTT</td>
+        <td>อ่าน/เขียนตารางทั้ง 9 ตาราง และใช้ Advisory Lock (<code>GET_LOCK</code>) กันประเมิน Auto-off ซ้ำ</td>
+        <td><code>backend/src/db.js</code></td>
+      </tr>
+      <tr>
+        <td><strong>บอร์ดแอร์ (รุ่น IR)</strong></td>
+        <td><strong>เครื่องแอร์</strong></td>
+        <td>แสงอินฟราเรด <code>38 kHz</code> (ขา GPIO 4)</td>
+        <td>เมื่อได้รับคำสั่งจาก MQTT หรือตารางรายวัน</td>
+        <td>ส่งพัลส์รหัส IR ตามยี่ห้อแอร์ (สื่อสารทางเดียว แอร์ไม่ส่งข้อมูลกลับ)</td>
+        <td><code>IRremoteESP8266</code>, <code>SaijoDenkiAC.cpp</code></td>
+      </tr>
+      <tr>
+        <td><strong>บอร์ดแอร์ (รุ่นสาย)</strong></td>
+        <td><strong>แอร์ Daikin</strong></td>
+        <td>โปรโตคอลสายรีโมต SLM8 (RX=18, TX=19)</td>
+        <td>รับ–ส่งเฟรมต่อเนื่อง 2 ทิศทาง</td>
+        <td>รับ–ส่งเฟรม 8 ไบต์ + Checksum สั่งงานแอร์และรู้ทันทีเมื่อมีคนกดปุ่มที่รีโมตติดผนัง</td>
+        <td><code>rmutt_esp32_air_wired.ino</code></td>
+      </tr>
+      <tr>
+        <td><strong>บอร์ด ESP32</strong></td>
+        <td><strong>PZEM / LD2410</strong></td>
+        <td>UART (Modbus <code>9600</code> / เรดาร์ <code>256000</code>)</td>
+        <td>PZEM ทุก 2 วิ · LD2410 ทุก 250 ms</td>
+        <td>อ่านค่าไฟฟ้าจากสายไฟแอร์ และอ่านค่าการหายใจ/ขยับตัวของคนในห้อง</td>
+        <td>เฟิร์มแวร์ทั้ง 3 รุ่น</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ==================== PAGE 2: LAYER 1 & 2 ==================== -->
+  <div class="page-break"></div>
+
+  <div class="section-header">
+    <span class="section-num">ส่วนที่ 2</span>
+    <h2>เจาะลึกระดับฮาร์ดแวร์หน้างาน (ESP32 คุยกับเซนเซอร์และเครื่องแอร์อย่างไร)</h2>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">⚡ 1. บอร์ดแอร์ ◄──► มิเตอร์ไฟ PZEM-004T <span class="badge badge-amber">UART Modbus 9600 bps</span></div>
+      <p style="margin: 0 0 6px 0;">ต่อผ่านขา <code>GPIO 16 (RX2)</code> และ <code>GPIO 17 (TX2)</code> บอร์ดส่งเฟรม Modbus ไปถามทุก <strong>2 วินาที</strong>:</p>
+      <ul style="margin: 0; padding-left: 17px;">
+        <li><strong>สิ่งที่ส่งไป:</strong> คำสั่งอ่าน Input Registers ของ PZEM</li>
+        <li><strong>สิ่งที่รับกลับมา (6 ค่า):</strong>
+          <ul>
+            <li>แรงดันไฟฟ้า (<code>voltage</code>, โวลต์ เช่น <code>229.4 V</code>)</li>
+            <li>กระแสไฟฟ้า (<code>current</code>, แอมแปร์ เช่น <code>4.15 A</code>)</li>
+            <li>กำลังไฟฟ้าจริง (<code>power</code>, วัตต์ เช่น <code>912.0 W</code>)</li>
+            <li>พลังงานสะสม (<code>energy</code>, หน่วย <code>kWh</code> เช่น <code>145.280 kWh</code>)</li>
+            <li>ความถี่ (<code>frequency</code>, <code>50.0 Hz</code>) และตัวประกอบกำลัง (<code>pf</code>)</li>
+          </ul>
+        </li>
+        <li><strong>การตัดสินว่าแอร์ทำงานจริง (Hysteresis 3 ครั้งติดกัน):</strong>
+          <ul>
+            <li>วัดได้ <code>≥ 30 W</code> ติดกัน 3 รอบ (6 วินาที) ──► <code>acRunning = true</code></li>
+            <li>วัดได้ <code>≤ 10 W</code> ติดกัน 3 รอบ (6 วินาที) ──► <code>acRunning = false</code></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-title">👀 2. บอร์ดตรวจจับคน ◄── เรดาร์ LD2410 <span class="badge badge-purple">UART 256000 bps</span></div>
+      <p style="margin: 0 0 6px 0;">ต่อผ่านขา <code>GPIO 16 (RX2)</code> และ <code>GPIO 17 (TX2)</code> ในโหมด Engineering Mode อ่านข้อมูลทุก <strong>250 มิลลิวินาที (4 ครั้ง/วินาที)</strong>:</p>
+      <ul style="margin: 0; padding-left: 17px;">
+        <li><strong>สิ่งที่รับมาจากเรดาร์:</strong>
+          <ul>
+            <li>สถานะเป้าหมายและระยะทาง (เซนติเมตร)</li>
+            <li>ค่าพลังงานสะท้อนแยกตามระยะ <strong>เกต 0 ถึง เกต 8</strong> (เกตละ ~0.75 เมตร รวม ~6.75 เมตร) ทั้งค่าเคลื่อนไหวและค่าอยู่นิ่ง (<code>staticEnergy</code> ที่จับการขยับอกขณะหายใจได้)</li>
+          </ul>
+        </li>
+        <li><strong>เกณฑ์ตัดสินว่ามีคนในห้อง:</strong>
+          <ul>
+            <li>ตรวจ <code>Gate 0</code> ถึง <code>Gate 8</code> ถ้ามีเกตใดเกตหนึ่งที่ <strong><code>staticEnergy &gt; 15</code></strong> ──► ถือว่า <strong><code>occupied = true</code> (มีคนอยู่)</strong></li>
+            <li>ถ้าเปลี่ยนจากมีคนเป็นไม่มีคน (หรือกลับกัน) บอร์ดจะส่ง MQTT <code>/status</code> แจ้งเซิร์ฟเวอร์ทันทีโดยไม่รอรอบ 10 วินาที</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📡 3. บอร์ดแอร์รุ่น IR ──► เครื่องปรับอากาศ <span class="badge badge-blue">Infrared 38 kHz</span></div>
+      <p style="margin: 0 0 6px 0;">ส่งสัญญาณออกทางขา <code>GPIO 4</code> ผ่านวงจรทรานซิสเตอร์ขับหลอด IR LED:</p>
+      <ul style="margin: 0; padding-left: 17px;">
+        <li><strong>สิ่งที่ส่งออกไป:</strong> แปลงสถานะทั้งก้อน (เปิด/ปิด, อุณหภูมิ 16–30°C, โหมด, ความเร็วพัดลม, บานสวิง) เป็นชุดพัลส์แสงอินฟราเรด 38 kHz ตามยี่ห้อแอร์ (รองรับ 19 โปรโตคอล เช่น <code>DAIKIN</code>, <code>MITSUBISHI_AC</code>, <code>GREE</code> และคลาส <code>SaijoDenkiAC</code> ที่ถอดรหัสเฟรมสร้างเอง)</li>
+        <li><strong>ข้อจำกัดสำคัญ:</strong> อินฟราเรดเป็นการส่ง <strong>ทางเดียว (One-way)</strong> แอร์ไม่ส่งสัญญาณตอบกลับ ระบบจึงต้องดูค่าวัตต์จาก PZEM-004T เพื่อพิสูจน์ว่าแอร์เปิดหรือดับจริง</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🔌 4. บอร์ดสายแอร์ Daikin ◄──► เครื่องแอร์ <span class="badge badge-green">โปรโตคอลสาย SLM8</span></div>
+      <p style="margin: 0 0 6px 0;">ต่อขนานเข้ากับสายรีโมตติดผนังของแอร์ Daikin (โปรโตคอล SLM8):</p>
+      <ul style="margin: 0; padding-left: 17px;">
+        <li><strong>สิ่งที่รับและส่ง:</strong> เฟรมข้อมูลขนาด <strong>8 ไบต์</strong> พร้อมไบต์ Checksum ท้ายเฟรม สื่อสารแบบ <strong>2 ทิศทาง (Two-way)</strong></li>
+        <li><strong>ข้อดีเหนือกว่า IR:</strong> สั่งเปิด/ปิด, อุณหภูมิ 16–30°C, โหมด Cool/Dry/Fan, พัดลม Low/Med/High/Auto, สวิง และโหมด Sleep ได้โดยไม่กลัวสิ่งกีดขวางบังหลอด IR และรู้สถานะจริงจากสายสัญญาณโดยตรง</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ==================== SECTION 3: BLE PROVISIONING ==================== -->
+  <div class="section-header">
+    <span class="section-num">ส่วนที่ 3</span>
+    <h2>การตั้งค่าบอร์ดครั้งแรกผ่าน Bluetooth Low Energy (BLE GATT Provisioning)</h2>
+  </div>
+
+  <p>ตอนนำบอร์ด ESP32 ตัวใหม่ไปติดที่ห้อง บอร์ดยังไม่รู้ชื่อ Wi‑Fi รหัสผ่าน และที่อยู่เซิร์ฟเวอร์ แอดมินจึงใช้แอปมือถือ Flutter คุยกับบอร์ดโดยตรงผ่าน <strong>Bluetooth Low Energy (BLE)</strong> ภายใต้ Service UUID หลัก <code>7b570001-a243-4e5b-8f13-179af81b2457</code></p>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 24%;">ชื่อช่อง (Characteristic)</th>
+        <th style="width: 26%;">UUID</th>
+        <th style="width: 12%;">ทิศทาง</th>
+        <th style="width: 38%;">ข้อมูล JSON ที่รับ–ส่ง และหน้าที่</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>1. Identity</strong> (ตัวตนบอร์ด)</td>
+        <td><code>7b570004-a243-4e5b-...</code></td>
+        <td>แอปอ่าน (Read)</td>
+        <td>บอร์ดส่งตัวตนกลับมา: <code>{"deviceId":"ESP32-A1B2C3D4E5F6","bleName":"RMUTT-AC-A1B2C3D4E5F6","deviceType":"air","firmwareVersion":"2.5.5","configured":false}</code> แอปตรวจว่าชื่อบลูทูธตรงกับเลข MAC จริงของชิปหรือไม่</td>
+      </tr>
+      <tr>
+        <td><strong>2. Settings</strong> (ค่าที่จำไว้)</td>
+        <td><code>7b570006-a243-4e5b-...</code></td>
+        <td>แอปอ่าน (Read)</td>
+        <td>ถ้าบอร์ดเคยตั้งค่าแล้ว (<code>configured: true</code>) แอปจะอ่านค่าเดิม (เช่น ชื่อ Wi‑Fi เดิม, ห้องเดิม, ยี่ห้อแอร์เดิม) มาเติมลงในฟอร์มให้อัตโนมัติ ไม่ต้องพิมพ์ใหม่ทั้งหมด</td>
+      </tr>
+      <tr>
+        <td><strong>3. Wi‑Fi Scan</strong> (สแกนไวไฟ)</td>
+        <td><code>7b570005-a243-4e5b-...</code></td>
+        <td>แอปอ่าน (Read)</td>
+        <td>เมื่อแอปอ่านช่องนี้ บอร์ดจะสแกนหาคลื่น Wi‑Fi 2.4 GHz รอบตัวบอร์ดจริง แล้วส่งกลับ: <code>{"ok":true,"networks":[["RMUTT-IoT",-55,true],["CPE-Lab",-68,true]]}</code> (ชื่อ, ความแรงสัญญาณ dBm, มีรหัสผ่านไหม)</td>
+      </tr>
+      <tr>
+        <td><strong>4. Config Write</strong> (เขียนค่าตั้ง)</td>
+        <td><code>7b570002-a243-4e5b-...</code></td>
+        <td>แอปเขียน (Write)</td>
+        <td>แอปแปลง JSON ตั้งค่าทั้งหมดเป็นไบต์ UTF-8 แล้ว <strong>หั่นเป็นก้อนละไม่เกิน 150 ไบต์</strong> โดยแต่ละก้อนมีหัวแพ็กเก็ต 6 ไบต์: <code>[1, 1, ลำดับก้อน(สูง), ลำดับก้อน(ต่ำ), จำนวนก้อนรวม(สูง), จำนวนก้อนรวม(ต่ำ)]</code> ตามด้วยเนื้อข้อมูล เพื่อไม่ให้เกินเพดาน MTU ของ Bluetooth</td>
+      </tr>
+      <tr>
+        <td><strong>5. Status Notify</strong> (ใบตอบรับ)</td>
+        <td><code>7b570003-a243-4e5b-...</code></td>
+        <td>บอร์ดแจ้ง (Notify)</td>
+        <td>หลังบอร์ดรับครบทุกก้อน บอร์ดจะลองต่อ Wi‑Fi ทันที แล้วส่งผลกลับมาทาง Notify: <code>{"ok":true,"wifiConnected":true,"saved":true,"message":"Configuration saved"}</code></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <pre><code>// ตัวอย่าง JSON ที่แอป Flutter ส่งเข้าช่อง Config Write (...0002) ไปยังบอร์ดแอร์
+{
+  "deviceId": "ESP32-A1B2C3D4E5F6",
+  "roomNumber": "16301",
+  "airNumber": 1,
+  "protocol": "DAIKIN",
+  "wifiSsid": "RMUTT-IoT",
+  "wifiPassword": "********",
+  "mqttHost": "rmutt-energy.tailb292b4.ts.net",   // ได้มาจาก Backend ตอนจองช่อง (POST /reservations)
+  "mqttPort": 8443,
+  "mqttUsername": "ac_esp32_a1b2c3d4e5f6",        // บัญชีเฉพาะของบอร์ดตัวนี้ตัวเดียว
+  "mqttPassword": "********************************", // คำนวณจาก HMAC-SHA256(MQTT_DEVICE_SECRET, deviceId)
+  "provisionToken": "9f86d081884c7d659a2feaa0...", // โทเคนใช้ครั้งเดียว อายุ 15 นาที สำหรับยืนยันตัวตนผ่าน MQTTS
+  "autoOn": "08:00",
+  "autoOff": "20:00"
+}</code></pre>
+
+  <!-- ==================== PAGE 3: LAYER 3 MQTT ==================== -->
+  <div class="page-break"></div>
+
+  <div class="section-header">
+    <span class="section-num">ส่วนที่ 4</span>
+    <h2>การสื่อสารระหว่างบอร์ด ESP32 กับเซิร์ฟเวอร์ผ่าน MQTT (MQTTS / Broker Layer)</h2>
+  </div>
+
+  <p>เมื่อบอร์ดต่อ Wi‑Fi สำเร็จ จะเชื่อมต่อเข้าสู่ <strong>Mosquitto Broker</strong> ด้วยโปรโตคอล <strong>MQTTS (MQTT over TLS)</strong> โดย Mosquitto ใช้ปลั๊กอิน <strong>Dynamic Security</strong> กั้นสิทธิ์ (ACL) ให้บอร์ดแต่ละตัวอ่านและเขียนได้เฉพาะ Topic ที่มีรหัส <code>deviceId</code> ของตัวเองเท่านั้น และตั้งค่า <strong>Last Will and Testament (LWT)</strong> ไว้ที่ Broker คือถ้าบอร์ดไฟดับหรือเน็ตหลุดเกินเวลา Keep-Alive ตัว Broker จะประกาศข้อความ <code>{"online":false}</code> เข้า Topic <code>/status</code> แทนบอร์ดทันที</p>
+
+  <h3>4.1 ตาราง MQTT Topics ทั้งหมดของบอร์ดแอร์ (<code>rmutt/ac/&lt;deviceId&gt;/...</code>)</h3>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 25%;">MQTT Topic</th>
+        <th style="width: 15%;">ทิศทาง</th>
+        <th style="width: 12%;">QoS / Retain</th>
+        <th style="width: 48%;">ส่งอะไร / รับอะไร และทำงานอย่างไร</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>rmutt/ac/&lt;id&gt;/provision</code></td>
+        <td>บอร์ด ──► เซิร์ฟเวอร์</td>
+        <td>QoS 1</td>
+        <td><strong>บอร์ดส่ง:</strong> <code>{"token":"...","firmwareVersion":"2.5.5","bleName":"RMUTT-AC-...","roomNumber":"16301","airNumber":1,"protocol":"DAIKIN"}</code><br>ส่งทันทีหลังตั้งค่า BLE เสร็จ Backend นำ <code>token</code> ไปเทียบกับค่า Hash ในตาราง <code>air_conditioners</code> ถ้าตรงและยังไม่หมดอายุ 15 นาที จะเปลี่ยนสถานะเป็น <code>active</code></td>
+      </tr>
+      <tr>
+        <td><code>rmutt/ac/&lt;id&gt;/provision-ack</code></td>
+        <td>เซิร์ฟเวอร์ ──► บอร์ด</td>
+        <td>QoS 1</td>
+        <td><strong>เซิร์ฟเวอร์ตอบ:</strong> <code>{"ok":true,"deviceId":"ESP32-...","roomNumber":"16301","airNumber":1}</code><br>เมื่อบอร์ดได้รับข้อความนี้ จะลบ <code>provisionToken</code> ออกจากหน่วยความจำ NVS ทันที และเริ่มทำงานปกติ</td>
+      </tr>
+      <tr>
+        <td><code>rmutt/ac/&lt;id&gt;/status</code></td>
+        <td>บอร์ด ──► เซิร์ฟเวอร์</td>
+        <td>Retained</td>
+        <td><strong>บอร์ดส่งทุก 10 วินาที (และทันทีเมื่อสถานะเปลี่ยน):</strong><br><code>{"online":true,"pzemAvailable":true,"acRunning":true,"voltage":229.4,"current":4.12,"power":910.5,"energy":145.28,"frequency":50.0,"pf":0.97,"firmwareVersion":"2.5.5","controlMode":"ir","otaError":null}</code><br>Backend นำไปคำนวณผลต่างหน่วยไฟลงตาราง <code>energy_hourly</code> อัปเดตตาราง <code>air_conditioners</code> และกระตุ้น <code>evaluateAutoOff()</code></td>
+      </tr>
+      <tr>
+        <td><code>rmutt/ac/&lt;id&gt;/state</code></td>
+        <td>บอร์ด ──► เซิร์ฟเวอร์</td>
+        <td>Retained</td>
+        <td><strong>บอร์ดส่งหลังยิงคำสั่งแอร์เสร็จ:</strong><br><code>{"power":true,"temperature":25,"mode":"cool","fanSpeed":"auto","swing":"off","horizontalSwing":false,"eco":false,"turbo":false,"sleep":false,"quiet":false,"light":true,"clean":false,"timerMinutes":null,"commandId":"uuid-1234"}</code><br>ทำให้แอปและเว็บรู้ว่าหน้าปัดรีโมตล่าสุดอยู่ที่ค่าอะไร</td>
+      </tr>
+      <tr>
+        <td><code>rmutt/ac/&lt;id&gt;/command</code></td>
+        <td>เซิร์ฟเวอร์ ──► บอร์ด</td>
+        <td>QoS 1</td>
+        <td><strong>เซิร์ฟเวอร์ส่งคำสั่งได้ 4 รูปแบบ:</strong><br>
+          1) <strong>สั่งรีโมตแอร์:</strong> <code>{"commandId":"...","power":false,"temperature":25,"mode":"cool",...}</code> (จากผู้ใช้กด หรือจากระบบ Auto-Off)<br>
+          2) <strong>สั่งอัปเดต OTA:</strong> <code>{"action":"ota","url":"https://.../firmware/rmutt_esp32_air-2.5.5.bin"}</code><br>
+          3) <strong>สั่งเปิดบลูทูธซ้ำ:</strong> <code>{"action":"enter_setup"}</code><br>
+          4) <strong>สั่งถอดบอร์ดออกจากห้อง:</strong> <code>{"action":"unprovision"}</code> (บอร์ดจะล้าง NVS แล้วกลับเข้าโหมด BLE)
+        </td>
+      </tr>
+      <tr>
+        <td><code>rmutt/ac/&lt;id&gt;/schedule</code></td>
+        <td>เซิร์ฟเวอร์ ──► บอร์ด</td>
+        <td>Retained / QoS 1</td>
+        <td><strong>เซิร์ฟเวอร์ส่ง:</strong> <code>{"configured":true,"withinSchedule":true,"termStatus":"active","updatedAt":"..."}</code><br>บอกบอร์ดว่าห้องนี้ตั้งตารางเรียนไว้ในระบบกลางแล้วหรือยัง และตอนนี้มีคาบเรียนหรือไม่</td>
+      </tr>
+      <tr>
+        <td><code>rmutt/ac/&lt;id&gt;/history</code></td>
+        <td>บอร์ด ──► เซิร์ฟเวอร์</td>
+        <td>QoS 1</td>
+        <td><strong>บอร์ดส่งข้อมูลย้อนหลังหลังเน็ตกลับมา:</strong><br><code>{"records":[{"ts":1729200000,"kwh":144.80,"running":1,"samples":150}, ...]}</code><br>ส่งทีละชุด ชุดละไม่เกิน 10 รายการ (แต่ละรายการคือสรุปทุก 5 นาทีที่บอร์ดเก็บลงพาร์ติชัน <code>rmuttlog</code> ตอนเน็ตหลุด)</td>
+      </tr>
+      <tr>
+        <td><code>rmutt/ac/&lt;id&gt;/history-ack</code></td>
+        <td>เซิร์ฟเวอร์ ──► บอร์ด</td>
+        <td>QoS 1</td>
+        <td><strong>เซิร์ฟเวอร์ตอบรับ:</strong> <code>{"upTo":1729202700,"stored":10,"skipped":0}</code><br>ยืนยันว่าเซิร์ฟเวอร์บันทึกข้อมูลถึงเวลา <code>upTo</code> ลงฐานข้อมูลเรียบร้อยแล้ว บอร์ดจึงเลื่อนตัวชี้ Ring Buffer ลบชุดนั้นทิ้งแล้วส่งชุดถัดไป</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>4.2 ตาราง MQTT Topics ทั้งหมดของบอร์ดตรวจจับคน (<code>rmutt/occupancy/&lt;deviceId&gt;/...</code>)</h3>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 25%;">MQTT Topic</th>
+        <th style="width: 15%;">ทิศทาง</th>
+        <th style="width: 12%;">QoS / Retain</th>
+        <th style="width: 48%;">ส่งอะไร / รับอะไร และทำงานอย่างไร</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>rmutt/occupancy/&lt;id&gt;/provision</code><br><code>.../provision-ack</code></td>
+        <td>สองทิศทาง</td>
+        <td>QoS 1</td>
+        <td>ยืนยันตัวตนหลังตั้งค่า BLE เหมือนบอร์ดแอร์ (ผูก 1 ห้อง ต่อ 1 เซนเซอร์)</td>
+      </tr>
+      <tr>
+        <td><code>rmutt/occupancy/&lt;id&gt;/status</code></td>
+        <td>บอร์ด ──► เซิร์ฟเวอร์</td>
+        <td>Retained</td>
+        <td><strong>บอร์ดส่งทุก 10 วินาที และทันทีที่สถานะมีคนเปลี่ยน:</strong><br><code>{"online":true,"radarAvailable":true,"occupied":false,"Gate0":3,"Gate1":8,"Gate2":4,"Gate3":0,"Gate4":0,"Gate5":0,"Gate6":0,"Gate7":0,"Gate8":0,"maxStaticEnergy":8,"threshold":15,"firmwareVersion":"2.1.0"}</code><br>Backend อัปเดตตาราง <code>occupancy_sensors</code> และเรียก <code>evaluateAutoOff({roomNumber})</code> ทันที</td>
+      </tr>
+      <tr>
+        <td><code>rmutt/occupancy/&lt;id&gt;/command</code></td>
+        <td>เซิร์ฟเวอร์ ──► บอร์ด</td>
+        <td>QoS 1</td>
+        <td>รองรับคำสั่ง <code>{"action":"ota","url":"..."}</code>, <code>{"action":"enter_setup"}</code> และ <code>{"action":"unprovision"}</code></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout callout-why">
+    <div class="callout-title">💡 ทำไมต้องแยกฟิลด์ radarAvailable ออกจาก occupied? (หลักการ Fail-Safe)</div>
+    หากสายสัญญาณ UART ระหว่าง ESP32 กับเรดาร์ LD2410 หลุดหรือเรดาร์เสีย ค่าพลังงานทุกเกตจะเป็น <code>0</code> ถ้าบอร์ดส่งแค่ <code>occupied: false</code> ระบบจะเข้าใจผิดว่าห้องไม่มีคนแล้วสั่งปิดแอร์ใส่คนที่กำลังนั่งเรียนอยู่ ดังนั้นบอร์ดจึงส่ง <code>radarAvailable: false</code> มาด้วย และ Backend จะบังคับว่า <strong>ถ้าเรดาร์ไม่ออนไลน์หรืออ่านค่าไม่ได้ ห้ามปิดแอร์เด็ดขาด</strong>
+  </div>
+
+  <!-- ==================== PAGE 4: LAYER 4 REST API ==================== -->
+  <div class="page-break"></div>
+
+  <div class="section-header">
+    <span class="section-num">ส่วนที่ 5</span>
+    <h2>การสื่อสารระหว่างแอปมือถือ / เว็บแดชบอร์ด กับ Backend (HTTPS REST API + JWT)</h2>
+  </div>
+
+  <p>ทั้งแอป Flutter (<code>lib/services/*_service.dart</code>) และเว็บแดชบอร์ด (<code>webapp/assets/js/api.js</code>) สื่อสารกับ Backend ผ่าน <strong>HTTPS REST API</strong> โดยแนบ <code>Authorization: Bearer &lt;JWT&gt;</code> ไปกับทุกคำขอ และมีการดึงข้อมูลซ้ำอัตโนมัติ (Polling) เป็นจังหวะเพื่อให้หน้าจอแสดงข้อมูลล่าสุดเสมอ:</p>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">🔄 จังหวะดึงข้อมูลอัตโนมัติทุก 10 วินาที <span class="badge badge-green">Real-time Control</span></div>
+      <ul style="margin: 0; padding-left: 17px;">
+        <li><code>GET /api/rooms</code> — ดึงสถานะห้อง, มีคน/ไม่มีคน, และนาฬิกานับถอยหลังปิดแอร์อัตโนมัติ</li>
+        <li><code>GET /api/air-conditioners</code> — ดึงสถานะแอร์ทุกเครื่อง, กำลังไฟ (W), พลังงานสะสม (kWh), และสถานะออนไลน์</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-title">📊 จังหวะดึงข้อมูลอัตโนมัติทุก 30 วินาที <span class="badge badge-blue">Dashboard &amp; Alerts</span></div>
+      <ul style="margin: 0; padding-left: 17px;">
+        <li><code>GET /api/energy/summary</code> — ดึงยอดพลังงานรวมและจุดกราฟแท่งตามช่วงเวลาที่เลือก (วันนี้ / 7 วัน / 30 วัน / กำหนดเอง)</li>
+        <li><code>GET /api/alerts</code> — ดึงรายการแจ้งเตือนระบบ และเด้งแจ้งเตือนบนจอมือถือทันทีเมื่อพบใบแจ้งเตือนใหม่</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>ตารางสรุป REST API ทั้งหมด (ส่งอะไร ──► รับอะไร)</h3>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 24%;">Method &amp; Endpoint</th>
+        <th style="width: 10%;">สิทธิ์</th>
+        <th style="width: 31%;">ข้อมูลที่ส่งไป (Request Body / Query)</th>
+        <th style="width: 35%;">ข้อมูลที่รับกลับมา (Response JSON)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>POST /api/auth/login</code></td>
+        <td>ทุกคน</td>
+        <td><code>{"username":"admin","password":"..."}</code></td>
+        <td><code>{"token":"eyJ...","user":{"username","firstName","lastName","email","phone","role"}}</code></td>
+      </tr>
+      <tr>
+        <td><code>POST /api/auth/forgot-password</code><br><code>POST /api/auth/verify-otp</code><br><code>POST /api/auth/reset-password</code></td>
+        <td>ทุกคน</td>
+        <td>1) <code>{"identifier":"ชื่อหรืออีเมล"}</code><br>2) <code>{"requestId":"...","otp":"123456"}</code><br>3) <code>{"resetToken":"...","newPassword":"..."}</code></td>
+        <td>ส่งรหัส OTP 6 หลักเข้าอีเมลผ่าน SMTP ──► ตรวจ OTP ──► ตั้งรหัสใหม่พร้อมเพิ่มค่า <code>token_version</code> เพื่อเตะ Token เก่าทั้งหมดออกจากระบบ</td>
+      </tr>
+      <tr>
+        <td><code>GET /api/rooms</code><br><code>POST / PUT / DELETE /api/rooms</code></td>
+        <td>อ่าน: ทุกคน<br>แก้: Admin</td>
+        <td>ตอนสร้าง/แก้: <code>{"number":"16301","floor":3,"roomIndex":1,"type":"Lecture Room"}</code></td>
+        <td>คืนรายการห้องพร้อม <code>isOccupied</code>, <code>occupancySensorOnline</code>, <code>autoOffPhase</code> (<code>idle</code>/<code>counting</code>/<code>commanding</code>), <code>autoOffDeadlineAt</code></td>
+      </tr>
+      <tr>
+        <td><code>GET /api/air-conditioners</code></td>
+        <td>ทุกคน</td>
+        <td>—</td>
+        <td>คืนรายการแอร์ทุกเครื่อง: <code>deviceId</code>, <code>roomNumber</code>, <code>name</code>, <code>protocol</code>, <code>controlType</code> (<code>ir</code>/<code>wired</code>), <code>isOnline</code>, <code>pzemAvailable</code>, <code>acRunning</code>, <code>voltage</code>, <code>current</code>, <code>power</code>, <code>energy</code>, <code>state</code>, <code>autoOffSecondsRemaining</code></td>
+      </tr>
+      <tr>
+        <td><code>POST /api/air-conditioners/:id/command</code></td>
+        <td>ทุกคน</td>
+        <td><code>{"power":true,"temperature":25,"mode":"cool","fanSpeed":"auto","swing":"off",...}</code></td>
+        <td>ตอบ <code>202 Accepted</code> พร้อม <code>{"commandId":"...","state":{...}}</code> และส่งคำสั่งเข้า MQTT Topic <code>/command</code> ทันที</td>
+      </tr>
+      <tr>
+        <td><code>POST /api/air-conditioners/reservations</code></td>
+        <td>Admin</td>
+        <td><code>{"deviceId":"ESP32-...","bleName":"RMUTT-AC-...","roomNumber":"16301","airNumber":1,"protocol":"DAIKIN"}</code></td>
+        <td>สร้างบัญชี MQTT บน Mosquitto แล้วคืน <code>{"mqttHost","mqttPort","mqttUsername","mqttPassword","provisionToken"}</code> ให้แอปส่งต่อทาง BLE</td>
+      </tr>
+      <tr>
+        <td><code>GET /api/energy/summary</code></td>
+        <td>ทุกคน</td>
+        <td>Query: <code>?period=day|week|month|custom&amp;from=YYYY-MM-DD&amp;to=YYYY-MM-DD&amp;floor=3</code></td>
+        <td>คืน <code>totals</code> (<code>kwh</code>, <code>previousKwh</code>, <code>changePercent</code>, <code>runtimeMinutes</code>), <code>series</code> (จุดกราฟ), <code>rooms</code> (ยอดรายห้อง), <code>devices</code> (ยอดรายเครื่อง)</td>
+      </tr>
+      <tr>
+        <td><code>GET /api/energy/history</code><br><code>GET /api/energy/export</code></td>
+        <td>ทุกคน</td>
+        <td>Query: <code>scope=building|room|device</code>, <code>detail</code>, <code>from</code>, <code>to</code>, <code>metrics</code>, <code>rate</code></td>
+        <td><code>/history</code> คืนตารางข้อมูล JSON ส่วน <code>/export</code> คืนไฟล์ไบนารี <code>.xlsx</code> ที่เปิดใน Microsoft Excel ได้ทันที</td>
+      </tr>
+      <tr>
+        <td><code>GET /api/alerts</code><br><code>POST /api/alerts/:id/acknowledge</code></td>
+        <td>ทุกคน</td>
+        <td>Query: <code>?status=open&amp;limit=30</code></td>
+        <td>คืนรายการแจ้งเตือน (<code>outside_schedule_occupied</code>, <code>auto_off_succeeded</code>, <code>auto_off_failed</code>) และจำนวนที่ค้างอยู่ (<code>counts</code>)</td>
+      </tr>
+      <tr>
+        <td><code>GET /api/schedules</code><br><code>POST /api/schedules/import/preview</code><br><code>POST /api/schedules/import/commit</code></td>
+        <td>อ่าน: ทุกคน<br>แก้: Admin</td>
+        <td>ส่งไฟล์ <code>.xlsx</code> หรือ <code>.csv</code> ของตารางสอน และเลือกโหมดนำเข้า (<code>replaceAll: true/false</code>)</td>
+        <td>แกะชีต Excel ทุกห้อง ตรวจสอบวิชาซ้อนทับ แสดงตัวอย่างก่อนนำเข้า และบันทึกลงฐานข้อมูลใน Transaction เดียว</td>
+      </tr>
+      <tr>
+        <td><code>GET / PUT / DELETE /api/schedules/terms</code><br><code>GET / POST / PUT / DELETE /api/bookings</code></td>
+        <td>อ่าน: ทุกคน<br>แก้: Admin</td>
+        <td>วันเปิด–ปิดภาคเรียน (เช่น <code>{"semester":"1/2569","startDate":"2026-06-01","endDate":"2026-10-15"}</code>) และการจองห้องพิเศษ</td>
+        <td>ใช้กำหนดว่าวันไหนเปิดหรือปิดภาคเรียน และช่วงเวลาไหนมีการจองห้องประชุม/สอบนอกตารางเรียน</td>
+      </tr>
+      <tr>
+        <td><code>GET /api/settings</code><br><code>PATCH /api/settings/auto-off</code><br><code>PATCH /api/settings/rate</code></td>
+        <td>อ่าน: ทุกคน<br>แก้: Admin</td>
+        <td>• <code>PATCH /auto-off</code>: <code>{"enabled":true}</code> หรือ <code>{"testMode":true}</code><br>• <code>PATCH /rate</code>: <code>{"rate":4.50}</code></td>
+        <td>คืน <code>{"autoOffEnabled":true,"autoOffTestMode":false,"electricityRate":4.5,"timetable":{...}}</code> (เมื่อสลับ <code>testMode</code> จะรีเซ็ตตัวนับทุกห้องทันที)</td>
+      </tr>
+      <tr>
+        <td><code>GET / POST / DELETE /api/firmware</code><br><code>POST /api/air-conditioners/:id/ota</code></td>
+        <td>Admin</td>
+        <td>อัปโหลดไฟล์ไบนารี <code>.bin</code> (Header <code>X-File-Name</code>) หรือสั่งอัปเดตด้วย <code>{"fileName":"..."}</code></td>
+        <td>ตรวจ Magic Byte <code>0xE9</code> ของ ESP32 ตรวจชนิดบอร์ดให้ตรงกับไฟล์ แล้วสั่งบอร์ดดาวน์โหลดผ่าน HTTPS</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ==================== PAGE 5: END-TO-END FLOWS ==================== -->
+  <div class="page-break"></div>
+
+  <div class="section-header">
+    <span class="section-num">ส่วนที่ 6</span>
+    <h2>ลำดับการทำงานตั้งแต่ต้นจนจบในสถานการณ์จริง (End-to-End Scenarios)</h2>
+  </div>
+
+  <!-- Flow 1 -->
+  <div class="flow-box">
+    <div class="flow-header">🎬 สถานการณ์ที่ 1: ผู้ใช้กดปุ่ม "เปิดแอร์ 25°C โหมด Cool" ในแอปมือถือ หรือเว็บแดชบอร์ด</div>
+    <ol class="step-list">
+      <li><strong>แอปมือถือส่งคำขอ:</strong> เมื่อผู้ใช้กดปุ่มส่งคำสั่ง วิดเจ็ต <code>AirControlCard</code> เรียก <code>AirConditionerService.sendCommand()</code> ยิง <code>POST /api/air-conditioners/ESP32-XXXX/command</code> พร้อมแนบ JWT Token และ JSON <code>{"power":true,"temperature":25,"mode":"cool","fanSpeed":"auto","swing":"off"}</code></li>
+      <li><strong>Backend ตรวจสอบ 3 ชั้น:</strong> Middleware <code>authenticate.js</code> ตรวจลายเซ็น JWT ──► <code>routes/air-conditioners.js</code> ตรวจว่าบอร์ดลงทะเบียนแล้ว (<code>provision_status = 'active'</code>) ──► <code>validateAirState()</code> ตรวจความถูกต้องตามยี่ห้อแอร์ (เช่น Saijo Denki รับ 18–29°C, Daikin สายแอร์รับเฉพาะฟังก์ชันที่รีโมตผนังมี)</li>
+      <li><strong>Backend ส่งต่อเข้า MQTT และตอบ 202:</strong> Backend สร้างรหัส <code>commandId</code> แล้ว Publish เข้า Topic <code>rmutt/ac/ESP32-XXXX/command</code> (QoS 1) จากนั้นตอบ <code>202 Accepted</code> กลับให้แอปทันที</li>
+      <li><strong>บอร์ด ESP32 รับคำสั่งและสั่งแอร์:</strong> ฟังก์ชัน <code>mqttCallback()</code> บนบอร์ดรับข้อความมาเก็บไว้ แล้ว <code>loop()</code> เรียก <code>processMqttCommand()</code> บันทึกสถานะลงหน่วยความจำ NVS และยิงแสงอินฟราเรด 38 kHz (หรือส่งเฟรม SLM8 เข้าสายแอร์) ไปยังเครื่องแอร์</li>
+      <li><strong>บอร์ดรายงานผลกลับ:</strong> บอร์ดส่งสถานะหน้าปัดรีโมตกลับเข้า <code>rmutt/ac/ESP32-XXXX/state</code> และเมื่อคอมเพรสเซอร์แอร์เริ่มเดินจน PZEM วัดกำลังไฟได้ <code>≥ 30 W</code> ติดกัน 3 ครั้ง บอร์ดจะส่ง <code>acRunning: true</code> พร้อมค่าวัตต์จริงเข้า <code>rmutt/ac/ESP32-XXXX/status</code></li>
+      <li><strong>แอปแสดงผล:</strong> รอบดึงข้อมูลทุก 10 วินาทีของแอป (<code>GET /api/rooms</code> และ <code>/api/air-conditioners</code>) จึงเห็นว่าแอร์เปิดทำงานและแสดงกำลังไฟวัตต์จริงบนจอ</li>
+    </ol>
+  </div>
+
+  <!-- Flow 2 -->
+  <div class="flow-box">
+    <div class="flow-header">🎬 สถานการณ์ที่ 2: ห้องว่างไม่มีคน ──► ระบบนับถอยหลังและตัดแอร์อัตโนมัติ (โหมดปกติ vs โหมดทดสอบ)</div>
+    <ol class="step-list">
+      <li><strong>เรดาร์ตรวจพบว่าคนออกจากห้อง:</strong> บอร์ด <code>OCC32-XXXX</code> อ่านค่า LD2410 ทุก 250 ms เมื่อทุกเกต (0–8) มีค่า <code>staticEnergy &lt;= 15</code> บอร์ดจะส่ง <code>{"occupied":false,"radarAvailable":true}</code> เข้า Topic <code>rmutt/occupancy/OCC32-XXXX/status</code> ทันที</li>
+      <li><strong>Backend ประเมินกติกา 5 ด่าน (<code>decideAutoOff</code>):</strong>
+        <ul>
+          <li><strong>ด่าน 0:</strong> สวิตช์รวมทั้งอาคาร (<code>auto_off_enabled</code>) เปิดอยู่หรือไม่?</li>
+          <li><strong>ด่าน 1:</strong> ห้องนี้มีเซนเซอร์ ออนไลน์อยู่ และ <code>radarAvailable === true</code> หรือไม่? (ถ้าเซนเซอร์หลุด ──► ไม่ปิดแอร์)</li>
+          <li><strong>ด่าน 2:</strong> มิเตอร์ไฟแอร์ <code>pzemAvailable === true</code> หรือไม่?</li>
+          <li><strong>ด่าน 3:</strong> ห้องว่างจริงไหม (<code>occupied === false</code>)? (ถ้ามีคนเดินกลับเข้ามา ──► ยกเลิกการนับทันที)</li>
+          <li><strong>ด่าน 4:</strong> แอร์กำลังกินไฟอยู่จริงไหม (<code>acRunning === true</code>)?</li>
+          <li><strong>ด่าน 5 (เริ่มนับถอยหลัง):</strong> ตรวจตารางเรียน + ปฏิทินเปิด–ปิดเทอม + การจองห้อง ว่าตอนนี้อยู่ในคาบเรียนหรือไม่ (<code>withinClass</code>) และตรวจว่าเปิด <strong>โหมดทดสอบ (<code>testMode</code>)</strong> อยู่หรือไม่:
+            <ul>
+              <li><strong>โหมดปกติ (<code>testMode = false</code>):</strong> นอกคาบเรียน นับ <strong>300 วินาที (5 นาที)</strong> · ในคาบเรียน นับ <strong>900 วินาที (15 นาที)</strong></li>
+              <li><strong>โหมดทดสอบ (<code>testMode = true</code>):</strong> นอกคาบเรียน นับ <strong>30 วินาที</strong> · ในคาบเรียน นับ <strong>60 วินาที (1 นาที)</strong></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li><strong>แสดงเวลานับถอยหลังบนแอปและเว็บ:</strong> Backend บันทึก <code>auto_off_deadline_at</code> ลงตาราง <code>air_conditioners</code> แอปและเว็บที่ดึงข้อมูลอยู่จึงแสดงป้ายนับถอยหลังแบบเรียลไทม์บนการ์ดห้องและการ์ดแอร์</li>
+      <li><strong>เมื่อครบกำหนดเวลา:</strong> บริการ <code>services/auto-off.js</code> ส่งคำสั่ง <code>{"power":false,"source":"auto-off"}</code> ไปยัง <code>rmutt/ac/ESP32-XXXX/command</code>
+        <ul>
+          <li>หากผ่านไป 20 วินาทีแล้วแอร์ยังกินไฟอยู่ จะยิงซ้ำทุก <strong>20 วินาที สูงสุด 5 ครั้ง</strong> (ถ้าครบ 5 ครั้งยังไม่ดับ จะสร้างใบแจ้งเตือน <code>auto_off_failed</code>)</li>
+          <li>เมื่อกำลังไฟลดลงจน <code>acRunning = false</code> ระบบจะล้างนาฬิกาและสร้างใบแจ้งเตือน <code>auto_off_succeeded</code> แอปมือถือที่ดึง <code>GET /api/alerts</code> จะเด้ง Notification แจ้งเตือนขึ้นบนจอมือถือทันที</li>
+        </ul>
+      </li>
+    </ol>
+  </div>
+
+  <!-- Flow 3 -->
+  <div class="flow-box">
+    <div class="flow-header">🎬 สถานการณ์ที่ 3: แอดมินสลับสวิตช์ "โหมดทดสอบการปิดอัตโนมัติ (30 วิ / 1 นาที)"</div>
+    <ol class="step-list">
+      <li><strong>แอดมินกดสวิตช์ในหน้าตั้งค่า (แอปมือถือ หรือ เว็บแดชบอร์ด):</strong> ส่งคำขอ <code>PATCH /api/settings/auto-off</code> พร้อม JSON <code>{"testMode":true}</code></li>
+      <li><strong>Backend บันทึกและรีเซ็ตตัวนับทันที:</strong>
+        <ul>
+          <li>บันทึก <code>auto_off_test_mode = '1'</code> ลงตาราง <code>system_settings</code> และล้าง Cache การตั้งค่า</li>
+          <li>เรียก <code>clearAllCountdowns()</code> เพื่อล้าง <code>auto_off_deadline_at</code> เดิมของทุกเครื่อง (ที่อาจกำลังนับค้างไว้ที่ 5 หรือ 15 นาที)</li>
+          <li>เรียก <code>evaluateAutoOff()</code> ทันทีในจังหวะเดียวกัน ทำให้ห้องที่ว่างอยู่เริ่มนับถอยหลังใหม่ที่ <strong>30 วินาที (นอกคาบ)</strong> หรือ <strong>1 นาที (ในคาบ)</strong> ทันทีโดยไม่ต้องรอรอบประเมินถัดไป</li>
+        </ul>
+      </li>
+    </ol>
+  </div>
+
+  <!-- Flow 4 -->
+  <div class="flow-box">
+    <div class="flow-header">🎬 สถานการณ์ที่ 4: การคำนวณค่าไฟรายชั่วโมง และการเก็บข้อมูลย้อนหลังเมื่ออินเทอร์เน็ตหลุด</div>
+    <ol class="step-list">
+      <li><strong>กรณีออนไลน์ปกติ:</strong> ทุกครั้งที่บอร์ดส่ง <code>/status</code> (ทุก 10 วินาที) <code>energy-recorder.js</code> จะนำเลขมิเตอร์สะสม <code>energy</code> ล่าสุด ลบด้วยเลขมิเตอร์ครั้งก่อนหน้า (<code>energy_chain_kwh</code>) ได้เป็นหน่วยไฟที่เพิ่มขึ้น แล้วบวกสะสมลงในตาราง <code>energy_hourly</code> ของชั่วโมงนั้น (ตามเวลาประเทศไทย <code>Asia/Bangkok</code>)</li>
+      <li><strong>กรณีอินเทอร์เน็ตหลุดหรือเซิร์ฟเวอร์ดับ:</strong> บอร์ดแอร์ยังคงอ่าน PZEM ทุก 2 วินาที และทุก ๆ <strong>5 นาที</strong> จะสรุปเลขมิเตอร์และเวลาทำงานเป็นเรคคอร์ดขนาด 32 ไบต์ บันทึกลงพาร์ติชัน Flash ชื่อ <code>rmuttlog</code> (ขนาด 64 KB เก็บได้ 2,048 รายการ หรือประมาณ <strong>7 วันเต็ม</strong>)</li>
+      <li><strong>เมื่ออินเทอร์เน็ตกลับมา:</strong> บอร์ดจะสุ่มรอเวลา 5–45 วินาที (ป้องกันบอร์ดทั้งตึกยิงพร้อมกัน) แล้วส่งข้อมูลย้อนหลังเข้า Topic <code>/history</code> ทีละ 10 รายการ รอจนกว่า Backend จะบันทึกและตอบ <code>/history-ack</code> กลับมา จึงลบชุดนั้นออกจาก Flash ทำให้ข้อมูลการใช้ไฟไม่สูญหายแม้ไฟหรือเน็ตตึกจะมีปัญหา</li>
+    </ol>
+  </div>
+
+  <div class="footer-note">
+    เอกสารสรุปการสื่อสารทั้งระบบโปรเจกต์ <strong>RMUTT Save Energy (cpe_air_remote)</strong> · อาคาร 16 วิศวกรรมคอมพิวเตอร์ มทร.ธัญบุรี
+  </div>
+
+</body>
+</html>

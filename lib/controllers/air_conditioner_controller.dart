@@ -18,7 +18,9 @@ class AirConditionerController extends ChangeNotifier {
   bool isLoading = false;
   String? errorMessage;
   Timer? _refreshTimer;
+  Timer? _graceTimer;
   Future<void>? _inFlight;
+  final Map<String, ({bool isOn, DateTime commandedAt})> _recentCommands = {};
 
   Future<void> initialize() async {
     await refresh();
@@ -51,6 +53,26 @@ class AirConditionerController extends ChangeNotifier {
     if (!silent) notifyListeners();
     try {
       final devices = await repository.fetchAll();
+      final now = DateTime.now();
+      for (final air in devices) {
+        final deviceId = air.deviceId;
+        if (deviceId == null) continue;
+        final recent = _recentCommands[deviceId];
+        if (recent == null) continue;
+        final elapsed = now.difference(recent.commandedAt);
+        if (!elapsed.isNegative &&
+            elapsed < AirConditioner.commandGracePeriod) {
+          if (air.pzemAvailable && air.isRunning == recent.isOn) {
+            _recentCommands.remove(deviceId);
+          } else {
+            air.isOn = recent.isOn;
+            air.commandedAt = recent.commandedAt;
+            if (!recent.isOn) air.isRunning = false;
+          }
+        } else {
+          _recentCommands.remove(deviceId);
+        }
+      }
       for (final room in rooms) {
         room.airConditioners
           ..clear()
@@ -71,11 +93,22 @@ class AirConditionerController extends ChangeNotifier {
   @override
   void dispose() {
     _refreshTimer?.cancel();
+    _graceTimer?.cancel();
     super.dispose();
   }
 
   Future<void> sendCommand(AirConditioner air) async {
     await repository.sendCommand(air);
+    final now = DateTime.now();
+    air.commandedAt = now;
+    final deviceId = air.deviceId;
+    if (deviceId != null) {
+      _recentCommands[deviceId] = (isOn: air.isOn, commandedAt: now);
+      _graceTimer?.cancel();
+      _graceTimer = Timer(AirConditioner.commandGracePeriod, () {
+        refresh(silent: true);
+      });
+    }
     notifyListeners();
   }
 

@@ -50,10 +50,17 @@ class AirControlCard extends StatefulWidget {
 
 class _AirControlCardState extends State<AirControlCard> {
   bool _busy = false;
+  Timer? _graceTimer;
 
   AirConditioner get air => widget.air;
 
   bool get _canControl => !_busy && air.canControl;
+
+  @override
+  void dispose() {
+    _graceTimer?.cancel();
+    super.dispose();
+  }
 
   /// นาฬิกาปิดอัตโนมัติที่ใช้กับเครื่องนี้ (ของเครื่องก่อน แล้วค่อยของห้อง)
   DateTime? get _deadline {
@@ -484,6 +491,10 @@ class _AirControlCardState extends State<AirControlCard> {
       await widget.onCommand(draft);
       if (!mounted) return;
       setState(() => air.copyStateFrom(draft));
+      _graceTimer?.cancel();
+      _graceTimer = Timer(AirConditioner.commandGracePeriod, () {
+        if (mounted) setState(() {});
+      });
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
         ..showSnackBar(

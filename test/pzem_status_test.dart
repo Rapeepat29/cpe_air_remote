@@ -90,4 +90,43 @@ void main() {
 
     expect(air.isPoweredOn, isFalse);
   });
+
+  test('pressing turn on keeps the button on during the 20s grace period even at 2 W', () {
+    final air = AirConditioner(
+      id: 1,
+      name: 'Air 1',
+      isOn: false,
+      isRunning: false,
+      pzemAvailable: true,
+      power: 2,
+    );
+
+    final draft = air.editableCopy()..isOn = true;
+    final sentAt = DateTime.now().subtract(const Duration(seconds: 5));
+    air.copyStateFrom(draft, commandedAt: sentAt);
+
+    // อยู่ในช่วง 5–20 วินาทีแรกหลังกดเปิด ยังไม่เด้งกลับเป็นปิดแม้ไฟเพิ่งขึ้น 2 W
+    expect(air.inCommandGracePeriod(), isTrue);
+    expect(air.isPoweredOn, isTrue);
+  });
+
+  test('reverts to off after the 20s grace period when power stays at 2 W', () {
+    final air = AirConditioner(
+      id: 1,
+      name: 'Air 1',
+      isOn: false,
+      isRunning: false,
+      pzemAvailable: true,
+      power: 2,
+    );
+
+    final draft = air.editableCopy()..isOn = true;
+    final sentAt = DateTime.now().subtract(const Duration(seconds: 21));
+    air.copyStateFrom(draft, commandedAt: sentAt);
+
+    // พ้น 20 วินาทีแล้วแต่ไฟยังขึ้นแค่ 2 W (isRunning = false) แอปต้องเปลี่ยนเป็นปิด
+    expect(air.inCommandGracePeriod(), isFalse);
+    expect(air.isPoweredOn, isFalse);
+    expect(air.editableCopy().isOn, isFalse);
+  });
 }

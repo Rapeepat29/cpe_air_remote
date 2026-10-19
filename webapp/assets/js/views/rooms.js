@@ -447,16 +447,37 @@ function countdownStrip(room) {
 
 /** ร่างคำสั่งที่ผู้ใช้กำลังแก้อยู่ แยกจากสถานะจริงบนบอร์ด */
 const drafts = new Map();
+const recentCommands = new Map();
+const COMMAND_GRACE_MS = 20_000;
+
+function effectivePowerOf(unit) {
+  const recent = recentCommands.get(unit.deviceId);
+  if (recent && Date.now() - recent.at < COMMAND_GRACE_MS) {
+    if (unit.pzemAvailable === true && unit.acRunning === recent.power) {
+      recentCommands.delete(unit.deviceId);
+    } else {
+      return recent.power;
+    }
+  } else if (recent) {
+    recentCommands.delete(unit.deviceId);
+  }
+  if (unit.pzemAvailable === true) {
+    return unit.acRunning === true;
+  }
+  return Boolean(unit.state?.power);
+}
 
 function draftFor(unit) {
   if (!drafts.has(unit.deviceId)) {
-    // state.power คือคำสั่งล่าสุดที่ระบบส่ง ถ้ามีคนเปิดด้วยรีโมตจริง ค่านี้ยังเป็น false
-    // จึงถือว่าเปิดอยู่ด้วยถ้า PZEM ยืนยันแล้วว่าแอร์กินไฟ (เหมือนแอปมือถือ)
-    const running = unit.pzemAvailable === true && unit.acRunning === true;
     drafts.set(unit.deviceId, {
       ...unit.state,
-      power: Boolean(unit.state?.power) || running,
+      power: effectivePowerOf(unit),
     });
+  } else if (unit.pzemAvailable === true) {
+    const recent = recentCommands.get(unit.deviceId);
+    if (!recent || Date.now() - recent.at >= COMMAND_GRACE_MS) {
+      drafts.get(unit.deviceId).power = unit.acRunning === true;
+    }
   }
   return drafts.get(unit.deviceId);
 }
@@ -860,6 +881,10 @@ async function sendCommand(unit, draft, context, button = null) {
   if (button) button.disabled = true;
   try {
     await api.sendCommand(unit.deviceId, payload);
+    recentCommands.set(unit.deviceId, {
+      power: payload.power,
+      at: Date.now(),
+    });
     toastOk(
       `ส่งคำสั่งไปที่ ${unit.name} แล้ว · ` +
         'IR ไม่มีสัญญาณตอบกลับ ให้ดูค่ากำลังไฟว่าเปลี่ยนตามหรือไม่',
@@ -869,9 +894,17 @@ async function sendCommand(unit, draft, context, button = null) {
       loaders.airConditioners();
       loaders.live();
     }, 2500);
+    // เมื่อครบช่วงรอแอร์สตาร์ท 20 วินาที ดึงค่าซ้ำเพื่อให้สวิตช์ปรับตามไฟจริงจาก PZEM
+    window.setTimeout(() => {
+      loaders.airConditioners();
+      loaders.live();
+    }, COMMAND_GRACE_MS + 500);
   } catch (error) {
     // คำสั่งไม่ผ่าน ต้องดึงร่างกลับไปตรงกับของจริง ไม่งั้นหน้าจอจะโกหก
-    drafts.set(unit.deviceId, { ...unit.state });
+    drafts.set(unit.deviceId, {
+      ...unit.state,
+      power: effectivePowerOf(unit),
+    });
     context.refreshDrawer();
     toastError(error.message);
   } finally {
