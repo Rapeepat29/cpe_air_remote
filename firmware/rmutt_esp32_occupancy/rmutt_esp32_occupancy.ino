@@ -60,7 +60,7 @@ constexpr uint32_t BLE_READVERTISE_DELAY_MS = 600;
 constexpr uint32_t ONLINE_SETUP_WINDOW_MS = 5UL * 60UL * 1000UL;
 constexpr size_t MAX_CONFIG_BYTES = 3072;
 constexpr uint32_t NTP_SYNC_TIMEOUT_MS = 15000;
-constexpr char FIRMWARE_VERSION[] = "1.3.9";
+constexpr char FIRMWARE_VERSION[] = "1.3.10";
 
 // The service layout is shared with the A/C board, while the advertised name
 // and identity clearly distinguish RMUTT-OCC devices.
@@ -660,7 +660,9 @@ void processPendingConfig() {
       isValidRoomNumber(incoming.roomNumber) &&
       !incoming.provisioningToken.isEmpty() &&
       !incoming.wifiSsid.isEmpty() &&
-      incoming.wifiPassword.length() >= 8 &&
+      // รหัสว่าง = Wi-Fi แบบเปิด (ไม่มีรหัสผ่าน) ถ้ามีรหัสต้องยาว 8 ตัวขึ้นไปตาม WPA
+      (incoming.wifiPassword.isEmpty() ||
+       incoming.wifiPassword.length() >= 8) &&
       !incoming.mqttHost.isEmpty() &&
       !incoming.mqttTopic.isEmpty();
   if (!valid) {
@@ -728,7 +730,12 @@ bool connectWifiCredentials(
   WiFi.disconnect(false, false);
   delay(100);
   WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid.c_str(), password.c_str());
+  if (password.isEmpty()) {
+    // Wi-Fi แบบเปิด ไม่ส่งรหัสผ่าน
+    WiFi.begin(ssid.c_str());
+  } else {
+    WiFi.begin(ssid.c_str(), password.c_str());
+  }
   connectionInProgress = true;
   const uint32_t startedAt = millis();
   while (WiFi.status() != WL_CONNECTED &&

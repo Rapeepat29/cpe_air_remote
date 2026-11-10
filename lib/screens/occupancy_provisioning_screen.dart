@@ -202,7 +202,7 @@ class _OccupancyProvisioningScreenState
                       ? context.tr(
                           'Leave blank to keep the password already saved on ESP32.',
                         )
-                      : null,
+                      : context.tr('Leave blank if the Wi-Fi has no password.'),
                 ),
                 validator: _validateWifiPassword,
               ),
@@ -412,10 +412,12 @@ class _OccupancyProvisioningScreenState
   }
 
   String? _validateWifiPassword(String? value) {
-    if ((value ?? '').length >= 8) return null;
-    final identity = _identity;
-    if (identity != null && _shouldKeepPassword(identity)) return null;
-    return context.tr('Enter at least 8 characters');
+    final password = value ?? '';
+    // เว้นว่าง = Wi-Fi แบบเปิด หรือใช้รหัสเดิมในบอร์ด (ดู _shouldKeepPassword)
+    if (password.isEmpty || password.length >= 8) return null;
+    return context.tr(
+      'Enter at least 8 characters, or leave blank for Wi-Fi without a password',
+    );
   }
 }
 

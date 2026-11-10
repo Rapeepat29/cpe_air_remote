@@ -75,7 +75,7 @@ constexpr uint8_t AC_RUNNING_CONFIRM_SAMPLES = 3;
 constexpr uint8_t PZEM_FAILURE_LIMIT = 3;
 constexpr size_t MAX_CONFIG_BYTES = 4096;
 constexpr uint32_t NTP_SYNC_TIMEOUT_MS = 15000;
-constexpr char FIRMWARE_VERSION[] = "2.5.5-slm8";
+constexpr char FIRMWARE_VERSION[] = "2.5.6-slm8";
 // บอกแอปว่าเป็นบอร์ดสายแอร์ ยี่ห้อไหน (แอปแสดงให้ผู้ใช้เห็น ไม่ให้เลือกยี่ห้อ IR)
 constexpr char CONTROL_TYPE[] = "wired";
 constexpr char AIR_BRAND[] = "Daikin";
@@ -929,7 +929,9 @@ void processPendingConfig() {
       !incoming.airName.isEmpty() &&
       !incoming.provisioningToken.isEmpty() &&
       !incoming.wifiSsid.isEmpty() &&
-      incoming.wifiPassword.length() >= 8 &&
+      // รหัสว่าง = Wi-Fi แบบเปิด (ไม่มีรหัสผ่าน) ถ้ามีรหัสต้องยาว 8 ตัวขึ้นไปตาม WPA
+      (incoming.wifiPassword.isEmpty() ||
+       incoming.wifiPassword.length() >= 8) &&
       !incoming.mqttHost.isEmpty() &&
       !incoming.mqttTopic.isEmpty() &&
       isSupportedAirProtocol(incoming.airProtocol);
@@ -1029,7 +1031,12 @@ bool connectWifiCredentials(
   WiFi.disconnect(false, false);
   delay(100);
   WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid.c_str(), password.c_str());
+  if (password.isEmpty()) {
+    // Wi-Fi แบบเปิด ไม่ส่งรหัสผ่าน
+    WiFi.begin(ssid.c_str());
+  } else {
+    WiFi.begin(ssid.c_str(), password.c_str());
+  }
   const uint32_t startedAt = millis();
   while (WiFi.status() != WL_CONNECTED &&
          millis() - startedAt < timeoutMs) {
