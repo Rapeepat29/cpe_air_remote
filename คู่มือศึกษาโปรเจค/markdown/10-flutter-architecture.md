@@ -302,7 +302,7 @@ linter:
 - **enum** `AirMode {auto, cool, dry, fan, heat}`, `FanSpeed {auto, low, medium, high, turbo}`, `SwingMode {auto, top, upper, middle, lower, bottom, off}` ชื่อ enum ตรงกับสตริงที่ Backend/เฟิร์มแวร์ใช้ (ส่งด้วย `.name`) และมี extension `.label` สำหรับข้อความที่แสดง
 - **คลาส `AirConditioner`** ฟิลด์แบ่งเป็นกลุ่ม: ตัวตน (`id` = เลข air ในห้อง, `deviceId` เช่น `ESP32-XXXXXXXXXXXX`, `roomNumber`, `bleName`, `protocol` ค่าเริ่มต้น `HAIER_AC160`, `provisionStatus`, `mqttTopic`, `dailyOn/dailyOff`), สถานะออนไลน์ (`isOnline`, `lastSeenAt`), **สถานะที่สั่ง** (`isOn`, `temperature`, `mode`, `fanSpeed`, `verticalSwing`, `eco`, `turbo` ฯลฯ), **ค่าที่วัดจริงจาก PZEM** (`voltage`, `current`, `power`, `energyKwh`, `frequencyHz`, `powerFactor`, `pzemAvailable`), `isRunning` (แอร์กำลังกินไฟจริงหรือไม่) และกลุ่มปิดอัตโนมัติ (`autoOffEnabled`, `autoOffDeadlineAt`, `autoOffAttempts`, `autoOffInClass`)
 - **ข้อควรจำ:** `isOn` (คำสั่งล่าสุดที่ระบบส่ง ทั้งแบบยิง IR และแบบสายแอร์) กับ `isRunning` (กำลังไฟจริงจาก PZEM) เป็นคนละเรื่องกัน เพราะรีโมตอินฟราเรดไม่มีสัญญาณตอบกลับ และแม้บอร์ดสายแอร์จะอ่านสถานะจากสายได้ แอปก็ยังใช้กติกาเดียวกันทุกรุ่น `test/pzem_status_test.dart` ยืนยันว่าห้องนับแอร์ที่ "ทำงาน" จาก `isRunning` ไม่ใช่ `isOn`
-- **getter `isPoweredOn`:** `isOn || (pzemAvailable && isRunning)` คือ "แอร์เปิดอยู่จริงไหม" ใช้แสดงผลบนหน้าจอแทน `isOn` แก้ปัญหาที่มีคนเปิดแอร์ด้วยรีโมตตัวจริง แล้วแอปขึ้นว่า "ปิดอยู่" ทั้งที่ PZEM วัดได้ว่ากินไฟ (เกณฑ์ ≥ 30 W ติดกัน 3 ครั้งจากเฟิร์มแวร์) ดูรายละเอียดในหัวข้อถัดไป
+- **getter `isPoweredOn`:** `isOn || (pzemAvailable && isRunning)` คือ "แอร์เปิดอยู่จริงไหม" ใช้แสดงผลบนหน้าจอแทน `isOn` แก้ปัญหาที่มีคนเปิดแอร์ด้วยรีโมตตัวจริง แล้วแอปขึ้นว่า "ปิดอยู่" ทั้งที่ PZEM วัดได้ว่ากินไฟ (เกณฑ์ ≥ 50 W ติดกัน 3 ครั้งจากเฟิร์มแวร์) ดูรายละเอียดในหัวข้อถัดไป
 - **getter สิทธิ์ควบคุม:** `canControl => isProvisioned && isOnline && deviceId != null`
 - **ยี่ห้อและวิธีควบคุม:** ฟังก์ชันนอกคลาส `airBrandOf(protocol)` / `airControlTypeOf(protocol)` และ getter `isWired`, `brand`, `controlTypeLabel` แยกแอร์ที่ **ยิง IR** ออกจากแอร์ที่ **ต่อสายแอร์ Daikin** (`protocol = 'DAIKIN_WIRED'`) ดูหัวข้อย่อยถัดไป
 - **ข้อจำกัดตามโปรโตคอล:** `isSaijoDenki` (`protocol == 'SAIJO_DENKI'`) ทำให้ `minimumTemperature`/`maximumTemperature` เป็น 18/29 (ปกติ 16/30), `supportedModes` เหลือ cool/dry/fan, `supportedSwingModes` มี upper/lower แต่ไม่มี off และ `supportsAdditionalFunctions` เป็นเท็จ ส่วน `isWired` จำกัดโหมดเป็น cool/dry/fan พัดลมไม่มี turbo สวิงมีแค่ auto/off และฟังก์ชันเสริมเหลือ Sleep ผ่าน getter รายตัว `supportsEco`, `supportsSleep` ฯลฯ `normalizeForProtocol()` ถูกเรียกใน constructor และ `copyStateFrom` เพื่อบังคับค่าให้อยู่ในขอบเขต (`test/saijo_denki_support_test.dart`, `test/daikin_wired_support_test.dart`)
@@ -519,7 +519,7 @@ getter ในคลาส `AirConditioner` ที่เพิ่มคู่ก�
   ///
   /// `isOn` คือคำสั่งล่าสุดที่ระบบยิง IR ไป ถ้ามีคนเปิดแอร์ด้วยรีโมตจริง
   /// ค่านี้จะยังเป็น false ทั้งที่แอร์กินไฟอยู่ จึงเชื่อ PZEM ด้วย:
-  /// ถ้าเฟิร์มแวร์ยืนยันแล้วว่าแอร์ทำงาน (>= 30 W ติดกัน 3 ครั้ง) ถือว่าเปิดอยู่
+  /// ถ้าเฟิร์มแวร์ยืนยันแล้วว่าแอร์ทำงาน (>= 50 W ติดกัน 3 ครั้ง) ถือว่าเปิดอยู่
   bool get isPoweredOn => isOn || (pzemAvailable && isRunning);
 ```
 
@@ -538,7 +538,7 @@ getter ในคลาส `AirConditioner` ที่เพิ่มคู่ก�
 
 > [!ASK]
 > **ถาม:** ถ้ามีคนเปิดแอร์ด้วยรีโมตจริง แอปจะรู้ไหม?
-> **ตอบ:** รู้ครับ ภายในราว 6 วินาทีที่ PZEM วัดได้ ≥ 30 W ติดกัน 3 ครั้ง บอร์ดส่ง `acRunning = true` แอปใช้ `isPoweredOn` ซึ่งเชื่อทั้งคำสั่งล่าสุดและค่าไฟจริง จึงขึ้นว่าเปิดอยู่ และถ้าผู้ใช้ปรับอุณหภูมิต่อ คำสั่งจะยังเป็น "เปิด" เว็บแอปใช้กติกาเดียวกัน แต่รู้แค่เปิด/ปิด ไม่รู้ว่าตั้งกี่องศาบนรีโมต
+> **ตอบ:** รู้ครับ ภายในราว 6 วินาทีที่ PZEM วัดได้ ≥ 50 W ติดกัน 3 ครั้ง บอร์ดส่ง `acRunning = true` แอปใช้ `isPoweredOn` ซึ่งเชื่อทั้งคำสั่งล่าสุดและค่าไฟจริง จึงขึ้นว่าเปิดอยู่ และถ้าผู้ใช้ปรับอุณหภูมิต่อ คำสั่งจะยังเป็น "เปิด" เว็บแอปใช้กติกาเดียวกัน แต่รู้แค่เปิด/ปิด ไม่รู้ว่าตั้งกี่องศาบนรีโมต
 
 #### `auth_user.dart`, `remembered_login.dart`, `admin_contact.dart`, `managed_user.dart` — ผู้ใช้และคนติดต่อ
 

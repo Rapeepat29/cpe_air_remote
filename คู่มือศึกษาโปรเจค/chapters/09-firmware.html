@@ -820,7 +820,7 @@
 </thead>
 <tbody>
 <tr>
-<td><code>powerWatts &gt;= 30</code> ติดกัน 3 ครั้ง</td>
+<td><code>powerWatts &gt;= 50</code> ติดกัน 3 ครั้ง</td>
 <td><code>acRunning = true</code></td>
 </tr>
 <tr>
@@ -3249,11 +3249,11 @@ y 63    │ 845 W   [OUT OF CLASS]               │  แถบล่าง: ว
 </div>
 
 <ul>
-<li><strong>1708–1709:</strong> ถ้ากำลังไฟ ≥ 30 W (<code>AC_RUNNING_ON_WATTS</code>): ล้างตัวนับ "หยุด" (เพราะไม่ติดกันแล้ว)</li>
+<li><strong>1708–1709:</strong> ถ้ากำลังไฟ ≥ 50 W (<code>AC_RUNNING_ON_WATTS</code>): ล้างตัวนับ "หยุด" (เพราะไม่ติดกันแล้ว)</li>
 <li><strong>1710–1712:</strong> เพิ่มตัวนับ "ทำงาน" จนถึงเพดาน 3 (ไม่ให้เพิ่มเกิน)</li>
 <li><strong>1713–1715:</strong> ถึง 3 ครั้งติดกัน (≈ 6 วินาที) จึงตั้ง <code>acRunning = true</code></li>
 <li><strong>1716–1723:</strong> ถ้ากำลังไฟ ≤ 10 W (<code>AC_RUNNING_OFF_WATTS</code>): สลับกัน ล้างตัวนับ "ทำงาน" นับ "หยุด" ถึง 3 → <code>acRunning = false</code></li>
-<li><strong>1724–1729:</strong> ค่าอยู่ระหว่าง 10 ถึง 30 W (<strong>แถบ hysteresis</strong>): ไม่เปลี่ยนสถานะ และเคลียร์ตัวนับทั้งสอง คือต้อง "ติดกัน" จริง ๆ</li>
+<li><strong>1724–1729:</strong> ค่าอยู่ระหว่าง 10 ถึง 50 W (<strong>แถบ hysteresis</strong>): ไม่เปลี่ยนสถานะ และเคลียร์ตัวนับทั้งสอง คือต้อง "ติดกัน" จริง ๆ</li>
 </ul>
 <div class="callout why"><div class="callout-title">ทำไม</div><p>คอมเพรสเซอร์แอร์ตัด-ต่อเป็นช่วง ๆ กำลังไฟตกจากหลายร้อยวัตต์เหลือแค่พัดลม (หลักสิบวัตต์) การตัดสินจากค่าเดียวจะเห็นแอร์ "ปิด" ทุกครั้งที่คอมเพรสเซอร์พัก และเกณฑ์ขึ้น/ลงที่ต่างกัน (30 และ 10) ป้องกันการกระพริบเมื่อกำลังไฟแกว่งรอบเกณฑ์เดียว การนับ 3 ครั้งติดกันป้องกันสัญญาณรบกวนครั้งเดียว ตรรกะนี้ทำที่บอร์ดเพราะบอร์ดเห็นทุกค่าทุก 2 วินาทีและมีตัวนับอยู่แล้ว ส่งค่าดิบทุกค่าขึ้นเซิร์ฟเวอร์จะเปลืองเครือข่ายและต้องเก็บ state ต่อบอร์ดฝั่งเซิร์ฟเวอร์</p></div>
 
@@ -4316,7 +4316,7 @@ y 63    │ 845 W   [OUT OF CLASS]               │  แถบล่าง: ว
 <h3 id="2-callback-ทำสั้น-ๆ-แล้วใช้-flag-ส่งต่อให้-loop">2) Callback ทำสั้น ๆ แล้วใช้ flag ส่งต่อให้ <code>loop()</code><a class="anchor" href="#2-callback-ทำสั้น-ๆ-แล้วใช้-flag-ส่งต่อให้-loop">#</a></h3>
 <p><strong>ใช้ที่ไหน:</strong> <code>ConfigCallbacks::onWrite</code> → <code>configReady</code>; <code>mqttCallback</code> → <code>mqttCommandReady</code>, <code>otaRequested</code>, <code>historyAckReady</code>, <code>provisionAckClearReady</code> <strong>ทำไม:</strong> callback ถูกเรียกจาก BLE task หรือใน <code>mqttClient.loop()</code> งานช้า (ทดสอบ Wi-Fi 15 วินาที, ลบ flash, ดาวน์โหลด OTA) ในนั้นจะบล็อกการรับส่งและอาจทำให้ stack ล้ม จึงแค่จดว่า "มีงาน" แล้วให้ลูปหลักทำในจังหวะที่ควบคุมได้ ลดปัญหาการเข้าถึงตัวแปรจากหลาย task พร้อมกัน</p>
 <h3 id="3-hysteresis-และการยืนยันหลายครั้ง-debounce">3) Hysteresis และการยืนยันหลายครั้ง (debounce)<a class="anchor" href="#3-hysteresis-และการยืนยันหลายครั้ง-debounce">#</a></h3>
-<p><strong>ใช้ที่ไหน:</strong> <code>readPowerMeter()</code> (30 W ขึ้น / 10 W ลง / ติดกัน 3 ครั้ง) <strong>ทำไม:</strong> สัญญาณจริงมีสัญญาณรบกวนและแกว่งใกล้เกณฑ์ ถ้าเกณฑ์เดียวสถานะจะกระพริบ และการส่ง status ซ้ำ ๆ ทำให้ล้นเครือข่าย ช่องว่างระหว่างเกณฑ์ทำให้ต้องเปลี่ยน "ชัดเจน" จึงสลับ</p>
+<p><strong>ใช้ที่ไหน:</strong> <code>readPowerMeter()</code> (50 W ขึ้น / 10 W ลง / ติดกัน 3 ครั้ง) <strong>ทำไม:</strong> สัญญาณจริงมีสัญญาณรบกวนและแกว่งใกล้เกณฑ์ ถ้าเกณฑ์เดียวสถานะจะกระพริบ และการส่ง status ซ้ำ ๆ ทำให้ล้นเครือข่าย ช่องว่างระหว่างเกณฑ์ทำให้ต้องเปลี่ยน "ชัดเจน" จึงสลับ</p>
 <h3 id="4-ตัดสินที่ขอบ-edge-ส่งเฉพาะข้อสรุป">4) ตัดสินที่ขอบ (edge) ส่งเฉพาะข้อสรุป<a class="anchor" href="#4-ตัดสินที่ขอบ-edge-ส่งเฉพาะข้อสรุป">#</a></h3>
 <p><strong>ใช้ที่ไหน:</strong> <code>acRunning</code> ตัดสินที่บอร์ดแอร์, <code>occupied</code> ตัดสินที่บอร์ดตรวจจับคน (ส่งเป็น boolean ไม่ส่งค่ารายเกต) <strong>ทำไม:</strong> ลดทราฟฟิก ลดภาระ Backend และคงความถูกต้องแม้เครือข่ายขาด เพราะตรรกะที่ต้องมี "ประวัติค่าติดกัน" ใช้ตัวแปรในบอร์ดได้เลย</p>
 <h3 id="5-state-เปรียบเทียบก่อน-หลัง-diff-based-sending">5) State เปรียบเทียบก่อน-หลัง (diff-based sending)<a class="anchor" href="#5-state-เปรียบเทียบก่อน-หลัง-diff-based-sending">#</a></h3>
@@ -4342,7 +4342,7 @@ y 63    │ 845 W   [OUT OF CLASS]               │  แถบล่าง: ว
 <p>ตอบ: ต้องการ Wi-Fi และ BLE ในตัวเดียวและราคาถูก ESP32 มีทั้งสองอย่างพร้อม flash พอทำ OTA และเก็บข้อมูลย้อนหลังได้ Uno ไม่มี Wi-Fi/BLE ส่วน Raspberry Pi เป็นคอมพิวเตอร์เต็มรูปแบบ แพงและกินไฟกว่า เกินความจำเป็นสำหรับงานที่แค่ยิง IR อ่านเซ็นเซอร์และส่ง MQTT</p></div>
 
 <div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม: บอร์ดรู้ได้อย่างไรว่าแอร์ "ทำงานอยู่จริง" ในเมื่อ IR เป็นทางเดียว?</strong></p>
-<p>ตอบ: ไม่เชื่อคำสั่งที่ส่ง แต่วัดกำลังไฟจริงด้วย PZEM-004T ทุก 2 วินาที ถ้ากำลังไฟ ≥ 30 W ติดกัน 3 ครั้ง ถือว่าทำงาน ถ้า ≤ 10 W ติดกัน 3 ครั้ง ถือว่าหยุด ระหว่างนั้นคงสถานะเดิม (hysteresis) เพราะคอมเพรสเซอร์ตัดต่อเป็นช่วง ๆ ถ้าตัดสินจากค่าเดียวสถานะจะกระพริบ</p></div>
+<p>ตอบ: ไม่เชื่อคำสั่งที่ส่ง แต่วัดกำลังไฟจริงด้วย PZEM-004T ทุก 2 วินาที ถ้ากำลังไฟ ≥ 50 W ติดกัน 3 ครั้ง ถือว่าทำงาน ถ้า ≤ 10 W ติดกัน 3 ครั้ง ถือว่าหยุด ระหว่างนั้นคงสถานะเดิม (hysteresis) เพราะคอมเพรสเซอร์ตัดต่อเป็นช่วง ๆ ถ้าตัดสินจากค่าเดียวสถานะจะกระพริบ</p></div>
 
 <div class="callout ask"><div class="callout-title">อาจารย์อาจถาม</div><p><strong>ถาม: ถ้า Wi-Fi ล่มหรือเน็ตหลุด ข้อมูลการใช้ไฟหายไหม?</strong></p>
 <p>ตอบ: ไม่หาย บอร์ดสรุปค่าเป็นช่วง 5 นาที (แรงดัน กระแส กำลัง พลังงานสะสม เวลาที่แอร์ทำงาน) เขียนลงพาร์ติชัน <code>rmuttlog</code> ใน flash แบบ ring buffer 2,048 รายการ (~7 วัน) พอต่อ MQTT ได้ก็ส่งทีละ 10 รายการไปที่ <code>/history</code> รอ Backend ตอบ <code>/history-ack</code> แล้วจึงลบ ถ้าไม่ตอบจะส่งซ้ำ ข้อมูลอยู่ใน flash จึงรอดแม้บอร์ดรีบูตหรือไฟดับ ข้อจำกัดคือต้องเคยได้เวลาจริงจาก NTP ก่อน ถ้าบูตตอนไม่มีเน็ตเลยจะยังเก็บไม่ได้ และถ้าหลุดเกิน ~7 วัน ข้อมูลเก่าสุดจะถูกทับ</p></div>
@@ -4390,7 +4390,7 @@ y 63    │ 845 W   [OUT OF CLASS]               │  แถบล่าง: ว
 <li class="check"><input type="checkbox"> อธิบายความต่าง MCU กับคอมพิวเตอร์, <code>setup()</code>/<code>loop()</code>, <code>millis()</code> กับ <code>delay()</code> และยกตัวอย่างในโค้ดได้</li>
 <li class="check"><input type="checkbox"> บอกขา GPIO17/16/18/25/26/27/0 และ 21/22 (จอ OLED) ของบอร์ดแอร์ IR, ขาเพิ่มของบอร์ดสายแอร์ (33/35/34/4) และ GPIO32/33/0 ของบอร์ดตรวจจับคนได้ พร้อมบอกว่าต่อไขว้ TX/RX</li>
 <li class="check"><input type="checkbox"> อธิบาย 38 kHz, mark/space, 72 บิต ของ Saijo และทำไมใช้ตารางเฟรมสำเร็จรูป</li>
-<li class="check"><input type="checkbox"> บอกเกณฑ์ 30 W / 10 W / 3 ครั้ง / อ่านทุก 2 วินาที และเหตุผลของ hysteresis</li>
+<li class="check"><input type="checkbox"> บอกเกณฑ์ 50 W / 10 W / 3 ครั้ง / อ่านทุก 2 วินาที และเหตุผลของ hysteresis</li>
 <li class="check"><input type="checkbox"> เล่าลำดับ BLE provisioning ตั้งแต่เปิด BLE → เขียน config เป็นชิ้น ๆ → ทดสอบ Wi-Fi → บันทึก NVS → รีสตาร์ต → ส่ง token → ack</li>
 <li class="check"><input type="checkbox"> อธิบายโหมดกู้ Wi-Fi (ลองซ้ำทุก 30 วินาที ครั้งละ 8 วินาที) และเหตุผลของ Wi-Fi-only mode</li>
 <li class="check"><input type="checkbox"> บอกตัวเลือก MQTT ในโค้ด: client id, LWT (QoS 1 retained), TLS + ใบรากฝัง, หัวข้อที่ subscribe, buffer 2048</li>
