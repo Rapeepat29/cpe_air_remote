@@ -46,6 +46,7 @@ String airBrandOf(String protocol) {
     return 'Daikin';
   }
   if (value == 'SAIJO_DENKI') return 'Saijo Denki';
+  if (value == 'STAR_AIRE') return 'Star Aire';
   if (value.startsWith('MITSUBISHI')) return 'Mitsubishi Electric';
   if (value.startsWith('HAIER')) return 'Haier';
   const names = {
@@ -234,6 +235,9 @@ class AirConditioner {
   bool get canControl => isProvisioned && isOnline && deviceId != null;
   bool get isSaijoDenki => protocol == 'SAIJO_DENKI';
 
+  /// Star Aire (รีโมต DT-03): Cool / Dry / Fan, พัดลม 4 ระดับ, Sleep, ไม่มี Swing
+  bool get isStarAire => protocol == 'STAR_AIRE';
+
   /// ควบคุมผ่านสายแอร์ (แทนรีโมตติดผนัง) ไม่ใช่ยิง IR
   bool get isWired => airControlTypeOf(protocol) == 'wired';
 
@@ -246,10 +250,10 @@ class AirConditioner {
   int get minimumTemperature => isSaijoDenki ? 18 : 16;
   int get maximumTemperature => isSaijoDenki ? 29 : 30;
   List<AirMode> get supportedModes =>
-      isSaijoDenki || isWired
+      isSaijoDenki || isWired || isStarAire
           ? const [AirMode.cool, AirMode.dry, AirMode.fan]
           : AirMode.values;
-  List<FanSpeed> get supportedFanSpeeds => isWired
+  List<FanSpeed> get supportedFanSpeeds => isWired || isStarAire
       ? const [FanSpeed.auto, FanSpeed.low, FanSpeed.medium, FanSpeed.high]
       : isSaijoDenki
       ? const [
@@ -260,7 +264,9 @@ class AirConditioner {
           FanSpeed.turbo,
         ]
       : FanSpeed.values;
-  List<SwingMode> get supportedSwingModes => isWired
+  List<SwingMode> get supportedSwingModes => isStarAire
+      ? const [SwingMode.auto]
+      : isWired
       ? const [SwingMode.auto, SwingMode.off]
       : isSaijoDenki
       ? const [
@@ -281,14 +287,15 @@ class AirConditioner {
   bool get supportsAdditionalFunctions => !isSaijoDenki;
 
   // ฟังก์ชันเสริมทีละตัว รุ่นสายแอร์มีแค่ Sleep (ใช้ไม่ได้ในโหมด Dry)
-  bool get supportsHorizontalSwing => supportsAdditionalFunctions && !isWired;
-  bool get supportsEco => supportsAdditionalFunctions && !isWired;
-  bool get supportsTurbo => supportsAdditionalFunctions && !isWired;
+  bool get _sleepOnly => isWired || isStarAire;
+  bool get supportsHorizontalSwing => supportsAdditionalFunctions && !_sleepOnly;
+  bool get supportsEco => supportsAdditionalFunctions && !_sleepOnly;
+  bool get supportsTurbo => supportsAdditionalFunctions && !_sleepOnly;
   bool get supportsSleep =>
       supportsAdditionalFunctions && !(isWired && mode == AirMode.dry);
-  bool get supportsQuiet => supportsAdditionalFunctions && !isWired;
-  bool get supportsDisplayLight => supportsAdditionalFunctions && !isWired;
-  bool get supportsClean => supportsAdditionalFunctions && !isWired;
+  bool get supportsQuiet => supportsAdditionalFunctions && !_sleepOnly;
+  bool get supportsDisplayLight => supportsAdditionalFunctions && !_sleepOnly;
+  bool get supportsClean => supportsAdditionalFunctions && !_sleepOnly;
 
   String fanSpeedLabel(FanSpeed speed) {
     if (!isSaijoDenki) return speed.label;
@@ -317,6 +324,17 @@ class AirConditioner {
       quiet = false;
       clean = false;
       if (mode == AirMode.dry) sleep = false;
+      return;
+    }
+    if (isStarAire) {
+      if (!supportedModes.contains(mode)) mode = AirMode.cool;
+      if (fanSpeed == FanSpeed.turbo) fanSpeed = FanSpeed.high;
+      verticalSwing = SwingMode.auto;
+      horizontalSwing = false;
+      eco = false;
+      turbo = false;
+      quiet = false;
+      clean = false;
       return;
     }
     if (!isSaijoDenki) return;
