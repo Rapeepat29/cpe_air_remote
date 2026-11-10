@@ -247,3 +247,57 @@ test('detects a wired board from its MQTT status', () => {
   assert.equal(protocolFromStatus({ online: true }), null);
   assert.equal(protocolFromStatus(null), null);
 });
+
+test('accepts the custom Star Aire protocol', () => {
+  const result = validateReservationInput({
+    deviceId: 'ESP32-001122334455',
+    bleName: 'RMUTT-AC-001122334455',
+    roomNumber: '16101',
+    airNumber: 3,
+    name: 'Star Aire 3',
+    protocol: 'star_aire',
+  });
+  assert.equal(result.protocol, 'STAR_AIRE');
+});
+
+test('limits Star Aire to the functions captured from the DT-03 remote', () => {
+  const base = {
+    power: true,
+    temperature: 24,
+    mode: 'cool',
+    fanSpeed: 'medium',
+    verticalSwing: 'top',
+    horizontalSwing: true,
+    eco: true,
+    turbo: true,
+    sleep: true,
+    quiet: true,
+    clean: true,
+  };
+
+  const state = validateAirState(base, 'STAR_AIRE');
+  assert.equal(state.temperature, 24);
+  assert.equal(state.fanSpeed, 'medium');
+  assert.equal(state.sleep, true);
+  assert.equal(state.verticalSwing, 'auto');
+  assert.equal(state.horizontalSwing, false);
+  assert.equal(state.eco, false);
+  assert.equal(state.turbo, false);
+  assert.equal(state.quiet, false);
+  assert.equal(state.clean, false);
+
+  assert.equal(validateAirState({ ...base, mode: 'dry' }, 'STAR_AIRE').mode, 'dry');
+  assert.equal(validateAirState({ ...base, mode: 'fan' }, 'STAR_AIRE').mode, 'fan');
+  assert.throws(
+    () => validateAirState({ ...base, mode: 'heat' }, 'STAR_AIRE'),
+    /Star Aire/,
+  );
+  assert.throws(
+    () => validateAirState({ ...base, mode: 'auto' }, 'STAR_AIRE'),
+    /Star Aire/,
+  );
+  assert.throws(
+    () => validateAirState({ ...base, fanSpeed: 'turbo' }, 'STAR_AIRE'),
+    /Star Aire/,
+  );
+});

@@ -56,6 +56,7 @@ const PROTOCOLS = [
   'SAIJO_DENKI',
   'SAMSUNG_AC',
   'SHARP_AC',
+  'STAR_AIRE',
   'TOSHIBA_AC',
 ];
 

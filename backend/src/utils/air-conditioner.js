@@ -28,6 +28,7 @@ const protocols = new Set([
   'SAIJO_DENKI',
   'SAMSUNG_AC',
   'SHARP_AC',
+  'STAR_AIRE',
   'TOSHIBA_AC',
 ]);
 const modes = new Set(['auto', 'cool', 'dry', 'fan', 'heat']);
@@ -134,6 +135,19 @@ export function validateAirState(body, protocol = '') {
     }
   }
 
+  // Star Aire (รีโมต DT-03): เก็บสัญญาณได้เฉพาะ เปิด/ปิด อุณหภูมิ โหมด พัดลม และ Sleep
+  const starAire = cleanString(protocol).toUpperCase() === 'STAR_AIRE';
+  if (starAire) {
+    if (mode !== 'cool' && mode !== 'dry' && mode !== 'fan') {
+      throw new ApiError(400, 'Star Aire รองรับโหมด Cool, Dry และ Fan');
+    }
+    if (fanSpeed === 'turbo') {
+      throw new ApiError(400, 'Star Aire ไม่มีพัดลมระดับ Turbo');
+    }
+  }
+  // ฟังก์ชันที่เครื่องไม่มี ปิดไว้เลยให้ตรงกับที่แอร์ทำจริง
+  const limited = wired || starAire;
+
   // รุ่นสายแอร์ไม่มีฟังก์ชันเสริมเหล่านี้ ปิดไว้เลยให้ตรงกับที่แอร์ทำจริง
   // (Sleep มีจริง ยกเว้นในโหมด Dry ที่แอร์ไม่รับ)
   return {
@@ -141,14 +155,15 @@ export function validateAirState(body, protocol = '') {
     temperature,
     mode,
     fanSpeed,
-    verticalSwing,
-    horizontalSwing: wired ? false : boolean(source.horizontalSwing),
-    eco: wired ? false : boolean(source.eco),
-    turbo: wired ? false : boolean(source.turbo),
+    // Star Aire ยังไม่มีคำสั่ง Swing ค่าที่ส่งมาจึงไม่มีผล เก็บเป็น auto ค่าเดียว
+    verticalSwing: starAire ? 'auto' : verticalSwing,
+    horizontalSwing: limited ? false : boolean(source.horizontalSwing),
+    eco: limited ? false : boolean(source.eco),
+    turbo: limited ? false : boolean(source.turbo),
     sleep: wired && mode === 'dry' ? false : boolean(source.sleep),
-    quiet: wired ? false : boolean(source.quiet),
+    quiet: limited ? false : boolean(source.quiet),
     displayLight: boolean(source.displayLight, true),
-    clean: wired ? false : boolean(source.clean),
+    clean: limited ? false : boolean(source.clean),
     timerOnMinutes,
     timerOffMinutes,
   };
