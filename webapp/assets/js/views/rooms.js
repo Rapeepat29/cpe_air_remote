@@ -81,6 +81,18 @@ function limitsFor(protocol) {
       note: 'Saijo Denki: 18–29°C · ไม่มีคำสั่งปิด Swing',
     };
   }
+  if (String(protocol).toUpperCase() === 'STAR_AIRE') {
+    // รีโมต DT-03: ยังไม่มีคำสั่ง Swing และฟังก์ชันเสริมมีแค่ Sleep
+    return {
+      minTemp: 16,
+      maxTemp: 30,
+      modes: ['cool', 'dry', 'fan'],
+      fans: ['auto', 'low', 'medium', 'high'],
+      swings: ['auto'],
+      extras: () => EXTRA_TOGGLES.filter((item) => item.key === 'sleep'),
+      note: 'Star Aire: Cool / Dry / Fan · พัดลม Auto–High · Sleep · ไม่มีคำสั่ง Swing',
+    };
+  }
   return {
     minTemp: 16,
     maxTemp: 30,

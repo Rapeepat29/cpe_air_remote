@@ -354,6 +354,7 @@ const BRAND_BY_PROTOCOL = {
   DAIKIN_WIRED: 'Daikin',
   DAIKIN: 'Daikin',
   SAIJO_DENKI: 'Saijo Denki',
+  STAR_AIRE: 'Star Aire',
   MITSUBISHI_AC: 'Mitsubishi Electric',
   PANASONIC_AC: 'Panasonic',
   GREE: 'Gree',

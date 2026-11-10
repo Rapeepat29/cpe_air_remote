@@ -276,6 +276,10 @@ class _BleProvisioningScreenState extends State<BleProvisioningScreen> {
                       child: Text('Saijo Denki'),
                     ),
                     DropdownMenuItem(
+                      value: 'STAR_AIRE',
+                      child: Text('Star Aire'),
+                    ),
+                    DropdownMenuItem(
                       value: 'DAIKIN',
                       child: Text('Daikin'),
                     ),

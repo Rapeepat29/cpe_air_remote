@@ -29,6 +29,7 @@
 #include <Preferences.h>
 #include <PubSubClient.h>
 #include "SaijoDenkiAC.h"
+#include "StarAireAC.h"
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
 
@@ -66,8 +67,9 @@ constexpr uint32_t AC_POWER_ON_GRACE_MS = 20000;
 constexpr uint8_t PZEM_FAILURE_LIMIT = 3;
 constexpr size_t MAX_CONFIG_BYTES = 4096;
 constexpr uint32_t NTP_SYNC_TIMEOUT_MS = 15000;
-constexpr char FIRMWARE_VERSION[] = "2.5.2";
+constexpr char FIRMWARE_VERSION[] = "2.5.3";
 constexpr char SAIJO_DENKI_PROTOCOL[] = "SAIJO_DENKI";
+constexpr char STAR_AIRE_PROTOCOL[] = "STAR_AIRE";
 // ข้อมูลย้อนหลังตอนเน็ตหลุด: ส่งทีละ 10 รายการ รอ Backend ตอบก่อนส่งชุดถัดไป
 constexpr uint8_t HISTORY_PARTITION_SUBTYPE = 0x40;
 constexpr size_t HISTORY_BATCH_SIZE = 10;
@@ -151,6 +153,7 @@ bool clockSynced = false;
 PubSubClient mqttClient(wifiClient);
 IRac irAc(IR_LED_PIN);
 SaijoDenkiAC saijoAc(IR_LED_PIN);
+StarAireAC starAireAc(IR_LED_PIN);
 PZEM004Tv30 pzem(Serial2, PZEM_RX_PIN, PZEM_TX_PIN);
 
 DeviceConfig config;
@@ -252,6 +255,7 @@ String lastOtaError;
 String createDeviceId();
 bool isValidRoomNumber(const String &value);
 bool isSaijoProtocol(const String &value);
+bool isStarAireProtocol(const String &value);
 bool isSupportedAirProtocol(const String &value);
 void loadConfig();
 void saveConfig(const DeviceConfig &newConfig);
@@ -288,6 +292,7 @@ void publishState(const String &commandId = "");
 void publishProvisioningToken();
 void sendCurrentIrState(const AirState *previousState = nullptr);
 void sendSaijoCurrentIrState(const AirState *previousState);
+void sendStarAireCurrentIrState();
 void processTimers();
 void processDailySchedule();
 void readPowerMeter();
@@ -457,6 +462,7 @@ void setup() {
       RED_LED_PIN,
       YELLOW_LED_PIN);
   saijoAc.begin();
+  starAireAc.begin();
   initHistoryLog();
   loadConfig();
   loadAirState();
@@ -593,8 +599,13 @@ bool isSaijoProtocol(const String &value) {
   return value.equalsIgnoreCase(SAIJO_DENKI_PROTOCOL);
 }
 
+bool isStarAireProtocol(const String &value) {
+  return value.equalsIgnoreCase(STAR_AIRE_PROTOCOL);
+}
+
 bool isSupportedAirProtocol(const String &value) {
   if (isSaijoProtocol(value)) return true;
+  if (isStarAireProtocol(value)) return true;
   return IRac::isProtocolSupported(strToDecodeType(value.c_str()));
 }
 
@@ -1317,6 +1328,23 @@ void processMqttCommand() {
     Serial.println("MQTT command rejected: unsupported Saijo Denki mode");
     return;
   }
+  // Star Aire (รีโมต DT-03): Cool / Dry / Fan และพัดลม Auto / Low / Medium / High
+  const bool starAireProtocol = isStarAireProtocol(config.airProtocol);
+  if (starAireProtocol &&
+      mode != "cool" &&
+      mode != "dry" &&
+      mode != "fan") {
+    Serial.println("MQTT command rejected: unsupported Star Aire mode");
+    return;
+  }
+  if (starAireProtocol &&
+      fanSpeed != "auto" &&
+      fanSpeed != "low" &&
+      fanSpeed != "medium" &&
+      fanSpeed != "high") {
+    Serial.println("MQTT command rejected: unsupported Star Aire fan speed");
+    return;
+  }
   if (saijoProtocol &&
       fanSpeed != "auto" &&
       fanSpeed != "low" &&
@@ -1377,6 +1405,10 @@ void sendCurrentIrState(const AirState *previousState) {
     sendSaijoCurrentIrState(previousState);
     return;
   }
+  if (isStarAireProtocol(config.airProtocol)) {
+    sendStarAireCurrentIrState();
+    return;
+  }
 
   const decode_type_t selectedProtocol =
       strToDecodeType(config.airProtocol.c_str());
@@ -1430,6 +1462,28 @@ void sendCurrentIrState(const AirState *previousState) {
       airState.temperature,
       airState.mode.c_str(),
       airState.fanSpeed.c_str());
+}
+
+// รีโมต Star Aire ส่งสถานะทั้งชุดในเฟรมเดียว จึงไม่ต้องเทียบกับสถานะก่อนหน้า
+void sendStarAireCurrentIrState() {
+  const StarAireMode mode =
+      airState.mode == "dry" ? StarAireMode::kDry
+      : airState.mode == "fan" ? StarAireMode::kFan
+                               : StarAireMode::kCool;
+  const StarAireFan fan =
+      airState.fanSpeed == "low" ? StarAireFan::kLow
+      : airState.fanSpeed == "medium" ? StarAireFan::kMedium
+      : airState.fanSpeed == "high" ? StarAireFan::kHigh
+                                    : StarAireFan::kAuto;
+  starAireAc.send(
+      airState.power, mode, fan, airState.temperature, airState.sleep);
+  Serial.printf(
+      "IR sent: protocol=STAR_AIRE power=%s temp=%u mode=%s fan=%s sleep=%s\n",
+      airState.power ? "ON" : "OFF",
+      airState.temperature,
+      airState.mode.c_str(),
+      airState.fanSpeed.c_str(),
+      airState.sleep ? "ON" : "OFF");
 }
 
 void sendSaijoCurrentIrState(const AirState *previousState) {
