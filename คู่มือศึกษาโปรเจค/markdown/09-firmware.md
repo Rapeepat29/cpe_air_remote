@@ -240,7 +240,7 @@ UART1 เปิดที่ 256000 baud, `SERIAL_8N1` (8 บิตข้อม�
 | `ONLINE_SETUP_WINDOW_MS` | 300000 (5 นาที) | หน้าต่างตั้งค่า BLE ตอนที่บอร์ดยังออนไลน์ |
 | `YELLOW_LED_BLINK_INTERVAL_MS` | 400 | จังหวะกระพริบ LED เหลือง |
 | `CLASS_SCHEDULE_TTL_MS` | 120000 (2 นาที) | ผลตารางเรียนจาก Backend ถือว่าสดไม่เกิน 2 นาที |
-| `AC_RUNNING_ON_WATTS` / `AC_RUNNING_OFF_WATTS` | 30.0 / 10.0 | เกณฑ์ hysteresis ของ "แอร์ทำงาน" |
+| `AC_RUNNING_ON_WATTS` / `AC_RUNNING_OFF_WATTS` | 50.0 / 10.0 | เกณฑ์ hysteresis ของ "แอร์ทำงาน" |
 | `AC_RUNNING_CONFIRM_SAMPLES` | 3 | ต้องเจอติดกัน 3 ครั้ง |
 | `PZEM_FAILURE_LIMIT` | 3 | อ่านพลาดติดกัน 3 ครั้งถือว่า PZEM ใช้ไม่ได้ |
 | `MAX_CONFIG_BYTES` | 4096 | ขนาดสูงสุดของ JSON ตั้งค่าที่รับทาง BLE |
