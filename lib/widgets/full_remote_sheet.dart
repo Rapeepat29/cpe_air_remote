@@ -1,3 +1,5 @@
+import 'package:flutter/cupertino.dart' show CupertinoPicker;
+
 import '../localization/localized_material.dart';
 
 import '../models/air_conditioner.dart';
@@ -262,40 +264,12 @@ class _FullRemoteSheetState extends State<FullRemoteSheet> {
     final selected = await showModalBottomSheet<int?>(
       context: context,
       showDragHandle: true,
+      isScrollControlled: true,
       constraints: const BoxConstraints(maxWidth: 480),
-      builder: (context) {
-        const options = <int>[30, 60, 120, 240, 360, 480];
-        return SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(18, 0, 18, 24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: options
-                      .map(
-                        (minutes) => ActionChip(
-                          label: Text(_timerText(context, minutes)),
-                          onPressed: () {
-                            Navigator.of(context).pop(minutes);
-                          },
-                        ),
-                      )
-                      .toList(),
-                ),
-                const SizedBox(height: 10),
-                OutlinedButton(
-                  onPressed: () => Navigator.of(context).pop(-1),
-                  child: Text(context.tr('Clear Timer')),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
+      builder: (context) => _TimerPickerSheet(
+        title: context.tr(isOn ? 'Set Auto-On Timer' : 'Set Auto-Off Timer'),
+        initialMinutes: isOn ? air.timerOnMinutes : air.timerOffMinutes,
+      ),
     );
     if (selected == null) return;
     setState(() {
@@ -455,6 +429,174 @@ class _TimerTile extends StatelessWidget {
       ),
       trailing: const Icon(Icons.chevron_right_rounded),
       onTap: onTap,
+    );
+  }
+}
+
+/// แผ่นเลือกเวลาตั้งเวลาเปิด/ปิด: หมุนเลือกชั่วโมงกับนาทีเองได้ (1 นาที ถึง 23 ชม. 59 นาที)
+/// คืนค่าเป็นจำนวนนาที, -1 = ล้างการตั้งเวลา, null = ปิดแผ่นโดยไม่เปลี่ยน
+class _TimerPickerSheet extends StatefulWidget {
+  const _TimerPickerSheet({required this.title, this.initialMinutes});
+
+  final String title;
+  final int? initialMinutes;
+
+  @override
+  State<_TimerPickerSheet> createState() => _TimerPickerSheetState();
+}
+
+class _TimerPickerSheetState extends State<_TimerPickerSheet> {
+  static const _quickOptions = <int>[30, 60, 120, 240, 360, 480];
+  static const _maxMinutes = 23 * 60 + 59;
+
+  late int _hours;
+  late int _minutes;
+  late final FixedExtentScrollController _hourController;
+  late final FixedExtentScrollController _minuteController;
+
+  int get _total => _hours * 60 + _minutes;
+
+  @override
+  void initState() {
+    super.initState();
+    final initial = (widget.initialMinutes ?? 30).clamp(1, _maxMinutes).toInt();
+    _hours = initial ~/ 60;
+    _minutes = initial % 60;
+    _hourController = FixedExtentScrollController(initialItem: _hours);
+    _minuteController = FixedExtentScrollController(initialItem: _minutes);
+  }
+
+  @override
+  void dispose() {
+    _hourController.dispose();
+    _minuteController.dispose();
+    super.dispose();
+  }
+
+  void _jumpTo(int totalMinutes) {
+    const duration = Duration(milliseconds: 250);
+    _hourController.animateToItem(
+      totalMinutes ~/ 60,
+      duration: duration,
+      curve: Curves.easeOut,
+    );
+    _minuteController.animateToItem(
+      totalMinutes % 60,
+      duration: duration,
+      curve: Curves.easeOut,
+    );
+  }
+
+  Widget _wheel({
+    required Key key,
+    required FixedExtentScrollController controller,
+    required int count,
+    required String unit,
+    required ValueChanged<int> onChanged,
+  }) {
+    final theme = Theme.of(context);
+    return Expanded(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SizedBox(
+            width: 72,
+            height: 160,
+            child: CupertinoPicker(
+              key: key,
+              scrollController: controller,
+              itemExtent: 40,
+              onSelectedItemChanged: onChanged,
+              children: List<Widget>.generate(
+                count,
+                (index) => Center(
+                  child: Text(
+                    '$index',
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      color: theme.colorScheme.onSurface,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 6),
+          Text(unit, style: theme.textTheme.titleMedium),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(18, 0, 18, 24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              widget.title,
+              style: theme.textTheme.titleMedium,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 4),
+            Row(
+              children: [
+                _wheel(
+                  key: const Key('timer-hours-wheel'),
+                  controller: _hourController,
+                  count: 24,
+                  unit: context.tr('hours'),
+                  onChanged: (value) => setState(() => _hours = value),
+                ),
+                _wheel(
+                  key: const Key('timer-minutes-wheel'),
+                  controller: _minuteController,
+                  count: 60,
+                  unit: context.tr('minutes'),
+                  onChanged: (value) => setState(() => _minutes = value),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: _quickOptions
+                  .map(
+                    (minutes) => ActionChip(
+                      label: Text(_timerText(context, minutes)),
+                      onPressed: () => _jumpTo(minutes),
+                    ),
+                  )
+                  .toList(),
+            ),
+            const SizedBox(height: 14),
+            FilledButton(
+              key: const Key('timer-confirm-button'),
+              onPressed: _total < 1
+                  ? null
+                  : () => Navigator.of(context).pop(_total),
+              style: FilledButton.styleFrom(
+                minimumSize: const Size.fromHeight(48),
+              ),
+              child: Text(
+                _total < 1
+                    ? context.tr('Choose a time')
+                    : '${context.tr('Set Timer')} ${_timerText(context, _total)}',
+              ),
+            ),
+            const SizedBox(height: 8),
+            OutlinedButton(
+              onPressed: () => Navigator.of(context).pop(-1),
+              child: Text(context.tr('Clear Timer')),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

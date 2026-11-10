@@ -823,6 +823,10 @@ const _thaiTranslations = <String, String>{
   'Set Auto-On Timer': 'ตั้งเวลาเปิดอัตโนมัติ',
   'Set Auto-Off Timer': 'ตั้งเวลาปิดอัตโนมัติ',
   'Clear Timer': 'ล้างการตั้งเวลา',
+  'Set Timer': 'ตั้งเวลา',
+  'Choose a time': 'เลือกเวลา',
+  'hours': 'ชั่วโมง',
+  'minutes': 'นาที',
   'COOLING': 'กำลังทำความเย็น',
   'PZEM meter unavailable': 'ไม่พบมิเตอร์ PZEM',
   'Air conditioner running outside schedule':
