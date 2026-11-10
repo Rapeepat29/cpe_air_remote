@@ -394,7 +394,7 @@ class _BleProvisioningScreenState extends State<BleProvisioningScreen> {
                   labelText: context.tr('Wi-Fi password'),
                   prefixIcon: const Icon(Icons.password_rounded),
                   helperText: widget.existingAir == null
-                      ? null
+                      ? context.tr('Leave blank if the Wi-Fi has no password.')
                       : context.tr(
                           'Leave blank to keep the password already saved on ESP32.',
                         ),
@@ -801,13 +801,12 @@ class _BleProvisioningScreenState extends State<BleProvisioningScreen> {
 
   String? _validateWifiPassword(String? value) {
     final password = value ?? '';
-    if (password.length >= 8) return null;
-    final identity = _identity;
-    if (identity != null &&
-        _shouldKeepWifiPassword(identity)) {
-      return null;
-    }
-    return context.tr('Enter at least 8 characters');
+    // เว้นว่าง = Wi-Fi แบบเปิด หรือใช้รหัสเดิมในบอร์ด (ดู _shouldKeepWifiPassword)
+    // บอร์ดทดสอบต่อ Wi-Fi ก่อนบันทึกเสมอ ถ้าลืมกรอกรหัสจะแจ้งว่าต่อไม่ได้
+    if (password.isEmpty || password.length >= 8) return null;
+    return context.tr(
+      'Enter at least 8 characters, or leave blank for Wi-Fi without a password',
+    );
   }
 
   String _formatTime(TimeOfDay value) {
