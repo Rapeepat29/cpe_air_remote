@@ -67,7 +67,7 @@ constexpr uint32_t AC_POWER_ON_GRACE_MS = 20000;
 constexpr uint8_t PZEM_FAILURE_LIMIT = 3;
 constexpr size_t MAX_CONFIG_BYTES = 4096;
 constexpr uint32_t NTP_SYNC_TIMEOUT_MS = 15000;
-constexpr char FIRMWARE_VERSION[] = "2.5.3";
+constexpr char FIRMWARE_VERSION[] = "2.5.4";
 constexpr char SAIJO_DENKI_PROTOCOL[] = "SAIJO_DENKI";
 constexpr char STAR_AIRE_PROTOCOL[] = "STAR_AIRE";
 // ข้อมูลย้อนหลังตอนเน็ตหลุด: ส่งทีละ 10 รายการ รอ Backend ตอบก่อนส่งชุดถัดไป
