@@ -387,6 +387,10 @@ const _thaiTranslations = <String, String>{
   'Select Wi-Fi and enter its password': 'เลือก Wi-Fi และกรอกรหัสผ่าน',
   'Wi-Fi name (SSID)': 'ชื่อ Wi-Fi (SSID)',
   'Wi-Fi password': 'รหัสผ่าน Wi-Fi',
+  'Leave blank if the Wi-Fi has no password.':
+      'เว้นว่างได้ถ้า Wi-Fi ไม่มีรหัสผ่าน',
+  'Enter at least 8 characters, or leave blank for Wi-Fi without a password':
+      'กรอกอย่างน้อย 8 ตัวอักษร หรือเว้นว่างถ้า Wi-Fi ไม่มีรหัสผ่าน',
   'Leave blank to keep the password already saved on ESP32.':
       'เว้นว่างไว้เพื่อใช้รหัสผ่านเดิมที่บันทึกอยู่ใน ESP32',
   'Tap the scan button to view Wi-Fi detected by this ESP32.':
